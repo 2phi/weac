@@ -1,6 +1,6 @@
 # WEAC
 
-WEak layer AntiCrack nucleation model
+**WE**ak layer **A**nti**C**rack nucleation model
 
 ## Copyright Notice
 
