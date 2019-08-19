@@ -1,5 +1,7 @@
 # waec
 
-Copyright Notice:
+WEak layer AntiCrack nucleation model
 
-We currently do not offer any license. For licensing questions please contact us.
+# Copyright Notice
+
+We currently do not offer an open source license. Please contact us for private licensing options.
