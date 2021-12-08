@@ -1,23 +1,21 @@
 <!-- PROJECT LOGO -->
-<img style="float: left; margin: 0 20px 0 0;" img src="img/logo.png" alt="Logo" width="80" height="80">
+<img style="float: right; margin: 0 20px 0 0;" img src="img/logo.png" alt="Logo" width="80" height="80">
 
-  # **WEAC** &nbsp;·&nbsp; **We**ak Layer **A**nti**c**rack Nucleation Model
+# **WEAC** &nbsp;·&nbsp; **We**ak Layer **A**nti**c**rack Nucleation Model
 
-  <!-- PROJECT SHIELDS -->
-  [![Weac][weac-shield]][weac-url]
-  [![Release][release-shield]][release-url]
-  [![Contributors][contributors-shield]][contributors-url]
-  [![Forks][forks-shield]][forks-url]
-  [![Stargazers][stars-shield]][stars-url]
-  [![Issues][issues-shield]][issues-url]
+<!-- PROJECT SHIELDS -->
+<!-- [![Weac][weac-shield]][weac-url]
+[![Release][release-shield]][release-url] -->
+[![Contributors][contributors-shield]][contributors-url]
+[![Forks][forks-shield]][forks-url]
+[![Stargazers][stars-shield]][stars-url]
+[![Issues][issues-shield]][issues-url]
 
 Implementation of closed-form analytical models for the analysis for dry-snow slab avalanche release.
 
 [View Demo](https://github.com/2phi/weac) · 
 [Report Bug](https://github.com/2phi/weac) · 
 [Request Feature](https://github.com/2phi/weac)
-
-</br>
 
 <!-- TABLE OF CONTENTS -->
 ## Table of Contents
@@ -27,8 +25,6 @@ Implementation of closed-form analytical models for the analysis for dry-snow sl
 4. [Roadmap](#roadmap)
 5. [License](#license)
 6. [Contact](#contact)
-
-</br>
 
 <!-- ABOUT THE PROJECT -->
 ## About the project
@@ -42,14 +38,11 @@ Please refer to the companion papers for model derivations, illustrations, dimen
 - Rosendahl, P. L., & Weißgraeber, P. (2020). Modeling snow slab avalanches caused by weak-layer failure – Part 1: Slabs on compliant and collapsible weak layers. The Cryosphere, 14(1), 115–130. https://doi.org/10.5194/tc-14-115-2020
 - Rosendahl, P. L., & Weißgraeber, P. (2020). Modeling snow slab avalanches caused by weak-layer failure – Part 2: Coupled mixed-mode criterion for skier-triggered anticracks. The Cryosphere, 14(1), 131–145. https://doi.org/10.5194/tc-14-131-2020
 
-</br>
-
 <!-- INSTALLATION -->
 ## Installation
 
 This is an example of how you may give instructions on setting up your project locally.
 To get a local copy up and running follow these simple example steps.
-
 
 1. Clone the repo
    ```sh
@@ -64,7 +57,6 @@ To get a local copy up and running follow these simple example steps.
 Use this space to show useful examples of how a project can be used. Additional screenshots, code examples and demos work well in this space. You may also link to more resources.
 
 _For more examples, please refer to the [Documentation](https://example.com)._
-
 
 
 <!-- ROADMAP -->
