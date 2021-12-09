@@ -25,9 +25,10 @@ Implementation of closed-form analytical models for the analysis of dry-snow sla
 2. [Installation](#installation)
 3. [Usage](#usage)
 4. [Roadmap](#roadmap)
-5. [License](#license)
-6. [Contributin](#contributing)
-6. [Contact](#contact)
+5. [Release history](#release-history)
+6. [How to contribute](#how-to-contribute)
+7. [License](#license)
+8. [Contact](#contact)
 
 <!-- ABOUT THE PROJECT -->
 ## About the project
@@ -101,7 +102,7 @@ See the [open issues](https://github.com/2phi/weac/issues) for a list of propose
 - Written in MATLAB
 
 <!-- CONTRIBUTING -->
-## Contributing
+## How to contribute
 
 1. Fork the project
 2. Create your feature branch (`git checkout -b feature/AmazingFeature`)
@@ -113,7 +114,9 @@ See the [open issues](https://github.com/2phi/weac/issues) for a list of propose
 <!-- LICENSE -->
 ## License
 
-Copyright 2phi GbR, 2021. We currently do not offer an open source license. Please contact us for private licensing options.
+Copyright 2phi GbR, 2021.
+
+We currently do not offer an open source license. Please contact us for private licensing options.
 
 <!-- Do not forget to pick a license provide details in the `LICENSE` file. -->
 
