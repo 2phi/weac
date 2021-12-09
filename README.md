@@ -48,10 +48,15 @@ Completely rewritten in [Python](https://www.python.org) and built with [Atom](h
 <!-- INSTALLATION -->
 ## Installation
 
-Install anywhere using the `pip` Package Installer for Python:
+Install globally using the `pip` Package Installer for Python
 ```sh
 pip install weac
 ```
+or clone the repo
+```sh
+git clone https://github.com/2phi/weac
+```
+for local use.
 
 Needs
 - [Numpy](https://numpy.org/) for matrix operations
