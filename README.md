@@ -4,17 +4,20 @@
 # WEAC &nbsp;·&nbsp; Weak Layer Anticrack Nucleation Model
 
 <!-- PROJECT SHIELDS -->
+<!-- PyPI Version /pypi/v/:packageName -->
+<!-- PyPI Downloads /pypi/:period/:packageName -->
+<!-- PyPI Versions /pypi/pyversions/:packageName -->
 [![Weac][weac-shield]][weac-url]
 [![Release][release-shield]][release-url]
 [![Contributors][contributors-shield]][contributors-url]
-[![Forks][forks-shield]][forks-url]
 [![Stargazers][stars-shield]][stars-url]
+[![Forks][forks-shield]][forks-url]
 [![Issues][issues-shield]][issues-url] \
-Implementation of closed-form analytical models for the analysis for dry-snow slab avalanche release.
+Implementation of closed-form analytical models for the analysis of dry-snow slab avalanche release.
 
 [View Demo](https://github.com/2phi/weac) · 
-[Report Bug](https://github.com/2phi/weac) · 
-[Request Feature](https://github.com/2phi/weac)
+[Report Bug](https://github.com/2phi/weac/issues) · 
+[Request Feature](https://github.com/2phi/weac/issues)
 
 <!-- TABLE OF CONTENTS -->
 ## Table of Contents
@@ -23,6 +26,7 @@ Implementation of closed-form analytical models for the analysis for dry-snow sl
 3. [Usage](#usage)
 4. [Roadmap](#roadmap)
 5. [License](#license)
+6. [Contributin](#contributing)
 6. [Contact](#contact)
 
 <!-- ABOUT THE PROJECT -->
@@ -37,53 +41,81 @@ Please refer to the companion papers for model derivations, illustrations, dimen
 - Rosendahl, P. L., & Weißgraeber, P. (2020). Modeling snow slab avalanches caused by weak-layer failure – Part 1: Slabs on compliant and collapsible weak layers. The Cryosphere, 14(1), 115–130. https://doi.org/10.5194/tc-14-115-2020
 - Rosendahl, P. L., & Weißgraeber, P. (2020). Modeling snow slab avalanches caused by weak-layer failure – Part 2: Coupled mixed-mode criterion for skier-triggered anticracks. The Cryosphere, 14(1), 131–145. https://doi.org/10.5194/tc-14-131-2020
 
+Completely rewritten in [Python](https://www.python.org) and built with [Atom](https://atom.io), [GitKraken](https://www.gitkraken.com), and [Jupyter](https://jupyter.org). Looking for the [MATLAB](https://www.mathworks.com/products/matlab.html) implementation? Check out [release v1.0](https://github.com/2phi/weac/releases/tag/v1.0.0).
+
+
 <!-- INSTALLATION -->
 ## Installation
 
-This is an example of how you may give instructions on setting up your project locally.
-To get a local copy up and running follow these simple example steps.
+Install anywhere using the `pip` Package Installer for Python:
+```sh
+pip install weac
+```
 
-1. Clone the repo
-   ```sh
-   git clone https://github.com/your_username_/Project-Name.git
-   ```
-2. Install NPM packages
-   ```sh
-   npm install
+Needs
+- [Numpy](https://numpy.org/) for matrix operations
+- [Scipy](https://www.scipy.org/) for solving optimization problems
+- [Pandas](https://pandas.pydata.org/) for data handling
+- [Matplotlib](https://matplotlib.org/) for plotting
+- [Timeit](https://docs.python.org/3/library/timeit.html) for timing
+
 <!-- USAGE EXAMPLES -->
 ## Usage
 
-Use this space to show useful examples of how a project can be used. Additional screenshots, code examples and demos work well in this space. You may also link to more resources.
-
-_For more examples, please refer to the [Documentation](https://example.com)._
+_Under construction._ This space will show useful examples of how the package can be used. 
+<!-- _For more examples, please refer to the [Documentation](https://example.com)._ -->
 
 
 <!-- ROADMAP -->
 ## Roadmap
 
-See the [open issues](https://github.com/2phi/weac/issues) for a list of proposed features (and known issues).
+See the [open issues](https://github.com/2phi/weac/issues) for a list of proposed features and known issues.
 
+### v2.2
+- [ ] Finite fracture mechanics implementation for layered snow covers
 
+### v2.1
+- [ ] Flip coordinate system and order of layers of the slab
+- [ ] Allow for cutting PSTs from left or right side
+
+### v2.0
+- [x] Completely rewritten in Python
+- [x] Displacement ODE soliver implemented
+- [x] Stress analysis of arbitrarily layered snow slabs
+- [x] FEM validation of
+  - [x] displacements
+  - [x] weak-layer stresses
+  - [x] energy release rates in weak layers
+- [ ] Documentation
+- [ ] Demo and examples
+
+## Release history
+
+### v1.0
+
+- Deformation analysis of homogeneous snow labs
+- Weak-layer stress prediction
+- Energy release rates of cracks in weak layers
+- Finite fracture mechanics implementation
+- Prediction of anticrack nucleation
+- Written in MATLAB
 
 <!-- CONTRIBUTING -->
 ## Contributing
 
-Contributions are what make the open source community such an amazing place to be learn, inspire, and create. Any contributions you make are **greatly appreciated**.
-
-1. Fork the Project
-2. Create your Feature Branch (`git checkout -b feature/AmazingFeature`)
-3. Commit your Changes (`git commit -m 'Add some AmazingFeature'`)
-4. Push to the Branch (`git push origin feature/AmazingFeature`)
-5. Open a Pull Request
-
+1. Fork the project
+2. Create your feature branch (`git checkout -b feature/AmazingFeature`)
+3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
+4. Push to the branch (`git push origin feature/AmazingFeature`)
+5. Open a pull request
 
 
 <!-- LICENSE -->
 ## License
 
-We currently do not offer an open source license. Please contact us for private licensing options.
-Do not forget to pick a license provide details in the `LICENSE` file.
+Copyright 2phi GbR, 2021. We currently do not offer an open source license. Please contact us for private licensing options.
 
+<!-- Do not forget to pick a license provide details in the `LICENSE` file. -->
 
 
 <!-- CONTACT -->
