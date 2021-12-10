@@ -9,8 +9,14 @@ authors:
   orcid: "https://orcid.org/0000-0001-8320-8672"
 title: "Weak Layer Anticrack Nucleation Model"
 version: 2.0.0
-# doi: 10.0000/zenodo.0000
 date-released: 2021-12-30
+identifiers:
+  - description: Collection of archived snapshots of all versions of WEAC
+    type: doi
+    value: 10.5281/zenodo.5773113
+  - description: Release v1.0.0 for the analysis of homogeneous slabs written in MATLAB
+    type: doi
+    value: 10.5281/zenodo.5773114
 url: "https://github.com/2phi/weac"
 preferred-citation:
   type: article
@@ -25,7 +31,7 @@ preferred-citation:
   journal: "The Cryosphere"
   start: 131 # First page number
   end: 145 # Last page number
-  title: "Modeling snow slab avalanches caused by weak-layer failure - Part 2: Coupled mixed-mode criterion for skier-triggered anticracks."
+  title: "Modeling snow slab avalanches caused by weak-layer failure - Part 2: Coupled mixed-mode criterion for skier-triggered anticracks"
   issue: 1
   volume: 14
   year: 2020

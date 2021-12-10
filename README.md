@@ -9,6 +9,7 @@
 <!-- PyPI Versions /pypi/pyversions/:packageName -->
 [![Weac][weac-shield]][weac-url]
 [![Release][release-shield]][release-url]
+[![DOI](https://zenodo.org/badge/203163531.svg)](https://zenodo.org/badge/latestdoi/203163531)
 [![Contributors][contributors-shield]][contributors-url]
 [![Stargazers][stars-shield]][stars-url]
 [![Forks][forks-shield]][forks-url]
