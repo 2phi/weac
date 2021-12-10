@@ -16,7 +16,7 @@
 [![DOI](https://zenodo.org/badge/203163531.svg)](https://zenodo.org/badge/latestdoi/203163531)\
 Implementation of closed-form analytical models for the analysis of dry-snow slab avalanche release.
 
-[View Demo](https://github.com/2phi/weac) · 
+[View Demo](https://github.com/2phi/weac/blob/main/demo/demo.ipynb) · 
 [Report Bug](https://github.com/2phi/weac/issues) · 
 [Request Feature](https://github.com/2phi/weac/issues)
 
