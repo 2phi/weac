@@ -9,11 +9,11 @@
 <!-- PyPI Versions /pypi/pyversions/:packageName -->
 [![Weac][weac-shield]][weac-url]
 [![Release][release-shield]][release-url]
-[![DOI](https://zenodo.org/badge/203163531.svg)](https://zenodo.org/badge/latestdoi/203163531)
 [![Contributors][contributors-shield]][contributors-url]
 [![Stargazers][stars-shield]][stars-url]
 [![Forks][forks-shield]][forks-url]
-[![Issues][issues-shield]][issues-url] \
+[![Issues][issues-shield]][issues-url]
+[![DOI](https://zenodo.org/badge/203163531.svg)](https://zenodo.org/badge/latestdoi/203163531)\
 Implementation of closed-form analytical models for the analysis of dry-snow slab avalanche release.
 
 [View Demo](https://github.com/2phi/weac) · 
@@ -68,7 +68,7 @@ Needs
 <!-- USAGE EXAMPLES -->
 ## Usage
 
-_Under construction._ This space will show useful examples of how the package can be used. 
+_In preparation._ This space will show useful examples of how the package can be used. 
 <!-- _For more examples, please refer to the [Documentation](https://example.com)._ -->
 
 
@@ -130,7 +130,7 @@ We currently do not offer an open source license. Please contact us for private 
 <!-- CONTACT -->
 ## Contact
 
-E-mail: mail@2phi.de · Web: https://2phi.de · Project Link: [https://github.com/2phi/weac](https://github.com/2phi/weac)
+E-mail: mail@2phi.de · Web: https://2phi.de · Project Link: [https://github.com/2phi/weac](https://github.com/2phi/weac) · Project DOI: http://dx.doi.org/10.5281/zenodo.5773113
 
 
 

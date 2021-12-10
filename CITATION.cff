@@ -1,5 +1,6 @@
 cff-version: 1.2.0
 message: "If you use this software, please cite it as below."
+title: "Weak Layer Anticrack Nucleation Model (WEAC)"
 authors:
 - family-names: "Rosendahl"
   given-names: "Philipp Laurens"
@@ -7,7 +8,6 @@ authors:
 - family-names: "Weissgraeber"
   given-names: "Philipp"
   orcid: "https://orcid.org/0000-0001-8320-8672"
-title: "Weak Layer Anticrack Nucleation Model"
 version: 2.0.0
 date-released: 2021-12-30
 identifiers:

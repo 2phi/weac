@@ -1,2 +1,6 @@
 
 .DS_Store
+
+demo/.ipynb_checkpoints/
+
+weac/__pycache__/
