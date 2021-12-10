@@ -1,0 +1,31 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite it as below."
+authors:
+- family-names: "Rosendahl"
+  given-names: "Philipp Laurens"
+  orcid: "https://orcid.org/0000-0002-6587-875X"
+- family-names: "Weißgraeber"
+  given-names: "Philipp"
+  orcid: "https://orcid.org/0000-0001-8320-8672"
+title: "Weak Layer Anticrack Nucleation Model"
+version: 2.0.0
+# doi: 10.0000/zenodo.0000
+date-released: 2021-12-30
+url: "https://github.com/2phi/weac"
+preferred-citation:
+  type: article
+  authors:
+  - family-names: "Rosendahl"
+    given-names: "Philipp Laurens"
+    orcid: "https://orcid.org/0000-0002-6587-875X"
+  - family-names: "Weißgraeber"
+    given-names: "Philipp"
+    orcid: "https://orcid.org/0000-0001-8320-8672"
+  doi: "10.5194/tc-14-131-2020"
+  journal: "The Cryosphere
+  start: 131 # First page number
+  end: 145 # Last page number
+  title: "Modeling snow slab avalanches caused by weak-layer failure – Part 2: Coupled mixed-mode criterion for skier-triggered anticracks."
+  issue: 1
+  volume: 14
+  year: 2020
