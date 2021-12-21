@@ -17,6 +17,7 @@
 Implementation of closed-form analytical models for the analysis of dry-snow slab avalanche release.
 
 [View Demo](https://github.com/2phi/weac/blob/main/demo/demo.ipynb) · 
+[Read Docs](https://2phi.github.io/weac/) · 
 [Report Bug](https://github.com/2phi/weac/issues) · 
 [Request Feature](https://github.com/2phi/weac/issues)
 
@@ -67,7 +68,7 @@ Needs
 <!-- USAGE EXAMPLES -->
 ## Usage
 
-_The following describes the basic usage of WEAC. For more examples, please refer to the [demo](https://github.com/2phi/weac/blob/main/demo/demo.ipynb)._
+The following describes the basic usage of WEAC. Please refer to the [demo](https://github.com/2phi/weac/blob/main/demo/demo.ipynb) for more examples and read the [documentation](https://2phi.github.io/weac/) for details.
 
 Load the module.
 ```python
