@@ -16,10 +16,10 @@
 [![DOI](https://zenodo.org/badge/203163531.svg)](https://zenodo.org/badge/latestdoi/203163531)\
 Implementation of closed-form analytical models for the analysis of dry-snow slab avalanche release.
 
-[View Demo](https://github.com/2phi/weac/blob/main/demo/demo.ipynb) · 
-[Read Docs](https://2phi.github.io/weac/) · 
-[Report Bug](https://github.com/2phi/weac/issues) · 
-[Request Feature](https://github.com/2phi/weac/issues)
+[View demo](https://github.com/2phi/weac/blob/main/demo/demo.ipynb) · 
+[Report bug](https://github.com/2phi/weac/issues) · 
+[Request feature](https://github.com/2phi/weac/issues) · 
+[Read the docs](https://2phi.github.io/weac/)
 
 <!-- TABLE OF CONTENTS -->
 ## Contents
@@ -102,8 +102,10 @@ Visualize the results.
 ```python
 # Visualize deformations as a contour plot
 weac.plot.contours(skier, xq, zq, window=200, scale=100)
+
 # Plot slab displacements
 weac.plot.displacements(skier, x=xq, z=zq, **segments)
+
 # Plot weak-layer stresses
 weac.plot.stresses(skier, x=xb, z=zq, **segments)
 ```
@@ -128,8 +130,8 @@ See the [open issues](https://github.com/2phi/weac/issues) for a list of propose
   - [x] displacements
   - [x] weak-layer stresses
   - [x] energy release rates in weak layers
-- [ ] Documentation
-- [ ] Demo and examples
+- [x] Documentation
+- [x] Demo and examples
 
 ## Release history
 
