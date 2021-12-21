@@ -67,9 +67,48 @@ Needs
 <!-- USAGE EXAMPLES -->
 ## Usage
 
-_In preparation._ This space will show useful examples of how the package can be used. 
-<!-- _For more examples, please refer to the [Documentation](https://example.com)._ -->
+The following describes the basic usage of WEAC. For more examples, please refer to the [Demo](https://github.com/2phi/weac/blob/main/demo/demo.ipynb).
 
+Load the module.
+```python
+import weac
+```
+Choose a profile from the database (see [demo](https://github.com/2phi/weac/blob/main/demo/demo.ipynb)) or create your own.
+```python
+myprofile = [[180, 100],
+             [190,  40],
+             [230, 130],
+             [380,  20],
+             [270, 100]]
+```
+Create a model instance with optional custom layering.
+```python
+skier = weac.Layered(system='skier', layers=myprofile)
+```
+Calculate lists of segment lengths, locations of foundations, and position and magnitude of skier loads from the inputs total length `L` (mm), crack length `a` (mm), and skier weight `m` (kg). We can choose to analyze the situtation before a crack appears even if a cracklength > 0 is set by replacing the `'crack'` key thorugh the `'uncracked'` key.
+```python
+segments = skier.calc_segments(L=10000, a=300, m=80)['crack']
+```
+Assemble the system of linear equations and solve the boundary-value problem for the free constants `C` providing the inclination `phi` in degrees.
+```python
+C = skier.assemble_and_solve(phi=38, **segments)
+```
+Prepare the output by rasterizing the solution vector at all horizontal positions `xq`. The result is returned in the form of the ndarray `zq`. We also get `xb` that only contains x-coordinates that lie on a foundation.
+```python
+xq, zq, xb = skier.rasterize_solution(C=C, phi=38, **segments)
+```
+Visualize deformations scaled by a factor of `100` as a contour plot in a `200` cm window around the maximum deflection.
+```python
+weac.plot.contours(skier, xq, zq, window=200, scale=100)
+```
+Plot the displacements of the slab.
+```python
+weac.plot.displacements(skier, x=xq, z=zq, **segments)
+```
+Plot weak-layer stresses.
+```python
+weac.plot.stresses(skier, x=xb, z=zq, **segments)
+```
 
 <!-- ROADMAP -->
 ## Roadmap

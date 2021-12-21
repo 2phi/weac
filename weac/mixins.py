@@ -704,7 +704,7 @@ class AnalysisMixin:
         C : ndarray
             Vector of free constants.
         phi : float
-            Inclination (radians).
+            Inclination (degrees).
         li : ndarray
             List of segment lengths (mm).
         ki : ndarray
