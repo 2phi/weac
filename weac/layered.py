@@ -13,7 +13,7 @@ class Layered(FieldQuantitiesMixin, SolutionMixin, AnalysisMixin, Eigensystem):
     class Eigensystem(), methods for the calculation of field
     quantities from FieldQuantitiesMixin(), methods for the solution
     of the system from SolutionMixin() and methods for the output
-    analysis from AnalysisMixin.
+    analysis from AnalysisMixin().
     """
 
     def __init__(self, system='pst-', layers=None):
@@ -23,9 +23,9 @@ class Layered(FieldQuantitiesMixin, SolutionMixin, AnalysisMixin, Eigensystem):
         Arguments
         ---------
         system : {'pst-', '-pst', 'skier', 'skiers'}, optional
-            Type of system to analyse: PST cut from the right(pst-),
-            PST cut form the left(-pst), one skier on infinite
-            slab(skier) or multiple skiers on infinite slab(skeirs).
+            Type of system to analyse: PST cut from the right (pst-),
+            PST cut form the left (-pst), one skier on infinite
+            slab (skier) or multiple skiers on infinite slab (skiers).
             Default is 'pst-'.
         layers : list, optional
             2D list of layer densities and thicknesses. Columns are

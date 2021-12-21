@@ -73,31 +73,6 @@ class Eigensystem:
         Used for numerical stability.
     sysmat : ndarray
         System matrix.
-
-    Methods
-    -------
-    set_foundation_properties(t=30, E=0.25, nu=0.25)
-        Sets material properties and geometry of foundation (weak layer).
-    set_beam_properties(layers, C0=6.0, C1=4.60, nu=0.25)
-        Sets material and properties geometry of beam (slab).
-    calc_foundation_stiffness(self)
-        Computes foundation normal and shear stiffness.
-    calc_laminate_stiffness_matrix(self)
-        Provides laminate stiffness matrix (ABD matrix).
-    calc_system_matrix(self)
-        Assembles first-order ODE system matrix.
-    calc_eigensystem(self)
-        Runs eigenvalue analysis of the system matrix.
-    get_weight_load(phi)
-        Calculates line loads (slab weigth).
-    get_skier_load(m, phi)
-        Calculates skier point loads.
-    zh(x, l=0, bed=True)
-        Computes bedded or free complementary solution.
-    zp(x, phi, bed=True)
-        Computes bedded or free particular integrals.
-    z(x, C, l, phi, bed=True)
-        Assembles solution vector.
     """
 
     def __init__(self, system='pst-'):

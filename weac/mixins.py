@@ -15,45 +15,6 @@ class FieldQuantitiesMixin:
 
     Provides methods for the computation of displacements, stresses,
     strains, and energy release rates from the solution vector.
-
-    Methods
-    -------
-    w(Z)
-        Calculates the slab centerline deflection.
-    wp(Z)
-        Calculates the first derivative of the slab centerline deflection.
-    psi(Z)
-        Calculates the slab idplane rotation.
-    psip(Z)
-        Calculates the first derivative of the slab midplane rotation.
-    u(Z, z0)
-        Calculates the horizontal displacement of the slab.
-    up(Z, z0)
-        Calculates the first derivative of the horizontal slab displacement.
-    N(Z)
-        Calculates the axial normal force N = A11 u' + B11 psi' of the slab.
-    M(Z)
-        Calculates the bending moment M = B11 u' + D11 psi' of the slab.
-    V(Z)
-        Calculates the vertical shear force V = kA55(w' + psi) of the slab.
-    sig(Z)
-        Calculates the weak-layer normal stress.
-    tau(Z)
-        Calculates the weak-layer shear stress.
-    eps(Z)
-        Calculates the weak-layer normal strain.
-    gamma(Z)
-        Calculates the weak-layer shear strain.
-    maxp(Z)
-        Calculates the maximum principal stress in the weak layer.
-    Gi(Ztip)
-        Calculates the mode I differential energy release rate at crack tip.
-    Gii(Ztip)
-        Calculates the mode II differential energy release rate at crack tip.
-    int1(x, z0, z1)
-        Calculates the integrand of the mode I crack opening integral.
-    int2(x, z0, z1)
-        Calculates the integrand of the mode II crack opening integral.
     """
 
     # pylint: disable=no-self-use
@@ -378,18 +339,6 @@ class SolutionMixin:
 
     Provides methods for the assembly of the system of equations
     and for the computation of the free constants.
-
-    Methods
-    -------
-    bc(z)
-        Provides equations for free(pst) or infinite(skiers) boundaries.
-    eqs(zl, zr, pos='mid')
-        Provides boundary or transmission conditions for beam segments.
-    calc_segments(li=False, mi=False, ki=False, k0=False,
-                  L=1e4, a=0, m=0, **kwargs)
-        Assembles lists that define the segmentation of the beam.
-    assemble_and_solve(phi, li, mi, ki)
-        Computes the free constants for arbitrary beam assemblies.
     """
 
     def bc(self, z):
@@ -684,15 +633,6 @@ class AnalysisMixin:
 
     Provides methods for the analysis of layered slabs on compliant
     elastic foundations.
-
-    Methods
-    -------
-    rasterize_solution(C, phi, li, ki, **kwargs)
-        Computes solution vector at discretized coordinates xi.
-    ginc(C0, C1, phi, li, ki, k0, **kwargs)
-        Computes the total differential energy release rate of all cracks.
-    ginc(C0, C1, phi, li, ki, k0, **kwargs):
-        Computes the total incremental energy relase rate of of all cracks.
     """
 
     def rasterize_solution(self, C, phi, li, ki, num=250, **kwargs):
@@ -712,6 +652,17 @@ class AnalysisMixin:
             a foundation or not.
         num : int
             Number of grid points.
+
+        Returns
+        -------
+        xq : ndarray
+            Grid point x-coordinates at which solution vector
+            is discretized.
+        zq : ndarray
+            Matrix with solution vectors as colums at grid
+            points xq.
+        xb : ndarray
+            Grid point x-coordinates that lie on a foundation.
         """
         # Unused arguments
         _ = kwargs
@@ -761,7 +712,31 @@ class AnalysisMixin:
         return xq, zq, xb
 
     def ginc(self, C0, C1, phi, li, ki, k0, **kwargs):
-        """Compute incremental energy relase rate of of all cracks."""
+        """
+        Compute incremental energy relase rate of of all cracks.
+
+        Arguments
+        ---------
+        C0 : ndarray
+            Free constants of uncracked solution.
+        C1 : ndarray
+            Free constants of cracked solution.
+        phi : float
+            Inclination (degress).
+        li : ndarray
+            List of segment lengths.
+        ki : ndarray
+            List of booleans indicating whether segment lies on
+            a foundation or not in the cracked configuration.
+        k0 : ndarray
+            List of booleans indicating whether segment lies on
+            a foundation or not in the uncracked configuration.
+
+        Returns
+        -------
+        ndarray
+            List of total, mode I, and mode II energy release rates.
+        """
         # Unused arguments
         _ = kwargs
 
@@ -794,7 +769,26 @@ class AnalysisMixin:
         return np.array([Ginc1 + Ginc2, Ginc1, Ginc2]).flatten()
 
     def gdif(self, C, phi, li, ki, **kwargs):
-        """Compute differential energy release rate of all crack tips."""
+        """
+        Compute differential energy release rate of all crack tips.
+
+        Arguments
+        ---------
+        C : ndarray
+            Free constants of the solution.
+        phi : float
+            Inclination (degress).
+        li : ndarray
+            List of segment lengths.
+        ki : ndarray
+            List of booleans indicating whether segment lies on
+            a foundation or not in the cracked configuration.
+
+        Returns
+        -------
+        ndarray
+            List of total, mode I, and mode II energy release rates.
+        """
         # Unused arguments
         _ = kwargs
 

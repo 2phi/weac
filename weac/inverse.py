@@ -18,7 +18,7 @@ class Inverse(FieldQuantitiesMixin, SolutionMixin, AnalysisMixin, Eigensystem):
     class Eigensystem(), methods for the calculation of field
     quantities from FieldQuantitiesMixin(), methods for the solution
     of the system from SolutionMixin() and methods for the output
-    analysis from AnalysisMixin.
+    analysis from AnalysisMixin().
     """
 
     def __init__(
@@ -29,14 +29,14 @@ class Inverse(FieldQuantitiesMixin, SolutionMixin, AnalysisMixin, Eigensystem):
         Arguments
         ---------
         system : str, optional
-            Type of system to analyse(default is 'pst-')
+            Type of system to analyse. Default is 'pst-'.
         layers : list, optional
-            List of layer densities and thicknesses(default is None)
+            List of layer densities and thicknesses. Default is None.
         parameters : tuple, optional
             Fitting parameters C0, C1, and Eweak. Multiplicative constant
             of Young modulus parametrization, exponent constant of Young
             modulus parametrization, and weak-layer Young modulus,
-            respectively(default is (6.0, 4.6, 0.25))
+            respectively. Default is (6.0, 4.6, 0.25).
         """
         # Call parent __init__
         super().__init__(system=system)

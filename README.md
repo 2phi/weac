@@ -67,7 +67,7 @@ Needs
 <!-- USAGE EXAMPLES -->
 ## Usage
 
-The following describes the basic usage of WEAC. For more examples, please refer to the [Demo](https://github.com/2phi/weac/blob/main/demo/demo.ipynb).
+_The following describes the basic usage of WEAC. For more examples, please refer to the [demo](https://github.com/2phi/weac/blob/main/demo/demo.ipynb)._
 
 Load the module.
 ```python
@@ -97,16 +97,13 @@ Prepare the output by rasterizing the solution vector at all horizontal position
 ```python
 xq, zq, xb = skier.rasterize_solution(C=C, phi=38, **segments)
 ```
-Visualize deformations scaled by a factor of `100` as a contour plot in a `200` cm window around the maximum deflection.
+Visualize the results.
 ```python
+# Visualize deformations as a contour plot
 weac.plot.contours(skier, xq, zq, window=200, scale=100)
-```
-Plot the displacements of the slab.
-```python
+# Plot slab displacements
 weac.plot.displacements(skier, x=xq, z=zq, **segments)
-```
-Plot weak-layer stresses.
-```python
+# Plot weak-layer stresses
 weac.plot.stresses(skier, x=xb, z=zq, **segments)
 ```
 

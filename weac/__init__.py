@@ -26,7 +26,6 @@ Inverse()
 # Module imports
 from weac.layered import Layered
 from weac.inverse import Inverse
-from weac.tools import time
 from weac import plot
 
 # Version
@@ -36,6 +35,5 @@ __version__ = '2.0.0'
 __all__ = [
     'Layered',
     'Inverse',
-    'time',
     'plot'
 ]
