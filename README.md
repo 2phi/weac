@@ -21,7 +21,7 @@ Implementation of closed-form analytical models for the analysis of dry-snow sla
 [Request Feature](https://github.com/2phi/weac/issues)
 
 <!-- TABLE OF CONTENTS -->
-## Table of Contents
+## Contents
 1. [About the project](#about-the-project)
 2. [Installation](#installation)
 3. [Usage](#usage)
@@ -34,7 +34,7 @@ Implementation of closed-form analytical models for the analysis of dry-snow sla
 <!-- ABOUT THE PROJECT -->
 ## About the project
 
-WEAC implements closed-form analytical models for the [mechanical analysis of dry-snow slabs on compliant weak layers](https://doi.org/10.5194/tc-14-115-2020), the [prediction of anticrack onset](https://doi.org/10.5194/tc-14-131-2020), and, in particular, allwos for stratified snow covers. The model covers propagation saw tests (a), and uncracked (b) or cracked (c) skier-loaded buried weak layers.
+WEAC implements closed-form analytical models for the [mechanical analysis of dry-snow slabs on compliant weak layers](https://doi.org/10.5194/tc-14-115-2020), the [prediction of anticrack onset](https://doi.org/10.5194/tc-14-131-2020), and, in particular, allows for the analysis of stratified snow covers. The model covers propagation saw tests (a), and uncracked (b) or cracked (c) skier-loaded buried weak layers.
 
 <img src="img/bc.png" alt="Boundary conditions" width="500"/>
 
@@ -63,7 +63,6 @@ Needs
 - [Scipy](https://www.scipy.org/) for solving optimization problems
 - [Pandas](https://pandas.pydata.org/) for data handling
 - [Matplotlib](https://matplotlib.org/) for plotting
-- [Timeit](https://docs.python.org/3/library/timeit.html) for timing
 
 <!-- USAGE EXAMPLES -->
 ## Usage
@@ -82,7 +81,7 @@ See the [open issues](https://github.com/2phi/weac/issues) for a list of propose
 
 ### v2.1
 - [ ] Flip coordinate system and order of layers of the slab
-- [ ] Allow for cutting PSTs from left or right side
+- [x] Allow for cutting PSTs from left or right side
 
 ### v2.0
 - [x] Completely rewritten in Python

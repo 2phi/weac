@@ -4,3 +4,5 @@
 demo/.ipynb_checkpoints/
 
 weac/__pycache__/
+
+.ropeproject/
