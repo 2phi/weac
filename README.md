@@ -1,6 +1,5 @@
 <!-- LOGO AND TITLE-->
-<p align="right"><img src="img/logo.png" alt="Logo" width="80" height="80"></p>
-
+<p align="right"><img src="https://github.com/2phi/weac/raw/main/img/logo.png" alt="Logo" width="80" height="80"></p>
 # WEAC &nbsp;·&nbsp; Weak Layer Anticrack Nucleation Model
 
 <!-- PROJECT SHIELDS -->
@@ -37,7 +36,7 @@ Implementation of closed-form analytical models for the analysis of dry-snow sla
 
 WEAC implements closed-form analytical models for the [mechanical analysis of dry-snow slabs on compliant weak layers](https://doi.org/10.5194/tc-14-115-2020), the [prediction of anticrack onset](https://doi.org/10.5194/tc-14-131-2020), and, in particular, allows for the analysis of stratified snow covers. The model covers propagation saw tests (a), and uncracked (b) or cracked (c) skier-loaded buried weak layers.
 
-<img src="img/bc.png" alt="Boundary conditions" width="500"/>
+<img src="https://github.com/2phi/weac/raw/main/img/bc.png" alt="Boundary conditions" width="500"/>
 
 Please refer to the companion papers for model derivations, illustrations, dimensions, material properties, and kinematics:
 
@@ -101,7 +100,7 @@ xq, zq, xb = skier.rasterize_solution(C=C, phi=38, **segments)
 Visualize the results.
 ```python
 # Visualize deformations as a contour plot
-weac.plot.contours(skier, xq, zq, window=200, scale=100)
+weac.plot.contours(skier, x=xq, z=zq, window=200, scale=100)
 
 # Plot slab displacements
 weac.plot.displacements(skier, x=xq, z=zq, **segments)
@@ -168,7 +167,7 @@ We currently do not offer an open source license. Please contact us for private 
 <!-- CONTACT -->
 ## Contact
 
-E-mail: mail@2phi.de · Web: https://2phi.de · Project Link: [https://github.com/2phi/weac](https://github.com/2phi/weac) · Project DOI: http://dx.doi.org/10.5281/zenodo.5773113
+E-mail: mail@2phi.de · Web: https://2phi.de · Project Link: [https://github.com/2phi/weac](https://github.com/2phi/weac) · Project DOI: [http://dx.doi.org/10.5281/zenodo.5773113](http://dx.doi.org/10.5281/zenodo.5773113)
 
 
 
