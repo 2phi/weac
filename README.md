@@ -86,7 +86,7 @@ Create a model instance with optional custom layering.
 ```python
 skier = weac.Layered(system='skier', layers=myprofile)
 ```
-Calculate lists of segment lengths, locations of foundations, and position and magnitude of skier loads from the inputs total length `L` (mm), crack length `a` (mm), and skier weight `m` (kg). We can choose to analyze the situtation before a crack appears even if a cracklength > 0 is set by replacing the `'crack'` key thorugh the `'uncracked'` key.
+Calculate lists of segment lengths, locations of foundations, and position and magnitude of skier loads from the inputs total length `L` (mm), crack length `a` (mm), and skier weight `m` (kg). We can choose to analyze the situtation before a crack appears even if a crack length > 0 is set by replacing the `'crack'` key thorugh the `'uncracked'` key.
 ```python
 segments = skier.calc_segments(L=10000, a=300, m=80)['crack']
 ```
@@ -124,7 +124,7 @@ See the [open issues](https://github.com/2phi/weac/issues) for a list of propose
 
 ### v2.0
 - [x] Completely rewritten in Python
-- [x] Displacement ODE soliver implemented
+- [x] Coupled bending-extension ODE solver implemented
 - [x] Stress analysis of arbitrarily layered snow slabs
 - [x] FEM validation of
   - [x] displacements
