@@ -4,15 +4,14 @@
 # WEAC &nbsp;·&nbsp; Weak Layer Anticrack Nucleation Model
 
 <!-- PROJECT SHIELDS -->
-<!-- PyPI Version /pypi/v/:packageName -->
 <!-- PyPI Downloads /pypi/:period/:packageName -->
 <!-- PyPI Versions /pypi/pyversions/:packageName -->
+<!-- [![Forks][forks-shield]][forks-url] -->
 [![Weac][weac-shield]][weac-url]
 [![Release][release-shield]][release-url]
 [![PyPI][pypi-shield]][pypi-url]
 [![Contributors][contributors-shield]][contributors-url]
 [![Stargazers][stars-shield]][stars-url]
-<!-- [![Forks][forks-shield]][forks-url] -->
 [![Issues][issues-shield]][issues-url]
 [![DOI](https://zenodo.org/badge/203163531.svg)](https://zenodo.org/badge/latestdoi/203163531)\
 Implementation of closed-form analytical models for the analysis of dry-snow slab avalanche release.
