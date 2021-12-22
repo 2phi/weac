@@ -22,7 +22,9 @@ jobs:
         python -m pip install --upgrade pip
         pip install build twine
     - name: Build package
-      run: python -m build
+      run: |
+        mkdir build
+        python -m build
     - name: Publish package
       env:
         TWINE_USERNAME: __token__
