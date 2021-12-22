@@ -122,18 +122,18 @@ See the [open issues](https://github.com/2phi/weac/issues) for a list of propose
 - [ ] Flip coordinate system and order of layers of the slab
 - [x] Allow for cutting PSTs from left or right side
 
-### v2.0
-- [x] Completely rewritten in Python
-- [x] Coupled bending-extension ODE solver implemented
-- [x] Stress analysis of arbitrarily layered snow slabs
-- [x] FEM validation of
-  - [x] displacements
-  - [x] weak-layer stresses
-  - [x] energy release rates in weak layers
-- [x] Documentation
-- [x] Demo and examples
-
 ## Release history
+
+### v2.0
+- Completely rewritten in Python
+- Coupled bending-extension ODE solver implemented
+- Stress analysis of arbitrarily layered snow slabs
+- FEM validation of
+  - displacements
+  - weak-layer stresses
+  - energy release rates in weak layers
+- Documentation
+- Demo and examples
 
 ### v1.0
 
