@@ -11,7 +11,7 @@ from weac.inverse import Inverse
 from weac import plot
 
 # Version
-__version__ = '2.0.1'
+__version__ = '2.0.2'
 
 # Public names
 __all__ = [
