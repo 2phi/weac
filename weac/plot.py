@@ -113,7 +113,7 @@ def slab_profile(instance):
 # === DEFORMATION CONTOUR PLOT ================================================
 
 
-def contours(instance, xq, zq, window=1e12, scale=100):
+def contours(instance, x, z, window=1e12, scale=100):
     """
     Plot 2D deformation contours.
 
@@ -121,10 +121,10 @@ def contours(instance, xq, zq, window=1e12, scale=100):
     ---------
     instance : object
         Instance of layered class.
-    xq : ndarray
+    x : ndarray
         Discretized x-coordinates (mm).
-    zq : ndarray
-        Solution vectors at positions xq as columns of matrix zq.
+    z : ndarray
+        Solution vectors at positions x as columns of matrix z.
     window : int
         Plot window (cm) around maximum vertical deflection.
     scale : int
@@ -134,18 +134,18 @@ def contours(instance, xq, zq, window=1e12, scale=100):
     yq = np.linspace(-instance.h/2, instance.h/2, num=21)
 
     # Initialize grid coordinates
-    X, Y = np.meshgrid(xq/10, yq/10)
+    X, Y = np.meshgrid(x/10, yq/10)
 
     # Compute displacements on grid
-    U = np.vstack([instance.u(zq, z0=y) for y in yq])
-    W = np.vstack([instance.w(zq) for _ in yq])
+    U = np.vstack([instance.u(z, z0=y) for y in yq])
+    W = np.vstack([instance.w(z) for _ in yq])
 
     # Plot outline
     plt.plot(outline(X), outline(Y), 'k--', alpha=0.3, linewidth=1)
     plt.plot(outline(X+scale*U), outline(Y+scale*W), 'k', linewidth=1)
 
     # Get x-coordinate of maximum deflection w (cm) and derive plot limits
-    xfocus = xq[np.max(np.argmax(W, axis=1))]/10
+    xfocus = x[np.max(np.argmax(W, axis=1))]/10
     xmax = np.min([np.max(X+scale*U), xfocus + window/2])
     xmin = np.max([np.min(X+scale*U), xfocus - window/2])
 
@@ -341,7 +341,7 @@ def err_modes(da, G, kind='inc'):
         ax1data=data, name='modes', vlines=False)
 
 
-def fea_disp(instance, xq, zq, fea):
+def fea_disp(instance, x, z, fea):
     """Wrap dispalcements plot."""
     data = [
         [fea[:, 0]/10, -np.flipud(fea[:, 1]), r'FEA $u_0$'],
@@ -350,9 +350,9 @@ def fea_disp(instance, xq, zq, fea):
         # [fea[:, 0]/10, np.flipud(fea[:, 4]), r'FEA $w(z=-h/2)$'],
         [fea[:, 0]/10,
             np.flipud(np.rad2deg(fea[:, 5])), r'FEA $\psi$'],
-        [xq/10, instance.u(zq, z0=0), r'$u_0$'],
-        [xq/10, -instance.w(zq), r'$w$'],
-        [xq/10, np.rad2deg(instance.psi(zq)), r'$\psi$']
+        [x/10, instance.u(z, z0=0), r'$u_0$'],
+        [x/10, -instance.w(z), r'$w$'],
+        [x/10, np.rad2deg(instance.psi(z)), r'$\psi$']
     ]
     plot_data(
         ax1label=r'Displacements (mm)', ax1data=data, name='fea_disp',

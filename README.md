@@ -1,5 +1,6 @@
 <!-- LOGO AND TITLE-->
 <p align="right"><img src="https://github.com/2phi/weac/raw/main/img/logo.png" alt="Logo" width="80" height="80"></p>
+
 # WEAC &nbsp;·&nbsp; Weak Layer Anticrack Nucleation Model
 
 <!-- PROJECT SHIELDS -->

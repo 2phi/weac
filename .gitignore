@@ -1,8 +1,16 @@
-
+# MacOS
 .DS_Store
 
-demo/.ipynb_checkpoints/
+# Jupyter Notebook
+.ipynb_checkpoints
 
-weac/__pycache__/
+# Byte-compiled
+__pycache__/
 
-.ropeproject/
+# Rope project settings
+.ropeproject
+
+# Distribution / packaging
+build/
+dist/
+*.egg-info/
