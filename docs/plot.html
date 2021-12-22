@@ -1,0 +1,948 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
+<meta name="generator" content="pdoc 0.10.0" />
+<title>weac.plot API documentation</title>
+<meta name="description" content="Plotting resources for the WEak Layer AntiCrack nucleation model." />
+<link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/sanitize.min.css" integrity="sha256-PK9q560IAAa6WVRRh76LtCaI8pjTJ2z11v0miyNNjrs=" crossorigin>
+<link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/typography.min.css" integrity="sha256-7l/o7C8jubJiy74VsKTidCy1yBkRtiUGbVkYBylBqUg=" crossorigin>
+<link rel="stylesheet preload" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.1.1/styles/github.min.css" crossorigin>
+<style>:root{--highlight-color:#fe9}.flex{display:flex !important}body{line-height:1.5em}#content{padding:20px}#sidebar{padding:30px;overflow:hidden}#sidebar > *:last-child{margin-bottom:2cm}.http-server-breadcrumbs{font-size:130%;margin:0 0 15px 0}#footer{font-size:.75em;padding:5px 30px;border-top:1px solid #ddd;text-align:right}#footer p{margin:0 0 0 1em;display:inline-block}#footer p:last-child{margin-right:30px}h1,h2,h3,h4,h5{font-weight:300}h1{font-size:2.5em;line-height:1.1em}h2{font-size:1.75em;margin:1em 0 .50em 0}h3{font-size:1.4em;margin:25px 0 10px 0}h4{margin:0;font-size:105%}h1:target,h2:target,h3:target,h4:target,h5:target,h6:target{background:var(--highlight-color);padding:.2em 0}a{color:#058;text-decoration:none;transition:color .3s ease-in-out}a:hover{color:#e82}.title code{font-weight:bold}h2[id^="header-"]{margin-top:2em}.ident{color:#900}pre code{background:#f8f8f8;font-size:.8em;line-height:1.4em}code{background:#f2f2f1;padding:1px 4px;overflow-wrap:break-word}h1 code{background:transparent}pre{background:#f8f8f8;border:0;border-top:1px solid #ccc;border-bottom:1px solid #ccc;margin:1em 0;padding:1ex}#http-server-module-list{display:flex;flex-flow:column}#http-server-module-list div{display:flex}#http-server-module-list dt{min-width:10%}#http-server-module-list p{margin-top:0}.toc ul,#index{list-style-type:none;margin:0;padding:0}#index code{background:transparent}#index h3{border-bottom:1px solid #ddd}#index ul{padding:0}#index h4{margin-top:.6em;font-weight:bold}@media (min-width:200ex){#index .two-column{column-count:2}}@media (min-width:300ex){#index .two-column{column-count:3}}dl{margin-bottom:2em}dl dl:last-child{margin-bottom:4em}dd{margin:0 0 1em 3em}#header-classes + dl > dd{margin-bottom:3em}dd dd{margin-left:2em}dd p{margin:10px 0}.name{background:#eee;font-weight:bold;font-size:.85em;padding:5px 10px;display:inline-block;min-width:40%}.name:hover{background:#e0e0e0}dt:target .name{background:var(--highlight-color)}.name > span:first-child{white-space:nowrap}.name.class > span:nth-child(2){margin-left:.4em}.inherited{color:#999;border-left:5px solid #eee;padding-left:1em}.inheritance em{font-style:normal;font-weight:bold}.desc h2{font-weight:400;font-size:1.25em}.desc h3{font-size:1em}.desc dt code{background:inherit}.source summary,.git-link-div{color:#666;text-align:right;font-weight:400;font-size:.8em;text-transform:uppercase}.source summary > *{white-space:nowrap;cursor:pointer}.git-link{color:inherit;margin-left:1em}.source pre{max-height:500px;overflow:auto;margin:0}.source pre code{font-size:12px;overflow:visible}.hlist{list-style:none}.hlist li{display:inline}.hlist li:after{content:',\2002'}.hlist li:last-child:after{content:none}.hlist .hlist{display:inline;padding-left:1em}img{max-width:100%}td{padding:0 .5em}.admonition{padding:.1em .5em;margin-bottom:1em}.admonition-title{font-weight:bold}.admonition.note,.admonition.info,.admonition.important{background:#aef}.admonition.todo,.admonition.versionadded,.admonition.tip,.admonition.hint{background:#dfd}.admonition.warning,.admonition.versionchanged,.admonition.deprecated{background:#fd4}.admonition.error,.admonition.danger,.admonition.caution{background:lightpink}</style>
+<style media="screen and (min-width: 700px)">@media screen and (min-width:700px){#sidebar{width:30%;height:100vh;overflow:auto;position:sticky;top:0}#content{width:70%;max-width:100ch;padding:3em 4em;border-left:1px solid #ddd}pre code{font-size:1em}.item .name{font-size:1em}main{display:flex;flex-direction:row-reverse;justify-content:flex-end}.toc ul ul,#index ul{padding-left:1.5em}.toc > ul > li{margin-top:.5em}}</style>
+<style media="print">@media print{#sidebar h1{page-break-before:always}.source{display:none}}@media print{*{background:transparent !important;color:#000 !important;box-shadow:none !important;text-shadow:none !important}a[href]:after{content:" (" attr(href) ")";font-size:90%}a[href][title]:after{content:none}abbr[title]:after{content:" (" attr(title) ")"}.ir a:after,a[href^="javascript:"]:after,a[href^="#"]:after{content:""}pre,blockquote{border:1px solid #999;page-break-inside:avoid}thead{display:table-header-group}tr,img{page-break-inside:avoid}img{max-width:100% !important}@page{margin:0.5cm}p,h2,h3{orphans:3;widows:3}h1,h2,h3,h4,h5,h6{page-break-after:avoid}}</style>
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.1.1/highlight.min.js" integrity="sha256-Uv3H6lx7dJmRfRvH8TH6kJD1TSK1aFcwgx+mdg3epi8=" crossorigin></script>
+<script>window.addEventListener('DOMContentLoaded', () => hljs.initHighlighting())</script>
+</head>
+<body>
+<main>
+<article id="content">
+<header>
+<h1 class="title">Module <code>weac.plot</code></h1>
+</header>
+<section id="section-intro">
+<p>Plotting resources for the WEak Layer AntiCrack nucleation model.</p>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">&#34;&#34;&#34;Plotting resources for the WEak Layer AntiCrack nucleation model.&#34;&#34;&#34;
+# pylint: disable=invalid-name,too-many-locals,too-many-branches
+# pylint: disable=too-many-arguments,too-many-statements
+
+# Third party imports
+from matplotlib.colors import Normalize
+import numpy as np
+import matplotlib.pyplot as plt
+
+# Project imports
+from weac.tools import isnotebook
+
+# === SET PLOT STYLES =========================================================
+
+
+def set_plotstyles():
+    &#34;&#34;&#34;Define styles plot markers, labels and colors.&#34;&#34;&#34;
+    labelstyle = {         # Text style of plot labels
+        &#39;backgroundcolor&#39;: &#39;w&#39;,
+        &#39;horizontalalignment&#39;: &#39;center&#39;,
+        &#39;verticalalignment&#39;: &#39;center&#39;}
+    # markerstyle = {        # Style of plot markers
+    #     &#39;marker&#39;: &#39;o&#39;,
+    #     &#39;markersize&#39;: 5,
+    #     &#39;markerfacecolor&#39;: &#39;w&#39;,
+    #     &#39;zorder&#39;: 3}
+    colors = np.array([    # TUD color palette
+        [&#39;#DCDCDC&#39;, &#39;#B5B5B5&#39;, &#39;#898989&#39;, &#39;#535353&#39;],   # gray
+        [&#39;#5D85C3&#39;, &#39;#005AA9&#39;, &#39;#004E8A&#39;, &#39;#243572&#39;],   # blue
+        [&#39;#009CDA&#39;, &#39;#0083CC&#39;, &#39;#00689D&#39;, &#39;#004E73&#39;],   # ocean
+        [&#39;#50B695&#39;, &#39;#009D81&#39;, &#39;#008877&#39;, &#39;#00715E&#39;],   # teal
+        [&#39;#AFCC50&#39;, &#39;#99C000&#39;, &#39;#7FAB16&#39;, &#39;#6A8B22&#39;],   # green
+        [&#39;#DDDF48&#39;, &#39;#C9D400&#39;, &#39;#B1BD00&#39;, &#39;#99A604&#39;],   # lime
+        [&#39;#FFE05C&#39;, &#39;#FDCA00&#39;, &#39;#D7AC00&#39;, &#39;#AE8E00&#39;],   # yellow
+        [&#39;#F8BA3C&#39;, &#39;#F5A300&#39;, &#39;#D28700&#39;, &#39;#BE6F00&#39;],   # sand
+        [&#39;#EE7A34&#39;, &#39;#EC6500&#39;, &#39;#CC4C03&#39;, &#39;#A94913&#39;],   # orange
+        [&#39;#E9503E&#39;, &#39;#E6001A&#39;, &#39;#B90F22&#39;, &#39;#961C26&#39;],   # red
+        [&#39;#C9308E&#39;, &#39;#A60084&#39;, &#39;#951169&#39;, &#39;#732054&#39;],   # magenta
+        [&#39;#804597&#39;, &#39;#721085&#39;, &#39;#611C73&#39;, &#39;#4C226A&#39;]])  # puple
+    return labelstyle, colors
+
+
+# === CONVENIENCE FUNCTIONS ===================================================
+
+
+class MidpointNormalize(Normalize):
+    &#34;&#34;&#34;Colormap normalization to a specified midpoint. Default is 0.&#34;&#34;&#34;
+
+    def __init__(self, vmin, vmax, midpoint=0, clip=False):
+        &#34;&#34;&#34;Inizialize normalization.&#34;&#34;&#34;
+        self.midpoint = midpoint
+        Normalize.__init__(self, vmin, vmax, clip)
+
+    def __call__(self, value, clip=None):
+        &#34;&#34;&#34;Make instances callable as functions.&#34;&#34;&#34;
+        normalized_min = max(0, 0.5*(1 - abs(
+            (self.midpoint - self.vmin)/(self.midpoint - self.vmax))))
+        normalized_max = min(1, 0.5*(1 + abs(
+            (self.vmax - self.midpoint)/(self.midpoint - self.vmin))))
+        normalized_mid = 0.5
+        x, y = [self.vmin, self.midpoint, self.vmax], [
+            normalized_min, normalized_mid, normalized_max]
+        return np.ma.masked_array(np.interp(value, x, y))
+
+
+def outline(grid):
+    &#34;&#34;&#34;Extract outline values of a 2D array (matrix, grid).&#34;&#34;&#34;
+    top = grid[0, :-1]
+    right = grid[:-1, -1]
+    bot = grid[-1, :0:-1]
+    left = grid[::-1, 0]
+
+    return np.hstack([top, right, bot, left])
+
+
+# === PLOT SLAB PROFILE =======================================================
+
+
+def slab_profile(instance):
+    &#34;&#34;&#34;Create bar chart of slab profile.&#34;&#34;&#34;
+    x = []
+    y = []
+
+    total_heigth = 0
+
+    for line in instance.slab:
+        x.append(line[0])
+        x.append(line[0])
+
+        y.append(total_heigth)
+        total_heigth = total_heigth + line[1]
+        y.append(total_heigth)
+
+    # Font setup
+    plt.rc(&#39;font&#39;, family=&#39;serif&#39;, size=8)
+    plt.rc(&#39;mathtext&#39;, fontset=&#39;cm&#39;)
+
+    # Create figure
+    fig = plt.figure(figsize=(2, 2))
+    plt.axis()
+    ax1 = fig.gca()
+
+    # Set axis labels
+    ax1.set_xlabel(&#39;Density (kg/m$^3$)&#39;)
+    ax1.set_ylabel(&#39;Thickness (mm)&#39;)
+
+    ax1.set_xlim(500, 0)
+
+    ax1.fill_betweenx(y, 0, x)
+    plt.show()
+
+
+# === DEFORMATION CONTOUR PLOT ================================================
+
+
+def contours(instance, xq, zq, window=1e12, scale=100):
+    &#34;&#34;&#34;
+    Plot 2D deformation contours.
+
+    Arguments
+    ---------
+    instance : object
+        Instance of layered class.
+    xq : ndarray
+        Discretized x-coordinates (mm).
+    zq : ndarray
+        Solution vectors at positions xq as columns of matrix zq.
+    window : int
+        Plot window (cm) around maximum vertical deflection.
+    scale : int
+        Scaling factor for the visualization of displacements.
+    &#34;&#34;&#34;
+    # Calculate y-coordinates (top to bottom)
+    yq = np.linspace(-instance.h/2, instance.h/2, num=21)
+
+    # Initialize grid coordinates
+    X, Y = np.meshgrid(xq/10, yq/10)
+
+    # Compute displacements on grid
+    U = np.vstack([instance.u(zq, z0=y) for y in yq])
+    W = np.vstack([instance.w(zq) for _ in yq])
+
+    # Plot outline
+    plt.plot(outline(X), outline(Y), &#39;k--&#39;, alpha=0.3, linewidth=1)
+    plt.plot(outline(X+scale*U), outline(Y+scale*W), &#39;k&#39;, linewidth=1)
+
+    # Get x-coordinate of maximum deflection w (cm) and derive plot limits
+    xfocus = xq[np.max(np.argmax(W, axis=1))]/10
+    xmax = np.min([np.max(X+scale*U), xfocus + window/2])
+    xmin = np.max([np.min(X+scale*U), xfocus - window/2])
+
+    # Normalize colormap
+    norm = MidpointNormalize(vmin=1e3*np.min(U), vmax=1e3*np.max(U))
+
+    # Plot contours on deformed grid
+    plt.contourf(X+scale*U, Y+scale*W, 1e3*U,
+                 norm=norm, cmap=&#39;RdBu_r&#39;, levels=100, alpha=0.2)
+
+    # Plot setup
+    plt.axis(&#39;scaled&#39;)
+    plt.colorbar(label=r&#39;$u$ ($\mu$m)&#39;, shrink=0.5)
+    plt.gca().set_xlabel(r&#39;$x$ (mm)&#39;)
+    plt.gca().set_ylabel(r&#39;$z$ (mm)&#39;)
+    plt.gca().invert_yaxis()
+    plt.gca().use_sticky_edges = False
+    plt.xlim([xmin, xmax])
+
+
+# === BASE PLOT FUNCTION ======================================================
+
+
+def plot_data(
+        name, ax1data, ax1label,
+        ax2data=None, ax2label=None,
+        labelpos=None, vlines=True,
+        li=False, mi=False, ki=False,
+        xlabel=r&#39;Horizontal position $x$ (cm)&#39;):
+    &#34;&#34;&#34;Plot data. Base function.&#34;&#34;&#34;
+    # Clear figure
+    plt.clf()
+
+    # Plot styles
+    labelstyle, colors = set_plotstyles()
+
+    # Font setup
+    plt.rc(&#39;font&#39;, family=&#39;serif&#39;, size=12)
+    plt.rc(&#39;mathtext&#39;, fontset=&#39;cm&#39;)
+
+    # Create figure
+    plt.axis()
+    ax1 = plt.gca()
+
+    # Axis limits
+    ax1.autoscale(axis=&#39;x&#39;, tight=True)
+
+    # Set axis labels
+    ax1.set_xlabel(xlabel + r&#39; $\longrightarrow$&#39;)
+    ax1.set_ylabel(ax1label + r&#39; $\longrightarrow$&#39;)
+
+    # Plot x-axis
+    ax1.axhline(0, linewidth=0.5, color=&#39;gray&#39;)
+
+    # Plot vertical separators
+    if vlines:
+        ax1.axvline(0, linewidth=0.5, color=&#39;gray&#39;)
+        for i, f in enumerate(ki):
+            if not f:
+                ax1.axvspan(sum(li[:i])/10, sum(li[:i+1])/10,
+                            facecolor=&#39;gray&#39;, alpha=0.05, zorder=100)
+        for i, m in enumerate(mi, start=1):
+            if m &gt; 0:
+                ax1.axvline(sum(li[:i])/10, linewidth=0.5, color=&#39;gray&#39;)
+    else:
+        ax1.autoscale(axis=&#39;y&#39;, tight=True)
+
+    # Calculate labelposition
+    if not labelpos:
+        x = ax1data[0][0]
+        labelpos = int(0.95*len(x[~np.isnan(x)]))
+
+    # Fill left y-axis
+    i = -1
+    for x, y, label in ax1data:
+        i += 1
+        if label == &#39;&#39; or &#39;FEA&#39; in label:
+            # line, = ax1.plot(x, y, &#39;k:&#39;, linewidth=1)
+            ax1.plot(x, y, linewidth=3, color=&#39;white&#39;)
+            line, = ax1.plot(x, y, &#39;:&#39;, linewidth=1)  # , color=&#39;black&#39;
+            thislabelpos = -2
+            x, y = x[~np.isnan(x)], y[~np.isnan(x)]
+            xtx = (x[thislabelpos - 1] + x[thislabelpos])/2
+            ytx = (y[thislabelpos - 1] + y[thislabelpos])/2
+            ax1.text(xtx, ytx, label, color=line.get_color(),
+                     **labelstyle)
+        else:
+            # Plot line
+            ax1.plot(x, y, linewidth=3, color=&#39;white&#39;)
+            line, = ax1.plot(x, y, linewidth=1)
+            # Line label
+            x, y = x[~np.isnan(x)], y[~np.isnan(x)]
+            if len(x) &gt; 0:
+                xtx = (x[labelpos - 10*i - 1] + x[labelpos - 10*i])/2
+                ytx = (y[labelpos - 10*i - 1] + y[labelpos - 10*i])/2
+                ax1.text(xtx, ytx, label, color=line.get_color(),
+                         **labelstyle)
+
+    # Fill right y-axis
+    if ax2data:
+        # Create right y-axis
+        ax2 = ax1.twinx()
+        # Set axis label
+        ax2.set_ylabel(ax2label + r&#39; $\longrightarrow$&#39;)
+        # Fill
+        for x, y, label in ax2data:
+            # Plot line
+            ax2.plot(x, y, linewidth=3, color=&#39;white&#39;)
+            line, = ax2.plot(x, y, linewidth=1, color=colors[8, 0])
+            # Line label
+            x, y = x[~np.isnan(x)], y[~np.isnan(x)]
+            xtx = (x[labelpos - 1] + x[labelpos])/2
+            ytx = (y[labelpos - 1] + y[labelpos])/2
+            ax2.text(xtx, ytx, label, color=line.get_color(),
+                     **labelstyle)
+
+    # Save figure
+    filename = name + &#39;.pdf&#39;
+    if isnotebook():
+        plt.show()
+    else:
+        print(&#39;Rendering&#39;, filename, &#39;...&#39;)
+        plt.savefig(&#39;plots/&#39; + filename, bbox_inches=&#39;tight&#39;)
+
+
+# === PLOT WRAPPERS ===========================================================
+
+
+def displacements(instance, x, z, **segments):
+    &#34;&#34;&#34;Wrap for dispalcements plot.&#34;&#34;&#34;
+    data = [
+        [x/10, instance.u(z, z0=0), r&#39;$u_0$&#39;],
+        [x/10, -instance.w(z), r&#39;$w$&#39;],
+        [x/10, np.rad2deg(instance.psi(z)), r&#39;$\psi$&#39;]
+    ]
+    plot_data(ax1label=r&#39;Displacements (mm)&#39;, ax1data=data,
+              name=&#39;disp&#39;, **segments)
+
+
+def section_forces(instance, x, z, **segments):
+    &#34;&#34;&#34;Wrap section forces plot.&#34;&#34;&#34;
+    data = [
+        [x/10, instance.N(z), r&#39;$N$&#39;],
+        [x/10, instance.M(z), r&#39;$M$&#39;],
+        [x/10, instance.V(z), r&#39;$V$&#39;]
+    ]
+    plot_data(ax1label=r&#39;Section forces&#39;, ax1data=data,
+              name=&#39;forc&#39;, **segments)
+
+
+def stresses(instance, x, z, **segments):
+    &#34;&#34;&#34;Wrap stress plot.&#34;&#34;&#34;
+    data = [
+        [x/10, 1e3*instance.tau(z), r&#39;$\tau$&#39;],
+        [x/10, 1e3*instance.sig(z), r&#39;$\sigma$&#39;]
+    ]
+    plot_data(ax1label=r&#39;Stress (kPa)&#39;, ax1data=data,
+              name=&#39;stress&#39;, **segments)
+
+
+def stress_criteria(x, stress, **segments):
+    &#34;&#34;&#34;Wrap plot of stress and energy criteria.&#34;&#34;&#34;
+    data = [
+        [x/10, stress, r&#39;$\sigma/\sigma_\mathrm{c}$&#39;]
+    ]
+    plot_data(ax1label=r&#39;Criteria&#39;, ax1data=data,
+              name=&#39;crit&#39;, **segments)
+
+
+def err_comp(da, Gdif, Ginc, mode=0):
+    &#34;&#34;&#34;Wrap energy release rate plot.&#34;&#34;&#34;
+    data = [
+        [da/10, 1e3*Gdif[mode, :], r&#39;$\mathcal{G}$&#39;],
+        [da/10, 1e3*Ginc[mode, :], r&#39;$\bar{\mathcal{G}}$&#39;]
+    ]
+    plot_data(
+        xlabel=r&#39;Crack length $\Delta a$ (cm)&#39;,
+        ax1label=r&#39;Energy release rate (J/m$^2$)&#39;,
+        ax1data=data, name=&#39;err&#39;, vlines=False)
+
+
+def err_modes(da, G, kind=&#39;inc&#39;):
+    &#34;&#34;&#34;Wrap energy release rate plot.&#34;&#34;&#34;
+    label = r&#39;$\bar{\mathcal{G}}$&#39; if kind == &#39;inc&#39; else r&#39;$\mathcal{G}$&#39;
+    data = [
+        [da/10, 1e3*G[2, :], label + r&#39;$_\mathrm{I\!I}$&#39;],
+        [da/10, 1e3*G[1, :], label + r&#39;$_\mathrm{I}$&#39;],
+        [da/10, 1e3*G[0, :], label + r&#39;$_\mathrm{I+I\!I}$&#39;]
+    ]
+    plot_data(
+        xlabel=r&#39;Crack length $a$ (cm)&#39;,
+        ax1label=r&#39;Energy release rate (J/m$^2$)&#39;,
+        ax1data=data, name=&#39;modes&#39;, vlines=False)
+
+
+def fea_disp(instance, xq, zq, fea):
+    &#34;&#34;&#34;Wrap dispalcements plot.&#34;&#34;&#34;
+    data = [
+        [fea[:, 0]/10, -np.flipud(fea[:, 1]), r&#39;FEA $u_0$&#39;],
+        [fea[:, 0]/10, np.flipud(fea[:, 2]), r&#39;FEA $w_0$&#39;],
+        # [fea[:, 0]/10, -np.flipud(fea[:, 3]), r&#39;FEA $u(z=-h/2)$&#39;],
+        # [fea[:, 0]/10, np.flipud(fea[:, 4]), r&#39;FEA $w(z=-h/2)$&#39;],
+        [fea[:, 0]/10,
+            np.flipud(np.rad2deg(fea[:, 5])), r&#39;FEA $\psi$&#39;],
+        [xq/10, instance.u(zq, z0=0), r&#39;$u_0$&#39;],
+        [xq/10, -instance.w(zq), r&#39;$w$&#39;],
+        [xq/10, np.rad2deg(instance.psi(zq)), r&#39;$\psi$&#39;]
+    ]
+    plot_data(
+        ax1label=r&#39;Displacements (mm)&#39;, ax1data=data, name=&#39;fea_disp&#39;,
+        labelpos=-50)
+
+
+def fea_stress(instance, xb, zb, fea):
+    &#34;&#34;&#34;Wrap stress plot.&#34;&#34;&#34;
+    data = [
+        [fea[:, 0]/10, 1e3*np.flipud(fea[:, 2]), r&#39;FEA $\sigma_2$&#39;],
+        [fea[:, 0]/10, 1e3*np.flipud(fea[:, 3]), r&#39;FEA $\tau_{12}$&#39;],
+        [xb/10, 1e3*instance.tau(zb), r&#39;$\tau$&#39;],
+        [xb/10, 1e3*instance.sig(zb), r&#39;$\sigma$&#39;]
+    ]
+    plot_data(ax1label=r&#39;Stress (kPa)&#39;, ax1data=data, name=&#39;fea_stress&#39;,
+              labelpos=-50)</code></pre>
+</details>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+<h2 class="section-title" id="header-functions">Functions</h2>
+<dl>
+<dt id="weac.plot.contours"><code class="name flex">
+<span>def <span class="ident">contours</span></span>(<span>instance, xq, zq, window=1000000000000.0, scale=100)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Plot 2D deformation contours.</p>
+<h2 id="arguments">Arguments</h2>
+<dl>
+<dt><strong><code>instance</code></strong> :&ensp;<code>object</code></dt>
+<dd>Instance of layered class.</dd>
+<dt><strong><code>xq</code></strong> :&ensp;<code>ndarray</code></dt>
+<dd>Discretized x-coordinates (mm).</dd>
+<dt><strong><code>zq</code></strong> :&ensp;<code>ndarray</code></dt>
+<dd>Solution vectors at positions xq as columns of matrix zq.</dd>
+<dt><strong><code>window</code></strong> :&ensp;<code>int</code></dt>
+<dd>Plot window (cm) around maximum vertical deflection.</dd>
+<dt><strong><code>scale</code></strong> :&ensp;<code>int</code></dt>
+<dd>Scaling factor for the visualization of displacements.</dd>
+</dl></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def contours(instance, xq, zq, window=1e12, scale=100):
+    &#34;&#34;&#34;
+    Plot 2D deformation contours.
+
+    Arguments
+    ---------
+    instance : object
+        Instance of layered class.
+    xq : ndarray
+        Discretized x-coordinates (mm).
+    zq : ndarray
+        Solution vectors at positions xq as columns of matrix zq.
+    window : int
+        Plot window (cm) around maximum vertical deflection.
+    scale : int
+        Scaling factor for the visualization of displacements.
+    &#34;&#34;&#34;
+    # Calculate y-coordinates (top to bottom)
+    yq = np.linspace(-instance.h/2, instance.h/2, num=21)
+
+    # Initialize grid coordinates
+    X, Y = np.meshgrid(xq/10, yq/10)
+
+    # Compute displacements on grid
+    U = np.vstack([instance.u(zq, z0=y) for y in yq])
+    W = np.vstack([instance.w(zq) for _ in yq])
+
+    # Plot outline
+    plt.plot(outline(X), outline(Y), &#39;k--&#39;, alpha=0.3, linewidth=1)
+    plt.plot(outline(X+scale*U), outline(Y+scale*W), &#39;k&#39;, linewidth=1)
+
+    # Get x-coordinate of maximum deflection w (cm) and derive plot limits
+    xfocus = xq[np.max(np.argmax(W, axis=1))]/10
+    xmax = np.min([np.max(X+scale*U), xfocus + window/2])
+    xmin = np.max([np.min(X+scale*U), xfocus - window/2])
+
+    # Normalize colormap
+    norm = MidpointNormalize(vmin=1e3*np.min(U), vmax=1e3*np.max(U))
+
+    # Plot contours on deformed grid
+    plt.contourf(X+scale*U, Y+scale*W, 1e3*U,
+                 norm=norm, cmap=&#39;RdBu_r&#39;, levels=100, alpha=0.2)
+
+    # Plot setup
+    plt.axis(&#39;scaled&#39;)
+    plt.colorbar(label=r&#39;$u$ ($\mu$m)&#39;, shrink=0.5)
+    plt.gca().set_xlabel(r&#39;$x$ (mm)&#39;)
+    plt.gca().set_ylabel(r&#39;$z$ (mm)&#39;)
+    plt.gca().invert_yaxis()
+    plt.gca().use_sticky_edges = False
+    plt.xlim([xmin, xmax])</code></pre>
+</details>
+</dd>
+<dt id="weac.plot.displacements"><code class="name flex">
+<span>def <span class="ident">displacements</span></span>(<span>instance, x, z, **segments)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Wrap for dispalcements plot.</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def displacements(instance, x, z, **segments):
+    &#34;&#34;&#34;Wrap for dispalcements plot.&#34;&#34;&#34;
+    data = [
+        [x/10, instance.u(z, z0=0), r&#39;$u_0$&#39;],
+        [x/10, -instance.w(z), r&#39;$w$&#39;],
+        [x/10, np.rad2deg(instance.psi(z)), r&#39;$\psi$&#39;]
+    ]
+    plot_data(ax1label=r&#39;Displacements (mm)&#39;, ax1data=data,
+              name=&#39;disp&#39;, **segments)</code></pre>
+</details>
+</dd>
+<dt id="weac.plot.err_comp"><code class="name flex">
+<span>def <span class="ident">err_comp</span></span>(<span>da, Gdif, Ginc, mode=0)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Wrap energy release rate plot.</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def err_comp(da, Gdif, Ginc, mode=0):
+    &#34;&#34;&#34;Wrap energy release rate plot.&#34;&#34;&#34;
+    data = [
+        [da/10, 1e3*Gdif[mode, :], r&#39;$\mathcal{G}$&#39;],
+        [da/10, 1e3*Ginc[mode, :], r&#39;$\bar{\mathcal{G}}$&#39;]
+    ]
+    plot_data(
+        xlabel=r&#39;Crack length $\Delta a$ (cm)&#39;,
+        ax1label=r&#39;Energy release rate (J/m$^2$)&#39;,
+        ax1data=data, name=&#39;err&#39;, vlines=False)</code></pre>
+</details>
+</dd>
+<dt id="weac.plot.err_modes"><code class="name flex">
+<span>def <span class="ident">err_modes</span></span>(<span>da, G, kind='inc')</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Wrap energy release rate plot.</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def err_modes(da, G, kind=&#39;inc&#39;):
+    &#34;&#34;&#34;Wrap energy release rate plot.&#34;&#34;&#34;
+    label = r&#39;$\bar{\mathcal{G}}$&#39; if kind == &#39;inc&#39; else r&#39;$\mathcal{G}$&#39;
+    data = [
+        [da/10, 1e3*G[2, :], label + r&#39;$_\mathrm{I\!I}$&#39;],
+        [da/10, 1e3*G[1, :], label + r&#39;$_\mathrm{I}$&#39;],
+        [da/10, 1e3*G[0, :], label + r&#39;$_\mathrm{I+I\!I}$&#39;]
+    ]
+    plot_data(
+        xlabel=r&#39;Crack length $a$ (cm)&#39;,
+        ax1label=r&#39;Energy release rate (J/m$^2$)&#39;,
+        ax1data=data, name=&#39;modes&#39;, vlines=False)</code></pre>
+</details>
+</dd>
+<dt id="weac.plot.fea_disp"><code class="name flex">
+<span>def <span class="ident">fea_disp</span></span>(<span>instance, xq, zq, fea)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Wrap dispalcements plot.</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def fea_disp(instance, xq, zq, fea):
+    &#34;&#34;&#34;Wrap dispalcements plot.&#34;&#34;&#34;
+    data = [
+        [fea[:, 0]/10, -np.flipud(fea[:, 1]), r&#39;FEA $u_0$&#39;],
+        [fea[:, 0]/10, np.flipud(fea[:, 2]), r&#39;FEA $w_0$&#39;],
+        # [fea[:, 0]/10, -np.flipud(fea[:, 3]), r&#39;FEA $u(z=-h/2)$&#39;],
+        # [fea[:, 0]/10, np.flipud(fea[:, 4]), r&#39;FEA $w(z=-h/2)$&#39;],
+        [fea[:, 0]/10,
+            np.flipud(np.rad2deg(fea[:, 5])), r&#39;FEA $\psi$&#39;],
+        [xq/10, instance.u(zq, z0=0), r&#39;$u_0$&#39;],
+        [xq/10, -instance.w(zq), r&#39;$w$&#39;],
+        [xq/10, np.rad2deg(instance.psi(zq)), r&#39;$\psi$&#39;]
+    ]
+    plot_data(
+        ax1label=r&#39;Displacements (mm)&#39;, ax1data=data, name=&#39;fea_disp&#39;,
+        labelpos=-50)</code></pre>
+</details>
+</dd>
+<dt id="weac.plot.fea_stress"><code class="name flex">
+<span>def <span class="ident">fea_stress</span></span>(<span>instance, xb, zb, fea)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Wrap stress plot.</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def fea_stress(instance, xb, zb, fea):
+    &#34;&#34;&#34;Wrap stress plot.&#34;&#34;&#34;
+    data = [
+        [fea[:, 0]/10, 1e3*np.flipud(fea[:, 2]), r&#39;FEA $\sigma_2$&#39;],
+        [fea[:, 0]/10, 1e3*np.flipud(fea[:, 3]), r&#39;FEA $\tau_{12}$&#39;],
+        [xb/10, 1e3*instance.tau(zb), r&#39;$\tau$&#39;],
+        [xb/10, 1e3*instance.sig(zb), r&#39;$\sigma$&#39;]
+    ]
+    plot_data(ax1label=r&#39;Stress (kPa)&#39;, ax1data=data, name=&#39;fea_stress&#39;,
+              labelpos=-50)</code></pre>
+</details>
+</dd>
+<dt id="weac.plot.outline"><code class="name flex">
+<span>def <span class="ident">outline</span></span>(<span>grid)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Extract outline values of a 2D array (matrix, grid).</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def outline(grid):
+    &#34;&#34;&#34;Extract outline values of a 2D array (matrix, grid).&#34;&#34;&#34;
+    top = grid[0, :-1]
+    right = grid[:-1, -1]
+    bot = grid[-1, :0:-1]
+    left = grid[::-1, 0]
+
+    return np.hstack([top, right, bot, left])</code></pre>
+</details>
+</dd>
+<dt id="weac.plot.plot_data"><code class="name flex">
+<span>def <span class="ident">plot_data</span></span>(<span>name, ax1data, ax1label, ax2data=None, ax2label=None, labelpos=None, vlines=True, li=False, mi=False, ki=False, xlabel='Horizontal position $x$ (cm)')</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Plot data. Base function.</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def plot_data(
+        name, ax1data, ax1label,
+        ax2data=None, ax2label=None,
+        labelpos=None, vlines=True,
+        li=False, mi=False, ki=False,
+        xlabel=r&#39;Horizontal position $x$ (cm)&#39;):
+    &#34;&#34;&#34;Plot data. Base function.&#34;&#34;&#34;
+    # Clear figure
+    plt.clf()
+
+    # Plot styles
+    labelstyle, colors = set_plotstyles()
+
+    # Font setup
+    plt.rc(&#39;font&#39;, family=&#39;serif&#39;, size=12)
+    plt.rc(&#39;mathtext&#39;, fontset=&#39;cm&#39;)
+
+    # Create figure
+    plt.axis()
+    ax1 = plt.gca()
+
+    # Axis limits
+    ax1.autoscale(axis=&#39;x&#39;, tight=True)
+
+    # Set axis labels
+    ax1.set_xlabel(xlabel + r&#39; $\longrightarrow$&#39;)
+    ax1.set_ylabel(ax1label + r&#39; $\longrightarrow$&#39;)
+
+    # Plot x-axis
+    ax1.axhline(0, linewidth=0.5, color=&#39;gray&#39;)
+
+    # Plot vertical separators
+    if vlines:
+        ax1.axvline(0, linewidth=0.5, color=&#39;gray&#39;)
+        for i, f in enumerate(ki):
+            if not f:
+                ax1.axvspan(sum(li[:i])/10, sum(li[:i+1])/10,
+                            facecolor=&#39;gray&#39;, alpha=0.05, zorder=100)
+        for i, m in enumerate(mi, start=1):
+            if m &gt; 0:
+                ax1.axvline(sum(li[:i])/10, linewidth=0.5, color=&#39;gray&#39;)
+    else:
+        ax1.autoscale(axis=&#39;y&#39;, tight=True)
+
+    # Calculate labelposition
+    if not labelpos:
+        x = ax1data[0][0]
+        labelpos = int(0.95*len(x[~np.isnan(x)]))
+
+    # Fill left y-axis
+    i = -1
+    for x, y, label in ax1data:
+        i += 1
+        if label == &#39;&#39; or &#39;FEA&#39; in label:
+            # line, = ax1.plot(x, y, &#39;k:&#39;, linewidth=1)
+            ax1.plot(x, y, linewidth=3, color=&#39;white&#39;)
+            line, = ax1.plot(x, y, &#39;:&#39;, linewidth=1)  # , color=&#39;black&#39;
+            thislabelpos = -2
+            x, y = x[~np.isnan(x)], y[~np.isnan(x)]
+            xtx = (x[thislabelpos - 1] + x[thislabelpos])/2
+            ytx = (y[thislabelpos - 1] + y[thislabelpos])/2
+            ax1.text(xtx, ytx, label, color=line.get_color(),
+                     **labelstyle)
+        else:
+            # Plot line
+            ax1.plot(x, y, linewidth=3, color=&#39;white&#39;)
+            line, = ax1.plot(x, y, linewidth=1)
+            # Line label
+            x, y = x[~np.isnan(x)], y[~np.isnan(x)]
+            if len(x) &gt; 0:
+                xtx = (x[labelpos - 10*i - 1] + x[labelpos - 10*i])/2
+                ytx = (y[labelpos - 10*i - 1] + y[labelpos - 10*i])/2
+                ax1.text(xtx, ytx, label, color=line.get_color(),
+                         **labelstyle)
+
+    # Fill right y-axis
+    if ax2data:
+        # Create right y-axis
+        ax2 = ax1.twinx()
+        # Set axis label
+        ax2.set_ylabel(ax2label + r&#39; $\longrightarrow$&#39;)
+        # Fill
+        for x, y, label in ax2data:
+            # Plot line
+            ax2.plot(x, y, linewidth=3, color=&#39;white&#39;)
+            line, = ax2.plot(x, y, linewidth=1, color=colors[8, 0])
+            # Line label
+            x, y = x[~np.isnan(x)], y[~np.isnan(x)]
+            xtx = (x[labelpos - 1] + x[labelpos])/2
+            ytx = (y[labelpos - 1] + y[labelpos])/2
+            ax2.text(xtx, ytx, label, color=line.get_color(),
+                     **labelstyle)
+
+    # Save figure
+    filename = name + &#39;.pdf&#39;
+    if isnotebook():
+        plt.show()
+    else:
+        print(&#39;Rendering&#39;, filename, &#39;...&#39;)
+        plt.savefig(&#39;plots/&#39; + filename, bbox_inches=&#39;tight&#39;)</code></pre>
+</details>
+</dd>
+<dt id="weac.plot.section_forces"><code class="name flex">
+<span>def <span class="ident">section_forces</span></span>(<span>instance, x, z, **segments)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Wrap section forces plot.</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def section_forces(instance, x, z, **segments):
+    &#34;&#34;&#34;Wrap section forces plot.&#34;&#34;&#34;
+    data = [
+        [x/10, instance.N(z), r&#39;$N$&#39;],
+        [x/10, instance.M(z), r&#39;$M$&#39;],
+        [x/10, instance.V(z), r&#39;$V$&#39;]
+    ]
+    plot_data(ax1label=r&#39;Section forces&#39;, ax1data=data,
+              name=&#39;forc&#39;, **segments)</code></pre>
+</details>
+</dd>
+<dt id="weac.plot.set_plotstyles"><code class="name flex">
+<span>def <span class="ident">set_plotstyles</span></span>(<span>)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Define styles plot markers, labels and colors.</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def set_plotstyles():
+    &#34;&#34;&#34;Define styles plot markers, labels and colors.&#34;&#34;&#34;
+    labelstyle = {         # Text style of plot labels
+        &#39;backgroundcolor&#39;: &#39;w&#39;,
+        &#39;horizontalalignment&#39;: &#39;center&#39;,
+        &#39;verticalalignment&#39;: &#39;center&#39;}
+    # markerstyle = {        # Style of plot markers
+    #     &#39;marker&#39;: &#39;o&#39;,
+    #     &#39;markersize&#39;: 5,
+    #     &#39;markerfacecolor&#39;: &#39;w&#39;,
+    #     &#39;zorder&#39;: 3}
+    colors = np.array([    # TUD color palette
+        [&#39;#DCDCDC&#39;, &#39;#B5B5B5&#39;, &#39;#898989&#39;, &#39;#535353&#39;],   # gray
+        [&#39;#5D85C3&#39;, &#39;#005AA9&#39;, &#39;#004E8A&#39;, &#39;#243572&#39;],   # blue
+        [&#39;#009CDA&#39;, &#39;#0083CC&#39;, &#39;#00689D&#39;, &#39;#004E73&#39;],   # ocean
+        [&#39;#50B695&#39;, &#39;#009D81&#39;, &#39;#008877&#39;, &#39;#00715E&#39;],   # teal
+        [&#39;#AFCC50&#39;, &#39;#99C000&#39;, &#39;#7FAB16&#39;, &#39;#6A8B22&#39;],   # green
+        [&#39;#DDDF48&#39;, &#39;#C9D400&#39;, &#39;#B1BD00&#39;, &#39;#99A604&#39;],   # lime
+        [&#39;#FFE05C&#39;, &#39;#FDCA00&#39;, &#39;#D7AC00&#39;, &#39;#AE8E00&#39;],   # yellow
+        [&#39;#F8BA3C&#39;, &#39;#F5A300&#39;, &#39;#D28700&#39;, &#39;#BE6F00&#39;],   # sand
+        [&#39;#EE7A34&#39;, &#39;#EC6500&#39;, &#39;#CC4C03&#39;, &#39;#A94913&#39;],   # orange
+        [&#39;#E9503E&#39;, &#39;#E6001A&#39;, &#39;#B90F22&#39;, &#39;#961C26&#39;],   # red
+        [&#39;#C9308E&#39;, &#39;#A60084&#39;, &#39;#951169&#39;, &#39;#732054&#39;],   # magenta
+        [&#39;#804597&#39;, &#39;#721085&#39;, &#39;#611C73&#39;, &#39;#4C226A&#39;]])  # puple
+    return labelstyle, colors</code></pre>
+</details>
+</dd>
+<dt id="weac.plot.slab_profile"><code class="name flex">
+<span>def <span class="ident">slab_profile</span></span>(<span>instance)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Create bar chart of slab profile.</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def slab_profile(instance):
+    &#34;&#34;&#34;Create bar chart of slab profile.&#34;&#34;&#34;
+    x = []
+    y = []
+
+    total_heigth = 0
+
+    for line in instance.slab:
+        x.append(line[0])
+        x.append(line[0])
+
+        y.append(total_heigth)
+        total_heigth = total_heigth + line[1]
+        y.append(total_heigth)
+
+    # Font setup
+    plt.rc(&#39;font&#39;, family=&#39;serif&#39;, size=8)
+    plt.rc(&#39;mathtext&#39;, fontset=&#39;cm&#39;)
+
+    # Create figure
+    fig = plt.figure(figsize=(2, 2))
+    plt.axis()
+    ax1 = fig.gca()
+
+    # Set axis labels
+    ax1.set_xlabel(&#39;Density (kg/m$^3$)&#39;)
+    ax1.set_ylabel(&#39;Thickness (mm)&#39;)
+
+    ax1.set_xlim(500, 0)
+
+    ax1.fill_betweenx(y, 0, x)
+    plt.show()</code></pre>
+</details>
+</dd>
+<dt id="weac.plot.stress_criteria"><code class="name flex">
+<span>def <span class="ident">stress_criteria</span></span>(<span>x, stress, **segments)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Wrap plot of stress and energy criteria.</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def stress_criteria(x, stress, **segments):
+    &#34;&#34;&#34;Wrap plot of stress and energy criteria.&#34;&#34;&#34;
+    data = [
+        [x/10, stress, r&#39;$\sigma/\sigma_\mathrm{c}$&#39;]
+    ]
+    plot_data(ax1label=r&#39;Criteria&#39;, ax1data=data,
+              name=&#39;crit&#39;, **segments)</code></pre>
+</details>
+</dd>
+<dt id="weac.plot.stresses"><code class="name flex">
+<span>def <span class="ident">stresses</span></span>(<span>instance, x, z, **segments)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Wrap stress plot.</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def stresses(instance, x, z, **segments):
+    &#34;&#34;&#34;Wrap stress plot.&#34;&#34;&#34;
+    data = [
+        [x/10, 1e3*instance.tau(z), r&#39;$\tau$&#39;],
+        [x/10, 1e3*instance.sig(z), r&#39;$\sigma$&#39;]
+    ]
+    plot_data(ax1label=r&#39;Stress (kPa)&#39;, ax1data=data,
+              name=&#39;stress&#39;, **segments)</code></pre>
+</details>
+</dd>
+</dl>
+</section>
+<section>
+<h2 class="section-title" id="header-classes">Classes</h2>
+<dl>
+<dt id="weac.plot.MidpointNormalize"><code class="flex name class">
+<span>class <span class="ident">MidpointNormalize</span></span>
+<span>(</span><span>vmin, vmax, midpoint=0, clip=False)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Colormap normalization to a specified midpoint. Default is 0.</p>
+<p>Inizialize normalization.</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class MidpointNormalize(Normalize):
+    &#34;&#34;&#34;Colormap normalization to a specified midpoint. Default is 0.&#34;&#34;&#34;
+
+    def __init__(self, vmin, vmax, midpoint=0, clip=False):
+        &#34;&#34;&#34;Inizialize normalization.&#34;&#34;&#34;
+        self.midpoint = midpoint
+        Normalize.__init__(self, vmin, vmax, clip)
+
+    def __call__(self, value, clip=None):
+        &#34;&#34;&#34;Make instances callable as functions.&#34;&#34;&#34;
+        normalized_min = max(0, 0.5*(1 - abs(
+            (self.midpoint - self.vmin)/(self.midpoint - self.vmax))))
+        normalized_max = min(1, 0.5*(1 + abs(
+            (self.vmax - self.midpoint)/(self.midpoint - self.vmin))))
+        normalized_mid = 0.5
+        x, y = [self.vmin, self.midpoint, self.vmax], [
+            normalized_min, normalized_mid, normalized_max]
+        return np.ma.masked_array(np.interp(value, x, y))</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li>matplotlib.colors.Normalize</li>
+</ul>
+</dd>
+</dl>
+</section>
+</article>
+<nav id="sidebar">
+<h1>Index</h1>
+<div class="toc">
+<ul></ul>
+</div>
+<ul id="index">
+<li><h3>Super-module</h3>
+<ul>
+<li><code><a title="weac" href="index.html">weac</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-functions">Functions</a></h3>
+<ul class="two-column">
+<li><code><a title="weac.plot.contours" href="#weac.plot.contours">contours</a></code></li>
+<li><code><a title="weac.plot.displacements" href="#weac.plot.displacements">displacements</a></code></li>
+<li><code><a title="weac.plot.err_comp" href="#weac.plot.err_comp">err_comp</a></code></li>
+<li><code><a title="weac.plot.err_modes" href="#weac.plot.err_modes">err_modes</a></code></li>
+<li><code><a title="weac.plot.fea_disp" href="#weac.plot.fea_disp">fea_disp</a></code></li>
+<li><code><a title="weac.plot.fea_stress" href="#weac.plot.fea_stress">fea_stress</a></code></li>
+<li><code><a title="weac.plot.outline" href="#weac.plot.outline">outline</a></code></li>
+<li><code><a title="weac.plot.plot_data" href="#weac.plot.plot_data">plot_data</a></code></li>
+<li><code><a title="weac.plot.section_forces" href="#weac.plot.section_forces">section_forces</a></code></li>
+<li><code><a title="weac.plot.set_plotstyles" href="#weac.plot.set_plotstyles">set_plotstyles</a></code></li>
+<li><code><a title="weac.plot.slab_profile" href="#weac.plot.slab_profile">slab_profile</a></code></li>
+<li><code><a title="weac.plot.stress_criteria" href="#weac.plot.stress_criteria">stress_criteria</a></code></li>
+<li><code><a title="weac.plot.stresses" href="#weac.plot.stresses">stresses</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-classes">Classes</a></h3>
+<ul>
+<li>
+<h4><code><a title="weac.plot.MidpointNormalize" href="#weac.plot.MidpointNormalize">MidpointNormalize</a></code></h4>
+</li>
+</ul>
+</li>
+</ul>
+</nav>
+</main>
+<footer id="footer">
+<p>Generated by <a href="https://pdoc3.github.io/pdoc" title="pdoc: Python API documentation generator"><cite>pdoc</cite> 0.10.0</a>.</p>
+</footer>
+</body>
+</html>
