@@ -152,10 +152,10 @@ class Eigensystem:
         Arguments
         ---------
         layers : list or str
-            2D list of layer densities and thicknesses. Columns are
-            density (kg/m^3) and thickness (mm). One row corresponds
-            to one layer. If entered as str, last split must be
-            available in database.
+            2D list of top-to-bottom layer densities and thicknesses.
+            Columns are density (kg/m^3) and thickness (mm). One row
+            corresponds to one layer. If entered as str, last split
+            must be available in database.
         C0 : float, optional
             Multiplicative constant of Young modulus parametrization
             according to Gerling et al. (2017). Default is 6.0.
@@ -165,33 +165,38 @@ class Eigensystem:
         nu : float, optional
             Possion's ratio. Default is 0.25
         """
-        # Elastic properties and geometry
         if isinstance(layers, str):
+            # Read layering and Young's modulus from database
             layers, E = load_dummy_profile(layers.split()[-1])
         else:
+            # Compute Young's modulus from density parametrization
             layers = np.array(layers)
             E = gerling(layers[:, 0], C0=C0, C1=C1)  # Young's modulus
 
-        # Other elastic properties and geometry
+        # Derive other elastic properties
         nu = nu*np.ones(layers.shape[0])         # Global poisson's ratio
         G = E/(2*(1 + nu))                       # Shear modulus
         self.k = 5/6                             # Shear correction factor
 
-        # Assemble layering into matrix (bottom to top)
-        self.slab = np.flipud(np.vstack([layers.T, E, G, nu]).T)
-
-        # Compute center of gravity
+        # Compute total slab thickness and center of gravity
         self.h, self.zs = calc_center_of_gravity(layers)
+
+        # Assemble layering into matrix (top to bottom)
+        # Columns are density (kg/m^3), layer thickness (mm)
+        # Young's modulus (MPa), shear modulus (MPa), and
+        # Poisson's ratio
+        self.slab = np.vstack([layers.T, E, G, nu]).T
+
 
     def calc_foundation_stiffness(self):
         """Compute foundation normal and shear stiffness."""
-        # Plaine strain shear and Young's modulus (MPa)
-        G = self.weak['E']/(2*(1 + self.weak['nu']))
-        E = self.weak['E']/(1 - self.weak['nu']**2)
+        # Elastic moduli (MPa) under plane-strain conditions
+        G = self.weak['E']/(2*(1 + self.weak['nu']))    # Shear modulus
+        E = self.weak['E']/(1 - self.weak['nu']**2)     # Young's modulus
 
-        # Foundation stiffnesses
-        self.kn = E/self.t   # Normal stiffness (N/mm^3)
-        self.kt = G/self.t   # Shear stiffness (N/mm^3)
+        # Foundation (weak layer) stiffnesses (N/mm^3)
+        self.kn = E/self.t                              # Normal stiffness
+        self.kt = G/self.t                              # Shear stiffness
 
     def calc_laminate_stiffness_matrix(self):
         """
@@ -199,22 +204,21 @@ class Eigensystem:
 
         Return plane-strain laminate stiffness matrix (ABD matrix).
         """
-        # Number of plies, ply thicknesses
+        # Number of plies and ply thicknesses (top to bottom)
         n = self.slab.shape[0]
         t = self.slab[:, 1]
-        # Initialize ply coordinates (bottom to top in laminate CSYS)
+        # Calculate ply coordinates (top to bottom) in coordinate system
+        # with downward pointing z-axis (z-list will be negative to positive)
         z = np.zeros(n + 1)
         for j in range(n + 1):
-            z[j] = -self.h/2 + \
-                sum(t[0:j])
+            z[j] = -self.h/2 + sum(t[0:j])
         # Initialize stiffness components
         A11, B11, D11, kA55 = 0, 0, 0, 0
-        # Add layerwise contributions (sign of B11 to agree with beam CSYS)
+        # Add layerwise contributions
         for i in range(n):
-            # Add layerwise contributions
             E, G, nu = self.slab[i, 2:5]
             A11 = A11 + E/(1 - nu**2)*(z[i+1] - z[i])
-            B11 = B11 - 1/2*E/(1 - nu**2)*(z[i+1]**2 - z[i]**2)
+            B11 = B11 + 1/2*E/(1 - nu**2)*(z[i+1]**2 - z[i]**2)
             D11 = D11 + 1/3*E/(1 - nu**2)*(z[i+1]**3 - z[i]**3)
             kA55 = kA55 + self.k*G*(z[i+1] - z[i])
 

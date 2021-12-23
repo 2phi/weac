@@ -118,11 +118,12 @@ See the [open issues](https://github.com/2phi/weac/issues) for a list of propose
 ### v2.2
 - [ ] Finite fracture mechanics implementation for layered snow covers
 
-### v2.1
-- [ ] Flip coordinate system and order of layers of the slab
-- [x] Allow for cutting PSTs from left or right side
-
 ## Release history
+
+### v2.1
+- Consistent use of coordinate system with downward pointing z-axis
+- Consitent top-to-bottom ordering of slab layers
+- Implementation of PSTs cut from either left or right side
 
 ### v2.0
 - Completely rewritten in Python
@@ -149,9 +150,9 @@ See the [open issues](https://github.com/2phi/weac/issues) for a list of propose
 ## How to contribute
 
 1. Fork the project
-2. Create your feature branch (`git checkout -b feature/AmazingFeature`)
-3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
-4. Push to the branch (`git push origin feature/AmazingFeature`)
+2. Create your feature branch (`git checkout -b feature/amazingfeature`)
+3. Commit your changes (`git commit -m 'Add some amazingfeature'`)
+4. Push to the branch (`git push origin feature/amazingfeature`)
 5. Open a pull request
 
 

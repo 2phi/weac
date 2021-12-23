@@ -83,7 +83,7 @@ def slab_profile(instance):
 
     total_heigth = 0
 
-    for line in instance.slab:
+    for line in np.flipud(instance.slab):
         x.append(line[0])
         x.append(line[0])
 
