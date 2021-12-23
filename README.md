@@ -73,7 +73,7 @@ Load the module.
 ```python
 import weac
 ```
-Choose a profile from the database (see [demo](https://github.com/2phi/weac/blob/main/demo/demo.ipynb)) or create your own.
+Choose a profile from the database (see [demo](https://github.com/2phi/weac/blob/main/demo/demo.ipynb)) or create your own as a 2D array where the columns are density (kg/m^2) and layer thickness (mm). One row corresponds to one layer counted from top (below surface) to bottom (above weak layer). 
 ```python
 myprofile = [[180, 100],  # (1) surface layer
              [190,  40],  # (2)
