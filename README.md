@@ -76,11 +76,11 @@ import weac
 ```
 Choose a profile from the database (see [demo](https://github.com/2phi/weac/blob/main/demo/demo.ipynb)) or create your own.
 ```python
-myprofile = [[180, 100],
-             [190,  40],
-             [230, 130],
-             [380,  20],
-             [270, 100]]
+myprofile = [[180, 100],  # (1) surface layer
+             [190,  40],  # (2)
+             [230, 130],  #  :
+             [380,  20],  #  :
+             [270, 100]]  # (L) last slab layer above weak layer
 ```
 Create a model instance with optional custom layering.
 ```python
@@ -122,7 +122,7 @@ See the [open issues](https://github.com/2phi/weac/issues) for a list of propose
 
 ### v2.1
 - Consistent use of coordinate system with downward pointing z-axis
-- Consitent top-to-bottom ordering of slab layers
+- Consitent top-to-bottom numbering of slab layers
 - Implementation of PSTs cut from either left or right side
 
 ### v2.0
