@@ -187,7 +187,6 @@ class Eigensystem:
         # Poisson's ratio
         self.slab = np.vstack([layers.T, E, G, nu]).T
 
-
     def calc_foundation_stiffness(self):
         """Compute foundation normal and shear stiffness."""
         # Elastic moduli (MPa) under plane-strain conditions
@@ -290,7 +289,7 @@ class Eigensystem:
         Arguments
         ---------
         phi : float
-            Inclination (degrees).
+            Inclination (degrees). Counterclockwise positive.
 
         Returns
         -------
@@ -306,7 +305,7 @@ class Eigensystem:
         q = sum(rho*self.g*self.slab[:, 1])     # Line load (N/mm)
         # Split into components
         qn = q*np.cos(phi)                      # Normal direction
-        qt = q*np.sin(phi)                      # Tangential direction
+        qt = -q*np.sin(phi)                     # Tangential direction
 
         return qn, qt
 
@@ -319,7 +318,7 @@ class Eigensystem:
         m : float
             Skier weight (kg).
         phi : float
-            Inclination (degrees).
+            Inclination (degrees). Counterclockwise positive.
 
         Returns
         -------
@@ -331,7 +330,7 @@ class Eigensystem:
         phi = np.deg2rad(phi)                   # Convert inclination to rad
         F = 1e-3*np.array(m)*self.g/self.lski   # Total skier load (N)
         Fn = F*np.cos(phi)                      # Normal skier load (N)
-        Ft = F*np.sin(phi)                      # Tangential skier load (N)
+        Ft = -F*np.sin(phi)                     # Tangential skier load (N)
 
         return Fn, Ft
 
