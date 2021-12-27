@@ -104,7 +104,7 @@ Calculate lists of segment lengths, locations of foundations, and position and m
 ```python
 segments = skier.calc_segments(L=10000, a=300, m=80)['crack']
 ```
-Assemble the system of linear equations and solve the boundary-value problem for the free constants `C` providing the inclination `phi` in degrees.
+Assemble the system of linear equations and solve the boundary-value problem for the free constants `C` providing the inclination `phi` (counterclockwise positive) in degrees.
 ```python
 C = skier.assemble_and_solve(phi=38, **segments)
 ```
