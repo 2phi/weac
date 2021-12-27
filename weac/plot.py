@@ -92,17 +92,17 @@ def slab_profile(instance):
         y.append(total_heigth)
 
     # Font setup
-    plt.rc('font', family='serif', size=8)
+    plt.rc('font', family='serif', size=7)
     plt.rc('mathtext', fontset='cm')
 
     # Create figure
-    fig = plt.figure(figsize=(2, 2))
+    fig = plt.figure(figsize=(2, 3))
     plt.axis()
     ax1 = fig.gca()
 
     # Set axis labels
     ax1.set_xlabel('Density (kg/m$^3$)')
-    ax1.set_ylabel('Thickness (mm)')
+    ax1.set_ylabel('Height above weak layer (mm)')
 
     ax1.set_xlim(500, 0)
 
@@ -130,15 +130,18 @@ def contours(instance, x, z, window=1e12, scale=100):
     scale : int
         Scaling factor for the visualization of displacements.
     """
-    # Calculate y-coordinates (top to bottom)
-    yq = np.linspace(-instance.h/2, instance.h/2, num=21)
+    # Plot Setup
+    plt.rc('font', family='serif', size=10)
 
-    # Initialize grid coordinates
-    X, Y = np.meshgrid(x/10, yq/10)
+    # Calculate top-to-bottom vertical positions (mm) in beam coordinate system
+    y = np.linspace(-instance.h/2, instance.h/2, num=21)
 
-    # Compute displacements on grid
-    U = np.vstack([instance.u(z, z0=y) for y in yq])
-    W = np.vstack([instance.w(z) for _ in yq])
+    # Compute displacements on grid (cm)
+    U = 1e-1*np.vstack([instance.u(z, z0=y, unit='mm') for y in y])
+    W = 1e-1*np.vstack([instance.w(z, unit='mm') for _ in y])
+
+    # Compute grid coordinates with vertical origin at top surface (cm)
+    X, Y = np.meshgrid(1e-1*x, 1e-1*(y + instance.h/2))
 
     # Plot outline
     plt.plot(outline(X), outline(Y), 'k--', alpha=0.3, linewidth=1)
@@ -158,12 +161,22 @@ def contours(instance, x, z, window=1e12, scale=100):
 
     # Plot setup
     plt.axis('scaled')
-    plt.colorbar(label=r'$u$ ($\mu$m)', shrink=0.5)
-    plt.gca().set_xlabel(r'$x$ (mm)')
-    plt.gca().set_ylabel(r'$z$ (mm)')
+    plt.xlim([xmin, xmax])
+    plt.gca().set_aspect(2)
     plt.gca().invert_yaxis()
     plt.gca().use_sticky_edges = False
-    plt.xlim([xmin, xmax])
+
+    # Plot labels
+    plt.gca().set_xlabel(r'lateral position $x$ (cm) $\longrightarrow$')
+    plt.gca().set_ylabel('depth below surface\n' r'$\longleftarrow $ $d$ (cm)')
+    plt.title(fr'${scale}\!\times\!$ scaled deformations (cm)', size=11)
+
+    # Colorbar
+    cbar = plt.colorbar(
+        shrink=0.5,
+        label=('lateral displacements\n'
+               r'$u$ ($\mu\mathrm{m}$) $\longrightarrow$'))
+    cbar.ax.tick_params(labelsize=9)
 
 
 # === BASE PLOT FUNCTION ======================================================
@@ -219,7 +232,7 @@ def plot_data(
         labelpos = int(0.95*len(x[~np.isnan(x)]))
 
     # Fill left y-axis
-    i = -1
+    i = 0
     for x, y, label in ax1data:
         i += 1
         if label == '' or 'FEA' in label:
@@ -277,11 +290,11 @@ def plot_data(
 def displacements(instance, x, z, **segments):
     """Wrap for dispalcements plot."""
     data = [
-        [x/10, instance.u(z, z0=0), r'$u_0$'],
-        [x/10, -instance.w(z), r'$w$'],
-        [x/10, np.rad2deg(instance.psi(z)), r'$\psi$']
+        [x/10, instance.u(z, z0=0, unit='mm'), r'$u_0\ (\mathrm{mm})$'],
+        [x/10, -instance.w(z, unit='mm'), r'$-w\ (\mathrm{mm})$'],
+        [x/10, instance.psi(z, unit='degrees'), r'$\psi\ (^\circ)$ ']
     ]
-    plot_data(ax1label=r'Displacements (mm)', ax1data=data,
+    plot_data(ax1label=r'Displacements', ax1data=data,
               name='disp', **segments)
 
 
@@ -299,8 +312,8 @@ def section_forces(instance, x, z, **segments):
 def stresses(instance, x, z, **segments):
     """Wrap stress plot."""
     data = [
-        [x/10, 1e3*instance.tau(z), r'$\tau$'],
-        [x/10, 1e3*instance.sig(z), r'$\sigma$']
+        [x/10, instance.tau(z, unit='kPa'), r'$\tau$'],
+        [x/10, instance.sig(z, unit='kPa'), r'$\sigma$']
     ]
     plot_data(ax1label=r'Stress (kPa)', ax1data=data,
               name='stress', **segments)
@@ -351,7 +364,7 @@ def fea_disp(instance, x, z, fea):
         [fea[:, 0]/10,
             np.flipud(np.rad2deg(fea[:, 5])), r'FEA $\psi$'],
         [x/10, instance.u(z, z0=0), r'$u_0$'],
-        [x/10, -instance.w(z), r'$w$'],
+        [x/10, -instance.w(z), r'$-w$'],
         [x/10, np.rad2deg(instance.psi(z)), r'$\psi$']
     ]
     plot_data(
@@ -364,8 +377,8 @@ def fea_stress(instance, xb, zb, fea):
     data = [
         [fea[:, 0]/10, 1e3*np.flipud(fea[:, 2]), r'FEA $\sigma_2$'],
         [fea[:, 0]/10, 1e3*np.flipud(fea[:, 3]), r'FEA $\tau_{12}$'],
-        [xb/10, 1e3*instance.tau(zb), r'$\tau$'],
-        [xb/10, 1e3*instance.sig(zb), r'$\sigma$']
+        [xb/10, instance.tau(zb, unit='kPa'), r'$\tau$'],
+        [xb/10, instance.sig(zb, unit='kPa'), r'$\sigma$']
     ]
     plot_data(ax1label=r'Stress (kPa)', ax1data=data, name='fea_stress',
               labelpos=-50)
