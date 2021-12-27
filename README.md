@@ -117,11 +117,19 @@ Visualize the results.
 # Visualize deformations as a contour plot
 weac.plot.contours(skier, x=xq, z=zq, window=200, scale=100)
 
-# Plot slab displacements
+# Plot slab displacements (using x-coordinates of all segments, xq)
 weac.plot.displacements(skier, x=xq, z=zq, **segments)
 
-# Plot weak-layer stresses
+# Plot weak-layer stresses (using only x-coordinates of bedded segments, xb)
 weac.plot.stresses(skier, x=xb, z=zq, **segments)
+```
+Compute output quantities for exporting or plotting.
+```python
+# Slab deflections (using x-coordinates of all segments, xq)
+x_cm, w_um = skier.get_slab_deflection(x=xq, z=zq, unit='um')
+
+# Weak-layer shear stress (using only x-coordinates of bedded segments, xb)
+x_cm, tau_kPa = skier.get_weaklayer_shearstress(x=xb, z=zq, unit='kPa')
 ```
 
 <!-- ROADMAP -->
@@ -137,7 +145,7 @@ See the [open issues](https://github.com/2phi/weac/issues) for a list of propose
 - [x] Add dimension arguments to field-quantity methods
 - [x] Improved aspect ratio of profile views and contour plots
 - [x] Improved plot labels
-- [ ] Provide convenience functions for the export of weak-layer stresses and slab deformations
+- [x] Provide convenience methods for the export of weak-layer stresses and slab deformations
 - [ ] Add demo dif
 
 ## Release history

@@ -1,11 +1,15 @@
 """Class for the elastic analysis of layered snow slabs."""
 
 # Project imports
-from weac.mixins import FieldQuantitiesMixin, SolutionMixin, AnalysisMixin
+from weac.mixins import FieldQuantitiesMixin
+from weac.mixins import SolutionMixin
+from weac.mixins import AnalysisMixin
+from weac.mixins import OutputMixin
 from weac.eigensystem import Eigensystem
 
 
-class Layered(FieldQuantitiesMixin, SolutionMixin, AnalysisMixin, Eigensystem):
+class Layered(FieldQuantitiesMixin, SolutionMixin, AnalysisMixin,
+              OutputMixin, Eigensystem):
     """
     Layered beam on elastic foundation model application interface.
 

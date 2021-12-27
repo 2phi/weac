@@ -2,11 +2,15 @@
 # pylint: disable=invalid-name
 
 # Project imports
-from weac.mixins import FieldQuantitiesMixin, SolutionMixin, AnalysisMixin
+from weac.mixins import FieldQuantitiesMixin
+from weac.mixins import SolutionMixin
+from weac.mixins import AnalysisMixin
+from weac.mixins import OutputMixin
 from weac.eigensystem import Eigensystem
 
 
-class Inverse(FieldQuantitiesMixin, SolutionMixin, AnalysisMixin, Eigensystem):
+class Inverse(FieldQuantitiesMixin, SolutionMixin, AnalysisMixin,
+              OutputMixin, Eigensystem):
     """
     Fit the elastic properties of the layers of a snowpack.
 
