@@ -17,10 +17,11 @@
 [![DOI][doi-badge]][doi-url]\
 Implementation of closed-form analytical models for the analysis of dry-snow slab avalanche release.
 
-[View demo](https://github.com/2phi/weac/blob/main/demo/demo.ipynb) · 
-[Report bug](https://github.com/2phi/weac/issues) · 
-[Request feature](https://github.com/2phi/weac/issues) · 
-[Read the docs](https://2phi.github.io/weac/)
+[View the demo](https://github.com/2phi/weac/blob/main/demo/demo.ipynb) · 
+[Report a bug](https://github.com/2phi/weac/issues) · 
+[Request a feature](https://github.com/2phi/weac/issues) · 
+[Read the docs](https://2phi.github.io/weac/) · 
+[Cite the software](https://github.com/2phi/weac/blob/main/CITATION.cff)
 
 <!-- TABLE OF CONTENTS -->
 ## Contents
@@ -47,7 +48,15 @@ Please refer to the companion papers for model derivations, illustrations, dimen
 - Rosendahl, P. L., & Weißgraeber, P. (2020). Modeling snow slab avalanches caused by weak-layer failure – Part 1: Slabs on compliant and collapsible weak layers. The Cryosphere, 14(1), 115–130. https://doi.org/10.5194/tc-14-115-2020
 - Rosendahl, P. L., & Weißgraeber, P. (2020). Modeling snow slab avalanches caused by weak-layer failure – Part 2: Coupled mixed-mode criterion for skier-triggered anticracks. The Cryosphere, 14(1), 131–145. https://doi.org/10.5194/tc-14-131-2020
 
-Written in [Python](https://www.python.org) and built with [Atom](https://atom.io), [GitKraken](https://www.gitkraken.com), and [Jupyter](https://jupyter.org). Note that [release v1.0](https://github.com/2phi/weac/releases/tag/v1.0.0) was written and built in [MATLAB](https://www.mathworks.com/products/matlab.html).
+Written in [🐍 Python](https://www.python.org)  and built with [<span style="color:#498B60">⚛</span> Atom](https://atom.io), [🐙 GitKraken](https://www.gitkraken.com), and [🪐 Jupyter](https://jupyter.org). Note that [release v1.0](https://github.com/2phi/weac/releases/tag/v1.0.0) was written and built in [🌋 MATLAB](https://www.mathworks.com/products/matlab.html). 
+
+<!-- 
+[![Python](https://img.shields.io/badge/Python-306998.svg?style=flat&logo=python&logoColor=white&label&labelColor=gray)](https://www.python.org)
+[![Jupyter](https://img.shields.io/badge/Jupyter-e67124.svg?style=flat&logo=jupyter&logoColor=white&label&labelColor=gray)](https://jupyter.org)
+[![Atom](https://img.shields.io/badge/Atom-498b60.svg?style=flat&logo=atom&logoColor=white&label&labelColor=gray)](https://atom.io)
+[![GitKraken](https://img.shields.io/badge/GitKraken-179287.svg?style=flat&logo=gitkraken&logoColor=white&label&labelColor=gray)](https://www.gitkraken.com) -->
+
+
 
 <!-- INSTALLATION -->
 ## Installation
@@ -124,10 +133,12 @@ See the [open issues](https://github.com/2phi/weac/issues) for a list of propose
 - [ ] Finite fracture mechanics implementation for layered snow covers
 
 ### v2.2
-- [ ] Make sign of the slope angle phi consistent with the coordinate system (positive counterclockwise)
-- [ ] Add dimension arguments to field-quantity methods
+- [x] Make sign of inclination `phi` consistent with the coordinate system (positive counterclockwise)
+- [x] Add dimension arguments to field-quantity methods
+- [x] Improved aspect ratio of profile views and contour plots
+- [x] Improved plot labels
 - [ ] Provide convenience functions for the export of weak-layer stresses and slab deformations
-
+- [ ] Add demo dif
 
 ## Release history
 
@@ -137,7 +148,7 @@ See the [open issues](https://github.com/2phi/weac/issues) for a list of propose
 - Implementation of PSTs cut from either left or right side
 
 ### v2.0
-- Completely rewritten in Python 🐍
+- Completely rewritten in 🐍 Python
 - Coupled bending-extension ODE solver implemented
 - Stress analysis of arbitrarily layered snow slabs
 - FEM validation of
@@ -149,7 +160,7 @@ See the [open issues](https://github.com/2phi/weac/issues) for a list of propose
 
 ### v1.0
 
-- Written in MATLAB 🌋
+- Written in 🌋 MATLAB
 - Deformation analysis of homogeneous snow labs
 - Weak-layer stress prediction
 - Energy release rates of cracks in weak layers
