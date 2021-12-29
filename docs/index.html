@@ -42,7 +42,7 @@ from weac.inverse import Inverse
 from weac import plot
 
 # Version
-__version__ = &#39;2.0.0&#39;
+__version__ = &#39;2.1.0&#39;
 
 # Public names
 __all__ = [
@@ -123,7 +123,8 @@ respectively. Default is (6.0, 4.6, 0.25).</dd>
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">class Inverse(FieldQuantitiesMixin, SolutionMixin, AnalysisMixin, Eigensystem):
+<pre><code class="python">class Inverse(FieldQuantitiesMixin, SolutionMixin, AnalysisMixin,
+              OutputMixin, Eigensystem):
     &#34;&#34;&#34;
     Fit the elastic properties of the layers of a snowpack.
 
@@ -176,6 +177,7 @@ respectively. Default is (6.0, 4.6, 0.25).</dd>
 <li><a title="weac.mixins.FieldQuantitiesMixin" href="mixins.html#weac.mixins.FieldQuantitiesMixin">FieldQuantitiesMixin</a></li>
 <li><a title="weac.mixins.SolutionMixin" href="mixins.html#weac.mixins.SolutionMixin">SolutionMixin</a></li>
 <li><a title="weac.mixins.AnalysisMixin" href="mixins.html#weac.mixins.AnalysisMixin">AnalysisMixin</a></li>
+<li><a title="weac.mixins.OutputMixin" href="mixins.html#weac.mixins.OutputMixin">OutputMixin</a></li>
 <li><a title="weac.eigensystem.Eigensystem" href="eigensystem.html#weac.eigensystem.Eigensystem">Eigensystem</a></li>
 </ul>
 <h3>Inherited members</h3>
@@ -215,6 +217,15 @@ respectively. Default is (6.0, 4.6, 0.25).</dd>
 <li><code><a title="weac.mixins.AnalysisMixin.gdif" href="mixins.html#weac.mixins.AnalysisMixin.gdif">gdif</a></code></li>
 <li><code><a title="weac.mixins.AnalysisMixin.ginc" href="mixins.html#weac.mixins.AnalysisMixin.ginc">ginc</a></code></li>
 <li><code><a title="weac.mixins.AnalysisMixin.rasterize_solution" href="mixins.html#weac.mixins.AnalysisMixin.rasterize_solution">rasterize_solution</a></code></li>
+</ul>
+</li>
+<li><code><b><a title="weac.mixins.OutputMixin" href="mixins.html#weac.mixins.OutputMixin">OutputMixin</a></b></code>:
+<ul class="hlist">
+<li><code><a title="weac.mixins.OutputMixin.get_slab_deflection" href="mixins.html#weac.mixins.OutputMixin.get_slab_deflection">get_slab_deflection</a></code></li>
+<li><code><a title="weac.mixins.OutputMixin.get_slab_displacement" href="mixins.html#weac.mixins.OutputMixin.get_slab_displacement">get_slab_displacement</a></code></li>
+<li><code><a title="weac.mixins.OutputMixin.get_slab_rotation" href="mixins.html#weac.mixins.OutputMixin.get_slab_rotation">get_slab_rotation</a></code></li>
+<li><code><a title="weac.mixins.OutputMixin.get_weaklayer_normalstress" href="mixins.html#weac.mixins.OutputMixin.get_weaklayer_normalstress">get_weaklayer_normalstress</a></code></li>
+<li><code><a title="weac.mixins.OutputMixin.get_weaklayer_shearstress" href="mixins.html#weac.mixins.OutputMixin.get_weaklayer_shearstress">get_weaklayer_shearstress</a></code></li>
 </ul>
 </li>
 <li><code><b><a title="weac.eigensystem.Eigensystem" href="eigensystem.html#weac.eigensystem.Eigensystem">Eigensystem</a></b></code>:
@@ -262,7 +273,8 @@ to one layer. Default is [[240, 200], ].</dd>
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">class Layered(FieldQuantitiesMixin, SolutionMixin, AnalysisMixin, Eigensystem):
+<pre><code class="python">class Layered(FieldQuantitiesMixin, SolutionMixin, AnalysisMixin,
+              OutputMixin, Eigensystem):
     &#34;&#34;&#34;
     Layered beam on elastic foundation model application interface.
 
@@ -307,6 +319,7 @@ to one layer. Default is [[240, 200], ].</dd>
 <li><a title="weac.mixins.FieldQuantitiesMixin" href="mixins.html#weac.mixins.FieldQuantitiesMixin">FieldQuantitiesMixin</a></li>
 <li><a title="weac.mixins.SolutionMixin" href="mixins.html#weac.mixins.SolutionMixin">SolutionMixin</a></li>
 <li><a title="weac.mixins.AnalysisMixin" href="mixins.html#weac.mixins.AnalysisMixin">AnalysisMixin</a></li>
+<li><a title="weac.mixins.OutputMixin" href="mixins.html#weac.mixins.OutputMixin">OutputMixin</a></li>
 <li><a title="weac.eigensystem.Eigensystem" href="eigensystem.html#weac.eigensystem.Eigensystem">Eigensystem</a></li>
 </ul>
 <h3>Inherited members</h3>
@@ -346,6 +359,15 @@ to one layer. Default is [[240, 200], ].</dd>
 <li><code><a title="weac.mixins.AnalysisMixin.gdif" href="mixins.html#weac.mixins.AnalysisMixin.gdif">gdif</a></code></li>
 <li><code><a title="weac.mixins.AnalysisMixin.ginc" href="mixins.html#weac.mixins.AnalysisMixin.ginc">ginc</a></code></li>
 <li><code><a title="weac.mixins.AnalysisMixin.rasterize_solution" href="mixins.html#weac.mixins.AnalysisMixin.rasterize_solution">rasterize_solution</a></code></li>
+</ul>
+</li>
+<li><code><b><a title="weac.mixins.OutputMixin" href="mixins.html#weac.mixins.OutputMixin">OutputMixin</a></b></code>:
+<ul class="hlist">
+<li><code><a title="weac.mixins.OutputMixin.get_slab_deflection" href="mixins.html#weac.mixins.OutputMixin.get_slab_deflection">get_slab_deflection</a></code></li>
+<li><code><a title="weac.mixins.OutputMixin.get_slab_displacement" href="mixins.html#weac.mixins.OutputMixin.get_slab_displacement">get_slab_displacement</a></code></li>
+<li><code><a title="weac.mixins.OutputMixin.get_slab_rotation" href="mixins.html#weac.mixins.OutputMixin.get_slab_rotation">get_slab_rotation</a></code></li>
+<li><code><a title="weac.mixins.OutputMixin.get_weaklayer_normalstress" href="mixins.html#weac.mixins.OutputMixin.get_weaklayer_normalstress">get_weaklayer_normalstress</a></code></li>
+<li><code><a title="weac.mixins.OutputMixin.get_weaklayer_shearstress" href="mixins.html#weac.mixins.OutputMixin.get_weaklayer_shearstress">get_weaklayer_shearstress</a></code></li>
 </ul>
 </li>
 <li><code><b><a title="weac.eigensystem.Eigensystem" href="eigensystem.html#weac.eigensystem.Eigensystem">Eigensystem</a></b></code>:

@@ -181,10 +181,10 @@ class Eigensystem:
         Arguments
         ---------
         layers : list or str
-            2D list of layer densities and thicknesses. Columns are
-            density (kg/m^3) and thickness (mm). One row corresponds
-            to one layer. If entered as str, last split must be
-            available in database.
+            2D list of top-to-bottom layer densities and thicknesses.
+            Columns are density (kg/m^3) and thickness (mm). One row
+            corresponds to one layer. If entered as str, last split
+            must be available in database.
         C0 : float, optional
             Multiplicative constant of Young modulus parametrization
             according to Gerling et al. (2017). Default is 6.0.
@@ -194,33 +194,37 @@ class Eigensystem:
         nu : float, optional
             Possion&#39;s ratio. Default is 0.25
         &#34;&#34;&#34;
-        # Elastic properties and geometry
         if isinstance(layers, str):
+            # Read layering and Young&#39;s modulus from database
             layers, E = load_dummy_profile(layers.split()[-1])
         else:
+            # Compute Young&#39;s modulus from density parametrization
             layers = np.array(layers)
             E = gerling(layers[:, 0], C0=C0, C1=C1)  # Young&#39;s modulus
 
-        # Other elastic properties and geometry
+        # Derive other elastic properties
         nu = nu*np.ones(layers.shape[0])         # Global poisson&#39;s ratio
         G = E/(2*(1 + nu))                       # Shear modulus
         self.k = 5/6                             # Shear correction factor
 
-        # Assemble layering into matrix (bottom to top)
-        self.slab = np.flipud(np.vstack([layers.T, E, G, nu]).T)
-
-        # Compute center of gravity
+        # Compute total slab thickness and center of gravity
         self.h, self.zs = calc_center_of_gravity(layers)
+
+        # Assemble layering into matrix (top to bottom)
+        # Columns are density (kg/m^3), layer thickness (mm)
+        # Young&#39;s modulus (MPa), shear modulus (MPa), and
+        # Poisson&#39;s ratio
+        self.slab = np.vstack([layers.T, E, G, nu]).T
 
     def calc_foundation_stiffness(self):
         &#34;&#34;&#34;Compute foundation normal and shear stiffness.&#34;&#34;&#34;
-        # Plaine strain shear and Young&#39;s modulus (MPa)
-        G = self.weak[&#39;E&#39;]/(2*(1 + self.weak[&#39;nu&#39;]))
-        E = self.weak[&#39;E&#39;]/(1 - self.weak[&#39;nu&#39;]**2)
+        # Elastic moduli (MPa) under plane-strain conditions
+        G = self.weak[&#39;E&#39;]/(2*(1 + self.weak[&#39;nu&#39;]))    # Shear modulus
+        E = self.weak[&#39;E&#39;]/(1 - self.weak[&#39;nu&#39;]**2)     # Young&#39;s modulus
 
-        # Foundation stiffnesses
-        self.kn = E/self.t   # Normal stiffness (N/mm^3)
-        self.kt = G/self.t   # Shear stiffness (N/mm^3)
+        # Foundation (weak layer) stiffnesses (N/mm^3)
+        self.kn = E/self.t                              # Normal stiffness
+        self.kt = G/self.t                              # Shear stiffness
 
     def calc_laminate_stiffness_matrix(self):
         &#34;&#34;&#34;
@@ -228,22 +232,21 @@ class Eigensystem:
 
         Return plane-strain laminate stiffness matrix (ABD matrix).
         &#34;&#34;&#34;
-        # Number of plies, ply thicknesses
+        # Number of plies and ply thicknesses (top to bottom)
         n = self.slab.shape[0]
         t = self.slab[:, 1]
-        # Initialize ply coordinates (bottom to top in laminate CSYS)
+        # Calculate ply coordinates (top to bottom) in coordinate system
+        # with downward pointing z-axis (z-list will be negative to positive)
         z = np.zeros(n + 1)
         for j in range(n + 1):
-            z[j] = -self.h/2 + \
-                sum(t[0:j])
+            z[j] = -self.h/2 + sum(t[0:j])
         # Initialize stiffness components
         A11, B11, D11, kA55 = 0, 0, 0, 0
-        # Add layerwise contributions (sign of B11 to agree with beam CSYS)
+        # Add layerwise contributions
         for i in range(n):
-            # Add layerwise contributions
             E, G, nu = self.slab[i, 2:5]
             A11 = A11 + E/(1 - nu**2)*(z[i+1] - z[i])
-            B11 = B11 - 1/2*E/(1 - nu**2)*(z[i+1]**2 - z[i]**2)
+            B11 = B11 + 1/2*E/(1 - nu**2)*(z[i+1]**2 - z[i]**2)
             D11 = D11 + 1/3*E/(1 - nu**2)*(z[i+1]**3 - z[i]**3)
             kA55 = kA55 + self.k*G*(z[i+1] - z[i])
 
@@ -315,7 +318,7 @@ class Eigensystem:
         Arguments
         ---------
         phi : float
-            Inclination (degrees).
+            Inclination (degrees). Counterclockwise positive.
 
         Returns
         -------
@@ -331,7 +334,7 @@ class Eigensystem:
         q = sum(rho*self.g*self.slab[:, 1])     # Line load (N/mm)
         # Split into components
         qn = q*np.cos(phi)                      # Normal direction
-        qt = q*np.sin(phi)                      # Tangential direction
+        qt = -q*np.sin(phi)                     # Tangential direction
 
         return qn, qt
 
@@ -344,7 +347,7 @@ class Eigensystem:
         m : float
             Skier weight (kg).
         phi : float
-            Inclination (degrees).
+            Inclination (degrees). Counterclockwise positive.
 
         Returns
         -------
@@ -356,7 +359,7 @@ class Eigensystem:
         phi = np.deg2rad(phi)                   # Convert inclination to rad
         F = 1e-3*np.array(m)*self.g/self.lski   # Total skier load (N)
         Fn = F*np.cos(phi)                      # Normal skier load (N)
-        Ft = F*np.sin(phi)                      # Tangential skier load (N)
+        Ft = -F*np.sin(phi)                     # Tangential skier load (N)
 
         return Fn, Ft
 
@@ -725,10 +728,10 @@ to one layer. Default is [[240, 200], ].</dd>
         Arguments
         ---------
         layers : list or str
-            2D list of layer densities and thicknesses. Columns are
-            density (kg/m^3) and thickness (mm). One row corresponds
-            to one layer. If entered as str, last split must be
-            available in database.
+            2D list of top-to-bottom layer densities and thicknesses.
+            Columns are density (kg/m^3) and thickness (mm). One row
+            corresponds to one layer. If entered as str, last split
+            must be available in database.
         C0 : float, optional
             Multiplicative constant of Young modulus parametrization
             according to Gerling et al. (2017). Default is 6.0.
@@ -738,33 +741,37 @@ to one layer. Default is [[240, 200], ].</dd>
         nu : float, optional
             Possion&#39;s ratio. Default is 0.25
         &#34;&#34;&#34;
-        # Elastic properties and geometry
         if isinstance(layers, str):
+            # Read layering and Young&#39;s modulus from database
             layers, E = load_dummy_profile(layers.split()[-1])
         else:
+            # Compute Young&#39;s modulus from density parametrization
             layers = np.array(layers)
             E = gerling(layers[:, 0], C0=C0, C1=C1)  # Young&#39;s modulus
 
-        # Other elastic properties and geometry
+        # Derive other elastic properties
         nu = nu*np.ones(layers.shape[0])         # Global poisson&#39;s ratio
         G = E/(2*(1 + nu))                       # Shear modulus
         self.k = 5/6                             # Shear correction factor
 
-        # Assemble layering into matrix (bottom to top)
-        self.slab = np.flipud(np.vstack([layers.T, E, G, nu]).T)
-
-        # Compute center of gravity
+        # Compute total slab thickness and center of gravity
         self.h, self.zs = calc_center_of_gravity(layers)
+
+        # Assemble layering into matrix (top to bottom)
+        # Columns are density (kg/m^3), layer thickness (mm)
+        # Young&#39;s modulus (MPa), shear modulus (MPa), and
+        # Poisson&#39;s ratio
+        self.slab = np.vstack([layers.T, E, G, nu]).T
 
     def calc_foundation_stiffness(self):
         &#34;&#34;&#34;Compute foundation normal and shear stiffness.&#34;&#34;&#34;
-        # Plaine strain shear and Young&#39;s modulus (MPa)
-        G = self.weak[&#39;E&#39;]/(2*(1 + self.weak[&#39;nu&#39;]))
-        E = self.weak[&#39;E&#39;]/(1 - self.weak[&#39;nu&#39;]**2)
+        # Elastic moduli (MPa) under plane-strain conditions
+        G = self.weak[&#39;E&#39;]/(2*(1 + self.weak[&#39;nu&#39;]))    # Shear modulus
+        E = self.weak[&#39;E&#39;]/(1 - self.weak[&#39;nu&#39;]**2)     # Young&#39;s modulus
 
-        # Foundation stiffnesses
-        self.kn = E/self.t   # Normal stiffness (N/mm^3)
-        self.kt = G/self.t   # Shear stiffness (N/mm^3)
+        # Foundation (weak layer) stiffnesses (N/mm^3)
+        self.kn = E/self.t                              # Normal stiffness
+        self.kt = G/self.t                              # Shear stiffness
 
     def calc_laminate_stiffness_matrix(self):
         &#34;&#34;&#34;
@@ -772,22 +779,21 @@ to one layer. Default is [[240, 200], ].</dd>
 
         Return plane-strain laminate stiffness matrix (ABD matrix).
         &#34;&#34;&#34;
-        # Number of plies, ply thicknesses
+        # Number of plies and ply thicknesses (top to bottom)
         n = self.slab.shape[0]
         t = self.slab[:, 1]
-        # Initialize ply coordinates (bottom to top in laminate CSYS)
+        # Calculate ply coordinates (top to bottom) in coordinate system
+        # with downward pointing z-axis (z-list will be negative to positive)
         z = np.zeros(n + 1)
         for j in range(n + 1):
-            z[j] = -self.h/2 + \
-                sum(t[0:j])
+            z[j] = -self.h/2 + sum(t[0:j])
         # Initialize stiffness components
         A11, B11, D11, kA55 = 0, 0, 0, 0
-        # Add layerwise contributions (sign of B11 to agree with beam CSYS)
+        # Add layerwise contributions
         for i in range(n):
-            # Add layerwise contributions
             E, G, nu = self.slab[i, 2:5]
             A11 = A11 + E/(1 - nu**2)*(z[i+1] - z[i])
-            B11 = B11 - 1/2*E/(1 - nu**2)*(z[i+1]**2 - z[i]**2)
+            B11 = B11 + 1/2*E/(1 - nu**2)*(z[i+1]**2 - z[i]**2)
             D11 = D11 + 1/3*E/(1 - nu**2)*(z[i+1]**3 - z[i]**3)
             kA55 = kA55 + self.k*G*(z[i+1] - z[i])
 
@@ -859,7 +865,7 @@ to one layer. Default is [[240, 200], ].</dd>
         Arguments
         ---------
         phi : float
-            Inclination (degrees).
+            Inclination (degrees). Counterclockwise positive.
 
         Returns
         -------
@@ -875,7 +881,7 @@ to one layer. Default is [[240, 200], ].</dd>
         q = sum(rho*self.g*self.slab[:, 1])     # Line load (N/mm)
         # Split into components
         qn = q*np.cos(phi)                      # Normal direction
-        qt = q*np.sin(phi)                      # Tangential direction
+        qt = -q*np.sin(phi)                     # Tangential direction
 
         return qn, qt
 
@@ -888,7 +894,7 @@ to one layer. Default is [[240, 200], ].</dd>
         m : float
             Skier weight (kg).
         phi : float
-            Inclination (degrees).
+            Inclination (degrees). Counterclockwise positive.
 
         Returns
         -------
@@ -900,7 +906,7 @@ to one layer. Default is [[240, 200], ].</dd>
         phi = np.deg2rad(phi)                   # Convert inclination to rad
         F = 1e-3*np.array(m)*self.g/self.lski   # Total skier load (N)
         Fn = F*np.cos(phi)                      # Normal skier load (N)
-        Ft = F*np.sin(phi)                      # Tangential skier load (N)
+        Ft = -F*np.sin(phi)                     # Tangential skier load (N)
 
         return Fn, Ft
 
@@ -1076,13 +1082,13 @@ to one layer. Default is [[240, 200], ].</dd>
 </summary>
 <pre><code class="python">def calc_foundation_stiffness(self):
     &#34;&#34;&#34;Compute foundation normal and shear stiffness.&#34;&#34;&#34;
-    # Plaine strain shear and Young&#39;s modulus (MPa)
-    G = self.weak[&#39;E&#39;]/(2*(1 + self.weak[&#39;nu&#39;]))
-    E = self.weak[&#39;E&#39;]/(1 - self.weak[&#39;nu&#39;]**2)
+    # Elastic moduli (MPa) under plane-strain conditions
+    G = self.weak[&#39;E&#39;]/(2*(1 + self.weak[&#39;nu&#39;]))    # Shear modulus
+    E = self.weak[&#39;E&#39;]/(1 - self.weak[&#39;nu&#39;]**2)     # Young&#39;s modulus
 
-    # Foundation stiffnesses
-    self.kn = E/self.t   # Normal stiffness (N/mm^3)
-    self.kt = G/self.t   # Shear stiffness (N/mm^3)</code></pre>
+    # Foundation (weak layer) stiffnesses (N/mm^3)
+    self.kn = E/self.t                              # Normal stiffness
+    self.kt = G/self.t                              # Shear stiffness</code></pre>
 </details>
 </dd>
 <dt id="weac.eigensystem.Eigensystem.calc_laminate_stiffness_matrix"><code class="name flex">
@@ -1101,22 +1107,21 @@ to one layer. Default is [[240, 200], ].</dd>
 
     Return plane-strain laminate stiffness matrix (ABD matrix).
     &#34;&#34;&#34;
-    # Number of plies, ply thicknesses
+    # Number of plies and ply thicknesses (top to bottom)
     n = self.slab.shape[0]
     t = self.slab[:, 1]
-    # Initialize ply coordinates (bottom to top in laminate CSYS)
+    # Calculate ply coordinates (top to bottom) in coordinate system
+    # with downward pointing z-axis (z-list will be negative to positive)
     z = np.zeros(n + 1)
     for j in range(n + 1):
-        z[j] = -self.h/2 + \
-            sum(t[0:j])
+        z[j] = -self.h/2 + sum(t[0:j])
     # Initialize stiffness components
     A11, B11, D11, kA55 = 0, 0, 0, 0
-    # Add layerwise contributions (sign of B11 to agree with beam CSYS)
+    # Add layerwise contributions
     for i in range(n):
-        # Add layerwise contributions
         E, G, nu = self.slab[i, 2:5]
         A11 = A11 + E/(1 - nu**2)*(z[i+1] - z[i])
-        B11 = B11 - 1/2*E/(1 - nu**2)*(z[i+1]**2 - z[i]**2)
+        B11 = B11 + 1/2*E/(1 - nu**2)*(z[i+1]**2 - z[i]**2)
         D11 = D11 + 1/3*E/(1 - nu**2)*(z[i+1]**3 - z[i]**3)
         kA55 = kA55 + self.k*G*(z[i+1] - z[i])
 
@@ -1188,7 +1193,7 @@ and rearranged to z' = -(A ^ -1)Bz + (A ^ -1)d = Ez + F</p></div>
 <dt><strong><code>m</code></strong> :&ensp;<code>float</code></dt>
 <dd>Skier weight (kg).</dd>
 <dt><strong><code>phi</code></strong> :&ensp;<code>float</code></dt>
-<dd>Inclination (degrees).</dd>
+<dd>Inclination (degrees). Counterclockwise positive.</dd>
 </dl>
 <h2 id="returns">Returns</h2>
 <dl>
@@ -1210,7 +1215,7 @@ and rearranged to z' = -(A ^ -1)Bz + (A ^ -1)d = Ez + F</p></div>
     m : float
         Skier weight (kg).
     phi : float
-        Inclination (degrees).
+        Inclination (degrees). Counterclockwise positive.
 
     Returns
     -------
@@ -1222,7 +1227,7 @@ and rearranged to z' = -(A ^ -1)Bz + (A ^ -1)d = Ez + F</p></div>
     phi = np.deg2rad(phi)                   # Convert inclination to rad
     F = 1e-3*np.array(m)*self.g/self.lski   # Total skier load (N)
     Fn = F*np.cos(phi)                      # Normal skier load (N)
-    Ft = F*np.sin(phi)                      # Tangential skier load (N)
+    Ft = -F*np.sin(phi)                     # Tangential skier load (N)
 
     return Fn, Ft</code></pre>
 </details>
@@ -1235,7 +1240,7 @@ and rearranged to z' = -(A ^ -1)Bz + (A ^ -1)d = Ez + F</p></div>
 <h2 id="arguments">Arguments</h2>
 <dl>
 <dt><strong><code>phi</code></strong> :&ensp;<code>float</code></dt>
-<dd>Inclination (degrees).</dd>
+<dd>Inclination (degrees). Counterclockwise positive.</dd>
 </dl>
 <h2 id="returns">Returns</h2>
 <dl>
@@ -1255,7 +1260,7 @@ and rearranged to z' = -(A ^ -1)Bz + (A ^ -1)d = Ez + F</p></div>
     Arguments
     ---------
     phi : float
-        Inclination (degrees).
+        Inclination (degrees). Counterclockwise positive.
 
     Returns
     -------
@@ -1271,7 +1276,7 @@ and rearranged to z' = -(A ^ -1)Bz + (A ^ -1)d = Ez + F</p></div>
     q = sum(rho*self.g*self.slab[:, 1])     # Line load (N/mm)
     # Split into components
     qn = q*np.cos(phi)                      # Normal direction
-    qt = q*np.sin(phi)                      # Tangential direction
+    qt = -q*np.sin(phi)                     # Tangential direction
 
     return qn, qt</code></pre>
 </details>
@@ -1284,10 +1289,10 @@ and rearranged to z' = -(A ^ -1)Bz + (A ^ -1)d = Ez + F</p></div>
 <h2 id="arguments">Arguments</h2>
 <dl>
 <dt><strong><code>layers</code></strong> :&ensp;<code>list</code> or <code>str</code></dt>
-<dd>2D list of layer densities and thicknesses. Columns are
-density (kg/m^3) and thickness (mm). One row corresponds
-to one layer. If entered as str, last split must be
-available in database.</dd>
+<dd>2D list of top-to-bottom layer densities and thicknesses.
+Columns are density (kg/m^3) and thickness (mm). One row
+corresponds to one layer. If entered as str, last split
+must be available in database.</dd>
 <dt><strong><code>C0</code></strong> :&ensp;<code>float</code>, optional</dt>
 <dd>Multiplicative constant of Young modulus parametrization
 according to Gerling et al. (2017). Default is 6.0.</dd>
@@ -1308,10 +1313,10 @@ Gerling et al. (2017). Default is 4.6.</dd>
     Arguments
     ---------
     layers : list or str
-        2D list of layer densities and thicknesses. Columns are
-        density (kg/m^3) and thickness (mm). One row corresponds
-        to one layer. If entered as str, last split must be
-        available in database.
+        2D list of top-to-bottom layer densities and thicknesses.
+        Columns are density (kg/m^3) and thickness (mm). One row
+        corresponds to one layer. If entered as str, last split
+        must be available in database.
     C0 : float, optional
         Multiplicative constant of Young modulus parametrization
         according to Gerling et al. (2017). Default is 6.0.
@@ -1321,23 +1326,27 @@ Gerling et al. (2017). Default is 4.6.</dd>
     nu : float, optional
         Possion&#39;s ratio. Default is 0.25
     &#34;&#34;&#34;
-    # Elastic properties and geometry
     if isinstance(layers, str):
+        # Read layering and Young&#39;s modulus from database
         layers, E = load_dummy_profile(layers.split()[-1])
     else:
+        # Compute Young&#39;s modulus from density parametrization
         layers = np.array(layers)
         E = gerling(layers[:, 0], C0=C0, C1=C1)  # Young&#39;s modulus
 
-    # Other elastic properties and geometry
+    # Derive other elastic properties
     nu = nu*np.ones(layers.shape[0])         # Global poisson&#39;s ratio
     G = E/(2*(1 + nu))                       # Shear modulus
     self.k = 5/6                             # Shear correction factor
 
-    # Assemble layering into matrix (bottom to top)
-    self.slab = np.flipud(np.vstack([layers.T, E, G, nu]).T)
+    # Compute total slab thickness and center of gravity
+    self.h, self.zs = calc_center_of_gravity(layers)
 
-    # Compute center of gravity
-    self.h, self.zs = calc_center_of_gravity(layers)</code></pre>
+    # Assemble layering into matrix (top to bottom)
+    # Columns are density (kg/m^3), layer thickness (mm)
+    # Young&#39;s modulus (MPa), shear modulus (MPa), and
+    # Poisson&#39;s ratio
+    self.slab = np.vstack([layers.T, E, G, nu]).T</code></pre>
 </details>
 </dd>
 <dt id="weac.eigensystem.Eigensystem.set_foundation_properties"><code class="name flex">

@@ -47,7 +47,7 @@ class FieldQuantitiesMixin:
     &#34;&#34;&#34;
 
     # pylint: disable=no-self-use
-    def w(self, Z):
+    def w(self, Z, unit=&#39;mm&#39;):
         &#34;&#34;&#34;
         Get centerline deflection w.
 
@@ -55,13 +55,21 @@ class FieldQuantitiesMixin:
         ---------
         Z : ndarray
             Solution vector [u(x) u&#39;(x) w(x) w&#39;(x) psi(x) psi&#39;(x)]^T.
+        unit : {&#39;m&#39;, &#39;cm&#39;, &#39;mm&#39;, &#39;um&#39;}, optional
+            Desired output unit. Default is mm.
 
         Returns
         -------
-        w : float
-            Deflection w (mm) of the slab.
+        float
+            Deflection w (in specified unit) of the slab.
         &#34;&#34;&#34;
-        return Z[2, :]
+        convert = {
+            &#39;m&#39;: 1e-3,   # meters
+            &#39;cm&#39;: 1e-1,  # centimeters
+            &#39;mm&#39;: 1,     # millimeters
+            &#39;um&#39;: 1e3    # micrometers
+        }
+        return convert[unit]*Z[2, :]
 
     def wp(self, Z):
         &#34;&#34;&#34;
@@ -74,12 +82,12 @@ class FieldQuantitiesMixin:
 
         Returns
         -------
-        wp : float
+        float
             First derivative w&#39; of the deflection of the slab.
         &#34;&#34;&#34;
         return Z[3, :]
 
-    def psi(self, Z):
+    def psi(self, Z, unit=&#39;rad&#39;):
         &#34;&#34;&#34;
         Get midplane rotation psi.
 
@@ -87,13 +95,19 @@ class FieldQuantitiesMixin:
         ---------
         Z : ndarray
             Solution vector [u(x) u&#39;(x) w(x) w&#39;(x) psi(x) psi&#39;(x)]^T.
+        unit : {&#39;deg&#39;, &#39;degrees&#39;, &#39;rad&#39;, &#39;radians&#39;}, optional
+            Desired output unit. Default is radians.
 
         Returns
         -------
         psi : float
-            Midplane rotation psi (radians) of the slab.
+            Cross-section rotation psi (radians) of the slab.
         &#34;&#34;&#34;
-        return Z[4, :]
+        if unit in [&#39;deg&#39;, &#39;degree&#39;, &#39;degrees&#39;]:
+            psi = np.rad2deg(Z[4, :])
+        elif unit in [&#39;rad&#39;, &#39;radian&#39;, &#39;radians&#39;]:
+            psi = Z[4, :]
+        return psi
 
     def psip(self, Z):
         &#34;&#34;&#34;
@@ -106,14 +120,14 @@ class FieldQuantitiesMixin:
 
         Returns
         -------
-        psip : float
+        float
             First derivative psi&#39; of the midplane rotation (radians/mm)
              of the slab.
         &#34;&#34;&#34;
         return Z[5, :]
 
     # pylint: enable=no-self-use
-    def u(self, Z, z0):
+    def u(self, Z, z0, unit=&#39;mm&#39;):
         &#34;&#34;&#34;
         Get horizontal displacement u = u0 + z0 psi.
 
@@ -123,13 +137,21 @@ class FieldQuantitiesMixin:
             Solution vector [u(x) u&#39;(x) w(x) w&#39;(x) psi(x) psi&#39;(x)]^T.
         z0 : float
             Z-coordinate (mm) where u is to be evaluated.
+        unit : {&#39;m&#39;, &#39;cm&#39;, &#39;mm&#39;, &#39;um&#39;}, optional
+            Desired output unit. Default is mm.
 
         Returns
         -------
-        u : float
+        float
             Horizontal displacement u (mm) of the slab.
         &#34;&#34;&#34;
-        return Z[0, :] + z0*self.psi(Z)
+        convert = {
+            &#39;m&#39;: 1e-3,   # meters
+            &#39;cm&#39;: 1e-1,  # centimeters
+            &#39;mm&#39;: 1,     # millimeters
+            &#39;um&#39;: 1e3    # micrometers
+        }
+        return convert[unit]*(Z[0, :] + z0*self.psi(Z))
 
     def up(self, Z, z0):
         &#34;&#34;&#34;
@@ -144,7 +166,7 @@ class FieldQuantitiesMixin:
 
         Returns
         -------
-        up : float
+        float
             First derivative u&#39; = u0&#39; + z0 psi&#39; of the horizontal
             displacement of the slab.
         &#34;&#34;&#34;
@@ -161,7 +183,7 @@ class FieldQuantitiesMixin:
 
         Returns
         -------
-        N : float
+        float
             Axial normal force N (N) in the slab.
         &#34;&#34;&#34;
         return self.A11*Z[1, :] + self.B11*Z[5, :]
@@ -177,7 +199,7 @@ class FieldQuantitiesMixin:
 
         Returns
         -------
-        M : float
+        float
             Bending moment M (Nmm) in the slab.
         &#34;&#34;&#34;
         return self.B11*Z[1, :] + self.D11*Z[5, :]
@@ -193,12 +215,12 @@ class FieldQuantitiesMixin:
 
         Returns
         -------
-        V : float
+        float
             Vertical shear force V (N) in the slab.
         &#34;&#34;&#34;
         return self.kA55*(Z[3, :] + Z[4, :])
 
-    def sig(self, Z):
+    def sig(self, Z, unit=&#39;MPa&#39;):
         &#34;&#34;&#34;
         Get weak-layer normal stress.
 
@@ -206,15 +228,21 @@ class FieldQuantitiesMixin:
         ---------
         Z : ndarray
             Solution vector [u(x) u&#39;(x) w(x) w&#39;(x) psi(x) psi&#39;(x)]^T.
+        unit : {&#39;MPa&#39;, &#39;kPa&#39;}, optional
+            Desired output unit. Default is MPa.
 
         Returns
         -------
-        sig : float
-            Weak-layer normal stress sigma (MPa).
+        float
+            Weak-layer normal stress sigma (in specified unit).
         &#34;&#34;&#34;
-        return -self.kn*self.w(Z)
+        convert = {
+            &#39;kPa&#39;: 1e3,
+            &#39;MPa&#39;: 1
+        }
+        return -convert[unit]*self.kn*self.w(Z)
 
-    def tau(self, Z):
+    def tau(self, Z, unit=&#39;MPa&#39;):
         &#34;&#34;&#34;
         Get weak-layer shear stress.
 
@@ -222,13 +250,20 @@ class FieldQuantitiesMixin:
         ---------
         Z : ndarray
             Solution vector [u(x) u&#39;(x) w(x) w&#39;(x) psi(x) psi&#39;(x)]^T.
+        unit : {&#39;MPa&#39;, &#39;kPa&#39;}, optional
+            Desired output unit. Default is MPa.
 
         Returns
         -------
-        tau : float
-            Weak-layer shear stress tau (MPa).
+        float
+            Weak-layer shear stress tau (in specified unit).
         &#34;&#34;&#34;
-        return self.kt*(self.wp(Z)*self.t/2 - self.u(Z, z0=self.h/2))
+        convert = {
+            &#39;kPa&#39;: 1e3,
+            &#39;MPa&#39;: 1
+        }
+        return -convert[unit]*self.kt*(
+            self.wp(Z)*self.t/2 - self.u(Z, z0=self.h/2))
 
     def eps(self, Z):
         &#34;&#34;&#34;
@@ -241,8 +276,8 @@ class FieldQuantitiesMixin:
 
         Returns
         -------
-        eps : float
-            Weak-layer normal strain epsilon (MPa).
+        float
+            Weak-layer normal strain epsilon.
         &#34;&#34;&#34;
         return -self.w(Z)/self.t
 
@@ -257,8 +292,8 @@ class FieldQuantitiesMixin:
 
         Returns
         -------
-        gamma : float
-            Weak-layer shear strain gamma (MPa).
+        float
+            Weak-layer shear strain gamma.
         &#34;&#34;&#34;
         return self.wp(Z)/2 - self.u(Z, z0=self.h/2)/self.t
 
@@ -273,7 +308,7 @@ class FieldQuantitiesMixin:
 
         Returns
         -------
-        maxp : float
+        loat
             Maximum principal stress (MPa) in the weak layer.
         &#34;&#34;&#34;
         sig = self.sig(Z)
@@ -281,7 +316,7 @@ class FieldQuantitiesMixin:
         return np.amax([[sig + np.sqrt(sig**2 + 4*tau**2),
                          sig - np.sqrt(sig**2 + 4*tau**2)]], axis=1)[0]/2
 
-    def Gi(self, Ztip):
+    def Gi(self, Ztip, unit=&#39;kJ/m^2&#39;):
         &#34;&#34;&#34;
         Get mode I differential energy release rate at crack tip.
 
@@ -290,16 +325,23 @@ class FieldQuantitiesMixin:
         Ztip : ndarray
             Solution vector [u(x) u&#39;(x) w(x) w&#39;(x) psi(x) psi&#39;(x)]^T
             at the crack tip.
+        unit : {&#39;N/mm&#39;, &#39;kJ/m^2&#39;, &#39;J/m^2&#39;}, optional
+            Desired output unit. Default is kJ/m^2.
 
         Returns
         -------
-        Gi : float
-            Mode I differential energy release rate (N/mm) at the
-            crack tip.
+        float
+            Mode I differential energy release rate (N/mm = kJ/m^2
+            or J/m^2) at the crack tip.
         &#34;&#34;&#34;
-        return self.sig(Ztip)**2/(2*self.kn)
+        convert = {
+            &#39;J/m^2&#39;: 1e3,   # joule per square meter
+            &#39;kJ/m^2&#39;: 1,    # kilojoule per square meter
+            &#39;N/mm&#39;: 1       # newton per millimeter
+        }
+        return convert[unit]*self.sig(Ztip)**2/(2*self.kn)
 
-    def Gii(self, Ztip):
+    def Gii(self, Ztip, unit=&#39;kJ/m^2&#39;):
         &#34;&#34;&#34;
         Get mode II differential energy release rate at crack tip.
 
@@ -308,14 +350,21 @@ class FieldQuantitiesMixin:
         Ztip : ndarray
             Solution vector [u(x) u&#39;(x) w(x) w&#39;(x) psi(x) psi&#39;(x)]^T
             at the crack tip.
+        unit : {&#39;N/mm&#39;, &#39;kJ/m^2&#39;, &#39;J/m^2&#39;}, optional
+            Desired output unit. Default is kJ/m^2 = N/mm.
 
         Returns
         -------
-        Gii : float
-            Mode II differential energy release rate (N/mm) at the
-            crack tip.
+        float
+            Mode II differential energy release rate (N/mm = kJ/m^2
+            or J/m^2) at the crack tip.
         &#34;&#34;&#34;
-        return self.tau(Ztip)**2/(2*self.kt)
+        convert = {
+            &#39;J/m^2&#39;: 1e3,   # joule per square meter
+            &#39;kJ/m^2&#39;: 1,    # kilojoule per square meter
+            &#39;N/mm&#39;: 1       # newton per millimeter
+        }
+        return convert[unit]*self.tau(Ztip)**2/(2*self.kt)
 
     def int1(self, x, z0, z1):
         &#34;&#34;&#34;
@@ -334,7 +383,7 @@ class FieldQuantitiesMixin:
 
         Returns
         -------
-        int1 : float or ndarray
+        float or ndarray
             Integrant of the mode I crack opening integral.
         &#34;&#34;&#34;
         return self.sig(z0(x))*self.eps(z1(x))*self.t
@@ -346,7 +395,7 @@ class FieldQuantitiesMixin:
         Arguments
         ---------
         x: float, ndarray
-            X-coordinate where integrand is to be evaluated(mm).
+            X-coordinate where integrand is to be evaluated (mm).
         z0: callable
             Function that returns the solution vector of the uncracked
             configuration.
@@ -356,7 +405,7 @@ class FieldQuantitiesMixin:
 
         Returns
         -------
-        int2 : float or ndarray
+        float or ndarray
             Integrant of the mode II crack opening integral.
         &#34;&#34;&#34;
         return self.tau(z0(x))*self.gamma(z1(x))*self.t
@@ -372,17 +421,17 @@ class SolutionMixin:
 
     def bc(self, z):
         &#34;&#34;&#34;
-        Provide equations for free(pst) or infinite(skiers) ends.
+        Provide equations for free (pst) or infinite (skiers) ends.
 
         Arguments
         ---------
         z: ndarray
-            Solution vector(6x1) at a certain position x.
+            Solution vector (6x1) at a certain position x.
 
         Returns
         -------
         bc: ndarray
-            Boundary condition vector(lenght 3) at position x.
+            Boundary condition vector (lenght 3) at position x.
         &#34;&#34;&#34;
         if self.system in [&#39;pst-&#39;, &#39;-pst&#39;]:
             # Free ends
@@ -404,21 +453,21 @@ class SolutionMixin:
         Arguments
         ---------
         zl: ndarray
-            Solution vector(6x1) at left end of beam segement.
+            Solution vector (6x1) at left end of beam segement.
         zr: ndarray
-            Solution vector(6x1) at right end of beam segement.
+            Solution vector (6x1) at right end of beam segement.
         pos: {&#39;left&#39;, &#39;mid&#39;, &#39;right&#39;, &#39;l&#39;, &#39;m&#39;, &#39;r&#39;}, optional
             Determines whether the segement under consideration
-            is a left boundary segement(left, l), one of the
-            center segement(mid, m), or a right boundary
-            segement(right, r). Default is &#39;mid&#39;.
+            is a left boundary segement (left, l), one of the
+            center segement (mid, m), or a right boundary
+            segemen t (right, r). Default is &#39;mid&#39;.
 
         Returns
         -------
         eqs: ndarray
-            Vector(of length 9) of boundary conditions(3) and
-            transmission conditions(6) for boundary segements
-            or vector of transmission conditions(of length 6+6)
+            Vector (of length 9) of boundary conditions (3) and
+            transmission conditions (6) for boundary segements
+            or vector of transmission conditions (of length 6+6)
             for center segments.
         &#34;&#34;&#34;
         if pos in (&#39;l&#39;, &#39;left&#39;):
@@ -470,39 +519,40 @@ class SolutionMixin:
         &#34;&#34;&#34;
         Assemble lists defining the segments.
 
-        This includes length(li), foundation(ki, k0), and skier weight(mi).
+        This includes length (li), foundation (ki, k0), and skier
+        weight (mi).
 
         Arguments
         ---------
         li: squence, optional
             List of lengths of segements(mm). Used for system &#39;skiers&#39;.
         mi: squence, optional
-            List of skier weigths(kg) at segement boundaries. Used for
+            List of skier weigths (kg) at segement boundaries. Used for
             system &#39;skiers&#39;.
         ki: squence, optional
             List of one bool per segement indicating whether segement
-            has foundation(True) or not (False) in the cracked state.
+            has foundation (True) or not (False) in the cracked state.
             Used for system &#39;skiers&#39;.
         k0: squence, optional
             List of one bool per segement indicating whether segement
             has foundation(True) or not (False) in the uncracked state.
             Used for system &#39;skiers&#39;.
         L: float, optional
-            Total length of model(mm). Used for systems &#39;pst-&#39;, &#39;-pst&#39;,
+            Total length of model (mm). Used for systems &#39;pst-&#39;, &#39;-pst&#39;,
             and &#39;skier&#39;.
         a: float, optional
-            Crack length(mm).  Used for systems &#39;pst-&#39;, &#39;-pst&#39;, and
+            Crack length (mm).  Used for systems &#39;pst-&#39;, &#39;-pst&#39;, and
             &#39;skier&#39;.
         m: float, optional
-            Weight of skier(kg) in the axial center of the model.
+            Weight of skier (kg) in the axial center of the model.
             Used for system &#39;skier&#39;.
 
         Returns
         -------
         segments: dict
-            Dictionary with lists of segement lengths(li), skier
-            weights(mi), and foundation booleans in the cracked(ki)
-            and ncracked(k0) configurations.
+            Dictionary with lists of segement lengths (li), skier
+            weights (mi), and foundation booleans in the cracked (ki)
+            and uncracked (k0) configurations.
         &#34;&#34;&#34;
         _ = kwargs                                      # Unused arguments
         if self.system == &#39;skiers&#39;:
@@ -555,14 +605,14 @@ class SolutionMixin:
         Arguments
         ---------
         phi: float
-            Inclination(degrees).
+            Inclination (degrees).
         li: ndarray
-            List of lengths of segements(mm).
+            List of lengths of segements (mm).
         mi: ndarray
-            List of skier weigths(kg) at segement boundaries.
+            List of skier weigths (kg) at segement boundaries.
         ki: ndarray
             List of one bool per segement indicating whether segement
-            has foundation(True) or not (False).
+            has foundation (True) or not (False).
 
         Returns
         -------
@@ -576,7 +626,7 @@ class SolutionMixin:
         if not any(ki):
             raise ValueError(&#39;Provide at least one bedded segment.&#39;)
         # Mismatch of number of segements and transisions
-        if len(li) != len(ki) or len(li)-1 != len(mi):
+        if len(li) != len(ki) or len(li) - 1 != len(mi):
             raise ValueError(&#39;Make sure len(li)=N, len(ki)=N, and &#39;
                              &#39;len(mi)=N-1 for a system of N segments.&#39;)
 
@@ -630,17 +680,17 @@ class SolutionMixin:
                 pos=pos)
             # Rows for left-hand side assembly
             start = 0 if i == 0 else 3
-            stop = 6 if i == nS-1 else 9
+            stop = 6 if i == nS - 1 else 9
             # Assemble left-hand side
-            zh0[(6*i-start):(6*i+stop), i*nDOF:(i+1)*nDOF] = zhi
-            zp0[(6*i-start):(6*i+stop)] += zpi
+            zh0[(6*i - start):(6*i + stop), i*nDOF:(i + 1)*nDOF] = zhi
+            zp0[(6*i - start):(6*i + stop)] += zpi
 
         # Loop through loads to assemble right-hand side
         for i, m in enumerate(mi, start=1):
             # Get skier loads
             Fn, Ft = self.get_skier_load(m, phi)
             # Right-hand side for transmission from segment i-1 to segment i
-            rhs[6*i:6*i+3] = np.vstack([Ft, -Ft*self.h/2, Fn])
+            rhs[6*i:6*i + 3] = np.vstack([Ft, -Ft*self.h/2, Fn])
 
         # Set rhs so that complementary integral vanishes at boundaries
         if self.system not in [&#39;pst-&#39;, &#39;-pst&#39;]:
@@ -720,17 +770,17 @@ class AnalysisMixin:
             # Compute start and end coordinates of segment i
             x0 = lic[i]
             # Assemble global coordinate vector
-            xq[nqc[i]:nqc[i+1]] = x0 + xi
+            xq[nqc[i]:nqc[i + 1]] = x0 + xi
             # Mask coordinates not on foundation (excluding endpoints)
             if not ki[i]:
-                isbedded[nqc[i]+1:nqc[i+1]] = False
+                isbedded[nqc[i] + 1:nqc[i + 1]] = False
             # Compute segment solution
             zi = self.z(xi, C[:, [i]], l, phi, ki[i])
             # Assemble global solution matrix
-            zq[:, nqc[i]:nqc[i+1]] = zi
+            zq[:, nqc[i]:nqc[i + 1]] = zi
 
         # Add masking of consecutive unbedded segments
-        isrepeated = [ki[j] or ki[j+1] for j, _ in enumerate(ki[:-1])]
+        isrepeated = [ki[j] or ki[j + 1] for j, _ in enumerate(ki[:-1])]
         for i, truefalse in enumerate(isrepeated, start=1):
             isbedded[nqc[i]] = truefalse
 
@@ -792,8 +842,10 @@ class AnalysisMixin:
             int2 = partial(self.int2, z0=z0, z1=z1)
 
             # Segement contributions to total crack opening integral
-            Ginc1 += romberg(int1, 0, l, rtol=self.tol, vec_func=True)/(2*da)
-            Ginc2 += romberg(int2, 0, l, rtol=self.tol, vec_func=True)/(2*da)
+            Ginc1 += romberg(int1, 0, l, rtol=self.tol,
+                             vec_func=True)/(2*da)
+            Ginc2 += romberg(int2, 0, l, rtol=self.tol,
+                             vec_func=True)/(2*da)
 
         return np.array([Ginc1 + Ginc2, Ginc1, Ginc2]).flatten()
 
@@ -826,7 +878,7 @@ class AnalysisMixin:
         itr = np.arange(ntr)
 
         # Identify bedded-free and free-bedded transitions as crack tips
-        iscracktip = [ki[j] != ki[j+1] for j in range(ntr)]
+        iscracktip = [ki[j] != ki[j + 1] for j in range(ntr)]
 
         # Transition indices of crack tips and total number of crack tips
         ict = itr[iscracktip]
@@ -851,7 +903,181 @@ class AnalysisMixin:
         Gdif[:, avgmask] *= 0.5             # Weigth with half crack length
 
         # Return total differential energy release rate of all crack tips
-        return Gdif.sum(axis=1)</code></pre>
+        return Gdif.sum(axis=1)
+
+
+class OutputMixin:
+    &#34;&#34;&#34;
+    Mixin for outputs.
+
+    Provides convenience methods for the assembly of output lists
+    such as rasterized displacements or rasterized stresses.
+    &#34;&#34;&#34;
+
+    def get_weaklayer_shearstress(self, x, z, unit=&#39;MPa&#39;, removeNaNs=False):
+        &#34;&#34;&#34;
+        Compute weak-layer shear stress.
+
+        Arguments
+        ---------
+        x : ndarray
+            Discretized x-coordinates (mm) where coordinates of unsupported
+            (no foundation) segments are NaNs.
+        z : ndarray
+            Solution vectors at positions x as columns of matrix z.
+        unit : {&#39;MPa&#39;, &#39;kPa&#39;}, optional
+            Stress output unit. Default is MPa.
+        keepNaNs : bool
+            If set, do not remove
+
+        Returns
+        -------
+        x : ndarray
+            Horizontal coordinates (cm).
+        sig : ndarray
+            Normal stress (stress unit input).
+        &#34;&#34;&#34;
+        # Convert coordinates from mm to cm and stresses from MPa to unit
+        x = x/10
+        tau = self.tau(z, unit=unit)
+        # Filter stresses in unspupported segments
+        if removeNaNs:
+            # Remove coordinate-stress pairs where no weak layer is present
+            tau = tau[~np.isnan(x)]
+            x = x[~np.isnan(x)]
+        else:
+            # Set stress NaN where no weak layer is present
+            tau[np.isnan(x)] = np.nan
+
+        return x, tau
+
+    def get_weaklayer_normalstress(self, x, z, unit=&#39;MPa&#39;, removeNaNs=False):
+        &#34;&#34;&#34;
+        Compute weak-layer normal stress.
+
+        Arguments
+        ---------
+        x : ndarray
+            Discretized x-coordinates (mm) where coordinates of unsupported
+            (no foundation) segments are NaNs.
+        z : ndarray
+            Solution vectors at positions x as columns of matrix z.
+        unit : {&#39;MPa&#39;, &#39;kPa&#39;}, optional
+            Stress output unit. Default is MPa.
+        keepNaNs : bool
+            If set, do not remove
+
+        Returns
+        -------
+        x : ndarray
+            Horizontal coordinates (cm).
+        sig : ndarray
+            Normal stress (stress unit input).
+        &#34;&#34;&#34;
+        # Convert coordinates from mm to cm and stresses from MPa to unit
+        x = x/10
+        sig = self.sig(z, unit=unit)
+        # Filter stresses in unspupported segments
+        if removeNaNs:
+            # Remove coordinate-stress pairs where no weak layer is present
+            sig = sig[~np.isnan(x)]
+            x = x[~np.isnan(x)]
+        else:
+            # Set stress NaN where no weak layer is present
+            sig[np.isnan(x)] = np.nan
+
+        return x, sig
+
+    def get_slab_displacement(self, x, z, loc=&#39;mid&#39;, unit=&#39;mm&#39;):
+        &#34;&#34;&#34;
+        Compute horizontal slab displacement.
+
+        Arguments
+        ---------
+        x : ndarray
+            Discretized x-coordinates (mm) where coordinates of
+            unsupported (no foundation) segments are NaNs.
+        z : ndarray
+            Solution vectors at positions x as columns of matrix z.
+        loc : {&#39;top&#39;, &#39;mid&#39;, &#39;bot&#39;}
+            Get displacements of top, midplane or bottom of slab.
+            Default is mid.
+        unit : {&#39;m&#39;, &#39;cm&#39;, &#39;mm&#39;, &#39;um&#39;}, optional
+            Displacement output unit. Default is mm.
+
+        Returns
+        -------
+        x : ndarray
+            Horizontal coordinates (cm).
+        ndarray
+            Horizontal displacements (unit input).
+        &#34;&#34;&#34;
+        # Coordinates (cm)
+        x = x/10
+        # Locator
+        z0 = {&#39;top&#39;: -self.h/2, &#39;mid&#39;: 0, &#39;bot&#39;: self.h/2}
+        # Displacement (unit)
+        u = self.u(z, z0=z0[loc], unit=unit)
+        # Output array
+        return x, u
+
+    def get_slab_deflection(self, x, z, unit=&#39;mm&#39;):
+        &#34;&#34;&#34;
+        Compute vertical slab displacement.
+
+        Arguments
+        ---------
+        x : ndarray
+            Discretized x-coordinates (mm) where coordinates of
+            unsupported (no foundation) segments are NaNs.
+        z : ndarray
+            Solution vectors at positions x as columns of matrix z.
+            Default is mid.
+        unit : {&#39;m&#39;, &#39;cm&#39;, &#39;mm&#39;, &#39;um&#39;}, optional
+            Displacement output unit. Default is mm.
+
+        Returns
+        -------
+        x : ndarray
+            Horizontal coordinates (cm).
+        ndarray
+            Vertical deflections (unit input).
+        &#34;&#34;&#34;
+        # Coordinates (cm)
+        x = x/10
+        # Deflection (unit)
+        w = self.w(z, unit=unit)
+        # Output array
+        return x, w
+
+    def get_slab_rotation(self, x, z, unit=&#39;degrees&#39;):
+        &#34;&#34;&#34;
+        Compute slab cross-section rotation angle.
+
+        Arguments
+        ---------
+        x : ndarray
+            Discretized x-coordinates (mm) where coordinates of
+            unsupported (no foundation) segments are NaNs.
+        z : ndarray
+            Solution vectors at positions x as columns of matrix z.
+            Default is mid.
+        unit : {&#39;deg&#39;, degrees&#39;, &#39;rad&#39;, &#39;radians&#39;}, optional
+            Rotation angle output unit. Default is degrees.
+
+        Returns
+        -------
+        x : ndarray
+            Horizontal coordinates (cm).
+        ndarray
+            Cross section rotations (unit input).
+        &#34;&#34;&#34;
+        # Coordinates (cm)
+        x = x/10
+        # Cross-section rotation angle (unit)
+        psi = self.psi(z, unit=unit)
+        # Output array
+        return x, psi</code></pre>
 </details>
 </section>
 <section>
@@ -938,17 +1164,17 @@ elastic foundations.</p></div>
             # Compute start and end coordinates of segment i
             x0 = lic[i]
             # Assemble global coordinate vector
-            xq[nqc[i]:nqc[i+1]] = x0 + xi
+            xq[nqc[i]:nqc[i + 1]] = x0 + xi
             # Mask coordinates not on foundation (excluding endpoints)
             if not ki[i]:
-                isbedded[nqc[i]+1:nqc[i+1]] = False
+                isbedded[nqc[i] + 1:nqc[i + 1]] = False
             # Compute segment solution
             zi = self.z(xi, C[:, [i]], l, phi, ki[i])
             # Assemble global solution matrix
-            zq[:, nqc[i]:nqc[i+1]] = zi
+            zq[:, nqc[i]:nqc[i + 1]] = zi
 
         # Add masking of consecutive unbedded segments
-        isrepeated = [ki[j] or ki[j+1] for j, _ in enumerate(ki[:-1])]
+        isrepeated = [ki[j] or ki[j + 1] for j, _ in enumerate(ki[:-1])]
         for i, truefalse in enumerate(isrepeated, start=1):
             isbedded[nqc[i]] = truefalse
 
@@ -1010,8 +1236,10 @@ elastic foundations.</p></div>
             int2 = partial(self.int2, z0=z0, z1=z1)
 
             # Segement contributions to total crack opening integral
-            Ginc1 += romberg(int1, 0, l, rtol=self.tol, vec_func=True)/(2*da)
-            Ginc2 += romberg(int2, 0, l, rtol=self.tol, vec_func=True)/(2*da)
+            Ginc1 += romberg(int1, 0, l, rtol=self.tol,
+                             vec_func=True)/(2*da)
+            Ginc2 += romberg(int2, 0, l, rtol=self.tol,
+                             vec_func=True)/(2*da)
 
         return np.array([Ginc1 + Ginc2, Ginc1, Ginc2]).flatten()
 
@@ -1044,7 +1272,7 @@ elastic foundations.</p></div>
         itr = np.arange(ntr)
 
         # Identify bedded-free and free-bedded transitions as crack tips
-        iscracktip = [ki[j] != ki[j+1] for j in range(ntr)]
+        iscracktip = [ki[j] != ki[j + 1] for j in range(ntr)]
 
         # Transition indices of crack tips and total number of crack tips
         ict = itr[iscracktip]
@@ -1133,7 +1361,7 @@ a foundation or not in the cracked configuration.</dd>
     itr = np.arange(ntr)
 
     # Identify bedded-free and free-bedded transitions as crack tips
-    iscracktip = [ki[j] != ki[j+1] for j in range(ntr)]
+    iscracktip = [ki[j] != ki[j + 1] for j in range(ntr)]
 
     # Transition indices of crack tips and total number of crack tips
     ict = itr[iscracktip]
@@ -1244,8 +1472,10 @@ a foundation or not in the uncracked configuration.</dd>
         int2 = partial(self.int2, z0=z0, z1=z1)
 
         # Segement contributions to total crack opening integral
-        Ginc1 += romberg(int1, 0, l, rtol=self.tol, vec_func=True)/(2*da)
-        Ginc2 += romberg(int2, 0, l, rtol=self.tol, vec_func=True)/(2*da)
+        Ginc1 += romberg(int1, 0, l, rtol=self.tol,
+                         vec_func=True)/(2*da)
+        Ginc2 += romberg(int2, 0, l, rtol=self.tol,
+                         vec_func=True)/(2*da)
 
     return np.array([Ginc1 + Ginc2, Ginc1, Ginc2]).flatten()</code></pre>
 </details>
@@ -1340,17 +1570,17 @@ points xq.</dd>
         # Compute start and end coordinates of segment i
         x0 = lic[i]
         # Assemble global coordinate vector
-        xq[nqc[i]:nqc[i+1]] = x0 + xi
+        xq[nqc[i]:nqc[i + 1]] = x0 + xi
         # Mask coordinates not on foundation (excluding endpoints)
         if not ki[i]:
-            isbedded[nqc[i]+1:nqc[i+1]] = False
+            isbedded[nqc[i] + 1:nqc[i + 1]] = False
         # Compute segment solution
         zi = self.z(xi, C[:, [i]], l, phi, ki[i])
         # Assemble global solution matrix
-        zq[:, nqc[i]:nqc[i+1]] = zi
+        zq[:, nqc[i]:nqc[i + 1]] = zi
 
     # Add masking of consecutive unbedded segments
-    isrepeated = [ki[j] or ki[j+1] for j, _ in enumerate(ki[:-1])]
+    isrepeated = [ki[j] or ki[j + 1] for j, _ in enumerate(ki[:-1])]
     for i, truefalse in enumerate(isrepeated, start=1):
         isbedded[nqc[i]] = truefalse
 
@@ -1383,7 +1613,7 @@ strains, and energy release rates from the solution vector.</p></div>
     &#34;&#34;&#34;
 
     # pylint: disable=no-self-use
-    def w(self, Z):
+    def w(self, Z, unit=&#39;mm&#39;):
         &#34;&#34;&#34;
         Get centerline deflection w.
 
@@ -1391,13 +1621,21 @@ strains, and energy release rates from the solution vector.</p></div>
         ---------
         Z : ndarray
             Solution vector [u(x) u&#39;(x) w(x) w&#39;(x) psi(x) psi&#39;(x)]^T.
+        unit : {&#39;m&#39;, &#39;cm&#39;, &#39;mm&#39;, &#39;um&#39;}, optional
+            Desired output unit. Default is mm.
 
         Returns
         -------
-        w : float
-            Deflection w (mm) of the slab.
+        float
+            Deflection w (in specified unit) of the slab.
         &#34;&#34;&#34;
-        return Z[2, :]
+        convert = {
+            &#39;m&#39;: 1e-3,   # meters
+            &#39;cm&#39;: 1e-1,  # centimeters
+            &#39;mm&#39;: 1,     # millimeters
+            &#39;um&#39;: 1e3    # micrometers
+        }
+        return convert[unit]*Z[2, :]
 
     def wp(self, Z):
         &#34;&#34;&#34;
@@ -1410,12 +1648,12 @@ strains, and energy release rates from the solution vector.</p></div>
 
         Returns
         -------
-        wp : float
+        float
             First derivative w&#39; of the deflection of the slab.
         &#34;&#34;&#34;
         return Z[3, :]
 
-    def psi(self, Z):
+    def psi(self, Z, unit=&#39;rad&#39;):
         &#34;&#34;&#34;
         Get midplane rotation psi.
 
@@ -1423,13 +1661,19 @@ strains, and energy release rates from the solution vector.</p></div>
         ---------
         Z : ndarray
             Solution vector [u(x) u&#39;(x) w(x) w&#39;(x) psi(x) psi&#39;(x)]^T.
+        unit : {&#39;deg&#39;, &#39;degrees&#39;, &#39;rad&#39;, &#39;radians&#39;}, optional
+            Desired output unit. Default is radians.
 
         Returns
         -------
         psi : float
-            Midplane rotation psi (radians) of the slab.
+            Cross-section rotation psi (radians) of the slab.
         &#34;&#34;&#34;
-        return Z[4, :]
+        if unit in [&#39;deg&#39;, &#39;degree&#39;, &#39;degrees&#39;]:
+            psi = np.rad2deg(Z[4, :])
+        elif unit in [&#39;rad&#39;, &#39;radian&#39;, &#39;radians&#39;]:
+            psi = Z[4, :]
+        return psi
 
     def psip(self, Z):
         &#34;&#34;&#34;
@@ -1442,14 +1686,14 @@ strains, and energy release rates from the solution vector.</p></div>
 
         Returns
         -------
-        psip : float
+        float
             First derivative psi&#39; of the midplane rotation (radians/mm)
              of the slab.
         &#34;&#34;&#34;
         return Z[5, :]
 
     # pylint: enable=no-self-use
-    def u(self, Z, z0):
+    def u(self, Z, z0, unit=&#39;mm&#39;):
         &#34;&#34;&#34;
         Get horizontal displacement u = u0 + z0 psi.
 
@@ -1459,13 +1703,21 @@ strains, and energy release rates from the solution vector.</p></div>
             Solution vector [u(x) u&#39;(x) w(x) w&#39;(x) psi(x) psi&#39;(x)]^T.
         z0 : float
             Z-coordinate (mm) where u is to be evaluated.
+        unit : {&#39;m&#39;, &#39;cm&#39;, &#39;mm&#39;, &#39;um&#39;}, optional
+            Desired output unit. Default is mm.
 
         Returns
         -------
-        u : float
+        float
             Horizontal displacement u (mm) of the slab.
         &#34;&#34;&#34;
-        return Z[0, :] + z0*self.psi(Z)
+        convert = {
+            &#39;m&#39;: 1e-3,   # meters
+            &#39;cm&#39;: 1e-1,  # centimeters
+            &#39;mm&#39;: 1,     # millimeters
+            &#39;um&#39;: 1e3    # micrometers
+        }
+        return convert[unit]*(Z[0, :] + z0*self.psi(Z))
 
     def up(self, Z, z0):
         &#34;&#34;&#34;
@@ -1480,7 +1732,7 @@ strains, and energy release rates from the solution vector.</p></div>
 
         Returns
         -------
-        up : float
+        float
             First derivative u&#39; = u0&#39; + z0 psi&#39; of the horizontal
             displacement of the slab.
         &#34;&#34;&#34;
@@ -1497,7 +1749,7 @@ strains, and energy release rates from the solution vector.</p></div>
 
         Returns
         -------
-        N : float
+        float
             Axial normal force N (N) in the slab.
         &#34;&#34;&#34;
         return self.A11*Z[1, :] + self.B11*Z[5, :]
@@ -1513,7 +1765,7 @@ strains, and energy release rates from the solution vector.</p></div>
 
         Returns
         -------
-        M : float
+        float
             Bending moment M (Nmm) in the slab.
         &#34;&#34;&#34;
         return self.B11*Z[1, :] + self.D11*Z[5, :]
@@ -1529,12 +1781,12 @@ strains, and energy release rates from the solution vector.</p></div>
 
         Returns
         -------
-        V : float
+        float
             Vertical shear force V (N) in the slab.
         &#34;&#34;&#34;
         return self.kA55*(Z[3, :] + Z[4, :])
 
-    def sig(self, Z):
+    def sig(self, Z, unit=&#39;MPa&#39;):
         &#34;&#34;&#34;
         Get weak-layer normal stress.
 
@@ -1542,15 +1794,21 @@ strains, and energy release rates from the solution vector.</p></div>
         ---------
         Z : ndarray
             Solution vector [u(x) u&#39;(x) w(x) w&#39;(x) psi(x) psi&#39;(x)]^T.
+        unit : {&#39;MPa&#39;, &#39;kPa&#39;}, optional
+            Desired output unit. Default is MPa.
 
         Returns
         -------
-        sig : float
-            Weak-layer normal stress sigma (MPa).
+        float
+            Weak-layer normal stress sigma (in specified unit).
         &#34;&#34;&#34;
-        return -self.kn*self.w(Z)
+        convert = {
+            &#39;kPa&#39;: 1e3,
+            &#39;MPa&#39;: 1
+        }
+        return -convert[unit]*self.kn*self.w(Z)
 
-    def tau(self, Z):
+    def tau(self, Z, unit=&#39;MPa&#39;):
         &#34;&#34;&#34;
         Get weak-layer shear stress.
 
@@ -1558,13 +1816,20 @@ strains, and energy release rates from the solution vector.</p></div>
         ---------
         Z : ndarray
             Solution vector [u(x) u&#39;(x) w(x) w&#39;(x) psi(x) psi&#39;(x)]^T.
+        unit : {&#39;MPa&#39;, &#39;kPa&#39;}, optional
+            Desired output unit. Default is MPa.
 
         Returns
         -------
-        tau : float
-            Weak-layer shear stress tau (MPa).
+        float
+            Weak-layer shear stress tau (in specified unit).
         &#34;&#34;&#34;
-        return self.kt*(self.wp(Z)*self.t/2 - self.u(Z, z0=self.h/2))
+        convert = {
+            &#39;kPa&#39;: 1e3,
+            &#39;MPa&#39;: 1
+        }
+        return -convert[unit]*self.kt*(
+            self.wp(Z)*self.t/2 - self.u(Z, z0=self.h/2))
 
     def eps(self, Z):
         &#34;&#34;&#34;
@@ -1577,8 +1842,8 @@ strains, and energy release rates from the solution vector.</p></div>
 
         Returns
         -------
-        eps : float
-            Weak-layer normal strain epsilon (MPa).
+        float
+            Weak-layer normal strain epsilon.
         &#34;&#34;&#34;
         return -self.w(Z)/self.t
 
@@ -1593,8 +1858,8 @@ strains, and energy release rates from the solution vector.</p></div>
 
         Returns
         -------
-        gamma : float
-            Weak-layer shear strain gamma (MPa).
+        float
+            Weak-layer shear strain gamma.
         &#34;&#34;&#34;
         return self.wp(Z)/2 - self.u(Z, z0=self.h/2)/self.t
 
@@ -1609,7 +1874,7 @@ strains, and energy release rates from the solution vector.</p></div>
 
         Returns
         -------
-        maxp : float
+        loat
             Maximum principal stress (MPa) in the weak layer.
         &#34;&#34;&#34;
         sig = self.sig(Z)
@@ -1617,7 +1882,7 @@ strains, and energy release rates from the solution vector.</p></div>
         return np.amax([[sig + np.sqrt(sig**2 + 4*tau**2),
                          sig - np.sqrt(sig**2 + 4*tau**2)]], axis=1)[0]/2
 
-    def Gi(self, Ztip):
+    def Gi(self, Ztip, unit=&#39;kJ/m^2&#39;):
         &#34;&#34;&#34;
         Get mode I differential energy release rate at crack tip.
 
@@ -1626,16 +1891,23 @@ strains, and energy release rates from the solution vector.</p></div>
         Ztip : ndarray
             Solution vector [u(x) u&#39;(x) w(x) w&#39;(x) psi(x) psi&#39;(x)]^T
             at the crack tip.
+        unit : {&#39;N/mm&#39;, &#39;kJ/m^2&#39;, &#39;J/m^2&#39;}, optional
+            Desired output unit. Default is kJ/m^2.
 
         Returns
         -------
-        Gi : float
-            Mode I differential energy release rate (N/mm) at the
-            crack tip.
+        float
+            Mode I differential energy release rate (N/mm = kJ/m^2
+            or J/m^2) at the crack tip.
         &#34;&#34;&#34;
-        return self.sig(Ztip)**2/(2*self.kn)
+        convert = {
+            &#39;J/m^2&#39;: 1e3,   # joule per square meter
+            &#39;kJ/m^2&#39;: 1,    # kilojoule per square meter
+            &#39;N/mm&#39;: 1       # newton per millimeter
+        }
+        return convert[unit]*self.sig(Ztip)**2/(2*self.kn)
 
-    def Gii(self, Ztip):
+    def Gii(self, Ztip, unit=&#39;kJ/m^2&#39;):
         &#34;&#34;&#34;
         Get mode II differential energy release rate at crack tip.
 
@@ -1644,14 +1916,21 @@ strains, and energy release rates from the solution vector.</p></div>
         Ztip : ndarray
             Solution vector [u(x) u&#39;(x) w(x) w&#39;(x) psi(x) psi&#39;(x)]^T
             at the crack tip.
+        unit : {&#39;N/mm&#39;, &#39;kJ/m^2&#39;, &#39;J/m^2&#39;}, optional
+            Desired output unit. Default is kJ/m^2 = N/mm.
 
         Returns
         -------
-        Gii : float
-            Mode II differential energy release rate (N/mm) at the
-            crack tip.
+        float
+            Mode II differential energy release rate (N/mm = kJ/m^2
+            or J/m^2) at the crack tip.
         &#34;&#34;&#34;
-        return self.tau(Ztip)**2/(2*self.kt)
+        convert = {
+            &#39;J/m^2&#39;: 1e3,   # joule per square meter
+            &#39;kJ/m^2&#39;: 1,    # kilojoule per square meter
+            &#39;N/mm&#39;: 1       # newton per millimeter
+        }
+        return convert[unit]*self.tau(Ztip)**2/(2*self.kt)
 
     def int1(self, x, z0, z1):
         &#34;&#34;&#34;
@@ -1670,7 +1949,7 @@ strains, and energy release rates from the solution vector.</p></div>
 
         Returns
         -------
-        int1 : float or ndarray
+        float or ndarray
             Integrant of the mode I crack opening integral.
         &#34;&#34;&#34;
         return self.sig(z0(x))*self.eps(z1(x))*self.t
@@ -1682,7 +1961,7 @@ strains, and energy release rates from the solution vector.</p></div>
         Arguments
         ---------
         x: float, ndarray
-            X-coordinate where integrand is to be evaluated(mm).
+            X-coordinate where integrand is to be evaluated (mm).
         z0: callable
             Function that returns the solution vector of the uncracked
             configuration.
@@ -1692,7 +1971,7 @@ strains, and energy release rates from the solution vector.</p></div>
 
         Returns
         -------
-        int2 : float or ndarray
+        float or ndarray
             Integrant of the mode II crack opening integral.
         &#34;&#34;&#34;
         return self.tau(z0(x))*self.gamma(z1(x))*self.t</code></pre>
@@ -1705,7 +1984,7 @@ strains, and energy release rates from the solution vector.</p></div>
 <h3>Methods</h3>
 <dl>
 <dt id="weac.mixins.FieldQuantitiesMixin.Gi"><code class="name flex">
-<span>def <span class="ident">Gi</span></span>(<span>self, Ztip)</span>
+<span>def <span class="ident">Gi</span></span>(<span>self, Ztip, unit='kJ/m^2')</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Get mode I differential energy release rate at crack tip.</p>
@@ -1714,18 +1993,20 @@ strains, and energy release rates from the solution vector.</p></div>
 <dt><strong><code>Ztip</code></strong> :&ensp;<code>ndarray</code></dt>
 <dd>Solution vector [u(x) u'(x) w(x) w'(x) psi(x) psi'(x)]^T
 at the crack tip.</dd>
+<dt><strong><code>unit</code></strong> :&ensp;<code>{'N/mm', 'kJ/m^2', 'J/m^2'}</code>, optional</dt>
+<dd>Desired output unit. Default is kJ/m^2.</dd>
 </dl>
 <h2 id="returns">Returns</h2>
 <dl>
-<dt><strong><code>Gi</code></strong> :&ensp;<code>float</code></dt>
-<dd>Mode I differential energy release rate (N/mm) at the
-crack tip.</dd>
+<dt><code>float</code></dt>
+<dd>Mode I differential energy release rate (N/mm = kJ/m^2
+or J/m^2) at the crack tip.</dd>
 </dl></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def Gi(self, Ztip):
+<pre><code class="python">def Gi(self, Ztip, unit=&#39;kJ/m^2&#39;):
     &#34;&#34;&#34;
     Get mode I differential energy release rate at crack tip.
 
@@ -1734,18 +2015,25 @@ crack tip.</dd>
     Ztip : ndarray
         Solution vector [u(x) u&#39;(x) w(x) w&#39;(x) psi(x) psi&#39;(x)]^T
         at the crack tip.
+    unit : {&#39;N/mm&#39;, &#39;kJ/m^2&#39;, &#39;J/m^2&#39;}, optional
+        Desired output unit. Default is kJ/m^2.
 
     Returns
     -------
-    Gi : float
-        Mode I differential energy release rate (N/mm) at the
-        crack tip.
+    float
+        Mode I differential energy release rate (N/mm = kJ/m^2
+        or J/m^2) at the crack tip.
     &#34;&#34;&#34;
-    return self.sig(Ztip)**2/(2*self.kn)</code></pre>
+    convert = {
+        &#39;J/m^2&#39;: 1e3,   # joule per square meter
+        &#39;kJ/m^2&#39;: 1,    # kilojoule per square meter
+        &#39;N/mm&#39;: 1       # newton per millimeter
+    }
+    return convert[unit]*self.sig(Ztip)**2/(2*self.kn)</code></pre>
 </details>
 </dd>
 <dt id="weac.mixins.FieldQuantitiesMixin.Gii"><code class="name flex">
-<span>def <span class="ident">Gii</span></span>(<span>self, Ztip)</span>
+<span>def <span class="ident">Gii</span></span>(<span>self, Ztip, unit='kJ/m^2')</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Get mode II differential energy release rate at crack tip.</p>
@@ -1754,18 +2042,20 @@ crack tip.</dd>
 <dt><strong><code>Ztip</code></strong> :&ensp;<code>ndarray</code></dt>
 <dd>Solution vector [u(x) u'(x) w(x) w'(x) psi(x) psi'(x)]^T
 at the crack tip.</dd>
+<dt><strong><code>unit</code></strong> :&ensp;<code>{'N/mm', 'kJ/m^2', 'J/m^2'}</code>, optional</dt>
+<dd>Desired output unit. Default is kJ/m^2 = N/mm.</dd>
 </dl>
 <h2 id="returns">Returns</h2>
 <dl>
-<dt><strong><code>Gii</code></strong> :&ensp;<code>float</code></dt>
-<dd>Mode II differential energy release rate (N/mm) at the
-crack tip.</dd>
+<dt><code>float</code></dt>
+<dd>Mode II differential energy release rate (N/mm = kJ/m^2
+or J/m^2) at the crack tip.</dd>
 </dl></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def Gii(self, Ztip):
+<pre><code class="python">def Gii(self, Ztip, unit=&#39;kJ/m^2&#39;):
     &#34;&#34;&#34;
     Get mode II differential energy release rate at crack tip.
 
@@ -1774,14 +2064,21 @@ crack tip.</dd>
     Ztip : ndarray
         Solution vector [u(x) u&#39;(x) w(x) w&#39;(x) psi(x) psi&#39;(x)]^T
         at the crack tip.
+    unit : {&#39;N/mm&#39;, &#39;kJ/m^2&#39;, &#39;J/m^2&#39;}, optional
+        Desired output unit. Default is kJ/m^2 = N/mm.
 
     Returns
     -------
-    Gii : float
-        Mode II differential energy release rate (N/mm) at the
-        crack tip.
+    float
+        Mode II differential energy release rate (N/mm = kJ/m^2
+        or J/m^2) at the crack tip.
     &#34;&#34;&#34;
-    return self.tau(Ztip)**2/(2*self.kt)</code></pre>
+    convert = {
+        &#39;J/m^2&#39;: 1e3,   # joule per square meter
+        &#39;kJ/m^2&#39;: 1,    # kilojoule per square meter
+        &#39;N/mm&#39;: 1       # newton per millimeter
+    }
+    return convert[unit]*self.tau(Ztip)**2/(2*self.kt)</code></pre>
 </details>
 </dd>
 <dt id="weac.mixins.FieldQuantitiesMixin.M"><code class="name flex">
@@ -1796,7 +2093,7 @@ crack tip.</dd>
 </dl>
 <h2 id="returns">Returns</h2>
 <dl>
-<dt><strong><code>M</code></strong> :&ensp;<code>float</code></dt>
+<dt><code>float</code></dt>
 <dd>Bending moment M (Nmm) in the slab.</dd>
 </dl></div>
 <details class="source">
@@ -1814,7 +2111,7 @@ crack tip.</dd>
 
     Returns
     -------
-    M : float
+    float
         Bending moment M (Nmm) in the slab.
     &#34;&#34;&#34;
     return self.B11*Z[1, :] + self.D11*Z[5, :]</code></pre>
@@ -1832,7 +2129,7 @@ crack tip.</dd>
 </dl>
 <h2 id="returns">Returns</h2>
 <dl>
-<dt><strong><code>N</code></strong> :&ensp;<code>float</code></dt>
+<dt><code>float</code></dt>
 <dd>Axial normal force N (N) in the slab.</dd>
 </dl></div>
 <details class="source">
@@ -1850,7 +2147,7 @@ crack tip.</dd>
 
     Returns
     -------
-    N : float
+    float
         Axial normal force N (N) in the slab.
     &#34;&#34;&#34;
     return self.A11*Z[1, :] + self.B11*Z[5, :]</code></pre>
@@ -1868,7 +2165,7 @@ crack tip.</dd>
 </dl>
 <h2 id="returns">Returns</h2>
 <dl>
-<dt><strong><code>V</code></strong> :&ensp;<code>float</code></dt>
+<dt><code>float</code></dt>
 <dd>Vertical shear force V (N) in the slab.</dd>
 </dl></div>
 <details class="source">
@@ -1886,7 +2183,7 @@ crack tip.</dd>
 
     Returns
     -------
-    V : float
+    float
         Vertical shear force V (N) in the slab.
     &#34;&#34;&#34;
     return self.kA55*(Z[3, :] + Z[4, :])</code></pre>
@@ -1904,8 +2201,8 @@ crack tip.</dd>
 </dl>
 <h2 id="returns">Returns</h2>
 <dl>
-<dt><strong><code>eps</code></strong> :&ensp;<code>float</code></dt>
-<dd>Weak-layer normal strain epsilon (MPa).</dd>
+<dt><code>float</code></dt>
+<dd>Weak-layer normal strain epsilon.</dd>
 </dl></div>
 <details class="source">
 <summary>
@@ -1922,8 +2219,8 @@ crack tip.</dd>
 
     Returns
     -------
-    eps : float
-        Weak-layer normal strain epsilon (MPa).
+    float
+        Weak-layer normal strain epsilon.
     &#34;&#34;&#34;
     return -self.w(Z)/self.t</code></pre>
 </details>
@@ -1940,8 +2237,8 @@ crack tip.</dd>
 </dl>
 <h2 id="returns">Returns</h2>
 <dl>
-<dt><strong><code>gamma</code></strong> :&ensp;<code>float</code></dt>
-<dd>Weak-layer shear strain gamma (MPa).</dd>
+<dt><code>float</code></dt>
+<dd>Weak-layer shear strain gamma.</dd>
 </dl></div>
 <details class="source">
 <summary>
@@ -1958,8 +2255,8 @@ crack tip.</dd>
 
     Returns
     -------
-    gamma : float
-        Weak-layer shear strain gamma (MPa).
+    float
+        Weak-layer shear strain gamma.
     &#34;&#34;&#34;
     return self.wp(Z)/2 - self.u(Z, z0=self.h/2)/self.t</code></pre>
 </details>
@@ -1982,7 +2279,7 @@ configuration.</dd>
 </dl>
 <h2 id="returns">Returns</h2>
 <dl>
-<dt><strong><code>int1</code></strong> :&ensp;<code>float</code> or <code>ndarray</code></dt>
+<dt><code>float</code> or <code>ndarray</code></dt>
 <dd>Integrant of the mode I crack opening integral.</dd>
 </dl></div>
 <details class="source">
@@ -2006,7 +2303,7 @@ configuration.</dd>
 
     Returns
     -------
-    int1 : float or ndarray
+    float or ndarray
         Integrant of the mode I crack opening integral.
     &#34;&#34;&#34;
     return self.sig(z0(x))*self.eps(z1(x))*self.t</code></pre>
@@ -2020,7 +2317,7 @@ configuration.</dd>
 <h2 id="arguments">Arguments</h2>
 <dl>
 <dt><strong><code>x</code></strong> :&ensp;<code>float, ndarray</code></dt>
-<dd>X-coordinate where integrand is to be evaluated(mm).</dd>
+<dd>X-coordinate where integrand is to be evaluated (mm).</dd>
 <dt><strong><code>z0</code></strong> :&ensp;<code>callable</code></dt>
 <dd>Function that returns the solution vector of the uncracked
 configuration.</dd>
@@ -2030,7 +2327,7 @@ configuration.</dd>
 </dl>
 <h2 id="returns">Returns</h2>
 <dl>
-<dt><strong><code>int2</code></strong> :&ensp;<code>float</code> or <code>ndarray</code></dt>
+<dt><code>float</code> or <code>ndarray</code></dt>
 <dd>Integrant of the mode II crack opening integral.</dd>
 </dl></div>
 <details class="source">
@@ -2044,7 +2341,7 @@ configuration.</dd>
     Arguments
     ---------
     x: float, ndarray
-        X-coordinate where integrand is to be evaluated(mm).
+        X-coordinate where integrand is to be evaluated (mm).
     z0: callable
         Function that returns the solution vector of the uncracked
         configuration.
@@ -2054,7 +2351,7 @@ configuration.</dd>
 
     Returns
     -------
-    int2 : float or ndarray
+    float or ndarray
         Integrant of the mode II crack opening integral.
     &#34;&#34;&#34;
     return self.tau(z0(x))*self.gamma(z1(x))*self.t</code></pre>
@@ -2072,7 +2369,7 @@ configuration.</dd>
 </dl>
 <h2 id="returns">Returns</h2>
 <dl>
-<dt><strong><code>maxp</code></strong> :&ensp;<code>float</code></dt>
+<dt><code>loat</code></dt>
 <dd>Maximum principal stress (MPa) in the weak layer.</dd>
 </dl></div>
 <details class="source">
@@ -2090,7 +2387,7 @@ configuration.</dd>
 
     Returns
     -------
-    maxp : float
+    loat
         Maximum principal stress (MPa) in the weak layer.
     &#34;&#34;&#34;
     sig = self.sig(Z)
@@ -2100,7 +2397,7 @@ configuration.</dd>
 </details>
 </dd>
 <dt id="weac.mixins.FieldQuantitiesMixin.psi"><code class="name flex">
-<span>def <span class="ident">psi</span></span>(<span>self, Z)</span>
+<span>def <span class="ident">psi</span></span>(<span>self, Z, unit='rad')</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Get midplane rotation psi.</p>
@@ -2108,17 +2405,19 @@ configuration.</dd>
 <dl>
 <dt><strong><code>Z</code></strong> :&ensp;<code>ndarray</code></dt>
 <dd>Solution vector [u(x) u'(x) w(x) w'(x) psi(x) psi'(x)]^T.</dd>
+<dt><strong><code>unit</code></strong> :&ensp;<code>{'deg', 'degrees', 'rad', 'radians'}</code>, optional</dt>
+<dd>Desired output unit. Default is radians.</dd>
 </dl>
 <h2 id="returns">Returns</h2>
 <dl>
 <dt><strong><code>psi</code></strong> :&ensp;<code>float</code></dt>
-<dd>Midplane rotation psi (radians) of the slab.</dd>
+<dd>Cross-section rotation psi (radians) of the slab.</dd>
 </dl></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def psi(self, Z):
+<pre><code class="python">def psi(self, Z, unit=&#39;rad&#39;):
     &#34;&#34;&#34;
     Get midplane rotation psi.
 
@@ -2126,13 +2425,19 @@ configuration.</dd>
     ---------
     Z : ndarray
         Solution vector [u(x) u&#39;(x) w(x) w&#39;(x) psi(x) psi&#39;(x)]^T.
+    unit : {&#39;deg&#39;, &#39;degrees&#39;, &#39;rad&#39;, &#39;radians&#39;}, optional
+        Desired output unit. Default is radians.
 
     Returns
     -------
     psi : float
-        Midplane rotation psi (radians) of the slab.
+        Cross-section rotation psi (radians) of the slab.
     &#34;&#34;&#34;
-    return Z[4, :]</code></pre>
+    if unit in [&#39;deg&#39;, &#39;degree&#39;, &#39;degrees&#39;]:
+        psi = np.rad2deg(Z[4, :])
+    elif unit in [&#39;rad&#39;, &#39;radian&#39;, &#39;radians&#39;]:
+        psi = Z[4, :]
+    return psi</code></pre>
 </details>
 </dd>
 <dt id="weac.mixins.FieldQuantitiesMixin.psip"><code class="name flex">
@@ -2147,7 +2452,7 @@ configuration.</dd>
 </dl>
 <h2 id="returns">Returns</h2>
 <dl>
-<dt><strong><code>psip</code></strong> :&ensp;<code>float</code></dt>
+<dt><code>float</code></dt>
 <dd>First derivative psi' of the midplane rotation (radians/mm)
 of the slab.</dd>
 </dl></div>
@@ -2166,7 +2471,7 @@ of the slab.</dd>
 
     Returns
     -------
-    psip : float
+    float
         First derivative psi&#39; of the midplane rotation (radians/mm)
          of the slab.
     &#34;&#34;&#34;
@@ -2174,7 +2479,7 @@ of the slab.</dd>
 </details>
 </dd>
 <dt id="weac.mixins.FieldQuantitiesMixin.sig"><code class="name flex">
-<span>def <span class="ident">sig</span></span>(<span>self, Z)</span>
+<span>def <span class="ident">sig</span></span>(<span>self, Z, unit='MPa')</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Get weak-layer normal stress.</p>
@@ -2182,17 +2487,19 @@ of the slab.</dd>
 <dl>
 <dt><strong><code>Z</code></strong> :&ensp;<code>ndarray</code></dt>
 <dd>Solution vector [u(x) u'(x) w(x) w'(x) psi(x) psi'(x)]^T.</dd>
+<dt><strong><code>unit</code></strong> :&ensp;<code>{'MPa', 'kPa'}</code>, optional</dt>
+<dd>Desired output unit. Default is MPa.</dd>
 </dl>
 <h2 id="returns">Returns</h2>
 <dl>
-<dt><strong><code>sig</code></strong> :&ensp;<code>float</code></dt>
-<dd>Weak-layer normal stress sigma (MPa).</dd>
+<dt><code>float</code></dt>
+<dd>Weak-layer normal stress sigma (in specified unit).</dd>
 </dl></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def sig(self, Z):
+<pre><code class="python">def sig(self, Z, unit=&#39;MPa&#39;):
     &#34;&#34;&#34;
     Get weak-layer normal stress.
 
@@ -2200,17 +2507,23 @@ of the slab.</dd>
     ---------
     Z : ndarray
         Solution vector [u(x) u&#39;(x) w(x) w&#39;(x) psi(x) psi&#39;(x)]^T.
+    unit : {&#39;MPa&#39;, &#39;kPa&#39;}, optional
+        Desired output unit. Default is MPa.
 
     Returns
     -------
-    sig : float
-        Weak-layer normal stress sigma (MPa).
+    float
+        Weak-layer normal stress sigma (in specified unit).
     &#34;&#34;&#34;
-    return -self.kn*self.w(Z)</code></pre>
+    convert = {
+        &#39;kPa&#39;: 1e3,
+        &#39;MPa&#39;: 1
+    }
+    return -convert[unit]*self.kn*self.w(Z)</code></pre>
 </details>
 </dd>
 <dt id="weac.mixins.FieldQuantitiesMixin.tau"><code class="name flex">
-<span>def <span class="ident">tau</span></span>(<span>self, Z)</span>
+<span>def <span class="ident">tau</span></span>(<span>self, Z, unit='MPa')</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Get weak-layer shear stress.</p>
@@ -2218,17 +2531,19 @@ of the slab.</dd>
 <dl>
 <dt><strong><code>Z</code></strong> :&ensp;<code>ndarray</code></dt>
 <dd>Solution vector [u(x) u'(x) w(x) w'(x) psi(x) psi'(x)]^T.</dd>
+<dt><strong><code>unit</code></strong> :&ensp;<code>{'MPa', 'kPa'}</code>, optional</dt>
+<dd>Desired output unit. Default is MPa.</dd>
 </dl>
 <h2 id="returns">Returns</h2>
 <dl>
-<dt><strong><code>tau</code></strong> :&ensp;<code>float</code></dt>
-<dd>Weak-layer shear stress tau (MPa).</dd>
+<dt><code>float</code></dt>
+<dd>Weak-layer shear stress tau (in specified unit).</dd>
 </dl></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def tau(self, Z):
+<pre><code class="python">def tau(self, Z, unit=&#39;MPa&#39;):
     &#34;&#34;&#34;
     Get weak-layer shear stress.
 
@@ -2236,17 +2551,24 @@ of the slab.</dd>
     ---------
     Z : ndarray
         Solution vector [u(x) u&#39;(x) w(x) w&#39;(x) psi(x) psi&#39;(x)]^T.
+    unit : {&#39;MPa&#39;, &#39;kPa&#39;}, optional
+        Desired output unit. Default is MPa.
 
     Returns
     -------
-    tau : float
-        Weak-layer shear stress tau (MPa).
+    float
+        Weak-layer shear stress tau (in specified unit).
     &#34;&#34;&#34;
-    return self.kt*(self.wp(Z)*self.t/2 - self.u(Z, z0=self.h/2))</code></pre>
+    convert = {
+        &#39;kPa&#39;: 1e3,
+        &#39;MPa&#39;: 1
+    }
+    return -convert[unit]*self.kt*(
+        self.wp(Z)*self.t/2 - self.u(Z, z0=self.h/2))</code></pre>
 </details>
 </dd>
 <dt id="weac.mixins.FieldQuantitiesMixin.u"><code class="name flex">
-<span>def <span class="ident">u</span></span>(<span>self, Z, z0)</span>
+<span>def <span class="ident">u</span></span>(<span>self, Z, z0, unit='mm')</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Get horizontal displacement u = u0 + z0 psi.</p>
@@ -2256,17 +2578,19 @@ of the slab.</dd>
 <dd>Solution vector [u(x) u'(x) w(x) w'(x) psi(x) psi'(x)]^T.</dd>
 <dt><strong><code>z0</code></strong> :&ensp;<code>float</code></dt>
 <dd>Z-coordinate (mm) where u is to be evaluated.</dd>
+<dt><strong><code>unit</code></strong> :&ensp;<code>{'m', 'cm', 'mm', 'um'}</code>, optional</dt>
+<dd>Desired output unit. Default is mm.</dd>
 </dl>
 <h2 id="returns">Returns</h2>
 <dl>
-<dt><strong><code>u</code></strong> :&ensp;<code>float</code></dt>
+<dt><code>float</code></dt>
 <dd>Horizontal displacement u (mm) of the slab.</dd>
 </dl></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def u(self, Z, z0):
+<pre><code class="python">def u(self, Z, z0, unit=&#39;mm&#39;):
     &#34;&#34;&#34;
     Get horizontal displacement u = u0 + z0 psi.
 
@@ -2276,13 +2600,21 @@ of the slab.</dd>
         Solution vector [u(x) u&#39;(x) w(x) w&#39;(x) psi(x) psi&#39;(x)]^T.
     z0 : float
         Z-coordinate (mm) where u is to be evaluated.
+    unit : {&#39;m&#39;, &#39;cm&#39;, &#39;mm&#39;, &#39;um&#39;}, optional
+        Desired output unit. Default is mm.
 
     Returns
     -------
-    u : float
+    float
         Horizontal displacement u (mm) of the slab.
     &#34;&#34;&#34;
-    return Z[0, :] + z0*self.psi(Z)</code></pre>
+    convert = {
+        &#39;m&#39;: 1e-3,   # meters
+        &#39;cm&#39;: 1e-1,  # centimeters
+        &#39;mm&#39;: 1,     # millimeters
+        &#39;um&#39;: 1e3    # micrometers
+    }
+    return convert[unit]*(Z[0, :] + z0*self.psi(Z))</code></pre>
 </details>
 </dd>
 <dt id="weac.mixins.FieldQuantitiesMixin.up"><code class="name flex">
@@ -2299,7 +2631,7 @@ of the slab.</dd>
 </dl>
 <h2 id="returns">Returns</h2>
 <dl>
-<dt><strong><code>up</code></strong> :&ensp;<code>float</code></dt>
+<dt><code>float</code></dt>
 <dd>First derivative u' = u0' + z0 psi' of the horizontal
 displacement of the slab.</dd>
 </dl></div>
@@ -2320,7 +2652,7 @@ displacement of the slab.</dd>
 
     Returns
     -------
-    up : float
+    float
         First derivative u&#39; = u0&#39; + z0 psi&#39; of the horizontal
         displacement of the slab.
     &#34;&#34;&#34;
@@ -2328,7 +2660,7 @@ displacement of the slab.</dd>
 </details>
 </dd>
 <dt id="weac.mixins.FieldQuantitiesMixin.w"><code class="name flex">
-<span>def <span class="ident">w</span></span>(<span>self, Z)</span>
+<span>def <span class="ident">w</span></span>(<span>self, Z, unit='mm')</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Get centerline deflection w.</p>
@@ -2336,17 +2668,19 @@ displacement of the slab.</dd>
 <dl>
 <dt><strong><code>Z</code></strong> :&ensp;<code>ndarray</code></dt>
 <dd>Solution vector [u(x) u'(x) w(x) w'(x) psi(x) psi'(x)]^T.</dd>
+<dt><strong><code>unit</code></strong> :&ensp;<code>{'m', 'cm', 'mm', 'um'}</code>, optional</dt>
+<dd>Desired output unit. Default is mm.</dd>
 </dl>
 <h2 id="returns">Returns</h2>
 <dl>
-<dt><strong><code>w</code></strong> :&ensp;<code>float</code></dt>
-<dd>Deflection w (mm) of the slab.</dd>
+<dt><code>float</code></dt>
+<dd>Deflection w (in specified unit) of the slab.</dd>
 </dl></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def w(self, Z):
+<pre><code class="python">def w(self, Z, unit=&#39;mm&#39;):
     &#34;&#34;&#34;
     Get centerline deflection w.
 
@@ -2354,13 +2688,21 @@ displacement of the slab.</dd>
     ---------
     Z : ndarray
         Solution vector [u(x) u&#39;(x) w(x) w&#39;(x) psi(x) psi&#39;(x)]^T.
+    unit : {&#39;m&#39;, &#39;cm&#39;, &#39;mm&#39;, &#39;um&#39;}, optional
+        Desired output unit. Default is mm.
 
     Returns
     -------
-    w : float
-        Deflection w (mm) of the slab.
+    float
+        Deflection w (in specified unit) of the slab.
     &#34;&#34;&#34;
-    return Z[2, :]</code></pre>
+    convert = {
+        &#39;m&#39;: 1e-3,   # meters
+        &#39;cm&#39;: 1e-1,  # centimeters
+        &#39;mm&#39;: 1,     # millimeters
+        &#39;um&#39;: 1e3    # micrometers
+    }
+    return convert[unit]*Z[2, :]</code></pre>
 </details>
 </dd>
 <dt id="weac.mixins.FieldQuantitiesMixin.wp"><code class="name flex">
@@ -2375,7 +2717,7 @@ displacement of the slab.</dd>
 </dl>
 <h2 id="returns">Returns</h2>
 <dl>
-<dt><strong><code>wp</code></strong> :&ensp;<code>float</code></dt>
+<dt><code>float</code></dt>
 <dd>First derivative w' of the deflection of the slab.</dd>
 </dl></div>
 <details class="source">
@@ -2393,10 +2735,512 @@ displacement of the slab.</dd>
 
     Returns
     -------
-    wp : float
+    float
         First derivative w&#39; of the deflection of the slab.
     &#34;&#34;&#34;
     return Z[3, :]</code></pre>
+</details>
+</dd>
+</dl>
+</dd>
+<dt id="weac.mixins.OutputMixin"><code class="flex name class">
+<span>class <span class="ident">OutputMixin</span></span>
+</code></dt>
+<dd>
+<div class="desc"><p>Mixin for outputs.</p>
+<p>Provides convenience methods for the assembly of output lists
+such as rasterized displacements or rasterized stresses.</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class OutputMixin:
+    &#34;&#34;&#34;
+    Mixin for outputs.
+
+    Provides convenience methods for the assembly of output lists
+    such as rasterized displacements or rasterized stresses.
+    &#34;&#34;&#34;
+
+    def get_weaklayer_shearstress(self, x, z, unit=&#39;MPa&#39;, removeNaNs=False):
+        &#34;&#34;&#34;
+        Compute weak-layer shear stress.
+
+        Arguments
+        ---------
+        x : ndarray
+            Discretized x-coordinates (mm) where coordinates of unsupported
+            (no foundation) segments are NaNs.
+        z : ndarray
+            Solution vectors at positions x as columns of matrix z.
+        unit : {&#39;MPa&#39;, &#39;kPa&#39;}, optional
+            Stress output unit. Default is MPa.
+        keepNaNs : bool
+            If set, do not remove
+
+        Returns
+        -------
+        x : ndarray
+            Horizontal coordinates (cm).
+        sig : ndarray
+            Normal stress (stress unit input).
+        &#34;&#34;&#34;
+        # Convert coordinates from mm to cm and stresses from MPa to unit
+        x = x/10
+        tau = self.tau(z, unit=unit)
+        # Filter stresses in unspupported segments
+        if removeNaNs:
+            # Remove coordinate-stress pairs where no weak layer is present
+            tau = tau[~np.isnan(x)]
+            x = x[~np.isnan(x)]
+        else:
+            # Set stress NaN where no weak layer is present
+            tau[np.isnan(x)] = np.nan
+
+        return x, tau
+
+    def get_weaklayer_normalstress(self, x, z, unit=&#39;MPa&#39;, removeNaNs=False):
+        &#34;&#34;&#34;
+        Compute weak-layer normal stress.
+
+        Arguments
+        ---------
+        x : ndarray
+            Discretized x-coordinates (mm) where coordinates of unsupported
+            (no foundation) segments are NaNs.
+        z : ndarray
+            Solution vectors at positions x as columns of matrix z.
+        unit : {&#39;MPa&#39;, &#39;kPa&#39;}, optional
+            Stress output unit. Default is MPa.
+        keepNaNs : bool
+            If set, do not remove
+
+        Returns
+        -------
+        x : ndarray
+            Horizontal coordinates (cm).
+        sig : ndarray
+            Normal stress (stress unit input).
+        &#34;&#34;&#34;
+        # Convert coordinates from mm to cm and stresses from MPa to unit
+        x = x/10
+        sig = self.sig(z, unit=unit)
+        # Filter stresses in unspupported segments
+        if removeNaNs:
+            # Remove coordinate-stress pairs where no weak layer is present
+            sig = sig[~np.isnan(x)]
+            x = x[~np.isnan(x)]
+        else:
+            # Set stress NaN where no weak layer is present
+            sig[np.isnan(x)] = np.nan
+
+        return x, sig
+
+    def get_slab_displacement(self, x, z, loc=&#39;mid&#39;, unit=&#39;mm&#39;):
+        &#34;&#34;&#34;
+        Compute horizontal slab displacement.
+
+        Arguments
+        ---------
+        x : ndarray
+            Discretized x-coordinates (mm) where coordinates of
+            unsupported (no foundation) segments are NaNs.
+        z : ndarray
+            Solution vectors at positions x as columns of matrix z.
+        loc : {&#39;top&#39;, &#39;mid&#39;, &#39;bot&#39;}
+            Get displacements of top, midplane or bottom of slab.
+            Default is mid.
+        unit : {&#39;m&#39;, &#39;cm&#39;, &#39;mm&#39;, &#39;um&#39;}, optional
+            Displacement output unit. Default is mm.
+
+        Returns
+        -------
+        x : ndarray
+            Horizontal coordinates (cm).
+        ndarray
+            Horizontal displacements (unit input).
+        &#34;&#34;&#34;
+        # Coordinates (cm)
+        x = x/10
+        # Locator
+        z0 = {&#39;top&#39;: -self.h/2, &#39;mid&#39;: 0, &#39;bot&#39;: self.h/2}
+        # Displacement (unit)
+        u = self.u(z, z0=z0[loc], unit=unit)
+        # Output array
+        return x, u
+
+    def get_slab_deflection(self, x, z, unit=&#39;mm&#39;):
+        &#34;&#34;&#34;
+        Compute vertical slab displacement.
+
+        Arguments
+        ---------
+        x : ndarray
+            Discretized x-coordinates (mm) where coordinates of
+            unsupported (no foundation) segments are NaNs.
+        z : ndarray
+            Solution vectors at positions x as columns of matrix z.
+            Default is mid.
+        unit : {&#39;m&#39;, &#39;cm&#39;, &#39;mm&#39;, &#39;um&#39;}, optional
+            Displacement output unit. Default is mm.
+
+        Returns
+        -------
+        x : ndarray
+            Horizontal coordinates (cm).
+        ndarray
+            Vertical deflections (unit input).
+        &#34;&#34;&#34;
+        # Coordinates (cm)
+        x = x/10
+        # Deflection (unit)
+        w = self.w(z, unit=unit)
+        # Output array
+        return x, w
+
+    def get_slab_rotation(self, x, z, unit=&#39;degrees&#39;):
+        &#34;&#34;&#34;
+        Compute slab cross-section rotation angle.
+
+        Arguments
+        ---------
+        x : ndarray
+            Discretized x-coordinates (mm) where coordinates of
+            unsupported (no foundation) segments are NaNs.
+        z : ndarray
+            Solution vectors at positions x as columns of matrix z.
+            Default is mid.
+        unit : {&#39;deg&#39;, degrees&#39;, &#39;rad&#39;, &#39;radians&#39;}, optional
+            Rotation angle output unit. Default is degrees.
+
+        Returns
+        -------
+        x : ndarray
+            Horizontal coordinates (cm).
+        ndarray
+            Cross section rotations (unit input).
+        &#34;&#34;&#34;
+        # Coordinates (cm)
+        x = x/10
+        # Cross-section rotation angle (unit)
+        psi = self.psi(z, unit=unit)
+        # Output array
+        return x, psi</code></pre>
+</details>
+<h3>Subclasses</h3>
+<ul class="hlist">
+<li><a title="weac.inverse.Inverse" href="inverse.html#weac.inverse.Inverse">Inverse</a></li>
+<li><a title="weac.layered.Layered" href="layered.html#weac.layered.Layered">Layered</a></li>
+</ul>
+<h3>Methods</h3>
+<dl>
+<dt id="weac.mixins.OutputMixin.get_slab_deflection"><code class="name flex">
+<span>def <span class="ident">get_slab_deflection</span></span>(<span>self, x, z, unit='mm')</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Compute vertical slab displacement.</p>
+<h2 id="arguments">Arguments</h2>
+<dl>
+<dt><strong><code>x</code></strong> :&ensp;<code>ndarray</code></dt>
+<dd>Discretized x-coordinates (mm) where coordinates of
+unsupported (no foundation) segments are NaNs.</dd>
+<dt><strong><code>z</code></strong> :&ensp;<code>ndarray</code></dt>
+<dd>Solution vectors at positions x as columns of matrix z.
+Default is mid.</dd>
+<dt><strong><code>unit</code></strong> :&ensp;<code>{'m', 'cm', 'mm', 'um'}</code>, optional</dt>
+<dd>Displacement output unit. Default is mm.</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><strong><code>x</code></strong> :&ensp;<code>ndarray</code></dt>
+<dd>Horizontal coordinates (cm).</dd>
+<dt><code>ndarray</code></dt>
+<dd>Vertical deflections (unit input).</dd>
+</dl></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def get_slab_deflection(self, x, z, unit=&#39;mm&#39;):
+    &#34;&#34;&#34;
+    Compute vertical slab displacement.
+
+    Arguments
+    ---------
+    x : ndarray
+        Discretized x-coordinates (mm) where coordinates of
+        unsupported (no foundation) segments are NaNs.
+    z : ndarray
+        Solution vectors at positions x as columns of matrix z.
+        Default is mid.
+    unit : {&#39;m&#39;, &#39;cm&#39;, &#39;mm&#39;, &#39;um&#39;}, optional
+        Displacement output unit. Default is mm.
+
+    Returns
+    -------
+    x : ndarray
+        Horizontal coordinates (cm).
+    ndarray
+        Vertical deflections (unit input).
+    &#34;&#34;&#34;
+    # Coordinates (cm)
+    x = x/10
+    # Deflection (unit)
+    w = self.w(z, unit=unit)
+    # Output array
+    return x, w</code></pre>
+</details>
+</dd>
+<dt id="weac.mixins.OutputMixin.get_slab_displacement"><code class="name flex">
+<span>def <span class="ident">get_slab_displacement</span></span>(<span>self, x, z, loc='mid', unit='mm')</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Compute horizontal slab displacement.</p>
+<h2 id="arguments">Arguments</h2>
+<dl>
+<dt><strong><code>x</code></strong> :&ensp;<code>ndarray</code></dt>
+<dd>Discretized x-coordinates (mm) where coordinates of
+unsupported (no foundation) segments are NaNs.</dd>
+<dt><strong><code>z</code></strong> :&ensp;<code>ndarray</code></dt>
+<dd>Solution vectors at positions x as columns of matrix z.</dd>
+<dt><strong><code>loc</code></strong> :&ensp;<code>{'top', 'mid', 'bot'}</code></dt>
+<dd>Get displacements of top, midplane or bottom of slab.
+Default is mid.</dd>
+<dt><strong><code>unit</code></strong> :&ensp;<code>{'m', 'cm', 'mm', 'um'}</code>, optional</dt>
+<dd>Displacement output unit. Default is mm.</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><strong><code>x</code></strong> :&ensp;<code>ndarray</code></dt>
+<dd>Horizontal coordinates (cm).</dd>
+<dt><code>ndarray</code></dt>
+<dd>Horizontal displacements (unit input).</dd>
+</dl></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def get_slab_displacement(self, x, z, loc=&#39;mid&#39;, unit=&#39;mm&#39;):
+    &#34;&#34;&#34;
+    Compute horizontal slab displacement.
+
+    Arguments
+    ---------
+    x : ndarray
+        Discretized x-coordinates (mm) where coordinates of
+        unsupported (no foundation) segments are NaNs.
+    z : ndarray
+        Solution vectors at positions x as columns of matrix z.
+    loc : {&#39;top&#39;, &#39;mid&#39;, &#39;bot&#39;}
+        Get displacements of top, midplane or bottom of slab.
+        Default is mid.
+    unit : {&#39;m&#39;, &#39;cm&#39;, &#39;mm&#39;, &#39;um&#39;}, optional
+        Displacement output unit. Default is mm.
+
+    Returns
+    -------
+    x : ndarray
+        Horizontal coordinates (cm).
+    ndarray
+        Horizontal displacements (unit input).
+    &#34;&#34;&#34;
+    # Coordinates (cm)
+    x = x/10
+    # Locator
+    z0 = {&#39;top&#39;: -self.h/2, &#39;mid&#39;: 0, &#39;bot&#39;: self.h/2}
+    # Displacement (unit)
+    u = self.u(z, z0=z0[loc], unit=unit)
+    # Output array
+    return x, u</code></pre>
+</details>
+</dd>
+<dt id="weac.mixins.OutputMixin.get_slab_rotation"><code class="name flex">
+<span>def <span class="ident">get_slab_rotation</span></span>(<span>self, x, z, unit='degrees')</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Compute slab cross-section rotation angle.</p>
+<h2 id="arguments">Arguments</h2>
+<dl>
+<dt><strong><code>x</code></strong> :&ensp;<code>ndarray</code></dt>
+<dd>Discretized x-coordinates (mm) where coordinates of
+unsupported (no foundation) segments are NaNs.</dd>
+<dt><strong><code>z</code></strong> :&ensp;<code>ndarray</code></dt>
+<dd>Solution vectors at positions x as columns of matrix z.
+Default is mid.</dd>
+<dt><strong><code>unit</code></strong> :&ensp;<code>{'deg', degrees', 'rad', 'radians'}</code>, optional</dt>
+<dd>Rotation angle output unit. Default is degrees.</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><strong><code>x</code></strong> :&ensp;<code>ndarray</code></dt>
+<dd>Horizontal coordinates (cm).</dd>
+<dt><code>ndarray</code></dt>
+<dd>Cross section rotations (unit input).</dd>
+</dl></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def get_slab_rotation(self, x, z, unit=&#39;degrees&#39;):
+    &#34;&#34;&#34;
+    Compute slab cross-section rotation angle.
+
+    Arguments
+    ---------
+    x : ndarray
+        Discretized x-coordinates (mm) where coordinates of
+        unsupported (no foundation) segments are NaNs.
+    z : ndarray
+        Solution vectors at positions x as columns of matrix z.
+        Default is mid.
+    unit : {&#39;deg&#39;, degrees&#39;, &#39;rad&#39;, &#39;radians&#39;}, optional
+        Rotation angle output unit. Default is degrees.
+
+    Returns
+    -------
+    x : ndarray
+        Horizontal coordinates (cm).
+    ndarray
+        Cross section rotations (unit input).
+    &#34;&#34;&#34;
+    # Coordinates (cm)
+    x = x/10
+    # Cross-section rotation angle (unit)
+    psi = self.psi(z, unit=unit)
+    # Output array
+    return x, psi</code></pre>
+</details>
+</dd>
+<dt id="weac.mixins.OutputMixin.get_weaklayer_normalstress"><code class="name flex">
+<span>def <span class="ident">get_weaklayer_normalstress</span></span>(<span>self, x, z, unit='MPa', removeNaNs=False)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Compute weak-layer normal stress.</p>
+<h2 id="arguments">Arguments</h2>
+<dl>
+<dt><strong><code>x</code></strong> :&ensp;<code>ndarray</code></dt>
+<dd>Discretized x-coordinates (mm) where coordinates of unsupported
+(no foundation) segments are NaNs.</dd>
+<dt><strong><code>z</code></strong> :&ensp;<code>ndarray</code></dt>
+<dd>Solution vectors at positions x as columns of matrix z.</dd>
+<dt><strong><code>unit</code></strong> :&ensp;<code>{'MPa', 'kPa'}</code>, optional</dt>
+<dd>Stress output unit. Default is MPa.</dd>
+<dt><strong><code>keepNaNs</code></strong> :&ensp;<code>bool</code></dt>
+<dd>If set, do not remove</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><strong><code>x</code></strong> :&ensp;<code>ndarray</code></dt>
+<dd>Horizontal coordinates (cm).</dd>
+<dt><strong><code>sig</code></strong> :&ensp;<code>ndarray</code></dt>
+<dd>Normal stress (stress unit input).</dd>
+</dl></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def get_weaklayer_normalstress(self, x, z, unit=&#39;MPa&#39;, removeNaNs=False):
+    &#34;&#34;&#34;
+    Compute weak-layer normal stress.
+
+    Arguments
+    ---------
+    x : ndarray
+        Discretized x-coordinates (mm) where coordinates of unsupported
+        (no foundation) segments are NaNs.
+    z : ndarray
+        Solution vectors at positions x as columns of matrix z.
+    unit : {&#39;MPa&#39;, &#39;kPa&#39;}, optional
+        Stress output unit. Default is MPa.
+    keepNaNs : bool
+        If set, do not remove
+
+    Returns
+    -------
+    x : ndarray
+        Horizontal coordinates (cm).
+    sig : ndarray
+        Normal stress (stress unit input).
+    &#34;&#34;&#34;
+    # Convert coordinates from mm to cm and stresses from MPa to unit
+    x = x/10
+    sig = self.sig(z, unit=unit)
+    # Filter stresses in unspupported segments
+    if removeNaNs:
+        # Remove coordinate-stress pairs where no weak layer is present
+        sig = sig[~np.isnan(x)]
+        x = x[~np.isnan(x)]
+    else:
+        # Set stress NaN where no weak layer is present
+        sig[np.isnan(x)] = np.nan
+
+    return x, sig</code></pre>
+</details>
+</dd>
+<dt id="weac.mixins.OutputMixin.get_weaklayer_shearstress"><code class="name flex">
+<span>def <span class="ident">get_weaklayer_shearstress</span></span>(<span>self, x, z, unit='MPa', removeNaNs=False)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Compute weak-layer shear stress.</p>
+<h2 id="arguments">Arguments</h2>
+<dl>
+<dt><strong><code>x</code></strong> :&ensp;<code>ndarray</code></dt>
+<dd>Discretized x-coordinates (mm) where coordinates of unsupported
+(no foundation) segments are NaNs.</dd>
+<dt><strong><code>z</code></strong> :&ensp;<code>ndarray</code></dt>
+<dd>Solution vectors at positions x as columns of matrix z.</dd>
+<dt><strong><code>unit</code></strong> :&ensp;<code>{'MPa', 'kPa'}</code>, optional</dt>
+<dd>Stress output unit. Default is MPa.</dd>
+<dt><strong><code>keepNaNs</code></strong> :&ensp;<code>bool</code></dt>
+<dd>If set, do not remove</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><strong><code>x</code></strong> :&ensp;<code>ndarray</code></dt>
+<dd>Horizontal coordinates (cm).</dd>
+<dt><strong><code>sig</code></strong> :&ensp;<code>ndarray</code></dt>
+<dd>Normal stress (stress unit input).</dd>
+</dl></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def get_weaklayer_shearstress(self, x, z, unit=&#39;MPa&#39;, removeNaNs=False):
+    &#34;&#34;&#34;
+    Compute weak-layer shear stress.
+
+    Arguments
+    ---------
+    x : ndarray
+        Discretized x-coordinates (mm) where coordinates of unsupported
+        (no foundation) segments are NaNs.
+    z : ndarray
+        Solution vectors at positions x as columns of matrix z.
+    unit : {&#39;MPa&#39;, &#39;kPa&#39;}, optional
+        Stress output unit. Default is MPa.
+    keepNaNs : bool
+        If set, do not remove
+
+    Returns
+    -------
+    x : ndarray
+        Horizontal coordinates (cm).
+    sig : ndarray
+        Normal stress (stress unit input).
+    &#34;&#34;&#34;
+    # Convert coordinates from mm to cm and stresses from MPa to unit
+    x = x/10
+    tau = self.tau(z, unit=unit)
+    # Filter stresses in unspupported segments
+    if removeNaNs:
+        # Remove coordinate-stress pairs where no weak layer is present
+        tau = tau[~np.isnan(x)]
+        x = x[~np.isnan(x)]
+    else:
+        # Set stress NaN where no weak layer is present
+        tau[np.isnan(x)] = np.nan
+
+    return x, tau</code></pre>
 </details>
 </dd>
 </dl>
@@ -2422,17 +3266,17 @@ and for the computation of the free constants.</p></div>
 
     def bc(self, z):
         &#34;&#34;&#34;
-        Provide equations for free(pst) or infinite(skiers) ends.
+        Provide equations for free (pst) or infinite (skiers) ends.
 
         Arguments
         ---------
         z: ndarray
-            Solution vector(6x1) at a certain position x.
+            Solution vector (6x1) at a certain position x.
 
         Returns
         -------
         bc: ndarray
-            Boundary condition vector(lenght 3) at position x.
+            Boundary condition vector (lenght 3) at position x.
         &#34;&#34;&#34;
         if self.system in [&#39;pst-&#39;, &#39;-pst&#39;]:
             # Free ends
@@ -2454,21 +3298,21 @@ and for the computation of the free constants.</p></div>
         Arguments
         ---------
         zl: ndarray
-            Solution vector(6x1) at left end of beam segement.
+            Solution vector (6x1) at left end of beam segement.
         zr: ndarray
-            Solution vector(6x1) at right end of beam segement.
+            Solution vector (6x1) at right end of beam segement.
         pos: {&#39;left&#39;, &#39;mid&#39;, &#39;right&#39;, &#39;l&#39;, &#39;m&#39;, &#39;r&#39;}, optional
             Determines whether the segement under consideration
-            is a left boundary segement(left, l), one of the
-            center segement(mid, m), or a right boundary
-            segement(right, r). Default is &#39;mid&#39;.
+            is a left boundary segement (left, l), one of the
+            center segement (mid, m), or a right boundary
+            segemen t (right, r). Default is &#39;mid&#39;.
 
         Returns
         -------
         eqs: ndarray
-            Vector(of length 9) of boundary conditions(3) and
-            transmission conditions(6) for boundary segements
-            or vector of transmission conditions(of length 6+6)
+            Vector (of length 9) of boundary conditions (3) and
+            transmission conditions (6) for boundary segements
+            or vector of transmission conditions (of length 6+6)
             for center segments.
         &#34;&#34;&#34;
         if pos in (&#39;l&#39;, &#39;left&#39;):
@@ -2520,39 +3364,40 @@ and for the computation of the free constants.</p></div>
         &#34;&#34;&#34;
         Assemble lists defining the segments.
 
-        This includes length(li), foundation(ki, k0), and skier weight(mi).
+        This includes length (li), foundation (ki, k0), and skier
+        weight (mi).
 
         Arguments
         ---------
         li: squence, optional
             List of lengths of segements(mm). Used for system &#39;skiers&#39;.
         mi: squence, optional
-            List of skier weigths(kg) at segement boundaries. Used for
+            List of skier weigths (kg) at segement boundaries. Used for
             system &#39;skiers&#39;.
         ki: squence, optional
             List of one bool per segement indicating whether segement
-            has foundation(True) or not (False) in the cracked state.
+            has foundation (True) or not (False) in the cracked state.
             Used for system &#39;skiers&#39;.
         k0: squence, optional
             List of one bool per segement indicating whether segement
             has foundation(True) or not (False) in the uncracked state.
             Used for system &#39;skiers&#39;.
         L: float, optional
-            Total length of model(mm). Used for systems &#39;pst-&#39;, &#39;-pst&#39;,
+            Total length of model (mm). Used for systems &#39;pst-&#39;, &#39;-pst&#39;,
             and &#39;skier&#39;.
         a: float, optional
-            Crack length(mm).  Used for systems &#39;pst-&#39;, &#39;-pst&#39;, and
+            Crack length (mm).  Used for systems &#39;pst-&#39;, &#39;-pst&#39;, and
             &#39;skier&#39;.
         m: float, optional
-            Weight of skier(kg) in the axial center of the model.
+            Weight of skier (kg) in the axial center of the model.
             Used for system &#39;skier&#39;.
 
         Returns
         -------
         segments: dict
-            Dictionary with lists of segement lengths(li), skier
-            weights(mi), and foundation booleans in the cracked(ki)
-            and ncracked(k0) configurations.
+            Dictionary with lists of segement lengths (li), skier
+            weights (mi), and foundation booleans in the cracked (ki)
+            and uncracked (k0) configurations.
         &#34;&#34;&#34;
         _ = kwargs                                      # Unused arguments
         if self.system == &#39;skiers&#39;:
@@ -2605,14 +3450,14 @@ and for the computation of the free constants.</p></div>
         Arguments
         ---------
         phi: float
-            Inclination(degrees).
+            Inclination (degrees).
         li: ndarray
-            List of lengths of segements(mm).
+            List of lengths of segements (mm).
         mi: ndarray
-            List of skier weigths(kg) at segement boundaries.
+            List of skier weigths (kg) at segement boundaries.
         ki: ndarray
             List of one bool per segement indicating whether segement
-            has foundation(True) or not (False).
+            has foundation (True) or not (False).
 
         Returns
         -------
@@ -2626,7 +3471,7 @@ and for the computation of the free constants.</p></div>
         if not any(ki):
             raise ValueError(&#39;Provide at least one bedded segment.&#39;)
         # Mismatch of number of segements and transisions
-        if len(li) != len(ki) or len(li)-1 != len(mi):
+        if len(li) != len(ki) or len(li) - 1 != len(mi):
             raise ValueError(&#39;Make sure len(li)=N, len(ki)=N, and &#39;
                              &#39;len(mi)=N-1 for a system of N segments.&#39;)
 
@@ -2680,17 +3525,17 @@ and for the computation of the free constants.</p></div>
                 pos=pos)
             # Rows for left-hand side assembly
             start = 0 if i == 0 else 3
-            stop = 6 if i == nS-1 else 9
+            stop = 6 if i == nS - 1 else 9
             # Assemble left-hand side
-            zh0[(6*i-start):(6*i+stop), i*nDOF:(i+1)*nDOF] = zhi
-            zp0[(6*i-start):(6*i+stop)] += zpi
+            zh0[(6*i - start):(6*i + stop), i*nDOF:(i + 1)*nDOF] = zhi
+            zp0[(6*i - start):(6*i + stop)] += zpi
 
         # Loop through loads to assemble right-hand side
         for i, m in enumerate(mi, start=1):
             # Get skier loads
             Fn, Ft = self.get_skier_load(m, phi)
             # Right-hand side for transmission from segment i-1 to segment i
-            rhs[6*i:6*i+3] = np.vstack([Ft, -Ft*self.h/2, Fn])
+            rhs[6*i:6*i + 3] = np.vstack([Ft, -Ft*self.h/2, Fn])
 
         # Set rhs so that complementary integral vanishes at boundaries
         if self.system not in [&#39;pst-&#39;, &#39;-pst&#39;]:
@@ -2766,14 +3611,14 @@ and solve for constants C.</p>
 <h2 id="arguments">Arguments</h2>
 <dl>
 <dt><strong><code>phi</code></strong> :&ensp;<code>float</code></dt>
-<dd>Inclination(degrees).</dd>
+<dd>Inclination (degrees).</dd>
 <dt><strong><code>li</code></strong> :&ensp;<code>ndarray</code></dt>
-<dd>List of lengths of segements(mm).</dd>
+<dd>List of lengths of segements (mm).</dd>
 <dt><strong><code>mi</code></strong> :&ensp;<code>ndarray</code></dt>
-<dd>List of skier weigths(kg) at segement boundaries.</dd>
+<dd>List of skier weigths (kg) at segement boundaries.</dd>
 <dt><strong><code>ki</code></strong> :&ensp;<code>ndarray</code></dt>
 <dd>List of one bool per segement indicating whether segement
-has foundation(True) or not (False).</dd>
+has foundation (True) or not (False).</dd>
 </dl>
 <h2 id="returns">Returns</h2>
 <dl>
@@ -2802,14 +3647,14 @@ segements. Columns contain the 6 constants of each segement.</dd>
     Arguments
     ---------
     phi: float
-        Inclination(degrees).
+        Inclination (degrees).
     li: ndarray
-        List of lengths of segements(mm).
+        List of lengths of segements (mm).
     mi: ndarray
-        List of skier weigths(kg) at segement boundaries.
+        List of skier weigths (kg) at segement boundaries.
     ki: ndarray
         List of one bool per segement indicating whether segement
-        has foundation(True) or not (False).
+        has foundation (True) or not (False).
 
     Returns
     -------
@@ -2823,7 +3668,7 @@ segements. Columns contain the 6 constants of each segement.</dd>
     if not any(ki):
         raise ValueError(&#39;Provide at least one bedded segment.&#39;)
     # Mismatch of number of segements and transisions
-    if len(li) != len(ki) or len(li)-1 != len(mi):
+    if len(li) != len(ki) or len(li) - 1 != len(mi):
         raise ValueError(&#39;Make sure len(li)=N, len(ki)=N, and &#39;
                          &#39;len(mi)=N-1 for a system of N segments.&#39;)
 
@@ -2877,17 +3722,17 @@ segements. Columns contain the 6 constants of each segement.</dd>
             pos=pos)
         # Rows for left-hand side assembly
         start = 0 if i == 0 else 3
-        stop = 6 if i == nS-1 else 9
+        stop = 6 if i == nS - 1 else 9
         # Assemble left-hand side
-        zh0[(6*i-start):(6*i+stop), i*nDOF:(i+1)*nDOF] = zhi
-        zp0[(6*i-start):(6*i+stop)] += zpi
+        zh0[(6*i - start):(6*i + stop), i*nDOF:(i + 1)*nDOF] = zhi
+        zp0[(6*i - start):(6*i + stop)] += zpi
 
     # Loop through loads to assemble right-hand side
     for i, m in enumerate(mi, start=1):
         # Get skier loads
         Fn, Ft = self.get_skier_load(m, phi)
         # Right-hand side for transmission from segment i-1 to segment i
-        rhs[6*i:6*i+3] = np.vstack([Ft, -Ft*self.h/2, Fn])
+        rhs[6*i:6*i + 3] = np.vstack([Ft, -Ft*self.h/2, Fn])
 
     # Set rhs so that complementary integral vanishes at boundaries
     if self.system not in [&#39;pst-&#39;, &#39;-pst&#39;]:
@@ -2907,16 +3752,16 @@ segements. Columns contain the 6 constants of each segement.</dd>
 <span>def <span class="ident">bc</span></span>(<span>self, z)</span>
 </code></dt>
 <dd>
-<div class="desc"><p>Provide equations for free(pst) or infinite(skiers) ends.</p>
+<div class="desc"><p>Provide equations for free (pst) or infinite (skiers) ends.</p>
 <h2 id="arguments">Arguments</h2>
 <dl>
 <dt><strong><code>z</code></strong> :&ensp;<code>ndarray</code></dt>
-<dd>Solution vector(6x1) at a certain position x.</dd>
+<dd>Solution vector (6x1) at a certain position x.</dd>
 </dl>
 <h2 id="returns">Returns</h2>
 <dl>
 <dt><strong><code>bc</code></strong> :&ensp;<code>ndarray</code></dt>
-<dd>Boundary condition vector(lenght 3) at position x.</dd>
+<dd>Boundary condition vector (lenght 3) at position x.</dd>
 </dl></div>
 <details class="source">
 <summary>
@@ -2924,17 +3769,17 @@ segements. Columns contain the 6 constants of each segement.</dd>
 </summary>
 <pre><code class="python">def bc(self, z):
     &#34;&#34;&#34;
-    Provide equations for free(pst) or infinite(skiers) ends.
+    Provide equations for free (pst) or infinite (skiers) ends.
 
     Arguments
     ---------
     z: ndarray
-        Solution vector(6x1) at a certain position x.
+        Solution vector (6x1) at a certain position x.
 
     Returns
     -------
     bc: ndarray
-        Boundary condition vector(lenght 3) at position x.
+        Boundary condition vector (lenght 3) at position x.
     &#34;&#34;&#34;
     if self.system in [&#39;pst-&#39;, &#39;-pst&#39;]:
         # Free ends
@@ -2955,39 +3800,40 @@ segements. Columns contain the 6 constants of each segement.</dd>
 </code></dt>
 <dd>
 <div class="desc"><p>Assemble lists defining the segments.</p>
-<p>This includes length(li), foundation(ki, k0), and skier weight(mi).</p>
+<p>This includes length (li), foundation (ki, k0), and skier
+weight (mi).</p>
 <h2 id="arguments">Arguments</h2>
 <dl>
 <dt><strong><code>li</code></strong> :&ensp;<code>squence</code>, optional</dt>
 <dd>List of lengths of segements(mm). Used for system 'skiers'.</dd>
 <dt><strong><code>mi</code></strong> :&ensp;<code>squence</code>, optional</dt>
-<dd>List of skier weigths(kg) at segement boundaries. Used for
+<dd>List of skier weigths (kg) at segement boundaries. Used for
 system 'skiers'.</dd>
 <dt><strong><code>ki</code></strong> :&ensp;<code>squence</code>, optional</dt>
 <dd>List of one bool per segement indicating whether segement
-has foundation(True) or not (False) in the cracked state.
+has foundation (True) or not (False) in the cracked state.
 Used for system 'skiers'.</dd>
 <dt><strong><code>k0</code></strong> :&ensp;<code>squence</code>, optional</dt>
 <dd>List of one bool per segement indicating whether segement
 has foundation(True) or not (False) in the uncracked state.
 Used for system 'skiers'.</dd>
 <dt><strong><code>L</code></strong> :&ensp;<code>float</code>, optional</dt>
-<dd>Total length of model(mm). Used for systems 'pst-', '-pst',
+<dd>Total length of model (mm). Used for systems 'pst-', '-pst',
 and 'skier'.</dd>
 <dt><strong><code>a</code></strong> :&ensp;<code>float</code>, optional</dt>
-<dd>Crack length(mm).
+<dd>Crack length (mm).
 Used for systems 'pst-', '-pst', and
 'skier'.</dd>
 <dt><strong><code>m</code></strong> :&ensp;<code>float</code>, optional</dt>
-<dd>Weight of skier(kg) in the axial center of the model.
+<dd>Weight of skier (kg) in the axial center of the model.
 Used for system 'skier'.</dd>
 </dl>
 <h2 id="returns">Returns</h2>
 <dl>
 <dt><strong><code>segments</code></strong> :&ensp;<code>dict</code></dt>
-<dd>Dictionary with lists of segement lengths(li), skier
-weights(mi), and foundation booleans in the cracked(ki)
-and ncracked(k0) configurations.</dd>
+<dd>Dictionary with lists of segement lengths (li), skier
+weights (mi), and foundation booleans in the cracked (ki)
+and uncracked (k0) configurations.</dd>
 </dl></div>
 <details class="source">
 <summary>
@@ -2998,39 +3844,40 @@ and ncracked(k0) configurations.</dd>
     &#34;&#34;&#34;
     Assemble lists defining the segments.
 
-    This includes length(li), foundation(ki, k0), and skier weight(mi).
+    This includes length (li), foundation (ki, k0), and skier
+    weight (mi).
 
     Arguments
     ---------
     li: squence, optional
         List of lengths of segements(mm). Used for system &#39;skiers&#39;.
     mi: squence, optional
-        List of skier weigths(kg) at segement boundaries. Used for
+        List of skier weigths (kg) at segement boundaries. Used for
         system &#39;skiers&#39;.
     ki: squence, optional
         List of one bool per segement indicating whether segement
-        has foundation(True) or not (False) in the cracked state.
+        has foundation (True) or not (False) in the cracked state.
         Used for system &#39;skiers&#39;.
     k0: squence, optional
         List of one bool per segement indicating whether segement
         has foundation(True) or not (False) in the uncracked state.
         Used for system &#39;skiers&#39;.
     L: float, optional
-        Total length of model(mm). Used for systems &#39;pst-&#39;, &#39;-pst&#39;,
+        Total length of model (mm). Used for systems &#39;pst-&#39;, &#39;-pst&#39;,
         and &#39;skier&#39;.
     a: float, optional
-        Crack length(mm).  Used for systems &#39;pst-&#39;, &#39;-pst&#39;, and
+        Crack length (mm).  Used for systems &#39;pst-&#39;, &#39;-pst&#39;, and
         &#39;skier&#39;.
     m: float, optional
-        Weight of skier(kg) in the axial center of the model.
+        Weight of skier (kg) in the axial center of the model.
         Used for system &#39;skier&#39;.
 
     Returns
     -------
     segments: dict
-        Dictionary with lists of segement lengths(li), skier
-        weights(mi), and foundation booleans in the cracked(ki)
-        and ncracked(k0) configurations.
+        Dictionary with lists of segement lengths (li), skier
+        weights (mi), and foundation booleans in the cracked (ki)
+        and uncracked (k0) configurations.
     &#34;&#34;&#34;
     _ = kwargs                                      # Unused arguments
     if self.system == &#39;skiers&#39;:
@@ -3075,21 +3922,21 @@ and ncracked(k0) configurations.</dd>
 <h2 id="arguments">Arguments</h2>
 <dl>
 <dt><strong><code>zl</code></strong> :&ensp;<code>ndarray</code></dt>
-<dd>Solution vector(6x1) at left end of beam segement.</dd>
+<dd>Solution vector (6x1) at left end of beam segement.</dd>
 <dt><strong><code>zr</code></strong> :&ensp;<code>ndarray</code></dt>
-<dd>Solution vector(6x1) at right end of beam segement.</dd>
+<dd>Solution vector (6x1) at right end of beam segement.</dd>
 <dt><strong><code>pos</code></strong> :&ensp;<code>{'left', 'mid', 'right', 'l', 'm', 'r'}</code>, optional</dt>
 <dd>Determines whether the segement under consideration
-is a left boundary segement(left, l), one of the
-center segement(mid, m), or a right boundary
-segement(right, r). Default is 'mid'.</dd>
+is a left boundary segement (left, l), one of the
+center segement (mid, m), or a right boundary
+segemen t (right, r). Default is 'mid'.</dd>
 </dl>
 <h2 id="returns">Returns</h2>
 <dl>
 <dt><strong><code>eqs</code></strong> :&ensp;<code>ndarray</code></dt>
-<dd>Vector(of length 9) of boundary conditions(3) and
-transmission conditions(6) for boundary segements
-or vector of transmission conditions(of length 6+6)
+<dd>Vector (of length 9) of boundary conditions (3) and
+transmission conditions (6) for boundary segements
+or vector of transmission conditions (of length 6+6)
 for center segments.</dd>
 </dl></div>
 <details class="source">
@@ -3103,21 +3950,21 @@ for center segments.</dd>
     Arguments
     ---------
     zl: ndarray
-        Solution vector(6x1) at left end of beam segement.
+        Solution vector (6x1) at left end of beam segement.
     zr: ndarray
-        Solution vector(6x1) at right end of beam segement.
+        Solution vector (6x1) at right end of beam segement.
     pos: {&#39;left&#39;, &#39;mid&#39;, &#39;right&#39;, &#39;l&#39;, &#39;m&#39;, &#39;r&#39;}, optional
         Determines whether the segement under consideration
-        is a left boundary segement(left, l), one of the
-        center segement(mid, m), or a right boundary
-        segement(right, r). Default is &#39;mid&#39;.
+        is a left boundary segement (left, l), one of the
+        center segement (mid, m), or a right boundary
+        segemen t (right, r). Default is &#39;mid&#39;.
 
     Returns
     -------
     eqs: ndarray
-        Vector(of length 9) of boundary conditions(3) and
-        transmission conditions(6) for boundary segements
-        or vector of transmission conditions(of length 6+6)
+        Vector (of length 9) of boundary conditions (3) and
+        transmission conditions (6) for boundary segements
+        or vector of transmission conditions (of length 6+6)
         for center segments.
     &#34;&#34;&#34;
     if pos in (&#39;l&#39;, &#39;left&#39;):
@@ -3212,6 +4059,16 @@ for center segments.</dd>
 <li><code><a title="weac.mixins.FieldQuantitiesMixin.up" href="#weac.mixins.FieldQuantitiesMixin.up">up</a></code></li>
 <li><code><a title="weac.mixins.FieldQuantitiesMixin.w" href="#weac.mixins.FieldQuantitiesMixin.w">w</a></code></li>
 <li><code><a title="weac.mixins.FieldQuantitiesMixin.wp" href="#weac.mixins.FieldQuantitiesMixin.wp">wp</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="weac.mixins.OutputMixin" href="#weac.mixins.OutputMixin">OutputMixin</a></code></h4>
+<ul class="">
+<li><code><a title="weac.mixins.OutputMixin.get_slab_deflection" href="#weac.mixins.OutputMixin.get_slab_deflection">get_slab_deflection</a></code></li>
+<li><code><a title="weac.mixins.OutputMixin.get_slab_displacement" href="#weac.mixins.OutputMixin.get_slab_displacement">get_slab_displacement</a></code></li>
+<li><code><a title="weac.mixins.OutputMixin.get_slab_rotation" href="#weac.mixins.OutputMixin.get_slab_rotation">get_slab_rotation</a></code></li>
+<li><code><a title="weac.mixins.OutputMixin.get_weaklayer_normalstress" href="#weac.mixins.OutputMixin.get_weaklayer_normalstress">get_weaklayer_normalstress</a></code></li>
+<li><code><a title="weac.mixins.OutputMixin.get_weaklayer_shearstress" href="#weac.mixins.OutputMixin.get_weaklayer_shearstress">get_weaklayer_shearstress</a></code></li>
 </ul>
 </li>
 <li>
