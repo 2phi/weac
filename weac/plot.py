@@ -92,17 +92,16 @@ def slab_profile(instance):
         y.append(total_heigth)
 
     # Font setup
-    plt.rc('font', family='serif', size=7)
+    plt.rc('font', family='serif', size=10)
     plt.rc('mathtext', fontset='cm')
 
     # Create figure
     fig = plt.figure(figsize=(2, 3))
-    plt.axis()
     ax1 = fig.gca()
 
     # Set axis labels
-    ax1.set_xlabel('Density (kg/m$^3$)')
-    ax1.set_ylabel('Height above weak layer (mm)')
+    ax1.set_xlabel(r'$\longleftarrow$ Density $\rho$ (kg/m$^3$)')
+    ax1.set_ylabel(r'Height above weak layer (mm) $\longrightarrow$')
 
     ax1.set_xlim(500, 0)
 
@@ -169,14 +168,14 @@ def contours(instance, x, z, window=1e12, scale=100):
     # Plot labels
     plt.gca().set_xlabel(r'lateral position $x$ (cm) $\longrightarrow$')
     plt.gca().set_ylabel('depth below surface\n' r'$\longleftarrow $ $d$ (cm)')
-    plt.title(fr'${scale}\!\times\!$ scaled deformations (cm)', size=11)
+    plt.title(fr'${scale}\!\times\!$ scaled deformations (cm)', size=10)
 
     # Colorbar
     cbar = plt.colorbar(
         shrink=0.5,
         label=('lateral displacements\n'
                r'$u$ ($\mu\mathrm{m}$) $\longrightarrow$'))
-    cbar.ax.tick_params(labelsize=9)
+    cbar.ax.tick_params(labelsize=8)
 
 
 # === BASE PLOT FUNCTION ======================================================
@@ -189,19 +188,16 @@ def plot_data(
         li=False, mi=False, ki=False,
         xlabel=r'Horizontal position $x$ (cm)'):
     """Plot data. Base function."""
-    # Clear figure
-    plt.clf()
+    # Figure setup
+    plt.rc('font', family='serif', size=10)
+    plt.rc('mathtext', fontset='cm')
 
     # Plot styles
     labelstyle, colors = set_plotstyles()
 
-    # Font setup
-    plt.rc('font', family='serif', size=12)
-    plt.rc('mathtext', fontset='cm')
-
     # Create figure
-    plt.axis()
-    ax1 = plt.gca()
+    fig = plt.figure(figsize=(5, 10/3))
+    ax1 = fig.gca()
 
     # Axis limits
     ax1.autoscale(axis='x', tight=True)
