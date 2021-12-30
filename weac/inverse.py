@@ -48,12 +48,7 @@ class Inverse(FieldQuantitiesMixin, SolutionMixin, AnalysisMixin,
         # Unpack fitting parameters
         C0, C1, Eweak = parameters
 
-        # Set material properties
+        # Set material properties and set up model
         self.set_beam_properties(layers=layers, C0=C0, C1=C1)
         self.set_foundation_properties(E=Eweak)
-
-        # Set up model
-        self.calc_foundation_stiffness()
-        self.calc_laminate_stiffness_matrix()
-        self.calc_system_matrix()
-        self.calc_eigensystem()
+        self.calc_fundamental_system()

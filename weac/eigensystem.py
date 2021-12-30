@@ -123,7 +123,7 @@ class Eigensystem:
         self.sR = False         # Stability shift of real eigenvalues
         self.sysmat = False     # System matrix
 
-    def set_foundation_properties(self, t=30, E=0.25, nu=0.25):
+    def set_foundation_properties(self, t=30, E=0.25, nu=0.25, update=False):
         """
         Set material properties and geometry of foundation (weak layer).
 
@@ -135,6 +135,9 @@ class Eigensystem:
             Weak-layer Young modulus (MPa). Default is 0.25.
         nu : float, optional
             Weak-layer Poisson ratio. Default is 0.25.
+        update : bool, optional
+            If true, recalculate the fundamental system after
+            foundation properties have changed.
         """
         # Geometry
         self.t = t              # Weak-layer thickness (mm)
@@ -145,7 +148,12 @@ class Eigensystem:
             'E': E              # Young's modulus (MPa)
         }
 
-    def set_beam_properties(self, layers, C0=6.0, C1=4.60, nu=0.25):
+        # Recalculate the fundamental system after properties have changed
+        if update:
+            self.calc_fundamental_system()
+
+    def set_beam_properties(self, layers, C0=6.0, C1=4.60,
+                            nu=0.25, update=False):
         """
         Set material and properties geometry of beam (slab).
 
@@ -164,6 +172,9 @@ class Eigensystem:
             Gerling et al. (2017). Default is 4.6.
         nu : float, optional
             Possion's ratio. Default is 0.25
+        update : bool, optional
+            If true, recalculate the fundamental system after
+            foundation properties have changed.
         """
         if isinstance(layers, str):
             # Read layering and Young's modulus from database
@@ -186,6 +197,10 @@ class Eigensystem:
         # Young's modulus (MPa), shear modulus (MPa), and
         # Poisson's ratio
         self.slab = np.vstack([layers.T, E, G, nu]).T
+
+        # Recalculate the fundamental system after properties have changed
+        if update:
+            self.calc_fundamental_system()
 
     def calc_foundation_stiffness(self):
         """Compute foundation normal and shear stiffness."""
@@ -266,7 +281,7 @@ class Eigensystem:
         self.sysmat = np.array(E)
 
     def calc_eigensystem(self):
-        """Run eigenvalue analysis of the system matrix."""
+        """Calculate eigenvalues and eigenvectors of the system matrix."""
         # Calculate eigenvalues (ew) and eigenvectors (ev)
         ew, ev = np.linalg.eig(self.sysmat)
         # Classify real and complex eigenvalues
@@ -281,6 +296,13 @@ class Eigensystem:
         # Prepare positive eigenvalue shifts for numerical robustness
         self.sR, self.sC = np.zeros(self.ewR.shape), np.zeros(self.ewC.shape)
         self.sR[self.ewR > 0], self.sC[self.ewC > 0] = -1, -1
+
+    def calc_fundamental_system(self):
+        """Calculate the fundamental system of the problem."""
+        self.calc_foundation_stiffness()
+        self.calc_laminate_stiffness_matrix()
+        self.calc_system_matrix()
+        self.calc_eigensystem()
 
     def get_weight_load(self, phi):
         """

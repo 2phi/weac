@@ -39,12 +39,7 @@ class Layered(FieldQuantitiesMixin, SolutionMixin, AnalysisMixin,
         # Call parent __init__
         super().__init__(system=system)
 
-        # Set material properties
+        # Set material properties and set up model
         self.set_beam_properties(layers if layers else [[240, 200], ])
         self.set_foundation_properties()
-
-        # Set up model
-        self.calc_foundation_stiffness()
-        self.calc_laminate_stiffness_matrix()
-        self.calc_system_matrix()
-        self.calc_eigensystem()
+        self.calc_fundamental_system()
