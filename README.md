@@ -108,28 +108,28 @@ Assemble the system of linear equations and solve the boundary-value problem for
 ```python
 C = skier.assemble_and_solve(phi=38, **segments)
 ```
-Prepare the output by rasterizing the solution vector at all horizontal positions `xq`. The result is returned in the form of the ndarray `zq`. We also get `xb` that only contains x-coordinates that lie on a foundation.
+Prepare the output by rasterizing the solution vector at all horizontal positions `xsl` (slab). The result is returned in the form of the ndarray `z`. We also get `xwl` (weak layer) that only contains x-coordinates that are supported by a foundation.
 ```python
-xq, zq, xb = skier.rasterize_solution(C=C, phi=38, **segments)
+xsl, z, xwl = skier.rasterize_solution(C=C, phi=38, **segments)
 ```
 Visualize the results.
 ```python
 # Visualize deformations as a contour plot
-weac.plot.contours(skier, x=xq, z=zq, window=200, scale=100)
+weac.plot.contours(skier, x=xsl, z=z, window=200, scale=100)
 
-# Plot slab displacements (using x-coordinates of all segments, xq)
-weac.plot.displacements(skier, x=xq, z=zq, **segments)
+# Plot slab displacements (using x-coordinates of all segments, xsl)
+weac.plot.displacements(skier, x=xsl, z=z, **segments)
 
-# Plot weak-layer stresses (using only x-coordinates of bedded segments, xb)
-weac.plot.stresses(skier, x=xb, z=zq, **segments)
+# Plot weak-layer stresses (using only x-coordinates of bedded segments, xwl)
+weac.plot.stresses(skier, x=xwl, z=z, **segments)
 ```
 Compute output quantities for exporting or plotting.
 ```python
-# Slab deflections (using x-coordinates of all segments, xq)
-x_cm, w_um = skier.get_slab_deflection(x=xq, z=zq, unit='um')
+# Slab deflections (using x-coordinates of all segments, xsl)
+x_cm, w_um = skier.get_slab_deflection(x=xsl, z=z, unit='um')
 
-# Weak-layer shear stress (using only x-coordinates of bedded segments, xb)
-x_cm, tau_kPa = skier.get_weaklayer_shearstress(x=xb, z=zq, unit='kPa')
+# Weak-layer shear stress (using only x-coordinates of bedded segments, xwl)
+x_cm, tau_kPa = skier.get_weaklayer_shearstress(x=xwl, z=z, unit='kPa')
 ```
 
 <!-- ROADMAP -->
@@ -147,7 +147,6 @@ See the [open issues](https://github.com/2phi/weac/issues) for a list of propose
 - [x] Improved plot labels
 - [x] Provide convenience methods for the export of weak-layer stresses and slab deformations
 - [x] Add wrapper for (re)calculation of the fundamental system
-- [x] Change plot backend to `svg`
 - [ ] Add demo gif
 
 ## Release history
