@@ -77,15 +77,10 @@ class Inverse(FieldQuantitiesMixin, SolutionMixin, AnalysisMixin,
         # Unpack fitting parameters
         C0, C1, Eweak = parameters
 
-        # Set material properties
+        # Set material properties and set up model
         self.set_beam_properties(layers=layers, C0=C0, C1=C1)
         self.set_foundation_properties(E=Eweak)
-
-        # Set up model
-        self.calc_foundation_stiffness()
-        self.calc_laminate_stiffness_matrix()
-        self.calc_system_matrix()
-        self.calc_eigensystem()</code></pre>
+        self.calc_fundamental_system()</code></pre>
 </details>
 </section>
 <section>
@@ -167,15 +162,10 @@ respectively. Default is (6.0, 4.6, 0.25).</dd>
         # Unpack fitting parameters
         C0, C1, Eweak = parameters
 
-        # Set material properties
+        # Set material properties and set up model
         self.set_beam_properties(layers=layers, C0=C0, C1=C1)
         self.set_foundation_properties(E=Eweak)
-
-        # Set up model
-        self.calc_foundation_stiffness()
-        self.calc_laminate_stiffness_matrix()
-        self.calc_system_matrix()
-        self.calc_eigensystem()</code></pre>
+        self.calc_fundamental_system()</code></pre>
 </details>
 <h3>Ancestors</h3>
 <ul class="hlist">
@@ -237,6 +227,7 @@ respectively. Default is (6.0, 4.6, 0.25).</dd>
 <ul class="hlist">
 <li><code><a title="weac.eigensystem.Eigensystem.calc_eigensystem" href="eigensystem.html#weac.eigensystem.Eigensystem.calc_eigensystem">calc_eigensystem</a></code></li>
 <li><code><a title="weac.eigensystem.Eigensystem.calc_foundation_stiffness" href="eigensystem.html#weac.eigensystem.Eigensystem.calc_foundation_stiffness">calc_foundation_stiffness</a></code></li>
+<li><code><a title="weac.eigensystem.Eigensystem.calc_fundamental_system" href="eigensystem.html#weac.eigensystem.Eigensystem.calc_fundamental_system">calc_fundamental_system</a></code></li>
 <li><code><a title="weac.eigensystem.Eigensystem.calc_laminate_stiffness_matrix" href="eigensystem.html#weac.eigensystem.Eigensystem.calc_laminate_stiffness_matrix">calc_laminate_stiffness_matrix</a></code></li>
 <li><code><a title="weac.eigensystem.Eigensystem.calc_system_matrix" href="eigensystem.html#weac.eigensystem.Eigensystem.calc_system_matrix">calc_system_matrix</a></code></li>
 <li><code><a title="weac.eigensystem.Eigensystem.get_skier_load" href="eigensystem.html#weac.eigensystem.Eigensystem.get_skier_load">get_skier_load</a></code></li>
