@@ -78,9 +78,21 @@ def outline(grid):
 
 def slab_profile(instance):
     """Create bar chart of slab profile."""
+    # Reset plot styles
+    plt.rcdefaults()
+
+    # Plot Setup
+    plt.rcdefaults()
+    plt.rc('font', family='serif', size=10)
+    plt.rc('mathtext', fontset='cm')
+
+    # Create figure
+    fig = plt.figure(figsize=(8/3, 4))
+    ax1 = fig.gca()
+
+    # Initialize coordinates
     x = []
     y = []
-
     total_heigth = 0
 
     for line in np.flipud(instance.slab):
@@ -91,14 +103,6 @@ def slab_profile(instance):
         total_heigth = total_heigth + line[1]
         y.append(total_heigth)
 
-    # Font setup
-    plt.rc('font', family='serif', size=10)
-    plt.rc('mathtext', fontset='cm')
-
-    # Create figure
-    fig = plt.figure(figsize=(2, 3))
-    ax1 = fig.gca()
-
     # Set axis labels
     ax1.set_xlabel(r'$\longleftarrow$ Density $\rho$ (kg/m$^3$)')
     ax1.set_ylabel(r'Height above weak layer (mm) $\longrightarrow$')
@@ -108,6 +112,8 @@ def slab_profile(instance):
     ax1.fill_betweenx(y, 0, x)
     plt.show()
 
+    # Reset plot styles
+    plt.rcdefaults()
 
 # === DEFORMATION CONTOUR PLOT ================================================
 
@@ -130,7 +136,9 @@ def contours(instance, x, z, window=1e12, scale=100):
         Scaling factor for the visualization of displacements.
     """
     # Plot Setup
+    plt.rcdefaults()
     plt.rc('font', family='serif', size=10)
+    plt.rc('mathtext', fontset='cm')
 
     # Calculate top-to-bottom vertical positions (mm) in beam coordinate system
     y = np.linspace(-instance.h/2, instance.h/2, num=21)
@@ -154,7 +162,7 @@ def contours(instance, x, z, window=1e12, scale=100):
     # Normalize colormap
     norm = MidpointNormalize(vmin=1e3*np.min(U), vmax=1e3*np.max(U))
 
-    # Plot contours on deformed grid
+        # Plot contours on deformed grid
     plt.contourf(X+scale*U, Y+scale*W, 1e3*U,
                  norm=norm, cmap='RdBu_r', levels=100, alpha=0.2)
 
@@ -177,6 +185,9 @@ def contours(instance, x, z, window=1e12, scale=100):
                r'$u$ ($\mu\mathrm{m}$) $\longrightarrow$'))
     cbar.ax.tick_params(labelsize=8)
 
+    # Reset plot styles
+    plt.rcdefaults()
+
 
 # === BASE PLOT FUNCTION ======================================================
 
@@ -189,6 +200,7 @@ def plot_data(
         xlabel=r'Horizontal position $x$ (cm)'):
     """Plot data. Base function."""
     # Figure setup
+    plt.rcdefaults()
     plt.rc('font', family='serif', size=10)
     plt.rc('mathtext', fontset='cm')
 
@@ -196,7 +208,7 @@ def plot_data(
     labelstyle, colors = set_plotstyles()
 
     # Create figure
-    fig = plt.figure(figsize=(5, 10/3))
+    fig = plt.figure(figsize=(4, 8/3))
     ax1 = fig.gca()
 
     # Axis limits
@@ -278,6 +290,9 @@ def plot_data(
     else:
         print('Rendering', filename, '...')
         plt.savefig('plots/' + filename, bbox_inches='tight')
+
+    # Reset plot styles
+    plt.rcdefaults()
 
 
 # === PLOT WRAPPERS ===========================================================
