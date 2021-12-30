@@ -48,7 +48,7 @@ Please refer to the companion papers for model derivations, illustrations, dimen
 - Rosendahl, P. L., & Weißgraeber, P. (2020). Modeling snow slab avalanches caused by weak-layer failure – Part 1: Slabs on compliant and collapsible weak layers. The Cryosphere, 14(1), 115–130. https://doi.org/10.5194/tc-14-115-2020
 - Rosendahl, P. L., & Weißgraeber, P. (2020). Modeling snow slab avalanches caused by weak-layer failure – Part 2: Coupled mixed-mode criterion for skier-triggered anticracks. The Cryosphere, 14(1), 131–145. https://doi.org/10.5194/tc-14-131-2020
 
-Written in [🐍 Python](https://www.python.org)  and built with [<span style="color:#498B60">⚛</span> Atom](https://atom.io), [🐙 GitKraken](https://www.gitkraken.com), and [🪐 Jupyter](https://jupyter.org). Note that [release v1.0](https://github.com/2phi/weac/releases/tag/v1.0.0) was written and built in [🌋 MATLAB](https://www.mathworks.com/products/matlab.html). 
+Written in [🐍 Python](https://www.python.org) and built with [<span style="color:#498B60">⚛</span> Atom](https://atom.io), [🐙 GitKraken](https://www.gitkraken.com), and [🪐 Jupyter](https://jupyter.org). Note that [release v1.0](https://github.com/2phi/weac/releases/tag/v1.0.0) was written and built in [🌋 MATLAB](https://www.mathworks.com/products/matlab.html). 
 
 <!-- 
 [![Python](https://img.shields.io/badge/Python-306998.svg?style=flat&logo=python&logoColor=white&label&labelColor=gray)](https://www.python.org)
@@ -146,7 +146,9 @@ See the [open issues](https://github.com/2phi/weac/issues) for a list of propose
 - [x] Improved aspect ratio of profile views and contour plots
 - [x] Improved plot labels
 - [x] Provide convenience methods for the export of weak-layer stresses and slab deformations
-- [ ] Add demo dif
+- [x] Add wrapper for (re)calculation of the fundamental system
+- [x] Change plot backend to `svg`
+- [ ] Add demo gif
 
 ## Release history
 
