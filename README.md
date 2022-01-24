@@ -1,7 +1,44 @@
 <!-- LOGO AND TITLE-->
-<p align="right"><img src="https://github.com/2phi/weac/raw/main/img/logo.png" alt="Logo" width="80" height="80"></p>
+<!-- <p align="right"><img src="https://github.com/2phi/weac/raw/main/img/logo.png" alt="Logo" width="80" height="80"></p> -->
 
-# WEAC &nbsp;·&nbsp; Weak Layer Anticrack Nucleation Model
+
+<h1 align="center">
+  <br>
+  <img src="https://github.com/2phi/weac/raw/main/img/logo.png" alt="WEAC" width="120">
+  <br>
+  <br>
+  <b>WEAC</b>
+  <br>
+  <sub><sup><b>Weak Layer Anticrack Nucleation Model</b></sup></sub>
+  <br>
+</h1>
+
+<p align="center">
+  Implementation of closed-form analytical models for the analysis of dry-snow slab avalanche release.
+</p>
+
+<p align="center">
+  <a href="https://github.com/2phi/weac/releases">
+    <img alt="Release" src="https://img.shields.io/github/v/release/2phi/weac.svg?display_name=tag&color=f99a44&style=flat-square&logo=data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADIAAAAtCAYAAADsvzj/AAAACXBIWXMAAAsSAAALEgHS3X78AAAClUlEQVRoge1Z0W2DMBC9Vv0vGzQblE5QugEjZISMwAZNN2AEOkEzAtmAbkAmuMrSWbKezmBsC9IoT7KU4OPw8707G/PAzHQLeLwJFnciV4g7kWvDnci14WaIPCXeXxDRnohq51pHRC0RjYm+l8Gs7JGtYeaRdfTMXCT4tm0vviwGZm6ZeYe2sQ9oPQRcdAkESiCAGMUmiUjjcXxSrsdGIQR9KpEBHtKIjMoMRKZIjBJl1X+KrAYIL8ptzEiid/LCRZlCpJKGmka0C3PCVzhOTuEockZEa1p+uGTNAA7MXHvu9yV2D3YHp2/ITURL/hPYuESxdGr324FiCXfz85iTiCYpLI2ofbdvNyGpcoZwcvmdG8R+YhYH6POtR83MhGHEo4kUHl0fwA6j0cJEaBhBUoVS8rHYRBHxkdCqFNZ9N1q+3GhmnnXUxhVDBAenhloplQyJjrNsYaOhbVO8e7ilkdA07XOuLXC2r/aQsFGtlPxDyS0mspNBaTPoI6Hp2k10X5LXsFa4JLCKBRPBLXQIiVIGqVUzV35T2//FJEzTXqwKeTl6D3ip6pz/c/YWFRE9e/pe4f9F7Ps5p0iklMG9BAzoJdAOUQfancV2CLKGEGl7ppw4TMgKZbjoDTP08OGXiN6I6IGIPuR/DD4nZGXxJXJa9M6Pp/GDIpdvOWBAx7W00tH2WXz0kkOVonsfTD4Yf6eoKZqo/Z22FYhoWjlFdKmHFWt9H6mkiGiyOktUk7DWAZ2Ry9HT1+R4wJpfrExUfrQx5HC+9ZHpdy5HWxOJq1AK1iSyU651yrUobEnkN3j7EYAtpZUtGrQxkWz5QSsTwUXv30akcH5nK7sWW0jrIl+0siL109sSmJwwu2KzJcn7WY6I/gB+kRV89venQwAAAABJRU5ErkJggg==" />
+  </a>
+  <a href="https://pypi.org/project/weac/">
+    <img alt="Release" src="https://img.shields.io/pypi/v/weac.svg?logo=python&logoColor=white&color=f46b58&style=flat-square" />
+  </a>
+  <a href="https://zenodo.org/badge/latestdoi/203163531">
+    <img alt="Release" src="https://img.shields.io/badge/DOI-10.5281/zenodo.5773113-f03a6d.svg?style=flat-square" />
+  </a>
+</p>
+
+<p align="center">
+  <a href="https://github.com/2phi/weac/blob/main/demo/demo.ipynb">View the demo</a> · 
+  <a href="https://github.com/2phi/weac/issues">Report a bug</a> · 
+  <a href="https://github.com/2phi/weac/issues">Request a feature</a> · 
+  <a href="https://2phi.github.io/weac/">Read the docs</a> · 
+  <a href="https://github.com/2phi/weac/blob/main/CITATION.cff)">Cite the software</a>
+  <br>
+</p>
+
+<!-- # WEAC &nbsp;·&nbsp; Weak Layer Anticrack Nucleation Model -->
 
 <!-- BADGES -->
 <!-- [![Weac][weac-badge]][weac-url] -->
@@ -12,16 +49,17 @@
 <!-- [![Issues][issues-badge]][issues-url] -->
 <!-- [![Forks][forks-badge]][forks-url] -->
 <!-- [![DOI](https://zenodo.org/badge/203163531.svg)](https://zenodo.org/badge/latestdoi/203163531) -->
-[![Release][release-badge]][release-url]
-[![PyPI][pypi-badge]][pypi-url]
-[![DOI][doi-badge]][doi-url]\
-Implementation of closed-form analytical models for the analysis of dry-snow slab avalanche release.
 
-[View the demo](https://github.com/2phi/weac/blob/main/demo/demo.ipynb) · 
-[Report a bug](https://github.com/2phi/weac/issues) · 
-[Request a feature](https://github.com/2phi/weac/issues) · 
-[Read the docs](https://2phi.github.io/weac/) · 
-[Cite the software](https://github.com/2phi/weac/blob/main/CITATION.cff)
+<!-- [![Release][release-badge]][release-url] -->
+<!-- [![PyPI][pypi-badge]][pypi-url] -->
+<!-- [![DOI][doi-badge]][doi-url]\ -->
+<!-- Implementation of closed-form analytical models for the analysis of dry-snow slab avalanche release. -->
+
+<!-- [View the demo](https://github.com/2phi/weac/blob/main/demo/demo.ipynb) ·  -->
+<!-- [Report a bug](https://github.com/2phi/weac/issues) ·  -->
+<!-- [Request a feature](https://github.com/2phi/weac/issues) ·  -->
+<!-- [Read the docs](https://2phi.github.io/weac/) ·  -->
+<!-- [Cite the software](https://github.com/2phi/weac/blob/main/CITATION.cff) -->
 
 <!-- TABLE OF CONTENTS -->
 ## Contents
@@ -51,10 +89,10 @@ Please refer to the companion papers for model derivations, illustrations, dimen
 Written in [🐍 Python](https://www.python.org) and built with [<span style="color:#498B60">⚛</span> Atom](https://atom.io), [🐙 GitKraken](https://www.gitkraken.com), and [🪐 Jupyter](https://jupyter.org). Note that [release v1.0](https://github.com/2phi/weac/releases/tag/v1.0.0) was written and built in [🌋 MATLAB](https://www.mathworks.com/products/matlab.html). 
 
 <!-- 
-[![Python](https://img.shields.io/badge/Python-306998.svg?style=flat&logo=python&logoColor=white&label&labelColor=gray)](https://www.python.org)
-[![Jupyter](https://img.shields.io/badge/Jupyter-e67124.svg?style=flat&logo=jupyter&logoColor=white&label&labelColor=gray)](https://jupyter.org)
-[![Atom](https://img.shields.io/badge/Atom-498b60.svg?style=flat&logo=atom&logoColor=white&label&labelColor=gray)](https://atom.io)
-[![GitKraken](https://img.shields.io/badge/GitKraken-179287.svg?style=flat&logo=gitkraken&logoColor=white&label&labelColor=gray)](https://www.gitkraken.com) -->
+[![Python](https://img.shields.io/badge/Python-306998.svg?style=flat-square&logo=python&logoColor=white&label&labelColor=gray)](https://www.python.org)
+[![Jupyter](https://img.shields.io/badge/Jupyter-e67124.svg?style=flat-square&logo=jupyter&logoColor=white&label&labelColor=gray)](https://jupyter.org)
+[![Atom](https://img.shields.io/badge/Atom-498b60.svg?style=flat-square&logo=atom&logoColor=white&label&labelColor=gray)](https://atom.io)
+[![GitKraken](https://img.shields.io/badge/GitKraken-179287.svg?style=flat-square&logo=gitkraken&logoColor=white&label&labelColor=gray)](https://www.gitkraken.com) -->
 
 
 
@@ -137,8 +175,12 @@ x_cm, tau_kPa = skier.get_weaklayer_shearstress(x=xwl, z=z, unit='kPa')
 
 See the [open issues](https://github.com/2phi/weac/issues) for a list of proposed features and known issues.
 
-### v2.3
+### v2.4
 - [ ] Finite fracture mechanics implementation for layered snow covers
+
+### v2.3
+- [ ] Implement anistropic weak layer
+- [ ] Add demo gif
 
 ### v2.2
 - [x] Make sign of inclination `phi` consistent with the coordinate system (positive counterclockwise)
@@ -147,7 +189,7 @@ See the [open issues](https://github.com/2phi/weac/issues) for a list of propose
 - [x] Improved plot labels
 - [x] Provide convenience methods for the export of weak-layer stresses and slab deformations
 - [x] Add wrapper for (re)calculation of the fundamental system
-- [ ] Add demo gif
+- [ ] Allow for additional distributed surface loads
 
 ## Release history
 
@@ -182,7 +224,7 @@ See the [open issues](https://github.com/2phi/weac/issues) for a list of propose
 
 1. Fork the project
 2. Create your feature branch (`git checkout -b feature/amazingfeature`)
-3. Commit your changes (`git commit -m 'Add some amazingfeature'`)
+3. Commit your changes (`git commit -m 'Add some amazing feature'`)
 4. Push to the branch (`git push origin feature/amazingfeature`)
 5. Open a pull request
 
@@ -190,11 +232,9 @@ See the [open issues](https://github.com/2phi/weac/issues) for a list of propose
 <!-- LICENSE -->
 ## License
 
-Copyright 2phi GbR, 2021.
+Copyright 2phi GbR, 2020-2022.
 
 We currently do not offer an open source license. Please contact us for private licensing options.
-
-<!-- Do not forget to pick a license provide details in the `LICENSE` file. -->
 
 
 <!-- CONTACT -->
@@ -206,26 +246,26 @@ E-mail: mail@2phi.de · Web: https://2phi.de · Project Link: [https://github.co
 
 <!-- MARKDOWN LINKS & IMAGES -->
 <!-- https://www.markdownguide.org/basic-syntax/#reference-style-links -->
-[contributors-badge]: https://img.shields.io/github/contributors/2phi/weac.svg?style=flat&logo=github&color=yellow
+[contributors-badge]: https://img.shields.io/github/contributors/2phi/weac.svg?style=flat-square&logo=github&color=yellow
 
-[forks-badge]: https://img.shields.io/github/forks/2phi/weac.svg?&color=blueviolet&style=flat&logo=github
+[forks-badge]: https://img.shields.io/github/forks/2phi/weac.svg?&color=blueviolet&style=flat-square&logo=github
 
-[stars-badge]: https://img.shields.io/github/stars/2phi/weac.svg?style=flat&logo=github&color=orange
+[stars-badge]: https://img.shields.io/github/stars/2phi/weac.svg?style=flat-square&logo=github&color=orange
 
-[issues-badge]: https://img.shields.io/github/issues/2phi/weac.svg?style=flat&logo=github
+[issues-badge]: https://img.shields.io/github/issues/2phi/weac.svg?style=flat-square&logo=github
 
-[pypi-badge]: https://img.shields.io/pypi/v/weac.svg?logo=python&logoColor=white&color=f46b58&style=flat
+[pypi-badge]: https://img.shields.io/pypi/v/weac.svg?logo=python&logoColor=white&color=f46b58&style=flat-square
 
-[pypi-downloads-badge]: https://img.shields.io/pypi/dm/weac.svg?logo=python&logoColor=white&color=red&style=flat
+[pypi-downloads-badge]: https://img.shields.io/pypi/dm/weac.svg?logo=python&logoColor=white&color=red&style=flat-square
 
-[python-dist-badge]: https://img.shields.io/pypi/pyversions/weac.svg?style=flat&logo=python&logoColor=white
+[python-dist-badge]: https://img.shields.io/pypi/pyversions/weac.svg?style=flat-square&logo=python&logoColor=white
 
-[doi-badge]: https://img.shields.io/badge/DOI-10.5281/zenodo.5773113-f03a6d.svg?style=flat
+[doi-badge]: https://img.shields.io/badge/DOI-10.5281/zenodo.5773113-f03a6d.svg?style=flat-square
 <!-- &logo=zenodo&logoColor=white -->
 
-[release-badge]: https://img.shields.io/github/v/release/2phi/weac.svg?display_name=tag&color=f99a44&style=flat&logo=data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADIAAAAtCAYAAADsvzj/AAAACXBIWXMAAAsSAAALEgHS3X78AAAClUlEQVRoge1Z0W2DMBC9Vv0vGzQblE5QugEjZISMwAZNN2AEOkEzAtmAbkAmuMrSWbKezmBsC9IoT7KU4OPw8707G/PAzHQLeLwJFnciV4g7kWvDnci14WaIPCXeXxDRnohq51pHRC0RjYm+l8Gs7JGtYeaRdfTMXCT4tm0vviwGZm6ZeYe2sQ9oPQRcdAkESiCAGMUmiUjjcXxSrsdGIQR9KpEBHtKIjMoMRKZIjBJl1X+KrAYIL8ptzEiid/LCRZlCpJKGmka0C3PCVzhOTuEockZEa1p+uGTNAA7MXHvu9yV2D3YHp2/ITURL/hPYuESxdGr324FiCXfz85iTiCYpLI2ofbdvNyGpcoZwcvmdG8R+YhYH6POtR83MhGHEo4kUHl0fwA6j0cJEaBhBUoVS8rHYRBHxkdCqFNZ9N1q+3GhmnnXUxhVDBAenhloplQyJjrNsYaOhbVO8e7ilkdA07XOuLXC2r/aQsFGtlPxDyS0mspNBaTPoI6Hp2k10X5LXsFa4JLCKBRPBLXQIiVIGqVUzV35T2//FJEzTXqwKeTl6D3ip6pz/c/YWFRE9e/pe4f9F7Ps5p0iklMG9BAzoJdAOUQfancV2CLKGEGl7ppw4TMgKZbjoDTP08OGXiN6I6IGIPuR/DD4nZGXxJXJa9M6Pp/GDIpdvOWBAx7W00tH2WXz0kkOVonsfTD4Yf6eoKZqo/Z22FYhoWjlFdKmHFWt9H6mkiGiyOktUk7DWAZ2Ry9HT1+R4wJpfrExUfrQx5HC+9ZHpdy5HWxOJq1AK1iSyU651yrUobEnkN3j7EYAtpZUtGrQxkWz5QSsTwUXv30akcH5nK7sWW0jrIl+0siL109sSmJwwu2KzJcn7WY6I/gB+kRV89venQwAAAABJRU5ErkJggg==
+[release-badge]: https://img.shields.io/github/v/release/2phi/weac.svg?display_name=tag&color=f99a44&style=flat-square&logo=data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADIAAAAtCAYAAADsvzj/AAAACXBIWXMAAAsSAAALEgHS3X78AAAClUlEQVRoge1Z0W2DMBC9Vv0vGzQblE5QugEjZISMwAZNN2AEOkEzAtmAbkAmuMrSWbKezmBsC9IoT7KU4OPw8707G/PAzHQLeLwJFnciV4g7kWvDnci14WaIPCXeXxDRnohq51pHRC0RjYm+l8Gs7JGtYeaRdfTMXCT4tm0vviwGZm6ZeYe2sQ9oPQRcdAkESiCAGMUmiUjjcXxSrsdGIQR9KpEBHtKIjMoMRKZIjBJl1X+KrAYIL8ptzEiid/LCRZlCpJKGmka0C3PCVzhOTuEockZEa1p+uGTNAA7MXHvu9yV2D3YHp2/ITURL/hPYuESxdGr324FiCXfz85iTiCYpLI2ofbdvNyGpcoZwcvmdG8R+YhYH6POtR83MhGHEo4kUHl0fwA6j0cJEaBhBUoVS8rHYRBHxkdCqFNZ9N1q+3GhmnnXUxhVDBAenhloplQyJjrNsYaOhbVO8e7ilkdA07XOuLXC2r/aQsFGtlPxDyS0mspNBaTPoI6Hp2k10X5LXsFa4JLCKBRPBLXQIiVIGqVUzV35T2//FJEzTXqwKeTl6D3ip6pz/c/YWFRE9e/pe4f9F7Ps5p0iklMG9BAzoJdAOUQfancV2CLKGEGl7ppw4TMgKZbjoDTP08OGXiN6I6IGIPuR/DD4nZGXxJXJa9M6Pp/GDIpdvOWBAx7W00tH2WXz0kkOVonsfTD4Yf6eoKZqo/Z22FYhoWjlFdKmHFWt9H6mkiGiyOktUk7DWAZ2Ry9HT1+R4wJpfrExUfrQx5HC+9ZHpdy5HWxOJq1AK1iSyU651yrUobEnkN3j7EYAtpZUtGrQxkWz5QSsTwUXv30akcH5nK7sWW0jrIl+0siL109sSmJwwu2KzJcn7WY6I/gB+kRV89venQwAAAABJRU5ErkJggg==
 
-[weac-badge]: https://img.shields.io/badge/weac-2.1-orange.svg?style=flat&logo=data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADIAAAAtCAYAAADsvzj/AAAACXBIWXMAAAsSAAALEgHS3X78AAAClUlEQVRoge1Z0W2DMBC9Vv0vGzQblE5QugEjZISMwAZNN2AEOkEzAtmAbkAmuMrSWbKezmBsC9IoT7KU4OPw8707G/PAzHQLeLwJFnciV4g7kWvDnci14WaIPCXeXxDRnohq51pHRC0RjYm+l8Gs7JGtYeaRdfTMXCT4tm0vviwGZm6ZeYe2sQ9oPQRcdAkESiCAGMUmiUjjcXxSrsdGIQR9KpEBHtKIjMoMRKZIjBJl1X+KrAYIL8ptzEiid/LCRZlCpJKGmka0C3PCVzhOTuEockZEa1p+uGTNAA7MXHvu9yV2D3YHp2/ITURL/hPYuESxdGr324FiCXfz85iTiCYpLI2ofbdvNyGpcoZwcvmdG8R+YhYH6POtR83MhGHEo4kUHl0fwA6j0cJEaBhBUoVS8rHYRBHxkdCqFNZ9N1q+3GhmnnXUxhVDBAenhloplQyJjrNsYaOhbVO8e7ilkdA07XOuLXC2r/aQsFGtlPxDyS0mspNBaTPoI6Hp2k10X5LXsFa4JLCKBRPBLXQIiVIGqVUzV35T2//FJEzTXqwKeTl6D3ip6pz/c/YWFRE9e/pe4f9F7Ps5p0iklMG9BAzoJdAOUQfancV2CLKGEGl7ppw4TMgKZbjoDTP08OGXiN6I6IGIPuR/DD4nZGXxJXJa9M6Pp/GDIpdvOWBAx7W00tH2WXz0kkOVonsfTD4Yf6eoKZqo/Z22FYhoWjlFdKmHFWt9H6mkiGiyOktUk7DWAZ2Ry9HT1+R4wJpfrExUfrQx5HC+9ZHpdy5HWxOJq1AK1iSyU651yrUobEnkN3j7EYAtpZUtGrQxkWz5QSsTwUXv30akcH5nK7sWW0jrIl+0siL109sSmJwwu2KzJcn7WY6I/gB+kRV89venQwAAAABJRU5ErkJggg==
+[weac-badge]: https://img.shields.io/badge/weac-2.1-orange.svg?style=flat-square&logo=data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADIAAAAtCAYAAADsvzj/AAAACXBIWXMAAAsSAAALEgHS3X78AAAClUlEQVRoge1Z0W2DMBC9Vv0vGzQblE5QugEjZISMwAZNN2AEOkEzAtmAbkAmuMrSWbKezmBsC9IoT7KU4OPw8707G/PAzHQLeLwJFnciV4g7kWvDnci14WaIPCXeXxDRnohq51pHRC0RjYm+l8Gs7JGtYeaRdfTMXCT4tm0vviwGZm6ZeYe2sQ9oPQRcdAkESiCAGMUmiUjjcXxSrsdGIQR9KpEBHtKIjMoMRKZIjBJl1X+KrAYIL8ptzEiid/LCRZlCpJKGmka0C3PCVzhOTuEockZEa1p+uGTNAA7MXHvu9yV2D3YHp2/ITURL/hPYuESxdGr324FiCXfz85iTiCYpLI2ofbdvNyGpcoZwcvmdG8R+YhYH6POtR83MhGHEo4kUHl0fwA6j0cJEaBhBUoVS8rHYRBHxkdCqFNZ9N1q+3GhmnnXUxhVDBAenhloplQyJjrNsYaOhbVO8e7ilkdA07XOuLXC2r/aQsFGtlPxDyS0mspNBaTPoI6Hp2k10X5LXsFa4JLCKBRPBLXQIiVIGqVUzV35T2//FJEzTXqwKeTl6D3ip6pz/c/YWFRE9e/pe4f9F7Ps5p0iklMG9BAzoJdAOUQfancV2CLKGEGl7ppw4TMgKZbjoDTP08OGXiN6I6IGIPuR/DD4nZGXxJXJa9M6Pp/GDIpdvOWBAx7W00tH2WXz0kkOVonsfTD4Yf6eoKZqo/Z22FYhoWjlFdKmHFWt9H6mkiGiyOktUk7DWAZ2Ry9HT1+R4wJpfrExUfrQx5HC+9ZHpdy5HWxOJq1AK1iSyU651yrUobEnkN3j7EYAtpZUtGrQxkWz5QSsTwUXv30akcH5nK7sWW0jrIl+0siL109sSmJwwu2KzJcn7WY6I/gB+kRV89venQwAAAABJRU5ErkJggg==
 
 [forks-url]: https://github.com/2phi/weac/network/members
 [stars-url]: https://github.com/2phi/weac/stargazers
