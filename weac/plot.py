@@ -78,9 +78,6 @@ def outline(grid):
 
 def slab_profile(instance):
     """Create bar chart of slab profile."""
-    # Reset plot styles
-    plt.rcdefaults()
-
     # Plot Setup
     plt.rcdefaults()
     plt.rc('font', family='serif', size=10)
@@ -162,7 +159,7 @@ def contours(instance, x, z, window=1e12, scale=100):
     # Normalize colormap
     norm = MidpointNormalize(vmin=1e3*np.min(U), vmax=1e3*np.max(U))
 
-        # Plot contours on deformed grid
+    # Plot contours on deformed grid
     plt.contourf(X+scale*U, Y+scale*W, 1e3*U,
                  norm=norm, cmap='RdBu_r', levels=100, alpha=0.2)
 
