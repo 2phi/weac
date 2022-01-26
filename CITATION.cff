@@ -14,6 +14,9 @@ identifiers:
   - description: Collection of archived snapshots of all versions of WEAC
     type: doi
     value: 10.5281/zenodo.5773113
+  - description: Release v2.2 with consistent coordinate systems
+    type: doi
+    value: 10.5281/zenodo.5907134
   - description: Release v2.1 for the analysis of layered slabs written in Python
     type: doi
     value: 10.5281/zenodo.5802058

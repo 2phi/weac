@@ -190,13 +190,13 @@ See the [open issues](https://github.com/2phi/weac/issues) for a list of propose
 ## Release history
 
 ### v2.2
-- [x] Make sign of inclination `phi` consistent with the coordinate system (positive counterclockwise)
-- [x] Add dimension arguments to field-quantity methods
-- [x] Improved aspect ratio of profile views and contour plots
-- [x] Improved plot labels
-- [x] Provide convenience methods for the export of weak-layer stresses and slab deformations
-- [x] Add wrapper for (re)calculation of the fundamental system
-- [x] Allow for additional distributed surface loads
+- Sign of inclination `phi` consistent with the coordinate system (positive counterclockwise)
+- Dimension arguments to field-quantity methods added
+- Improved aspect ratio of profile views and contour plots
+- Improved plot labels
+- Convenience methods for the export of weak-layer stresses and slab deformations provided
+- Wrapper for (re)calculation of the fundamental system added
+- Now allows for distributed surface loads
 
 ### v2.1
 - Consistent use of coordinate system with downward pointing z-axis
