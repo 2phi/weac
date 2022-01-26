@@ -28,7 +28,8 @@
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">&#34;&#34;&#34;Base class for the elastic analysis of layered snow slabs.&#34;&#34;&#34;
-# pylint: disable=invalid-name,too-many-arguments,too-many-instance-attributes
+# pylint: disable=invalid-name,too-many-instance-attributes
+# pylint: disable=too-many-arguments,too-many-locals
 
 # Third party imports
 import numpy as np
@@ -133,6 +134,7 @@ class Eigensystem:
         self.kt = False         # Weak-layer shear stiffness
 
         # Initialize slab attributes
+        self.p = 0              # Surface line load (N/mm)
         self.slab = False       # Slab properties dictionary
         self.k = False          # Slab shear correction factor
         self.h = False          # Total slab height (mm)
@@ -230,6 +232,23 @@ class Eigensystem:
         # Recalculate the fundamental system after properties have changed
         if update:
             self.calc_fundamental_system()
+
+    def set_surface_load(self, p):
+        &#34;&#34;&#34;
+        Set surface line load.
+
+        Define a distributed surface load (N/mm) that acts
+        in vertical (gravity) direction on the top surface
+        of the slab.
+
+        Arguments
+        ---------
+        p : float
+            Surface line load (N/mm) that acts in vertical
+            (gravity) direction onm the top surface of the
+            slab.
+        &#34;&#34;&#34;
+        self.p = p
 
     def calc_foundation_stiffness(self):
         &#34;&#34;&#34;Compute foundation normal and shear stiffness.&#34;&#34;&#34;
@@ -335,7 +354,7 @@ class Eigensystem:
 
     def get_weight_load(self, phi):
         &#34;&#34;&#34;
-        Calculate line loads.
+        Calculate line loads from slab mass.
 
         Arguments
         ---------
@@ -345,9 +364,9 @@ class Eigensystem:
         Returns
         -------
         qn : float
-            Line load (N/mm) in normal direction.
+            Line load (N/mm) at center of gravity in normal direction.
         qt : float
-            Line load (N/mm) in tangential direction.
+            Line load (N/mm) at center of gravity in tangential direction.
         &#34;&#34;&#34;
         # Convert units
         phi = np.deg2rad(phi)                   # Convert inclination to rad
@@ -359,6 +378,30 @@ class Eigensystem:
         qt = -q*np.sin(phi)                     # Tangential direction
 
         return qn, qt
+
+    def get_surface_load(self, phi):
+        &#34;&#34;&#34;
+        Calculate surface line loads.
+
+        Arguments
+        ---------
+        phi : float
+            Inclination (degrees). Counterclockwise positive.
+
+        Returns
+        -------
+        pn : float
+            Surface line load (N/mm) in normal direction.
+        pt : float
+            Surface line load (N/mm) in tangential direction.
+        &#34;&#34;&#34;
+        # Convert units
+        phi = np.deg2rad(phi)                   # Convert inclination to rad
+        # Split into components
+        pn = self.p*np.cos(phi)                 # Normal direction
+        pt = -self.p*np.sin(phi)                # Tangential direction
+
+        return pn, pt
 
     def get_skier_load(self, m, phi):
         &#34;&#34;&#34;
@@ -451,32 +494,44 @@ class Eigensystem:
         zp : ndarray
             Particular integral vector (6x1) at position x.
         &#34;&#34;&#34;
-        # Get weight load
+        # Get weight and surface loads
         qn, qt = self.get_weight_load(phi)
+        pn, pt = self.get_surface_load(phi)
 
-        # Set foundation stiffness variables
+        # Set foundation stiffnesses
         kn = self.kn
         kt = self.kt
+
+        # Unpack laminate stiffnesses
+        A11 = self.A11
+        B11 = self.B11
+        kA55 = self.kA55
+        E0 = self.E0
+
+        # Unpack geometric properties
+        h = self.h
+        t = self.t
+        zs = self.zs
 
         # Assemble particular integral vectors
         if bed:
             zp = np.array([
-                [qt/kt + self.h*qt*(self.h + self.t
-                                    - 2*self.zs)/(4*self.kA55)],
+                [(qt + pt)/kt + h*qt*(h + t - 2*zs)/(4*kA55)
+                    + h*pt*(2*h + t)/(4*kA55)],
                 [0],
-                [qn/kn],
+                [(qn + pn)/kn],
                 [0],
-                [-qt*(self.h + self.t - 2*self.zs)/(2*self.kA55)],
+                [-(qt*(h + t - 2*zs) + pt*(2*h + t))/(2*kA55)],
                 [0]])
         else:
             zp = np.array([
-                [(-3*qt/self.A11 - self.B11*qn*x/self.E0)/6*x**2],
-                [(-2*qt/self.A11 - self.B11*qn*x/self.E0)/2*x],
-                [-self.A11*qn*x**4/(24*self.E0)],
-                [-self.A11*qn*x**3/(6*self.E0)],
-                [self.A11*qn*x**3/(6*self.E0) + (
-                    (self.zs - self.B11/self.A11)*qt - qn*x)/self.kA55],
-                [self.A11*qn*x**2/(2*self.E0) - qn/self.kA55]])
+                [(-3*(qt + pt)/A11 - B11*(qn + pn)*x/E0)/6*x**2],
+                [(-2*(qt + pt)/A11 - B11*(qn + pn)*x/E0)/2*x],
+                [-A11*(qn + pn)*x**4/(24*E0)],
+                [-A11*(qn + pn)*x**3/(6*E0)],
+                [A11*(qn + pn)*x**3/(6*E0)
+                 + ((zs - B11/A11)*qt - h*pt/2 - (qn + pn)*x)/kA55],
+                [(qn + pn)*(A11*x**2/(2*E0) - 1/kA55)]])
 
         return zp
 
@@ -702,6 +757,7 @@ to one layer. Default is [[240, 200], ].</dd>
         self.kt = False         # Weak-layer shear stiffness
 
         # Initialize slab attributes
+        self.p = 0              # Surface line load (N/mm)
         self.slab = False       # Slab properties dictionary
         self.k = False          # Slab shear correction factor
         self.h = False          # Total slab height (mm)
@@ -799,6 +855,23 @@ to one layer. Default is [[240, 200], ].</dd>
         # Recalculate the fundamental system after properties have changed
         if update:
             self.calc_fundamental_system()
+
+    def set_surface_load(self, p):
+        &#34;&#34;&#34;
+        Set surface line load.
+
+        Define a distributed surface load (N/mm) that acts
+        in vertical (gravity) direction on the top surface
+        of the slab.
+
+        Arguments
+        ---------
+        p : float
+            Surface line load (N/mm) that acts in vertical
+            (gravity) direction onm the top surface of the
+            slab.
+        &#34;&#34;&#34;
+        self.p = p
 
     def calc_foundation_stiffness(self):
         &#34;&#34;&#34;Compute foundation normal and shear stiffness.&#34;&#34;&#34;
@@ -904,7 +977,7 @@ to one layer. Default is [[240, 200], ].</dd>
 
     def get_weight_load(self, phi):
         &#34;&#34;&#34;
-        Calculate line loads.
+        Calculate line loads from slab mass.
 
         Arguments
         ---------
@@ -914,9 +987,9 @@ to one layer. Default is [[240, 200], ].</dd>
         Returns
         -------
         qn : float
-            Line load (N/mm) in normal direction.
+            Line load (N/mm) at center of gravity in normal direction.
         qt : float
-            Line load (N/mm) in tangential direction.
+            Line load (N/mm) at center of gravity in tangential direction.
         &#34;&#34;&#34;
         # Convert units
         phi = np.deg2rad(phi)                   # Convert inclination to rad
@@ -928,6 +1001,30 @@ to one layer. Default is [[240, 200], ].</dd>
         qt = -q*np.sin(phi)                     # Tangential direction
 
         return qn, qt
+
+    def get_surface_load(self, phi):
+        &#34;&#34;&#34;
+        Calculate surface line loads.
+
+        Arguments
+        ---------
+        phi : float
+            Inclination (degrees). Counterclockwise positive.
+
+        Returns
+        -------
+        pn : float
+            Surface line load (N/mm) in normal direction.
+        pt : float
+            Surface line load (N/mm) in tangential direction.
+        &#34;&#34;&#34;
+        # Convert units
+        phi = np.deg2rad(phi)                   # Convert inclination to rad
+        # Split into components
+        pn = self.p*np.cos(phi)                 # Normal direction
+        pt = -self.p*np.sin(phi)                # Tangential direction
+
+        return pn, pt
 
     def get_skier_load(self, m, phi):
         &#34;&#34;&#34;
@@ -1020,32 +1117,44 @@ to one layer. Default is [[240, 200], ].</dd>
         zp : ndarray
             Particular integral vector (6x1) at position x.
         &#34;&#34;&#34;
-        # Get weight load
+        # Get weight and surface loads
         qn, qt = self.get_weight_load(phi)
+        pn, pt = self.get_surface_load(phi)
 
-        # Set foundation stiffness variables
+        # Set foundation stiffnesses
         kn = self.kn
         kt = self.kt
+
+        # Unpack laminate stiffnesses
+        A11 = self.A11
+        B11 = self.B11
+        kA55 = self.kA55
+        E0 = self.E0
+
+        # Unpack geometric properties
+        h = self.h
+        t = self.t
+        zs = self.zs
 
         # Assemble particular integral vectors
         if bed:
             zp = np.array([
-                [qt/kt + self.h*qt*(self.h + self.t
-                                    - 2*self.zs)/(4*self.kA55)],
+                [(qt + pt)/kt + h*qt*(h + t - 2*zs)/(4*kA55)
+                    + h*pt*(2*h + t)/(4*kA55)],
                 [0],
-                [qn/kn],
+                [(qn + pn)/kn],
                 [0],
-                [-qt*(self.h + self.t - 2*self.zs)/(2*self.kA55)],
+                [-(qt*(h + t - 2*zs) + pt*(2*h + t))/(2*kA55)],
                 [0]])
         else:
             zp = np.array([
-                [(-3*qt/self.A11 - self.B11*qn*x/self.E0)/6*x**2],
-                [(-2*qt/self.A11 - self.B11*qn*x/self.E0)/2*x],
-                [-self.A11*qn*x**4/(24*self.E0)],
-                [-self.A11*qn*x**3/(6*self.E0)],
-                [self.A11*qn*x**3/(6*self.E0) + (
-                    (self.zs - self.B11/self.A11)*qt - qn*x)/self.kA55],
-                [self.A11*qn*x**2/(2*self.E0) - qn/self.kA55]])
+                [(-3*(qt + pt)/A11 - B11*(qn + pn)*x/E0)/6*x**2],
+                [(-2*(qt + pt)/A11 - B11*(qn + pn)*x/E0)/2*x],
+                [-A11*(qn + pn)*x**4/(24*E0)],
+                [-A11*(qn + pn)*x**3/(6*E0)],
+                [A11*(qn + pn)*x**3/(6*E0)
+                 + ((zs - B11/A11)*qt - h*pt/2 - (qn + pn)*x)/kA55],
+                [(qn + pn)*(A11*x**2/(2*E0) - 1/kA55)]])
 
         return zp
 
@@ -1293,11 +1402,57 @@ and rearranged to z' = -(A ^ -1)Bz + (A ^ -1)d = Ez + F</p></div>
     return Fn, Ft</code></pre>
 </details>
 </dd>
+<dt id="weac.eigensystem.Eigensystem.get_surface_load"><code class="name flex">
+<span>def <span class="ident">get_surface_load</span></span>(<span>self, phi)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Calculate surface line loads.</p>
+<h2 id="arguments">Arguments</h2>
+<dl>
+<dt><strong><code>phi</code></strong> :&ensp;<code>float</code></dt>
+<dd>Inclination (degrees). Counterclockwise positive.</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><strong><code>pn</code></strong> :&ensp;<code>float</code></dt>
+<dd>Surface line load (N/mm) in normal direction.</dd>
+<dt><strong><code>pt</code></strong> :&ensp;<code>float</code></dt>
+<dd>Surface line load (N/mm) in tangential direction.</dd>
+</dl></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def get_surface_load(self, phi):
+    &#34;&#34;&#34;
+    Calculate surface line loads.
+
+    Arguments
+    ---------
+    phi : float
+        Inclination (degrees). Counterclockwise positive.
+
+    Returns
+    -------
+    pn : float
+        Surface line load (N/mm) in normal direction.
+    pt : float
+        Surface line load (N/mm) in tangential direction.
+    &#34;&#34;&#34;
+    # Convert units
+    phi = np.deg2rad(phi)                   # Convert inclination to rad
+    # Split into components
+    pn = self.p*np.cos(phi)                 # Normal direction
+    pt = -self.p*np.sin(phi)                # Tangential direction
+
+    return pn, pt</code></pre>
+</details>
+</dd>
 <dt id="weac.eigensystem.Eigensystem.get_weight_load"><code class="name flex">
 <span>def <span class="ident">get_weight_load</span></span>(<span>self, phi)</span>
 </code></dt>
 <dd>
-<div class="desc"><p>Calculate line loads.</p>
+<div class="desc"><p>Calculate line loads from slab mass.</p>
 <h2 id="arguments">Arguments</h2>
 <dl>
 <dt><strong><code>phi</code></strong> :&ensp;<code>float</code></dt>
@@ -1306,9 +1461,9 @@ and rearranged to z' = -(A ^ -1)Bz + (A ^ -1)d = Ez + F</p></div>
 <h2 id="returns">Returns</h2>
 <dl>
 <dt><strong><code>qn</code></strong> :&ensp;<code>float</code></dt>
-<dd>Line load (N/mm) in normal direction.</dd>
+<dd>Line load (N/mm) at center of gravity in normal direction.</dd>
 <dt><strong><code>qt</code></strong> :&ensp;<code>float</code></dt>
-<dd>Line load (N/mm) in tangential direction.</dd>
+<dd>Line load (N/mm) at center of gravity in tangential direction.</dd>
 </dl></div>
 <details class="source">
 <summary>
@@ -1316,7 +1471,7 @@ and rearranged to z' = -(A ^ -1)Bz + (A ^ -1)d = Ez + F</p></div>
 </summary>
 <pre><code class="python">def get_weight_load(self, phi):
     &#34;&#34;&#34;
-    Calculate line loads.
+    Calculate line loads from slab mass.
 
     Arguments
     ---------
@@ -1326,9 +1481,9 @@ and rearranged to z' = -(A ^ -1)Bz + (A ^ -1)d = Ez + F</p></div>
     Returns
     -------
     qn : float
-        Line load (N/mm) in normal direction.
+        Line load (N/mm) at center of gravity in normal direction.
     qt : float
-        Line load (N/mm) in tangential direction.
+        Line load (N/mm) at center of gravity in tangential direction.
     &#34;&#34;&#34;
     # Convert units
     phi = np.deg2rad(phi)                   # Convert inclination to rad
@@ -1470,6 +1625,43 @@ foundation properties have changed.</dd>
     # Recalculate the fundamental system after properties have changed
     if update:
         self.calc_fundamental_system()</code></pre>
+</details>
+</dd>
+<dt id="weac.eigensystem.Eigensystem.set_surface_load"><code class="name flex">
+<span>def <span class="ident">set_surface_load</span></span>(<span>self, p)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Set surface line load.</p>
+<p>Define a distributed surface load (N/mm) that acts
+in vertical (gravity) direction on the top surface
+of the slab.</p>
+<h2 id="arguments">Arguments</h2>
+<dl>
+<dt><strong><code>p</code></strong> :&ensp;<code>float</code></dt>
+<dd>Surface line load (N/mm) that acts in vertical
+(gravity) direction onm the top surface of the
+slab.</dd>
+</dl></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def set_surface_load(self, p):
+    &#34;&#34;&#34;
+    Set surface line load.
+
+    Define a distributed surface load (N/mm) that acts
+    in vertical (gravity) direction on the top surface
+    of the slab.
+
+    Arguments
+    ---------
+    p : float
+        Surface line load (N/mm) that acts in vertical
+        (gravity) direction onm the top surface of the
+        slab.
+    &#34;&#34;&#34;
+    self.p = p</code></pre>
 </details>
 </dd>
 <dt id="weac.eigensystem.Eigensystem.z"><code class="name flex">
@@ -1648,32 +1840,44 @@ is True.</dd>
     zp : ndarray
         Particular integral vector (6x1) at position x.
     &#34;&#34;&#34;
-    # Get weight load
+    # Get weight and surface loads
     qn, qt = self.get_weight_load(phi)
+    pn, pt = self.get_surface_load(phi)
 
-    # Set foundation stiffness variables
+    # Set foundation stiffnesses
     kn = self.kn
     kt = self.kt
+
+    # Unpack laminate stiffnesses
+    A11 = self.A11
+    B11 = self.B11
+    kA55 = self.kA55
+    E0 = self.E0
+
+    # Unpack geometric properties
+    h = self.h
+    t = self.t
+    zs = self.zs
 
     # Assemble particular integral vectors
     if bed:
         zp = np.array([
-            [qt/kt + self.h*qt*(self.h + self.t
-                                - 2*self.zs)/(4*self.kA55)],
+            [(qt + pt)/kt + h*qt*(h + t - 2*zs)/(4*kA55)
+                + h*pt*(2*h + t)/(4*kA55)],
             [0],
-            [qn/kn],
+            [(qn + pn)/kn],
             [0],
-            [-qt*(self.h + self.t - 2*self.zs)/(2*self.kA55)],
+            [-(qt*(h + t - 2*zs) + pt*(2*h + t))/(2*kA55)],
             [0]])
     else:
         zp = np.array([
-            [(-3*qt/self.A11 - self.B11*qn*x/self.E0)/6*x**2],
-            [(-2*qt/self.A11 - self.B11*qn*x/self.E0)/2*x],
-            [-self.A11*qn*x**4/(24*self.E0)],
-            [-self.A11*qn*x**3/(6*self.E0)],
-            [self.A11*qn*x**3/(6*self.E0) + (
-                (self.zs - self.B11/self.A11)*qt - qn*x)/self.kA55],
-            [self.A11*qn*x**2/(2*self.E0) - qn/self.kA55]])
+            [(-3*(qt + pt)/A11 - B11*(qn + pn)*x/E0)/6*x**2],
+            [(-2*(qt + pt)/A11 - B11*(qn + pn)*x/E0)/2*x],
+            [-A11*(qn + pn)*x**4/(24*E0)],
+            [-A11*(qn + pn)*x**3/(6*E0)],
+            [A11*(qn + pn)*x**3/(6*E0)
+             + ((zs - B11/A11)*qt - h*pt/2 - (qn + pn)*x)/kA55],
+            [(qn + pn)*(A11*x**2/(2*E0) - 1/kA55)]])
 
     return zp</code></pre>
 </details>
@@ -1705,9 +1909,11 @@ is True.</dd>
 <li><code><a title="weac.eigensystem.Eigensystem.calc_laminate_stiffness_matrix" href="#weac.eigensystem.Eigensystem.calc_laminate_stiffness_matrix">calc_laminate_stiffness_matrix</a></code></li>
 <li><code><a title="weac.eigensystem.Eigensystem.calc_system_matrix" href="#weac.eigensystem.Eigensystem.calc_system_matrix">calc_system_matrix</a></code></li>
 <li><code><a title="weac.eigensystem.Eigensystem.get_skier_load" href="#weac.eigensystem.Eigensystem.get_skier_load">get_skier_load</a></code></li>
+<li><code><a title="weac.eigensystem.Eigensystem.get_surface_load" href="#weac.eigensystem.Eigensystem.get_surface_load">get_surface_load</a></code></li>
 <li><code><a title="weac.eigensystem.Eigensystem.get_weight_load" href="#weac.eigensystem.Eigensystem.get_weight_load">get_weight_load</a></code></li>
 <li><code><a title="weac.eigensystem.Eigensystem.set_beam_properties" href="#weac.eigensystem.Eigensystem.set_beam_properties">set_beam_properties</a></code></li>
 <li><code><a title="weac.eigensystem.Eigensystem.set_foundation_properties" href="#weac.eigensystem.Eigensystem.set_foundation_properties">set_foundation_properties</a></code></li>
+<li><code><a title="weac.eigensystem.Eigensystem.set_surface_load" href="#weac.eigensystem.Eigensystem.set_surface_load">set_surface_load</a></code></li>
 <li><code><a title="weac.eigensystem.Eigensystem.z" href="#weac.eigensystem.Eigensystem.z">z</a></code></li>
 <li><code><a title="weac.eigensystem.Eigensystem.zh" href="#weac.eigensystem.Eigensystem.zh">zh</a></code></li>
 <li><code><a title="weac.eigensystem.Eigensystem.zp" href="#weac.eigensystem.Eigensystem.zp">zp</a></code></li>

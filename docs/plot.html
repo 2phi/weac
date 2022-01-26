@@ -107,9 +107,18 @@ def outline(grid):
 
 def slab_profile(instance):
     &#34;&#34;&#34;Create bar chart of slab profile.&#34;&#34;&#34;
+    # Plot Setup
+    plt.rcdefaults()
+    plt.rc(&#39;font&#39;, family=&#39;serif&#39;, size=10)
+    plt.rc(&#39;mathtext&#39;, fontset=&#39;cm&#39;)
+
+    # Create figure
+    fig = plt.figure(figsize=(8/3, 4))
+    ax1 = fig.gca()
+
+    # Initialize coordinates
     x = []
     y = []
-
     total_heigth = 0
 
     for line in np.flipud(instance.slab):
@@ -120,24 +129,17 @@ def slab_profile(instance):
         total_heigth = total_heigth + line[1]
         y.append(total_heigth)
 
-    # Font setup
-    plt.rc(&#39;font&#39;, family=&#39;serif&#39;, size=7)
-    plt.rc(&#39;mathtext&#39;, fontset=&#39;cm&#39;)
-
-    # Create figure
-    fig = plt.figure(figsize=(2, 3))
-    plt.axis()
-    ax1 = fig.gca()
-
     # Set axis labels
-    ax1.set_xlabel(&#39;Density (kg/m$^3$)&#39;)
-    ax1.set_ylabel(&#39;Height above weak layer (mm)&#39;)
+    ax1.set_xlabel(r&#39;$\longleftarrow$ Density $\rho$ (kg/m$^3$)&#39;)
+    ax1.set_ylabel(r&#39;Height above weak layer (mm) $\longrightarrow$&#39;)
 
     ax1.set_xlim(500, 0)
 
     ax1.fill_betweenx(y, 0, x)
     plt.show()
 
+    # Reset plot styles
+    plt.rcdefaults()
 
 # === DEFORMATION CONTOUR PLOT ================================================
 
@@ -160,7 +162,9 @@ def contours(instance, x, z, window=1e12, scale=100):
         Scaling factor for the visualization of displacements.
     &#34;&#34;&#34;
     # Plot Setup
+    plt.rcdefaults()
     plt.rc(&#39;font&#39;, family=&#39;serif&#39;, size=10)
+    plt.rc(&#39;mathtext&#39;, fontset=&#39;cm&#39;)
 
     # Calculate top-to-bottom vertical positions (mm) in beam coordinate system
     y = np.linspace(-instance.h/2, instance.h/2, num=21)
@@ -198,14 +202,17 @@ def contours(instance, x, z, window=1e12, scale=100):
     # Plot labels
     plt.gca().set_xlabel(r&#39;lateral position $x$ (cm) $\longrightarrow$&#39;)
     plt.gca().set_ylabel(&#39;depth below surface\n&#39; r&#39;$\longleftarrow $ $d$ (cm)&#39;)
-    plt.title(fr&#39;${scale}\!\times\!$ scaled deformations (cm)&#39;, size=11)
+    plt.title(fr&#39;${scale}\!\times\!$ scaled deformations (cm)&#39;, size=10)
 
     # Colorbar
     cbar = plt.colorbar(
         shrink=0.5,
         label=(&#39;lateral displacements\n&#39;
                r&#39;$u$ ($\mu\mathrm{m}$) $\longrightarrow$&#39;))
-    cbar.ax.tick_params(labelsize=9)
+    cbar.ax.tick_params(labelsize=8)
+
+    # Reset plot styles
+    plt.rcdefaults()
 
 
 # === BASE PLOT FUNCTION ======================================================
@@ -218,19 +225,17 @@ def plot_data(
         li=False, mi=False, ki=False,
         xlabel=r&#39;Horizontal position $x$ (cm)&#39;):
     &#34;&#34;&#34;Plot data. Base function.&#34;&#34;&#34;
-    # Clear figure
-    plt.clf()
+    # Figure setup
+    plt.rcdefaults()
+    plt.rc(&#39;font&#39;, family=&#39;serif&#39;, size=10)
+    plt.rc(&#39;mathtext&#39;, fontset=&#39;cm&#39;)
 
     # Plot styles
     labelstyle, colors = set_plotstyles()
 
-    # Font setup
-    plt.rc(&#39;font&#39;, family=&#39;serif&#39;, size=12)
-    plt.rc(&#39;mathtext&#39;, fontset=&#39;cm&#39;)
-
     # Create figure
-    plt.axis()
-    ax1 = plt.gca()
+    fig = plt.figure(figsize=(4, 8/3))
+    ax1 = fig.gca()
 
     # Axis limits
     ax1.autoscale(axis=&#39;x&#39;, tight=True)
@@ -311,6 +316,9 @@ def plot_data(
     else:
         print(&#39;Rendering&#39;, filename, &#39;...&#39;)
         plt.savefig(&#39;plots/&#39; + filename, bbox_inches=&#39;tight&#39;)
+
+    # Reset plot styles
+    plt.rcdefaults()
 
 
 # === PLOT WRAPPERS ===========================================================
@@ -460,7 +468,9 @@ def fea_stress(instance, xb, zb, fea):
         Scaling factor for the visualization of displacements.
     &#34;&#34;&#34;
     # Plot Setup
+    plt.rcdefaults()
     plt.rc(&#39;font&#39;, family=&#39;serif&#39;, size=10)
+    plt.rc(&#39;mathtext&#39;, fontset=&#39;cm&#39;)
 
     # Calculate top-to-bottom vertical positions (mm) in beam coordinate system
     y = np.linspace(-instance.h/2, instance.h/2, num=21)
@@ -498,14 +508,17 @@ def fea_stress(instance, xb, zb, fea):
     # Plot labels
     plt.gca().set_xlabel(r&#39;lateral position $x$ (cm) $\longrightarrow$&#39;)
     plt.gca().set_ylabel(&#39;depth below surface\n&#39; r&#39;$\longleftarrow $ $d$ (cm)&#39;)
-    plt.title(fr&#39;${scale}\!\times\!$ scaled deformations (cm)&#39;, size=11)
+    plt.title(fr&#39;${scale}\!\times\!$ scaled deformations (cm)&#39;, size=10)
 
     # Colorbar
     cbar = plt.colorbar(
         shrink=0.5,
         label=(&#39;lateral displacements\n&#39;
                r&#39;$u$ ($\mu\mathrm{m}$) $\longrightarrow$&#39;))
-    cbar.ax.tick_params(labelsize=9)</code></pre>
+    cbar.ax.tick_params(labelsize=8)
+
+    # Reset plot styles
+    plt.rcdefaults()</code></pre>
 </details>
 </dd>
 <dt id="weac.plot.displacements"><code class="name flex">
@@ -655,19 +668,17 @@ def fea_stress(instance, xb, zb, fea):
         li=False, mi=False, ki=False,
         xlabel=r&#39;Horizontal position $x$ (cm)&#39;):
     &#34;&#34;&#34;Plot data. Base function.&#34;&#34;&#34;
-    # Clear figure
-    plt.clf()
+    # Figure setup
+    plt.rcdefaults()
+    plt.rc(&#39;font&#39;, family=&#39;serif&#39;, size=10)
+    plt.rc(&#39;mathtext&#39;, fontset=&#39;cm&#39;)
 
     # Plot styles
     labelstyle, colors = set_plotstyles()
 
-    # Font setup
-    plt.rc(&#39;font&#39;, family=&#39;serif&#39;, size=12)
-    plt.rc(&#39;mathtext&#39;, fontset=&#39;cm&#39;)
-
     # Create figure
-    plt.axis()
-    ax1 = plt.gca()
+    fig = plt.figure(figsize=(4, 8/3))
+    ax1 = fig.gca()
 
     # Axis limits
     ax1.autoscale(axis=&#39;x&#39;, tight=True)
@@ -747,7 +758,10 @@ def fea_stress(instance, xb, zb, fea):
         plt.show()
     else:
         print(&#39;Rendering&#39;, filename, &#39;...&#39;)
-        plt.savefig(&#39;plots/&#39; + filename, bbox_inches=&#39;tight&#39;)</code></pre>
+        plt.savefig(&#39;plots/&#39; + filename, bbox_inches=&#39;tight&#39;)
+
+    # Reset plot styles
+    plt.rcdefaults()</code></pre>
 </details>
 </dd>
 <dt id="weac.plot.section_forces"><code class="name flex">
@@ -817,9 +831,18 @@ def fea_stress(instance, xb, zb, fea):
 </summary>
 <pre><code class="python">def slab_profile(instance):
     &#34;&#34;&#34;Create bar chart of slab profile.&#34;&#34;&#34;
+    # Plot Setup
+    plt.rcdefaults()
+    plt.rc(&#39;font&#39;, family=&#39;serif&#39;, size=10)
+    plt.rc(&#39;mathtext&#39;, fontset=&#39;cm&#39;)
+
+    # Create figure
+    fig = plt.figure(figsize=(8/3, 4))
+    ax1 = fig.gca()
+
+    # Initialize coordinates
     x = []
     y = []
-
     total_heigth = 0
 
     for line in np.flipud(instance.slab):
@@ -830,23 +853,17 @@ def fea_stress(instance, xb, zb, fea):
         total_heigth = total_heigth + line[1]
         y.append(total_heigth)
 
-    # Font setup
-    plt.rc(&#39;font&#39;, family=&#39;serif&#39;, size=7)
-    plt.rc(&#39;mathtext&#39;, fontset=&#39;cm&#39;)
-
-    # Create figure
-    fig = plt.figure(figsize=(2, 3))
-    plt.axis()
-    ax1 = fig.gca()
-
     # Set axis labels
-    ax1.set_xlabel(&#39;Density (kg/m$^3$)&#39;)
-    ax1.set_ylabel(&#39;Height above weak layer (mm)&#39;)
+    ax1.set_xlabel(r&#39;$\longleftarrow$ Density $\rho$ (kg/m$^3$)&#39;)
+    ax1.set_ylabel(r&#39;Height above weak layer (mm) $\longrightarrow$&#39;)
 
     ax1.set_xlim(500, 0)
 
     ax1.fill_betweenx(y, 0, x)
-    plt.show()</code></pre>
+    plt.show()
+
+    # Reset plot styles
+    plt.rcdefaults()</code></pre>
 </details>
 </dd>
 <dt id="weac.plot.stress_criteria"><code class="name flex">

@@ -9,7 +9,7 @@
   <br>
   <b>WEAC</b>
   <br>
-  <sub><sup><b>Weak Layer Anticrack Nucleation Model</b></sup></sub>
+  <sub><sup>Weak Layer Anticrack Nucleation Model</sup></sub>
   <br>
 </h1>
 
@@ -35,6 +35,8 @@
   <a href="https://github.com/2phi/weac/issues">Request a feature</a> · 
   <a href="https://2phi.github.io/weac/">Read the docs</a> · 
   <a href="https://github.com/2phi/weac/blob/main/CITATION.cff)">Cite the software</a>
+  <br>
+  <br>
   <br>
 </p>
 
@@ -175,12 +177,17 @@ x_cm, tau_kPa = skier.get_weaklayer_shearstress(x=xwl, z=z, unit='kPa')
 
 See the [open issues](https://github.com/2phi/weac/issues) for a list of proposed features and known issues.
 
-### v2.4
+### v2.5
 - [ ] Finite fracture mechanics implementation for layered snow covers
 
-### v2.3
+### v2.4
 - [ ] Implement anistropic weak layer
+
+### v2.3
+- [ ] Provide a coutour plot of slab stresses
 - [ ] Add demo gif
+
+## Release history
 
 ### v2.2
 - [x] Make sign of inclination `phi` consistent with the coordinate system (positive counterclockwise)
@@ -189,9 +196,7 @@ See the [open issues](https://github.com/2phi/weac/issues) for a list of propose
 - [x] Improved plot labels
 - [x] Provide convenience methods for the export of weak-layer stresses and slab deformations
 - [x] Add wrapper for (re)calculation of the fundamental system
-- [ ] Allow for additional distributed surface loads
-
-## Release history
+- [x] Allow for additional distributed surface loads
 
 ### v2.1
 - Consistent use of coordinate system with downward pointing z-axis
