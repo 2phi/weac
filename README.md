@@ -81,7 +81,7 @@
 
 WEAC implements closed-form analytical models for the [mechanical analysis of dry-snow slabs on compliant weak layers](https://doi.org/10.5194/tc-14-115-2020), the [prediction of anticrack onset](https://doi.org/10.5194/tc-14-131-2020), and, in particular, allows for the analysis of stratified snow covers. The model covers propagation saw tests (a), and uncracked (b) or cracked (c) skier-loaded buried weak layers.
 
-<img src="https://github.com/2phi/weac/raw/main/img/bc.png" alt="Boundary conditions" width="500"/>
+<img src="https://github.com/2phi/weac/raw/main/img/systems.png" alt="Systems" width="500"/>
 
 Please refer to the companion papers for model derivations, illustrations, dimensions, material properties, and kinematics:
 
@@ -132,15 +132,15 @@ myprofile = [[170, 100],  # (1) surface layer
              [190,  40],  # (2)
              [230, 130],  #  :
              [250,  20],  #  :
-             [210,  70],  # (k)
+             [210,  70],  # (i)
              [380,  20],  #  :
-             [280, 100]]  # (L) last slab layer above weak layer
+             [280, 100]]  # (N) last slab layer above weak layer
 ```
 Create a model instance with optional custom layering.
 ```python
 skier = weac.Layered(system='skier', layers=myprofile)
 ```
-Calculate lists of segment lengths, locations of foundations, and position and magnitude of skier loads from the inputs total length `L` (mm), crack length `a` (mm), and skier weight `m` (kg). We can choose to analyze the situtation before a crack appears even if a crack length > 0 is set by replacing the `'crack'` key thorugh the `'uncracked'` key.
+Calculate lists of segment lengths, locations of foundations, and position and magnitude of skier loads from the inputs total length `L` (mm), crack length `a` (mm), and skier weight `m` (kg). We can choose to analyze the situtation before a crack appears even if a crack length > 0 is set by replacing the `'crack'` key thorugh the `'nocrack'` key.
 ```python
 segments = skier.calc_segments(L=10000, a=300, m=80)['crack']
 ```
