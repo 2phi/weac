@@ -820,7 +820,7 @@ class AnalysisMixin:
 
         return np.array([Ginc1 + Ginc2, Ginc1, Ginc2]).flatten()
 
-    def gdif(self, C, phi, li, ki, **kwargs):
+    def gdif(self, C, phi, li, ki, unit='kJ/m^2', **kwargs):
         """
         Compute differential energy release rate of all crack tips.
 
@@ -863,7 +863,7 @@ class AnalysisMixin:
             # Solution at crack tip
             z = self.z(li[idx], C[:, [idx]], li[idx], phi, bed=ki[idx])
             # Mode I and II differential energy release rates
-            Gdif[1:, j] = self.Gi(z), self.Gii(z)
+            Gdif[1:, j] = self.Gi(z, unit=unit), self.Gii(z, unit=unit)
 
         # Sum mode I and II contributions
         Gdif[0, :] = Gdif[1, :] + Gdif[2, :]
