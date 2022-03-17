@@ -30,9 +30,9 @@ def isnotebook():
 def load_dummy_profile(profile_id):
     """Define standard layering types for comparison."""
     # Layers [density (kg/m^3), thickness (mm), Young's modulus (N/mm^2)]
-    soft = [120., 120., 0.3]
-    medium = [180., 120., 1.5]
-    hard = [270., 120., 7.5]
+    soft = [180., 120., 5]
+    medium = [270., 120., 30]
+    hard = [350., 120., 93.8]
 
     # Database (top to bottom)
     database = {
