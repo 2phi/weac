@@ -117,7 +117,7 @@ def scapozza(rho):
 
 def gerling(rho, C0=6.0, C1=4.6):
     """
-    Compute Young's modulus density according to Gerling et al. 2017.
+    Compute Young's modulus from density according to Gerling et al. 2017.
 
     Arguments
     ---------

@@ -534,20 +534,20 @@ class SolutionMixin:
         elif self.system == 'pst-':
             li = np.array([L - a, a])                   # Segment lengths
             mi = np.array([0])                          # Skier weights
-            ki = np.array([True, False])                # No crack
-            k0 = np.array([True, True])                 # Crack
+            ki = np.array([True, False])                # Crack
+            k0 = np.array([True, True])                 # No crack
         elif self.system == '-pst':
             li = np.array([a, L - a])                   # Segment lengths
             mi = np.array([0])                          # Skier weights
-            ki = np.array([False, True])                # No crack
-            k0 = np.array([True, True])                 # Crack
+            ki = np.array([False, True])                # Crack
+            k0 = np.array([True, True])                 # No crack
         elif self.system == 'skier':
             lb = (L - a)/2                              # Half bedded length
             lf = a/2                                    # Half free length
             li = np.array([lb, lf, lf, lb])             # Segment lengths
             mi = np.array([0, m, 0])                    # Skier weights
-            ki = np.array([True, False, False, True])   # No crack
-            k0 = np.array([True, True, True, True])     # Crack
+            ki = np.array([True, False, False, True])   # Crack
+            k0 = np.array([True, True, True, True])     # No crack
         else:
             raise ValueError(f'System {self.system} is not implemented.')
 
@@ -563,14 +563,14 @@ class SolutionMixin:
         """
         Compute free constants for arbitrary beam assembly.
 
-        Assemble LHS from bedded and free segments in the form
-        [][zh1  0   0  ...  0   0   0][][][]  left
-        [] = [zh1 zh2  0  ...  0   0   0][] + [] = []  mid
-        [][0  zh2 zh3 ...  0   0   0][][][]  mid
-        [z0][... ... ... ... ... ... ...][C][zp][rhs]  mid
-        [][0   0   0  ... zhL zhM  0][][][]  mid
-        [][0   0   0  ...  0  zhM zhN][][][]  mid
-        [][0   0   0  ...  0   0  zhN][][][]  right
+        Assemble LHS from supported and unsupported segments in the form
+        [  ]   [ zh1  0   0  ...  0   0   0  ][   ]   [    ]   [     ]  left
+        [  ]   [ zh1 zh2  0  ...  0   0   0  ][   ]   [    ]   [     ]  mid
+        [  ]   [  0  zh2 zh3 ...  0   0   0  ][   ]   [    ]   [     ]  mid
+        [z0] = [ ... ... ... ... ... ... ... ][ C ] + [ zp ] = [ rhs ]  mid
+        [  ]   [  0   0   0  ... zhL zhM  0  ][   ]   [    ]   [     ]  mid
+        [  ]   [  0   0   0  ...  0  zhM zhN ][   ]   [    ]   [     ]  mid
+        [  ]   [  0   0   0  ...  0   0  zhN ][   ]   [    ]   [     ]  right
         and solve for constants C.
 
         Arguments
