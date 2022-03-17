@@ -869,9 +869,10 @@ class AnalysisMixin:
         Gdif[0, :] = Gdif[1, :] + Gdif[2, :]
 
         # Adjust contributions for center cracks
-        avgmask = np.full(nct, True)        # Initialize mask
-        avgmask[[0, -1]] = ki[[0, -1]]      # Do not weight edge cracks
-        Gdif[:, avgmask] *= 0.5             # Weigth with half crack length
+        if nct > 1:
+            avgmask = np.full(nct, True)    # Initialize mask
+            avgmask[[0, -1]] = ki[[0, -1]]  # Do not weight edge cracks
+            Gdif[:, avgmask] *= 0.5         # Weigth with half crack length
 
         # Return total differential energy release rate of all crack tips
         return Gdif.sum(axis=1)
