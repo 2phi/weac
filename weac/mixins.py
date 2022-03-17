@@ -742,17 +742,17 @@ class AnalysisMixin:
             x0 = lic[i]
             # Assemble global coordinate vector
             xq[nqc[i]:nqc[i + 1]] = x0 + xi
-            # Mask coordinates not on foundation (excluding endpoints)
+            # Mask coordinates not on foundation (including endpoints)
             if not ki[i]:
-                isbedded[nqc[i] + 1:nqc[i + 1]] = False
+                isbedded[nqc[i]:nqc[i + 1]] = False
             # Compute segment solution
             zi = self.z(xi, C[:, [i]], l, phi, ki[i])
             # Assemble global solution matrix
             zq[:, nqc[i]:nqc[i + 1]] = zi
 
-        # Add masking of consecutive unbedded segments
-        isrepeated = [ki[j] or ki[j + 1] for j, _ in enumerate(ki[:-1])]
-        for i, truefalse in enumerate(isrepeated, start=1):
+        # Make sure cracktips are included
+        transmissionbool = [ki[j] or ki[j + 1] for j, _ in enumerate(ki[:-1])]
+        for i, truefalse in enumerate(transmissionbool, start=1):
             isbedded[nqc[i]] = truefalse
 
         # Assemble vector of coordinates on foundation
