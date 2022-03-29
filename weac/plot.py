@@ -6,6 +6,7 @@
 from matplotlib.colors import Normalize
 import numpy as np
 import matplotlib.pyplot as plt
+import os
 
 # Project imports
 from weac.tools import isnotebook
@@ -107,7 +108,9 @@ def slab_profile(instance):
     ax1.set_xlim(500, 0)
 
     ax1.fill_betweenx(y, 0, x)
-    plt.show()
+    
+    # Save figure
+    save_plot(name='profile')
 
     # Reset plot styles
     plt.rcdefaults()
@@ -181,6 +184,9 @@ def contours(instance, x, z, window=1e12, scale=100):
         label=('lateral displacements\n'
                r'$u$ ($\mu\mathrm{m}$) $\longrightarrow$'))
     cbar.ax.tick_params(labelsize=8)
+
+    # Save figure
+    save_plot(name='cont')
 
     # Reset plot styles
     plt.rcdefaults()
@@ -281,12 +287,7 @@ def plot_data(
                      **labelstyle)
 
     # Save figure
-    filename = name + '.pdf'
-    if isnotebook():
-        plt.show()
-    else:
-        print('Rendering', filename, '...')
-        plt.savefig('plots/' + filename, bbox_inches='tight')
+    save_plot(name)
 
     # Reset plot styles
     plt.rcdefaults()
@@ -390,3 +391,26 @@ def fea_stress(instance, xb, zb, fea):
     ]
     plot_data(ax1label=r'Stress (kPa)', ax1data=data, name='fea_stress',
               labelpos=-50)
+
+
+# === SAVE FUNCTION ===========================================================
+
+def save_plot(name):
+    """depending on interpreter, shows or saves plots
+
+    Args:
+        name (string): name of the figure
+    """    
+    filename = name + '.pdf'
+    # show figure if on jupyter notebook
+    if isnotebook():
+        plt.show()
+    # save figure if on terminal
+    else:
+        print('Rendering', filename, '...')
+        # Make directory if not yet existing
+        if not os.path.isdir(os.path.join(os.getcwd(), 'plots')):
+            os.mkdir('plots')
+        plt.savefig('plots/' + filename, bbox_inches='tight')
+        print('Saved', filename, 'at', os.path.join(os.getcwd(), 'plots'))
+    return
