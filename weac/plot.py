@@ -3,10 +3,10 @@
 # pylint: disable=too-many-arguments,too-many-statements
 
 # Third party imports
+import os
 from matplotlib.colors import Normalize
 import numpy as np
 import matplotlib.pyplot as plt
-import os
 
 # Project imports
 from weac.tools import isnotebook
@@ -115,6 +115,9 @@ def slab_profile(instance):
     # Reset plot styles
     plt.rcdefaults()
 
+    # Clear Canvas
+    plt.close()
+
 # === DEFORMATION CONTOUR PLOT ================================================
 
 
@@ -157,12 +160,12 @@ def contours(instance, x, z, window=1e12, scale=100):
     # Get x-coordinate of maximum deflection w (cm) and derive plot x-limits
     xfocus = x[np.max(np.argmax(W, axis=1))]/10
     xmax = np.min([np.max(X+scale*U), xfocus + window/2])
-    xmin = np.max([np.min(X+scale*U), xfocus - window/2])
+    xmin = np.max([np.min(X), xfocus - window/2])
     
     # From maximum of deflection w (cm) and slab height h (cm) derive plot y-limits
     ymin = 0
     ymax = 1.1*(instance.h/10+scale*np.max(W))
-
+    
     # Normalize colormap
     norm = MidpointNormalize(vmin=1e3*np.min(U), vmax=1e3*np.max(U))
 
