@@ -156,12 +156,16 @@ def contours(instance, x, z, window=1e12, scale=100):
     # Plot outline
     plt.plot(outline(X), outline(Y), 'k--', alpha=0.3, linewidth=1)
     plt.plot(outline(X+scale*U), outline(Y+scale*W), 'k', linewidth=1)
+    
+    # Plot Element cross section
+    for posx in range(26,len(x),25):
+        plt.plot([(X+scale*U)[0][posx],(X+scale*U)[20][posx]], [(Y+scale*W)[0][posx],(Y+scale*W)[20][posx]], 'k', linewidth=0.5)   
 
     # Get x-coordinate of maximum deflection w (cm) and derive plot x-limits
     xfocus = x[np.max(np.argmax(W, axis=1))]/10
-    xmax = np.min([np.max(X+scale*U), xfocus + window/2])
-    xmin = np.max([np.min(X), xfocus - window/2])
-    
+    xmax = np.min([np.max(X+scale*U)+1e-1*instance.h/4, xfocus + window/2])
+    xmin = np.max([np.min(X)-1e-1*instance.h/4, xfocus - window/2])
+
     # From maximum of deflection w (cm) and slab height h (cm) derive plot y-limits
     ymin = 0
     ymax = 1.1*(instance.h/10+scale*np.max(W))
@@ -309,7 +313,9 @@ def displacements(instance, x, z, **segments):
     data = [
         [x/10, instance.u(z, z0=0, unit='mm'), r'$u_0\ (\mathrm{mm})$'],
         [x/10, -instance.w(z, unit='mm'), r'$-w\ (\mathrm{mm})$'],
-        [x/10, instance.psi(z, unit='degrees'), r'$\psi\ (^\circ)$ ']
+        [x/10, instance.psi(z, unit='degrees'), r'$\psi\ (^\circ)$ '],
+        #[x/10, -instance.wp(z)*10, r'$wp*10$']
+        #[x/10, -instance.M(z), r'$M$'] #'Moment'
     ]
     plot_data(ax1label=r'Displacements', ax1data=data,
               name='disp', **segments)
@@ -319,7 +325,7 @@ def section_forces(instance, x, z, **segments):
     """Wrap section forces plot."""
     data = [
         [x/10, instance.N(z), r'$N$'],
-        [x/10, instance.M(z), r'$M$'],
+        #[x/10, instance.M(z), r'$M$'],
         [x/10, instance.V(z), r'$V$']
     ]
     plot_data(ax1label=r'Section forces', ax1data=data,

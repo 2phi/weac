@@ -410,11 +410,14 @@ class SolutionMixin:
         elif self.system in ['skier', 'skiers']:
             # Infinite ends (vanishing complementary solution)
             bc = np.array([self.u(z, z0=0), self.w(z), self.psi(z)])
+        elif self.system in ['pst-T']:
+            # touchdown of a free end
+            bc = np.array([self.N(z), self.M(z)+22815*self.psi(z), self.w(z)])
         else:
             raise ValueError(
                 'Boundary conditions not defined for'
                 f'system of type {self.system}.')
-
+        #print(f'bc ({bc.shape}): {bc}')
         return bc
 
     def eqs(self, zl, zr, pos='mid'):
@@ -536,6 +539,11 @@ class SolutionMixin:
             mi = np.array([0])                          # Skier weights
             ki = np.array([True, False])                # Crack
             k0 = np.array([True, True])                 # No crack
+        elif self.system == 'pst-T':
+            li = np.array([L - a, a])                   # Segment lengths
+            mi = np.array([0])                          # Skier weights
+            ki = np.array([True, False])                # Crack
+            k0 = np.array([True, True])                 # No crack
         elif self.system == '-pst':
             li = np.array([a, L - a])                   # Segment lengths
             mi = np.array([0])                          # Skier weights
@@ -601,7 +609,7 @@ class SolutionMixin:
             raise ValueError('Make sure len(li)=N, len(ki)=N, and '
                              'len(mi)=N-1 for a system of N segments.')
 
-        if self.system not in ['pst-', '-pst']:
+        if self.system not in ['pst-', '-pst', 'pst-T']:
             # Boundary segements must be on foundation for infinite BCs
             if not all([ki[0], ki[-1]]):
                 raise ValueError('Provide bedded boundary segments in '
@@ -662,17 +670,24 @@ class SolutionMixin:
             Fn, Ft = self.get_skier_load(m, phi)
             # Right-hand side for transmission from segment i-1 to segment i
             rhs[6*i:6*i + 3] = np.vstack([Ft, -Ft*self.h/2, Fn])
-
         # Set rhs so that complementary integral vanishes at boundaries
-        if self.system not in ['pst-', '-pst']:
+        if self.system not in ['pst-', '-pst', 'pst-T']:
             rhs[:3] = self.bc(self.zp(x=0, phi=phi, bed=ki[0]))
             rhs[-3:] = self.bc(self.zp(x=li[-1], phi=phi, bed=ki[-1]))
+        test = 1
+        if test:
+            if self.system in ['pst-T']:
+                rhs[9] = 0      # N
+                rhs[10] = 0   # M
+                rhs[11] = 4000  # w
+        print(f'rhs \n {rhs}')
 
         # --- SOLVE -----------------------------------------------------------
 
         # Solve z0 = zh0*C + zp0 = rhs for constants, i.e. zh0*C = rhs - zp0
         C = np.linalg.solve(zh0, rhs - zp0)
-
+        print(C)
+        print(np.linalg.det(zh0))
         # Sort (nDOF = 6) constants for each segment into columns of a matrix
         return C.reshape([-1, nDOF]).T
 
