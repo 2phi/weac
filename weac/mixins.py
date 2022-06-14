@@ -390,7 +390,7 @@ class SolutionMixin:
     and for the computation of the free constants.
     """
 
-    def bc(self, z):
+    def bc(self, z, pos):
         """
         Provide equations for free (pst) or infinite (skiers) ends.
 
@@ -408,13 +408,21 @@ class SolutionMixin:
             # Free ends
             bc = np.array([self.N(z), self.M(z), self.V(z)])
         elif self.system in ['pst-TD']:
-            # touchdown of a free end
-            kD = self.calc_spring_stiffness()
-            bc = np.array([self.N(z), self.M(z)+kD*self.psi(z), self.w(z)])
+            if pos in ('r', 'right'):
+                # Touchdown of a free end
+                kD = self.calc_spring_stiffness()
+                bc = np.array([self.N(z), self.M(z)+kD*self.psi(z), self.w(z)])
+            else:
+                # Free ends
+                bc = np.array([self.N(z), self.M(z), self.V(z)])
         elif self.system in ['-pstTD']:
-            # touchdown of a free end
-            kD = self.calc_spring_stiffness()
-            bc = np.array([self.N(z), self.M(z)-kD*self.psi(z), self.w(z)])
+            if  pos in ('l', 'left'):
+                # touchdown of a free end
+                kD = self.calc_spring_stiffness()
+                bc = np.array([self.N(z), self.M(z)-kD*self.psi(z), self.w(z)])
+            else:
+                # Free ends
+                bc = np.array([self.N(z), self.M(z), self.V(z)])
         elif self.system in ['skier', 'skiers']:
             # Infinite ends (vanishing complementary solution)
             bc = np.array([self.u(z, z0=0), self.w(z), self.psi(z)])
@@ -450,9 +458,9 @@ class SolutionMixin:
         """
         if pos in ('l', 'left'):
             eqs = np.array([
-                self.bc(zl)[0],             # Left boundary condition
-                self.bc(zl)[1],             # Left boundary condition
-                self.bc(zl)[2],             # Left boundary condition
+                self.bc(zl, pos)[0],        # Left boundary condition
+                self.bc(zl, pos)[1],        # Left boundary condition
+                self.bc(zl, pos)[2],        # Left boundary condition
                 self.u(zr, z0=0),           # ui(xi = li)
                 self.w(zr),                 # wi(xi = li)
                 self.psi(zr),               # psii(xi = li)
@@ -481,15 +489,14 @@ class SolutionMixin:
                 -self.N(zl),                # -Ni(xi = 0)
                 -self.M(zl),                # -Mi(xi = 0)
                 -self.V(zl),                # -Vi(xi = 0)
-                self.bc(zr)[0],             # Right boundary condition
-                self.bc(zr)[1],             # Right boundary condition
-                self.bc(zr)[2]])            # Right boundary condition
+                self.bc(zr, pos)[0],        # Right boundary condition
+                self.bc(zr, pos)[1],        # Right boundary condition
+                self.bc(zr, pos)[2]])       # Right boundary condition
         else:
             raise ValueError(
                 (f'Invalid position argument {pos} given. '
                  'Valid segment positions are l, m, and r, '
                  'or left, mid and right.'))
-
         return eqs
 
     def calc_segments(self, li=False, mi=False, ki=False, k0=False,
@@ -534,12 +541,11 @@ class SolutionMixin:
             weights (mi), and foundation booleans in the cracked (ki)
             and uncracked (k0) configurations.
         """
-        _ = kwargs                                      # Unused arguments
         # Execute test for touchdown conditions
         qn, qt = self.get_weight_load(phi)
+        _ = qt, kwargs                                  # Unused arguments
         Lsp = self.calc_span_length(wcoll, qn)
         self.test_td(Lsp, a)
-        print(self.system)
         if self.system == 'skiers':
             li = np.array(li)                           # Segment lengths
             mi = np.array(mi)                           # Skier weights
@@ -687,9 +693,9 @@ class SolutionMixin:
             # Right-hand side for transmission from segment i-1 to segment i
             rhs[6*i:6*i + 3] = np.vstack([Ft, -Ft*self.h/2, Fn])
         # Set rhs so that complementary integral vanishes at boundaries
-        if self.system not in ['pst-', '-pst', 'pst-TD', '-pstTD']:
-            rhs[:3] = self.bc(self.zp(x=0, phi=phi, bed=ki[0]))
-            rhs[-3:] = self.bc(self.zp(x=li[-1], phi=phi, bed=ki[-1]))
+        #if self.system not in ['pst-', '-pst', 'pst-TD', '-pstTD']:
+        #    rhs[:3] = self.bc(self.zp(x=0, pos, phi=phi, bed=ki[0]))
+        #    rhs[-3:] = self.bc(self.zp(x=li[-1], pos, phi=phi, bed=ki[-1]))
         # Set rhs collapse height for touchdown
         if self.system in ['pst-TD']:
             rhs[9] = 0                          # N

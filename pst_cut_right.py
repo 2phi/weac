@@ -1,9 +1,6 @@
-# Third party imports
-import numpy as np
-import matplotlib.pyplot as plt
-from pyparsing import c_style_comment
-import sys
-#sys.path.append("..")
+"""
+Driver Code for Weac - PST
+"""
 
 # Project imports
 import weac
@@ -37,7 +34,7 @@ weac.plot.slab_profile(pst_cut_right)
 # --------------------------------------
 
 # Input
-totallength = 3600                    # Total length (mm)
+totallength = 3000                    # Total length (mm)
 cracklength = 1600.0                  # Crack length (mm)
 inclination = 0                       # Slope inclination (°)
 collapseheight = 10                   # weak layer collapse height (mm)
@@ -64,12 +61,8 @@ xsl_pst, z_pst, xwl_pst = pst_cut_right.rasterize_solution(
     C=C_pst, phi=inclination, **seg_pst)
 
 # === VISUALIZE RESULTS =====================================
-plot = 0
-if plot:
-    weac.plot.contours(pst_cut_right, x=xsl_pst, z=z_pst, window=2*totallength, scale=10)
-    weac.plot.displacements(pst_cut_right, x=xsl_pst, z=z_pst, **seg_pst)
-    weac.plot.stresses(pst_cut_right, x=xwl_pst, z=z_pst, **seg_pst)
-    weac.plot.section_forces(pst_cut_right, x=xsl_pst, z=z_pst, **seg_pst)
-    weac.plot.test(pst_cut_right, x=xsl_pst, z=z_pst, **seg_pst)
 
-#weac.plot.check_bc(pst_cut_right, z=z_pst, pos=-1)
+weac.plot.contours(pst_cut_right, x=xsl_pst, z=z_pst, window=2*totallength, scale=10)
+weac.plot.displacements(pst_cut_right, x=xsl_pst, z=z_pst, **seg_pst)
+weac.plot.stresses(pst_cut_right, x=xwl_pst, z=z_pst, **seg_pst)
+weac.plot.section_forces(pst_cut_right, x=xsl_pst, z=z_pst, **seg_pst)

@@ -449,7 +449,6 @@ class Eigensystem:
             span of the element between bedded element and touchdown
         """
         kD = self.calc_spring_stiffness()
-
         # Define polynomial equation for w'(l) = 0
         def polynomial():
             """
@@ -473,7 +472,6 @@ class Eigensystem:
         # Classify positive real roots
         pos = (np.roots(polynomial()).imag == 0) & (np.roots(polynomial()).real > 0)
         Lsp = np.roots(polynomial())[pos].real[0]
-        Lsp = 1500
 
         return Lsp
 
