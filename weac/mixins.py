@@ -407,17 +407,21 @@ class SolutionMixin:
         if self.system in ['pst-', '-pst']:
             # Free ends
             bc = np.array([self.N(z), self.M(z), self.V(z)])
+        elif self.system in ['pst-TD']:
+            # touchdown of a free end
+            kD = self.calc_spring_stiffness()
+            bc = np.array([self.N(z), self.M(z)+kD*self.psi(z), self.w(z)])
+        elif self.system in ['-pstTD']:
+            # touchdown of a free end
+            kD = self.calc_spring_stiffness()
+            bc = np.array([self.N(z), self.M(z)-kD*self.psi(z), self.w(z)])
         elif self.system in ['skier', 'skiers']:
             # Infinite ends (vanishing complementary solution)
             bc = np.array([self.u(z, z0=0), self.w(z), self.psi(z)])
-        elif self.system in ['pst-T']:
-            # touchdown of a free end
-            bc = np.array([self.N(z), self.M(z)+22815*self.psi(z), self.w(z)])
         else:
             raise ValueError(
                 'Boundary conditions not defined for'
                 f'system of type {self.system}.')
-        #print(f'bc ({bc.shape}): {bc}')
         return bc
 
     def eqs(self, zl, zr, pos='mid'):
@@ -489,7 +493,7 @@ class SolutionMixin:
         return eqs
 
     def calc_segments(self, li=False, mi=False, ki=False, k0=False,
-                      L=1e4, a=0, m=0, **kwargs):
+                      L=1e4, a=0, phi=0, wcoll=0, m=0, **kwargs):
         """
         Assemble lists defining the segments.
 
@@ -517,6 +521,8 @@ class SolutionMixin:
         a: float, optional
             Crack length (mm).  Used for systems 'pst-', '-pst', and
             'skier'.
+        phi: float, optional
+            Inclination (degree).
         m: float, optional
             Weight of skier (kg) in the axial center of the model.
             Used for system 'skier'.
@@ -529,6 +535,11 @@ class SolutionMixin:
             and uncracked (k0) configurations.
         """
         _ = kwargs                                      # Unused arguments
+        # Execute test for touchdown conditions
+        qn, qt = self.get_weight_load(phi)
+        Lsp = self.calc_span_length(wcoll, qn)
+        self.test_td(Lsp, a)
+        print(self.system)
         if self.system == 'skiers':
             li = np.array(li)                           # Segment lengths
             mi = np.array(mi)                           # Skier weights
@@ -539,13 +550,18 @@ class SolutionMixin:
             mi = np.array([0])                          # Skier weights
             ki = np.array([True, False])                # Crack
             k0 = np.array([True, True])                 # No crack
-        elif self.system == 'pst-T':
-            li = np.array([L - a, a])                   # Segment lengths
+        elif self.system == 'pst-TD':
+            li = np.array([L - a, Lsp])                 # Segment lengths
             mi = np.array([0])                          # Skier weights
             ki = np.array([True, False])                # Crack
             k0 = np.array([True, True])                 # No crack
         elif self.system == '-pst':
             li = np.array([a, L - a])                   # Segment lengths
+            mi = np.array([0])                          # Skier weights
+            ki = np.array([False, True])                # Crack
+            k0 = np.array([True, True])                 # No crack
+        elif self.system == '-pstTD':
+            li = np.array([Lsp, L - a])                   # Segment lengths
             mi = np.array([0])                          # Skier weights
             ki = np.array([False, True])                # Crack
             k0 = np.array([True, True])                 # No crack
@@ -567,7 +583,7 @@ class SolutionMixin:
 
         return segments
 
-    def assemble_and_solve(self, phi, li, mi, ki):
+    def assemble_and_solve(self, phi, wcoll, li, mi, ki):
         """
         Compute free constants for arbitrary beam assembly.
 
@@ -609,8 +625,8 @@ class SolutionMixin:
             raise ValueError('Make sure len(li)=N, len(ki)=N, and '
                              'len(mi)=N-1 for a system of N segments.')
 
-        if self.system not in ['pst-', '-pst', 'pst-T']:
-            # Boundary segements must be on foundation for infinite BCs
+        if self.system not in ['pst-', '-pst', 'pst-TD', '-pstTD']:
+            # Boundary segments must be on foundation for infinite BCs
             if not all([ki[0], ki[-1]]):
                 raise ValueError('Provide bedded boundary segments in '
                                  'order to account for infinite extensions.')
@@ -671,23 +687,23 @@ class SolutionMixin:
             # Right-hand side for transmission from segment i-1 to segment i
             rhs[6*i:6*i + 3] = np.vstack([Ft, -Ft*self.h/2, Fn])
         # Set rhs so that complementary integral vanishes at boundaries
-        if self.system not in ['pst-', '-pst', 'pst-T']:
+        if self.system not in ['pst-', '-pst', 'pst-TD', '-pstTD']:
             rhs[:3] = self.bc(self.zp(x=0, phi=phi, bed=ki[0]))
             rhs[-3:] = self.bc(self.zp(x=li[-1], phi=phi, bed=ki[-1]))
-        test = 1
-        if test:
-            if self.system in ['pst-T']:
-                rhs[9] = 0      # N
-                rhs[10] = 0   # M
-                rhs[11] = 4000  # w
-        print(f'rhs \n {rhs}')
+        # Set rhs collapse height for touchdown
+        if self.system in ['pst-TD']:
+            rhs[9] = 0                          # N
+            rhs[10] = 0                         # M + kD psi
+            rhs[11] = wcoll                     # w
+        if self.system in ['-pstTD']:
+            rhs[0] = 0                          # N
+            rhs[1] = 0                          # M + kD psi
+            rhs[2] = wcoll                      # w
 
         # --- SOLVE -----------------------------------------------------------
 
         # Solve z0 = zh0*C + zp0 = rhs for constants, i.e. zh0*C = rhs - zp0
         C = np.linalg.solve(zh0, rhs - zp0)
-        print(C)
-        print(np.linalg.det(zh0))
         # Sort (nDOF = 6) constants for each segment into columns of a matrix
         return C.reshape([-1, nDOF]).T
 

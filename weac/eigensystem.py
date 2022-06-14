@@ -399,6 +399,99 @@ class Eigensystem:
 
         return Fn, Ft
 
+    def calc_spring_stiffness(self, inf = 10000):
+        """
+        Calculate rotational spring stiffness from layer properties
+
+        Arguments
+        ---------
+        inf : int, optional
+            Boundary for definite Integral. Defaults to 10000 (mm).
+
+        Returns
+        -------
+        kD : float
+            rotational spring stiffness (Nmm/mm/rad)
+        """
+        # Translational stiffness of collapsed weak layer
+        # ANNAHME
+        kcoll = 16 * self.kn
+
+        # Abbreviations
+        #inf = 10000
+        beta = (kcoll/(4 * self.D11))**(1/4)
+        sin = np.sin(2 * inf * beta)
+        cos = np.cos(2 * inf * beta)
+        free = np.exp(2 * inf * beta)
+        damp = np.exp(-2 * inf * beta)
+
+        # Rotational spring stiffness for bedded euler-bernoulli-beam
+        kD = (damp * beta * (-2 + free + cos - sin) / (2 * self.kA55) \
+            + (3/4 + damp * (-1/2 - cos/4 - sin/4)) / (beta * self.D11) \
+            + kcoll * (1/4 + damp * (-1/2 + cos/4 + sin/4)) / (4 * self.D11**2 * beta**5))**(-1)
+
+        return kD
+
+    def calc_span_length(self, wcoll = 10, qn = 1e-3):
+        """
+        Calculate span from layer and weak layer properties and load situation
+
+        Arguments
+        ---------
+        wcoll : float, optional
+            collapse height of the weak layer. Defaults to 10.
+        qn : float, optional
+            weight of the slab. Defaults to 1e-3.
+
+        Returns
+        -------
+        Lsp : float
+            span of the element between bedded element and touchdown
+        """
+        kD = self.calc_spring_stiffness()
+
+        # Define polynomial equation for w'(l) = 0
+        def polynomial():
+            """
+            Calculate the coefficients of a sixth order polynomial equation
+
+            Returns
+            -------
+            a1 - a7 : list
+                first coefficient for sixth order term,
+                second coefficient for fith order term and so on.
+            """
+            a1 = self.kA55**2 * qn
+            a2 = 6 * kD * self.kA55 * qn
+            a3 = 30 * self.D11 * self.kA55 * qn
+            a4 = 72 * kD * self.D11 * qn
+            a5 = 72 * self.D11 * (self.D11 * qn - self.kA55**2 * wcoll)
+            a6 = -144 * kD * self.D11 * self.kA55 * wcoll
+            a7 = -144 * self.D11**2 * self.kA55 * wcoll
+            return [a1,a2,a3,a4,a5,a6,a7]
+
+        # Classify positive real roots
+        pos = (np.roots(polynomial()).imag == 0) & (np.roots(polynomial()).real > 0)
+        Lsp = np.roots(polynomial())[pos].real[0]
+        Lsp = 1500
+
+        return Lsp
+
+    def test_td(self, Lsp, a):
+        """
+        Check and modify system for touchdown
+
+        Arguments
+        ---------
+        Lsp : float
+            span of the element between bedded element and touchdown
+        a : float
+            cracklength for the unbedded element
+        """
+        if Lsp < a:
+            self.system = self.system + 'TD'
+            print('Touchdown with a span of', Lsp, 'mm.')
+
     def zh(self, x, l=0, bed=True):
         """
         Compute bedded or free complementary solution at position x.

@@ -11,16 +11,10 @@ import weac
 # === DEFINE SLAB LAYERING ============================================
 
 # Either use custom profile
-myprofile = [[170, 100],  # (1) surface layer
-             [190,  40],  # (2) 2nd layer
-             [230, 130],  #  :
-             [250,  20],  #  :
-             [210,  70],  # (i) i-th layer
-             [380,  20],  #  :
-             [280, 100]]  # (N) last slab layer above weak layer
+myprofile = [[108, 360]]  # (N) last slab layer above weak layer
 
 # Or select a predefined profile from database
-myprofile = 'medium'
+# myprofile = 'medium'
 
 # === CREATE MODEL INSTANCES ==========================================
 
@@ -43,9 +37,10 @@ weac.plot.slab_profile(pst_cut_right)
 # --------------------------------------
 
 # Input
-totallength = 2000                      # Total length (mm)
-cracklength = 300                       # Crack length (mm)
-inclination = 20                       # Slope inclination (°)
+totallength = 3600                    # Total length (mm)
+cracklength = 1600.0                  # Crack length (mm)
+inclination = 0                       # Slope inclination (°)
+collapseheight = 10                   # weak layer collapse height (mm)
 
 # Obtain lists of segment lengths, locations of foundations,
 # and position and magnitude of skier loads from inputs. We
@@ -53,13 +48,13 @@ inclination = 20                       # Slope inclination (°)
 # even if a cracklength > 0 is set by replacing the 'crack'
 # key thorugh the 'nocrack' key.
 seg_pst = pst_cut_right.calc_segments(
-    L=totallength, a=cracklength)['nocrack']
+    L=totallength, a=cracklength, wcoll=collapseheight, phi=inclination)['crack']
 
 # Assemble system of linear equations and solve the
 # boundary-value problem for free constants.
 
 C_pst = pst_cut_right.assemble_and_solve(
-    phi=inclination, **seg_pst)
+    phi=inclination, wcoll=collapseheight, **seg_pst)
 
 # Prepare the output by rasterizing the solution vector at all
 # horizontal positions xsl (slab). The result is returned in the
@@ -68,9 +63,13 @@ C_pst = pst_cut_right.assemble_and_solve(
 xsl_pst, z_pst, xwl_pst = pst_cut_right.rasterize_solution(
     C=C_pst, phi=inclination, **seg_pst)
 
-# === VISUALIZE SLAB DEFORMATIONS / DISPLACEMENTS / WEAK LAYER STRESSES =====================================
-plot = 1
+# === VISUALIZE RESULTS =====================================
+plot = 0
 if plot:
-    weac.plot.contours(pst_cut_right, x=xsl_pst, z=z_pst, scale=100)
+    weac.plot.contours(pst_cut_right, x=xsl_pst, z=z_pst, window=2*totallength, scale=10)
     weac.plot.displacements(pst_cut_right, x=xsl_pst, z=z_pst, **seg_pst)
     weac.plot.stresses(pst_cut_right, x=xwl_pst, z=z_pst, **seg_pst)
+    weac.plot.section_forces(pst_cut_right, x=xsl_pst, z=z_pst, **seg_pst)
+    weac.plot.test(pst_cut_right, x=xsl_pst, z=z_pst, **seg_pst)
+
+#weac.plot.check_bc(pst_cut_right, z=z_pst, pos=-1)
