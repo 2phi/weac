@@ -399,74 +399,84 @@ class Eigensystem:
 
         return Fn, Ft
 
-    def calc_spring_stiffness(self, inf = 10000):
+    def calc_rot_spring_stiffness(self, rel=1):
         """
-        Calculate rotational spring stiffness from layer properties
+        Calculate rotational spring stiffness from layer properties.
 
         Arguments
         ---------
-        inf : int, optional
-            Boundary for definite Integral. Defaults to 10000 (mm).
+        rel : float, optional
+            Factor of substratum to weak layer stiffness. Defaults to 1.
 
         Returns
         -------
-        kD : float
-            rotational spring stiffness (Nmm/mm/rad)
+        kR : float
+            Rotational spring stiffness (Nmm/mm/rad).
         """
         # Translational stiffness of collapsed weak layer
-        # ANNAHME
-        kcoll = 16 * self.kn
-
+        kn = rel * self.kn
         # Abbreviations
-        #inf = 10000
-        beta = (kcoll/(4 * self.D11))**(1/4)
-        sin = np.sin(2 * inf * beta)
-        cos = np.cos(2 * inf * beta)
-        free = np.exp(2 * inf * beta)
-        damp = np.exp(-2 * inf * beta)
-
+        beta = (kn/(4 * self.D11))**(1/4)
         # Rotational spring stiffness for bedded euler-bernoulli-beam
-        kD = (damp * beta * (-2 + free + cos - sin) / (2 * self.kA55) \
-            + (3/4 + damp * (-1/2 - cos/4 - sin/4)) / (beta * self.D11) \
-            + kcoll * (1/4 + damp * (-1/2 + cos/4 + sin/4)) / (4 * self.D11**2 * beta**5))**(-1)
+        kR = self.D11*beta
+        return kR
 
-        return kD
+    def calc_trans_spring_stiffness(self):
+        """
+        Calculate transversal spring stiffness from layer properties.
+
+        Returns
+        -------
+        kN : float
+            Transversal spring stiffness (N/mm^2).
+        """
+        # Abbreviations
+        beta = (self.kn/(4 * self.D11))**(1/4)
+        kN = 2*self.D11*beta**3
+        return kN
 
     def calc_span_length(self, wcoll = 10, qn = 1e-3):
         """
-        Calculate span from layer and weak layer properties and load situation
+        Calculate span from layer and weak layer properties and load situation.
 
         Arguments
         ---------
         wcoll : float, optional
-            collapse height of the weak layer. Defaults to 10.
+            Collapse height of the weak layer. Defaults to 10.
         qn : float, optional
-            weight of the slab. Defaults to 1e-3.
+            Weight of the slab. Defaults to 1e-3.
 
         Returns
         -------
         Lsp : float
-            span of the element between bedded element and touchdown
+            Span of the element between bedded element and touchdown.
         """
-        kD = self.calc_spring_stiffness()
+
+        # Get spring stiffnesses
+        kR1 = self.calc_rot_spring_stiffness()
+        kR2 = self.calc_rot_spring_stiffness(rel=16)
+        kN1 = self.calc_trans_spring_stiffness()
+
         # Define polynomial equation for w'(l) = 0
         def polynomial():
             """
-            Calculate the coefficients of a sixth order polynomial equation
+            Calculate the coefficients of a sixth order polynomial equation.
 
             Returns
             -------
-            a1 - a7 : list
-                first coefficient for sixth order term,
+            list
+                First coefficient for sixth order term,
                 second coefficient for fith order term and so on.
             """
-            a1 = self.kA55**2 * qn
-            a2 = 6 * kD * self.kA55 * qn
-            a3 = 30 * self.D11 * self.kA55 * qn
-            a4 = 72 * kD * self.D11 * qn
-            a5 = 72 * self.D11 * (self.D11 * qn - self.kA55**2 * wcoll)
-            a6 = -144 * kD * self.D11 * self.kA55 * wcoll
-            a7 = -144 * self.D11**2 * self.kA55 * wcoll
+            a1 = self.kA55**2*kR1*kN1*qn
+            a2 = 6*self.kA55*(self.D11*self.kA55 + kR1*kR2)*kN1*qn
+            a3 = 30*self.D11*self.kA55*(kR1 + kR2)*kN1*qn
+            a4 = 24*self.D11*(2*self.kA55**2*kR1 + 3*self.D11*self.kA55*kN1 + 3*kR1*kR2*kN1)*qn
+            a5 = 72*self.D11*(self.D11*(self.kA55**2 + (kR1 + kR2)*kN1)*qn \
+                + self.kA55*kR1*(2*kR2*qn - self.kA55*kN1*wcoll))
+            a6 = 144*self.D11*self.kA55*(self.D11*(kR1 + kR2)*qn \
+                - (self.D11*self.kA55 + kR1*kR2)*kN1*wcoll)
+            a7 = - 144*self.D11**2*self.kA55*(kR1 + kR2)*kN1*wcoll
             return [a1,a2,a3,a4,a5,a6,a7]
 
         # Classify positive real roots
@@ -475,20 +485,29 @@ class Eigensystem:
 
         return Lsp
 
-    def test_td(self, Lsp, a):
+    def test_td(self, wcoll, qn, a):
         """
-        Check and modify system for touchdown
+        Check system for touchdown.
 
         Arguments
         ---------
-        Lsp : float
-            span of the element between bedded element and touchdown
         a : float
-            cracklength for the unbedded element
+            Cracklength for the unbedded element.
+
+        Returns
+        -------
+        td : boolean
+            Determines whether end has touchdown.
         """
-        if Lsp < a:
-            self.system = self.system + 'TD'
-            print('Touchdown with a span of', Lsp, 'mm.')
+
+        # Compare span lenght to crack length
+        if self.calc_span_length(wcoll, qn) < a:
+            td = True
+            print(f'Touchdown at {self.calc_span_length(wcoll, qn)}.')
+        else:
+            td = False
+            print('No touchdown.')
+        return td
 
     def zh(self, x, l=0, bed=True):
         """

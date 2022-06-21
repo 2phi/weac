@@ -390,49 +390,47 @@ class SolutionMixin:
     and for the computation of the free constants.
     """
 
-    def bc(self, z, pos):
+    def bc(self, z, pos, td):
         """
         Provide equations for free (pst) or infinite (skiers) ends.
 
         Arguments
         ---------
-        z: ndarray
+        z : ndarray
             Solution vector (6x1) at a certain position x.
+        pos : {'left', 'mid', 'right', 'l', 'm', 'r'}, optional
+            Determines whether the segement under consideration
+            is a left boundary segement (left, l), one of the
+            center segement (mid, m), or a right boundary
+            segemen t (right, r). Default is 'mid'.
+        td : boolean
+            Determines whether end needs touchdown bc.
 
         Returns
         -------
-        bc: ndarray
+        bc : ndarray
             Boundary condition vector (lenght 3) at position x.
         """
+        # Free ends
         if self.system in ['pst-', '-pst']:
-            # Free ends
             bc = np.array([self.N(z), self.M(z), self.V(z)])
-        elif self.system in ['pst-TD']:
-            if pos in ('r', 'right'):
-                # Touchdown of a free end
-                kD = self.calc_spring_stiffness()
-                bc = np.array([self.N(z), self.M(z)+kD*self.psi(z), self.w(z)])
-            else:
-                # Free ends
-                bc = np.array([self.N(z), self.M(z), self.V(z)])
-        elif self.system in ['-pstTD']:
-            if  pos in ('l', 'left'):
-                # touchdown of a free end
-                kD = self.calc_spring_stiffness()
-                bc = np.array([self.N(z), self.M(z)-kD*self.psi(z), self.w(z)])
-            else:
-                # Free ends
-                bc = np.array([self.N(z), self.M(z), self.V(z)])
         elif self.system in ['skier', 'skiers']:
-            # Infinite ends (vanishing complementary solution)
+        # Infinite ends (vanishing complementary solution)
             bc = np.array([self.u(z, z0=0), self.w(z), self.psi(z)])
         else:
             raise ValueError(
                 'Boundary conditions not defined for'
                 f'system of type {self.system}.')
+        # Overwrite bc when touchdown
+        if td & bool(pos in ('r', 'right')):
+            kD = self.calc_rot_spring_stiffness(rel=16)
+            bc = np.array([self.N(z), self.M(z)+kD*self.psi(z), self.w(z)])
+        elif td & bool(pos in ('l', 'left')):
+            kD = self.calc_rot_spring_stiffness(rel=16)
+            bc = np.array([self.N(z), self.M(z)+kD*self.psi(z), self.w(z)])
         return bc
 
-    def eqs(self, zl, zr, pos='mid'):
+    def eqs(self, zl, zr, pos='mid', td=False):
         """
         Provide boundary or transmission conditions for beam segments.
 
@@ -446,7 +444,7 @@ class SolutionMixin:
             Determines whether the segement under consideration
             is a left boundary segement (left, l), one of the
             center segement (mid, m), or a right boundary
-            segemen t (right, r). Default is 'mid'.
+            segement (right, r). Default is 'mid'.
 
         Returns
         -------
@@ -458,9 +456,9 @@ class SolutionMixin:
         """
         if pos in ('l', 'left'):
             eqs = np.array([
-                self.bc(zl, pos)[0],        # Left boundary condition
-                self.bc(zl, pos)[1],        # Left boundary condition
-                self.bc(zl, pos)[2],        # Left boundary condition
+                self.bc(zl, pos, td)[0],        # Left boundary condition
+                self.bc(zl, pos, td)[1],        # Left boundary condition
+                self.bc(zl, pos, td)[2],        # Left boundary condition
                 self.u(zr, z0=0),           # ui(xi = li)
                 self.w(zr),                 # wi(xi = li)
                 self.psi(zr),               # psii(xi = li)
@@ -489,9 +487,9 @@ class SolutionMixin:
                 -self.N(zl),                # -Ni(xi = 0)
                 -self.M(zl),                # -Mi(xi = 0)
                 -self.V(zl),                # -Vi(xi = 0)
-                self.bc(zr, pos)[0],        # Right boundary condition
-                self.bc(zr, pos)[1],        # Right boundary condition
-                self.bc(zr, pos)[2]])       # Right boundary condition
+                self.bc(zr, pos, td)[0],        # Right boundary condition
+                self.bc(zr, pos, td)[1],        # Right boundary condition
+                self.bc(zr, pos, td)[2]])       # Right boundary condition
         else:
             raise ValueError(
                 (f'Invalid position argument {pos} given. '
@@ -509,65 +507,61 @@ class SolutionMixin:
 
         Arguments
         ---------
-        li: squence, optional
+        tdi : sequence, optional
+            List of one bool per segment end indicating whether end
+            has a touchdowm.
+        li : squence, optional
             List of lengths of segements(mm). Used for system 'skiers'.
-        mi: squence, optional
+        mi : squence, optional
             List of skier weigths (kg) at segement boundaries. Used for
             system 'skiers'.
-        ki: squence, optional
+        ki : squence, optional
             List of one bool per segement indicating whether segement
             has foundation (True) or not (False) in the cracked state.
             Used for system 'skiers'.
-        k0: squence, optional
+        k0 : squence, optional
             List of one bool per segement indicating whether segement
             has foundation(True) or not (False) in the uncracked state.
             Used for system 'skiers'.
-        L: float, optional
+        L : float, optional
             Total length of model (mm). Used for systems 'pst-', '-pst',
             and 'skier'.
-        a: float, optional
+        a : float, optional
             Crack length (mm).  Used for systems 'pst-', '-pst', and
             'skier'.
-        phi: float, optional
+        phi : float, optional
             Inclination (degree).
-        m: float, optional
+        m : float, optional
             Weight of skier (kg) in the axial center of the model.
             Used for system 'skier'.
 
         Returns
         -------
         segments: dict
-            Dictionary with lists of segement lengths (li), skier
-            weights (mi), and foundation booleans in the cracked (ki)
-            and uncracked (k0) configurations.
+            Dictionary with lists of touchdown booleans (tdi), segement
+            lengths (li), skier weights (mi), and foundation booleans
+            in the cracked (ki) and uncracked (k0) configurations.
         """
+
+        _ = kwargs                                      # Unused arguments
         # Execute test for touchdown conditions
-        qn, qt = self.get_weight_load(phi)
-        _ = qt, kwargs                                  # Unused arguments
-        Lsp = self.calc_span_length(wcoll, qn)
-        self.test_td(Lsp, a)
+        qn = self.get_weight_load(phi)[0]
+        td = self.test_td(wcoll, qn, a)
+        # Assemble segment lists
         if self.system == 'skiers':
             li = np.array(li)                           # Segment lengths
             mi = np.array(mi)                           # Skier weights
             ki = np.array(ki)                           # Crack
             k0 = np.array(k0)                           # No crack
         elif self.system == 'pst-':
+            tdi = np.array([False, False, False, td])  # Touchdown
             li = np.array([L - a, a])                   # Segment lengths
             mi = np.array([0])                          # Skier weights
             ki = np.array([True, False])                # Crack
             k0 = np.array([True, True])                 # No crack
-        elif self.system == 'pst-TD':
-            li = np.array([L - a, Lsp])                 # Segment lengths
-            mi = np.array([0])                          # Skier weights
-            ki = np.array([True, False])                # Crack
-            k0 = np.array([True, True])                 # No crack
         elif self.system == '-pst':
+            tdi = np.array([td, False, False, False])  # Touchdown
             li = np.array([a, L - a])                   # Segment lengths
-            mi = np.array([0])                          # Skier weights
-            ki = np.array([False, True])                # Crack
-            k0 = np.array([True, True])                 # No crack
-        elif self.system == '-pstTD':
-            li = np.array([Lsp, L - a])                   # Segment lengths
             mi = np.array([0])                          # Skier weights
             ki = np.array([False, True])                # Crack
             k0 = np.array([True, True])                 # No crack
@@ -583,13 +577,12 @@ class SolutionMixin:
 
         # Fill dictionary
         segments = {
-            'nocrack': {'li': li, 'mi': mi, 'ki': k0},
-            'crack': {'li': li, 'mi': mi, 'ki': ki},
-            'both': {'li': li, 'mi': mi, 'ki': ki, 'k0': k0}}
-
+            'nocrack': {'tdi': tdi, 'li': li, 'mi': mi, 'ki': k0},
+            'crack': {'tdi': tdi, 'li': li, 'mi': mi, 'ki': ki},
+            'both': {'tdi': tdi, 'li': li, 'mi': mi, 'ki': ki, 'k0': k0}}
         return segments
 
-    def assemble_and_solve(self, phi, wcoll, li, mi, ki):
+    def assemble_and_solve(self, phi, wcoll, tdi, li, mi, ki):
         """
         Compute free constants for arbitrary beam assembly.
 
@@ -605,13 +598,18 @@ class SolutionMixin:
 
         Arguments
         ---------
-        phi: float
-            Inclination (degrees).
-        li: ndarray
+        phi : float
+            Inclination of the slab (degrees).
+        wcoll : float
+            Collapse heigt of the weak layer (mm).
+        tdi : ndarray
+            List of one bool per segment end indicating whether end
+            has a touchdowm.
+        li : ndarray
             List of lengths of segements (mm).
-        mi: ndarray
+        mi : ndarray
             List of skier weigths (kg) at segement boundaries.
-        ki: ndarray
+        ki : ndarray
             List of one bool per segement indicating whether segement
             has foundation (True) or not (False).
 
@@ -631,7 +629,7 @@ class SolutionMixin:
             raise ValueError('Make sure len(li)=N, len(ki)=N, and '
                              'len(mi)=N-1 for a system of N segments.')
 
-        if self.system not in ['pst-', '-pst', 'pst-TD', '-pstTD']:
+        if self.system not in ['pst-', '-pst']:
             # Boundary segments must be on foundation for infinite BCs
             if not all([ki[0], ki[-1]]):
                 raise ValueError('Provide bedded boundary segments in '
@@ -670,15 +668,27 @@ class SolutionMixin:
         for i in range(nS):
             # Length, foundation and position of segment i
             l, k, pos = li[i], ki[i], pi[i]
+            # Check touchdown for outer segments ends
+            if pos == 'r':
+                td = tdi[-1:]
+            elif pos == 'l':
+                td = tdi[:1]
+            # Reset segment length for touchdown
+            if td:
+                qn = self.get_weight_load(phi)[0]
+                li[i] = self.calc_span_length(wcoll, qn)
+                l = li[i]
             # Transmission conditions at left and right segment ends
             zhi = self.eqs(
                 zl=self.zh(x=0, l=l, bed=k),
                 zr=self.zh(x=l, l=l, bed=k),
-                pos=pos)
+                pos=pos,
+                td=td)
             zpi = self.eqs(
                 zl=self.zp(x=0, phi=phi, bed=k),
                 zr=self.zp(x=l, phi=phi, bed=k),
-                pos=pos)
+                pos=pos,
+                td=td)
             # Rows for left-hand side assembly
             start = 0 if i == 0 else 3
             stop = 6 if i == nS - 1 else 9
@@ -693,18 +703,13 @@ class SolutionMixin:
             # Right-hand side for transmission from segment i-1 to segment i
             rhs[6*i:6*i + 3] = np.vstack([Ft, -Ft*self.h/2, Fn])
         # Set rhs so that complementary integral vanishes at boundaries
-        #if self.system not in ['pst-', '-pst', 'pst-TD', '-pstTD']:
-        #    rhs[:3] = self.bc(self.zp(x=0, pos, phi=phi, bed=ki[0]))
-        #    rhs[-3:] = self.bc(self.zp(x=li[-1], pos, phi=phi, bed=ki[-1]))
-        # Set rhs collapse height for touchdown
-        if self.system in ['pst-TD']:
-            rhs[9] = 0                          # N
-            rhs[10] = 0                         # M + kD psi
-            rhs[11] = wcoll                     # w
-        if self.system in ['-pstTD']:
-            rhs[0] = 0                          # N
-            rhs[1] = 0                          # M + kD psi
-            rhs[2] = wcoll                      # w
+        if self.system not in ['pst-', '-pst']:
+            rhs[:3] = self.bc(self.zp(x=0, phi=phi, bed=ki[0]), pos, td)
+            rhs[-3:] = self.bc(self.zp(x=li[-1], phi=phi, bed=ki[-1]), pos, td)
+        # Set rhs for touchdown
+        for s,t in enumerate(tdi):
+            if t:
+                rhs[s*3:(s+1)*3] = [0],[0],[wcoll]           # N, M + kD psi, w
 
         # --- SOLVE -----------------------------------------------------------
 

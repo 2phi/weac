@@ -211,7 +211,7 @@ def plot_data(
         name, ax1data, ax1label,
         ax2data=None, ax2label=None,
         labelpos=None, vlines=True,
-        li=False, mi=False, ki=False,
+        tdi=False, li=False, mi=False, ki=False,
         xlabel=r'Horizontal position $x$ (cm)'):
     """Plot data. Base function."""
     # Figure setup
