@@ -41,5 +41,5 @@ class Layered(FieldQuantitiesMixin, SolutionMixin, AnalysisMixin,
 
         # Set material properties and set up model
         self.set_beam_properties(layers if layers else [[240, 200], ])
-        self.set_foundation_properties()
+        self.set_foundation_properties(t=20, cf=0.5)
         self.calc_fundamental_system()

@@ -365,12 +365,12 @@ class FieldQuantitiesMixin:
 
         Arguments
         ---------
-        x: float, ndarray
+        x : float, ndarray
             X-coordinate where integrand is to be evaluated (mm).
-        z0: callable
+        z0 : callable
             Function that returns the solution vector of the uncracked
             configuration.
-        z1: callable
+        z1 : callable
             Function that returns the solution vector of the cracked
             configuration.
 
@@ -423,10 +423,10 @@ class SolutionMixin:
                 f'system of type {self.system}.')
         # Overwrite bc when touchdown
         if td & bool(pos in ('r', 'right')):
-            kD = self.calc_rot_spring_stiffness(rel=16)
+            kD = self.calc_rot_spring_stiffness(td)
             bc = np.array([self.N(z), self.M(z)+kD*self.psi(z), self.w(z)])
         elif td & bool(pos in ('l', 'left')):
-            kD = self.calc_rot_spring_stiffness(rel=16)
+            kD = self.calc_rot_spring_stiffness(td)
             bc = np.array([self.N(z), self.M(z)+kD*self.psi(z), self.w(z)])
         return bc
 
@@ -436,11 +436,11 @@ class SolutionMixin:
 
         Arguments
         ---------
-        zl: ndarray
+        zl : ndarray
             Solution vector (6x1) at left end of beam segement.
-        zr: ndarray
+        zr : ndarray
             Solution vector (6x1) at right end of beam segement.
-        pos: {'left', 'mid', 'right', 'l', 'm', 'r'}, optional
+        pos : {'left', 'mid', 'right', 'l', 'm', 'r'}, optional
             Determines whether the segement under consideration
             is a left boundary segement (left, l), one of the
             center segement (mid, m), or a right boundary
@@ -448,7 +448,7 @@ class SolutionMixin:
 
         Returns
         -------
-        eqs: ndarray
+        eqs : ndarray
             Vector (of length 9) of boundary conditions (3) and
             transmission conditions (6) for boundary segements
             or vector of transmission conditions (of length 6+6)
@@ -497,8 +497,8 @@ class SolutionMixin:
                  'or left, mid and right.'))
         return eqs
 
-    def calc_segments(self, li=False, mi=False, ki=False, k0=False,
-                      L=1e4, a=0, phi=0, wcoll=0, m=0, **kwargs):
+    def calc_segments(self, tdi=False, li=False, mi=False, ki=False, k0=False,
+                      L=1e4, a=0, phi=0, m=0, **kwargs):
         """
         Assemble lists defining the segments.
 
@@ -537,35 +537,41 @@ class SolutionMixin:
 
         Returns
         -------
-        segments: dict
+        segments : dict
             Dictionary with lists of touchdown booleans (tdi), segement
             lengths (li), skier weights (mi), and foundation booleans
             in the cracked (ki) and uncracked (k0) configurations.
         """
 
         _ = kwargs                                      # Unused arguments
+        # Calculate span length
+        Lsp = self.calc_span_length(phi)
         # Execute test for touchdown conditions
-        qn = self.get_weight_load(phi)[0]
-        td = self.test_td(wcoll, qn, a)
+        td = self.test_td(Lsp, a)
+        # Set span length
+        if not td:
+            Lsp = a
         # Assemble segment lists
         if self.system == 'skiers':
+            tdi = np.array(tdi)
             li = np.array(li)                           # Segment lengths
             mi = np.array(mi)                           # Skier weights
             ki = np.array(ki)                           # Crack
             k0 = np.array(k0)                           # No crack
         elif self.system == 'pst-':
-            tdi = np.array([False, False, False, td])  # Touchdown
-            li = np.array([L - a, a])                   # Segment lengths
+            tdi = np.array([False, False, td])          # Touchdown
+            li = np.array([L - a, Lsp])                   # Segment lengths
             mi = np.array([0])                          # Skier weights
             ki = np.array([True, False])                # Crack
             k0 = np.array([True, True])                 # No crack
         elif self.system == '-pst':
-            tdi = np.array([td, False, False, False])  # Touchdown
-            li = np.array([a, L - a])                   # Segment lengths
+            tdi = np.array([td, False, False])          # Touchdown
+            li = np.array([Lsp, L - a])                   # Segment lengths
             mi = np.array([0])                          # Skier weights
             ki = np.array([False, True])                # Crack
             k0 = np.array([True, True])                 # No crack
         elif self.system == 'skier':
+            tdi = np.array([False, False, False, False, False]) # Touchdown
             lb = (L - a)/2                              # Half bedded length
             lf = a/2                                    # Half free length
             li = np.array([lb, lf, lf, lb])             # Segment lengths
@@ -582,7 +588,7 @@ class SolutionMixin:
             'both': {'tdi': tdi, 'li': li, 'mi': mi, 'ki': ki, 'k0': k0}}
         return segments
 
-    def assemble_and_solve(self, phi, wcoll, tdi, li, mi, ki):
+    def assemble_and_solve(self, phi, tdi, li, mi, ki):
         """
         Compute free constants for arbitrary beam assembly.
 
@@ -600,8 +606,6 @@ class SolutionMixin:
         ---------
         phi : float
             Inclination of the slab (degrees).
-        wcoll : float
-            Collapse heigt of the weak layer (mm).
         tdi : ndarray
             List of one bool per segment end indicating whether end
             has a touchdowm.
@@ -615,7 +619,7 @@ class SolutionMixin:
 
         Returns
         -------
-        C: ndarray
+        C : ndarray
             Matrix(6xN) of solution constants for a system of N
             segements. Columns contain the 6 constants of each segement.
         """
@@ -673,11 +677,6 @@ class SolutionMixin:
                 td = tdi[-1:]
             elif pos == 'l':
                 td = tdi[:1]
-            # Reset segment length for touchdown
-            if td:
-                qn = self.get_weight_load(phi)[0]
-                li[i] = self.calc_span_length(wcoll, qn)
-                l = li[i]
             # Transmission conditions at left and right segment ends
             zhi = self.eqs(
                 zl=self.zh(x=0, l=l, bed=k),
@@ -706,10 +705,12 @@ class SolutionMixin:
         if self.system not in ['pst-', '-pst']:
             rhs[:3] = self.bc(self.zp(x=0, phi=phi, bed=ki[0]), pos, td)
             rhs[-3:] = self.bc(self.zp(x=li[-1], phi=phi, bed=ki[-1]), pos, td)
-        # Set rhs for touchdown
-        for s,t in enumerate(tdi):
-            if t:
-                rhs[s*3:(s+1)*3] = [0],[0],[wcoll]           # N, M + kD psi, w
+        # Loop through segments to set touchdown at right-hand side
+        for j,td in enumerate(tdi):
+            if td and j == 0:
+                rhs[0:3] = np.vstack([0,0,self.tc])           # N, M + kD psi, w
+            elif td and j == nS:
+                rhs[9:12] = np.vstack([0,0,self.tc])
 
         # --- SOLVE -----------------------------------------------------------
 

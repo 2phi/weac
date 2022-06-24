@@ -410,21 +410,37 @@ def fea_stress(instance, xb, zb, fea):
 # === SAVE FUNCTION ===========================================================
 
 def save_plot(name):
-    """depending on interpreter, shows or saves plots
+    """
+    Show or save plot depending on interpreter
 
-    Args:
-        name (string): name of the figure
-    """    
+    Arguments
+    ---------
+    name : string
+        Name for the figure.
+    """
     filename = name + '.pdf'
-    # show figure if on jupyter notebook
+    # Show figure if on jupyter notebook
     if isnotebook():
         plt.show()
-    # save figure if on terminal
+    # Save figure if on terminal
     else:
-        print('Rendering', filename, '...')
         # Make directory if not yet existing
         if not os.path.isdir(os.path.join(os.getcwd(), 'plots')):
             os.mkdir('plots')
         plt.savefig('plots/' + filename, bbox_inches='tight')
-        print('Saved', filename, 'at', os.path.join(os.getcwd(), 'plots'))
     return
+
+
+# === HILFSFUNKTION ===========================================================
+
+def check_bc(instance, z, end):
+    """Print solution at right boundary."""
+    print('results at', end)
+    print('N: ', instance.N(z)[end],
+          '\nM: ', instance.M(z)[end],
+          '\nV: ', instance.V(z)[end],
+          '\nM + kD psi: ',
+          instance.M(z)[end]+instance.calc_rot_spring_stiffness(td=True)*instance.psi(z, unit='rad')[end],
+          '\nw: ', instance.w(z, unit='mm')[end],
+          '\nwp: ', instance.wp(z)[end]
+        )

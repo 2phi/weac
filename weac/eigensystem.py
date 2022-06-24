@@ -103,6 +103,9 @@ class Eigensystem:
         self.t = False          # Weak-layer thickness (mm)
         self.kn = False         # Weak-layer compressive stiffness
         self.kt = False         # Weak-layer shear stiffness
+        self.tc = False         # Weak-layer collapse height (mm)
+        self.rel = False        # ratio of Weak-layer compressive stiffnesses
+                                # after and before collapse
 
         # Initialize slab attributes
         self.p = 0              # Surface line load (N/mm)
@@ -125,7 +128,7 @@ class Eigensystem:
         self.sR = False         # Stability shift of real eigenvalues
         self.sysmat = False     # System matrix
 
-    def set_foundation_properties(self, t=30, E=0.25, nu=0.25, update=False):
+    def set_foundation_properties(self, t=30, cf=0.5, E=0.25, nu=0.25, update=False):
         """
         Set material properties and geometry of foundation (weak layer).
 
@@ -133,6 +136,8 @@ class Eigensystem:
         ---------
         t : float, optional
             Weak-layer thickness (mm). Default is 30.
+        cf : float, optional
+            Weak-layer collaps factor. Default is 0.5.
         E : float, optional
             Weak-layer Young modulus (MPa). Default is 0.25.
         nu : float, optional
@@ -143,6 +148,7 @@ class Eigensystem:
         """
         # Geometry
         self.t = t              # Weak-layer thickness (mm)
+        self.tc = cf*self.t     # Weak-layer collapse height (mm)
 
         # Material properties
         self.weak = {
@@ -399,20 +405,27 @@ class Eigensystem:
 
         return Fn, Ft
 
-    def calc_rot_spring_stiffness(self, rel=1):
+    def calc_rot_spring_stiffness(self, td):
         """
         Calculate rotational spring stiffness from layer properties.
 
         Arguments
         ---------
-        rel : float, optional
-            Factor of substratum to weak layer stiffness. Defaults to 1.
+        td : boolean
+            Determines whether end has touchdown.
 
         Returns
         -------
         kR : float
             Rotational spring stiffness (Nmm/mm/rad).
         """
+        # Set rel
+        # rel sollte irgendwo anders gesetzt werden!
+        if td:
+            rel = 16
+        else:
+            rel = 1
+
         # Translational stiffness of collapsed weak layer
         kn = rel * self.kn
         # Abbreviations
@@ -432,30 +445,31 @@ class Eigensystem:
         """
         # Abbreviations
         beta = (self.kn/(4 * self.D11))**(1/4)
+        # Transversal spring stiffness for bedded euler-bernoulli-beam
         kN = 2*self.D11*beta**3
         return kN
 
-    def calc_span_length(self, wcoll = 10, qn = 1e-3):
+    def calc_span_length(self, phi=0):
         """
         Calculate span from layer and weak layer properties and load situation.
 
         Arguments
         ---------
-        wcoll : float, optional
-            Collapse height of the weak layer. Defaults to 10.
-        qn : float, optional
-            Weight of the slab. Defaults to 1e-3.
+        phi : float
+            Inclination of the slab (degrees). Defaults to 0°.
 
         Returns
         -------
         Lsp : float
             Span of the element between bedded element and touchdown.
         """
-
         # Get spring stiffnesses
-        kR1 = self.calc_rot_spring_stiffness()
-        kR2 = self.calc_rot_spring_stiffness(rel=16)
+        kR1 = self.calc_rot_spring_stiffness(td=False)
+        kR2 = self.calc_rot_spring_stiffness(td=True)
         kN1 = self.calc_trans_spring_stiffness()
+
+        # Get normal load
+        qn = self.get_weight_load(phi)[0]
 
         # Define polynomial equation for w'(l) = 0
         def polynomial():
@@ -473,10 +487,10 @@ class Eigensystem:
             a3 = 30*self.D11*self.kA55*(kR1 + kR2)*kN1*qn
             a4 = 24*self.D11*(2*self.kA55**2*kR1 + 3*self.D11*self.kA55*kN1 + 3*kR1*kR2*kN1)*qn
             a5 = 72*self.D11*(self.D11*(self.kA55**2 + (kR1 + kR2)*kN1)*qn \
-                + self.kA55*kR1*(2*kR2*qn - self.kA55*kN1*wcoll))
+                + self.kA55*kR1*(2*kR2*qn - self.kA55*kN1*self.tc))
             a6 = 144*self.D11*self.kA55*(self.D11*(kR1 + kR2)*qn \
-                - (self.D11*self.kA55 + kR1*kR2)*kN1*wcoll)
-            a7 = - 144*self.D11**2*self.kA55*(kR1 + kR2)*kN1*wcoll
+                - (self.D11*self.kA55 + kR1*kR2)*kN1*self.tc)
+            a7 = - 144*self.D11**2*self.kA55*(kR1 + kR2)*kN1*self.tc
             return [a1,a2,a3,a4,a5,a6,a7]
 
         # Classify positive real roots
@@ -485,12 +499,14 @@ class Eigensystem:
 
         return Lsp
 
-    def test_td(self, wcoll, qn, a):
+    def test_td(self, Lsp, a):
         """
         Check system for touchdown.
 
         Arguments
         ---------
+        Lsp : float
+            Span between bedded segment and touchdown
         a : float
             Cracklength for the unbedded element.
 
@@ -501,9 +517,9 @@ class Eigensystem:
         """
 
         # Compare span lenght to crack length
-        if self.calc_span_length(wcoll, qn) < a:
+        if Lsp < a:
             td = True
-            print(f'Touchdown at {self.calc_span_length(wcoll, qn)}.')
+            print(f'Touchdown at {Lsp}.')
         else:
             td = False
             print('No touchdown.')
