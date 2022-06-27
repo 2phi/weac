@@ -266,6 +266,13 @@ class Eigensystem:
         self.D11 = D11
         self.kA55 = kA55
         self.E0 = B11**2 - A11*D11
+        
+        print('Laminate stiffnesses\n'
+              f'A11 = {self.A11}\n'
+              f'B11 = {self.B11}\n'
+              f'D11 = {self.D11}\n'
+              f'kA55 = {self.kA55}\n'
+              )
 
     def calc_system_matrix(self):
         """
@@ -465,11 +472,19 @@ class Eigensystem:
         """
         # Get spring stiffnesses
         kR1 = self.calc_rot_spring_stiffness(td=False)
-        kR2 = self.calc_rot_spring_stiffness(td=True)
         kN1 = self.calc_trans_spring_stiffness()
+        kR2 = self.calc_rot_spring_stiffness(td=True)
+        
+        print('Spring stiffnesses:\n'
+              f'kR1 = {kR1}\n'
+              f'kN1 = {kN1}\n'
+              )
 
         # Get normal load
         qn = self.get_weight_load(phi)[0]
+        
+        print('Load in surface normal direction:\n'
+              f'qn = {qn}\n')
 
         # Define polynomial equation for w'(l) = 0
         def polynomial():
@@ -499,7 +514,7 @@ class Eigensystem:
 
         return Lsp
 
-    def test_td(self, Lsp, a):
+    def test_td(self, Lsp, Lfc, a):
         """
         Check system for touchdown.
 
@@ -515,15 +530,44 @@ class Eigensystem:
         td : boolean
             Determines whether end has touchdown.
         """
+        # Initiate Lfc for Zwischenbereich Lfc < a <= Lsp with dummy value
+        Lfc = 830
 
         # Compare span lenght to crack length
-        if Lsp < a:
-            td = True
-            print(f'Touchdown at {Lsp}.')
-        else:
+        if a <= Lfc:
             td = False
-            print('No touchdown.')
+            print('No touchdown.\n'
+                  f'a = {a}\n'
+                  f'Lfc = {Lfc}\n'
+                  f'Lsp = {Lsp}\n'
+                  )
+        elif Lfc < a <= Lsp:
+            td = True
+            print('Touchdown with reduced kR2.\n'
+                  f'Lfc = {Lfc}\n'
+                  f'a = {a}\n'
+                  f'Lsp = {Lsp}\n'
+                  )
+        elif Lsp < a:
+            td = True
+            print(f'Touchdown normal.\n'
+                  f'Lfc = {Lfc}\n'
+                  f'Lsp = {Lsp}\n'
+                  f'a = {a}\n'
+                  )
         return td
+
+    def reduction_for_kD(self,Lsp,Lfc,a):
+        """Test."""
+        if a <= Lfc:
+            kf = 0
+        elif Lfc < a <= Lsp:
+            kf = (a - Lfc)/(Lsp - Lfc)
+        elif Lsp < a:
+            kf = 1
+            
+        print(f'kf= {kf}')
+        return kf
 
     def zh(self, x, l=0, bed=True):
         """

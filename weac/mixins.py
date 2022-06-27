@@ -423,11 +423,11 @@ class SolutionMixin:
                 f'system of type {self.system}.')
         # Overwrite bc when touchdown
         if td & bool(pos in ('r', 'right')):
-            kD = self.calc_rot_spring_stiffness(td)
-            bc = np.array([self.N(z), self.M(z)+kD*self.psi(z), self.w(z)])
+            kR = self.reduction_for_kD(1364,830,840)*self.calc_rot_spring_stiffness(td)
+            bc = np.array([self.N(z), self.M(z)+kR*self.psi(z), self.w(z)])
         elif td & bool(pos in ('l', 'left')):
-            kD = self.calc_rot_spring_stiffness(td)
-            bc = np.array([self.N(z), self.M(z)+kD*self.psi(z), self.w(z)])
+            kR = self.reduction_for_kD(1364,830,840)*self.calc_rot_spring_stiffness(td)
+            bc = np.array([self.N(z), self.M(z)+kR*self.psi(z), self.w(z)])
         return bc
 
     def eqs(self, zl, zr, pos='mid', td=False):
@@ -546,11 +546,24 @@ class SolutionMixin:
         _ = kwargs                                      # Unused arguments
         # Calculate span length
         Lsp = self.calc_span_length(phi)
+        # Calculate first contact length
+        Lfc = 830
         # Execute test for touchdown conditions
-        td = self.test_td(Lsp, a)
+        td = self.test_td(Lsp, Lfc, a)
+
         # Set span length
-        if not td:
+        if a <= Lfc:
+            td = False
             Lsp = a
+        elif Lfc < a <= Lsp:
+            td = True
+            Lsp = a
+        elif Lsp < a:
+            td = True
+        
+        print('Right element lemght:\n'
+              f'L = {Lsp}')
+        
         # Assemble segment lists
         if self.system == 'skiers':
             tdi = np.array(tdi)
@@ -708,10 +721,9 @@ class SolutionMixin:
         # Loop through segments to set touchdown at right-hand side
         for j,td in enumerate(tdi):
             if td and j == 0:
-                rhs[0:3] = np.vstack([0,0,self.tc])           # N, M + kD psi, w
+                rhs[0:3] = np.vstack([0,0,self.tc])           # N, M + kR psi, w
             elif td and j == nS:
                 rhs[9:12] = np.vstack([0,0,self.tc])
-
         # --- SOLVE -----------------------------------------------------------
 
         # Solve z0 = zh0*C + zp0 = rhs for constants, i.e. zh0*C = rhs - zp0
