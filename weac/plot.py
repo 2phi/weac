@@ -159,12 +159,12 @@ def contours(instance, x, z, window=1e12, scale=100):
 
     # Get x-coordinate of maximum deflection w (cm) and derive plot x-limits
     xfocus = x[np.max(np.argmax(W, axis=1))]/10
-    xmax = np.min([np.max(X+scale*U), xfocus + window/2])
-    xmin = np.max([np.min(X), xfocus - window/2])
+    xmax = np.min([np.max(X+scale*U)+1e-1*instance.h/4, xfocus + window/2])
+    xmin = np.max([np.min(X)-1e-1*instance.h/4, xfocus - window/2])
     
     # From maximum of deflection w (cm) and slab height h (cm) derive plot y-limits
-    ymin = 0
-    ymax = 1.1*(instance.h/10+scale*np.max(W))
+    ymin = -instance.h/40
+    ymax = 5/4*instance.h/10+scale*np.max(W)
     
     # Normalize colormap
     norm = MidpointNormalize(vmin=1e3*np.min(U), vmax=1e3*np.max(U))
@@ -415,10 +415,8 @@ def save_plot(name):
         plt.show()
     # save figure if on terminal
     else:
-        print('Rendering', filename, '...')
         # Make directory if not yet existing
         if not os.path.isdir(os.path.join(os.getcwd(), 'plots')):
             os.mkdir('plots')
         plt.savefig('plots/' + filename, bbox_inches='tight')
-        print('Saved', filename, 'at', os.path.join(os.getcwd(), 'plots'))
     return

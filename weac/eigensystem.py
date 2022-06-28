@@ -103,6 +103,7 @@ class Eigensystem:
         self.t = False          # Weak-layer thickness (mm)
         self.kn = False         # Weak-layer compressive stiffness
         self.kt = False         # Weak-layer shear stiffness
+        self.tc = False         # Weak-layer collapse height (mm)
 
         # Initialize slab attributes
         self.p = 0              # Surface line load (N/mm)
@@ -125,7 +126,13 @@ class Eigensystem:
         self.sR = False         # Stability shift of real eigenvalues
         self.sysmat = False     # System matrix
 
-    def set_foundation_properties(self, t=30, E=0.25, nu=0.25, update=False):
+        # Initialize touchdown attributes
+        self.lS = False         # Maximum length of span between
+                                # between bedded and touchdowned boundary (mm)
+        self.lC = False         # Minimum length of substratum contact (mm)
+        self.ratio = False      # Stiffness ratio of collalpsed to uncollapsed weak-layer
+
+    def set_foundation_properties(self, t=30, cf=0.5, E=0.25, nu=0.25, update=False):
         """
         Set material properties and geometry of foundation (weak layer).
 
@@ -143,6 +150,7 @@ class Eigensystem:
         """
         # Geometry
         self.t = t              # Weak-layer thickness (mm)
+        self.tc = cf*self.t     # Weak-layer collapse height (mm)
 
         # Material properties
         self.weak = {
@@ -221,7 +229,7 @@ class Eigensystem:
         """
         self.p = p
 
-    def calc_foundation_stiffness(self):
+    def calc_foundation_stiffness(self, ratio=16):
         """Compute foundation normal and shear stiffness."""
         # Elastic moduli (MPa) under plane-strain conditions
         G = self.weak['E']/(2*(1 + self.weak['nu']))    # Shear modulus
@@ -230,6 +238,9 @@ class Eigensystem:
         # Foundation (weak layer) stiffnesses (N/mm^3)
         self.kn = E/self.t                              # Normal stiffness
         self.kt = G/self.t                              # Shear stiffness
+
+        # Weak-layer stiffness increment factor for collapse
+        self.ratio = ratio
 
     def calc_laminate_stiffness_matrix(self):
         """
@@ -398,6 +409,138 @@ class Eigensystem:
         Ft = -F*np.sin(phi)                     # Tangential skier load (N)
 
         return Fn, Ft
+
+    def calc_span_length(self):
+        """
+        Calculate span from layer and weak layer properties and load situation.
+
+        Returns
+        -------
+        lS : float
+            Span of the element between bedded element and touchdown for full touchdown.
+        """
+        def polynomial():
+            """
+            Calculate the coefficients of a sixth order polynomial equation.
+
+            Returns
+            -------
+            list
+                First coefficient for sixth order term,
+                second coefficient for fith order term and so on.
+            """
+            a1 = self.kA55**2*kR1*kN1*q0
+            a2 = 6*self.kA55*(self.D11*self.kA55 + kR1*kR2)*kN1*q0
+            a3 = 30*self.D11*self.kA55*(kR1 + kR2)*kN1*q0
+            a4 = 24*self.D11*(2*self.kA55**2*kR1 + 3*self.D11*self.kA55*kN1 + 3*kR1*kR2*kN1)*q0
+            a5 = 72*self.D11*(self.D11*(self.kA55**2 + (kR1 + kR2)*kN1)*q0 \
+                + self.kA55*kR1*(2*kR2*q0 - self.kA55*kN1*self.tc))
+            a6 = 144*self.D11*self.kA55*(self.D11*(kR1 + kR2)*q0 \
+                - (self.D11*self.kA55 + kR1*kR2)*kN1*self.tc)
+            a7 = - 144*self.D11**2*self.kA55*(kR1 + kR2)*kN1*self.tc
+            return [a1,a2,a3,a4,a5,a6,a7]
+
+        # Get spring stiffnesses
+        kR1 = self.calc_rot_spring(collapse=False)
+        kN1 = self.calc_trans_spring()
+        kR2 = self.calc_rot_spring(collapse=True)
+        # !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+        phi = 0
+        # !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+        # Get surface normal load components
+        qn = self.get_weight_load(phi)[0]
+        pn = self.get_surface_load(phi)[0]
+        q0 = qn + pn
+        # Calculate positive real roots
+        pos = (np.roots(polynomial()).imag == 0) & (np.roots(polynomial()).real > 0)
+        self.lS = np.roots(polynomial())[pos].real[0]
+
+    def calc_contact_length(self):
+        """
+        Calculate segment length where max slab deflection equals tc.
+
+        Returns
+        -------
+        lC : float
+            Maximum length without substratum contact.
+        """
+        def polynomial():
+            """
+            Calculate the coefficients of a fourth order polynomial equation.
+
+            Returns
+            -------
+            list
+                First coefficient for fourth order term,
+                second coefficient for third order term and so on.
+            """
+            a1 = 1/(8*self.D11)*q0
+            a2 = 1/(2*kR1)*q0
+            a3 = 1/(2*self.kA55)*q0
+            a4 = 1/kN1*q0
+            a5 = -self.tc
+            return [a1,a2,a3,a4,a5]
+
+        # Get spring stiffnesses
+        kR1 = self.calc_rot_spring(collapse=False)
+        kN1 = self.calc_trans_spring()
+        # !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+        phi = 0
+        # !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+        # Get surface normal load components
+        qn = self.get_weight_load(phi)[0]
+        pn = self.get_surface_load(phi)[0]
+        q0 = qn + pn
+        # Calculate positive real roots
+        pos = (np.roots(polynomial()).imag == 0) & (np.roots(polynomial()).real > 0)
+        self.lC = np.roots(polynomial())[pos].real[0]
+
+    def calc_rot_spring(self, collapse=False):
+        """
+        Calculate rotational spring stiffness from layer properties.
+
+        Arguments
+        ---------
+        collapse : boolean
+            Determines whether weak-layer has collapsed. Default is False.
+
+        Returns
+        -------
+        kR : float
+            Rotational spring stiffness (Nmm/mm/rad).
+        """
+        # get ratio for foundation stiffness after collapse
+        if collapse:
+            ratio = self.ratio
+        else:
+            ratio = 1
+        # Abbreviation term
+        beta = (ratio*self.kn/(4*self.D11))**(1/4)
+        # calc spring stiffness
+        kR = self.D11*beta
+
+        return kR
+
+    def calc_trans_spring(self):
+        """
+        Calculate translational spring stiffness from layer properties.
+
+        Returns
+        -------
+        kN : float
+            Translational spring stiffness (N/mm^2).
+        """
+        # Abbreviations
+        beta = (self.kn/(4 * self.D11))**(1/4)
+        # calc translational spring stiffness for bedded euler-bernoulli-beam
+        kN = 2*self.D11*beta**3
+
+        return kN
+
+    def calc_touchdown_system(self):
+        """Calculate the lenghts for touchdown evaluation"""
+        self.calc_span_length()
+        self.calc_contact_length()
 
     def zh(self, x, l=0, bed=True):
         """

@@ -43,3 +43,4 @@ class Layered(FieldQuantitiesMixin, SolutionMixin, AnalysisMixin,
         self.set_beam_properties(layers if layers else [[240, 200], ])
         self.set_foundation_properties()
         self.calc_fundamental_system()
+        self.calc_touchdown_system()

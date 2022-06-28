@@ -1,9 +1,6 @@
-# Third party imports
-import numpy as np
-import matplotlib.pyplot as plt
-from pyparsing import c_style_comment
-import sys
-#sys.path.append("..")
+"""
+Driver Code for Weac - PST
+"""
 
 # Project imports
 import weac
@@ -11,22 +8,15 @@ import weac
 # === DEFINE SLAB LAYERING ============================================
 
 # Either use custom profile
-myprofile = [[170, 100],  # (1) surface layer
-             [190,  40],  # (2) 2nd layer
-             [230, 130],  #  :
-             [250,  20],  #  :
-             [210,  70],  # (i) i-th layer
-             [380,  20],  #  :
-             [280, 100]]  # (N) last slab layer above weak layer
+myprofile = [[108, 360]]  # (N) last slab layer above weak layer
 
 # Or select a predefined profile from database
-myprofile = 'medium'
+#myprofile = 'medium'
 
 # === CREATE MODEL INSTANCES ==========================================
 
 # Propagation saw test cut from the right side with custom layering
 pst_cut_right = weac.Layered(system='pst-', layers=myprofile)
-
 
 # === INSPECT LAYERING ================================================
 
@@ -43,9 +33,9 @@ weac.plot.slab_profile(pst_cut_right)
 # --------------------------------------
 
 # Input
-totallength = 2000                      # Total length (mm)
-cracklength = 300                       # Crack length (mm)
-inclination = 20                       # Slope inclination (°)
+totallength = 4000                      # Total length (mm)
+cracklength = 1200.0                       # Crack length (mm)
+inclination = 0                      # Slope inclination (°)
 
 # Obtain lists of segment lengths, locations of foundations,
 # and position and magnitude of skier loads from inputs. We
@@ -53,7 +43,7 @@ inclination = 20                       # Slope inclination (°)
 # even if a cracklength > 0 is set by replacing the 'crack'
 # key thorugh the 'nocrack' key.
 seg_pst = pst_cut_right.calc_segments(
-    L=totallength, a=cracklength)['nocrack']
+    L=totallength, a=cracklength)['crack']
 
 # Assemble system of linear equations and solve the
 # boundary-value problem for free constants.
@@ -68,9 +58,9 @@ C_pst = pst_cut_right.assemble_and_solve(
 xsl_pst, z_pst, xwl_pst = pst_cut_right.rasterize_solution(
     C=C_pst, phi=inclination, **seg_pst)
 
-# === VISUALIZE SLAB DEFORMATIONS / DISPLACEMENTS / WEAK LAYER STRESSES =====================================
-plot = 1
-if plot:
-    weac.plot.contours(pst_cut_right, x=xsl_pst, z=z_pst, scale=100)
-    weac.plot.displacements(pst_cut_right, x=xsl_pst, z=z_pst, **seg_pst)
-    weac.plot.stresses(pst_cut_right, x=xwl_pst, z=z_pst, **seg_pst)
+# === VISUALIZE RESULTS =====================================
+
+weac.plot.contours(pst_cut_right, x=xsl_pst, z=z_pst, scale=10)
+weac.plot.displacements(pst_cut_right, x=xsl_pst, z=z_pst, **seg_pst)
+weac.plot.stresses(pst_cut_right, x=xwl_pst, z=z_pst, **seg_pst)
+weac.plot.section_forces(pst_cut_right, x=xwl_pst, z=z_pst, **seg_pst)
