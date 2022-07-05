@@ -591,7 +591,7 @@ class SolutionMixin:
                  'or left, mid and right.'))
         return eqs
 
-    def calc_segments(self, tdi=False, li=False, mi=False, ki=False, k0=False,
+    def calc_segments(self, li=False, mi=False, ki=False, k0=False,
                       L=1e4, a=0, m=0, **kwargs):
         """
         Assemble lists defining the segments.
