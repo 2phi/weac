@@ -167,8 +167,8 @@ def contours(instance, x, z, window=1e12, scale=100):
     xmin = np.max([np.min(X)-1e-1*instance.h/4, xfocus - window/2])
 
     # From maximum of deflection w (cm) and slab height h (cm) derive plot y-limits
-    ymin = 0
-    ymax = 1.1*(instance.h/10+scale*np.max(W))
+    ymin = -instance.h/40
+    ymax = 5/4*instance.h/10+scale*np.max(W)
     
     # Normalize colormap
     norm = MidpointNormalize(vmin=1e3*np.min(U), vmax=1e3*np.max(U))
@@ -429,18 +429,3 @@ def save_plot(name):
             os.mkdir('plots')
         plt.savefig('plots/' + filename, bbox_inches='tight')
     return
-
-
-# === HILFSFUNKTION ===========================================================
-
-def check_bc(instance, z, end):
-    """Print solution at right boundary."""
-    print('results at', end)
-    print('N: ', instance.N(z)[end],
-          '\nM: ', instance.M(z)[end],
-          '\nV: ', instance.V(z)[end],
-          '\nM + kD psi: ',
-          instance.M(z)[end]+instance.calc_rot_spring_stiffness(td=True)*instance.psi(z, unit='rad')[end],
-          '\nw: ', instance.w(z, unit='mm')[end],
-          '\nwp: ', instance.wp(z)[end]
-        )

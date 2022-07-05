@@ -4,6 +4,7 @@
 # Standard library imports
 from functools import partial
 
+
 # Third party imports
 import numpy as np
 from scipy.integrate import romberg
@@ -390,7 +391,63 @@ class SolutionMixin:
     and for the computation of the free constants.
     """
 
-    def bc(self, z, pos, td):
+    def mode_td(self, l=0):
+        """
+        Identify the mode of the pst-boundary.
+
+        Arguments
+        ---------
+        l : float, optional
+            Length of the segment in consideration. Default is zero.
+
+        Returns
+        -------
+        mode : string
+            Contains the mode for the boundary of the segment:
+            A - free end, B - intermediate touchdown,
+            C - full touchdown (maximum clamped end).
+        """
+        # Classify boundary type by element length
+        if l <= self.lC:
+            mode = 'A'
+        elif self.lC < l <= self.lS:
+            mode = 'B'
+        elif self.lS < l:
+            mode = 'C'
+
+        return mode
+
+    def reduce_stiffness(self, l=0, mode='A'):
+        """
+        Determines the reduction factor for a rotational spring.
+
+        Arguments
+        ---------
+        l : float, optional
+            Length of the segment in consideration. Default is zero.
+        mode : string, optional
+            Contains the mode for the boundary of the segment:
+            A - free end, B - intermediate touchdown, C - full touchdown.
+            Default is A.
+
+        Returns
+        -------
+        kf : float
+            Reduction factor.
+        """
+        # Reduction to zero for free end bc
+        if mode in ['A']:
+            kf = 0
+        # Reduction factor for touchdown
+        if mode in ['B', 'C']:
+            l = l - self.lC
+            # Beta needs to take into account different weak-layer spring stiffness
+            beta = self.beta*self.ratio**(1/4)
+            kf=(np.cos(2*beta*l)+np.cosh(2*beta*l)-2)/(np.sin(2*beta*l)+np.sinh(2*beta*l))
+
+        return kf
+
+    def bc(self, z, l=0, k=False, pos='mid'):
         """
         Provide equations for free (pst) or infinite (skiers) ends.
 
@@ -398,39 +455,71 @@ class SolutionMixin:
         ---------
         z : ndarray
             Solution vector (6x1) at a certain position x.
+        l : float, optional
+            Length of the segment in consideration. Default is zero.
+        k : boolean
+            Indicates whether segment has foundation(True) or not (False).
+            Default is False.
         pos : {'left', 'mid', 'right', 'l', 'm', 'r'}, optional
             Determines whether the segement under consideration
             is a left boundary segement (left, l), one of the
             center segement (mid, m), or a right boundary
-            segemen t (right, r). Default is 'mid'.
-        td : boolean
-            Determines whether end needs touchdown bc.
+            segement (right, r). Default is 'mid'.
 
         Returns
         -------
         bc : ndarray
             Boundary condition vector (lenght 3) at position x.
         """
-        # Free ends
+        # Check mode for free end
+        mode = self.mode_td(l=l)
+        # Get spring stiffness reduction factor
+        kf = self.reduce_stiffness(l=l, mode=mode)
+        # Get spring stiffness for collapsed weak-layer
+        kR = self.calc_rot_spring(collapse=True)
+
+        # Set boundary conditions for PST-systems
         if self.system in ['pst-', '-pst']:
-            bc = np.array([self.N(z), self.M(z), self.V(z)])
+            if not k:
+                if mode in ['A']:
+                    # Free end
+                    bc = np.array([self.N(z),
+                                   self.M(z),
+                                   self.V(z)
+                                   ])
+                elif mode in ['B', 'C'] and pos in ['r', 'right']:
+                    # Touchdown right
+                    bc = np.array([self.N(z),
+                                   self.M(z) + kf*kR*self.psi(z),
+                                   self.w(z)
+                                   ])
+                elif mode in ['B', 'C'] and pos in ['l', 'left']:
+                    # Touchdown left
+                    bc = np.array([self.N(z),
+                                   self.M(z) - kf*kR*self.psi(z),
+                                   self.w(z)
+                                   ])
+            else:
+                # Free end
+                bc = np.array([self.N(z),
+                                self.M(z),
+                                self.V(z)
+                                ])
+        # Set boundary conditions for SKIER-systems
         elif self.system in ['skier', 'skiers']:
-        # Infinite ends (vanishing complementary solution)
-            bc = np.array([self.u(z, z0=0), self.w(z), self.psi(z)])
+            # Infinite end (vanishing complementary solution)
+            bc = np.array([self.u(z, z0=0),
+                           self.w(z),
+                           self.psi(z)
+                           ])
         else:
             raise ValueError(
                 'Boundary conditions not defined for'
                 f'system of type {self.system}.')
-        # Overwrite bc when touchdown
-        if td & bool(pos in ('r', 'right')):
-            kR = self.reduction_for_kD(1364,830,840)*self.calc_rot_spring_stiffness(td)
-            bc = np.array([self.N(z), self.M(z)+kR*self.psi(z), self.w(z)])
-        elif td & bool(pos in ('l', 'left')):
-            kR = self.reduction_for_kD(1364,830,840)*self.calc_rot_spring_stiffness(td)
-            bc = np.array([self.N(z), self.M(z)+kR*self.psi(z), self.w(z)])
+
         return bc
 
-    def eqs(self, zl, zr, pos='mid', td=False):
+    def eqs(self, zl, zr, l=0, k=False, pos='mid'):
         """
         Provide boundary or transmission conditions for beam segments.
 
@@ -440,7 +529,12 @@ class SolutionMixin:
             Solution vector (6x1) at left end of beam segement.
         zr : ndarray
             Solution vector (6x1) at right end of beam segement.
-        pos : {'left', 'mid', 'right', 'l', 'm', 'r'}, optional
+        l : float, optional
+            Length of the segment in consideration. Default is zero.
+        k : boolean
+            Indicates whether segment has foundation(True) or not (False).
+            Default is False.
+        pos: {'left', 'mid', 'right', 'l', 'm', 'r'}, optional
             Determines whether the segement under consideration
             is a left boundary segement (left, l), one of the
             center segement (mid, m), or a right boundary
@@ -456,9 +550,9 @@ class SolutionMixin:
         """
         if pos in ('l', 'left'):
             eqs = np.array([
-                self.bc(zl, pos, td)[0],        # Left boundary condition
-                self.bc(zl, pos, td)[1],        # Left boundary condition
-                self.bc(zl, pos, td)[2],        # Left boundary condition
+                self.bc(zl, l, k, pos)[0],             # Left boundary condition
+                self.bc(zl, l, k, pos)[1],             # Left boundary condition
+                self.bc(zl, l, k, pos)[2],             # Left boundary condition
                 self.u(zr, z0=0),           # ui(xi = li)
                 self.w(zr),                 # wi(xi = li)
                 self.psi(zr),               # psii(xi = li)
@@ -487,9 +581,9 @@ class SolutionMixin:
                 -self.N(zl),                # -Ni(xi = 0)
                 -self.M(zl),                # -Mi(xi = 0)
                 -self.V(zl),                # -Vi(xi = 0)
-                self.bc(zr, pos, td)[0],        # Right boundary condition
-                self.bc(zr, pos, td)[1],        # Right boundary condition
-                self.bc(zr, pos, td)[2]])       # Right boundary condition
+                self.bc(zr, l, k, pos)[0],             # Right boundary condition
+                self.bc(zr, l, k, pos)[1],             # Right boundary condition
+                self.bc(zr, l, k, pos)[2]])            # Right boundary condition
         else:
             raise ValueError(
                 (f'Invalid position argument {pos} given. '
@@ -544,27 +638,14 @@ class SolutionMixin:
         """
 
         _ = kwargs                                      # Unused arguments
-        # Calculate span length
-        Lsp = self.calc_span_length(phi)
-        # Calculate first contact length
-        Lfc = 830
-        # Execute test for touchdown conditions
-        td = self.test_td(Lsp, Lfc, a)
+        # Set unbedded segment length
+        mode = self.mode_td(l=a)
+        if mode in ['A', 'B']:
+            lU = a
+        if mode in ['C']:
+            lU = self.lS
 
-        # Set span length
-        if a <= Lfc:
-            td = False
-            Lsp = a
-        elif Lfc < a <= Lsp:
-            td = True
-            Lsp = a
-        elif Lsp < a:
-            td = True
-        
-        print('Right element lemght:\n'
-              f'L = {Lsp}')
-        
-        # Assemble segment lists
+        # Assemble list defining the segments
         if self.system == 'skiers':
             tdi = np.array(tdi)
             li = np.array(li)                           # Segment lengths
@@ -572,14 +653,12 @@ class SolutionMixin:
             ki = np.array(ki)                           # Crack
             k0 = np.array(k0)                           # No crack
         elif self.system == 'pst-':
-            tdi = np.array([False, False, td])          # Touchdown
-            li = np.array([L - a, Lsp])                   # Segment lengths
+            li = np.array([L - a, lU])                   # Segment lengths
             mi = np.array([0])                          # Skier weights
             ki = np.array([True, False])                # Crack
             k0 = np.array([True, True])                 # No crack
         elif self.system == '-pst':
-            tdi = np.array([td, False, False])          # Touchdown
-            li = np.array([Lsp, L - a])                   # Segment lengths
+            li = np.array([lU, L - a])                   # Segment lengths
             mi = np.array([0])                          # Skier weights
             ki = np.array([False, True])                # Crack
             k0 = np.array([True, True])                 # No crack
@@ -618,10 +697,7 @@ class SolutionMixin:
         Arguments
         ---------
         phi : float
-            Inclination of the slab (degrees).
-        tdi : ndarray
-            List of one bool per segment end indicating whether end
-            has a touchdowm.
+            Inclination (degrees).
         li : ndarray
             List of lengths of segements (mm).
         mi : ndarray
@@ -694,13 +770,11 @@ class SolutionMixin:
             zhi = self.eqs(
                 zl=self.zh(x=0, l=l, bed=k),
                 zr=self.zh(x=l, l=l, bed=k),
-                pos=pos,
-                td=td)
+                l=l, k=k, pos=pos)
             zpi = self.eqs(
                 zl=self.zp(x=0, phi=phi, bed=k),
                 zr=self.zp(x=l, phi=phi, bed=k),
-                pos=pos,
-                td=td)
+                l=l, k=k, pos=pos)
             # Rows for left-hand side assembly
             start = 0 if i == 0 else 3
             stop = 6 if i == nS - 1 else 9
@@ -716,14 +790,20 @@ class SolutionMixin:
             rhs[6*i:6*i + 3] = np.vstack([Ft, -Ft*self.h/2, Fn])
         # Set rhs so that complementary integral vanishes at boundaries
         if self.system not in ['pst-', '-pst']:
-            rhs[:3] = self.bc(self.zp(x=0, phi=phi, bed=ki[0]), pos, td)
-            rhs[-3:] = self.bc(self.zp(x=li[-1], phi=phi, bed=ki[-1]), pos, td)
-        # Loop through segments to set touchdown at right-hand side
-        for j,td in enumerate(tdi):
-            if td and j == 0:
-                rhs[0:3] = np.vstack([0,0,self.tc])           # N, M + kR psi, w
-            elif td and j == nS:
-                rhs[9:12] = np.vstack([0,0,self.tc])
+            rhs[:3] = self.bc(self.zp(x=0, phi=phi, bed=ki[0]))
+            rhs[-3:] = self.bc(self.zp(x=li[-1], phi=phi, bed=ki[-1]))
+
+        # Loop through segments to set touchdown at rhs
+        for i in range(nS):
+            # Length, foundation and position of segment i
+            l, k, pos = li[i], ki[i], pi[i]
+            mode = self.mode_td(l=l)
+            if not k and bool(mode in ['B', 'C']):
+                if i==0:
+                    rhs[:3] = np.vstack([0,0,self.tc])
+                if i == (nS - 1):
+                    rhs[-3:] = np.vstack([0,0,self.tc])
+
         # --- SOLVE -----------------------------------------------------------
 
         # Solve z0 = zh0*C + zp0 = rhs for constants, i.e. zh0*C = rhs - zp0
