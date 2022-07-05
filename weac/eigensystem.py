@@ -36,6 +36,8 @@ class Eigensystem:
         Compressive foundation (weak-layer) stiffness (N/mm^3).
     kt : float
         Shear foundation (weak-layer) stiffness (N/mm^3).
+    tc : float
+        Weak-layer thickness after collapse (mm).
     slab : ndarray
         Matrix that holds the elastic properties of all slab layers.
         Columns are density (kg/m^3), layer heigth (mm), Young's
@@ -74,6 +76,18 @@ class Eigensystem:
         Used for numerical stability.
     sysmat : ndarray
         System matrix.
+    lC : float
+        Cracklength whose maximum deflection equals the
+        weak-layer thickness (mm).
+    lS : float
+        Cracklength when touchdown exerts maximum support
+        on the slab (mm). Corresponds to the longest possible
+        unbedded length.
+    ratio : float
+        Increment factor for the weak-layer stiffness from intact
+        to collapsed state.
+    beta : float
+        Describes the stiffnesses of weak-layer and slab.
     """
 
     def __init__(self, system='pst-'):
@@ -111,6 +125,7 @@ class Eigensystem:
         self.k = False          # Slab shear correction factor
         self.h = False          # Total slab height (mm)
         self.zs = False         # Z-coordinate of slab center of gravity (mm)
+        self.phi = False        # Slab inclination (°)
         self.A11 = False        # Slab extensional stiffness
         self.B11 = False        # Slab bending-extension coupling stiffness
         self.D11 = False        # Slab bending stiffness
@@ -127,10 +142,11 @@ class Eigensystem:
         self.sysmat = False     # System matrix
 
         # Initialize touchdown attributes
+        self.lC = False         # Minimum length of substratum contact (mm)
         self.lS = False         # Maximum length of span between
                                 # between bedded and touchdowned boundary (mm)
-        self.lC = False         # Minimum length of substratum contact (mm)
         self.ratio = False      # Stiffness ratio of collalpsed to uncollapsed weak-layer
+        self.beta = False       # Ratio of slab to bedding stiffness
 
     def set_foundation_properties(self, t=30, cf=0.5, E=0.25, nu=0.25, update=False):
         """
@@ -140,6 +156,9 @@ class Eigensystem:
         ---------
         t : float, optional
             Weak-layer thickness (mm). Default is 30.
+        cf : float
+            Fraction by which the weak-layer thickness is reduced
+            due to collapse.
         E : float, optional
             Weak-layer Young modulus (MPa). Default is 0.25.
         nu : float, optional
@@ -162,7 +181,7 @@ class Eigensystem:
         if update:
             self.calc_fundamental_system()
 
-    def set_beam_properties(self, layers, C0=6.0, C1=4.60,
+    def set_beam_properties(self, layers, phi, C0=6.0, C1=4.60,
                             nu=0.25, update=False):
         """
         Set material and properties geometry of beam (slab).
@@ -174,6 +193,8 @@ class Eigensystem:
             Columns are density (kg/m^3) and thickness (mm). One row
             corresponds to one layer. If entered as str, last split
             must be available in database.
+        phi : float
+            Inclination of the slab (degrees).
         C0 : float, optional
             Multiplicative constant of Young modulus parametrization
             according to Gerling et al. (2017). Default is 6.0.
@@ -207,6 +228,9 @@ class Eigensystem:
         # Young's modulus (MPa), shear modulus (MPa), and
         # Poisson's ratio
         self.slab = np.vstack([layers.T, E, G, nu]).T
+
+        # Set beam inclination
+        self.phi = phi
 
         # Recalculate the fundamental system after properties have changed
         if update:
@@ -410,6 +434,18 @@ class Eigensystem:
 
         return Fn, Ft
 
+    def calc_beta(self):
+        """
+        Calculate beta.
+
+        Returns
+        -------
+        beta : float
+            Weak-layer to slab stiffness relation factor.
+        """
+        # (Intact) weak-layer to slab stiffness relation factor
+        self.beta = (self.kn/(4*self.D11))**(1/4)
+
     def calc_span_length(self):
         """
         Calculate span from layer and weak layer properties and load situation.
@@ -440,16 +476,14 @@ class Eigensystem:
             a7 = - 144*self.D11**2*self.kA55*(kR1 + kR2)*kN1*self.tc
             return [a1,a2,a3,a4,a5,a6,a7]
 
-        # Get spring stiffnesses
+        # Get spring stiffnesses for adjacent segment with intact weak-layer
         kR1 = self.calc_rot_spring(collapse=False)
         kN1 = self.calc_trans_spring()
+        # Get spring stiffnesses for adjacent segment with collapsed weak-layer
         kR2 = self.calc_rot_spring(collapse=True)
-        # !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-        phi = 0
-        # !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
         # Get surface normal load components
-        qn = self.get_weight_load(phi)[0]
-        pn = self.get_surface_load(phi)[0]
+        qn = self.get_weight_load(self.phi)[0]
+        pn = self.get_surface_load(self.phi)[0]
         q0 = qn + pn
         # Calculate positive real roots
         pos = (np.roots(polynomial()).imag == 0) & (np.roots(polynomial()).real > 0)
@@ -481,28 +515,25 @@ class Eigensystem:
             a5 = -self.tc
             return [a1,a2,a3,a4,a5]
 
-        # Get spring stiffnesses
+        # Get spring stiffnesses for adjacent segment intact intact weak-layer
         kR1 = self.calc_rot_spring(collapse=False)
         kN1 = self.calc_trans_spring()
-        # !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-        phi = 0
-        # !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
         # Get surface normal load components
-        qn = self.get_weight_load(phi)[0]
-        pn = self.get_surface_load(phi)[0]
+        qn = self.get_weight_load(self.phi)[0]
+        pn = self.get_surface_load(self.phi)[0]
         q0 = qn + pn
         # Calculate positive real roots
         pos = (np.roots(polynomial()).imag == 0) & (np.roots(polynomial()).real > 0)
         self.lC = np.roots(polynomial())[pos].real[0]
 
-    def calc_rot_spring(self, collapse=False):
+    def calc_rot_spring(self, collapse=True):
         """
         Calculate rotational spring stiffness from layer properties.
 
         Arguments
         ---------
         collapse : boolean
-            Determines whether weak-layer has collapsed. Default is False.
+            Indicates whether weak-layer is collapsed.
 
         Returns
         -------
@@ -514,10 +545,8 @@ class Eigensystem:
             ratio = self.ratio
         else:
             ratio = 1
-        # Abbreviation term
-        beta = (ratio*self.kn/(4*self.D11))**(1/4)
         # calc spring stiffness
-        kR = self.D11*beta
+        kR = self.D11*self.beta*ratio**(1/4)
 
         return kR
 
@@ -530,15 +559,14 @@ class Eigensystem:
         kN : float
             Translational spring stiffness (N/mm^2).
         """
-        # Abbreviations
-        beta = (self.kn/(4 * self.D11))**(1/4)
         # calc translational spring stiffness for bedded euler-bernoulli-beam
-        kN = 2*self.D11*beta**3
+        kN = 2*self.D11*self.beta**3
 
         return kN
 
     def calc_touchdown_system(self):
         """Calculate the lenghts for touchdown evaluation"""
+        self.calc_beta()
         self.calc_span_length()
         self.calc_contact_length()
 

@@ -404,14 +404,17 @@ class SolutionMixin:
         -------
         mode : string
             Contains the mode for the boundary of the segment:
-            A - free end, B - intermediate touchdown, C - full touchdown.
+            A - free end, B - intermediate touchdown,
+            C - full touchdown (maximum clamped end).
         """
+        # Classify boundary type by element length
         if l <= self.lC:
             mode = 'A'
-        elif self.lC <= l < self.lS:
+        elif self.lC < l <= self.lS:
             mode = 'B'
-        elif self.lS <= l:
+        elif self.lS < l:
             mode = 'C'
+
         return mode
 
     def reduce_stiffness(self, l=0, mode='A'):
@@ -432,12 +435,16 @@ class SolutionMixin:
         kf : float
             Reduction factor.
         """
+        # Reduction to zero for free end bc
         if mode in ['A']:
             kf = 0
-        if mode in ['B']:
-            kf = (l - self.lC)/(self.lS - self.lC)
-        if mode in ['C']:
-            kf = 1
+        # Reduction factor for touchdown
+        if mode in ['B', 'C']:
+            l = l - self.lC
+            # Beta needs to take into account different weak-layer spring stiffness
+            beta = self.beta*self.ratio**(1/4)
+            kf=(np.cos(2*beta*l)+np.cosh(2*beta*l)-2)/(np.sin(2*beta*l)+np.sinh(2*beta*l))
+
         return kf
 
     def bc(self, z, l=0, k=False, pos='mid'):
@@ -683,13 +690,13 @@ class SolutionMixin:
 
         Arguments
         ---------
-        phi: float
+        phi : float
             Inclination (degrees).
-        li: ndarray
+        li : ndarray
             List of lengths of segements (mm).
-        mi: ndarray
+        mi : ndarray
             List of skier weigths (kg) at segement boundaries.
-        ki: ndarray
+        ki : ndarray
             List of one bool per segement indicating whether segement
             has foundation (True) or not (False).
 
@@ -786,7 +793,6 @@ class SolutionMixin:
                     rhs[:3] = np.vstack([0,0,self.tc])
                 if i == (nS - 1):
                     rhs[-3:] = np.vstack([0,0,self.tc])
-
 
         # --- SOLVE -----------------------------------------------------------
 
