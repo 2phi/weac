@@ -592,7 +592,7 @@ class SolutionMixin:
         return eqs
 
     def calc_segments(self, tdi=False, li=False, mi=False, ki=False, k0=False,
-                      L=1e4, a=0, phi=0, m=0, **kwargs):
+                      L=1e4, a=0, m=0, **kwargs):
         """
         Assemble lists defining the segments.
 
@@ -601,9 +601,6 @@ class SolutionMixin:
 
         Arguments
         ---------
-        tdi : sequence, optional
-            List of one bool per segment end indicating whether end
-            has a touchdowm.
         li : squence, optional
             List of lengths of segements(mm). Used for system 'skiers'.
         mi : squence, optional
@@ -647,7 +644,6 @@ class SolutionMixin:
 
         # Assemble list defining the segments
         if self.system == 'skiers':
-            tdi = np.array(tdi)
             li = np.array(li)                           # Segment lengths
             mi = np.array(mi)                           # Skier weights
             ki = np.array(ki)                           # Crack
@@ -663,7 +659,6 @@ class SolutionMixin:
             ki = np.array([False, True])                # Crack
             k0 = np.array([True, True])                 # No crack
         elif self.system == 'skier':
-            tdi = np.array([False, False, False, False, False]) # Touchdown
             lb = (L - a)/2                              # Half bedded length
             lf = a/2                                    # Half free length
             li = np.array([lb, lf, lf, lb])             # Segment lengths
@@ -675,12 +670,12 @@ class SolutionMixin:
 
         # Fill dictionary
         segments = {
-            'nocrack': {'tdi': tdi, 'li': li, 'mi': mi, 'ki': k0},
-            'crack': {'tdi': tdi, 'li': li, 'mi': mi, 'ki': ki},
-            'both': {'tdi': tdi, 'li': li, 'mi': mi, 'ki': ki, 'k0': k0}}
+            'nocrack': {'li': li, 'mi': mi, 'ki': k0},
+            'crack': {'li': li, 'mi': mi, 'ki': ki},
+            'both': {'li': li, 'mi': mi, 'ki': ki, 'k0': k0}}
         return segments
 
-    def assemble_and_solve(self, phi, tdi, li, mi, ki):
+    def assemble_and_solve(self, phi, li, mi, ki):
         """
         Compute free constants for arbitrary beam assembly.
 
@@ -761,11 +756,6 @@ class SolutionMixin:
         for i in range(nS):
             # Length, foundation and position of segment i
             l, k, pos = li[i], ki[i], pi[i]
-            # Check touchdown for outer segments ends
-            if pos == 'r':
-                td = tdi[-1:]
-            elif pos == 'l':
-                td = tdi[:1]
             # Transmission conditions at left and right segment ends
             zhi = self.eqs(
                 zl=self.zh(x=0, l=l, bed=k),

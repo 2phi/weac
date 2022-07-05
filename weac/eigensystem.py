@@ -295,13 +295,6 @@ class Eigensystem:
         self.D11 = D11
         self.kA55 = kA55
         self.E0 = B11**2 - A11*D11
-        
-        print('Laminate stiffnesses\n'
-              f'A11 = {self.A11}\n'
-              f'B11 = {self.B11}\n'
-              f'D11 = {self.D11}\n'
-              f'kA55 = {self.kA55}\n'
-              )
 
     def calc_system_matrix(self):
         """
