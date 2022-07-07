@@ -487,13 +487,25 @@ class SolutionMixin:
                                    self.M(z),
                                    self.V(z)
                                    ])
-                elif mode in ['B', 'C'] and pos in ['r', 'right']:
+                elif mode in ['B'] and pos in ['r', 'right']:
+                    # Touchdown right
+                    bc = np.array([self.N(z),
+                                   self.M(z),
+                                   self.w(z)
+                                   ])
+                elif mode in ['B'] and pos in ['l', 'left']:
+                    # Touchdown left
+                    bc = np.array([self.N(z),
+                                   self.M(z),
+                                   self.w(z)
+                                   ])
+                elif mode in ['C'] and pos in ['r', 'right']:
                     # Touchdown right
                     bc = np.array([self.N(z),
                                    self.M(z) + kf*kR*self.psi(z),
                                    self.w(z)
                                    ])
-                elif mode in ['B', 'C'] and pos in ['l', 'left']:
+                elif mode in ['C'] and pos in ['l', 'left']:
                     # Touchdown left
                     bc = np.array([self.N(z),
                                    self.M(z) - kf*kR*self.psi(z),
