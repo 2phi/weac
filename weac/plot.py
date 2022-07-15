@@ -208,6 +208,7 @@ def plot_data(
         ax2data=None, ax2label=None,
         labelpos=None, vlines=True,
         li=False, mi=False, ki=False,
+        mode=False, kR=False,
         xlabel=r'Horizontal position $x$ (cm)'):
     """Plot data. Base function."""
     # Figure setup
@@ -412,7 +413,7 @@ def save_plot(name):
     name : string
         Name for the figure.
     """
-    filename = name + '.pdf'
+    filename = name + '.png'
     # Show figure if on jupyter notebook
     if isnotebook():
         plt.show()

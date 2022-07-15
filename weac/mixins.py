@@ -436,18 +436,17 @@ class SolutionMixin:
             Reduction factor.
         """
         # Reduction to zero for free end bc
-        if mode in ['A']:
+        if mode in ['A', 'B']:
             kf = 0
         # Reduction factor for touchdown
-        if mode in ['B', 'C']:
-            l = l - self.lC
+        if mode in ['C']:
             # Beta needs to take into account different weak-layer spring stiffness
             beta = self.beta*self.ratio**(1/4)
             kf=(np.cos(2*beta*l)+np.cosh(2*beta*l)-2)/(np.sin(2*beta*l)+np.sinh(2*beta*l))
 
         return kf
 
-    def bc(self, z, l=0, k=False, pos='mid'):
+    def bc(self, z, k=False, pos='mid', mode='A', kR=0):
         """
         Provide equations for free (pst) or infinite (skiers) ends.
 
@@ -471,13 +470,6 @@ class SolutionMixin:
         bc : ndarray
             Boundary condition vector (lenght 3) at position x.
         """
-        # Check mode for free end
-        mode = self.mode_td(l=l)
-        # Get spring stiffness reduction factor
-        kf = self.reduce_stiffness(l=l, mode=mode)
-        # Get spring stiffness for collapsed weak-layer
-        kR = self.calc_rot_spring(collapse=True)
-
         # Set boundary conditions for PST-systems
         if self.system in ['pst-', '-pst']:
             if not k:
@@ -502,13 +494,13 @@ class SolutionMixin:
                 elif mode in ['C'] and pos in ['r', 'right']:
                     # Touchdown right
                     bc = np.array([self.N(z),
-                                   self.M(z) + kf*kR*self.psi(z),
+                                   self.M(z) + kR*self.psi(z),
                                    self.w(z)
                                    ])
                 elif mode in ['C'] and pos in ['l', 'left']:
                     # Touchdown left
                     bc = np.array([self.N(z),
-                                   self.M(z) - kf*kR*self.psi(z),
+                                   self.M(z) - kR*self.psi(z),
                                    self.w(z)
                                    ])
             else:
@@ -531,7 +523,7 @@ class SolutionMixin:
 
         return bc
 
-    def eqs(self, zl, zr, l=0, k=False, pos='mid'):
+    def eqs(self, zl, zr, l=0, k=False, pos='mid', mode='A', kR=0):
         """
         Provide boundary or transmission conditions for beam segments.
 
@@ -562,9 +554,9 @@ class SolutionMixin:
         """
         if pos in ('l', 'left'):
             eqs = np.array([
-                self.bc(zl, l, k, pos)[0],             # Left boundary condition
-                self.bc(zl, l, k, pos)[1],             # Left boundary condition
-                self.bc(zl, l, k, pos)[2],             # Left boundary condition
+                self.bc(zl, k, pos, mode, kR)[0],             # Left boundary condition
+                self.bc(zl, k, pos, mode, kR)[1],             # Left boundary condition
+                self.bc(zl, k, pos, mode, kR)[2],             # Left boundary condition
                 self.u(zr, z0=0),           # ui(xi = li)
                 self.w(zr),                 # wi(xi = li)
                 self.psi(zr),               # psii(xi = li)
@@ -593,9 +585,9 @@ class SolutionMixin:
                 -self.N(zl),                # -Ni(xi = 0)
                 -self.M(zl),                # -Mi(xi = 0)
                 -self.V(zl),                # -Vi(xi = 0)
-                self.bc(zr, l, k, pos)[0],             # Right boundary condition
-                self.bc(zr, l, k, pos)[1],             # Right boundary condition
-                self.bc(zr, l, k, pos)[2]])            # Right boundary condition
+                self.bc(zr, k, pos, mode, kR)[0],             # Right boundary condition
+                self.bc(zr, k, pos, mode, kR)[1],             # Right boundary condition
+                self.bc(zr, k, pos, mode, kR)[2]])            # Right boundary condition
         else:
             raise ValueError(
                 (f'Invalid position argument {pos} given. '
@@ -650,9 +642,12 @@ class SolutionMixin:
         # Set unbedded segment length
         mode = self.mode_td(l=a)
         if mode in ['A', 'B']:
-            lU = a
+            l = a
         if mode in ['C']:
-            lU = self.lS
+            l = self.lS
+
+        # Get spring stiffness for collapsed weak-layer
+        kR = self.reduce_stiffness(l=a-self.lS, mode=mode)*self.calc_rot_spring(collapse=True)
 
         # Assemble list defining the segments
         if self.system == 'skiers':
@@ -661,12 +656,12 @@ class SolutionMixin:
             ki = np.array(ki)                           # Crack
             k0 = np.array(k0)                           # No crack
         elif self.system == 'pst-':
-            li = np.array([L - a, lU])                   # Segment lengths
+            li = np.array([L - a, l])                   # Segment lengths
             mi = np.array([0])                          # Skier weights
             ki = np.array([True, False])                # Crack
             k0 = np.array([True, True])                 # No crack
         elif self.system == '-pst':
-            li = np.array([lU, L - a])                   # Segment lengths
+            li = np.array([l, L - a])                   # Segment lengths
             mi = np.array([0])                          # Skier weights
             ki = np.array([False, True])                # Crack
             k0 = np.array([True, True])                 # No crack
@@ -682,12 +677,12 @@ class SolutionMixin:
 
         # Fill dictionary
         segments = {
-            'nocrack': {'li': li, 'mi': mi, 'ki': k0},
-            'crack': {'li': li, 'mi': mi, 'ki': ki},
-            'both': {'li': li, 'mi': mi, 'ki': ki, 'k0': k0}}
+            'nocrack': {'li': li, 'mi': mi, 'ki': k0, 'mode': mode, 'kR': kR},
+            'crack': {'li': li, 'mi': mi, 'ki': ki, 'mode': mode, 'kR': kR},
+            'both': {'li': li, 'mi': mi, 'ki': ki, 'k0': k0, 'mode': mode, 'kR': kR}}
         return segments
 
-    def assemble_and_solve(self, phi, li, mi, ki):
+    def assemble_and_solve(self, phi, li, mi, ki, mode, kR):
         """
         Compute free constants for arbitrary beam assembly.
 
@@ -772,11 +767,11 @@ class SolutionMixin:
             zhi = self.eqs(
                 zl=self.zh(x=0, l=l, bed=k),
                 zr=self.zh(x=l, l=l, bed=k),
-                l=l, k=k, pos=pos)
+                k=k, pos=pos, mode=mode, kR=kR)
             zpi = self.eqs(
                 zl=self.zp(x=0, phi=phi, bed=k),
                 zr=self.zp(x=l, phi=phi, bed=k),
-                l=l, k=k, pos=pos)
+                k=k, pos=pos, mode=mode, kR=kR)
             # Rows for left-hand side assembly
             start = 0 if i == 0 else 3
             stop = 6 if i == nS - 1 else 9
@@ -799,7 +794,6 @@ class SolutionMixin:
         for i in range(nS):
             # Length, foundation and position of segment i
             l, k, pos = li[i], ki[i], pi[i]
-            mode = self.mode_td(l=l)
             if not k and bool(mode in ['B', 'C']):
                 if i==0:
                     rhs[:3] = np.vstack([0,0,self.tc])

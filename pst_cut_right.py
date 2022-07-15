@@ -8,7 +8,7 @@ import weac
 # === DEFINE SLAB LAYERING ============================================
 
 # Either use custom profile
-myprofile = [[108, 360]]  # (N) last slab layer above weak layer
+myprofile = [[108, 800]]  # (N) last slab layer above weak layer
 
 # Or select a predefined profile from database
 # myprofile = 'medium'
@@ -25,7 +25,7 @@ myprofile = [[108, 360]]  # (N) last slab layer above weak layer
 
 # Input
 totallength = 4000                      # Total length (mm)
-cracklength = 1200.0                       # Crack length (mm)
+cracklength = 1796.0                       # Crack length (mm)
 inclination = 0                      # Slope inclination (°)
 
 # === CREATE MODEL INSTANCES ==========================================
@@ -61,3 +61,7 @@ weac.plot.contours(pst_cut_right, x=xsl_pst, z=z_pst, window=2*totallength, scal
 weac.plot.displacements(pst_cut_right, x=xsl_pst, z=z_pst, **seg_pst)
 weac.plot.stresses(pst_cut_right, x=xwl_pst, z=z_pst, **seg_pst)
 weac.plot.section_forces(pst_cut_right, x=xsl_pst, z=z_pst, **seg_pst)
+
+print('M  ', pst_cut_right.M(z_pst)[-1])
+print('psi', pst_cut_right.psi(z_pst)[-1])
+print('wp ', pst_cut_right.wp(z_pst)[-1])

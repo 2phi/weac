@@ -569,6 +569,7 @@ class Eigensystem:
         self.calc_beta()
         self.calc_span_length()
         self.calc_contact_length()
+        print(f'lC {self.lC}\nlS {self.lS}')
 
     def zh(self, x, l=0, bed=True):
         """
