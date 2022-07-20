@@ -6,7 +6,10 @@ from functools import partial
 
 # Third party imports
 import numpy as np
-from scipy.integrate import romberg
+from scipy.integrate import romberg, cumulative_trapezoid
+
+# Module imports
+from weac.tools import tensile_strength_slab
 
 
 class FieldQuantitiesMixin:
@@ -268,25 +271,6 @@ class FieldQuantitiesMixin:
         """
         return self.dw_dx(Z)/2 - self.u(Z, z0=self.h/2)/self.t
 
-    def maxp(self, Z):
-        """
-        Get maximum principal stress in the weak layer.
-
-        Arguments
-        ---------
-        Z : ndarray
-            Solution vector [u(x) u'(x) w(x) w'(x) psi(x) psi'(x)]^T.
-
-        Returns
-        -------
-        loat
-            Maximum principal stress (MPa) in the weak layer.
-        """
-        sig = self.sig(Z)
-        tau = self.tau(Z)
-        return np.amax([[sig + np.sqrt(sig**2 + 4*tau**2),
-                         sig - np.sqrt(sig**2 + 4*tau**2)]], axis=1)[0]/2
-
     def Gi(self, Ztip, unit='kJ/m^2'):
         """
         Get mode I differential energy release rate at crack tip.
@@ -381,6 +365,125 @@ class FieldQuantitiesMixin:
         """
         return self.tau(z0(x))*self.gamma(z1(x))*self.t
 
+    def dz_dx(self, z, phi):
+        """
+        Get first derivative z'(x) = K*z(x) + q of the solution vector.
+
+        z'(x) = [u'(x) u''(x) w'(x) w''(x) psi'(x), psi''(x)]^T
+
+        Parameters
+        ----------
+        z : ndarray
+            Solution vector [u(x) u'(x) w(x) w'(x) psi(x), psi'(x)]^T
+        phi : float
+            Inclination (degrees). Counterclockwise positive.
+
+        Returns
+        -------
+        ndarray, float
+            First derivative z'(x) for the solution vector (6x1).
+        """
+        K = self.calc_system_matrix()
+        q = self.get_load_vector(phi)
+        return np.dot(K, z) + q
+
+    def dz_dxdx(self, z, phi):
+        """
+        Get second derivative z''(x) = K*z'(x) of the solution vector.
+
+        z''(x) = [u''(x) u'''(x) w''(x) w'''(x) psi''(x), psi'''(x)]^T
+
+        Parameters
+        ----------
+        z : ndarray
+            Solution vector [u(x) u'(x) w(x) w'(x) psi(x), psi'(x)]^T
+        phi : float
+            Inclination (degrees). Counterclockwise positive.
+
+        Returns
+        -------
+        ndarray, float
+            Second derivative z''(x) = (K*z(x) + q)' = K*z'(x) = K*(K*z(x) + q)
+            of the solution vector (6x1).
+        """
+        K = self.calc_system_matrix()
+        q = self.get_load_vector(phi)
+        dz_dx = np.dot(K, z) + q
+        return np.dot(K, dz_dx)
+
+    def du0_dxdx(self, z, phi):
+        """
+        Get second derivative of the horiz. centerline displacement u0''(x).
+
+        Parameters
+        ----------
+        z : ndarray
+            Solution vector [u(x) u'(x) w(x) w'(x) psi(x) psi'(x)]^T.
+        phi : float
+            Inclination (degrees). Counterclockwise positive.
+
+        Returns
+        -------
+        ndarray, float
+            Second derivative of the horizontal centerline displacement
+            u0''(x) (1/mm).
+        """
+        return self.dz_dx(z, phi)[1, :]
+
+    def dpsi_dxdx(self, z, phi):
+        """
+        Get second derivative of the cross-section rotation psi''(x).
+
+        Parameters
+        ----------
+        z : ndarray
+            Solution vector [u(x) u'(x) w(x) w'(x) psi(x) psi'(x)]^T.
+        phi : float
+            Inclination (degrees). Counterclockwise positive.
+
+        Returns
+        -------
+        ndarray, float
+            Second derivative of the cross-section rotation psi''(x) (1/mm^2).
+        """
+        return self.dz_dx(z, phi)[5, :]
+
+    def du0_dxdxdx(self, z, phi):
+        """
+        Get third derivative of the horiz. centerline displacement u0'''(x).
+
+        Parameters
+        ----------
+        z : ndarray
+            Solution vector [u(x) u'(x) w(x) w'(x) psi(x) psi'(x)]^T.
+        phi : float
+            Inclination (degrees). Counterclockwise positive.
+
+        Returns
+        -------
+        ndarray, float
+            Third derivative of the horizontal centerline displacement
+            u0'''(x) (1/mm^2).
+        """
+        return self.dz_dxdx(z, phi)[1, :]
+
+    def dpsi_dxdxdx(self, z, phi):
+        """
+        Get third derivative of the cross-section rotation psi'''(x).
+
+        Parameters
+        ----------
+        z : ndarray
+            Solution vector [u(x) u'(x) w(x) w'(x) psi(x) psi'(x)]^T.
+        phi : float
+            Inclination (degrees). Counterclockwise positive.
+
+        Returns
+        -------
+        ndarray, float
+            Third derivative of the cross-section rotation psi'''(x) (1/mm^3).
+        """
+        return self.dz_dxdx(z, phi)[5, :]
 
 class SolutionMixin:
     """
@@ -877,6 +980,320 @@ class AnalysisMixin:
         # Return total differential energy release rate of all crack tips
         return Gdif.sum(axis=1)
 
+    def get_zmesh(self, dz=2):
+        """
+        Get z-coordinates of grid points and corresponding elastic properties.
+
+        Arguments
+        ---------
+        dz : float, optional
+            Element size along z-axis (mm). Default is 2 mm.
+
+        Returns
+        -------
+        mesh : ndarray
+            Mesh along z-axis. Columns are a list of z-coordinates (mm) of
+            grid points along z-axis with at least two grid points (top,
+            bottom) per layer, Young's modulus of each grid point, shear
+            modulus of each grid point, and Poisson's ratio of each grid
+            point.
+        """
+        # Get ply (layer) coordinates
+        z = self.get_ply_coordinates()
+        # Compute number of grid points per layer
+        nlayer = np.ceil((z[1:] - z[:-1])/dz).astype(np.int32) + 1
+        # Calculate grid points as list of z-coordinates (mm)
+        zi = np.hstack([
+            np.linspace(z[i], z[i + 1], n, endpoint=True)
+            for i, n in enumerate(nlayer)
+        ])
+        # Get lists of corresponding elastic properties (E, nu, rho)
+        si = np.repeat(self.slab[:, [2, 4, 0]], nlayer, axis=0)
+        # Assemble mesh with columns (z, E, G, nu)
+        return np.column_stack([zi, si])
+
+    def Sxx(self, Z, phi, dz=2, unit='kPa'):
+        """
+        Compute axial normal stress in slab layers.
+
+        Arguments
+        ----------
+        Z : ndarray
+            Solution vector [u(x) u'(x) w(x) w'(x) psi(x), psi'(x)]^T
+        phi : float
+            Inclination (degrees). Counterclockwise positive.
+        dz : float, optional
+            Element size along z-axis (mm). Default is 2 mm.
+        unit : {'kPa', 'MPa'}, optional
+            Desired output unit. Default is 'kPa'.
+
+        Returns
+        -------
+        ndarray, float
+            Axial slab normal stress in specified unit.
+        """
+        # Unit conversion dict
+        convert = {
+            'kPa': 1e3,
+            'MPa': 1
+        }
+
+        # Get mesh along z-axis
+        zmesh = self.get_zmesh(dz=dz)
+        zi = zmesh[:, 0]
+        rho = 1e-12*zmesh[:, 3]
+
+        # Get dimensions of stress field (n rows, m columns)
+        n = zmesh.shape[0]
+        m = Z.shape[1]
+
+        # Initialize axial normal stress Sxx
+        Sxx = np.zeros(shape=[n, m])
+
+        # Compute axial normal stress Sxx at grid points in MPa
+        for i, (z, E, nu, _) in enumerate(zmesh):
+            Sxx[i, :] = E/(1-nu**2)*self.du_dx(Z, z)
+
+        # Calculate weight load at grid points and superimpose on stress field
+        qt = -rho*self.g*np.sin(np.deg2rad(phi))
+        for i, qi in enumerate(qt[:-1]):
+            Sxx[i, :] += qi*(zi[i+1] - zi[i])
+        Sxx[-1, :] += qt[-1]*(zi[-1] - zi[-2])
+
+        # Return axial normal stress in specified unit
+        return convert[unit]*Sxx
+
+    def Txz(self, Z, phi, dz=2, unit='kPa'):
+        """
+        Compute shear stress in slab layers.
+
+        Arguments
+        ----------
+        Z : ndarray
+            Solution vector [u(x) u'(x) w(x) w'(x) psi(x), psi'(x)]^T
+        phi : float
+            Inclination (degrees). Counterclockwise positive.
+        dz : float, optional
+            Element size along z-axis (mm). Default is 2 mm.
+        unit : {'kPa', 'MPa'}, optional
+            Desired output unit. Default is 'kPa'.
+
+        Returns
+        -------
+        ndarray
+            Shear stress at grid points in the slab in specified unit.
+        """
+        # Unit conversion dict
+        convert = {
+            'kPa': 1e3,
+            'MPa': 1
+        }
+        # Get mesh along z-axis
+        zmesh = self.get_zmesh(dz=dz)
+        zi = zmesh[:, 0]
+        rho = 1e-12*zmesh[:, 3]
+
+        # Get dimensions of stress field (n rows, m columns)
+        n = zmesh.shape[0]
+        m = Z.shape[1]
+
+        # Get second derivatives of centerline displacement u0 and
+        # cross-section rotaiton psi of all grid points along the x-axis
+        du0_dxdx = self.du0_dxdx(Z, phi)
+        dpsi_dxdx = self.dpsi_dxdx(Z, phi)
+
+        # Initialize first derivative of axial normal stress sxx w.r.t. x
+        dsxx_dx = np.zeros(shape=[n, m])
+
+        # Calculate first derivative of sxx at z-grid points
+        for i, (z, E, nu, _) in enumerate(zmesh):
+            dsxx_dx[i, :] = E/(1-nu**2)*(du0_dxdx + z*dpsi_dxdx)
+
+        # Calculate weight load at grid points
+        qt = -rho*self.g*np.sin(np.deg2rad(phi))
+
+        # Integrate -dsxx_dx along z and add cumulative weight load
+        # to obtain shear stress Txz in MPa
+        Txz = cumulative_trapezoid(dsxx_dx, zi, axis=0, initial=0)
+        Txz += cumulative_trapezoid(qt, zi, initial=0)[:, None]
+
+        # Return shear stress Txz in specified unit
+        return convert[unit]*Txz
+
+    def Szz(self, Z, phi, dz=2, unit='kPa'):
+        """
+        Compute transverse normal stress in slab layers.
+
+        Arguments
+        ----------
+        Z : ndarray
+            Solution vector [u(x) u'(x) w(x) w'(x) psi(x), psi'(x)]^T
+        phi : float
+            Inclination (degrees). Counterclockwise positive.
+        dz : float, optional
+            Element size along z-axis (mm). Default is 2 mm.
+        unit : {'kPa', 'MPa'}, optional
+            Desired output unit. Default is 'kPa'.
+
+        Returns
+        -------
+        ndarray, float
+            Transverse normal stress at grid points in the slab in
+            specified unit.
+        """
+        # Unit conversion dict
+        convert = {
+            'kPa': 1e3,
+            'MPa': 1
+        }
+
+        # Get mesh along z-axis
+        zmesh = self.get_zmesh(dz=dz)
+        zi = zmesh[:, 0]
+        rho = 1e-12*zmesh[:, 3]
+
+        # Get dimensions of stress field (n rows, m columns)
+        n = zmesh.shape[0]
+        m = Z.shape[1]
+
+        # Get third derivatives of centerline displacement u0 and
+        # cross-section rotaiton psi of all grid points along the x-axis
+        du0_dxdxdx = self.du0_dxdxdx(Z, phi)
+        dpsi_dxdxdx = self.dpsi_dxdxdx(Z, phi)
+
+        # Initialize second derivative of axial normal stress sxx w.r.t. x
+        dsxx_dxdx = np.zeros(shape=[n, m])
+
+        # Calculate second derivative of sxx at z-grid points
+        for i, (z, E, nu, _) in enumerate(zmesh):
+            dsxx_dxdx[i, :] = E/(1-nu**2)*(du0_dxdxdx + z*dpsi_dxdxdx)
+
+        # Calculate weight load at grid points
+        qn = rho*self.g*np.cos(np.deg2rad(phi))
+
+        # Integrate dsxx_dxdx twice along z to obtain transverse
+        # normal stress Szz in MPa
+        integrand = cumulative_trapezoid(dsxx_dxdx, zi, axis=0, initial=0)
+        Szz = cumulative_trapezoid(integrand, zi, axis=0, initial=0)
+        Szz += cumulative_trapezoid(-qn, zi, initial=0)[:, None]
+
+        # Return shear stress txz in specified unit
+        return convert[unit]*Szz
+
+    def principal_stress_slab(self, Z, phi, dz=2, unit='kPa',
+                              val='max', normalize=False):
+        """
+        Compute maxium or minimum principal stress in slab layers.
+
+        Arguments
+        ---------
+        Z : ndarray
+            Solution vector [u(x) u'(x) w(x) w'(x) psi(x), psi'(x)]^T
+        phi : float
+            Inclination (degrees). Counterclockwise positive.
+        dz : float, optional
+            Element size along z-axis (mm). Default is 2 mm.
+        unit : {'kPa', 'MPa'}, optional
+            Desired output unit. Default is 'kPa'.
+        val : str, optional
+            Maximum 'max' or minimum 'min' principal stress. Default is 'max'.
+        normalize : bool
+
+
+        Returns
+        -------
+        ndarray
+            Maximum or minimum principal stress in specified unit.
+
+        Raises
+        ------
+        ValueError
+            If specified principal stress component is neither 'max' nor
+            'min', or if normalization of compressive principal stress
+            is requested.
+        """
+        # Raise error if specified component is not available
+        if val not in ['min', 'max']:
+            raise ValueError(f'Component {val} not defined.')
+
+        # Multiplier selection dict
+        m = {'max': 1, 'min': -1}
+
+        # Get axial normal stresses, shear stresses, transverse normal stresses
+        Sxx = self.Sxx(Z=Z, phi=phi, dz=dz, unit=unit)
+        Txz = self.Txz(Z=Z, phi=phi, dz=dz, unit=unit)
+        Szz = self.Szz(Z=Z, phi=phi, dz=dz, unit=unit)
+
+        # Calculate principal stress
+        Ps = (Sxx + Szz)/2 + m[val]*np.sqrt((Sxx - Szz)**2 + 4*Txz**2)/2
+
+        # Raise error if normalization of compressive stresses is attempted
+        if normalize and val == 'min':
+            raise ValueError('Can only normlize tensile stresses.')
+
+        # Normalize tensile stresses to tensile strength
+        if normalize and val == 'max':
+            # Get layer densities
+            rho = self.get_zmesh(dz=dz)[:, 3]
+            # Normlize maximum principal stress to layers' tensile strength
+            return Ps/tensile_strength_slab(rho, unit=unit)[:, None]
+
+        # Return absolute principal stresses
+        return Ps
+
+    def principal_stress_weaklayer(self, Z, sc=2.6, unit='kPa', val='min',
+                                   normalize=False):
+        """
+        Compute maxium or minimum principal stress in the weak layer.
+
+        Arguments
+        ---------
+        Z : ndarray
+            Solution vector [u(x) u'(x) w(x) w'(x) psi(x), psi'(x)]^T
+        sc : float
+            Weak-layer compressive strength. Default is 2.6 kPa.
+        unit : {'kPa', 'MPa'}, optional
+            Desired output unit. Default is 'kPa'.
+        val : str, optional
+            Maximum 'max' or minimum 'min' principal stress. Default is 'min'.
+        normalize : bool
+
+        Returns
+        -------
+        ndarray
+            Maximum or minimum principal stress in specified unit.
+
+        Raises
+        ------
+        ValueError
+            If specified principal stress component is neither 'max' nor
+            'min', or if normalization of tensile principal stress
+            is requested.
+        """
+        # Raise error if specified component is not available
+        if val not in ['min', 'max']:
+            raise ValueError(f'Component {val} not defined.')
+
+        # Multiplier selection dict
+        m = {'max': 1, 'min': -1}
+
+        # Get weak-layer normal and shear stresses
+        sig = self.sig(Z, unit=unit)
+        tau = self.tau(Z, unit=unit)
+
+        # Calculate principal stress
+        ps = sig/2 + m[val]*np.sqrt(sig**2 + 4*tau**2)/2
+
+        # Raise error if normalization of tensile stresses is attempted
+        if normalize and val == 'max':
+            raise ValueError('Can only normlize compressive stresses.')
+
+        # Normalize compressive stresses to compressive strength
+        if normalize and val == 'min':
+            return ps/sc
+
+        # Return absolute principal stresses
+        return ps
 
 class OutputMixin:
     """
