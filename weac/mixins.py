@@ -42,7 +42,7 @@ class FieldQuantitiesMixin:
         }
         return convert[unit]*Z[2, :]
 
-    def wp(self, Z):
+    def dw_dx(self, Z):
         """
         Get first derivative w' of the centerline deflection.
 
@@ -80,7 +80,7 @@ class FieldQuantitiesMixin:
             psi = Z[4, :]
         return psi
 
-    def psip(self, Z):
+    def dpsi_dx(self, Z):
         """
         Get first derivative psi' of the midplane rotation.
 
@@ -124,7 +124,7 @@ class FieldQuantitiesMixin:
         }
         return convert[unit]*(Z[0, :] + z0*self.psi(Z))
 
-    def up(self, Z, z0):
+    def du_dx(self, Z, z0):
         """
         Get first derivative of the horizontal displacement.
 
@@ -141,7 +141,7 @@ class FieldQuantitiesMixin:
             First derivative u' = u0' + z0 psi' of the horizontal
             displacement of the slab.
         """
-        return Z[1, :] + z0*self.psip(Z)
+        return Z[1, :] + z0*self.dpsi_dx(Z)
 
     def N(self, Z):
         """
@@ -234,7 +234,7 @@ class FieldQuantitiesMixin:
             'MPa': 1
         }
         return -convert[unit]*self.kt*(
-            self.wp(Z)*self.t/2 - self.u(Z, z0=self.h/2))
+            self.dw_dx(Z)*self.t/2 - self.u(Z, z0=self.h/2))
 
     def eps(self, Z):
         """
@@ -266,7 +266,7 @@ class FieldQuantitiesMixin:
         float
             Weak-layer shear strain gamma.
         """
-        return self.wp(Z)/2 - self.u(Z, z0=self.h/2)/self.t
+        return self.dw_dx(Z)/2 - self.u(Z, z0=self.h/2)/self.t
 
     def maxp(self, Z):
         """
