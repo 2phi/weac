@@ -54,7 +54,7 @@ class Eigensystem:
         Bending stiffness of the slab (Nmm).
     kA55 : float
         Shear stiffness of the slab (N/mm).
-    E0 : float
+    K0 : float
         Characteristic stiffness value (N).
     ewC : ndarray
         List of complex eigenvalues.
@@ -114,7 +114,7 @@ class Eigensystem:
         self.B11 = False        # Slab bending-extension coupling stiffness
         self.D11 = False        # Slab bending stiffness
         self.kA55 = False       # Slab shear stiffness
-        self.E0 = False         # Stiffness determinant
+        self.K0 = False         # Stiffness determinant
 
         # Inizialize eigensystem attributes
         self.ewC = False        # Complex eigenvalues
@@ -123,7 +123,6 @@ class Eigensystem:
         self.evR = False        # Real eigenvectors
         self.sC = False         # Stability shift of complex eigenvalues
         self.sR = False         # Stability shift of real eigenvalues
-        self.sysmat = False     # System matrix
 
     def set_foundation_properties(self, t=30, E=0.25, nu=0.25, update=False):
         """
@@ -259,50 +258,86 @@ class Eigensystem:
         self.B11 = B11
         self.D11 = D11
         self.kA55 = kA55
-        self.E0 = B11**2 - A11*D11
+        self.K0 = B11**2 - A11*D11
 
     def calc_system_matrix(self):
         """
-        Assemble first-order ODE system matrix.
+        Assemble first-order ODE system matrix K.
 
         Using the solution vector z = [u, u', w, w', psi, psi']
         the ODE system is written in the form Az' + Bz = d
-        and rearranged to z' = -(A ^ -1)Bz + (A ^ -1)d = Ez + F
+        and rearranged to z' = -(A ^ -1)Bz + (A ^ -1)d = Kz + q
+
+        Returns
+        -------
+        ndarray
+            System matrix K (6x6).
         """
         kn = self.kn
         kt = self.kt
 
         # Abbreviations (MIT t/2 im GGW, MIT w' in Kinematik)
-        E21 = kt*(-2*self.D11 + self.B11*(self.h + self.t))/(2*self.E0)
-        E24 = (2*self.D11*kt*self.t
+        K21 = kt*(-2*self.D11 + self.B11*(self.h + self.t))/(2*self.K0)
+        K24 = (2*self.D11*kt*self.t
                - self.B11*kt*self.t*(self.h + self.t)
-               + 4*self.B11*self.kA55)/(4*self.E0)
-        E25 = (-2*self.D11*self.h*kt
+               + 4*self.B11*self.kA55)/(4*self.K0)
+        K25 = (-2*self.D11*self.h*kt
                + self.B11*self.h*kt*(self.h + self.t)
-               + 4*self.B11*self.kA55)/(4*self.E0)
-        E43 = kn/self.kA55
-        E61 = kt*(2*self.B11 - self.A11*(self.h + self.t))/(2*self.E0)
-        E64 = (-2*self.B11*kt*self.t
+               + 4*self.B11*self.kA55)/(4*self.K0)
+        K43 = kn/self.kA55
+        K61 = kt*(2*self.B11 - self.A11*(self.h + self.t))/(2*self.K0)
+        K64 = (-2*self.B11*kt*self.t
                + self.A11*kt*self.t*(self.h+self.t)
-               - 4*self.A11*self.kA55)/(4*self.E0)
-        E65 = (2*self.B11*self.h*kt
+               - 4*self.A11*self.kA55)/(4*self.K0)
+        K65 = (2*self.B11*self.h*kt
                - self.A11*self.h*kt*(self.h+self.t)
-               - 4*self.A11*self.kA55)/(4*self.E0)
+               - 4*self.A11*self.kA55)/(4*self.K0)
 
         # System matrix
-        E = [[0,    1,    0,    0,    0,    0],
-             [E21,    0,    0,  E24,  E25,    0],
+        K = [[0,    1,    0,    0,    0,    0],
+             [K21,  0,    0,  K24,  K25,    0],
              [0,    0,    0,    1,    0,    0],
-             [0,    0,  E43,    0,    0,   -1],
+             [0,    0,  K43,    0,    0,   -1],
              [0,    0,    0,    0,    0,    1],
-             [E61,    0,    0,  E64,  E65,    0]]
+             [K61,  0,    0,  K64,  K65,    0]]
 
-        self.sysmat = np.array(E)
+        return np.array(K)
+
+    def get_load_vector(self, phi):
+        """
+        Compute sytem load vector q.
+
+        Using the solution vector z = [u, u', w, w', psi, psi']
+        the ODE system is written in the form Az' + Bz = d
+        and rearranged to z' = -(A ^ -1)Bz + (A ^ -1)d = Kz + q
+
+        Arguments
+        ---------
+        phi : float
+            Inclination (degrees). Counterclockwise positive.
+
+        Returns
+        -------
+        ndarray
+            System load vector q (6x1).
+        """
+        qn, qt = self.get_weight_load(phi)
+        pn, pt = self.get_surface_load(phi)
+        return np.array([
+            [0],
+            [(self.B11*(self.h*pt - 2*qt*self.zs)
+              + 2*self.D11*(qt + pt))/(2*self.K0)],
+            [0],
+            [-(qn + pn)/self.kA55],
+            [0],
+            [-(self.A11*(self.h*pt - 2*qt*self.zs)
+               + 2*self.B11*(qt + pt))/(2*self.K0)]
+        ])
 
     def calc_eigensystem(self):
         """Calculate eigenvalues and eigenvectors of the system matrix."""
         # Calculate eigenvalues (ew) and eigenvectors (ev)
-        ew, ev = np.linalg.eig(self.sysmat)
+        ew, ev = np.linalg.eig(self.calc_system_matrix())
         # Classify real and complex eigenvalues
         real = (ew.imag == 0) & (ew.real != 0)  # real eigenvalues
         cmplx = ew.imag > 0                   # positive complex conjugates
@@ -320,7 +355,6 @@ class Eigensystem:
         """Calculate the fundamental system of the problem."""
         self.calc_foundation_stiffness()
         self.calc_laminate_stiffness_matrix()
-        self.calc_system_matrix()
         self.calc_eigensystem()
 
     def get_weight_load(self, phi):
@@ -434,7 +468,7 @@ class Eigensystem:
             # Abbreviations
             H14 = 3*self.B11/self.A11*x**2
             H24 = 6*self.B11/self.A11*x
-            H54 = -3*x**2 + 6*self.E0/(self.A11*self.kA55)
+            H54 = -3*x**2 + 6*self.K0/(self.A11*self.kA55)
             # Complementary solution matrix of free segments
             zh = np.array(
                 [[0,      0,      0,    H14,      1,      x],
@@ -477,7 +511,7 @@ class Eigensystem:
         A11 = self.A11
         B11 = self.B11
         kA55 = self.kA55
-        E0 = self.E0
+        E0 = self.K0
 
         # Unpack geometric properties
         h = self.h

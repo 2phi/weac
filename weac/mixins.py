@@ -542,7 +542,7 @@ class SolutionMixin:
             ki = np.array([False, True])                # Crack
             k0 = np.array([True, True])                 # No crack
         elif self.system == 'skier':
-            lb = (L - a)/2                              # Half bedded length
+            lb = (L - a)/2                              # Half supported length
             lf = a/2                                    # Half free length
             li = np.array([lb, lf, lf, lb])             # Segment lengths
             mi = np.array([0, m, 0])                    # Skier weights
@@ -595,7 +595,7 @@ class SolutionMixin:
 
         # No foundation
         if not any(ki):
-            raise ValueError('Provide at least one bedded segment.')
+            raise ValueError('Provide at least one supported segment.')
         # Mismatch of number of segements and transisions
         if len(li) != len(ki) or len(li) - 1 != len(mi):
             raise ValueError('Make sure len(li)=N, len(ki)=N, and '
@@ -604,7 +604,7 @@ class SolutionMixin:
         if self.system not in ['pst-', '-pst']:
             # Boundary segements must be on foundation for infinite BCs
             if not all([ki[0], ki[-1]]):
-                raise ValueError('Provide bedded boundary segments in '
+                raise ValueError('Provide supported boundary segments in '
                                  'order to account for infinite extensions.')
             # Make sure infinity boundary conditions are far enough from skiers
             if li[0] < 5e3 or li[-1] < 5e3:
@@ -730,7 +730,7 @@ class AnalysisMixin:
         nqc = np.insert(np.cumsum(nq), 0, 0)
 
         # Initialize arrays
-        isbedded = np.full(nq.sum(), True)
+        issupported = np.full(nq.sum(), True)
         xq = np.full(nq.sum(), np.nan)
         zq = np.full([6, xq.size], np.nan)
 
@@ -744,7 +744,7 @@ class AnalysisMixin:
             xq[nqc[i]:nqc[i + 1]] = x0 + xi
             # Mask coordinates not on foundation (including endpoints)
             if not ki[i]:
-                isbedded[nqc[i]:nqc[i + 1]] = False
+                issupported[nqc[i]:nqc[i + 1]] = False
             # Compute segment solution
             zi = self.z(xi, C[:, [i]], l, phi, ki[i])
             # Assemble global solution matrix
@@ -753,11 +753,11 @@ class AnalysisMixin:
         # Make sure cracktips are included
         transmissionbool = [ki[j] or ki[j + 1] for j, _ in enumerate(ki[:-1])]
         for i, truefalse in enumerate(transmissionbool, start=1):
-            isbedded[nqc[i]] = truefalse
+            issupported[nqc[i]] = truefalse
 
         # Assemble vector of coordinates on foundation
         xb = np.full(nq.sum(), np.nan)
-        xb[isbedded] = xq[isbedded]
+        xb[issupported] = xq[issupported]
 
         return xq, zq, xb
 
