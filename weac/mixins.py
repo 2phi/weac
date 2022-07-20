@@ -93,7 +93,7 @@ class FieldQuantitiesMixin:
         -------
         float
             First derivative psi' of the midplane rotation (radians/mm)
-             of the slab.
+            of the slab.
         """
         return Z[5, :]
 
@@ -114,7 +114,7 @@ class FieldQuantitiesMixin:
         Returns
         -------
         float
-            Horizontal displacement u (mm) of the slab.
+            Horizontal displacement u (unit) of the slab.
         """
         convert = {
             'm': 1e-3,   # meters
@@ -848,7 +848,7 @@ class AnalysisMixin:
         ntr = len(li) - 1
         itr = np.arange(ntr)
 
-        # Identify bedded-free and free-bedded transitions as crack tips
+        # Identify supported-free and free-supported transitions as crack tips
         iscracktip = [ki[j] != ki[j + 1] for j in range(ntr)]
 
         # Transition indices of crack tips and total number of crack tips

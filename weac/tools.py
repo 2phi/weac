@@ -3,6 +3,7 @@
 
 # Standard library imports
 from timeit import default_timer as timer
+from IPython import get_ipython
 
 # Third party imports
 import numpy as np
@@ -33,6 +34,10 @@ def load_dummy_profile(profile_id):
     soft = [180., 120., 5]
     medium = [270., 120., 30]
     hard = [350., 120., 93.8]
+    # soft = [120., 120., 0.3]
+    # medium = [180., 120., 1.5]
+    # hard = [270., 120., 7.5]
+
 
     # Database (top to bottom)
     database = {

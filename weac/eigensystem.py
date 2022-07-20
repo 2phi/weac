@@ -28,7 +28,7 @@ class Eigensystem:
         Type of boundary value problem. Default is 'pst-'.
     weak : dict
         Dictionary that holds the weak layer properties Young's
-        modulus (MPa) and Poisson's raito. Defaults are 0.25
+        modulus (MPa) and Poisson's ratio. Defaults are 0.25
         and 0.25, respectively.
     t : float
         Weak-layer thickness (mm). Default is 30.
