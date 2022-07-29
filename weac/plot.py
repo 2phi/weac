@@ -3,9 +3,11 @@
 # pylint: disable=too-many-arguments,too-many-statements
 
 # Third party imports
-from matplotlib.colors import Normalize
+# from matplotlib.colors import Normalize
 import numpy as np
 import matplotlib.pyplot as plt
+import matplotlib.colors as mc
+import colorsys
 
 # Project imports
 from weac.tools import isnotebook
@@ -43,13 +45,13 @@ def set_plotstyles():
 # === CONVENIENCE FUNCTIONS ===================================================
 
 
-class MidpointNormalize(Normalize):
+class MidpointNormalize(mc.Normalize):
     """Colormap normalization to a specified midpoint. Default is 0."""
 
     def __init__(self, vmin, vmax, midpoint=0, clip=False):
         """Inizialize normalization."""
         self.midpoint = midpoint
-        Normalize.__init__(self, vmin, vmax, clip)
+        mc.Normalize.__init__(self, vmin, vmax, clip)
 
     def __call__(self, value, clip=None):
         """Make instances callable as functions."""
