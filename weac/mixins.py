@@ -1198,7 +1198,7 @@ class AnalysisMixin:
         val : str, optional
             Maximum 'max' or minimum 'min' principal stress. Default is 'max'.
         normalize : bool
-
+            Toggle layerwise normalization to strength.
 
         Returns
         -------
@@ -1257,6 +1257,7 @@ class AnalysisMixin:
         val : str, optional
             Maximum 'max' or minimum 'min' principal stress. Default is 'min'.
         normalize : bool
+            Toggle layerwise normalization to strength.
 
         Returns
         -------
