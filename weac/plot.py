@@ -4,9 +4,10 @@
 
 # Third party imports
 import os
-from matplotlib.colors import Normalize
 import numpy as np
 import matplotlib.pyplot as plt
+import matplotlib.colors as mc
+import colorsys
 
 # Project imports
 from weac.tools import isnotebook
@@ -44,13 +45,13 @@ def set_plotstyles():
 # === CONVENIENCE FUNCTIONS ===================================================
 
 
-class MidpointNormalize(Normalize):
+class MidpointNormalize(mc.Normalize):
     """Colormap normalization to a specified midpoint. Default is 0."""
 
     def __init__(self, vmin, vmax, midpoint=0, clip=False):
         """Inizialize normalization."""
         self.midpoint = midpoint
-        Normalize.__init__(self, vmin, vmax, clip)
+        mc.Normalize.__init__(self, vmin, vmax, clip)
 
     def __call__(self, value, clip=None):
         """Make instances callable as functions."""
@@ -73,6 +74,70 @@ def outline(grid):
 
     return np.hstack([top, right, bot, left])
 
+
+def significant_digits(decimal):
+    """
+    Get the number of significant digits.
+
+    Arguments
+    ---------
+    decimal : float
+        Decimal number.
+
+    Returns
+    -------
+    int
+        Number of significant digits.
+    """
+    return -int(np.floor(np.log10(decimal)))
+
+
+def tight_central_distribution(limit, samples=100, tightness=1.5):
+    """
+    Provide values within a given interval distributed tightly around 0.
+
+    Parameters
+    ----------
+    limit : float
+        Maximum and minimum of value range.
+    samples : int, optional
+        Number of values. Default is 100.
+    tightness : int, optional
+        Degree of value densification at center. 1.0 corresponds
+        to equal spacing. Default is 1.5.
+
+    Returns
+    -------
+    ndarray
+        Array of values more tightly spaced around 0.
+    """
+    stop = limit**(1/tightness)
+    levels = np.linspace(0, stop, num=int(samples/2), endpoint=True)**tightness
+    return np.unique(np.hstack([-levels[::-1], levels]))
+
+
+def adjust_lightness(color, amount=0.5):
+    """
+    Adjust color lightness.
+
+    Arguments
+    ----------
+    color : str or tuple
+        Matplotlib colorname, hex string, or RGB value tuple.
+    amount : float, optional
+        Amount of lightening: >1 lightens, <1 darkens. Default is 0.5.
+
+    Returns
+    -------
+    tuple
+        RGB color tuple.
+    """
+    try:
+        c = mc.cnames[color]
+    except KeyError:
+        c = color
+    c = colorsys.rgb_to_hls(*mc.to_rgb(c))
+    return colorsys.hls_to_rgb(c[0], max(0, min(1, amount * c[1])), c[2])
 
 # === PLOT SLAB PROFILE =======================================================
 
@@ -121,63 +186,192 @@ def slab_profile(instance):
 # === DEFORMATION CONTOUR PLOT ================================================
 
 
-def contours(instance, x, z, window=1e12, scale=100):
+def deformed(instance, xsl, xwl, z, phi, dz=2, scale=100,
+             window=np.inf, pad=2, levels=300, aspect=2,
+             field='principal', normalize=True, dark=False):
     """
-    Plot 2D deformation contours.
+    Plot 2D deformed solution with displacement or stress fields.
 
     Arguments
     ---------
     instance : object
         Instance of layered class.
-    x : ndarray
-        Discretized x-coordinates (mm).
+    xsl : ndarray
+        Discretized slab x-coordinates (mm).
+    xwl : ndarray
+        Discretized weak-layer x-coordinates (mm).
     z : ndarray
         Solution vectors at positions x as columns of matrix z.
-    window : int
-        Plot window (cm) around maximum vertical deflection.
-    scale : int
-        Scaling factor for the visualization of displacements.
+    phi : float
+        Inclination (degrees). Counterclockwise positive.
+    dz : float, optional
+        Element size along z-axis (mm) for stress plot. Default is 2 mm.
+    scale : int, optional
+        Scaling factor for the visualization of displacements. Default
+        is 100.
+    window : int, optional
+        Plot window (cm) around maximum vertical deflection. Default
+        is inf (full view).
+    pad : float, optional
+        Padding around shown geometry. Default is 2.
+    levels : int, optional
+        Number of isolevels. Default is 300.
+    aspect : int, optional
+        Aspect ratio of the displayed geometry. 1 is true to scale.
+        Default is 2.
+    field : {'u', 'w', 'Sxx', 'Txz', 'Szz', 'principal'}, optional
+        Field quantity for contour plot. Axial deformation 'u', vertical
+        deflection 'w', axial normal stress 'Sxx', shear stress 'Txz',
+        transverse normal stress 'Szz', or principal stresses 'principal'.
+    normalize : bool, optional
+        Toggle layerwise normalization of principal stresses to respective
+        strength. Only available with field='principal'. Default is True.
+    dark : bool, optional
+        Toggle display on dark figure background. Default is False.
+
+    Raises
+    ------
+    ValueError
+        If invalid stress or displacement field is requested.
     """
     # Plot Setup
     plt.rcdefaults()
     plt.rc('font', family='serif', size=10)
     plt.rc('mathtext', fontset='cm')
 
+    # Set dark figure background if requested
+    if dark:
+        plt.style.use('dark_background')
+        fig = plt.figure()
+        ax = plt.gca()
+        fig.set_facecolor('#282c34')
+        ax.set_facecolor('white')
+
     # Calculate top-to-bottom vertical positions (mm) in beam coordinate system
-    y = np.linspace(-instance.h/2, instance.h/2, num=21)
+    zi = instance.get_zmesh(dz=dz)[:, 0]
 
-    # Compute displacements on grid (cm)
-    U = 1e-1*np.vstack([instance.u(z, z0=y, unit='mm') for y in y])
-    W = 1e-1*np.vstack([instance.w(z, unit='mm') for _ in y])
+    # Compute slab displacements on grid (cm)
+    Usl = np.vstack([instance.u(z, z0=z0, unit='cm') for z0 in zi])
+    Wsl = np.vstack([instance.w(z, unit='cm') for _ in zi])
 
-    # Compute grid coordinates with vertical origin at top surface (cm)
-    X, Y = np.meshgrid(1e-1*x, 1e-1*(y + instance.h/2))
+    # Put coordinate origin at horizontal center
+    if instance.system in ['skier', 'skiers']:
+        xsl = xsl - max(xsl)/2
+        xwl = xwl - max(xwl)/2
 
-    # Plot outline
-    plt.plot(outline(X), outline(Y), 'k--', alpha=0.3, linewidth=1)
-    plt.plot(outline(X+scale*U), outline(Y+scale*W), 'k', linewidth=1)
+    # Compute slab grid coordinates with vertical origin at top surface (cm)
+    Xsl, Zsl = np.meshgrid(1e-1*(xsl), 1e-1*zi)
 
-    # Get x-coordinate of maximum deflection w (cm) and derive plot x-limits
-    xfocus = x[np.max(np.argmax(W, axis=1))]/10
-    xmax = np.min([np.max(X+scale*U)+1e-1*instance.h/4, xfocus + window/2])
-    xmin = np.max([np.min(X)-1e-1*instance.h/4, xfocus - window/2])
+    # Get x-coordinate of maximum deflection w (cm) and derive plot limits
+    xfocus = xsl[np.max(np.argmax(Wsl, axis=1))]/10
+    xmax = np.min([np.max([Xsl, Xsl+scale*Usl]) + pad, xfocus + window/2])
+    xmin = np.max([np.min([Xsl, Xsl+scale*Usl]) - pad, xfocus - window/2])
 
-    # From maximum of deflection w (cm) and slab height h (cm) derive plot y-limits
-    ymin = -instance.h/40
-    ymax = 5/4*instance.h/10+scale*np.max(W)
-    
+    # Scale shown weak-layer thickness with to max deflection and add padding
+    zmax = np.max(Zsl + scale*Wsl) + pad
+    zmin = np.min(Zsl) - pad
+
+    # Compute weak-layer grid coordinates (cm)
+    Xwl, Zwl = np.meshgrid(1e-1*xwl, [1e-1*zi[-1], zmax])
+
+    # Assemble weak-layer displacement field (top and bottom)
+    Uwl = np.row_stack([Usl[-1, :], np.zeros(xwl.shape[0])])
+    Wwl = np.row_stack([Wsl[-1, :], np.zeros(xwl.shape[0])])
+
+    # Compute stress or displacement fields
+    match field:
+        # Horizontal displacements (um)
+        case 'u':
+            slab = 1e4*Usl
+            weak = 1e4*Usl[-1, :]
+            label = r'$u$ ($\mu$m)'
+        # Vertical deflection (um)
+        case 'w':
+            slab = 1e4*Wsl
+            weak = 1e4*Wsl[-1, :]
+            label = r'$w$ ($\mu$m)'
+        # Axial normal stresses (kPa)
+        case 'Sxx':
+            slab = instance.Sxx(z, phi, dz=dz, unit='kPa')
+            weak = np.zeros(xwl.shape[0])
+            label = r'$\sigma_{xx}$ (kPa)'
+        # Shear stresses (kPa)
+        case 'Txz':
+            slab = instance.Txz(z, phi, dz=dz, unit='kPa')
+            weak = instance.get_weaklayer_shearstress(
+                x=xwl, z=z, unit='kPa')[1]
+            label = r'$\tau_{xz}$ (kPa)'
+        # Transverse normal stresses (kPa)
+        case 'Szz':
+            slab = instance.Szz(z, phi, dz=dz, unit='kPa')
+            weak = instance.get_weaklayer_normalstress(
+                x=xwl, z=z, unit='kPa')[1]
+            label = r'$\sigma_{zz}$ (kPa)'
+        # Principal stresses
+        case 'principal':
+            slab = instance.principal_stress_slab(
+                z, phi, dz=dz, val='max', unit='kPa', normalize=normalize)
+            weak = instance.principal_stress_weaklayer(
+                z, val='min', unit='kPa', normalize=normalize)
+            if normalize:
+                label=(r'$\sigma_\mathrm{I}/\sigma_+$ (slab),  '
+                       r'$\sigma_\mathrm{I\!I\!I}/\sigma_-$ (weak layer)')
+            else:
+                label=(r'$\sigma_\mathrm{I}$ (kPa, slab),  '
+                       r'$\sigma_\mathrm{I\!I\!I}$ (kPa, weak layer)')
+        case _:
+            raise ValueError(
+                f"Invalid input '{field}' for field. Valid options are "
+                "'u', 'w', 'Sxx', 'Txz', 'Szz', or 'principal'")
+
+    # Complement label
+    label += r'  $\longrightarrow$'
+
+    # Assemble weak-layer output on grid
+    weak = np.row_stack([weak, weak])
+
     # Normalize colormap
-    norm = MidpointNormalize(vmin=1e3*np.min(U), vmax=1e3*np.max(U))
+    absmax = np.nanmax(np.abs([slab.min(), slab.max(), weak.min(), weak.max()]))
+    clim = np.round(absmax, significant_digits(absmax))
+    levels = np.linspace(-clim, clim, num=levels+1, endpoint=True)
+    # nanmax = np.nanmax([slab.max(), weak.max()])
+    # nanmin = np.nanmin([slab.min(), weak.min()])
+    # norm = MidpointNormalize(vmin=nanmin, vmax=nanmax)
 
-    # Plot contours on deformed grid
-    plt.contourf(X+scale*U, Y+scale*W, 1e3*U,
-                 norm=norm, cmap='RdBu_r', levels=100, alpha=0.2)
+    # Plot baseline
+    plt.axhline(zmax, color='k', linewidth=1)
+
+    # Plot outlines of the undeformed and deformed slab
+    plt.plot(outline(Xsl), outline(Zsl), 'k--', alpha=0.3, linewidth=1)
+    plt.plot(outline(Xsl + scale*Usl),
+             outline(Zsl + scale*Wsl),
+             'k', linewidth=1)
+
+    # Plot deformed weak-layer outline
+    if instance.system in ['-pst', 'pst-']:
+        nanmask = np.isfinite(xwl)
+        plt.plot(outline(Xwl[:, nanmask] + scale*Uwl[:, nanmask]),
+                 outline(Zwl[:, nanmask] + scale*Wwl[:, nanmask]),
+                 'k', linewidth=1)
+
+    # Colormap
+    cmap = plt.cm.RdBu_r
+    cmap.set_over(adjust_lightness(cmap(1.0), 0.9))
+    cmap.set_under(adjust_lightness(cmap(0.0), 0.9))
+
+    # Plot fields
+    plt.contourf(Xsl + scale*Usl, Zsl + scale*Wsl, slab,
+                 levels=levels, # norm=norm,
+                 cmap=cmap, extend='both')
+    plt.contourf(Xwl + scale*Uwl, Zwl + scale*Wwl, weak,
+                 levels=levels, # norm=norm,
+                 cmap=cmap, extend='both')
 
     # Plot setup
     plt.axis('scaled')
     plt.xlim([xmin, xmax])
-    plt.ylim([ymin,ymax])
-    plt.gca().set_aspect(2)
+    plt.ylim([zmin, zmax])
+    plt.gca().set_aspect(aspect)
     plt.gca().invert_yaxis()
     plt.gca().use_sticky_edges = False
 
@@ -186,12 +380,10 @@ def contours(instance, x, z, window=1e12, scale=100):
     plt.gca().set_ylabel('depth below surface\n' r'$\longleftarrow $ $d$ (cm)')
     plt.title(fr'${scale}\!\times\!$ scaled deformations (cm)', size=10)
 
-    # Colorbar
-    cbar = plt.colorbar(
-        shrink=0.5,
-        label=('lateral displacements\n'
-               r'$u$ ($\mu\mathrm{m}$) $\longrightarrow$'))
-    cbar.ax.tick_params(labelsize=8)
+    # Show colorbar
+    ticks = np.linspace(levels[0], levels[-1], num=11, endpoint=True)
+    plt.colorbar(orientation='horizontal', ticks=ticks,
+                 label=label, aspect=35)
 
     # Save figure
     save_plot(name='cont')
