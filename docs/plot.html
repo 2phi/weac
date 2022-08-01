@@ -32,9 +32,11 @@
 # pylint: disable=too-many-arguments,too-many-statements
 
 # Third party imports
-from matplotlib.colors import Normalize
+import os
 import numpy as np
 import matplotlib.pyplot as plt
+import matplotlib.colors as mc
+import colorsys
 
 # Project imports
 from weac.tools import isnotebook
@@ -72,13 +74,13 @@ def set_plotstyles():
 # === CONVENIENCE FUNCTIONS ===================================================
 
 
-class MidpointNormalize(Normalize):
+class MidpointNormalize(mc.Normalize):
     &#34;&#34;&#34;Colormap normalization to a specified midpoint. Default is 0.&#34;&#34;&#34;
 
     def __init__(self, vmin, vmax, midpoint=0, clip=False):
         &#34;&#34;&#34;Inizialize normalization.&#34;&#34;&#34;
         self.midpoint = midpoint
-        Normalize.__init__(self, vmin, vmax, clip)
+        mc.Normalize.__init__(self, vmin, vmax, clip)
 
     def __call__(self, value, clip=None):
         &#34;&#34;&#34;Make instances callable as functions.&#34;&#34;&#34;
@@ -101,6 +103,70 @@ def outline(grid):
 
     return np.hstack([top, right, bot, left])
 
+
+def significant_digits(decimal):
+    &#34;&#34;&#34;
+    Get the number of significant digits.
+
+    Arguments
+    ---------
+    decimal : float
+        Decimal number.
+
+    Returns
+    -------
+    int
+        Number of significant digits.
+    &#34;&#34;&#34;
+    return -int(np.floor(np.log10(decimal)))
+
+
+def tight_central_distribution(limit, samples=100, tightness=1.5):
+    &#34;&#34;&#34;
+    Provide values within a given interval distributed tightly around 0.
+
+    Parameters
+    ----------
+    limit : float
+        Maximum and minimum of value range.
+    samples : int, optional
+        Number of values. Default is 100.
+    tightness : int, optional
+        Degree of value densification at center. 1.0 corresponds
+        to equal spacing. Default is 1.5.
+
+    Returns
+    -------
+    ndarray
+        Array of values more tightly spaced around 0.
+    &#34;&#34;&#34;
+    stop = limit**(1/tightness)
+    levels = np.linspace(0, stop, num=int(samples/2), endpoint=True)**tightness
+    return np.unique(np.hstack([-levels[::-1], levels]))
+
+
+def adjust_lightness(color, amount=0.5):
+    &#34;&#34;&#34;
+    Adjust color lightness.
+
+    Arguments
+    ----------
+    color : str or tuple
+        Matplotlib colorname, hex string, or RGB value tuple.
+    amount : float, optional
+        Amount of lightening: &gt;1 lightens, &lt;1 darkens. Default is 0.5.
+
+    Returns
+    -------
+    tuple
+        RGB color tuple.
+    &#34;&#34;&#34;
+    try:
+        c = mc.cnames[color]
+    except KeyError:
+        c = color
+    c = colorsys.rgb_to_hls(*mc.to_rgb(c))
+    return colorsys.hls_to_rgb(c[0], max(0, min(1, amount * c[1])), c[2])
 
 # === PLOT SLAB PROFILE =======================================================
 
@@ -136,66 +202,205 @@ def slab_profile(instance):
     ax1.set_xlim(500, 0)
 
     ax1.fill_betweenx(y, 0, x)
-    plt.show()
+    
+    # Save figure
+    save_plot(name=&#39;profile&#39;)
 
     # Reset plot styles
     plt.rcdefaults()
 
+    # Clear Canvas
+    plt.close()
+
 # === DEFORMATION CONTOUR PLOT ================================================
 
 
-def contours(instance, x, z, window=1e12, scale=100):
+def deformed(instance, xsl, xwl, z, phi, dz=2, scale=100,
+             window=np.inf, pad=2, levels=300, aspect=2,
+             field=&#39;principal&#39;, normalize=True, dark=False):
     &#34;&#34;&#34;
-    Plot 2D deformation contours.
+    Plot 2D deformed solution with displacement or stress fields.
 
     Arguments
     ---------
     instance : object
         Instance of layered class.
-    x : ndarray
-        Discretized x-coordinates (mm).
+    xsl : ndarray
+        Discretized slab x-coordinates (mm).
+    xwl : ndarray
+        Discretized weak-layer x-coordinates (mm).
     z : ndarray
         Solution vectors at positions x as columns of matrix z.
-    window : int
-        Plot window (cm) around maximum vertical deflection.
-    scale : int
-        Scaling factor for the visualization of displacements.
+    phi : float
+        Inclination (degrees). Counterclockwise positive.
+    dz : float, optional
+        Element size along z-axis (mm) for stress plot. Default is 2 mm.
+    scale : int, optional
+        Scaling factor for the visualization of displacements. Default
+        is 100.
+    window : int, optional
+        Plot window (cm) around maximum vertical deflection. Default
+        is inf (full view).
+    pad : float, optional
+        Padding around shown geometry. Default is 2.
+    levels : int, optional
+        Number of isolevels. Default is 300.
+    aspect : int, optional
+        Aspect ratio of the displayed geometry. 1 is true to scale.
+        Default is 2.
+    field : {&#39;u&#39;, &#39;w&#39;, &#39;Sxx&#39;, &#39;Txz&#39;, &#39;Szz&#39;, &#39;principal&#39;}, optional
+        Field quantity for contour plot. Axial deformation &#39;u&#39;, vertical
+        deflection &#39;w&#39;, axial normal stress &#39;Sxx&#39;, shear stress &#39;Txz&#39;,
+        transverse normal stress &#39;Szz&#39;, or principal stresses &#39;principal&#39;.
+    normalize : bool, optional
+        Toggle layerwise normalization of principal stresses to respective
+        strength. Only available with field=&#39;principal&#39;. Default is True.
+    dark : bool, optional
+        Toggle display on dark figure background. Default is False.
+
+    Raises
+    ------
+    ValueError
+        If invalid stress or displacement field is requested.
     &#34;&#34;&#34;
     # Plot Setup
     plt.rcdefaults()
     plt.rc(&#39;font&#39;, family=&#39;serif&#39;, size=10)
     plt.rc(&#39;mathtext&#39;, fontset=&#39;cm&#39;)
 
+    # Set dark figure background if requested
+    if dark:
+        plt.style.use(&#39;dark_background&#39;)
+        fig = plt.figure()
+        ax = plt.gca()
+        fig.set_facecolor(&#39;#282c34&#39;)
+        ax.set_facecolor(&#39;white&#39;)
+
     # Calculate top-to-bottom vertical positions (mm) in beam coordinate system
-    y = np.linspace(-instance.h/2, instance.h/2, num=21)
+    zi = instance.get_zmesh(dz=dz)[:, 0]
 
-    # Compute displacements on grid (cm)
-    U = 1e-1*np.vstack([instance.u(z, z0=y, unit=&#39;mm&#39;) for y in y])
-    W = 1e-1*np.vstack([instance.w(z, unit=&#39;mm&#39;) for _ in y])
+    # Compute slab displacements on grid (cm)
+    Usl = np.vstack([instance.u(z, z0=z0, unit=&#39;cm&#39;) for z0 in zi])
+    Wsl = np.vstack([instance.w(z, unit=&#39;cm&#39;) for _ in zi])
 
-    # Compute grid coordinates with vertical origin at top surface (cm)
-    X, Y = np.meshgrid(1e-1*x, 1e-1*(y + instance.h/2))
+    # Put coordinate origin at horizontal center
+    if instance.system in [&#39;skier&#39;, &#39;skiers&#39;]:
+        xsl = xsl - max(xsl)/2
+        xwl = xwl - max(xwl)/2
 
-    # Plot outline
-    plt.plot(outline(X), outline(Y), &#39;k--&#39;, alpha=0.3, linewidth=1)
-    plt.plot(outline(X+scale*U), outline(Y+scale*W), &#39;k&#39;, linewidth=1)
+    # Compute slab grid coordinates with vertical origin at top surface (cm)
+    Xsl, Zsl = np.meshgrid(1e-1*(xsl), 1e-1*zi)
 
     # Get x-coordinate of maximum deflection w (cm) and derive plot limits
-    xfocus = x[np.max(np.argmax(W, axis=1))]/10
-    xmax = np.min([np.max(X+scale*U), xfocus + window/2])
-    xmin = np.max([np.min(X+scale*U), xfocus - window/2])
+    xfocus = xsl[np.max(np.argmax(Wsl, axis=1))]/10
+    xmax = np.min([np.max([Xsl, Xsl+scale*Usl]) + pad, xfocus + window/2])
+    xmin = np.max([np.min([Xsl, Xsl+scale*Usl]) - pad, xfocus - window/2])
+
+    # Scale shown weak-layer thickness with to max deflection and add padding
+    zmax = np.max(Zsl + scale*Wsl) + pad
+    zmin = np.min(Zsl) - pad
+
+    # Compute weak-layer grid coordinates (cm)
+    Xwl, Zwl = np.meshgrid(1e-1*xwl, [1e-1*zi[-1], zmax])
+
+    # Assemble weak-layer displacement field (top and bottom)
+    Uwl = np.row_stack([Usl[-1, :], np.zeros(xwl.shape[0])])
+    Wwl = np.row_stack([Wsl[-1, :], np.zeros(xwl.shape[0])])
+
+    # Compute stress or displacement fields
+    match field:
+        # Horizontal displacements (um)
+        case &#39;u&#39;:
+            slab = 1e4*Usl
+            weak = 1e4*Usl[-1, :]
+            label = r&#39;$u$ ($\mu$m)&#39;
+        # Vertical deflection (um)
+        case &#39;w&#39;:
+            slab = 1e4*Wsl
+            weak = 1e4*Wsl[-1, :]
+            label = r&#39;$w$ ($\mu$m)&#39;
+        # Axial normal stresses (kPa)
+        case &#39;Sxx&#39;:
+            slab = instance.Sxx(z, phi, dz=dz, unit=&#39;kPa&#39;)
+            weak = np.zeros(xwl.shape[0])
+            label = r&#39;$\sigma_{xx}$ (kPa)&#39;
+        # Shear stresses (kPa)
+        case &#39;Txz&#39;:
+            slab = instance.Txz(z, phi, dz=dz, unit=&#39;kPa&#39;)
+            weak = instance.get_weaklayer_shearstress(
+                x=xwl, z=z, unit=&#39;kPa&#39;)[1]
+            label = r&#39;$\tau_{xz}$ (kPa)&#39;
+        # Transverse normal stresses (kPa)
+        case &#39;Szz&#39;:
+            slab = instance.Szz(z, phi, dz=dz, unit=&#39;kPa&#39;)
+            weak = instance.get_weaklayer_normalstress(
+                x=xwl, z=z, unit=&#39;kPa&#39;)[1]
+            label = r&#39;$\sigma_{zz}$ (kPa)&#39;
+        # Principal stresses
+        case &#39;principal&#39;:
+            slab = instance.principal_stress_slab(
+                z, phi, dz=dz, val=&#39;max&#39;, unit=&#39;kPa&#39;, normalize=normalize)
+            weak = instance.principal_stress_weaklayer(
+                z, val=&#39;min&#39;, unit=&#39;kPa&#39;, normalize=normalize)
+            if normalize:
+                label=(r&#39;$\sigma_\mathrm{I}/\sigma_+$ (slab),  &#39;
+                       r&#39;$\sigma_\mathrm{I\!I\!I}/\sigma_-$ (weak layer)&#39;)
+            else:
+                label=(r&#39;$\sigma_\mathrm{I}$ (kPa, slab),  &#39;
+                       r&#39;$\sigma_\mathrm{I\!I\!I}$ (kPa, weak layer)&#39;)
+        case _:
+            raise ValueError(
+                f&#34;Invalid input &#39;{field}&#39; for field. Valid options are &#34;
+                &#34;&#39;u&#39;, &#39;w&#39;, &#39;Sxx&#39;, &#39;Txz&#39;, &#39;Szz&#39;, or &#39;principal&#39;&#34;)
+
+    # Complement label
+    label += r&#39;  $\longrightarrow$&#39;
+
+    # Assemble weak-layer output on grid
+    weak = np.row_stack([weak, weak])
 
     # Normalize colormap
-    norm = MidpointNormalize(vmin=1e3*np.min(U), vmax=1e3*np.max(U))
+    absmax = np.nanmax(np.abs([slab.min(), slab.max(), weak.min(), weak.max()]))
+    clim = np.round(absmax, significant_digits(absmax))
+    levels = np.linspace(-clim, clim, num=levels+1, endpoint=True)
+    # nanmax = np.nanmax([slab.max(), weak.max()])
+    # nanmin = np.nanmin([slab.min(), weak.min()])
+    # norm = MidpointNormalize(vmin=nanmin, vmax=nanmax)
 
-    # Plot contours on deformed grid
-    plt.contourf(X+scale*U, Y+scale*W, 1e3*U,
-                 norm=norm, cmap=&#39;RdBu_r&#39;, levels=100, alpha=0.2)
+    # Plot baseline
+    plt.axhline(zmax, color=&#39;k&#39;, linewidth=1)
+
+    # Plot outlines of the undeformed and deformed slab
+    plt.plot(outline(Xsl), outline(Zsl), &#39;k--&#39;, alpha=0.3, linewidth=1)
+    plt.plot(outline(Xsl + scale*Usl),
+             outline(Zsl + scale*Wsl),
+             &#39;k&#39;, linewidth=1)
+
+    # Plot deformed weak-layer outline
+    if instance.system in [&#39;-pst&#39;, &#39;pst-&#39;]:
+        nanmask = np.isfinite(xwl)
+        plt.plot(outline(Xwl[:, nanmask] + scale*Uwl[:, nanmask]),
+                 outline(Zwl[:, nanmask] + scale*Wwl[:, nanmask]),
+                 &#39;k&#39;, linewidth=1)
+
+    # Colormap
+    cmap = plt.cm.RdBu_r
+    cmap.set_over(adjust_lightness(cmap(1.0), 0.9))
+    cmap.set_under(adjust_lightness(cmap(0.0), 0.9))
+
+    # Plot fields
+    plt.contourf(Xsl + scale*Usl, Zsl + scale*Wsl, slab,
+                 levels=levels, # norm=norm,
+                 cmap=cmap, extend=&#39;both&#39;)
+    plt.contourf(Xwl + scale*Uwl, Zwl + scale*Wwl, weak,
+                 levels=levels, # norm=norm,
+                 cmap=cmap, extend=&#39;both&#39;)
 
     # Plot setup
     plt.axis(&#39;scaled&#39;)
     plt.xlim([xmin, xmax])
-    plt.gca().set_aspect(2)
+    plt.ylim([zmin, zmax])
+    plt.gca().set_aspect(aspect)
     plt.gca().invert_yaxis()
     plt.gca().use_sticky_edges = False
 
@@ -204,12 +409,13 @@ def contours(instance, x, z, window=1e12, scale=100):
     plt.gca().set_ylabel(&#39;depth below surface\n&#39; r&#39;$\longleftarrow $ $d$ (cm)&#39;)
     plt.title(fr&#39;${scale}\!\times\!$ scaled deformations (cm)&#39;, size=10)
 
-    # Colorbar
-    cbar = plt.colorbar(
-        shrink=0.5,
-        label=(&#39;lateral displacements\n&#39;
-               r&#39;$u$ ($\mu\mathrm{m}$) $\longrightarrow$&#39;))
-    cbar.ax.tick_params(labelsize=8)
+    # Show colorbar
+    ticks = np.linspace(levels[0], levels[-1], num=11, endpoint=True)
+    plt.colorbar(orientation=&#39;horizontal&#39;, ticks=ticks,
+                 label=label, aspect=35)
+
+    # Save figure
+    save_plot(name=&#39;cont&#39;)
 
     # Reset plot styles
     plt.rcdefaults()
@@ -310,12 +516,7 @@ def plot_data(
                      **labelstyle)
 
     # Save figure
-    filename = name + &#39;.pdf&#39;
-    if isnotebook():
-        plt.show()
-    else:
-        print(&#39;Rendering&#39;, filename, &#39;...&#39;)
-        plt.savefig(&#39;plots/&#39; + filename, bbox_inches=&#39;tight&#39;)
+    save_plot(name)
 
     # Reset plot styles
     plt.rcdefaults()
@@ -329,7 +530,7 @@ def displacements(instance, x, z, **segments):
     data = [
         [x/10, instance.u(z, z0=0, unit=&#39;mm&#39;), r&#39;$u_0\ (\mathrm{mm})$&#39;],
         [x/10, -instance.w(z, unit=&#39;mm&#39;), r&#39;$-w\ (\mathrm{mm})$&#39;],
-        [x/10, instance.psi(z, unit=&#39;degrees&#39;), r&#39;$\psi\ (^\circ)$ &#39;]
+        [x/10, instance.psi(z, unit=&#39;degrees&#39;), r&#39;$\psi\ (^\circ)$ &#39;],
     ]
     plot_data(ax1label=r&#39;Displacements&#39;, ax1data=data,
               name=&#39;disp&#39;, **segments)
@@ -418,7 +619,31 @@ def fea_stress(instance, xb, zb, fea):
         [xb/10, instance.sig(zb, unit=&#39;kPa&#39;), r&#39;$\sigma$&#39;]
     ]
     plot_data(ax1label=r&#39;Stress (kPa)&#39;, ax1data=data, name=&#39;fea_stress&#39;,
-              labelpos=-50)</code></pre>
+              labelpos=-50)
+
+
+# === SAVE FUNCTION ===========================================================
+
+def save_plot(name):
+    &#34;&#34;&#34;
+    Show or save plot depending on interpreter
+
+    Arguments
+    ---------
+    name : string
+        Name for the figure.
+    &#34;&#34;&#34;
+    filename = name + &#39;.pdf&#39;
+    # Show figure if on jupyter notebook
+    if isnotebook():
+        plt.show()
+    # Save figure if on terminal
+    else:
+        # Make directory if not yet existing
+        if not os.path.isdir(os.path.join(os.getcwd(), &#39;plots&#39;)):
+            os.mkdir(&#39;plots&#39;)
+        plt.savefig(&#39;plots/&#39; + filename, bbox_inches=&#39;tight&#39;)
+    return</code></pre>
 </details>
 </section>
 <section>
@@ -428,80 +653,288 @@ def fea_stress(instance, xb, zb, fea):
 <section>
 <h2 class="section-title" id="header-functions">Functions</h2>
 <dl>
-<dt id="weac.plot.contours"><code class="name flex">
-<span>def <span class="ident">contours</span></span>(<span>instance, x, z, window=1000000000000.0, scale=100)</span>
+<dt id="weac.plot.adjust_lightness"><code class="name flex">
+<span>def <span class="ident">adjust_lightness</span></span>(<span>color, amount=0.5)</span>
 </code></dt>
 <dd>
-<div class="desc"><p>Plot 2D deformation contours.</p>
+<div class="desc"><p>Adjust color lightness.</p>
 <h2 id="arguments">Arguments</h2>
 <dl>
-<dt><strong><code>instance</code></strong> :&ensp;<code>object</code></dt>
-<dd>Instance of layered class.</dd>
-<dt><strong><code>x</code></strong> :&ensp;<code>ndarray</code></dt>
-<dd>Discretized x-coordinates (mm).</dd>
-<dt><strong><code>z</code></strong> :&ensp;<code>ndarray</code></dt>
-<dd>Solution vectors at positions x as columns of matrix z.</dd>
-<dt><strong><code>window</code></strong> :&ensp;<code>int</code></dt>
-<dd>Plot window (cm) around maximum vertical deflection.</dd>
-<dt><strong><code>scale</code></strong> :&ensp;<code>int</code></dt>
-<dd>Scaling factor for the visualization of displacements.</dd>
+<dt><strong><code>color</code></strong> :&ensp;<code>str</code> or <code>tuple</code></dt>
+<dd>Matplotlib colorname, hex string, or RGB value tuple.</dd>
+<dt><strong><code>amount</code></strong> :&ensp;<code>float</code>, optional</dt>
+<dd>Amount of lightening: &gt;1 lightens, &lt;1 darkens. Default is 0.5.</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>tuple</code></dt>
+<dd>RGB color tuple.</dd>
 </dl></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def contours(instance, x, z, window=1e12, scale=100):
+<pre><code class="python">def adjust_lightness(color, amount=0.5):
     &#34;&#34;&#34;
-    Plot 2D deformation contours.
+    Adjust color lightness.
+
+    Arguments
+    ----------
+    color : str or tuple
+        Matplotlib colorname, hex string, or RGB value tuple.
+    amount : float, optional
+        Amount of lightening: &gt;1 lightens, &lt;1 darkens. Default is 0.5.
+
+    Returns
+    -------
+    tuple
+        RGB color tuple.
+    &#34;&#34;&#34;
+    try:
+        c = mc.cnames[color]
+    except KeyError:
+        c = color
+    c = colorsys.rgb_to_hls(*mc.to_rgb(c))
+    return colorsys.hls_to_rgb(c[0], max(0, min(1, amount * c[1])), c[2])</code></pre>
+</details>
+</dd>
+<dt id="weac.plot.deformed"><code class="name flex">
+<span>def <span class="ident">deformed</span></span>(<span>instance, xsl, xwl, z, phi, dz=2, scale=100, window=inf, pad=2, levels=300, aspect=2, field='principal', normalize=True, dark=False)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Plot 2D deformed solution with displacement or stress fields.</p>
+<h2 id="arguments">Arguments</h2>
+<dl>
+<dt><strong><code>instance</code></strong> :&ensp;<code>object</code></dt>
+<dd>Instance of layered class.</dd>
+<dt><strong><code>xsl</code></strong> :&ensp;<code>ndarray</code></dt>
+<dd>Discretized slab x-coordinates (mm).</dd>
+<dt><strong><code>xwl</code></strong> :&ensp;<code>ndarray</code></dt>
+<dd>Discretized weak-layer x-coordinates (mm).</dd>
+<dt><strong><code>z</code></strong> :&ensp;<code>ndarray</code></dt>
+<dd>Solution vectors at positions x as columns of matrix z.</dd>
+<dt><strong><code>phi</code></strong> :&ensp;<code>float</code></dt>
+<dd>Inclination (degrees). Counterclockwise positive.</dd>
+<dt><strong><code>dz</code></strong> :&ensp;<code>float</code>, optional</dt>
+<dd>Element size along z-axis (mm) for stress plot. Default is 2 mm.</dd>
+<dt><strong><code>scale</code></strong> :&ensp;<code>int</code>, optional</dt>
+<dd>Scaling factor for the visualization of displacements. Default
+is 100.</dd>
+<dt><strong><code>window</code></strong> :&ensp;<code>int</code>, optional</dt>
+<dd>Plot window (cm) around maximum vertical deflection. Default
+is inf (full view).</dd>
+<dt><strong><code>pad</code></strong> :&ensp;<code>float</code>, optional</dt>
+<dd>Padding around shown geometry. Default is 2.</dd>
+<dt><strong><code>levels</code></strong> :&ensp;<code>int</code>, optional</dt>
+<dd>Number of isolevels. Default is 300.</dd>
+<dt><strong><code>aspect</code></strong> :&ensp;<code>int</code>, optional</dt>
+<dd>Aspect ratio of the displayed geometry. 1 is true to scale.
+Default is 2.</dd>
+<dt><strong><code>field</code></strong> :&ensp;<code>{'u', 'w', 'Sxx', 'Txz', 'Szz', 'principal'}</code>, optional</dt>
+<dd>Field quantity for contour plot. Axial deformation 'u', vertical
+deflection 'w', axial normal stress 'Sxx', shear stress 'Txz',
+transverse normal stress 'Szz', or principal stresses 'principal'.</dd>
+<dt><strong><code>normalize</code></strong> :&ensp;<code>bool</code>, optional</dt>
+<dd>Toggle layerwise normalization of principal stresses to respective
+strength. Only available with field='principal'. Default is True.</dd>
+<dt><strong><code>dark</code></strong> :&ensp;<code>bool</code>, optional</dt>
+<dd>Toggle display on dark figure background. Default is False.</dd>
+</dl>
+<h2 id="raises">Raises</h2>
+<dl>
+<dt><code>ValueError</code></dt>
+<dd>If invalid stress or displacement field is requested.</dd>
+</dl></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def deformed(instance, xsl, xwl, z, phi, dz=2, scale=100,
+             window=np.inf, pad=2, levels=300, aspect=2,
+             field=&#39;principal&#39;, normalize=True, dark=False):
+    &#34;&#34;&#34;
+    Plot 2D deformed solution with displacement or stress fields.
 
     Arguments
     ---------
     instance : object
         Instance of layered class.
-    x : ndarray
-        Discretized x-coordinates (mm).
+    xsl : ndarray
+        Discretized slab x-coordinates (mm).
+    xwl : ndarray
+        Discretized weak-layer x-coordinates (mm).
     z : ndarray
         Solution vectors at positions x as columns of matrix z.
-    window : int
-        Plot window (cm) around maximum vertical deflection.
-    scale : int
-        Scaling factor for the visualization of displacements.
+    phi : float
+        Inclination (degrees). Counterclockwise positive.
+    dz : float, optional
+        Element size along z-axis (mm) for stress plot. Default is 2 mm.
+    scale : int, optional
+        Scaling factor for the visualization of displacements. Default
+        is 100.
+    window : int, optional
+        Plot window (cm) around maximum vertical deflection. Default
+        is inf (full view).
+    pad : float, optional
+        Padding around shown geometry. Default is 2.
+    levels : int, optional
+        Number of isolevels. Default is 300.
+    aspect : int, optional
+        Aspect ratio of the displayed geometry. 1 is true to scale.
+        Default is 2.
+    field : {&#39;u&#39;, &#39;w&#39;, &#39;Sxx&#39;, &#39;Txz&#39;, &#39;Szz&#39;, &#39;principal&#39;}, optional
+        Field quantity for contour plot. Axial deformation &#39;u&#39;, vertical
+        deflection &#39;w&#39;, axial normal stress &#39;Sxx&#39;, shear stress &#39;Txz&#39;,
+        transverse normal stress &#39;Szz&#39;, or principal stresses &#39;principal&#39;.
+    normalize : bool, optional
+        Toggle layerwise normalization of principal stresses to respective
+        strength. Only available with field=&#39;principal&#39;. Default is True.
+    dark : bool, optional
+        Toggle display on dark figure background. Default is False.
+
+    Raises
+    ------
+    ValueError
+        If invalid stress or displacement field is requested.
     &#34;&#34;&#34;
     # Plot Setup
     plt.rcdefaults()
     plt.rc(&#39;font&#39;, family=&#39;serif&#39;, size=10)
     plt.rc(&#39;mathtext&#39;, fontset=&#39;cm&#39;)
 
+    # Set dark figure background if requested
+    if dark:
+        plt.style.use(&#39;dark_background&#39;)
+        fig = plt.figure()
+        ax = plt.gca()
+        fig.set_facecolor(&#39;#282c34&#39;)
+        ax.set_facecolor(&#39;white&#39;)
+
     # Calculate top-to-bottom vertical positions (mm) in beam coordinate system
-    y = np.linspace(-instance.h/2, instance.h/2, num=21)
+    zi = instance.get_zmesh(dz=dz)[:, 0]
 
-    # Compute displacements on grid (cm)
-    U = 1e-1*np.vstack([instance.u(z, z0=y, unit=&#39;mm&#39;) for y in y])
-    W = 1e-1*np.vstack([instance.w(z, unit=&#39;mm&#39;) for _ in y])
+    # Compute slab displacements on grid (cm)
+    Usl = np.vstack([instance.u(z, z0=z0, unit=&#39;cm&#39;) for z0 in zi])
+    Wsl = np.vstack([instance.w(z, unit=&#39;cm&#39;) for _ in zi])
 
-    # Compute grid coordinates with vertical origin at top surface (cm)
-    X, Y = np.meshgrid(1e-1*x, 1e-1*(y + instance.h/2))
+    # Put coordinate origin at horizontal center
+    if instance.system in [&#39;skier&#39;, &#39;skiers&#39;]:
+        xsl = xsl - max(xsl)/2
+        xwl = xwl - max(xwl)/2
 
-    # Plot outline
-    plt.plot(outline(X), outline(Y), &#39;k--&#39;, alpha=0.3, linewidth=1)
-    plt.plot(outline(X+scale*U), outline(Y+scale*W), &#39;k&#39;, linewidth=1)
+    # Compute slab grid coordinates with vertical origin at top surface (cm)
+    Xsl, Zsl = np.meshgrid(1e-1*(xsl), 1e-1*zi)
 
     # Get x-coordinate of maximum deflection w (cm) and derive plot limits
-    xfocus = x[np.max(np.argmax(W, axis=1))]/10
-    xmax = np.min([np.max(X+scale*U), xfocus + window/2])
-    xmin = np.max([np.min(X+scale*U), xfocus - window/2])
+    xfocus = xsl[np.max(np.argmax(Wsl, axis=1))]/10
+    xmax = np.min([np.max([Xsl, Xsl+scale*Usl]) + pad, xfocus + window/2])
+    xmin = np.max([np.min([Xsl, Xsl+scale*Usl]) - pad, xfocus - window/2])
+
+    # Scale shown weak-layer thickness with to max deflection and add padding
+    zmax = np.max(Zsl + scale*Wsl) + pad
+    zmin = np.min(Zsl) - pad
+
+    # Compute weak-layer grid coordinates (cm)
+    Xwl, Zwl = np.meshgrid(1e-1*xwl, [1e-1*zi[-1], zmax])
+
+    # Assemble weak-layer displacement field (top and bottom)
+    Uwl = np.row_stack([Usl[-1, :], np.zeros(xwl.shape[0])])
+    Wwl = np.row_stack([Wsl[-1, :], np.zeros(xwl.shape[0])])
+
+    # Compute stress or displacement fields
+    match field:
+        # Horizontal displacements (um)
+        case &#39;u&#39;:
+            slab = 1e4*Usl
+            weak = 1e4*Usl[-1, :]
+            label = r&#39;$u$ ($\mu$m)&#39;
+        # Vertical deflection (um)
+        case &#39;w&#39;:
+            slab = 1e4*Wsl
+            weak = 1e4*Wsl[-1, :]
+            label = r&#39;$w$ ($\mu$m)&#39;
+        # Axial normal stresses (kPa)
+        case &#39;Sxx&#39;:
+            slab = instance.Sxx(z, phi, dz=dz, unit=&#39;kPa&#39;)
+            weak = np.zeros(xwl.shape[0])
+            label = r&#39;$\sigma_{xx}$ (kPa)&#39;
+        # Shear stresses (kPa)
+        case &#39;Txz&#39;:
+            slab = instance.Txz(z, phi, dz=dz, unit=&#39;kPa&#39;)
+            weak = instance.get_weaklayer_shearstress(
+                x=xwl, z=z, unit=&#39;kPa&#39;)[1]
+            label = r&#39;$\tau_{xz}$ (kPa)&#39;
+        # Transverse normal stresses (kPa)
+        case &#39;Szz&#39;:
+            slab = instance.Szz(z, phi, dz=dz, unit=&#39;kPa&#39;)
+            weak = instance.get_weaklayer_normalstress(
+                x=xwl, z=z, unit=&#39;kPa&#39;)[1]
+            label = r&#39;$\sigma_{zz}$ (kPa)&#39;
+        # Principal stresses
+        case &#39;principal&#39;:
+            slab = instance.principal_stress_slab(
+                z, phi, dz=dz, val=&#39;max&#39;, unit=&#39;kPa&#39;, normalize=normalize)
+            weak = instance.principal_stress_weaklayer(
+                z, val=&#39;min&#39;, unit=&#39;kPa&#39;, normalize=normalize)
+            if normalize:
+                label=(r&#39;$\sigma_\mathrm{I}/\sigma_+$ (slab),  &#39;
+                       r&#39;$\sigma_\mathrm{I\!I\!I}/\sigma_-$ (weak layer)&#39;)
+            else:
+                label=(r&#39;$\sigma_\mathrm{I}$ (kPa, slab),  &#39;
+                       r&#39;$\sigma_\mathrm{I\!I\!I}$ (kPa, weak layer)&#39;)
+        case _:
+            raise ValueError(
+                f&#34;Invalid input &#39;{field}&#39; for field. Valid options are &#34;
+                &#34;&#39;u&#39;, &#39;w&#39;, &#39;Sxx&#39;, &#39;Txz&#39;, &#39;Szz&#39;, or &#39;principal&#39;&#34;)
+
+    # Complement label
+    label += r&#39;  $\longrightarrow$&#39;
+
+    # Assemble weak-layer output on grid
+    weak = np.row_stack([weak, weak])
 
     # Normalize colormap
-    norm = MidpointNormalize(vmin=1e3*np.min(U), vmax=1e3*np.max(U))
+    absmax = np.nanmax(np.abs([slab.min(), slab.max(), weak.min(), weak.max()]))
+    clim = np.round(absmax, significant_digits(absmax))
+    levels = np.linspace(-clim, clim, num=levels+1, endpoint=True)
+    # nanmax = np.nanmax([slab.max(), weak.max()])
+    # nanmin = np.nanmin([slab.min(), weak.min()])
+    # norm = MidpointNormalize(vmin=nanmin, vmax=nanmax)
 
-    # Plot contours on deformed grid
-    plt.contourf(X+scale*U, Y+scale*W, 1e3*U,
-                 norm=norm, cmap=&#39;RdBu_r&#39;, levels=100, alpha=0.2)
+    # Plot baseline
+    plt.axhline(zmax, color=&#39;k&#39;, linewidth=1)
+
+    # Plot outlines of the undeformed and deformed slab
+    plt.plot(outline(Xsl), outline(Zsl), &#39;k--&#39;, alpha=0.3, linewidth=1)
+    plt.plot(outline(Xsl + scale*Usl),
+             outline(Zsl + scale*Wsl),
+             &#39;k&#39;, linewidth=1)
+
+    # Plot deformed weak-layer outline
+    if instance.system in [&#39;-pst&#39;, &#39;pst-&#39;]:
+        nanmask = np.isfinite(xwl)
+        plt.plot(outline(Xwl[:, nanmask] + scale*Uwl[:, nanmask]),
+                 outline(Zwl[:, nanmask] + scale*Wwl[:, nanmask]),
+                 &#39;k&#39;, linewidth=1)
+
+    # Colormap
+    cmap = plt.cm.RdBu_r
+    cmap.set_over(adjust_lightness(cmap(1.0), 0.9))
+    cmap.set_under(adjust_lightness(cmap(0.0), 0.9))
+
+    # Plot fields
+    plt.contourf(Xsl + scale*Usl, Zsl + scale*Wsl, slab,
+                 levels=levels, # norm=norm,
+                 cmap=cmap, extend=&#39;both&#39;)
+    plt.contourf(Xwl + scale*Uwl, Zwl + scale*Wwl, weak,
+                 levels=levels, # norm=norm,
+                 cmap=cmap, extend=&#39;both&#39;)
 
     # Plot setup
     plt.axis(&#39;scaled&#39;)
     plt.xlim([xmin, xmax])
-    plt.gca().set_aspect(2)
+    plt.ylim([zmin, zmax])
+    plt.gca().set_aspect(aspect)
     plt.gca().invert_yaxis()
     plt.gca().use_sticky_edges = False
 
@@ -510,12 +943,13 @@ def fea_stress(instance, xb, zb, fea):
     plt.gca().set_ylabel(&#39;depth below surface\n&#39; r&#39;$\longleftarrow $ $d$ (cm)&#39;)
     plt.title(fr&#39;${scale}\!\times\!$ scaled deformations (cm)&#39;, size=10)
 
-    # Colorbar
-    cbar = plt.colorbar(
-        shrink=0.5,
-        label=(&#39;lateral displacements\n&#39;
-               r&#39;$u$ ($\mu\mathrm{m}$) $\longrightarrow$&#39;))
-    cbar.ax.tick_params(labelsize=8)
+    # Show colorbar
+    ticks = np.linspace(levels[0], levels[-1], num=11, endpoint=True)
+    plt.colorbar(orientation=&#39;horizontal&#39;, ticks=ticks,
+                 label=label, aspect=35)
+
+    # Save figure
+    save_plot(name=&#39;cont&#39;)
 
     # Reset plot styles
     plt.rcdefaults()</code></pre>
@@ -535,7 +969,7 @@ def fea_stress(instance, xb, zb, fea):
     data = [
         [x/10, instance.u(z, z0=0, unit=&#39;mm&#39;), r&#39;$u_0\ (\mathrm{mm})$&#39;],
         [x/10, -instance.w(z, unit=&#39;mm&#39;), r&#39;$-w\ (\mathrm{mm})$&#39;],
-        [x/10, instance.psi(z, unit=&#39;degrees&#39;), r&#39;$\psi\ (^\circ)$ &#39;]
+        [x/10, instance.psi(z, unit=&#39;degrees&#39;), r&#39;$\psi\ (^\circ)$ &#39;],
     ]
     plot_data(ax1label=r&#39;Displacements&#39;, ax1data=data,
               name=&#39;disp&#39;, **segments)</code></pre>
@@ -753,15 +1187,46 @@ def fea_stress(instance, xb, zb, fea):
                      **labelstyle)
 
     # Save figure
-    filename = name + &#39;.pdf&#39;
-    if isnotebook():
-        plt.show()
-    else:
-        print(&#39;Rendering&#39;, filename, &#39;...&#39;)
-        plt.savefig(&#39;plots/&#39; + filename, bbox_inches=&#39;tight&#39;)
+    save_plot(name)
 
     # Reset plot styles
     plt.rcdefaults()</code></pre>
+</details>
+</dd>
+<dt id="weac.plot.save_plot"><code class="name flex">
+<span>def <span class="ident">save_plot</span></span>(<span>name)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Show or save plot depending on interpreter</p>
+<h2 id="arguments">Arguments</h2>
+<dl>
+<dt><strong><code>name</code></strong> :&ensp;<code>string</code></dt>
+<dd>Name for the figure.</dd>
+</dl></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def save_plot(name):
+    &#34;&#34;&#34;
+    Show or save plot depending on interpreter
+
+    Arguments
+    ---------
+    name : string
+        Name for the figure.
+    &#34;&#34;&#34;
+    filename = name + &#39;.pdf&#39;
+    # Show figure if on jupyter notebook
+    if isnotebook():
+        plt.show()
+    # Save figure if on terminal
+    else:
+        # Make directory if not yet existing
+        if not os.path.isdir(os.path.join(os.getcwd(), &#39;plots&#39;)):
+            os.mkdir(&#39;plots&#39;)
+        plt.savefig(&#39;plots/&#39; + filename, bbox_inches=&#39;tight&#39;)
+    return</code></pre>
 </details>
 </dd>
 <dt id="weac.plot.section_forces"><code class="name flex">
@@ -820,6 +1285,42 @@ def fea_stress(instance, xb, zb, fea):
     return labelstyle, colors</code></pre>
 </details>
 </dd>
+<dt id="weac.plot.significant_digits"><code class="name flex">
+<span>def <span class="ident">significant_digits</span></span>(<span>decimal)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Get the number of significant digits.</p>
+<h2 id="arguments">Arguments</h2>
+<dl>
+<dt><strong><code>decimal</code></strong> :&ensp;<code>float</code></dt>
+<dd>Decimal number.</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>int</code></dt>
+<dd>Number of significant digits.</dd>
+</dl></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def significant_digits(decimal):
+    &#34;&#34;&#34;
+    Get the number of significant digits.
+
+    Arguments
+    ---------
+    decimal : float
+        Decimal number.
+
+    Returns
+    -------
+    int
+        Number of significant digits.
+    &#34;&#34;&#34;
+    return -int(np.floor(np.log10(decimal)))</code></pre>
+</details>
+</dd>
 <dt id="weac.plot.slab_profile"><code class="name flex">
 <span>def <span class="ident">slab_profile</span></span>(<span>instance)</span>
 </code></dt>
@@ -860,10 +1361,15 @@ def fea_stress(instance, xb, zb, fea):
     ax1.set_xlim(500, 0)
 
     ax1.fill_betweenx(y, 0, x)
-    plt.show()
+    
+    # Save figure
+    save_plot(name=&#39;profile&#39;)
 
     # Reset plot styles
-    plt.rcdefaults()</code></pre>
+    plt.rcdefaults()
+
+    # Clear Canvas
+    plt.close()</code></pre>
 </details>
 </dd>
 <dt id="weac.plot.stress_criteria"><code class="name flex">
@@ -903,6 +1409,54 @@ def fea_stress(instance, xb, zb, fea):
               name=&#39;stress&#39;, **segments)</code></pre>
 </details>
 </dd>
+<dt id="weac.plot.tight_central_distribution"><code class="name flex">
+<span>def <span class="ident">tight_central_distribution</span></span>(<span>limit, samples=100, tightness=1.5)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Provide values within a given interval distributed tightly around 0.</p>
+<h2 id="parameters">Parameters</h2>
+<dl>
+<dt><strong><code>limit</code></strong> :&ensp;<code>float</code></dt>
+<dd>Maximum and minimum of value range.</dd>
+<dt><strong><code>samples</code></strong> :&ensp;<code>int</code>, optional</dt>
+<dd>Number of values. Default is 100.</dd>
+<dt><strong><code>tightness</code></strong> :&ensp;<code>int</code>, optional</dt>
+<dd>Degree of value densification at center. 1.0 corresponds
+to equal spacing. Default is 1.5.</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>ndarray</code></dt>
+<dd>Array of values more tightly spaced around 0.</dd>
+</dl></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def tight_central_distribution(limit, samples=100, tightness=1.5):
+    &#34;&#34;&#34;
+    Provide values within a given interval distributed tightly around 0.
+
+    Parameters
+    ----------
+    limit : float
+        Maximum and minimum of value range.
+    samples : int, optional
+        Number of values. Default is 100.
+    tightness : int, optional
+        Degree of value densification at center. 1.0 corresponds
+        to equal spacing. Default is 1.5.
+
+    Returns
+    -------
+    ndarray
+        Array of values more tightly spaced around 0.
+    &#34;&#34;&#34;
+    stop = limit**(1/tightness)
+    levels = np.linspace(0, stop, num=int(samples/2), endpoint=True)**tightness
+    return np.unique(np.hstack([-levels[::-1], levels]))</code></pre>
+</details>
+</dd>
 </dl>
 </section>
 <section>
@@ -919,13 +1473,13 @@ def fea_stress(instance, xb, zb, fea):
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">class MidpointNormalize(Normalize):
+<pre><code class="python">class MidpointNormalize(mc.Normalize):
     &#34;&#34;&#34;Colormap normalization to a specified midpoint. Default is 0.&#34;&#34;&#34;
 
     def __init__(self, vmin, vmax, midpoint=0, clip=False):
         &#34;&#34;&#34;Inizialize normalization.&#34;&#34;&#34;
         self.midpoint = midpoint
-        Normalize.__init__(self, vmin, vmax, clip)
+        mc.Normalize.__init__(self, vmin, vmax, clip)
 
     def __call__(self, value, clip=None):
         &#34;&#34;&#34;Make instances callable as functions.&#34;&#34;&#34;
@@ -958,8 +1512,9 @@ def fea_stress(instance, xb, zb, fea):
 </ul>
 </li>
 <li><h3><a href="#header-functions">Functions</a></h3>
-<ul class="two-column">
-<li><code><a title="weac.plot.contours" href="#weac.plot.contours">contours</a></code></li>
+<ul class="">
+<li><code><a title="weac.plot.adjust_lightness" href="#weac.plot.adjust_lightness">adjust_lightness</a></code></li>
+<li><code><a title="weac.plot.deformed" href="#weac.plot.deformed">deformed</a></code></li>
 <li><code><a title="weac.plot.displacements" href="#weac.plot.displacements">displacements</a></code></li>
 <li><code><a title="weac.plot.err_comp" href="#weac.plot.err_comp">err_comp</a></code></li>
 <li><code><a title="weac.plot.err_modes" href="#weac.plot.err_modes">err_modes</a></code></li>
@@ -967,11 +1522,14 @@ def fea_stress(instance, xb, zb, fea):
 <li><code><a title="weac.plot.fea_stress" href="#weac.plot.fea_stress">fea_stress</a></code></li>
 <li><code><a title="weac.plot.outline" href="#weac.plot.outline">outline</a></code></li>
 <li><code><a title="weac.plot.plot_data" href="#weac.plot.plot_data">plot_data</a></code></li>
+<li><code><a title="weac.plot.save_plot" href="#weac.plot.save_plot">save_plot</a></code></li>
 <li><code><a title="weac.plot.section_forces" href="#weac.plot.section_forces">section_forces</a></code></li>
 <li><code><a title="weac.plot.set_plotstyles" href="#weac.plot.set_plotstyles">set_plotstyles</a></code></li>
+<li><code><a title="weac.plot.significant_digits" href="#weac.plot.significant_digits">significant_digits</a></code></li>
 <li><code><a title="weac.plot.slab_profile" href="#weac.plot.slab_profile">slab_profile</a></code></li>
 <li><code><a title="weac.plot.stress_criteria" href="#weac.plot.stress_criteria">stress_criteria</a></code></li>
 <li><code><a title="weac.plot.stresses" href="#weac.plot.stresses">stresses</a></code></li>
+<li><code><a title="weac.plot.tight_central_distribution" href="#weac.plot.tight_central_distribution">tight_central_distribution</a></code></li>
 </ul>
 </li>
 <li><h3><a href="#header-classes">Classes</a></h3>
