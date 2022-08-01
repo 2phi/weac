@@ -180,7 +180,7 @@ class Eigensystem:
         if update:
             self.calc_fundamental_system()
 
-    def set_beam_properties(self, layers, phi, C0=6.0, C1=4.60,
+    def set_beam_properties(self, layers, phi=0, C0=6.0, C1=4.60,
                             nu=0.25, update=False):
         """
         Set material and properties geometry of beam (slab).
