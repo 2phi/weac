@@ -155,7 +155,9 @@ xsl, z, xwl = skier.rasterize_solution(C=C, phi=38, **segments)
 Visualize the results.
 ```python
 # Visualize deformations as a contour plot
-weac.plot.contours(skier, x=xsl, z=z, window=200, scale=100)
+weac.plot.deformed(skier, xsl=xsl_skier, xwl=xwl_skier, z=z_skier,
+                   phi=inclination, window=200, scale=200,
+                   field='principal')
 
 # Plot slab displacements (using x-coordinates of all segments, xsl)
 weac.plot.displacements(skier, x=xsl, z=z, **segments)
@@ -182,12 +184,13 @@ See the [open issues](https://github.com/2phi/weac/issues) for a list of propose
 
 ### v2.4
 - [ ] Implement anistropic weak layer
-
-### v2.3
-- [ ] Provide a coutour plot of slab stresses
 - [ ] Add demo gif
 
 ## Release history
+
+### v2.3
+- Stress plots on deformed contours
+- PSTs now account for slab touchdown
 
 ### v2.2
 - Sign of inclination `phi` consistent with the coordinate system (positive counterclockwise)
