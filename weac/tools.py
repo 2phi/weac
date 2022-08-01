@@ -3,6 +3,7 @@
 
 # Standard library imports
 from timeit import default_timer as timer
+from IPython import get_ipython
 
 # Third party imports
 import numpy as np
@@ -33,6 +34,10 @@ def load_dummy_profile(profile_id):
     soft = [180., 120., 5]
     medium = [270., 120., 30]
     hard = [350., 120., 93.8]
+    # soft = [120., 120., 0.3]
+    # medium = [180., 120., 1.5]
+    # hard = [270., 120., 7.5]
+
 
     # Database (top to bottom)
     database = {
@@ -136,3 +141,29 @@ def gerling(rho, C0=6.0, C1=4.6):
         Young's modulus (MPa).
     """
     return C0*1e-10*rho**C1
+
+def tensile_strength_slab(rho, unit='kPa'):
+    """
+    Estimate the tensile strenght of a slab layer from its density.
+
+    Uses the density parametrization of Sigrist (2006).
+
+    Arguments
+    ---------
+    rho : ndarray, float
+        Layer density (kg/m^3).
+    unit : str, optional
+        Desired output unit of the layer strength. Default is 'kPa'.
+
+    Returns
+    -------
+    ndarray
+        Tensile strenght in specified unit.
+    """
+    convert = {
+            'kPa': 1,
+            'MPa': 1e-3
+        }
+    rho_ice = 917
+    # Sigrist's equation is given in kPa
+    return convert[unit]*240*(rho/rho_ice)**2.44

@@ -28,7 +28,7 @@ class Eigensystem:
         Type of boundary value problem. Default is 'pst-'.
     weak : dict
         Dictionary that holds the weak layer properties Young's
-        modulus (MPa) and Poisson's raito. Defaults are 0.25
+        modulus (MPa) and Poisson's ratio. Defaults are 0.25
         and 0.25, respectively.
     t : float
         Weak-layer thickness (mm). Default is 30.
@@ -36,6 +36,8 @@ class Eigensystem:
         Compressive foundation (weak-layer) stiffness (N/mm^3).
     kt : float
         Shear foundation (weak-layer) stiffness (N/mm^3).
+    tc : float
+        Weak-layer thickness after collapse (mm).
     slab : ndarray
         Matrix that holds the elastic properties of all slab layers.
         Columns are density (kg/m^3), layer heigth (mm), Young's
@@ -54,7 +56,7 @@ class Eigensystem:
         Bending stiffness of the slab (Nmm).
     kA55 : float
         Shear stiffness of the slab (N/mm).
-    E0 : float
+    K0 : float
         Characteristic stiffness value (N).
     ewC : ndarray
         List of complex eigenvalues.
@@ -74,6 +76,18 @@ class Eigensystem:
         Used for numerical stability.
     sysmat : ndarray
         System matrix.
+    lC : float
+        Cracklength whose maximum deflection equals the
+        weak-layer thickness (mm).
+    lS : float
+        Cracklength when touchdown exerts maximum support
+        on the slab (mm). Corresponds to the longest possible
+        unbedded length.
+    ratio : float
+        Increment factor for the weak-layer stiffness from intact
+        to collapsed state.
+    beta : float
+        Describes the stiffnesses of weak-layer and slab.
     """
 
     def __init__(self, system='pst-'):
@@ -103,6 +117,7 @@ class Eigensystem:
         self.t = False          # Weak-layer thickness (mm)
         self.kn = False         # Weak-layer compressive stiffness
         self.kt = False         # Weak-layer shear stiffness
+        self.tc = False         # Weak-layer collapse height (mm)
 
         # Initialize slab attributes
         self.p = 0              # Surface line load (N/mm)
@@ -110,11 +125,12 @@ class Eigensystem:
         self.k = False          # Slab shear correction factor
         self.h = False          # Total slab height (mm)
         self.zs = False         # Z-coordinate of slab center of gravity (mm)
+        self.phi = False        # Slab inclination (°)
         self.A11 = False        # Slab extensional stiffness
         self.B11 = False        # Slab bending-extension coupling stiffness
         self.D11 = False        # Slab bending stiffness
         self.kA55 = False       # Slab shear stiffness
-        self.E0 = False         # Stiffness determinant
+        self.K0 = False         # Stiffness determinant
 
         # Inizialize eigensystem attributes
         self.ewC = False        # Complex eigenvalues
@@ -123,9 +139,15 @@ class Eigensystem:
         self.evR = False        # Real eigenvectors
         self.sC = False         # Stability shift of complex eigenvalues
         self.sR = False         # Stability shift of real eigenvalues
-        self.sysmat = False     # System matrix
 
-    def set_foundation_properties(self, t=30, E=0.25, nu=0.25, update=False):
+        # Initialize touchdown attributes
+        self.lC = False         # Minimum length of substratum contact (mm)
+        self.lS = False         # Maximum length of span between
+                                # between bedded and touchdowned boundary (mm)
+        self.ratio = False      # Stiffness ratio of collalpsed to uncollapsed weak-layer
+        self.beta = False       # Ratio of slab to bedding stiffness
+
+    def set_foundation_properties(self, t=30, cf=0.5, E=0.25, nu=0.25, update=False):
         """
         Set material properties and geometry of foundation (weak layer).
 
@@ -133,6 +155,9 @@ class Eigensystem:
         ---------
         t : float, optional
             Weak-layer thickness (mm). Default is 30.
+        cf : float
+            Fraction by which the weak-layer thickness is reduced
+            due to collapse. Default is 0.5.
         E : float, optional
             Weak-layer Young modulus (MPa). Default is 0.25.
         nu : float, optional
@@ -143,6 +168,7 @@ class Eigensystem:
         """
         # Geometry
         self.t = t              # Weak-layer thickness (mm)
+        self.tc = cf*self.t     # Weak-layer collapse height (mm)
 
         # Material properties
         self.weak = {
@@ -154,7 +180,7 @@ class Eigensystem:
         if update:
             self.calc_fundamental_system()
 
-    def set_beam_properties(self, layers, C0=6.0, C1=4.60,
+    def set_beam_properties(self, layers, phi=0, C0=6.0, C1=4.60,
                             nu=0.25, update=False):
         """
         Set material and properties geometry of beam (slab).
@@ -166,6 +192,8 @@ class Eigensystem:
             Columns are density (kg/m^3) and thickness (mm). One row
             corresponds to one layer. If entered as str, last split
             must be available in database.
+        phi : float
+            Inclination of the slab (degrees).
         C0 : float, optional
             Multiplicative constant of Young modulus parametrization
             according to Gerling et al. (2017). Default is 6.0.
@@ -200,6 +228,9 @@ class Eigensystem:
         # Poisson's ratio
         self.slab = np.vstack([layers.T, E, G, nu]).T
 
+        # Set beam inclination
+        self.phi = phi
+
         # Recalculate the fundamental system after properties have changed
         if update:
             self.calc_fundamental_system()
@@ -221,7 +252,7 @@ class Eigensystem:
         """
         self.p = p
 
-    def calc_foundation_stiffness(self):
+    def calc_foundation_stiffness(self, ratio=16):
         """Compute foundation normal and shear stiffness."""
         # Elastic moduli (MPa) under plane-strain conditions
         G = self.weak['E']/(2*(1 + self.weak['nu']))    # Shear modulus
@@ -231,24 +262,37 @@ class Eigensystem:
         self.kn = E/self.t                              # Normal stiffness
         self.kt = G/self.t                              # Shear stiffness
 
+        # Weak-layer stiffness increment factor for collapse
+        self.ratio = ratio
+
+    def get_ply_coordinates(self):
+        """
+        Calculate ply (layer) z-coordinates.
+
+        Returns
+        -------
+        ndarray
+            Ply (layer) z-coordinates (top to bottom) in coordinate system with
+            downward pointing z-axis (z-list will be negative to positive).
+
+        """
+        # Get list of ply (layer) thicknesses and prepend 0
+        t = np.concatenate(([0], self.slab[:, 1]))
+        # Calculate and return ply z-coordiantes
+        return np.cumsum(t) - self.h/2
+
     def calc_laminate_stiffness_matrix(self):
         """
         Provide ABD matrix.
 
         Return plane-strain laminate stiffness matrix (ABD matrix).
         """
-        # Number of plies and ply thicknesses (top to bottom)
-        n = self.slab.shape[0]
-        t = self.slab[:, 1]
-        # Calculate ply coordinates (top to bottom) in coordinate system
-        # with downward pointing z-axis (z-list will be negative to positive)
-        z = np.zeros(n + 1)
-        for j in range(n + 1):
-            z[j] = -self.h/2 + sum(t[0:j])
+        # Get ply coordinates (z-list is top to bottom, negative to positive)
+        z = self.get_ply_coordinates()
         # Initialize stiffness components
         A11, B11, D11, kA55 = 0, 0, 0, 0
         # Add layerwise contributions
-        for i in range(n):
+        for i in range(len(z) - 1):
             E, G, nu = self.slab[i, 2:5]
             A11 = A11 + E/(1 - nu**2)*(z[i+1] - z[i])
             B11 = B11 + 1/2*E/(1 - nu**2)*(z[i+1]**2 - z[i]**2)
@@ -259,50 +303,86 @@ class Eigensystem:
         self.B11 = B11
         self.D11 = D11
         self.kA55 = kA55
-        self.E0 = B11**2 - A11*D11
+        self.K0 = B11**2 - A11*D11
 
     def calc_system_matrix(self):
         """
-        Assemble first-order ODE system matrix.
+        Assemble first-order ODE system matrix K.
 
         Using the solution vector z = [u, u', w, w', psi, psi']
         the ODE system is written in the form Az' + Bz = d
-        and rearranged to z' = -(A ^ -1)Bz + (A ^ -1)d = Ez + F
+        and rearranged to z' = -(A ^ -1)Bz + (A ^ -1)d = Kz + q
+
+        Returns
+        -------
+        ndarray
+            System matrix K (6x6).
         """
         kn = self.kn
         kt = self.kt
 
         # Abbreviations (MIT t/2 im GGW, MIT w' in Kinematik)
-        E21 = kt*(-2*self.D11 + self.B11*(self.h + self.t))/(2*self.E0)
-        E24 = (2*self.D11*kt*self.t
+        K21 = kt*(-2*self.D11 + self.B11*(self.h + self.t))/(2*self.K0)
+        K24 = (2*self.D11*kt*self.t
                - self.B11*kt*self.t*(self.h + self.t)
-               + 4*self.B11*self.kA55)/(4*self.E0)
-        E25 = (-2*self.D11*self.h*kt
+               + 4*self.B11*self.kA55)/(4*self.K0)
+        K25 = (-2*self.D11*self.h*kt
                + self.B11*self.h*kt*(self.h + self.t)
-               + 4*self.B11*self.kA55)/(4*self.E0)
-        E43 = kn/self.kA55
-        E61 = kt*(2*self.B11 - self.A11*(self.h + self.t))/(2*self.E0)
-        E64 = (-2*self.B11*kt*self.t
+               + 4*self.B11*self.kA55)/(4*self.K0)
+        K43 = kn/self.kA55
+        K61 = kt*(2*self.B11 - self.A11*(self.h + self.t))/(2*self.K0)
+        K64 = (-2*self.B11*kt*self.t
                + self.A11*kt*self.t*(self.h+self.t)
-               - 4*self.A11*self.kA55)/(4*self.E0)
-        E65 = (2*self.B11*self.h*kt
+               - 4*self.A11*self.kA55)/(4*self.K0)
+        K65 = (2*self.B11*self.h*kt
                - self.A11*self.h*kt*(self.h+self.t)
-               - 4*self.A11*self.kA55)/(4*self.E0)
+               - 4*self.A11*self.kA55)/(4*self.K0)
 
         # System matrix
-        E = [[0,    1,    0,    0,    0,    0],
-             [E21,    0,    0,  E24,  E25,    0],
+        K = [[0,    1,    0,    0,    0,    0],
+             [K21,  0,    0,  K24,  K25,    0],
              [0,    0,    0,    1,    0,    0],
-             [0,    0,  E43,    0,    0,   -1],
+             [0,    0,  K43,    0,    0,   -1],
              [0,    0,    0,    0,    0,    1],
-             [E61,    0,    0,  E64,  E65,    0]]
+             [K61,  0,    0,  K64,  K65,    0]]
 
-        self.sysmat = np.array(E)
+        return np.array(K)
+
+    def get_load_vector(self, phi):
+        """
+        Compute sytem load vector q.
+
+        Using the solution vector z = [u, u', w, w', psi, psi']
+        the ODE system is written in the form Az' + Bz = d
+        and rearranged to z' = -(A ^ -1)Bz + (A ^ -1)d = Kz + q
+
+        Arguments
+        ---------
+        phi : float
+            Inclination (degrees). Counterclockwise positive.
+
+        Returns
+        -------
+        ndarray
+            System load vector q (6x1).
+        """
+        qn, qt = self.get_weight_load(phi)
+        pn, pt = self.get_surface_load(phi)
+        return np.array([
+            [0],
+            [(self.B11*(self.h*pt - 2*qt*self.zs)
+              + 2*self.D11*(qt + pt))/(2*self.K0)],
+            [0],
+            [-(qn + pn)/self.kA55],
+            [0],
+            [-(self.A11*(self.h*pt - 2*qt*self.zs)
+               + 2*self.B11*(qt + pt))/(2*self.K0)]
+        ])
 
     def calc_eigensystem(self):
         """Calculate eigenvalues and eigenvectors of the system matrix."""
         # Calculate eigenvalues (ew) and eigenvectors (ev)
-        ew, ev = np.linalg.eig(self.sysmat)
+        ew, ev = np.linalg.eig(self.calc_system_matrix())
         # Classify real and complex eigenvalues
         real = (ew.imag == 0) & (ew.real != 0)  # real eigenvalues
         cmplx = ew.imag > 0                   # positive complex conjugates
@@ -320,7 +400,6 @@ class Eigensystem:
         """Calculate the fundamental system of the problem."""
         self.calc_foundation_stiffness()
         self.calc_laminate_stiffness_matrix()
-        self.calc_system_matrix()
         self.calc_eigensystem()
 
     def get_weight_load(self, phi):
@@ -399,6 +478,142 @@ class Eigensystem:
 
         return Fn, Ft
 
+    def calc_beta(self):
+        """
+        Calculate beta.
+
+        Returns
+        -------
+        beta : float
+            Weak-layer to slab stiffness relation factor.
+        """
+        # (Intact) weak-layer to slab stiffness relation factor
+        self.beta = (self.kn/(4*self.D11))**(1/4)
+
+    def calc_span_length(self):
+        """
+        Calculate span from layer and weak layer properties and load situation.
+
+        Returns
+        -------
+        lS : float
+            Span of the element between bedded element and touchdown for full touchdown.
+        """
+        def polynomial():
+            """
+            Calculate the coefficients of a sixth order polynomial equation.
+
+            Returns
+            -------
+            list
+                First coefficient for sixth order term,
+                second coefficient for fith order term and so on.
+            """
+            a1 = self.kA55**2*kR1*kN1*q0
+            a2 = 6*self.kA55*(self.D11*self.kA55 + kR1*kR2)*kN1*q0
+            a3 = 30*self.D11*self.kA55*(kR1 + kR2)*kN1*q0
+            a4 = 24*self.D11*(2*self.kA55**2*kR1 + 3*self.D11*self.kA55*kN1 + 3*kR1*kR2*kN1)*q0
+            a5 = 72*self.D11*(self.D11*(self.kA55**2 + (kR1 + kR2)*kN1)*q0 \
+                + self.kA55*kR1*(2*kR2*q0 - self.kA55*kN1*self.tc))
+            a6 = 144*self.D11*self.kA55*(self.D11*(kR1 + kR2)*q0 \
+                - (self.D11*self.kA55 + kR1*kR2)*kN1*self.tc)
+            a7 = - 144*self.D11**2*self.kA55*(kR1 + kR2)*kN1*self.tc
+            return [a1,a2,a3,a4,a5,a6,a7]
+
+        # Get spring stiffnesses for adjacent segment with intact weak-layer
+        kR1 = self.calc_rot_spring(collapse=False)
+        kN1 = self.calc_trans_spring()
+        # Get spring stiffnesses for adjacent segment with collapsed weak-layer
+        kR2 = self.calc_rot_spring(collapse=True)
+        # Get surface normal load components
+        qn = self.get_weight_load(self.phi)[0]
+        pn = self.get_surface_load(self.phi)[0]
+        q0 = qn + pn
+        # Calculate positive real roots
+        pos = (np.roots(polynomial()).imag == 0) & (np.roots(polynomial()).real > 0)
+        self.lS = np.roots(polynomial())[pos].real[0]
+
+    def calc_contact_length(self):
+        """
+        Calculate segment length where max slab deflection equals tc.
+
+        Returns
+        -------
+        lC : float
+            Maximum length without substratum contact.
+        """
+        def polynomial():
+            """
+            Calculate the coefficients of a fourth order polynomial equation.
+
+            Returns
+            -------
+            list
+                First coefficient for fourth order term,
+                second coefficient for third order term and so on.
+            """
+            a1 = 1/(8*self.D11)*q0
+            a2 = 1/(2*kR1)*q0
+            a3 = 1/(2*self.kA55)*q0
+            a4 = 1/kN1*q0
+            a5 = -self.tc
+            return [a1,a2,a3,a4,a5]
+
+        # Get spring stiffnesses for adjacent segment intact intact weak-layer
+        kR1 = self.calc_rot_spring(collapse=False)
+        kN1 = self.calc_trans_spring()
+        # Get surface normal load components
+        qn = self.get_weight_load(self.phi)[0]
+        pn = self.get_surface_load(self.phi)[0]
+        q0 = qn + pn
+        # Calculate positive real roots
+        pos = (np.roots(polynomial()).imag == 0) & (np.roots(polynomial()).real > 0)
+        self.lC = np.roots(polynomial())[pos].real[0]
+
+    def calc_rot_spring(self, collapse=True):
+        """
+        Calculate rotational spring stiffness from layer properties.
+
+        Arguments
+        ---------
+        collapse : boolean
+            Indicates whether weak-layer is collapsed.
+
+        Returns
+        -------
+        kR : float
+            Rotational spring stiffness (Nmm/mm/rad).
+        """
+        # get ratio for foundation stiffness after collapse
+        if collapse:
+            ratio = self.ratio
+        else:
+            ratio = 1
+        # calc spring stiffness
+        kR = self.D11*self.beta*ratio**(1/4)
+
+        return kR
+
+    def calc_trans_spring(self):
+        """
+        Calculate translational spring stiffness from layer properties.
+
+        Returns
+        -------
+        kN : float
+            Translational spring stiffness (N/mm^2).
+        """
+        # calc translational spring stiffness for bedded euler-bernoulli-beam
+        kN = 2*self.D11*self.beta**3
+
+        return kN
+
+    def calc_touchdown_system(self):
+        """Calculate the lenghts for touchdown evaluation"""
+        self.calc_beta()
+        self.calc_span_length()
+        self.calc_contact_length()
+
     def zh(self, x, l=0, bed=True):
         """
         Compute bedded or free complementary solution at position x.
@@ -434,7 +649,7 @@ class Eigensystem:
             # Abbreviations
             H14 = 3*self.B11/self.A11*x**2
             H24 = 6*self.B11/self.A11*x
-            H54 = -3*x**2 + 6*self.E0/(self.A11*self.kA55)
+            H54 = -3*x**2 + 6*self.K0/(self.A11*self.kA55)
             # Complementary solution matrix of free segments
             zh = np.array(
                 [[0,      0,      0,    H14,      1,      x],
@@ -477,7 +692,7 @@ class Eigensystem:
         A11 = self.A11
         B11 = self.B11
         kA55 = self.kA55
-        E0 = self.E0
+        E0 = self.K0
 
         # Unpack geometric properties
         h = self.h

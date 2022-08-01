@@ -32,6 +32,7 @@
 
 # Standard library imports
 from timeit import default_timer as timer
+from IPython import get_ipython
 
 # Third party imports
 import numpy as np
@@ -59,9 +60,13 @@ def isnotebook():
 def load_dummy_profile(profile_id):
     &#34;&#34;&#34;Define standard layering types for comparison.&#34;&#34;&#34;
     # Layers [density (kg/m^3), thickness (mm), Young&#39;s modulus (N/mm^2)]
-    soft = [120., 120., 0.3]
-    medium = [180., 120., 1.5]
-    hard = [270., 120., 7.5]
+    soft = [180., 120., 5]
+    medium = [270., 120., 30]
+    hard = [350., 120., 93.8]
+    # soft = [120., 120., 0.3]
+    # medium = [180., 120., 1.5]
+    # hard = [270., 120., 7.5]
+
 
     # Database (top to bottom)
     database = {
@@ -146,7 +151,7 @@ def scapozza(rho):
 
 def gerling(rho, C0=6.0, C1=4.6):
     &#34;&#34;&#34;
-    Compute Young&#39;s modulus density according to Gerling et al. 2017.
+    Compute Young&#39;s modulus from density according to Gerling et al. 2017.
 
     Arguments
     ---------
@@ -164,7 +169,33 @@ def gerling(rho, C0=6.0, C1=4.6):
     E : float or ndarray
         Young&#39;s modulus (MPa).
     &#34;&#34;&#34;
-    return C0*1e-10*rho**C1</code></pre>
+    return C0*1e-10*rho**C1
+
+def tensile_strength_slab(rho, unit=&#39;kPa&#39;):
+    &#34;&#34;&#34;
+    Estimate the tensile strenght of a slab layer from its density.
+
+    Uses the density parametrization of Sigrist (2006).
+
+    Arguments
+    ---------
+    rho : ndarray, float
+        Layer density (kg/m^3).
+    unit : str, optional
+        Desired output unit of the layer strength. Default is &#39;kPa&#39;.
+
+    Returns
+    -------
+    ndarray
+        Tensile strenght in specified unit.
+    &#34;&#34;&#34;
+    convert = {
+            &#39;kPa&#39;: 1,
+            &#39;MPa&#39;: 1e-3
+        }
+    rho_ice = 917
+    # Sigrist&#39;s equation is given in kPa
+    return convert[unit]*240*(rho/rho_ice)**2.44</code></pre>
 </details>
 </section>
 <section>
@@ -232,7 +263,7 @@ to one layer.</dd>
 <span>def <span class="ident">gerling</span></span>(<span>rho, C0=6.0, C1=4.6)</span>
 </code></dt>
 <dd>
-<div class="desc"><p>Compute Young's modulus density according to Gerling et al. 2017.</p>
+<div class="desc"><p>Compute Young's modulus from density according to Gerling et al. 2017.</p>
 <h2 id="arguments">Arguments</h2>
 <dl>
 <dt><strong><code>rho</code></strong> :&ensp;<code>float</code> or <code>ndarray</code></dt>
@@ -255,7 +286,7 @@ Gerling et al. (2017). Default is 4.6.</dd>
 </summary>
 <pre><code class="python">def gerling(rho, C0=6.0, C1=4.6):
     &#34;&#34;&#34;
-    Compute Young&#39;s modulus density according to Gerling et al. 2017.
+    Compute Young&#39;s modulus from density according to Gerling et al. 2017.
 
     Arguments
     ---------
@@ -311,9 +342,13 @@ Gerling et al. (2017). Default is 4.6.</dd>
 <pre><code class="python">def load_dummy_profile(profile_id):
     &#34;&#34;&#34;Define standard layering types for comparison.&#34;&#34;&#34;
     # Layers [density (kg/m^3), thickness (mm), Young&#39;s modulus (N/mm^2)]
-    soft = [120., 120., 0.3]
-    medium = [180., 120., 1.5]
-    hard = [270., 120., 7.5]
+    soft = [180., 120., 5]
+    medium = [270., 120., 30]
+    hard = [350., 120., 93.8]
+    # soft = [120., 120., 0.3]
+    # medium = [180., 120., 1.5]
+    # hard = [270., 120., 7.5]
+
 
     # Database (top to bottom)
     database = {
@@ -384,6 +419,55 @@ Gerling et al. (2017). Default is 4.6.</dd>
     return E</code></pre>
 </details>
 </dd>
+<dt id="weac.tools.tensile_strength_slab"><code class="name flex">
+<span>def <span class="ident">tensile_strength_slab</span></span>(<span>rho, unit='kPa')</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Estimate the tensile strenght of a slab layer from its density.</p>
+<p>Uses the density parametrization of Sigrist (2006).</p>
+<h2 id="arguments">Arguments</h2>
+<dl>
+<dt><strong><code>rho</code></strong> :&ensp;<code>ndarray, float</code></dt>
+<dd>Layer density (kg/m^3).</dd>
+<dt><strong><code>unit</code></strong> :&ensp;<code>str</code>, optional</dt>
+<dd>Desired output unit of the layer strength. Default is 'kPa'.</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>ndarray</code></dt>
+<dd>Tensile strenght in specified unit.</dd>
+</dl></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def tensile_strength_slab(rho, unit=&#39;kPa&#39;):
+    &#34;&#34;&#34;
+    Estimate the tensile strenght of a slab layer from its density.
+
+    Uses the density parametrization of Sigrist (2006).
+
+    Arguments
+    ---------
+    rho : ndarray, float
+        Layer density (kg/m^3).
+    unit : str, optional
+        Desired output unit of the layer strength. Default is &#39;kPa&#39;.
+
+    Returns
+    -------
+    ndarray
+        Tensile strenght in specified unit.
+    &#34;&#34;&#34;
+    convert = {
+            &#39;kPa&#39;: 1,
+            &#39;MPa&#39;: 1e-3
+        }
+    rho_ice = 917
+    # Sigrist&#39;s equation is given in kPa
+    return convert[unit]*240*(rho/rho_ice)**2.44</code></pre>
+</details>
+</dd>
 <dt id="weac.tools.time"><code class="name flex">
 <span>def <span class="ident">time</span></span>(<span>)</span>
 </code></dt>
@@ -421,6 +505,7 @@ Gerling et al. (2017). Default is 4.6.</dd>
 <li><code><a title="weac.tools.isnotebook" href="#weac.tools.isnotebook">isnotebook</a></code></li>
 <li><code><a title="weac.tools.load_dummy_profile" href="#weac.tools.load_dummy_profile">load_dummy_profile</a></code></li>
 <li><code><a title="weac.tools.scapozza" href="#weac.tools.scapozza">scapozza</a></code></li>
+<li><code><a title="weac.tools.tensile_strength_slab" href="#weac.tools.tensile_strength_slab">tensile_strength_slab</a></code></li>
 <li><code><a title="weac.tools.time" href="#weac.tools.time">time</a></code></li>
 </ul>
 </li>

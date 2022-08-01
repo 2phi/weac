@@ -4,9 +4,13 @@
 # Standard library imports
 from functools import partial
 
+
 # Third party imports
 import numpy as np
-from scipy.integrate import romberg
+from scipy.integrate import romberg, cumulative_trapezoid
+
+# Module imports
+from weac.tools import tensile_strength_slab
 
 
 class FieldQuantitiesMixin:
@@ -42,7 +46,7 @@ class FieldQuantitiesMixin:
         }
         return convert[unit]*Z[2, :]
 
-    def wp(self, Z):
+    def dw_dx(self, Z):
         """
         Get first derivative w' of the centerline deflection.
 
@@ -80,7 +84,7 @@ class FieldQuantitiesMixin:
             psi = Z[4, :]
         return psi
 
-    def psip(self, Z):
+    def dpsi_dx(self, Z):
         """
         Get first derivative psi' of the midplane rotation.
 
@@ -93,7 +97,7 @@ class FieldQuantitiesMixin:
         -------
         float
             First derivative psi' of the midplane rotation (radians/mm)
-             of the slab.
+            of the slab.
         """
         return Z[5, :]
 
@@ -114,7 +118,7 @@ class FieldQuantitiesMixin:
         Returns
         -------
         float
-            Horizontal displacement u (mm) of the slab.
+            Horizontal displacement u (unit) of the slab.
         """
         convert = {
             'm': 1e-3,   # meters
@@ -124,7 +128,7 @@ class FieldQuantitiesMixin:
         }
         return convert[unit]*(Z[0, :] + z0*self.psi(Z))
 
-    def up(self, Z, z0):
+    def du_dx(self, Z, z0):
         """
         Get first derivative of the horizontal displacement.
 
@@ -141,7 +145,7 @@ class FieldQuantitiesMixin:
             First derivative u' = u0' + z0 psi' of the horizontal
             displacement of the slab.
         """
-        return Z[1, :] + z0*self.psip(Z)
+        return Z[1, :] + z0*self.dpsi_dx(Z)
 
     def N(self, Z):
         """
@@ -234,7 +238,7 @@ class FieldQuantitiesMixin:
             'MPa': 1
         }
         return -convert[unit]*self.kt*(
-            self.wp(Z)*self.t/2 - self.u(Z, z0=self.h/2))
+            self.dw_dx(Z)*self.t/2 - self.u(Z, z0=self.h/2))
 
     def eps(self, Z):
         """
@@ -266,26 +270,7 @@ class FieldQuantitiesMixin:
         float
             Weak-layer shear strain gamma.
         """
-        return self.wp(Z)/2 - self.u(Z, z0=self.h/2)/self.t
-
-    def maxp(self, Z):
-        """
-        Get maximum principal stress in the weak layer.
-
-        Arguments
-        ---------
-        Z : ndarray
-            Solution vector [u(x) u'(x) w(x) w'(x) psi(x) psi'(x)]^T.
-
-        Returns
-        -------
-        loat
-            Maximum principal stress (MPa) in the weak layer.
-        """
-        sig = self.sig(Z)
-        tau = self.tau(Z)
-        return np.amax([[sig + np.sqrt(sig**2 + 4*tau**2),
-                         sig - np.sqrt(sig**2 + 4*tau**2)]], axis=1)[0]/2
+        return self.dw_dx(Z)/2 - self.u(Z, z0=self.h/2)/self.t
 
     def Gi(self, Ztip, unit='kJ/m^2'):
         """
@@ -365,12 +350,12 @@ class FieldQuantitiesMixin:
 
         Arguments
         ---------
-        x: float, ndarray
+        x : float, ndarray
             X-coordinate where integrand is to be evaluated (mm).
-        z0: callable
+        z0 : callable
             Function that returns the solution vector of the uncracked
             configuration.
-        z1: callable
+        z1 : callable
             Function that returns the solution vector of the cracked
             configuration.
 
@@ -381,6 +366,125 @@ class FieldQuantitiesMixin:
         """
         return self.tau(z0(x))*self.gamma(z1(x))*self.t
 
+    def dz_dx(self, z, phi):
+        """
+        Get first derivative z'(x) = K*z(x) + q of the solution vector.
+
+        z'(x) = [u'(x) u''(x) w'(x) w''(x) psi'(x), psi''(x)]^T
+
+        Parameters
+        ----------
+        z : ndarray
+            Solution vector [u(x) u'(x) w(x) w'(x) psi(x), psi'(x)]^T
+        phi : float
+            Inclination (degrees). Counterclockwise positive.
+
+        Returns
+        -------
+        ndarray, float
+            First derivative z'(x) for the solution vector (6x1).
+        """
+        K = self.calc_system_matrix()
+        q = self.get_load_vector(phi)
+        return np.dot(K, z) + q
+
+    def dz_dxdx(self, z, phi):
+        """
+        Get second derivative z''(x) = K*z'(x) of the solution vector.
+
+        z''(x) = [u''(x) u'''(x) w''(x) w'''(x) psi''(x), psi'''(x)]^T
+
+        Parameters
+        ----------
+        z : ndarray
+            Solution vector [u(x) u'(x) w(x) w'(x) psi(x), psi'(x)]^T
+        phi : float
+            Inclination (degrees). Counterclockwise positive.
+
+        Returns
+        -------
+        ndarray, float
+            Second derivative z''(x) = (K*z(x) + q)' = K*z'(x) = K*(K*z(x) + q)
+            of the solution vector (6x1).
+        """
+        K = self.calc_system_matrix()
+        q = self.get_load_vector(phi)
+        dz_dx = np.dot(K, z) + q
+        return np.dot(K, dz_dx)
+
+    def du0_dxdx(self, z, phi):
+        """
+        Get second derivative of the horiz. centerline displacement u0''(x).
+
+        Parameters
+        ----------
+        z : ndarray
+            Solution vector [u(x) u'(x) w(x) w'(x) psi(x) psi'(x)]^T.
+        phi : float
+            Inclination (degrees). Counterclockwise positive.
+
+        Returns
+        -------
+        ndarray, float
+            Second derivative of the horizontal centerline displacement
+            u0''(x) (1/mm).
+        """
+        return self.dz_dx(z, phi)[1, :]
+
+    def dpsi_dxdx(self, z, phi):
+        """
+        Get second derivative of the cross-section rotation psi''(x).
+
+        Parameters
+        ----------
+        z : ndarray
+            Solution vector [u(x) u'(x) w(x) w'(x) psi(x) psi'(x)]^T.
+        phi : float
+            Inclination (degrees). Counterclockwise positive.
+
+        Returns
+        -------
+        ndarray, float
+            Second derivative of the cross-section rotation psi''(x) (1/mm^2).
+        """
+        return self.dz_dx(z, phi)[5, :]
+
+    def du0_dxdxdx(self, z, phi):
+        """
+        Get third derivative of the horiz. centerline displacement u0'''(x).
+
+        Parameters
+        ----------
+        z : ndarray
+            Solution vector [u(x) u'(x) w(x) w'(x) psi(x) psi'(x)]^T.
+        phi : float
+            Inclination (degrees). Counterclockwise positive.
+
+        Returns
+        -------
+        ndarray, float
+            Third derivative of the horizontal centerline displacement
+            u0'''(x) (1/mm^2).
+        """
+        return self.dz_dxdx(z, phi)[1, :]
+
+    def dpsi_dxdxdx(self, z, phi):
+        """
+        Get third derivative of the cross-section rotation psi'''(x).
+
+        Parameters
+        ----------
+        z : ndarray
+            Solution vector [u(x) u'(x) w(x) w'(x) psi(x) psi'(x)]^T.
+        phi : float
+            Inclination (degrees). Counterclockwise positive.
+
+        Returns
+        -------
+        ndarray, float
+            Third derivative of the cross-section rotation psi'''(x) (1/mm^3).
+        """
+        return self.dz_dxdx(z, phi)[5, :]
 
 class SolutionMixin:
     """
@@ -390,26 +494,127 @@ class SolutionMixin:
     and for the computation of the free constants.
     """
 
-    def bc(self, z):
+    def mode_td(self, l=0):
+        """
+        Identify the mode of the pst-boundary.
+
+        Arguments
+        ---------
+        l : float, optional
+            Length of the segment in consideration. Default is zero.
+
+        Returns
+        -------
+        mode : string
+            Contains the mode for the boundary of the segment:
+            A - free end, B - intermediate touchdown,
+            C - full touchdown (maximum clamped end).
+        """
+        # Classify boundary type by element length
+        if l <= self.lC:
+            mode = 'A'
+        elif self.lC < l <= self.lS:
+            mode = 'B'
+        elif self.lS < l:
+            mode = 'C'
+
+        return mode
+
+    def reduce_stiffness(self, l=0, mode='A'):
+        """
+        Determines the reduction factor for a rotational spring.
+
+        Arguments
+        ---------
+        l : float, optional
+            Length of the segment in consideration. Default is zero.
+        mode : string, optional
+            Contains the mode for the boundary of the segment:
+            A - free end, B - intermediate touchdown, C - full touchdown.
+            Default is A.
+
+        Returns
+        -------
+        kf : float
+            Reduction factor.
+        """
+        # Reduction to zero for free end bc
+        if mode in ['A']:
+            kf = 0
+        # Reduction factor for touchdown
+        if mode in ['B', 'C']:
+            l = l - self.lC
+            # Beta needs to take into account different weak-layer spring stiffness
+            beta = self.beta*self.ratio**(1/4)
+            kf=(np.cos(2*beta*l)+np.cosh(2*beta*l)-2)/(np.sin(2*beta*l)+np.sinh(2*beta*l))
+
+        return kf
+
+    def bc(self, z, l=0, k=False, pos='mid'):
         """
         Provide equations for free (pst) or infinite (skiers) ends.
 
         Arguments
         ---------
-        z: ndarray
+        z : ndarray
             Solution vector (6x1) at a certain position x.
+        l : float, optional
+            Length of the segment in consideration. Default is zero.
+        k : boolean
+            Indicates whether segment has foundation(True) or not (False).
+            Default is False.
+        pos : {'left', 'mid', 'right', 'l', 'm', 'r'}, optional
+            Determines whether the segement under consideration
+            is a left boundary segement (left, l), one of the
+            center segement (mid, m), or a right boundary
+            segement (right, r). Default is 'mid'.
 
         Returns
         -------
-        bc: ndarray
+        bc : ndarray
             Boundary condition vector (lenght 3) at position x.
         """
+        # Check mode for free end
+        mode = self.mode_td(l=l)
+        # Get spring stiffness reduction factor
+        kf = self.reduce_stiffness(l=l, mode=mode)
+        # Get spring stiffness for collapsed weak-layer
+        kR = self.calc_rot_spring(collapse=True)
+
+        # Set boundary conditions for PST-systems
         if self.system in ['pst-', '-pst']:
-            # Free ends
-            bc = np.array([self.N(z), self.M(z), self.V(z)])
+            if not k:
+                if mode in ['A']:
+                    # Free end
+                    bc = np.array([self.N(z),
+                                   self.M(z),
+                                   self.V(z)
+                                   ])
+                elif mode in ['B', 'C'] and pos in ['r', 'right']:
+                    # Touchdown right
+                    bc = np.array([self.N(z),
+                                   self.M(z) + kf*kR*self.psi(z),
+                                   self.w(z)
+                                   ])
+                elif mode in ['B', 'C'] and pos in ['l', 'left']:
+                    # Touchdown left
+                    bc = np.array([self.N(z),
+                                   self.M(z) - kf*kR*self.psi(z),
+                                   self.w(z)
+                                   ])
+            else:
+                # Free end
+                bc = np.array([self.N(z),
+                                self.M(z),
+                                self.V(z)
+                                ])
+        # Set boundary conditions for SKIER-systems
         elif self.system in ['skier', 'skiers']:
-            # Infinite ends (vanishing complementary solution)
-            bc = np.array([self.u(z, z0=0), self.w(z), self.psi(z)])
+            # Infinite end (vanishing complementary solution)
+            bc = np.array([self.u(z, z0=0),
+                           self.w(z),
+                           self.psi(z)
+                           ])
         else:
             raise ValueError(
                 'Boundary conditions not defined for'
@@ -417,25 +622,30 @@ class SolutionMixin:
 
         return bc
 
-    def eqs(self, zl, zr, pos='mid'):
+    def eqs(self, zl, zr, l=0, k=False, pos='mid'):
         """
         Provide boundary or transmission conditions for beam segments.
 
         Arguments
         ---------
-        zl: ndarray
+        zl : ndarray
             Solution vector (6x1) at left end of beam segement.
-        zr: ndarray
+        zr : ndarray
             Solution vector (6x1) at right end of beam segement.
+        l : float, optional
+            Length of the segment in consideration. Default is zero.
+        k : boolean
+            Indicates whether segment has foundation(True) or not (False).
+            Default is False.
         pos: {'left', 'mid', 'right', 'l', 'm', 'r'}, optional
             Determines whether the segement under consideration
             is a left boundary segement (left, l), one of the
             center segement (mid, m), or a right boundary
-            segemen t (right, r). Default is 'mid'.
+            segement (right, r). Default is 'mid'.
 
         Returns
         -------
-        eqs: ndarray
+        eqs : ndarray
             Vector (of length 9) of boundary conditions (3) and
             transmission conditions (6) for boundary segements
             or vector of transmission conditions (of length 6+6)
@@ -443,9 +653,9 @@ class SolutionMixin:
         """
         if pos in ('l', 'left'):
             eqs = np.array([
-                self.bc(zl)[0],             # Left boundary condition
-                self.bc(zl)[1],             # Left boundary condition
-                self.bc(zl)[2],             # Left boundary condition
+                self.bc(zl, l, k, pos)[0],             # Left boundary condition
+                self.bc(zl, l, k, pos)[1],             # Left boundary condition
+                self.bc(zl, l, k, pos)[2],             # Left boundary condition
                 self.u(zr, z0=0),           # ui(xi = li)
                 self.w(zr),                 # wi(xi = li)
                 self.psi(zr),               # psii(xi = li)
@@ -474,18 +684,17 @@ class SolutionMixin:
                 -self.N(zl),                # -Ni(xi = 0)
                 -self.M(zl),                # -Mi(xi = 0)
                 -self.V(zl),                # -Vi(xi = 0)
-                self.bc(zr)[0],             # Right boundary condition
-                self.bc(zr)[1],             # Right boundary condition
-                self.bc(zr)[2]])            # Right boundary condition
+                self.bc(zr, l, k, pos)[0],             # Right boundary condition
+                self.bc(zr, l, k, pos)[1],             # Right boundary condition
+                self.bc(zr, l, k, pos)[2]])            # Right boundary condition
         else:
             raise ValueError(
                 (f'Invalid position argument {pos} given. '
                  'Valid segment positions are l, m, and r, '
                  'or left, mid and right.'))
-
         return eqs
 
-    def calc_segments(self, li=False, mi=False, ki=False, k0=False,
+    def calc_segments(self, tdi=False, li=False, mi=False, ki=False, k0=False,
                       L=1e4, a=0, m=0, **kwargs):
         """
         Assemble lists defining the segments.
@@ -495,54 +704,65 @@ class SolutionMixin:
 
         Arguments
         ---------
-        li: squence, optional
+        li : squence, optional
             List of lengths of segements(mm). Used for system 'skiers'.
-        mi: squence, optional
+        mi : squence, optional
             List of skier weigths (kg) at segement boundaries. Used for
             system 'skiers'.
-        ki: squence, optional
+        ki : squence, optional
             List of one bool per segement indicating whether segement
             has foundation (True) or not (False) in the cracked state.
             Used for system 'skiers'.
-        k0: squence, optional
+        k0 : squence, optional
             List of one bool per segement indicating whether segement
             has foundation(True) or not (False) in the uncracked state.
             Used for system 'skiers'.
-        L: float, optional
+        L : float, optional
             Total length of model (mm). Used for systems 'pst-', '-pst',
             and 'skier'.
-        a: float, optional
+        a : float, optional
             Crack length (mm).  Used for systems 'pst-', '-pst', and
             'skier'.
-        m: float, optional
+        phi : float, optional
+            Inclination (degree).
+        m : float, optional
             Weight of skier (kg) in the axial center of the model.
             Used for system 'skier'.
 
         Returns
         -------
-        segments: dict
-            Dictionary with lists of segement lengths (li), skier
-            weights (mi), and foundation booleans in the cracked (ki)
-            and uncracked (k0) configurations.
+        segments : dict
+            Dictionary with lists of touchdown booleans (tdi), segement
+            lengths (li), skier weights (mi), and foundation booleans
+            in the cracked (ki) and uncracked (k0) configurations.
         """
+
         _ = kwargs                                      # Unused arguments
+        # Set unbedded segment length
+        mode = self.mode_td(l=a)
+        if mode in ['A', 'B']:
+            lU = a
+        if mode in ['C']:
+            lU = self.lS
+
+        # Assemble list defining the segments
         if self.system == 'skiers':
             li = np.array(li)                           # Segment lengths
             mi = np.array(mi)                           # Skier weights
             ki = np.array(ki)                           # Crack
             k0 = np.array(k0)                           # No crack
         elif self.system == 'pst-':
-            li = np.array([L - a, a])                   # Segment lengths
+            li = np.array([L - a, lU])                   # Segment lengths
             mi = np.array([0])                          # Skier weights
             ki = np.array([True, False])                # Crack
             k0 = np.array([True, True])                 # No crack
         elif self.system == '-pst':
-            li = np.array([a, L - a])                   # Segment lengths
+            li = np.array([lU, L - a])                   # Segment lengths
             mi = np.array([0])                          # Skier weights
             ki = np.array([False, True])                # Crack
             k0 = np.array([True, True])                 # No crack
         elif self.system == 'skier':
-            lb = (L - a)/2                              # Half bedded length
+            lb = (L - a)/2                              # Half supported length
             lf = a/2                                    # Half free length
             li = np.array([lb, lf, lf, lb])             # Segment lengths
             mi = np.array([0, m, 0])                    # Skier weights
@@ -556,7 +776,6 @@ class SolutionMixin:
             'nocrack': {'li': li, 'mi': mi, 'ki': k0},
             'crack': {'li': li, 'mi': mi, 'ki': ki},
             'both': {'li': li, 'mi': mi, 'ki': ki, 'k0': k0}}
-
         return segments
 
     def assemble_and_solve(self, phi, li, mi, ki):
@@ -575,19 +794,19 @@ class SolutionMixin:
 
         Arguments
         ---------
-        phi: float
+        phi : float
             Inclination (degrees).
-        li: ndarray
+        li : ndarray
             List of lengths of segements (mm).
-        mi: ndarray
+        mi : ndarray
             List of skier weigths (kg) at segement boundaries.
-        ki: ndarray
+        ki : ndarray
             List of one bool per segement indicating whether segement
             has foundation (True) or not (False).
 
         Returns
         -------
-        C: ndarray
+        C : ndarray
             Matrix(6xN) of solution constants for a system of N
             segements. Columns contain the 6 constants of each segement.
         """
@@ -595,16 +814,16 @@ class SolutionMixin:
 
         # No foundation
         if not any(ki):
-            raise ValueError('Provide at least one bedded segment.')
+            raise ValueError('Provide at least one supported segment.')
         # Mismatch of number of segements and transisions
         if len(li) != len(ki) or len(li) - 1 != len(mi):
             raise ValueError('Make sure len(li)=N, len(ki)=N, and '
                              'len(mi)=N-1 for a system of N segments.')
 
         if self.system not in ['pst-', '-pst']:
-            # Boundary segements must be on foundation for infinite BCs
+            # Boundary segments must be on foundation for infinite BCs
             if not all([ki[0], ki[-1]]):
-                raise ValueError('Provide bedded boundary segments in '
+                raise ValueError('Provide supported boundary segments in '
                                  'order to account for infinite extensions.')
             # Make sure infinity boundary conditions are far enough from skiers
             if li[0] < 5e3 or li[-1] < 5e3:
@@ -644,11 +863,11 @@ class SolutionMixin:
             zhi = self.eqs(
                 zl=self.zh(x=0, l=l, bed=k),
                 zr=self.zh(x=l, l=l, bed=k),
-                pos=pos)
+                l=l, k=k, pos=pos)
             zpi = self.eqs(
                 zl=self.zp(x=0, phi=phi, bed=k),
                 zr=self.zp(x=l, phi=phi, bed=k),
-                pos=pos)
+                l=l, k=k, pos=pos)
             # Rows for left-hand side assembly
             start = 0 if i == 0 else 3
             stop = 6 if i == nS - 1 else 9
@@ -662,17 +881,26 @@ class SolutionMixin:
             Fn, Ft = self.get_skier_load(m, phi)
             # Right-hand side for transmission from segment i-1 to segment i
             rhs[6*i:6*i + 3] = np.vstack([Ft, -Ft*self.h/2, Fn])
-
         # Set rhs so that complementary integral vanishes at boundaries
         if self.system not in ['pst-', '-pst']:
             rhs[:3] = self.bc(self.zp(x=0, phi=phi, bed=ki[0]))
             rhs[-3:] = self.bc(self.zp(x=li[-1], phi=phi, bed=ki[-1]))
 
+        # Loop through segments to set touchdown at rhs
+        for i in range(nS):
+            # Length, foundation and position of segment i
+            l, k, pos = li[i], ki[i], pi[i]
+            mode = self.mode_td(l=l)
+            if not k and bool(mode in ['B', 'C']):
+                if i==0:
+                    rhs[:3] = np.vstack([0,0,self.tc])
+                if i == (nS - 1):
+                    rhs[-3:] = np.vstack([0,0,self.tc])
+
         # --- SOLVE -----------------------------------------------------------
 
         # Solve z0 = zh0*C + zp0 = rhs for constants, i.e. zh0*C = rhs - zp0
         C = np.linalg.solve(zh0, rhs - zp0)
-
         # Sort (nDOF = 6) constants for each segment into columns of a matrix
         return C.reshape([-1, nDOF]).T
 
@@ -730,7 +958,7 @@ class AnalysisMixin:
         nqc = np.insert(np.cumsum(nq), 0, 0)
 
         # Initialize arrays
-        isbedded = np.full(nq.sum(), True)
+        issupported = np.full(nq.sum(), True)
         xq = np.full(nq.sum(), np.nan)
         zq = np.full([6, xq.size], np.nan)
 
@@ -744,7 +972,7 @@ class AnalysisMixin:
             xq[nqc[i]:nqc[i + 1]] = x0 + xi
             # Mask coordinates not on foundation (including endpoints)
             if not ki[i]:
-                isbedded[nqc[i]:nqc[i + 1]] = False
+                issupported[nqc[i]:nqc[i + 1]] = False
             # Compute segment solution
             zi = self.z(xi, C[:, [i]], l, phi, ki[i])
             # Assemble global solution matrix
@@ -753,11 +981,11 @@ class AnalysisMixin:
         # Make sure cracktips are included
         transmissionbool = [ki[j] or ki[j + 1] for j, _ in enumerate(ki[:-1])]
         for i, truefalse in enumerate(transmissionbool, start=1):
-            isbedded[nqc[i]] = truefalse
+            issupported[nqc[i]] = truefalse
 
         # Assemble vector of coordinates on foundation
         xb = np.full(nq.sum(), np.nan)
-        xb[isbedded] = xq[isbedded]
+        xb[issupported] = xq[issupported]
 
         return xq, zq, xb
 
@@ -848,7 +1076,7 @@ class AnalysisMixin:
         ntr = len(li) - 1
         itr = np.arange(ntr)
 
-        # Identify bedded-free and free-bedded transitions as crack tips
+        # Identify supported-free and free-supported transitions as crack tips
         iscracktip = [ki[j] != ki[j + 1] for j in range(ntr)]
 
         # Transition indices of crack tips and total number of crack tips
@@ -877,6 +1105,321 @@ class AnalysisMixin:
         # Return total differential energy release rate of all crack tips
         return Gdif.sum(axis=1)
 
+    def get_zmesh(self, dz=2):
+        """
+        Get z-coordinates of grid points and corresponding elastic properties.
+
+        Arguments
+        ---------
+        dz : float, optional
+            Element size along z-axis (mm). Default is 2 mm.
+
+        Returns
+        -------
+        mesh : ndarray
+            Mesh along z-axis. Columns are a list of z-coordinates (mm) of
+            grid points along z-axis with at least two grid points (top,
+            bottom) per layer, Young's modulus of each grid point, shear
+            modulus of each grid point, and Poisson's ratio of each grid
+            point.
+        """
+        # Get ply (layer) coordinates
+        z = self.get_ply_coordinates()
+        # Compute number of grid points per layer
+        nlayer = np.ceil((z[1:] - z[:-1])/dz).astype(np.int32) + 1
+        # Calculate grid points as list of z-coordinates (mm)
+        zi = np.hstack([
+            np.linspace(z[i], z[i + 1], n, endpoint=True)
+            for i, n in enumerate(nlayer)
+        ])
+        # Get lists of corresponding elastic properties (E, nu, rho)
+        si = np.repeat(self.slab[:, [2, 4, 0]], nlayer, axis=0)
+        # Assemble mesh with columns (z, E, G, nu)
+        return np.column_stack([zi, si])
+
+    def Sxx(self, Z, phi, dz=2, unit='kPa'):
+        """
+        Compute axial normal stress in slab layers.
+
+        Arguments
+        ----------
+        Z : ndarray
+            Solution vector [u(x) u'(x) w(x) w'(x) psi(x), psi'(x)]^T
+        phi : float
+            Inclination (degrees). Counterclockwise positive.
+        dz : float, optional
+            Element size along z-axis (mm). Default is 2 mm.
+        unit : {'kPa', 'MPa'}, optional
+            Desired output unit. Default is 'kPa'.
+
+        Returns
+        -------
+        ndarray, float
+            Axial slab normal stress in specified unit.
+        """
+        # Unit conversion dict
+        convert = {
+            'kPa': 1e3,
+            'MPa': 1
+        }
+
+        # Get mesh along z-axis
+        zmesh = self.get_zmesh(dz=dz)
+        zi = zmesh[:, 0]
+        rho = 1e-12*zmesh[:, 3]
+
+        # Get dimensions of stress field (n rows, m columns)
+        n = zmesh.shape[0]
+        m = Z.shape[1]
+
+        # Initialize axial normal stress Sxx
+        Sxx = np.zeros(shape=[n, m])
+
+        # Compute axial normal stress Sxx at grid points in MPa
+        for i, (z, E, nu, _) in enumerate(zmesh):
+            Sxx[i, :] = E/(1-nu**2)*self.du_dx(Z, z)
+
+        # Calculate weight load at grid points and superimpose on stress field
+        qt = -rho*self.g*np.sin(np.deg2rad(phi))
+        for i, qi in enumerate(qt[:-1]):
+            Sxx[i, :] += qi*(zi[i+1] - zi[i])
+        Sxx[-1, :] += qt[-1]*(zi[-1] - zi[-2])
+
+        # Return axial normal stress in specified unit
+        return convert[unit]*Sxx
+
+    def Txz(self, Z, phi, dz=2, unit='kPa'):
+        """
+        Compute shear stress in slab layers.
+
+        Arguments
+        ----------
+        Z : ndarray
+            Solution vector [u(x) u'(x) w(x) w'(x) psi(x), psi'(x)]^T
+        phi : float
+            Inclination (degrees). Counterclockwise positive.
+        dz : float, optional
+            Element size along z-axis (mm). Default is 2 mm.
+        unit : {'kPa', 'MPa'}, optional
+            Desired output unit. Default is 'kPa'.
+
+        Returns
+        -------
+        ndarray
+            Shear stress at grid points in the slab in specified unit.
+        """
+        # Unit conversion dict
+        convert = {
+            'kPa': 1e3,
+            'MPa': 1
+        }
+        # Get mesh along z-axis
+        zmesh = self.get_zmesh(dz=dz)
+        zi = zmesh[:, 0]
+        rho = 1e-12*zmesh[:, 3]
+
+        # Get dimensions of stress field (n rows, m columns)
+        n = zmesh.shape[0]
+        m = Z.shape[1]
+
+        # Get second derivatives of centerline displacement u0 and
+        # cross-section rotaiton psi of all grid points along the x-axis
+        du0_dxdx = self.du0_dxdx(Z, phi)
+        dpsi_dxdx = self.dpsi_dxdx(Z, phi)
+
+        # Initialize first derivative of axial normal stress sxx w.r.t. x
+        dsxx_dx = np.zeros(shape=[n, m])
+
+        # Calculate first derivative of sxx at z-grid points
+        for i, (z, E, nu, _) in enumerate(zmesh):
+            dsxx_dx[i, :] = E/(1-nu**2)*(du0_dxdx + z*dpsi_dxdx)
+
+        # Calculate weight load at grid points
+        qt = -rho*self.g*np.sin(np.deg2rad(phi))
+
+        # Integrate -dsxx_dx along z and add cumulative weight load
+        # to obtain shear stress Txz in MPa
+        Txz = cumulative_trapezoid(dsxx_dx, zi, axis=0, initial=0)
+        Txz += cumulative_trapezoid(qt, zi, initial=0)[:, None]
+
+        # Return shear stress Txz in specified unit
+        return convert[unit]*Txz
+
+    def Szz(self, Z, phi, dz=2, unit='kPa'):
+        """
+        Compute transverse normal stress in slab layers.
+
+        Arguments
+        ----------
+        Z : ndarray
+            Solution vector [u(x) u'(x) w(x) w'(x) psi(x), psi'(x)]^T
+        phi : float
+            Inclination (degrees). Counterclockwise positive.
+        dz : float, optional
+            Element size along z-axis (mm). Default is 2 mm.
+        unit : {'kPa', 'MPa'}, optional
+            Desired output unit. Default is 'kPa'.
+
+        Returns
+        -------
+        ndarray, float
+            Transverse normal stress at grid points in the slab in
+            specified unit.
+        """
+        # Unit conversion dict
+        convert = {
+            'kPa': 1e3,
+            'MPa': 1
+        }
+
+        # Get mesh along z-axis
+        zmesh = self.get_zmesh(dz=dz)
+        zi = zmesh[:, 0]
+        rho = 1e-12*zmesh[:, 3]
+
+        # Get dimensions of stress field (n rows, m columns)
+        n = zmesh.shape[0]
+        m = Z.shape[1]
+
+        # Get third derivatives of centerline displacement u0 and
+        # cross-section rotaiton psi of all grid points along the x-axis
+        du0_dxdxdx = self.du0_dxdxdx(Z, phi)
+        dpsi_dxdxdx = self.dpsi_dxdxdx(Z, phi)
+
+        # Initialize second derivative of axial normal stress sxx w.r.t. x
+        dsxx_dxdx = np.zeros(shape=[n, m])
+
+        # Calculate second derivative of sxx at z-grid points
+        for i, (z, E, nu, _) in enumerate(zmesh):
+            dsxx_dxdx[i, :] = E/(1-nu**2)*(du0_dxdxdx + z*dpsi_dxdxdx)
+
+        # Calculate weight load at grid points
+        qn = rho*self.g*np.cos(np.deg2rad(phi))
+
+        # Integrate dsxx_dxdx twice along z to obtain transverse
+        # normal stress Szz in MPa
+        integrand = cumulative_trapezoid(dsxx_dxdx, zi, axis=0, initial=0)
+        Szz = cumulative_trapezoid(integrand, zi, axis=0, initial=0)
+        Szz += cumulative_trapezoid(-qn, zi, initial=0)[:, None]
+
+        # Return shear stress txz in specified unit
+        return convert[unit]*Szz
+
+    def principal_stress_slab(self, Z, phi, dz=2, unit='kPa',
+                              val='max', normalize=False):
+        """
+        Compute maxium or minimum principal stress in slab layers.
+
+        Arguments
+        ---------
+        Z : ndarray
+            Solution vector [u(x) u'(x) w(x) w'(x) psi(x), psi'(x)]^T
+        phi : float
+            Inclination (degrees). Counterclockwise positive.
+        dz : float, optional
+            Element size along z-axis (mm). Default is 2 mm.
+        unit : {'kPa', 'MPa'}, optional
+            Desired output unit. Default is 'kPa'.
+        val : str, optional
+            Maximum 'max' or minimum 'min' principal stress. Default is 'max'.
+        normalize : bool
+            Toggle layerwise normalization to strength.
+
+        Returns
+        -------
+        ndarray
+            Maximum or minimum principal stress in specified unit.
+
+        Raises
+        ------
+        ValueError
+            If specified principal stress component is neither 'max' nor
+            'min', or if normalization of compressive principal stress
+            is requested.
+        """
+        # Raise error if specified component is not available
+        if val not in ['min', 'max']:
+            raise ValueError(f'Component {val} not defined.')
+
+        # Multiplier selection dict
+        m = {'max': 1, 'min': -1}
+
+        # Get axial normal stresses, shear stresses, transverse normal stresses
+        Sxx = self.Sxx(Z=Z, phi=phi, dz=dz, unit=unit)
+        Txz = self.Txz(Z=Z, phi=phi, dz=dz, unit=unit)
+        Szz = self.Szz(Z=Z, phi=phi, dz=dz, unit=unit)
+
+        # Calculate principal stress
+        Ps = (Sxx + Szz)/2 + m[val]*np.sqrt((Sxx - Szz)**2 + 4*Txz**2)/2
+
+        # Raise error if normalization of compressive stresses is attempted
+        if normalize and val == 'min':
+            raise ValueError('Can only normlize tensile stresses.')
+
+        # Normalize tensile stresses to tensile strength
+        if normalize and val == 'max':
+            # Get layer densities
+            rho = self.get_zmesh(dz=dz)[:, 3]
+            # Normlize maximum principal stress to layers' tensile strength
+            return Ps/tensile_strength_slab(rho, unit=unit)[:, None]
+
+        # Return absolute principal stresses
+        return Ps
+
+    def principal_stress_weaklayer(self, Z, sc=2.6, unit='kPa', val='min',
+                                   normalize=False):
+        """
+        Compute maxium or minimum principal stress in the weak layer.
+
+        Arguments
+        ---------
+        Z : ndarray
+            Solution vector [u(x) u'(x) w(x) w'(x) psi(x), psi'(x)]^T
+        sc : float
+            Weak-layer compressive strength. Default is 2.6 kPa.
+        unit : {'kPa', 'MPa'}, optional
+            Desired output unit. Default is 'kPa'.
+        val : str, optional
+            Maximum 'max' or minimum 'min' principal stress. Default is 'min'.
+        normalize : bool
+            Toggle layerwise normalization to strength.
+
+        Returns
+        -------
+        ndarray
+            Maximum or minimum principal stress in specified unit.
+
+        Raises
+        ------
+        ValueError
+            If specified principal stress component is neither 'max' nor
+            'min', or if normalization of tensile principal stress
+            is requested.
+        """
+        # Raise error if specified component is not available
+        if val not in ['min', 'max']:
+            raise ValueError(f'Component {val} not defined.')
+
+        # Multiplier selection dict
+        m = {'max': 1, 'min': -1}
+
+        # Get weak-layer normal and shear stresses
+        sig = self.sig(Z, unit=unit)
+        tau = self.tau(Z, unit=unit)
+
+        # Calculate principal stress
+        ps = sig/2 + m[val]*np.sqrt(sig**2 + 4*tau**2)/2
+
+        # Raise error if normalization of tensile stresses is attempted
+        if normalize and val == 'max':
+            raise ValueError('Can only normlize compressive stresses.')
+
+        # Normalize compressive stresses to compressive strength
+        if normalize and val == 'min':
+            return ps/sc
+
+        # Return absolute principal stresses
+        return ps
 
 class OutputMixin:
     """

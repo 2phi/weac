@@ -42,7 +42,7 @@ from weac.inverse import Inverse
 from weac import plot
 
 # Version
-__version__ = &#39;2.1.2&#39;
+__version__ = &#39;2.2.1&#39;
 
 # Public names
 __all__ = [
@@ -58,10 +58,6 @@ __all__ = [
 <dt><code class="name"><a title="weac.eigensystem" href="eigensystem.html">weac.eigensystem</a></code></dt>
 <dd>
 <div class="desc"><p>Base class for the elastic analysis of layered snow slabs.</p></div>
-</dd>
-<dt><code class="name"><a title="weac.fracture" href="fracture.html">weac.fracture</a></code></dt>
-<dd>
-<div class="desc"><p>Fracture mechanics methods for WEak Layer AntiCrack nucleation model.</p></div>
 </dd>
 <dt><code class="name"><a title="weac.inverse" href="inverse.html">weac.inverse</a></code></dt>
 <dd>
@@ -184,19 +180,24 @@ respectively. Default is (6.0, 4.6, 0.25).</dd>
 <li><code><a title="weac.mixins.FieldQuantitiesMixin.M" href="mixins.html#weac.mixins.FieldQuantitiesMixin.M">M</a></code></li>
 <li><code><a title="weac.mixins.FieldQuantitiesMixin.N" href="mixins.html#weac.mixins.FieldQuantitiesMixin.N">N</a></code></li>
 <li><code><a title="weac.mixins.FieldQuantitiesMixin.V" href="mixins.html#weac.mixins.FieldQuantitiesMixin.V">V</a></code></li>
+<li><code><a title="weac.mixins.FieldQuantitiesMixin.dpsi_dx" href="mixins.html#weac.mixins.FieldQuantitiesMixin.dpsi_dx">dpsi_dx</a></code></li>
+<li><code><a title="weac.mixins.FieldQuantitiesMixin.dpsi_dxdx" href="mixins.html#weac.mixins.FieldQuantitiesMixin.dpsi_dxdx">dpsi_dxdx</a></code></li>
+<li><code><a title="weac.mixins.FieldQuantitiesMixin.dpsi_dxdxdx" href="mixins.html#weac.mixins.FieldQuantitiesMixin.dpsi_dxdxdx">dpsi_dxdxdx</a></code></li>
+<li><code><a title="weac.mixins.FieldQuantitiesMixin.du0_dxdx" href="mixins.html#weac.mixins.FieldQuantitiesMixin.du0_dxdx">du0_dxdx</a></code></li>
+<li><code><a title="weac.mixins.FieldQuantitiesMixin.du0_dxdxdx" href="mixins.html#weac.mixins.FieldQuantitiesMixin.du0_dxdxdx">du0_dxdxdx</a></code></li>
+<li><code><a title="weac.mixins.FieldQuantitiesMixin.du_dx" href="mixins.html#weac.mixins.FieldQuantitiesMixin.du_dx">du_dx</a></code></li>
+<li><code><a title="weac.mixins.FieldQuantitiesMixin.dw_dx" href="mixins.html#weac.mixins.FieldQuantitiesMixin.dw_dx">dw_dx</a></code></li>
+<li><code><a title="weac.mixins.FieldQuantitiesMixin.dz_dx" href="mixins.html#weac.mixins.FieldQuantitiesMixin.dz_dx">dz_dx</a></code></li>
+<li><code><a title="weac.mixins.FieldQuantitiesMixin.dz_dxdx" href="mixins.html#weac.mixins.FieldQuantitiesMixin.dz_dxdx">dz_dxdx</a></code></li>
 <li><code><a title="weac.mixins.FieldQuantitiesMixin.eps" href="mixins.html#weac.mixins.FieldQuantitiesMixin.eps">eps</a></code></li>
 <li><code><a title="weac.mixins.FieldQuantitiesMixin.gamma" href="mixins.html#weac.mixins.FieldQuantitiesMixin.gamma">gamma</a></code></li>
 <li><code><a title="weac.mixins.FieldQuantitiesMixin.int1" href="mixins.html#weac.mixins.FieldQuantitiesMixin.int1">int1</a></code></li>
 <li><code><a title="weac.mixins.FieldQuantitiesMixin.int2" href="mixins.html#weac.mixins.FieldQuantitiesMixin.int2">int2</a></code></li>
-<li><code><a title="weac.mixins.FieldQuantitiesMixin.maxp" href="mixins.html#weac.mixins.FieldQuantitiesMixin.maxp">maxp</a></code></li>
 <li><code><a title="weac.mixins.FieldQuantitiesMixin.psi" href="mixins.html#weac.mixins.FieldQuantitiesMixin.psi">psi</a></code></li>
-<li><code><a title="weac.mixins.FieldQuantitiesMixin.psip" href="mixins.html#weac.mixins.FieldQuantitiesMixin.psip">psip</a></code></li>
 <li><code><a title="weac.mixins.FieldQuantitiesMixin.sig" href="mixins.html#weac.mixins.FieldQuantitiesMixin.sig">sig</a></code></li>
 <li><code><a title="weac.mixins.FieldQuantitiesMixin.tau" href="mixins.html#weac.mixins.FieldQuantitiesMixin.tau">tau</a></code></li>
 <li><code><a title="weac.mixins.FieldQuantitiesMixin.u" href="mixins.html#weac.mixins.FieldQuantitiesMixin.u">u</a></code></li>
-<li><code><a title="weac.mixins.FieldQuantitiesMixin.up" href="mixins.html#weac.mixins.FieldQuantitiesMixin.up">up</a></code></li>
 <li><code><a title="weac.mixins.FieldQuantitiesMixin.w" href="mixins.html#weac.mixins.FieldQuantitiesMixin.w">w</a></code></li>
-<li><code><a title="weac.mixins.FieldQuantitiesMixin.wp" href="mixins.html#weac.mixins.FieldQuantitiesMixin.wp">wp</a></code></li>
 </ul>
 </li>
 <li><code><b><a title="weac.mixins.SolutionMixin" href="mixins.html#weac.mixins.SolutionMixin">SolutionMixin</a></b></code>:
@@ -205,12 +206,20 @@ respectively. Default is (6.0, 4.6, 0.25).</dd>
 <li><code><a title="weac.mixins.SolutionMixin.bc" href="mixins.html#weac.mixins.SolutionMixin.bc">bc</a></code></li>
 <li><code><a title="weac.mixins.SolutionMixin.calc_segments" href="mixins.html#weac.mixins.SolutionMixin.calc_segments">calc_segments</a></code></li>
 <li><code><a title="weac.mixins.SolutionMixin.eqs" href="mixins.html#weac.mixins.SolutionMixin.eqs">eqs</a></code></li>
+<li><code><a title="weac.mixins.SolutionMixin.mode_td" href="mixins.html#weac.mixins.SolutionMixin.mode_td">mode_td</a></code></li>
+<li><code><a title="weac.mixins.SolutionMixin.reduce_stiffness" href="mixins.html#weac.mixins.SolutionMixin.reduce_stiffness">reduce_stiffness</a></code></li>
 </ul>
 </li>
 <li><code><b><a title="weac.mixins.AnalysisMixin" href="mixins.html#weac.mixins.AnalysisMixin">AnalysisMixin</a></b></code>:
 <ul class="hlist">
+<li><code><a title="weac.mixins.AnalysisMixin.Sxx" href="mixins.html#weac.mixins.AnalysisMixin.Sxx">Sxx</a></code></li>
+<li><code><a title="weac.mixins.AnalysisMixin.Szz" href="mixins.html#weac.mixins.AnalysisMixin.Szz">Szz</a></code></li>
+<li><code><a title="weac.mixins.AnalysisMixin.Txz" href="mixins.html#weac.mixins.AnalysisMixin.Txz">Txz</a></code></li>
 <li><code><a title="weac.mixins.AnalysisMixin.gdif" href="mixins.html#weac.mixins.AnalysisMixin.gdif">gdif</a></code></li>
+<li><code><a title="weac.mixins.AnalysisMixin.get_zmesh" href="mixins.html#weac.mixins.AnalysisMixin.get_zmesh">get_zmesh</a></code></li>
 <li><code><a title="weac.mixins.AnalysisMixin.ginc" href="mixins.html#weac.mixins.AnalysisMixin.ginc">ginc</a></code></li>
+<li><code><a title="weac.mixins.AnalysisMixin.principal_stress_slab" href="mixins.html#weac.mixins.AnalysisMixin.principal_stress_slab">principal_stress_slab</a></code></li>
+<li><code><a title="weac.mixins.AnalysisMixin.principal_stress_weaklayer" href="mixins.html#weac.mixins.AnalysisMixin.principal_stress_weaklayer">principal_stress_weaklayer</a></code></li>
 <li><code><a title="weac.mixins.AnalysisMixin.rasterize_solution" href="mixins.html#weac.mixins.AnalysisMixin.rasterize_solution">rasterize_solution</a></code></li>
 </ul>
 </li>
@@ -225,11 +234,19 @@ respectively. Default is (6.0, 4.6, 0.25).</dd>
 </li>
 <li><code><b><a title="weac.eigensystem.Eigensystem" href="eigensystem.html#weac.eigensystem.Eigensystem">Eigensystem</a></b></code>:
 <ul class="hlist">
+<li><code><a title="weac.eigensystem.Eigensystem.calc_beta" href="eigensystem.html#weac.eigensystem.Eigensystem.calc_beta">calc_beta</a></code></li>
+<li><code><a title="weac.eigensystem.Eigensystem.calc_contact_length" href="eigensystem.html#weac.eigensystem.Eigensystem.calc_contact_length">calc_contact_length</a></code></li>
 <li><code><a title="weac.eigensystem.Eigensystem.calc_eigensystem" href="eigensystem.html#weac.eigensystem.Eigensystem.calc_eigensystem">calc_eigensystem</a></code></li>
 <li><code><a title="weac.eigensystem.Eigensystem.calc_foundation_stiffness" href="eigensystem.html#weac.eigensystem.Eigensystem.calc_foundation_stiffness">calc_foundation_stiffness</a></code></li>
 <li><code><a title="weac.eigensystem.Eigensystem.calc_fundamental_system" href="eigensystem.html#weac.eigensystem.Eigensystem.calc_fundamental_system">calc_fundamental_system</a></code></li>
 <li><code><a title="weac.eigensystem.Eigensystem.calc_laminate_stiffness_matrix" href="eigensystem.html#weac.eigensystem.Eigensystem.calc_laminate_stiffness_matrix">calc_laminate_stiffness_matrix</a></code></li>
+<li><code><a title="weac.eigensystem.Eigensystem.calc_rot_spring" href="eigensystem.html#weac.eigensystem.Eigensystem.calc_rot_spring">calc_rot_spring</a></code></li>
+<li><code><a title="weac.eigensystem.Eigensystem.calc_span_length" href="eigensystem.html#weac.eigensystem.Eigensystem.calc_span_length">calc_span_length</a></code></li>
 <li><code><a title="weac.eigensystem.Eigensystem.calc_system_matrix" href="eigensystem.html#weac.eigensystem.Eigensystem.calc_system_matrix">calc_system_matrix</a></code></li>
+<li><code><a title="weac.eigensystem.Eigensystem.calc_touchdown_system" href="eigensystem.html#weac.eigensystem.Eigensystem.calc_touchdown_system">calc_touchdown_system</a></code></li>
+<li><code><a title="weac.eigensystem.Eigensystem.calc_trans_spring" href="eigensystem.html#weac.eigensystem.Eigensystem.calc_trans_spring">calc_trans_spring</a></code></li>
+<li><code><a title="weac.eigensystem.Eigensystem.get_load_vector" href="eigensystem.html#weac.eigensystem.Eigensystem.get_load_vector">get_load_vector</a></code></li>
+<li><code><a title="weac.eigensystem.Eigensystem.get_ply_coordinates" href="eigensystem.html#weac.eigensystem.Eigensystem.get_ply_coordinates">get_ply_coordinates</a></code></li>
 <li><code><a title="weac.eigensystem.Eigensystem.get_skier_load" href="eigensystem.html#weac.eigensystem.Eigensystem.get_skier_load">get_skier_load</a></code></li>
 <li><code><a title="weac.eigensystem.Eigensystem.get_surface_load" href="eigensystem.html#weac.eigensystem.Eigensystem.get_surface_load">get_surface_load</a></code></li>
 <li><code><a title="weac.eigensystem.Eigensystem.get_weight_load" href="eigensystem.html#weac.eigensystem.Eigensystem.get_weight_load">get_weight_load</a></code></li>
@@ -245,7 +262,7 @@ respectively. Default is (6.0, 4.6, 0.25).</dd>
 </dd>
 <dt id="weac.Layered"><code class="flex name class">
 <span>class <span class="ident">Layered</span></span>
-<span>(</span><span>system='pst-', layers=None)</span>
+<span>(</span><span>system='pst-', layers=None, phi=0)</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Layered beam on elastic foundation model application interface.</p>
@@ -283,7 +300,7 @@ to one layer. Default is [[240, 200], ].</dd>
     analysis from AnalysisMixin().
     &#34;&#34;&#34;
 
-    def __init__(self, system=&#39;pst-&#39;, layers=None):
+    def __init__(self, system=&#39;pst-&#39;, layers=None, phi=0):
         &#34;&#34;&#34;
         Initialize model with user input.
 
@@ -303,9 +320,10 @@ to one layer. Default is [[240, 200], ].</dd>
         super().__init__(system=system)
 
         # Set material properties and set up model
-        self.set_beam_properties(layers if layers else [[240, 200], ])
+        self.set_beam_properties(layers if layers else [[240, 200], ], phi)
         self.set_foundation_properties()
-        self.calc_fundamental_system()</code></pre>
+        self.calc_fundamental_system()
+        self.calc_touchdown_system()</code></pre>
 </details>
 <h3>Ancestors</h3>
 <ul class="hlist">
@@ -324,19 +342,24 @@ to one layer. Default is [[240, 200], ].</dd>
 <li><code><a title="weac.mixins.FieldQuantitiesMixin.M" href="mixins.html#weac.mixins.FieldQuantitiesMixin.M">M</a></code></li>
 <li><code><a title="weac.mixins.FieldQuantitiesMixin.N" href="mixins.html#weac.mixins.FieldQuantitiesMixin.N">N</a></code></li>
 <li><code><a title="weac.mixins.FieldQuantitiesMixin.V" href="mixins.html#weac.mixins.FieldQuantitiesMixin.V">V</a></code></li>
+<li><code><a title="weac.mixins.FieldQuantitiesMixin.dpsi_dx" href="mixins.html#weac.mixins.FieldQuantitiesMixin.dpsi_dx">dpsi_dx</a></code></li>
+<li><code><a title="weac.mixins.FieldQuantitiesMixin.dpsi_dxdx" href="mixins.html#weac.mixins.FieldQuantitiesMixin.dpsi_dxdx">dpsi_dxdx</a></code></li>
+<li><code><a title="weac.mixins.FieldQuantitiesMixin.dpsi_dxdxdx" href="mixins.html#weac.mixins.FieldQuantitiesMixin.dpsi_dxdxdx">dpsi_dxdxdx</a></code></li>
+<li><code><a title="weac.mixins.FieldQuantitiesMixin.du0_dxdx" href="mixins.html#weac.mixins.FieldQuantitiesMixin.du0_dxdx">du0_dxdx</a></code></li>
+<li><code><a title="weac.mixins.FieldQuantitiesMixin.du0_dxdxdx" href="mixins.html#weac.mixins.FieldQuantitiesMixin.du0_dxdxdx">du0_dxdxdx</a></code></li>
+<li><code><a title="weac.mixins.FieldQuantitiesMixin.du_dx" href="mixins.html#weac.mixins.FieldQuantitiesMixin.du_dx">du_dx</a></code></li>
+<li><code><a title="weac.mixins.FieldQuantitiesMixin.dw_dx" href="mixins.html#weac.mixins.FieldQuantitiesMixin.dw_dx">dw_dx</a></code></li>
+<li><code><a title="weac.mixins.FieldQuantitiesMixin.dz_dx" href="mixins.html#weac.mixins.FieldQuantitiesMixin.dz_dx">dz_dx</a></code></li>
+<li><code><a title="weac.mixins.FieldQuantitiesMixin.dz_dxdx" href="mixins.html#weac.mixins.FieldQuantitiesMixin.dz_dxdx">dz_dxdx</a></code></li>
 <li><code><a title="weac.mixins.FieldQuantitiesMixin.eps" href="mixins.html#weac.mixins.FieldQuantitiesMixin.eps">eps</a></code></li>
 <li><code><a title="weac.mixins.FieldQuantitiesMixin.gamma" href="mixins.html#weac.mixins.FieldQuantitiesMixin.gamma">gamma</a></code></li>
 <li><code><a title="weac.mixins.FieldQuantitiesMixin.int1" href="mixins.html#weac.mixins.FieldQuantitiesMixin.int1">int1</a></code></li>
 <li><code><a title="weac.mixins.FieldQuantitiesMixin.int2" href="mixins.html#weac.mixins.FieldQuantitiesMixin.int2">int2</a></code></li>
-<li><code><a title="weac.mixins.FieldQuantitiesMixin.maxp" href="mixins.html#weac.mixins.FieldQuantitiesMixin.maxp">maxp</a></code></li>
 <li><code><a title="weac.mixins.FieldQuantitiesMixin.psi" href="mixins.html#weac.mixins.FieldQuantitiesMixin.psi">psi</a></code></li>
-<li><code><a title="weac.mixins.FieldQuantitiesMixin.psip" href="mixins.html#weac.mixins.FieldQuantitiesMixin.psip">psip</a></code></li>
 <li><code><a title="weac.mixins.FieldQuantitiesMixin.sig" href="mixins.html#weac.mixins.FieldQuantitiesMixin.sig">sig</a></code></li>
 <li><code><a title="weac.mixins.FieldQuantitiesMixin.tau" href="mixins.html#weac.mixins.FieldQuantitiesMixin.tau">tau</a></code></li>
 <li><code><a title="weac.mixins.FieldQuantitiesMixin.u" href="mixins.html#weac.mixins.FieldQuantitiesMixin.u">u</a></code></li>
-<li><code><a title="weac.mixins.FieldQuantitiesMixin.up" href="mixins.html#weac.mixins.FieldQuantitiesMixin.up">up</a></code></li>
 <li><code><a title="weac.mixins.FieldQuantitiesMixin.w" href="mixins.html#weac.mixins.FieldQuantitiesMixin.w">w</a></code></li>
-<li><code><a title="weac.mixins.FieldQuantitiesMixin.wp" href="mixins.html#weac.mixins.FieldQuantitiesMixin.wp">wp</a></code></li>
 </ul>
 </li>
 <li><code><b><a title="weac.mixins.SolutionMixin" href="mixins.html#weac.mixins.SolutionMixin">SolutionMixin</a></b></code>:
@@ -345,12 +368,20 @@ to one layer. Default is [[240, 200], ].</dd>
 <li><code><a title="weac.mixins.SolutionMixin.bc" href="mixins.html#weac.mixins.SolutionMixin.bc">bc</a></code></li>
 <li><code><a title="weac.mixins.SolutionMixin.calc_segments" href="mixins.html#weac.mixins.SolutionMixin.calc_segments">calc_segments</a></code></li>
 <li><code><a title="weac.mixins.SolutionMixin.eqs" href="mixins.html#weac.mixins.SolutionMixin.eqs">eqs</a></code></li>
+<li><code><a title="weac.mixins.SolutionMixin.mode_td" href="mixins.html#weac.mixins.SolutionMixin.mode_td">mode_td</a></code></li>
+<li><code><a title="weac.mixins.SolutionMixin.reduce_stiffness" href="mixins.html#weac.mixins.SolutionMixin.reduce_stiffness">reduce_stiffness</a></code></li>
 </ul>
 </li>
 <li><code><b><a title="weac.mixins.AnalysisMixin" href="mixins.html#weac.mixins.AnalysisMixin">AnalysisMixin</a></b></code>:
 <ul class="hlist">
+<li><code><a title="weac.mixins.AnalysisMixin.Sxx" href="mixins.html#weac.mixins.AnalysisMixin.Sxx">Sxx</a></code></li>
+<li><code><a title="weac.mixins.AnalysisMixin.Szz" href="mixins.html#weac.mixins.AnalysisMixin.Szz">Szz</a></code></li>
+<li><code><a title="weac.mixins.AnalysisMixin.Txz" href="mixins.html#weac.mixins.AnalysisMixin.Txz">Txz</a></code></li>
 <li><code><a title="weac.mixins.AnalysisMixin.gdif" href="mixins.html#weac.mixins.AnalysisMixin.gdif">gdif</a></code></li>
+<li><code><a title="weac.mixins.AnalysisMixin.get_zmesh" href="mixins.html#weac.mixins.AnalysisMixin.get_zmesh">get_zmesh</a></code></li>
 <li><code><a title="weac.mixins.AnalysisMixin.ginc" href="mixins.html#weac.mixins.AnalysisMixin.ginc">ginc</a></code></li>
+<li><code><a title="weac.mixins.AnalysisMixin.principal_stress_slab" href="mixins.html#weac.mixins.AnalysisMixin.principal_stress_slab">principal_stress_slab</a></code></li>
+<li><code><a title="weac.mixins.AnalysisMixin.principal_stress_weaklayer" href="mixins.html#weac.mixins.AnalysisMixin.principal_stress_weaklayer">principal_stress_weaklayer</a></code></li>
 <li><code><a title="weac.mixins.AnalysisMixin.rasterize_solution" href="mixins.html#weac.mixins.AnalysisMixin.rasterize_solution">rasterize_solution</a></code></li>
 </ul>
 </li>
@@ -365,11 +396,19 @@ to one layer. Default is [[240, 200], ].</dd>
 </li>
 <li><code><b><a title="weac.eigensystem.Eigensystem" href="eigensystem.html#weac.eigensystem.Eigensystem">Eigensystem</a></b></code>:
 <ul class="hlist">
+<li><code><a title="weac.eigensystem.Eigensystem.calc_beta" href="eigensystem.html#weac.eigensystem.Eigensystem.calc_beta">calc_beta</a></code></li>
+<li><code><a title="weac.eigensystem.Eigensystem.calc_contact_length" href="eigensystem.html#weac.eigensystem.Eigensystem.calc_contact_length">calc_contact_length</a></code></li>
 <li><code><a title="weac.eigensystem.Eigensystem.calc_eigensystem" href="eigensystem.html#weac.eigensystem.Eigensystem.calc_eigensystem">calc_eigensystem</a></code></li>
 <li><code><a title="weac.eigensystem.Eigensystem.calc_foundation_stiffness" href="eigensystem.html#weac.eigensystem.Eigensystem.calc_foundation_stiffness">calc_foundation_stiffness</a></code></li>
 <li><code><a title="weac.eigensystem.Eigensystem.calc_fundamental_system" href="eigensystem.html#weac.eigensystem.Eigensystem.calc_fundamental_system">calc_fundamental_system</a></code></li>
 <li><code><a title="weac.eigensystem.Eigensystem.calc_laminate_stiffness_matrix" href="eigensystem.html#weac.eigensystem.Eigensystem.calc_laminate_stiffness_matrix">calc_laminate_stiffness_matrix</a></code></li>
+<li><code><a title="weac.eigensystem.Eigensystem.calc_rot_spring" href="eigensystem.html#weac.eigensystem.Eigensystem.calc_rot_spring">calc_rot_spring</a></code></li>
+<li><code><a title="weac.eigensystem.Eigensystem.calc_span_length" href="eigensystem.html#weac.eigensystem.Eigensystem.calc_span_length">calc_span_length</a></code></li>
 <li><code><a title="weac.eigensystem.Eigensystem.calc_system_matrix" href="eigensystem.html#weac.eigensystem.Eigensystem.calc_system_matrix">calc_system_matrix</a></code></li>
+<li><code><a title="weac.eigensystem.Eigensystem.calc_touchdown_system" href="eigensystem.html#weac.eigensystem.Eigensystem.calc_touchdown_system">calc_touchdown_system</a></code></li>
+<li><code><a title="weac.eigensystem.Eigensystem.calc_trans_spring" href="eigensystem.html#weac.eigensystem.Eigensystem.calc_trans_spring">calc_trans_spring</a></code></li>
+<li><code><a title="weac.eigensystem.Eigensystem.get_load_vector" href="eigensystem.html#weac.eigensystem.Eigensystem.get_load_vector">get_load_vector</a></code></li>
+<li><code><a title="weac.eigensystem.Eigensystem.get_ply_coordinates" href="eigensystem.html#weac.eigensystem.Eigensystem.get_ply_coordinates">get_ply_coordinates</a></code></li>
 <li><code><a title="weac.eigensystem.Eigensystem.get_skier_load" href="eigensystem.html#weac.eigensystem.Eigensystem.get_skier_load">get_skier_load</a></code></li>
 <li><code><a title="weac.eigensystem.Eigensystem.get_surface_load" href="eigensystem.html#weac.eigensystem.Eigensystem.get_surface_load">get_surface_load</a></code></li>
 <li><code><a title="weac.eigensystem.Eigensystem.get_weight_load" href="eigensystem.html#weac.eigensystem.Eigensystem.get_weight_load">get_weight_load</a></code></li>
@@ -395,7 +434,6 @@ to one layer. Default is [[240, 200], ].</dd>
 <li><h3><a href="#header-submodules">Sub-modules</a></h3>
 <ul>
 <li><code><a title="weac.eigensystem" href="eigensystem.html">weac.eigensystem</a></code></li>
-<li><code><a title="weac.fracture" href="fracture.html">weac.fracture</a></code></li>
 <li><code><a title="weac.inverse" href="inverse.html">weac.inverse</a></code></li>
 <li><code><a title="weac.layered" href="layered.html">weac.layered</a></code></li>
 <li><code><a title="weac.mixins" href="mixins.html">weac.mixins</a></code></li>
