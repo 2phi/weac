@@ -249,6 +249,7 @@ def deformed(instance, xsl, xwl, z, phi, dz=2, scale=100,
 
     # Calculate top-to-bottom vertical positions (mm) in beam coordinate system
     zi = instance.get_zmesh(dz=dz)[:, 0]
+    h = instance.h
 
     # Compute slab displacements on grid (cm)
     Usl = np.vstack([instance.u(z, z0=z0, unit='cm') for z0 in zi])
@@ -260,7 +261,7 @@ def deformed(instance, xsl, xwl, z, phi, dz=2, scale=100,
         xwl = xwl - max(xwl)/2
 
     # Compute slab grid coordinates with vertical origin at top surface (cm)
-    Xsl, Zsl = np.meshgrid(1e-1*(xsl), 1e-1*zi)
+    Xsl, Zsl = np.meshgrid(1e-1*(xsl), 1e-1*(zi + h/2))
 
     # Get x-coordinate of maximum deflection w (cm) and derive plot limits
     xfocus = xsl[np.max(np.argmax(Wsl, axis=1))]/10
@@ -272,7 +273,7 @@ def deformed(instance, xsl, xwl, z, phi, dz=2, scale=100,
     zmin = np.min(Zsl) - pad
 
     # Compute weak-layer grid coordinates (cm)
-    Xwl, Zwl = np.meshgrid(1e-1*xwl, [1e-1*zi[-1], zmax])
+    Xwl, Zwl = np.meshgrid(1e-1*xwl, [1e-1*(zi[-1] + h/2), zmax])
 
     # Assemble weak-layer displacement field (top and bottom)
     Uwl = np.row_stack([Usl[-1, :], np.zeros(xwl.shape[0])])
