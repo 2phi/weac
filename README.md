@@ -112,6 +112,7 @@ git clone https://github.com/2phi/weac
 for local use.
 
 Needs
+- [Python](https://www.python.org/downloads/release/python-3100/) &ge; 3.10
 - [Numpy](https://numpy.org/) for matrix operations
 - [Scipy](https://www.scipy.org/) for solving optimization problems
 - [Pandas](https://pandas.pydata.org/) for data handling
