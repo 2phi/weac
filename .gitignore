@@ -17,3 +17,11 @@ dist/
 
 # IDE setup
 .vscode/
+
+# Driver code
+pst_cut_right.py
+skierinduced.py
+
+# misc
+*.stats
+plots/

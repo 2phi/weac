@@ -383,6 +383,451 @@ class FieldQuantitiesMixin:
         return self.tau(z0(x))*self.gamma(z1(x))*self.t
 
 
+class SlabContactMixin:
+    """
+    Mixin for handling the touchdown situation in a PST.
+
+    Provides Methods for the calculation of substitute spring stiffnesses,
+    cracklength-tresholds and element lengths.
+    """
+    # pylint: disable=too-many-instance-attributes
+
+    def set_cracklength(self,a):
+        """
+        Set cracklength.
+
+        Arguments
+        ---------
+        a : float
+            Cracklength in a PST (mm).
+        """
+        self.a = a
+
+    def set_tc(self,cf):
+        """
+        Set height of the collapsed weak-layer.
+
+        Arguments
+        ---------
+        cf : float
+            Collapse-factor. Ratio of the collapsed to the
+            uncollapsed weak-layer height.
+        """
+        self.tc = cf*self.t
+
+    def set_ratio(self,ratio):
+        """
+        Set the ratio of the stiffness of the collapsed
+        to the uncollapsed weak-layer.
+
+        Arguments
+        ---------
+        ratio : float
+            Ratio of the stiffness of the collapsed to the
+            uncollapsed weak-layer.
+        """
+        self.ratio = ratio
+
+    def set_phi(self,phi):
+        """
+        Set inclination of the slab.
+
+        Arguments
+        ---------
+        phi : float
+            Inclination of the slab (°).
+        """
+        self.phi = phi
+
+    def calc_beta(self):
+        """
+        Calc beta for collapsed (betaC) and uncollapsed (betaU) weak-layer.
+        """
+        # collapsed
+        self.betaC = (self.ratio*self.kn/(4*self.D11))**(1/4)
+        # uncollapsed
+        self.betaU = (self.kn/(4*self.D11))**(1/4)
+
+    def calc_qn(self):
+        """
+        Calc total surface normal load.
+
+        Returns
+        -------
+        qn : float
+            Total surface normal load (N/mm).
+        """
+        qn = self.get_weight_load(self.phi)[0] + self.get_surface_load(self.phi)[0]
+
+        return qn
+
+    def calc_trans_spring(self):
+        """
+        Calculate substitute translational spring stiffness from layer properties
+        for uncollapsed and colapsed weak-layer.
+
+        Returns
+        -------
+        list
+            Translational spring stiffnesses (N/mm^2)
+            for uncollapsed (zeroth entry) and uncollapsed weak-layer (first entry).
+        """
+        # calc translational spring stiffnesses
+        kNU = 2*self.D11*self.betaU**3
+        kNC = 2*self.D11*self.betaC**3
+
+        return [kNU,kNC]
+
+    def calc_rot_spring(self):
+        """
+        Calculate substitute rotational spring stiffness from layer properties
+        for uncollapsed and collapsed weak-layer.
+
+        Returns
+        -------
+        list
+            Rotational spring stiffnesses (Nmm/mm/rad)
+            for uncollapsed (zeroth entry) and uncollapsed weak-layer (first entry).
+        """
+        # calc rotational spring stiffnesses
+        kRU = self.D11*self.betaU
+        kRC = self.D11*self.betaC
+
+        return [kRU,kRC]
+
+    def calc_a1(self):
+        """
+        Calculate cracklength where w(a) = tc.
+
+        This is the longest crack, to which 'free end' conditions apply.
+        It marks the threshold between Mode A and B.
+        """
+        def polynomial_4():
+            """
+            Calculate the coefficients of a fourth order polynomial equation.
+
+            Returns
+            -------
+            list
+                First coefficient for fourth order term,
+                second coefficient for third order term and so on.
+            """
+            c1 = 1/(8*self.D11)*qn
+            c2 = 1/(2*kRl)*qn
+            c3 = 1/(2*self.kA55)*qn
+            c4 = 1/kNl*qn
+            c5 = -self.tc
+            return [c1,c2,c3,c4,c5]
+
+        # Get spring stiffnesses for adjacent segment with uncollapsed weak-layer
+        kRl = self.calc_rot_spring()[0]
+        kNl = self.calc_trans_spring()[0]
+        # Get surface normal load components
+        qn = self.calc_qn()
+        # Calculate positive real roots
+        pos = (np.roots(polynomial_4()).imag == 0) & (np.roots(polynomial_4()).real > 0)
+        a1 = np.roots(polynomial_4())[pos].real[0]
+
+        return a1
+
+    def calc_a2(self):
+        """
+        Calculate cracklength where w(a) = tc and w'(a) = 0.
+
+        This is the longest crack, to which M=0, N=0, w=tc boundary conditions apply.
+        It marks the threshold between mode B and C.
+        """
+        def polynomial_6():
+            """
+            Calculate the coefficients of a sixth order polynomial equation.
+
+            Returns
+            -------
+            list
+                First coefficient for sixth order term,
+                second coefficient for fith order term and so on.
+            """
+            c1 = self.kA55**2*kRl*kNl*qn
+            c2 = 6*self.kA55**2*self.D11*kNl*qn
+            c3 = 30*self.D11*self.kA55*kRl*kNl*qn
+            c4 = 24*self.D11*qn*(
+                2*self.kA55**2*kRl \
+                + 3*self.D11*self.kA55*kNl)
+            c5 = 72*self.D11*(
+                self.D11*qn*(
+                    self.kA55**2 \
+                    + kRl*kNl) \
+                - self.kA55**2*kRl*kNl*self.tc)
+            c6 = 144*self.D11*self.kA55*(
+                self.D11*kRl*qn \
+                - self.D11*self.kA55*kNl*self.tc)
+            c7 = - 144*self.D11**2*self.kA55*kRl*kNl*self.tc
+            return [c1,c2,c3,c4,c5,c6,c7]
+
+        # Get spring stiffnesses for adjacent segment with uncollapsed weak-layer
+        kRl = self.calc_rot_spring()[0]
+        kNl = self.calc_trans_spring()[0]
+        # Get surface normal load components
+        qn = self.calc_qn()
+        # Calculate positive real roots
+        pos = (np.roots(polynomial_6()).imag == 0) & (np.roots(polynomial_6()).real > 0)
+        a2 = np.roots(polynomial_6())[pos].real[0]
+
+        return a2
+
+    def calc_a3(self,a2):
+        """
+        Calculate cracklength w(a) = tc, w'(a) = 0 and kf = constant.
+
+        This is the longest crack, to which M+-kf*kr*psi=0, N=0 and w=tc
+        conditions apply. It marks the threshold between mode C and D.
+        """
+        a3 = a2 + np.pi/self.betaC
+
+        return a3
+
+    def calc_lA(self):
+        """
+        Calculate the length of the touchdown element in mode A.
+        """
+        lA = self.a
+
+        return lA
+
+    def calc_lB(self):
+        """
+        Calculate the length of the touchdown element in mode B.
+        """
+        lB = self.a
+
+        return lB
+
+    def calc_lC(self):
+        """
+        Calculate the length of the touchdown element in mode C.
+        """
+        def polynomial_8():
+            """
+            Calculate the coefficients of a eighth order polynomial equation.
+
+            Returns
+            -------
+            list
+                First coefficient for eighth order term,
+                second coefficient for seventh order term and so on.
+            """
+            c1 = -12/np.pi**3*self.kA55*kNl*kRl*kRr*qn*self.betaC**3
+            c2 = -1/np.pi**3*self.kA55*kNl*kRr*qn*(
+                    18*kRl*np.pi*self.betaC**2 \
+                    + 12*self.betaC**3*(
+                        5*self.D11 \
+                        - 3*self.a*kRl))
+            c3 = -1/np.pi**3*kNl*qn*(
+                    self.kA55**2*kRl*np.pi**3 \
+                    + 18*self.kA55*np.pi*kRr*self.betaC**2*(
+                        5*self.D11 \
+                        - 2*self.a*kRl) \
+                    + 36*kRr*self.betaC**3*(
+                        -5*self.a*self.D11*self.kA55 \
+                        + 4*self.D11*kRl \
+                        + self.a**2*self.kA55*kRl))
+            c4 = 6/np.pi**3*qn*(
+                    -self.D11*self.kA55**2*kNl*np.pi**3 \
+                    - 3*kNl*kRr*np.pi*self.betaC**2*(
+                        -10*self.a*self.D11*self.kA55 \
+                        + 12*self.D11*kRl \
+                        + self.a**2*self.kA55*kRl) \
+                    + 2*kRr*self.betaC**3*(
+                        -3*self.D11*kNl*(
+                            4*self.D11 \
+                            + 5*self.a**2*self.kA55) \
+                        + kRl*(
+                            -24*self.D11*self.kA55 \
+                            + 36*self.a*self.D11*kNl \
+                            + self.a**3*self.kA55*kNl)))
+            c5 = 6/np.pi**3*self.D11*(
+                    -5*self.kA55*kNl*kRl*np.pi**3*qn \
+                    - 3*kRr*np.pi*qn*self.betaC**2*(
+                        12*self.D11*kNl \
+                        + 5*self.a**2*self.kA55*kNl \
+                        + 24*kRl*(self.kA55 - self.a*kNl)) \
+                    + 2*kRr*self.betaC**3*(
+                        12*self.D11*qn*(
+                            -2*self.kA55 \
+                            + 3*self.a*kNl) \
+                        + self.a*qn*(
+                            5*self.a**2*self.kA55*kNl \
+                            + 72*self.kA55*kRl \
+                            - 36*self.a*kNl*kRl) \
+                        + 24*self.kA55*kNl*kRl*self.tc))
+            c6 = 24/np.pi**3*self.D11*(
+                    -self.kA55*np.pi**3*qn*(
+                        3*self.D11*kNl \
+                        + 2*self.kA55*kRl) \
+                    - 9*kRr*np.pi*self.betaC**2*(
+                        2*self.D11*qn*(
+                            self.kA55 \
+                            - self.a*kNl) \
+                        + self.a*kRl*qn*(
+                            -4*self.kA55 \
+                            + self.a*kNl) \
+                        - 2*self.kA55*kNl*kRl*self.tc) \
+                    + 6*kRr*self.betaC**3*(
+                        self.a*qn*(
+                            self.D11*(6*self.kA55 - 3*self.a*kNl) \
+                            + self.a*kRl*(-6*self.kA55 + self.a*kNl)) \
+                        + 2*self.kA55*kNl*self.tc*(
+                            self.D11 \
+                            - 3*self.a*kRl)))
+            c7 = 72/np.pi**3*self.D11*(
+                    np.pi**3*(
+                        -self.D11*qn*(
+                            self.kA55**2 \
+                            + kNl*kRl) \
+                        + self.kA55**2*kNl*kRl*self.tc) \
+                    - 3*kRr*np.pi*self.betaC**2*(
+                        self.a*qn*(
+                            -4*self.D11*self.kA55 \
+                            + self.a*self.D11*kNl \
+                            + 2*self.a*self.kA55*kRl) \
+                        - 2*self.kA55*kNl*self.tc*(
+                            self.D11 \
+                            - 2*self.a*kRl)) \
+                    + 2*self.a*kRr*self.betaC**3*(
+                        self.a*qn*(
+                            -6*self.D11*self.kA55 \
+                            + self.a*self.D11*kNl \
+                            + 2*self.a*self.kA55*kRl) \
+                        - 6*self.kA55*kNl*self.tc*(
+                            self.D11 \
+                            - self.a*kRl)))
+            c8 = 144/np.pi**3*self.D11*self.kA55*(
+                    self.D11*np.pi**3*(
+                        -kRl*qn \
+                        + self.kA55*kNl*self.tc) \
+                    - 3*self.a*kRr*np.pi*self.betaC**2*(
+                        self.a*self.D11*qn \
+                        + 2*self.D11*kNl*self.tc \
+                        - self.a*kNl*kRl*self.tc) \
+                    + 2*self.a**2*kRr*self.betaC**3*(
+                        self.a*self.D11*qn \
+                        + 3*self.D11*kNl*self.tc \
+                        - self.a*kNl*kRl*self.tc))
+            c9 = 144/np.pi**3*self.D11**2*self.kA55*kNl*self.tc*(
+                    kRl*np.pi**3 \
+                    + self.a**2*kRr*self.betaC**2*(
+                        3*np.pi \
+                        - 2*self.a*self.betaC))
+            return [c1,c2,c3,c4,c5,c6,c7,c8,c9]
+
+        # Get spring stiffnesses for adjacent segment with uncollapsed weak-layer
+        kRl = self.calc_rot_spring()[0]
+        kNl = self.calc_trans_spring()[0]
+        # Get spring stiffnesses for adjacent segment with collapsed weak-layer
+        kRr = self.calc_rot_spring()[1]
+        # Get surface normal load components
+        qn = self.calc_qn()
+        # Calculate positive real roots
+        pos = (np.roots(polynomial_8()).imag == 0) & (np.roots(polynomial_8()).real > 0)
+        lC = np.roots(polynomial_8())[pos].real[0]
+
+        return lC
+
+    def calc_lD(self):
+        """
+        Calculate the length of the touchdown element in mode D.
+        """
+        def polynomial_6():
+            """
+            Calculate the coefficients of a sixth order polynomial equation.
+
+            Returns
+            -------
+            list
+                First coefficient for sixth order term,
+                second coefficient for fith order term and so on.
+            """
+            c1 = self.kA55**2*kRl*kNl*qn
+            c2 = 6*self.kA55*kNl*qn*(
+                self.D11*self.kA55 \
+                + kRl*kRr)
+            c3 = 30*self.D11*self.kA55*kNl*qn*(kRl + kRr)
+            c4 = 24*self.D11*qn*(
+                2*self.kA55**2*kRl \
+                + 3*self.D11*self.kA55*kNl \
+                + 3*kRl*kRr*kNl)
+            c5 = 72*self.D11*(
+                self.D11*qn*(
+                    self.kA55**2 \
+                    + kNl*(kRl + kRr)) \
+                + self.kA55*kRl*(
+                    2*kRr*qn \
+                    - self.kA55*kNl*self.tc))
+            c6 = 144*self.D11*self.kA55*(
+                self.D11*qn*(kRl + kRr) \
+                - kNl*self.tc*(
+                    self.D11*self.kA55 \
+                    + kRl*kRr))
+            c7 = - 144*self.D11**2*self.kA55*kNl*self.tc*(kRl + kRr)
+            return [c1,c2,c3,c4,c5,c6,c7]
+
+        # Get spring stiffnesses for adjacent segment with uncollapsed weak-layer
+        kRl = self.calc_rot_spring()[0]
+        kNl = self.calc_trans_spring()[0]
+        # Get spring stiffnesses for adjacent segment with collapsed weak-layer
+        kRr = self.calc_rot_spring()[1]
+        # Get surface normal load components
+        qn = self.calc_qn()
+        # Calculate positive real roots
+        pos = (np.roots(polynomial_6()).imag == 0) & (np.roots(polynomial_6()).real > 0)
+        lD = np.roots(polynomial_6())[pos].real[0]
+
+        return lD
+
+    def set_touchdown_attributes(self,a,cf,ratio,phi):
+        """Set class attributes for touchdown consideration"""
+        self.set_cracklength(a)
+        self.set_tc(cf)
+        self.set_ratio(ratio)
+        self.set_phi(phi)
+        self.calc_beta()
+
+    def calc_touchdown_mode(self):
+        """Calculate touchdown-mode from thresholds"""
+        a1 = self.calc_a1()
+        a2 = self.calc_a2()
+        a3 = self.calc_a3(a2)
+        print('a1:', a1, 'a2:', a2, 'a3:', a3)
+        if self.a <= a1:
+            mode = 'A'
+        elif a1 < self.a <= a2:
+            mode = 'B'
+        elif a2 < self.a <= a3:
+            mode = 'C'
+        elif a3 < self.a:
+            mode = 'D'
+        self.mode = mode
+
+    def calc_touchdown_length(self):
+        """Calculate touchdown length"""
+        if self.mode in ['A']:
+            self.td = self.calc_lA()
+        elif self.mode in ['B']:
+            self.td = self.calc_lB()
+        elif self.mode in ['C']:
+            self.td = self.calc_lC()
+        elif self.mode in ['D']:
+            self.td = self.calc_lD()
+
+    def calc_touchdown_system(self,a,cf,ratio,phi):
+        """Calculate touchdown"""
+        self.set_touchdown_attributes(a,cf,ratio,phi)
+        self.calc_touchdown_mode()
+        self.calc_touchdown_length()
+
+        print('a:', self.a, 'mode:', self.mode, 'td:', self.td)
+
+
 class SolutionMixin:
     """
     Mixin for the solution of boundary value problems.
@@ -391,62 +836,23 @@ class SolutionMixin:
     and for the computation of the free constants.
     """
 
-    def mode_td(self, l=0):
-        """
-        Identify the mode of the pst-boundary.
-
-        Arguments
-        ---------
-        l : float, optional
-            Length of the segment in consideration. Default is zero.
-
-        Returns
-        -------
-        mode : string
-            Contains the mode for the boundary of the segment:
-            A - free end, B - intermediate touchdown,
-            C - full touchdown (maximum clamped end).
-        """
-        # Classify boundary type by element length
-        if l <= self.lC:
-            mode = 'A'
-        elif self.lC < l <= self.lS:
-            mode = 'B'
-        elif self.lS < l:
-            mode = 'C'
-
-        return mode
-
-    def reduce_stiffness(self, l=0, mode='A'):
+    def reduce_stiffness(self):
         """
         Determines the reduction factor for a rotational spring.
 
         Arguments
         ---------
-        l : float, optional
-            Length of the segment in consideration. Default is zero.
-        mode : string, optional
-            Contains the mode for the boundary of the segment:
-            A - free end, B - intermediate touchdown, C - full touchdown.
-            Default is A.
-
         Returns
         -------
         kf : float
             Reduction factor.
         """
-        # Reduction to zero for free end bc
-        if mode in ['A', 'B']:
-            kf = 0
-        # Reduction factor for touchdown
-        if mode in ['C']:
-            # Beta needs to take into account different weak-layer spring stiffness
-            beta = self.beta*self.ratio**(1/4)
-            kf=(np.cos(2*beta*l)+np.cosh(2*beta*l)-2)/(np.sin(2*beta*l)+np.sinh(2*beta*l))
+        kf = - 2*(self.betaC*(self.a-self.td)/np.pi)**3 \
+            + 3*(self.betaC*(self.a-self.td)/np.pi)**2
 
         return kf
 
-    def bc(self, z, k=False, pos='mid', mode='A', kR=0):
+    def bc(self, z, k=False, pos='mid'):
         """
         Provide equations for free (pst) or infinite (skiers) ends.
 
@@ -470,34 +876,55 @@ class SolutionMixin:
         bc : ndarray
             Boundary condition vector (lenght 3) at position x.
         """
+
         # Set boundary conditions for PST-systems
         if self.system in ['pst-', '-pst']:
             if not k:
-                if mode in ['A']:
+                if self.mode in ['A']:
                     # Free end
                     bc = np.array([self.N(z),
                                    self.M(z),
                                    self.V(z)
                                    ])
-                elif mode in ['B'] and pos in ['r', 'right']:
+                elif self.mode in ['B'] and pos in ['r', 'right']:
                     # Touchdown right
                     bc = np.array([self.N(z),
                                    self.M(z),
                                    self.w(z)
                                    ])
-                elif mode in ['B'] and pos in ['l', 'left']:
-                    # Touchdown left
+                elif self.mode in ['B'] and pos in ['l', 'left']:   # Kann dieser Block
+                    # Touchdown left                                # verschwinden? Analog zu 'A'
                     bc = np.array([self.N(z),
                                    self.M(z),
                                    self.w(z)
                                    ])
-                elif mode in ['C'] and pos in ['r', 'right']:
+                elif self.mode in ['C'] and pos in ['r', 'right']:
+                    # Spring stiffness
+                    kR = self.reduce_stiffness() * self.calc_rot_spring()[1]
                     # Touchdown right
                     bc = np.array([self.N(z),
                                    self.M(z) + kR*self.psi(z),
                                    self.w(z)
                                    ])
-                elif mode in ['C'] and pos in ['l', 'left']:
+                elif self.mode in ['C'] and pos in ['l', 'left']:
+                    # Spring stiffness
+                    kR = self.reduce_stiffness() * self.calc_rot_spring()[1]
+                    # Touchdown left
+                    bc = np.array([self.N(z),
+                                   self.M(z) - kR*self.psi(z),
+                                   self.w(z)
+                                   ])
+                elif self.mode in ['D'] and pos in ['r', 'right']:
+                    # Spring stiffness
+                    kR = self.calc_rot_spring()[1]
+                    # Touchdown right
+                    bc = np.array([self.N(z),
+                                   self.M(z) + kR*self.psi(z),
+                                   self.w(z)
+                                   ])
+                elif self.mode in ['D'] and pos in ['l', 'left']:
+                    # Spring stiffness
+                    kR = self.calc_rot_spring()[1]
                     # Touchdown left
                     bc = np.array([self.N(z),
                                    self.M(z) - kR*self.psi(z),
@@ -523,7 +950,7 @@ class SolutionMixin:
 
         return bc
 
-    def eqs(self, zl, zr, l=0, k=False, pos='mid', mode='A', kR=0):
+    def eqs(self, zl, zr, k=False, pos='mid'):
         """
         Provide boundary or transmission conditions for beam segments.
 
@@ -533,8 +960,6 @@ class SolutionMixin:
             Solution vector (6x1) at left end of beam segement.
         zr : ndarray
             Solution vector (6x1) at right end of beam segement.
-        l : float, optional
-            Length of the segment in consideration. Default is zero.
         k : boolean
             Indicates whether segment has foundation(True) or not (False).
             Default is False.
@@ -554,9 +979,9 @@ class SolutionMixin:
         """
         if pos in ('l', 'left'):
             eqs = np.array([
-                self.bc(zl, k, pos, mode, kR)[0],             # Left boundary condition
-                self.bc(zl, k, pos, mode, kR)[1],             # Left boundary condition
-                self.bc(zl, k, pos, mode, kR)[2],             # Left boundary condition
+                self.bc(zl, k, pos)[0],             # Left boundary condition
+                self.bc(zl, k, pos)[1],             # Left boundary condition
+                self.bc(zl, k, pos)[2],             # Left boundary condition
                 self.u(zr, z0=0),           # ui(xi = li)
                 self.w(zr),                 # wi(xi = li)
                 self.psi(zr),               # psii(xi = li)
@@ -585,9 +1010,9 @@ class SolutionMixin:
                 -self.N(zl),                # -Ni(xi = 0)
                 -self.M(zl),                # -Mi(xi = 0)
                 -self.V(zl),                # -Vi(xi = 0)
-                self.bc(zr, k, pos, mode, kR)[0],             # Right boundary condition
-                self.bc(zr, k, pos, mode, kR)[1],             # Right boundary condition
-                self.bc(zr, k, pos, mode, kR)[2]])            # Right boundary condition
+                self.bc(zr, k, pos)[0],             # Right boundary condition
+                self.bc(zr, k, pos)[1],             # Right boundary condition
+                self.bc(zr, k, pos)[2]])            # Right boundary condition
         else:
             raise ValueError(
                 (f'Invalid position argument {pos} given. '
@@ -596,7 +1021,7 @@ class SolutionMixin:
         return eqs
 
     def calc_segments(self, li=False, mi=False, ki=False, k0=False,
-                      L=1e4, a=0, m=0, **kwargs):
+                      L=1e4, m=0, **kwargs):
         """
         Assemble lists defining the segments.
 
@@ -639,15 +1064,6 @@ class SolutionMixin:
         """
 
         _ = kwargs                                      # Unused arguments
-        # Set unbedded segment length
-        mode = self.mode_td(l=a)
-        if mode in ['A', 'B']:
-            l = a
-        if mode in ['C']:
-            l = self.lS
-
-        # Get spring stiffness for collapsed weak-layer
-        kR = self.reduce_stiffness(l=a-self.lS, mode=mode)*self.calc_rot_spring(collapse=True)
 
         # Assemble list defining the segments
         if self.system == 'skiers':
@@ -656,18 +1072,18 @@ class SolutionMixin:
             ki = np.array(ki)                           # Crack
             k0 = np.array(k0)                           # No crack
         elif self.system == 'pst-':
-            li = np.array([L - a, l])                   # Segment lengths
+            li = np.array([L - self.a, self.td])             # Segment lengths
             mi = np.array([0])                          # Skier weights
             ki = np.array([True, False])                # Crack
             k0 = np.array([True, True])                 # No crack
         elif self.system == '-pst':
-            li = np.array([l, L - a])                   # Segment lengths
+            li = np.array([self.td, L - self.a])             # Segment lengths
             mi = np.array([0])                          # Skier weights
             ki = np.array([False, True])                # Crack
             k0 = np.array([True, True])                 # No crack
         elif self.system == 'skier':
-            lb = (L - a)/2                              # Half bedded length
-            lf = a/2                                    # Half free length
+            lb = (L - self.a)/2                              # Half bedded length
+            lf = self.a/2                                    # Half free length
             li = np.array([lb, lf, lf, lb])             # Segment lengths
             mi = np.array([0, m, 0])                    # Skier weights
             ki = np.array([True, False, False, True])   # Crack
@@ -677,12 +1093,12 @@ class SolutionMixin:
 
         # Fill dictionary
         segments = {
-            'nocrack': {'li': li, 'mi': mi, 'ki': k0, 'mode': mode, 'kR': kR},
-            'crack': {'li': li, 'mi': mi, 'ki': ki, 'mode': mode, 'kR': kR},
-            'both': {'li': li, 'mi': mi, 'ki': ki, 'k0': k0, 'mode': mode, 'kR': kR}}
+            'nocrack': {'li': li, 'mi': mi, 'ki': k0},
+            'crack': {'li': li, 'mi': mi, 'ki': ki},
+            'both': {'li': li, 'mi': mi, 'ki': ki}}
         return segments
 
-    def assemble_and_solve(self, phi, li, mi, ki, mode, kR):
+    def assemble_and_solve(self, phi, li, mi, ki):
         """
         Compute free constants for arbitrary beam assembly.
 
@@ -767,11 +1183,11 @@ class SolutionMixin:
             zhi = self.eqs(
                 zl=self.zh(x=0, l=l, bed=k),
                 zr=self.zh(x=l, l=l, bed=k),
-                k=k, pos=pos, mode=mode, kR=kR)
+                k=k, pos=pos)
             zpi = self.eqs(
                 zl=self.zp(x=0, phi=phi, bed=k),
                 zr=self.zp(x=l, phi=phi, bed=k),
-                k=k, pos=pos, mode=mode, kR=kR)
+                k=k, pos=pos)
             # Rows for left-hand side assembly
             start = 0 if i == 0 else 3
             stop = 6 if i == nS - 1 else 9
@@ -794,7 +1210,7 @@ class SolutionMixin:
         for i in range(nS):
             # Length, foundation and position of segment i
             l, k, pos = li[i], ki[i], pi[i]
-            if not k and bool(mode in ['B', 'C']):
+            if not k and bool(self.mode in ['B', 'C', 'D']):
                 if i==0:
                     rhs[:3] = np.vstack([0,0,self.tc])
                 if i == (nS - 1):
