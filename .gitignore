@@ -25,3 +25,4 @@ skierinduced.py
 # misc
 *.stats
 plots/
+test/
