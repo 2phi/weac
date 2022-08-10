@@ -121,7 +121,7 @@ def slab_profile(instance):
 # === DEFORMATION CONTOUR PLOT ================================================
 
 
-def contours(instance, x, z, window=1e12, scale=100):
+def contours(instance, x, z, i, window=1e12, scale=100):
     """
     Plot 2D deformation contours.
 
@@ -159,12 +159,12 @@ def contours(instance, x, z, window=1e12, scale=100):
 
     # Get x-coordinate of maximum deflection w (cm) and derive plot x-limits
     xfocus = x[np.max(np.argmax(W, axis=1))]/10
-    xmax = np.min([np.max(X+scale*U)+1e-1*instance.h/4, xfocus + window/2])
-    xmin = np.max([np.min(X)-1e-1*instance.h/4, xfocus - window/2])
+    xmax = 1.1*window/10
+    xmin = -0.1*window/10
 
     # From maximum of deflection w (cm) and slab height h (cm) derive plot y-limits
-    ymin = -instance.h/40
-    ymax = 5/4*instance.h/10+scale*np.max(W)
+    ymin = -0.1*instance.h/10
+    ymax = 2*instance.h/10
     
     # Normalize colormap
     norm = MidpointNormalize(vmin=1e3*np.min(U), vmax=1e3*np.max(U))
@@ -186,15 +186,11 @@ def contours(instance, x, z, window=1e12, scale=100):
     plt.gca().set_ylabel('depth below surface\n' r'$\longleftarrow $ $d$ (cm)')
     plt.title(fr'${scale}\!\times\!$ scaled deformations (cm)', size=10)
 
-    # Colorbar
-    cbar = plt.colorbar(
-        shrink=0.5,
-        label=('lateral displacements\n'
-               r'$u$ ($\mu\mathrm{m}$) $\longrightarrow$'))
-    cbar.ax.tick_params(labelsize=8)
-
     # Save figure
-    save_plot(name='cont')
+    save_plot(name='cont'+str(i))
+    
+    # Clear Canvas
+    plt.close()
 
     # Reset plot styles
     plt.rcdefaults()
@@ -298,6 +294,9 @@ def plot_data(
     # Save figure
     save_plot(name)
 
+    # Clear canvas
+    plt.close()
+    
     # Reset plot styles
     plt.rcdefaults()
 
@@ -305,7 +304,7 @@ def plot_data(
 # === PLOT WRAPPERS ===========================================================
 
 
-def displacements(instance, x, z, **segments):
+def displacements(instance, x, z, i, **segments):
     """Wrap for dispalcements plot."""
     data = [
         [x/10, instance.u(z, z0=0, unit='mm'), r'$u_0\ (\mathrm{mm})$'],
@@ -313,10 +312,10 @@ def displacements(instance, x, z, **segments):
         [x/10, instance.psi(z, unit='degrees'), r'$\psi\ (^\circ)$ '],
     ]
     plot_data(ax1label=r'Displacements', ax1data=data,
-              name='disp', **segments)
+              name='disp'+str(i), **segments)
 
 
-def section_forces(instance, x, z, **segments):
+def section_forces(instance, x, z, i, **segments):
     """Wrap section forces plot."""
     data = [
         [x/10, instance.N(z), r'$N$'],
@@ -324,17 +323,17 @@ def section_forces(instance, x, z, **segments):
         [x/10, instance.V(z), r'$V$']
     ]
     plot_data(ax1label=r'Section forces', ax1data=data,
-              name='forc', **segments)
+              name='forc'+str(i), **segments)
 
 
-def stresses(instance, x, z, **segments):
+def stresses(instance, x, z, i, **segments):
     """Wrap stress plot."""
     data = [
         [x/10, instance.tau(z, unit='kPa'), r'$\tau$'],
         [x/10, instance.sig(z, unit='kPa'), r'$\sigma$']
     ]
     plot_data(ax1label=r'Stress (kPa)', ax1data=data,
-              name='stress', **segments)
+              name='stress'+str(i), **segments)
 
 
 def stress_criteria(x, stress, **segments):

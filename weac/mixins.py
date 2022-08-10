@@ -797,7 +797,6 @@ class SlabContactMixin:
         a1 = self.calc_a1()
         a2 = self.calc_a2()
         a3 = self.calc_a3(a2)
-        print('a1:', a1, 'a2:', a2, 'a3:', a3)
         if self.a <= a1:
             mode = 'A'
         elif a1 < self.a <= a2:
@@ -824,8 +823,6 @@ class SlabContactMixin:
         self.set_touchdown_attributes(a,cf,ratio,phi)
         self.calc_touchdown_mode()
         self.calc_touchdown_length()
-
-        print('a:', self.a, 'mode:', self.mode, 'td:', self.td)
 
 
 class SolutionMixin:
