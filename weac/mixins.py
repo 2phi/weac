@@ -405,7 +405,7 @@ class SlabContactMixin:
 
     def set_tc(self,cf):
         """
-        Set height of the collapsed weak-layer.
+        Set height of the crack.
 
         Arguments
         ---------
@@ -413,7 +413,9 @@ class SlabContactMixin:
             Collapse-factor. Ratio of the collapsed to the
             uncollapsed weak-layer height.
         """
-        self.tc = cf*self.t
+        qn = self.calc_qn()
+        self.tc = cf*self.t - qn/self.kn
+        print('tc: ', self.tc)
 
     def set_ratio(self,ratio):
         """
