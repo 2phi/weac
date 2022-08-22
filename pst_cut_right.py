@@ -27,7 +27,7 @@ myprofile = [[126, 570]]  # (N) last slab layer above weak layer
 
 # Input
 totallength = 5000                      # Total length (mm)
-cracklength = np.linspace(1610,2400,80)                       # Crack length (mm)
+cracklength = np.linspace(3200.0,3600.0,41)                       # Crack length (mm)
 inclination = 0                      # Slope inclination (°)
 
 for i in cracklength:
@@ -38,7 +38,6 @@ for i in cracklength:
             a=i, cf=1.0/3, ratio=16, phi=inclination)
 
     # === INSPECT LAYERING ================================================
-    #weac.plot.slab_profile(pst_cut_right)
 
     # Obtain lists of segment lengths, locations of foundations,
     # and position and magnitude of skier loads from inputs. We
@@ -75,7 +74,8 @@ for i in cracklength:
             pst_cut_right.u(z_pst, z0=0)[-1], pst_cut_right.up(z_pst, z0=0)[-1], pst_cut_right.w(z_pst)[-1],
             pst_cut_right.wp(z_pst)[-1], pst_cut_right.psi(z_pst)[-1], pst_cut_right.psip(z_pst)[-1],
             pst_cut_right.sig(z_pst)[int((totallength-i)/10)], pst_cut_right.tau(z_pst)[int((totallength-i)/10)],
-            pst_cut_right.Gi(z_pst)[int((totallength-i)/10)], pst_cut_right.Gii(z_pst)[int((totallength-i)/10)]]
+            pst_cut_right.Gi(z_pst)[int((totallength-i)/10)], pst_cut_right.Gii(z_pst)[int((totallength-i)/10)],
+            pst_cut_right.td]
 
     for x in data:
         file.write('{:10.6f}'.format(x))
