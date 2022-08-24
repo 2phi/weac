@@ -382,7 +382,54 @@ class FieldQuantitiesMixin:
         """
         return self.tau(z0(x))*self.gamma(z1(x))*self.t
 
+    def external_potential(self, C, phi, L, **segments):
+        """
+        Compute total external potential (PST or skier-on-slab setup).
+        """
+        # Rasterize solution
+        xq, zq, xb = self.rasterize_solution(C=C, phi=phi, **segments)
+        # Compute displacements where weight loads are applied
+        w0 = self.w(zq)
+        # Get weight loads
+        qn, _ = self.get_weight_load(phi)
+        # Integrate external work
+        Wext = np.average(w0)*qn*np.sum(segments['li'])/2 \
+                + w0[-1]*qn*(L - np.sum(segments['li']))/2
+        print((L - np.sum(segments['li'])))
+        # alternative integration by trapezoidal
+        Wext_tr = np.trapz(qn*w0, xq)
+                
+        return Wext, Wext_tr
 
+    def internal_potential(self, C, phi, **segments):
+        """
+        Compute total internal potential (PST or skier-on-slab setup).
+        """
+        # Rasterize solution
+        xq, zq, xb = self.rasterize_solution(C=C, phi=phi, **segments)
+        
+        # Compute section forces
+        N, M, V = self.N(zq), self.M(zq), self.V(zq)
+        # Compute stored energy of the slab (beam)
+        P_beam = np.trapz(N**2/self.A11 + M**2/self.D11 + V**2/self.kA55, xq)/2
+
+        # Drop parts of the solution that are not a foundation
+        zweak = zq[:, ~np.isnan(xb)]
+        xweak = xb[~np.isnan(xb)]
+        # Compute displacments of segment on foundation
+        w = self.w(zweak)
+        u = self.u(zweak, z0=self.h/2)
+        # Compute stored energy of the weak-layer
+        P_wl = np.trapz(self.kn*w**2 + self.kt*u**2, xweak)/2
+        # Alternative wl energy?
+        # P_wl += 1/2*np.trapz(sig*eps + tau*gamma, xweak)*self.t
+        
+        # Spring energy
+        psi = self.psi(zq)[-1]
+        P_rs = psi**2*self.calc_rot_spring()[1]/2
+
+        return P_wl + P_beam + P_rs, P_wl, P_beam, P_rs
+    
 class SlabContactMixin:
     """
     Mixin for handling the touchdown situation in a PST.
@@ -415,7 +462,7 @@ class SlabContactMixin:
         """
         qn = self.calc_qn()
         self.tc = cf*self.t - qn/self.kn
-        print('tc: ', self.tc)
+        #print('tc: ', self.tc)
 
     def set_ratio(self,ratio):
         """
@@ -799,7 +846,7 @@ class SlabContactMixin:
         a1 = self.calc_a1()
         a2 = self.calc_a2()
         a3 = self.calc_a3(a2)
-        print('a1:', a1, 'a2:', a2, 'a3:', a3)
+        #print('a1:', a1, 'a2:', a2, 'a3:', a3)
         if self.a <= a1:
             mode = 'A'
         elif a1 < self.a <= a2:
@@ -827,7 +874,7 @@ class SlabContactMixin:
         self.calc_touchdown_mode()
         self.calc_touchdown_length()
 
-        print('a:', self.a, 'mode:', self.mode, 'td:', self.td)
+        #print('a:', self.a, 'mode:', self.mode, 'td:', self.td)
 
 
 class SolutionMixin:
