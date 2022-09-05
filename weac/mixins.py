@@ -462,7 +462,6 @@ class SlabContactMixin:
         """
         qn = self.calc_qn()
         self.tc = cf*self.t - qn/self.kn
-        #print('tc: ', self.tc)
 
     def set_ratio(self,ratio):
         """
@@ -624,14 +623,57 @@ class SlabContactMixin:
 
         return a2
 
-    def calc_a3(self,a2):
+    def calc_a3(self):
         """
         Calculate cracklength w(a) = tc, w'(a) = 0 and kf = constant.
 
         This is the longest crack, to which M+-kf*kr*psi=0, N=0 and w=tc
         conditions apply. It marks the threshold between mode C and D.
         """
-        a3 = a2 + np.pi/self.betaC
+        def polynomial_6():
+            """
+            Calculate the coefficients of a sixth order polynomial equation.
+
+            Returns
+            -------
+            list
+                First coefficient for sixth order term,
+                second coefficient for fith order term and so on.
+            """
+            c1 = self.kA55**2*kRl*kNl*qn
+            c2 = 6*self.kA55*kNl*qn*(
+                self.D11*self.kA55 \
+                + kRl*kRr)
+            c3 = 30*self.D11*self.kA55*kNl*qn*(kRl + kRr)
+            c4 = 24*self.D11*qn*(
+                2*self.kA55**2*kRl \
+                + 3*self.D11*self.kA55*kNl \
+                + 3*kRl*kRr*kNl)
+            c5 = 72*self.D11*(
+                self.D11*qn*(
+                    self.kA55**2 \
+                    + kNl*(kRl + kRr)) \
+                + self.kA55*kRl*(
+                    2*kRr*qn \
+                    - self.kA55*kNl*self.tc))
+            c6 = 144*self.D11*self.kA55*(
+                self.D11*qn*(kRl + kRr) \
+                - kNl*self.tc*(
+                    self.D11*self.kA55 \
+                    + kRl*kRr))
+            c7 = - 144*self.D11**2*self.kA55*kNl*self.tc*(kRl + kRr)
+            return [c1,c2,c3,c4,c5,c6,c7]
+
+        # Get spring stiffnesses for adjacent segment with uncollapsed weak-layer
+        kRl = self.calc_rot_spring()[0]
+        kNl = self.calc_trans_spring()[0]
+        # Get spring stiffnesses for adjacent segment with collapsed weak-layer
+        kRr = self.calc_rot_spring()[1]
+        # Get surface normal load components
+        qn = self.calc_qn()
+        # Calculate positive real roots
+        pos = (np.roots(polynomial_6()).imag == 0) & (np.roots(polynomial_6()).real > 0)
+        a3 = np.roots(polynomial_6())[pos].real[0] + np.pi/self.betaC
 
         return a3
 
@@ -786,51 +828,7 @@ class SlabContactMixin:
         """
         Calculate the length of the touchdown element in mode D.
         """
-        def polynomial_6():
-            """
-            Calculate the coefficients of a sixth order polynomial equation.
-
-            Returns
-            -------
-            list
-                First coefficient for sixth order term,
-                second coefficient for fith order term and so on.
-            """
-            c1 = self.kA55**2*kRl*kNl*qn
-            c2 = 6*self.kA55*kNl*qn*(
-                self.D11*self.kA55 \
-                + kRl*kRr)
-            c3 = 30*self.D11*self.kA55*kNl*qn*(kRl + kRr)
-            c4 = 24*self.D11*qn*(
-                2*self.kA55**2*kRl \
-                + 3*self.D11*self.kA55*kNl \
-                + 3*kRl*kRr*kNl)
-            c5 = 72*self.D11*(
-                self.D11*qn*(
-                    self.kA55**2 \
-                    + kNl*(kRl + kRr)) \
-                + self.kA55*kRl*(
-                    2*kRr*qn \
-                    - self.kA55*kNl*self.tc))
-            c6 = 144*self.D11*self.kA55*(
-                self.D11*qn*(kRl + kRr) \
-                - kNl*self.tc*(
-                    self.D11*self.kA55 \
-                    + kRl*kRr))
-            c7 = - 144*self.D11**2*self.kA55*kNl*self.tc*(kRl + kRr)
-            return [c1,c2,c3,c4,c5,c6,c7]
-
-        # Get spring stiffnesses for adjacent segment with uncollapsed weak-layer
-        kRl = self.calc_rot_spring()[0]
-        kNl = self.calc_trans_spring()[0]
-        # Get spring stiffnesses for adjacent segment with collapsed weak-layer
-        kRr = self.calc_rot_spring()[1]
-        # Get surface normal load components
-        qn = self.calc_qn()
-        # Calculate positive real roots
-        pos = (np.roots(polynomial_6()).imag == 0) & (np.roots(polynomial_6()).real > 0)
-        lD = np.roots(polynomial_6())[pos].real[0]
-
+        lD = self.calc_a3() - np.pi/self.betaC
         return lD
 
     def set_touchdown_attributes(self,a,cf,ratio,phi):
@@ -845,8 +843,7 @@ class SlabContactMixin:
         """Calculate touchdown-mode from thresholds"""
         a1 = self.calc_a1()
         a2 = self.calc_a2()
-        a3 = self.calc_a3(a2)
-        #print('a1:', a1, 'a2:', a2, 'a3:', a3)
+        a3 = self.calc_a3()
         if self.a <= a1:
             mode = 'A'
         elif a1 < self.a <= a2:
@@ -873,8 +870,6 @@ class SlabContactMixin:
         self.set_touchdown_attributes(a,cf,ratio,phi)
         self.calc_touchdown_mode()
         self.calc_touchdown_length()
-
-        #print('a:', self.a, 'mode:', self.mode, 'td:', self.td)
 
 
 class SolutionMixin:
