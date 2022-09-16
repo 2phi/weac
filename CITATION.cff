@@ -27,17 +27,17 @@ url: "https://github.com/2phi/weac"
 preferred-citation:
   type: article
   authors:
-  - family-names: "Rosendahl"
-    given-names: "Philipp Laurens"
-    orcid: "https://orcid.org/0000-0002-6587-875X"
   - family-names: "Weißgraeber"
     given-names: "Philipp"
     orcid: "https://orcid.org/0000-0001-8320-8672"
-  doi: "10.5194/tc-14-131-2020"
+  - family-names: "Rosendahl"
+    given-names: "Philipp Laurens"
+    orcid: "https://orcid.org/0000-0002-6587-875X"
+  doi: "10.5194/tc-2022-140"
   journal: "The Cryosphere"
-  start: 131 # First page number
-  end: 145 # Last page number
-  title: "Modeling snow slab avalanches caused by weak-layer failure - Part 2: Coupled mixed-mode criterion for skier-triggered anticracks"
+  start: 0 # First page number
+  end: 0 # Last page number
+  title: "A closed-form model for layered snow slabs"
   issue: 1
-  volume: 14
-  year: 2020
+  volume: 0
+  year: 2022
