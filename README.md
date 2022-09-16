@@ -85,7 +85,7 @@ WEAC implements closed-form analytical models for the [mechanical analysis of dr
 
 Cite the repository as:
 ```
-Rosendahl, P. L. & Weissgraeber, P. (2022). Weak Layer Anticrack Nucleation Model (WEAC). Zenodo. [10.5281/zenodo.5773113](https://doi.org/10.5281/zenodo.5773113)
+Rosendahl, P. L. & Weissgraeber, P. (2022). Weak Layer Anticrack Nucleation Model (WEAC). Zenodo. https://doi.org/10.5281/zenodo.5773113
 ```
 
 Read the [📄 whitepaper](https://doi.org/10.5194/tc-2022-140) for model derivations, illustrations, dimensions, material properties, and kinematics:
