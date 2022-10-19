@@ -7,37 +7,36 @@ import numpy as np
 # Project imports
 import weac
 
-# === DEFINE SLAB LAYERING ============================================
+# === VARIABLES ======================================================
+# Input
+rho = 250                                   # Slab density (kg/m3)
+height = 400                                # Slab height (mm)
+totallength = 7000                         # Total length (mm)
+#cracklength =np.linspace(60.0,6000.0,100)   # Crack length (mm)
+cracklength = np.array([2200.0,3500.0])
+inclination = 0                             # Slope inclination (°); pos angle downslope cut in pst-
 
+# Initiante Gdif
+Gdif = np.array([0])
+
+# Output location
+out = '../../04_touchdown/04_results/data/long_pst/Gdif/data/'+str(rho)+'_'+str(height)+'.txt'
+
+# === DEFINE SLAB LAYERING ============================================
 # Either use custom profile
-myprofile = [[126, 570]]  # (N) last slab layer above weak layer
+myprofile = [[rho,height]]  # (N) last slab layer above weak layer
 
 # Or select a predefined profile from database
 # myprofile = 'medium'
 
-# Example with a crack cut from the right-hand side.
-
-# +-----------------------------+-----+
-# |                             |     |
-# |             1               |  2  |
-# |                             |     |
-# +-----------------------------+-----+
-#  |||||||||||||||||||||||||||||
-# --------------------------------------
-
-# Input
-totallength = 5000                      # Total length (mm)
-cracklength = np.linspace(3200.0,3600.0,41)                       # Crack length (mm)
-inclination = 0                      # Slope inclination (°)
-
+# === SOLVE SYSTEM ================================================
 for i in cracklength:
-    print(i)
     # === CREATE MODEL INSTANCES ==========================================
     # Propagation saw test cut from the right side with custom layering
-    pst_cut_right = weac.Layered(system='pst-', layers=myprofile, \
-            a=i, cf=1.0/3, ratio=16, phi=inclination)
+    pst_cut_right = weac.Layered(system='-pst', layers=myprofile, \
+            a=float(i), cf=1.0, ratio=16, phi=inclination)
 
-    # === INSPECT LAYERING ================================================
+    # === INSPECT LAYERING ========================================
 
     # Obtain lists of segment lengths, locations of foundations,
     # and position and magnitude of skier loads from inputs. We
@@ -61,23 +60,25 @@ for i in cracklength:
         C=C_pst, phi=inclination, num=totallength/10, **seg_pst)
 
     # === VISUALIZE RESULTS =====================================
-    weac.plot.contours(pst_cut_right, x=xsl_pst, z=z_pst, i=i, window=totallength, scale=10)
+    weac.plot.contours(pst_cut_right, x=xsl_pst, z=z_pst, i=i, window=totallength, scale=15)
     weac.plot.displacements(pst_cut_right, x=xsl_pst, z=z_pst, i=i, **seg_pst)
     weac.plot.stresses(pst_cut_right, x=xwl_pst, z=z_pst, i=i, **seg_pst)
-    weac.plot.section_forces(pst_cut_right, x=xsl_pst, z=z_pst, i=i, **seg_pst)
+    #weac.plot.section_forces(pst_cut_right, x=xsl_pst, z=z_pst, i=i, **seg_pst)
 
-    # === WRITE BOUNDARY RESULTS =====================================
-    file = open(file='scratch/out.txt', mode='a', encoding='UTF-8')
+    # === COMPUTE ENERGY RELEASE RATE ===========================
+    #Gdif = pst_cut_right.gdif(C_pst, inclination,**seg_pst)[0]
+
+    #file = open(file=out, mode='a', encoding='UTF-8')
+    #file.write('{:10.6f}'.format(Gdif))
+    #file.write('\n')
+
+    #sig = pst_cut_right.sig(z_pst,unit='kPa')
+    tau = pst_cut_right.tau(z_pst,unit='kPa')
+    #w = pst_cut_right.w(z_pst)
     
-    # Fill left and right boundary values into list
-    data = [i, pst_cut_right.M(z_pst)[-1], pst_cut_right.N(z_pst)[-1], pst_cut_right.V(z_pst)[-1],
-            pst_cut_right.u(z_pst, z0=0)[-1], pst_cut_right.up(z_pst, z0=0)[-1], pst_cut_right.w(z_pst)[-1],
-            pst_cut_right.wp(z_pst)[-1], pst_cut_right.psi(z_pst)[-1], pst_cut_right.psip(z_pst)[-1],
-            pst_cut_right.sig(z_pst)[int((totallength-i)/10)], pst_cut_right.tau(z_pst)[int((totallength-i)/10)],
-            pst_cut_right.Gi(z_pst)[int((totallength-i)/10)], pst_cut_right.Gii(z_pst)[int((totallength-i)/10)],
-            pst_cut_right.td]
-
-    for x in data:
-        file.write('{:10.6f}'.format(x))
-        file.write('\t')
-    file.write('\n')
+    write = 0
+    if write:
+        file = open(file='scratch/tau.txt', mode='a', encoding='UTF-8')
+        for element in tau:
+            file.write('{:10.6f}'.format(element))
+            file.write('\n')

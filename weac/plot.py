@@ -108,7 +108,7 @@ def slab_profile(instance):
     ax1.set_xlim(500, 0)
 
     ax1.fill_betweenx(y, 0, x)
-    
+
     # Save figure
     save_plot(name='profile')
 
@@ -165,7 +165,7 @@ def contours(instance, x, z, i, window=1e12, scale=100):
     # From maximum of deflection w (cm) and slab height h (cm) derive plot y-limits
     ymin = -0.1*instance.h/10
     ymax = 2*instance.h/10
-    
+
     # Normalize colormap
     norm = MidpointNormalize(vmin=1e3*np.min(U), vmax=1e3*np.max(U))
 
@@ -188,7 +188,7 @@ def contours(instance, x, z, i, window=1e12, scale=100):
 
     # Save figure
     save_plot(name='cont'+str(i))
-    
+
     # Clear Canvas
     plt.close()
 
@@ -296,7 +296,7 @@ def plot_data(
 
     # Clear canvas
     plt.close()
-    
+
     # Reset plot styles
     plt.rcdefaults()
 

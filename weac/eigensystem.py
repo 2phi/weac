@@ -149,7 +149,7 @@ class Eigensystem:
         self.mode = False       # Touchdown-mode can be either A, B, C or D
         self.td = False         # Touchdown length
 
-    def set_foundation_properties(self, t=30, E=0.25, nu=0.25, update=False):
+    def set_foundation_properties(self, t=10.0, E=0.25, nu=0.25, update=False):
         """
         Set material properties and geometry of foundation (weak layer).
 
@@ -255,7 +255,7 @@ class Eigensystem:
         # Elastic moduli (MPa) under plane-strain conditions
         G = self.weak['E']/(2*(1 + self.weak['nu']))    # Shear modulus
         E = self.weak['E']/(1 - self.weak['nu']**2)     # Young's modulus
-        
+
         # Foundation (weak layer) stiffnesses (N/mm^3)
         self.kn = E/self.t                              # Normal stiffness
         self.kt = G/self.t                              # Shear stiffness
