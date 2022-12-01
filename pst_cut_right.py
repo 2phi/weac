@@ -27,7 +27,7 @@ myprofile = [[126, 570]]  # (N) last slab layer above weak layer
 
 # Input
 totallength = 5000                      # Total length (mm)
-cracklength = 1500.0                       # Crack length (mm)
+cracklength = 2000.0                       # Crack length (mm)
 inclination = 0                      # Slope inclination (°)
 
 # === CREATE MODEL INSTANCES ==========================================
@@ -59,20 +59,10 @@ C_pst = pst_cut_right.assemble_and_solve(
 xsl_pst, z_pst, xwl_pst = pst_cut_right.rasterize_solution(
     C=C_pst, phi=inclination, num=totallength/10, **seg_pst)
 
-visres = 0
-if visres:
+plot = 1
+if plot:
     # === VISUALIZE RESULTS =====================================
     weac.plot.contours(pst_cut_right, x=xsl_pst, z=z_pst, window=totallength, scale=10)
     weac.plot.displacements(pst_cut_right, x=xsl_pst, z=z_pst, **seg_pst)
     weac.plot.stresses(pst_cut_right, x=xwl_pst, z=z_pst, **seg_pst)
     weac.plot.section_forces(pst_cut_right, x=xsl_pst, z=z_pst, **seg_pst)
-
-evares = 0
-if evares:
-    # === EVALUATE RESULTS =====================================
-    # Fill left and right boundary values into list
-    data = [pst_cut_right.M(z_pst)[-1], pst_cut_right.N(z_pst)[-1], pst_cut_right.V(z_pst)[-1],
-            pst_cut_right.u(z_pst, z0=0)[-1], pst_cut_right.up(z_pst, z0=0)[-1], pst_cut_right.w(z_pst)[-1],
-            pst_cut_right.wp(z_pst)[-1], pst_cut_right.psi(z_pst)[-1], pst_cut_right.psip(z_pst)[-1],
-            pst_cut_right.sig(z_pst)[int((totallength-cracklength)/10)], pst_cut_right.tau(z_pst)[int((totallength-cracklength)/10)],
-            pst_cut_right.Gi(z_pst)[int((totallength-cracklength)/10)], pst_cut_right.Gii(z_pst)[int((totallength-cracklength)/10)]]

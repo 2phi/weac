@@ -255,7 +255,7 @@ class Eigensystem:
         # Elastic moduli (MPa) under plane-strain conditions
         G = self.weak['E']/(2*(1 + self.weak['nu']))    # Shear modulus
         E = self.weak['E']/(1 - self.weak['nu']**2)     # Young's modulus
-        
+    
         # Foundation (weak layer) stiffnesses (N/mm^3)
         self.kn = E/self.t                              # Normal stiffness
         self.kt = G/self.t                              # Shear stiffness

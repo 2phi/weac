@@ -382,54 +382,7 @@ class FieldQuantitiesMixin:
         """
         return self.tau(z0(x))*self.gamma(z1(x))*self.t
 
-    def external_potential(self, C, phi, L, **segments):
-        """
-        Compute total external potential (PST or skier-on-slab setup).
-        """
-        # Rasterize solution
-        xq, zq, xb = self.rasterize_solution(C=C, phi=phi, **segments)
-        # Compute displacements where weight loads are applied
-        w0 = self.w(zq)
-        # Get weight loads
-        qn, _ = self.get_weight_load(phi)
-        # Integrate external work
-        Wext = np.average(w0)*qn*np.sum(segments['li'])/2 \
-                + w0[-1]*qn*(L - np.sum(segments['li']))/2
-        print((L - np.sum(segments['li'])))
-        # alternative integration by trapezoidal
-        Wext_tr = np.trapz(qn*w0, xq)
-                
-        return Wext, Wext_tr
 
-    def internal_potential(self, C, phi, **segments):
-        """
-        Compute total internal potential (PST or skier-on-slab setup).
-        """
-        # Rasterize solution
-        xq, zq, xb = self.rasterize_solution(C=C, phi=phi, **segments)
-        
-        # Compute section forces
-        N, M, V = self.N(zq), self.M(zq), self.V(zq)
-        # Compute stored energy of the slab (beam)
-        P_beam = np.trapz(N**2/self.A11 + M**2/self.D11 + V**2/self.kA55, xq)/2
-
-        # Drop parts of the solution that are not a foundation
-        zweak = zq[:, ~np.isnan(xb)]
-        xweak = xb[~np.isnan(xb)]
-        # Compute displacments of segment on foundation
-        w = self.w(zweak)
-        u = self.u(zweak, z0=self.h/2)
-        # Compute stored energy of the weak-layer
-        P_wl = np.trapz(self.kn*w**2 + self.kt*u**2, xweak)/2
-        # Alternative wl energy?
-        # P_wl += 1/2*np.trapz(sig*eps + tau*gamma, xweak)*self.t
-        
-        # Spring energy
-        psi = self.psi(zq)[-1]
-        P_rs = psi**2*self.calc_rot_spring()[1]/2
-
-        return P_wl + P_beam + P_rs, P_wl, P_beam, P_rs
-    
 class SlabContactMixin:
     """
     Mixin for handling the touchdown situation in a PST.
@@ -460,6 +413,7 @@ class SlabContactMixin:
             Collapse-factor. Ratio of the collapsed to the
             uncollapsed weak-layer height.
         """
+        # subtract displacement under constact load from collapsed wl height
         qn = self.calc_qn()
         self.tc = cf*self.t - qn/self.kn
 
@@ -509,6 +463,19 @@ class SlabContactMixin:
 
         return qn
 
+    def calc_qt(self):
+        """
+        Calc total surface tangential load.
+
+        Returns
+        -------
+        qt : float
+            Total surface normal tangential (N/mm).
+        """
+        qt = self.get_weight_load(self.phi)[1] + self.get_surface_load(self.phi)[1]
+
+        return qt
+
     def calc_trans_spring(self):
         """
         Calculate substitute translational spring stiffness from layer properties
@@ -521,8 +488,8 @@ class SlabContactMixin:
             for uncollapsed (zeroth entry) and uncollapsed weak-layer (first entry).
         """
         # calc translational spring stiffnesses
-        kNU = 2*self.D11*self.betaU**3
-        kNC = 2*self.D11*self.betaC**3
+        kNU = 4*self.D11*self.kA55*self.betaU**3/(2*self.kA55 + self.D11*self.betaU**2)
+        kNC = 4*self.D11*self.kA55*self.betaC**3/(2*self.kA55 + self.D11*self.betaC**2)
 
         return [kNU,kNC]
 
@@ -538,8 +505,8 @@ class SlabContactMixin:
             for uncollapsed (zeroth entry) and uncollapsed weak-layer (first entry).
         """
         # calc rotational spring stiffnesses
-        kRU = self.D11*self.betaU
-        kRC = self.D11*self.betaC
+        kRU = 2*self.D11*self.kA55*self.betaU/(2*self.kA55 + self.D11*self.betaU**2)
+        kRC = 2*self.D11*self.kA55*self.betaC/(2*self.kA55 + self.D11*self.betaC**2)
 
         return [kRU,kRC]
 
@@ -829,6 +796,7 @@ class SlabContactMixin:
         Calculate the length of the touchdown element in mode D.
         """
         lD = self.calc_a3() - np.pi/self.betaC
+
         return lD
 
     def set_touchdown_attributes(self,a,cf,ratio,phi):
@@ -1250,15 +1218,23 @@ class SolutionMixin:
             rhs[:3] = self.bc(self.zp(x=0, phi=phi, bed=ki[0]))
             rhs[-3:] = self.bc(self.zp(x=li[-1], phi=phi, bed=ki[-1]))
 
-        # Loop through segments to set touchdown at rhs
+        # Loop through segments to set touchdown conditions at rhs
         for i in range(nS):
             # Length, foundation and position of segment i
             l, k, pos = li[i], ki[i], pi[i]
+            # Set displacement BC in stages B and C
             if not k and bool(self.mode in ['B', 'C', 'D']):
                 if i==0:
                     rhs[:3] = np.vstack([0,0,self.tc])
                 if i == (nS - 1):
                     rhs[-3:] = np.vstack([0,0,self.tc])
+            # Set normal force and displacement BC for stage D
+            if not k and bool(self.mode in ['D']):
+                N = self.calc_qt()*(self.a-self.td)
+                if i==0:
+                    rhs[:3] = np.vstack([-N,0,self.tc])
+                if i == (nS - 1):
+                    rhs[-3:] = np.vstack([N,0,self.tc])
 
         # --- SOLVE -----------------------------------------------------------
 
@@ -1476,6 +1452,111 @@ class OutputMixin:
     Provides convenience methods for the assembly of output lists
     such as rasterized displacements or rasterized stresses.
     """
+    def external_potential(self, C, phi, L, **segments):
+        """
+        Compute total external potential (pst only).
+
+        Arguments
+        ---------
+        C : ndarray
+            Matrix(6xN) of solution constants for a system of N
+            segements. Columns contain the 6 constants of each segement.
+        phi : float
+            Inclination of the slab (°).
+        L : float, optional
+            Total length of model (mm).
+        segments : dict
+            Dictionary with lists of touchdown booleans (tdi), segement
+            lengths (li), skier weights (mi), and foundation booleans
+            in the cracked (ki) and uncracked (k0) configurations.
+
+        Returns
+        -------
+        Pi_ext : float
+            Total external potential (Nmm).
+        """
+        # Rasterize solution
+        xq, zq, xb = self.rasterize_solution(C=C, phi=phi, **segments)
+        _ = xq, xb
+        # Compute displacements where weight loads are applied
+        w0 = self.w(zq)
+        us = self.u(zq, z0=self.zs)
+        # Get weight loads
+        qn = self.calc_qn()
+        qt = self.calc_qt()
+        # use +/- and us[0]/us[-1] according to system and phi
+        # compute total external potential
+        Pi_ext = -qn*(segments['li'][0] + segments['li'][1])*np.average(w0) \
+            - qn*(L - (segments['li'][0] + segments['li'][1]))*self.tc
+        # Ensure
+        if self.system in ['pst-']:
+            ub = us[-1]
+        elif self.system in ['-pst']:
+            ub = us[0]
+        Pi_ext += - qt*(segments['li'][0] + segments['li'][1])*np.average(us) \
+            - qt*(L - (segments['li'][0] + segments['li'][1]))*ub
+        if self.system not in ['pst-', '-pst']:
+            print('Input error: Only pst-setup implemented at the moment.')
+
+        return Pi_ext
+
+    def internal_potential(self, C, phi, L, pos, **segments):
+        """
+        Compute total internal potential (pst only).
+
+        Arguments
+        ---------
+        C : ndarray
+            Matrix(6xN) of solution constants for a system of N
+            segements. Columns contain the 6 constants of each segement.
+        phi : float
+            Inclination of the slab (°).
+        L : float, optional
+            Total length of model (mm).
+        segments : dict
+            Dictionary with lists of touchdown booleans (tdi), segement
+            lengths (li), skier weights (mi), and foundation booleans
+            in the cracked (ki) and uncracked (k0) configurations.
+
+        Returns
+        -------
+        Pi_int : float
+            Total internal potential (Nmm).
+        """
+        # Rasterize solution
+        xq, zq, xb = self.rasterize_solution(C=C, phi=phi, **segments)
+
+        # Compute section forces
+        N, M, V = self.N(zq), self.M(zq), self.V(zq)
+
+        # Drop parts of the solution that are not a foundation
+        zweak = zq[:, ~np.isnan(xb)]
+        xweak = xb[~np.isnan(xb)]
+
+        # Compute weak layer displacements
+        wweak = self.w(zweak)
+        uweak = self.u(zweak, z0=self.h/2)
+
+        # Compute stored energy of the slab (monte-carlo integration)
+        n = len(xq)
+        nweak = len(xweak)
+
+        # energy share from moment, shear force, wl normal and tangential springs
+        Pi_int = L/2/n/self.A11*np.sum([Ni**2 for Ni in N]) \
+                + L/2/n/self.D11*np.sum([Mi**2 for Mi in M]) \
+                + L/2/n/self.kA55*np.sum([Vi**2 for Vi in V]) \
+                + L*self.kn/2/nweak*np.sum([wi**2 for wi in wweak]) \
+                + L*self.kt/2/nweak*np.sum([ui**2 for ui in uweak])
+        # energy share from substitute rotation spring
+        if self.mode in ['C','D']:
+            if pos in ['r', 'right']:
+                Pi_int += 1/2*M[-1]*(self.psi(zq)[-1])**2
+            elif pos in ['l', 'left']:
+                Pi_int += 1/2*M[0]*(self.psi(zq)[0])**2
+        if self.system not in ['pst-', '-pst']:
+            print('Input error: Only pst-setup implemented at the moment.')
+
+        return Pi_int
 
     def get_weaklayer_shearstress(self, x, z, unit='MPa', removeNaNs=False):
         """
