@@ -30,9 +30,9 @@ def isnotebook():
 def load_dummy_profile(profile_id):
     """Define standard layering types for comparison."""
     # Layers [density (kg/m^3), thickness (mm), Young's modulus (N/mm^2)]
-    soft = [180., 120., 5]
-    medium = [270., 120., 30]
-    hard = [350., 120., 93.8]
+    soft = [180., 120., 5.02748]
+    medium = [270., 120., 29.9331]
+    hard = [350., 120., 93.7671]
 
     # Database (top to bottom)
     database = {
@@ -80,7 +80,7 @@ def calc_center_of_gravity(layers):
     H : float
         Total slab thickness (mm).
     zs : float
-        Z-coordinate of center of gravity (mm).
+        Z-coordinate of center of gravity measured from the midplane of the slab (mm).
     """
     # Layering info for center of gravity calculation (bottom to top)
     n = layers.shape[0]                 # Number of layers
@@ -89,7 +89,7 @@ def calc_center_of_gravity(layers):
     H = sum(h)                          # Total slab thickness
     # Layer center coordinates (bottom to top)
     zi = [H/2 - sum(h[0:j]) - h[j]/2 for j in range(n)]
-    # Z-coordinate of the center of gravity
+    # Z-coordinate of the center of gravity measured from midplane of the slab
     zs = sum(zi*h*rho)/sum(h*rho)
     # Return slab thickness and center of gravity
     return H, zs

@@ -4,6 +4,7 @@
 
 # Third party imports
 import numpy as np
+from numpy.linalg import inv
 
 # Project imports
 from weac.tools import gerling, calc_center_of_gravity, load_dummy_profile
@@ -126,11 +127,18 @@ class Eigensystem:
         self.h = False          # Total slab height (mm)
         self.zs = False         # Z-coordinate of slab center of gravity (mm)
         self.phi = False        # Slab inclination (°)
+        self.A = False          # Constant stiffness value
+        self.B = False          # Linear stiffness value
+        self.C = False          # Quadratic stiffness value
+        self.D = False          # Constant shear modulus
         self.A11 = False        # Slab extensional stiffness
         self.B11 = False        # Slab bending-extension coupling stiffness
         self.D11 = False        # Slab bending stiffness
         self.kA55 = False       # Slab shear stiffness
         self.E0 = False         # Stiffness determinant
+        self.m = False          # Integral over densities
+        self.mz = False         # First static moment of densities
+        self.zz = False
 
         # Inizialize eigensystem attributes
         self.ewC = False        # Complex eigenvalues
@@ -140,7 +148,8 @@ class Eigensystem:
         self.sC = False         # Stability shift of complex eigenvalues
         self.sR = False         # Stability shift of real eigenvalues
         self.sysmat = False     # System matrix
-
+        self.sysMatA = False
+        self.sysMatB = False
         # Initialize touchdown attributes
         self.lC = False         # Minimum length of substratum contact (mm)
         self.lS = False         # Maximum length of span between
@@ -148,7 +157,7 @@ class Eigensystem:
         self.ratio = False      # Stiffness ratio of collalpsed to uncollapsed weak-layer
         self.beta = False       # Ratio of slab to bedding stiffness
 
-    def set_foundation_properties(self, t=30, cf=0.5, E=0.25, nu=0.25, update=False):
+    def set_foundation_properties(self, t=30, cf=0.5, E=0.25, nu=0.25, rhoweak = 100, update=False):
         """
         Set material properties and geometry of foundation (weak layer).
 
@@ -173,8 +182,9 @@ class Eigensystem:
 
         # Material properties
         self.weak = {
-            'nu': nu,           # Poisson's ratio (-)
-            'E': E              # Young's modulus (MPa)
+            'nu': nu,            # Poisson's ratio (-)
+            'E': E,              # Young's modulus (MPa)
+            'rho': rhoweak*1e-12 # Density (t/mm^3)       
         }
 
         # Recalculate the fundamental system after properties have changed
@@ -266,6 +276,7 @@ class Eigensystem:
         # Weak-layer stiffness increment factor for collapse
         self.ratio = ratio
 
+
     def calc_laminate_stiffness_matrix(self):
         """
         Provide ABD matrix.
@@ -296,43 +307,210 @@ class Eigensystem:
         self.kA55 = kA55
         self.E0 = B11**2 - A11*D11
 
+    def calc_stiffness_properties(self):
+        """
+        Provide layering dependent variables.
+
+        Return plane-strain laminate stiffness matrix (ABD matrix).
+        """
+        # Number of plies and ply thicknesses (top to bottom)
+        n = self.slab.shape[0]
+        t = self.slab[:, 1]
+        # Calculate ply coordinates (top to bottom) in coordinate system
+        # with downward pointing z-axis (z-list will be negative to positive)
+        z = np.zeros(n + 1)
+        for j in range(n + 1):
+            z[j] = -self.h - self.t/2 + sum(t[0:j])
+
+        # Initialize stiffness components
+        A, B, C, D = 0, 0, 0, 0
+        # Inititalize densities
+        m , mz = 0 , 0
+        # Add layerwise contributions
+        for i in range(n):
+            E, G, nu = self.slab[i, 2:5]
+            A = A + E/((1-2*nu)*(1+nu))*(1-nu)*(z[i+1] - z[i])
+            B = B + 1/2*E/((1-2*nu)*(1+nu))*(1-nu)*(z[i+1]**2 - z[i]**2)
+            C = C + 1/3*E/((1-2*nu)*(1+nu))*(1-nu)*(z[i+1]**3 - z[i]**3)
+            D = D + G*(z[i+1] - z[i])
+            m = m + self.slab[i,0]*1e-12*(z[i+1]-z[i])
+            mz = mz + 1/2*self.slab[i,0]*1e-12*(z[i+1]**2 - z[i]**2)
+        self.zz = z
+        self.A = A
+        self.B = B
+        self.C = C
+        self.D = D
+        self.m = m
+        self.mz = mz 
+
+
     def calc_system_matrix(self):
         """
         Assemble first-order ODE system matrix.
 
-        Using the solution vector z = [u, u', w, w', psi, psi']
+        Using the solution vector z = [u, u', w, w', psi, psi',phiU, phiU', phiW, phiW']
         the ODE system is written in the form Az' + Bz = d
-        and rearranged to z' = -(A ^ -1)Bz + (A ^ -1)d = Ez + F
+        and rearranged to z' = -(A ^ -1) B z + (A ^ -1) d = E z + F
         """
-        kn = self.kn
-        kt = self.kt
+        Ew = self.weak['E']
+        nuw = self.weak['nu']
 
-        # Abbreviations (MIT t/2 im GGW, MIT w' in Kinematik)
-        E21 = kt*(-2*self.D11 + self.B11*(self.h + self.t))/(2*self.E0)
-        E24 = (2*self.D11*kt*self.t
-               - self.B11*kt*self.t*(self.h + self.t)
-               + 4*self.B11*self.kA55)/(4*self.E0)
-        E25 = (-2*self.D11*self.h*kt
-               + self.B11*self.h*kt*(self.h + self.t)
-               + 4*self.B11*self.kA55)/(4*self.E0)
-        E43 = kn/self.kA55
-        E61 = kt*(2*self.B11 - self.A11*(self.h + self.t))/(2*self.E0)
-        E64 = (-2*self.B11*kt*self.t
-               + self.A11*kt*self.t*(self.h+self.t)
-               - 4*self.A11*self.kA55)/(4*self.E0)
-        E65 = (2*self.B11*self.h*kt
-               - self.A11*self.h*kt*(self.h+self.t)
-               - 4*self.A11*self.kA55)/(4*self.E0)
+        t = self.t
+        h = self.h
+        A = self.A
+        B = self.B
+        C = self.C
+        D = self.D
+        Pi = np.pi
 
-        # System matrix
-        E = [[0,    1,    0,    0,    0,    0],
-             [E21,    0,    0,  E24,  E25,    0],
-             [0,    0,    0,    1,    0,    0],
-             [0,    0,  E43,    0,    0,   -1],
-             [0,    0,    0,    0,    0,    1],
-             [E61,    0,    0,  E64,  E65,    0]]
 
-        self.sysmat = np.array(E)
+        # a22 = -A - (Ew * t * (1. - nuw)) / (3. * (1. + nuw) * (1. - 2. * nuw))
+        # a26 = -B - 0.5 * A *(h + t)
+        # a28 = -(t * Ew * (1 - nuw)) / (Pi * (1. + nuw) * (1. - 2. * nuw))
+
+        # a44 = - D - t * Ew / (6. * (1. + nuw))
+        # a4X = - t * Ew / (2. * Pi * (1. + nuw))
+
+        # a62 = - B - 0.5 * A * (h + t)
+        # a66 = - C -0.25 * (h + t) * (4. * B + A * (h + t))
+
+        # a82 = - t * Ew * (1. - nuw) / (Pi * (1. + nuw) * (1. - 2. * nuw))
+        # a88 = - t * Ew * (1. - nuw) / (2. * (1. + nuw) * (1. - 2. * nuw))
+
+        # aX4 = - t * Ew / (2. * Pi * (1. + nuw))
+        # aXX = - t * Ew / (4. * (1. + nuw))
+
+        # SystemMatrixA = [[1,   0, 0,   0, 0,   0, 0,   0, 0,   0],
+        #                  [0, a22, 0,   0, 0, a26, 0, a28, 0,   0],
+        #                  [0,   0, 1,   0, 0,   0, 0,   0, 0,   0],
+        #                  [0,   0, 0, a44, 0,   0, 0,   0, 0, a4X],
+        #                  [0,   0, 0,   0, 1,   0, 0,   0, 0,   0],
+        #                  [0, a62, 0,   0, 0, a66, 0,   0, 0,   0],
+        #                  [0,   0, 0,   0, 0,   0, 1,   0, 0,   0],
+        #                  [0, a82, 0,   0, 0,   0, 0, a88, 0,   0],
+        #                  [0,   0, 0,   0, 0,   0, 0,   0, 1,   0],
+        #                  [0,   0, 0, aX4, 0,   0, 0,   0, 0, aXX]]
+        # self.sysMatA = SystemMatrixA
+        # b21 = Ew / (t * 2. * (1. + nuw))
+        # b24 = - Ew * (1. - 4. * nuw) / (4. * (1. - 2. * nuw) * (1. - nuw))
+        # b2X = - Ew / (Pi * (1. - 2. * nuw) * (1. + nuw))
+
+        # b42 = Ew * (1. - 4. * nuw) / (4. * (1. - 2. * nuw) * (1. + nuw))
+        # b43 = Ew * (1. - nuw) / (t * (1. - 2. * nuw) * (1. + nuw))
+        # b46 = - D
+        # b48 = - Ew / (Pi * (1. - 2. * nuw) * (1. + nuw))
+        
+        # b64 = D
+        # b65 = D
+
+        # b84 = Ew / (Pi * (1. - 2. * nuw) * (1. + nuw))
+        # b87 = Ew * Pi**2 / (4. * t * (1. + nuw))
+
+        # bX2 = Ew / (Pi * (1. - 2. * nuw) * (1. + nuw))
+        # bX9 = Ew * Pi**2 * (1. - nuw) / (2. * t * (1. + nuw) * (1. - 2. * nuw))
+
+
+        # SystemMatrixB = [[   0,  -1,   0,   0,   0,   0,   0,   0,   0,   0],
+        #                  [ b21,   0, b24,   0,   0,   0,   0,   0,   0, b2X],
+        #                  [   0,   0,   0,  -1,   0,   0,   0,   0,   0,   0],
+        #                  [   0, b42, b43,   0,   0, b46,   0, b48,   0,   0],
+        #                  [   0,   0,   0,   0,   0,  -1,   0,   0,   0,   0],
+        #                  [   0,   0,   0, b64, b65,   0,   0,   0,   0,   0],
+        #                  [   0,   0,   0,   0,   0,   0,   0,  -1,   0,   0],
+        #                  [   0,   0,   0, b84,   0,   0, b87,   0,   0,   0],
+        #                  [   0,   0,   0,   0,   0,   0,   0,   0,   0,  -1],
+        #                  [   0, bX2,   0,   0,   0,   0,   0,   0, bX9,   0]]
+        
+        
+        # self.sysMatB = SystemMatrixB
+        # Assemble (10x10) system matrix in accordance to Mathemtica script.
+        c21 = 3. * Pi**2 * (4. * C + (  t)*( A * (  t) + 4. * B ) )* Ew * (-1. + 2 * nuw) \
+                / (2. * t * ((Pi**2 - 6.) * t *(4. * C + (  t)*( A * (  t) + 4. * B ) ) * Ew * (-1. + nuw) - 12. * (B**2 - A * C) * Pi**2 * (-1. + nuw + 2. * nuw**2)))
+        c24 = - 3. * ((4 * C + (  t) * (4 * B + A * (  t))) * Ew * (-8. - Pi**2 + 4. * Pi**2 * nuw) + 8. * D * Pi**2 * (2. * B + A* (  t) ) * (-1. + nuw + 2. * nuw**2)) \
+                / (4. * (-6. + Pi**2) * t * (4. * C + (  t) * (4. * B + A * (  t))) * Ew * (-1. + nuw) - 48. * (B**2 - A * C) * Pi**2 * (-1. + nuw + 2. * nuw**2))
+        
+        
+        c25 = 6. * D * Pi**2 * (2. * B + A * (  t)) * (1 + nuw) * (-1. + 2. * nuw) \
+                / (-((-6. + Pi**2) * t * (4. * C + (  t) * (4. * B + A * (  t))) * Ew * (-1. +  nuw)) + 12. * (B**2 - A * C) * Pi**2 * (-1. + nuw + 2. * nuw**2))
+        
+        
+        
+        c27 = - 3. * Pi**3 * (4. * C + (  t) * (4. * B + A * (  t))) * Ew * (-1. + 2. * nuw) \
+                / (2. * t * ((-6. + Pi**2) * t * (4. * C + (  t) * (4. * B + A * (  t))) * Ew * (-1. + nuw) - 12. * (B**2 - A * C) * Pi**2 * (-1. + nuw +  2. * nuw**2)))
+        c2X =  3. * Pi * (4. * C + (  t) * (4. * B + A * (  t))) * Ew \
+                / ((-6. + Pi**2) * t * (4. * C + (  t) * (4. * B + A * (  t))) * Ew * (-1. + nuw) - 12. * (B**2 - A * C) * Pi**2 * (-1. + nuw + 2. * nuw**2))
+
+        c42 = 3. * Ew * (8. - Pi**2 + 4. * Pi**2 * nuw) / (2. * (-1. + 2. * nuw) * ((-6. + Pi**2) * t * Ew + 6. * D * Pi**2 * (1. + nuw)))
+        c43 = 6. * Pi**2  * (-1 + nuw) * Ew / (t * (-1. + 2. * nuw) * ((-6 + Pi**2) * t * Ew + 6. * D * Pi**2 * (1. + nuw)))
+
+        c46 = - 6. * D * Pi**2 * (1. + nuw) / ((-6. + Pi**2) * t * Ew + 6. * D * Pi**2 * (1. + nuw))
+        
+        c48 = 6. * Pi * Ew / ((-1. + 2. * nuw ) * ((-6 + Pi**2) * t * Ew + 6. * D * Pi**2 * (1. + nuw)))
+
+        c49 = - 6. * Pi**3 * (-1. + nuw) * Ew / (t * (-1. + 2. * nuw ) * ((-6 + Pi**2) * t * Ew + 6. * D * Pi**2 * (1. + nuw)))
+
+        c61 = - 3. * Pi**2 * (2 * B + A * (  t)) * Ew * (-1. + 2. * nuw) \
+                / (t * ((-6 + Pi**2) * t * (4. * C + (  t) * (4. * B + A * (  t))) * Ew * (-1. + nuw) - 12. * (B**2 - A * C) * Pi**2 * (-1. + nuw + 2. * nuw**2)))
+
+                
+        c64 = (Ew * ( (-6) *B* ( 8 + Pi**2) - 8 * D * ( -6 + Pi**2) * t - 3 * A * ( 8 + Pi**2) * t + 4 * ( 6 * B * Pi**2 + 3 * A * Pi**2 * t + 2 * D * (-6 + Pi**2) * t) * nuw) + 24 * A * D * Pi**2 * (-1 + nuw + 2 * nuw**2)) \
+                / (2 * (-6 + Pi**2) * t * ( 4*C + t*(4 * B + A * t)) * Ew * (-1 + nuw) - 24 * ( B**2 - A * C) * Pi**2 * (-1 + nuw + 2*nuw**2))
+
+        c65 = (4. * D * ((-6. + Pi**2) * t * Ew * (-1 + nuw) + 3. * A * Pi**2 * (-1. + nuw + 2. * nuw**2))) \
+                / ((-6. + Pi**2) * t * (4. * C + (  t) * (4. * B + A * (  t))) * Ew * (-1. + nuw) - 12. * (B**2 - A * C) * Pi**2 * (-1. + nuw + 2. * nuw**2)) 
+
+
+
+        c67 = 3. * Pi**3 * (2. * B + A * (  t) )* Ew * (-1 + 2. * nuw) \
+                / (t * ((-6. + Pi**2) * t * (4. * C + (  t) * (4. * B + A * (  t))) * Ew * ( -1. + nuw) - 12. * (B**2 - A * C) * Pi**2 * ( -1. + nuw + 2. * nuw**2)))
+        
+
+
+        
+        c6X = 6. * Pi * (2. * B + A * (  t)) * Ew \
+                / (-((-6. + Pi**2) * t * (4. * C + (  t) * (4. * B + A * (  t))) * Ew * (-1. + nuw)) + 12. * (B**2 - A * C) * Pi**2 * (-1. + nuw + 2. * nuw**2))
+
+        c81 = - 3. * Pi * (4. * C +  (  t) * (4. * B + A * (  t))) * Ew * (-1. + 2. * nuw) \
+                / (t * ((-6. + Pi**2) * t * ( 4. * C + (  t) * (4. * B + A * (  t))) * Ew * (-1. + nuw) - 12. * (B**2 - A * C) * Pi**2 * (-1 + nuw + 2. * nuw**2)))
+
+        c84 = (Pi * (24. * (2. * B**2 - 2. * B * D * t - A * (2. * C + D * t * (  t)) + D * t * (2. * B + A * (  t)) * nuw)* (-1. + nuw + 2. * nuw**2) + \
+                t*(4. * C + (  t) * (4. * B + A * (  t)))* Ew * ( 7. - 19. * nuw + 12. * nuw**2) )) \
+                / (2. * t * (-1. + nuw) * ((-6. + Pi**2) * t * (4. * C + (  t) * ( 4. * B + A * (  t))) * Ew * (-1. + nuw) - 12.* ( B**2 - A * C) * Pi**2 * (-1. + nuw +2. * nuw**2)))
+        c85 = -12. * D * Pi * ( 2. * B + A * (  t)) * (1. + nuw) * (-1. + 2. * nuw) \
+                / (-((-6. + Pi**2) * t * (4. * C + (  t) * ( 4. * B + A * (  t))) * Ew * (-1. + nuw) ) + 12. * ( B**2 - A * C) * Pi**2 * (-1. + nuw + 2. * nuw**2))
+        
+        
+        c87 = Pi**4 * (-1. + 2. * nuw) * (t * ( 4. * C + (  t) * (4. * B + A * (  t))) * Ew * (-1. + nuw) - 12 * (B**2 - A * C) * (-1. + nuw + 2. * nuw**2)) \
+                / (2. * t**2  * (-1 + nuw) * ((-6. + Pi**2) * t * (4. * C + (  t) * (4. * B + A * (  t))) * Ew * ( -1. + nuw) - 12. * (B**2 - A * C) * Pi**2 * ( -1. + nuw + 2. * nuw**2)))
+        
+        
+        
+        c8X =- 6. * (4. * C + (  t) * (4. * B + A * (  t))) * Ew \
+                / ((-6. + Pi**2) * t * (4. * C + (  t) * (4. * B + A * (  t))) * Ew * ( -1. + nuw) - 12. * (B**2 - A * C) * Pi**2 * ( -1. + nuw + 2. * nuw**2))
+
+        cX2 = - Pi * (24. * D * (1. + nuw) + Ew * (t + 12. * t * nuw))\
+                / (t * (-1. + 2. * nuw) * ((-6 + Pi**2) * t* Ew + 6. * D * Pi**2 * (1 + nuw)))
+        cX3 = - 12. * Pi * Ew * (-1 + nuw) / (t * (-1. + 2. * nuw) * ((-6 + Pi**2) * t* Ew + 6. * D * Pi**2 * (1 + nuw)))
+        cX6 = 12. * D * Pi * (1. + nuw) / ((-6 + Pi**2)*t * Ew + 6. * D * Pi**2 * (1. + nuw))
+        cX8 = -12. * Ew \
+                / ((-1. + 2. * nuw) * ((-6 + Pi**2) * t* Ew + 6. * D * Pi**2 * (1 + nuw)))
+        cX9 = 2. * Pi**4 *(-1. + nuw) * (t*Ew + 6. * D * (1+nuw)) \
+                / (t**2 * (-1. + 2. * nuw) * ((-6 + Pi**2) * t* Ew + 6. * D * Pi**2 * (1 + nuw)))
+
+        SystemMatrixC = [[  0,   1,   0,   0,   0,   0,   0,   0,   0,   0],
+                         [c21,   0,   0, c24, c25,   0, c27,   0,   0, c2X],
+                         [  0,   0,   0,   1,   0,   0,   0,   0,   0,   0],
+                         [  0, c42, c43,   0,   0, c46,   0, c48, c49,   0],
+                         [  0,   0,   0,   0,   0,   1,   0,   0,   0,   0],
+                         [c61,   0,   0, c64, c65,   0, c67,   0,   0, c6X],
+                         [  0,   0,   0,   0,   0,   0,   0,   1,   0,   0],
+                         [c81,   0,   0, c84, c85,   0, c87,   0,   0, c8X],
+                         [  0,   0,   0,   0,   0,   0,   0,   0,   0,   1],
+                         [  0, cX2, cX3,   0,   0, cX6,   0, cX8, cX9,   0]]
+        
+
+
+        self.sysmat = np.array(SystemMatrixC)
 
     def calc_eigensystem(self):
         """Calculate eigenvalues and eigenvectors of the system matrix."""
@@ -355,6 +533,7 @@ class Eigensystem:
         """Calculate the fundamental system of the problem."""
         self.calc_foundation_stiffness()
         self.calc_laminate_stiffness_matrix()
+        self.calc_stiffness_properties()
         self.calc_system_matrix()
         self.calc_eigensystem()
 
@@ -602,18 +781,43 @@ class Eigensystem:
                        self.evC.imag*np.cos(self.ewC.imag*x)
                        + self.evC.real*np.sin(self.ewC.imag*x))], axis=1)
         else:
-            # Abbreviations
-            H14 = 3*self.B11/self.A11*x**2
-            H24 = 6*self.B11/self.A11*x
-            H54 = -3*x**2 + 6*self.E0/(self.A11*self.kA55)
+            # Abbreviations for the unbedded segemnts in accordance with Mathematica script
+            H12 = 0.5 * self.kA55 *self.B11/self.E0*x**2
+            H13 = 0.5 * self.kA55 *self.B11/self.E0*x**2
+
+
+            H22 = self.kA55 * self.B11 / self.E0 * x
+            H23 = self.kA55 * self.B11 / self.E0 * x
+
+
+            H32 = x + 1 / 6 * self.A11 * self.kA55 / self.E0 *x**3
+            H33 =     1 / 6 * self.A11 * self.kA55 / self.E0 *x**3
+            H34 = -0.5 * x**2
+            
+            
+            H42 = 1 + 1 / 2 * self.A11 * self.kA55 / self.E0 * x**2
+            H43 = 1 / 2 * self.A11 * self.kA55 / self.E0 * x**2
+            H44 = - x
+
+
+            H52 = -1/2 * self.A11 * self.kA55 / self.E0 * x**2
+            H53 = 1 - 1/2 * self.A11 * self.kA55 / self.E0 * x**2
+            H54 = x
+
+
+            H62 = -self.A11 * self.kA55 / self.E0 * x
+            H63 = -self.A11 * self.kA55 / self.E0 * x
+            H64 = 1
+
+
             # Complementary solution matrix of free segments
             zh = np.array(
-                [[0,      0,      0,    H14,      1,      x],
-                 [0,      0,      0,    H24,      0,      1],
-                 [1,      x,   x**2,   x**3,      0,      0],
-                 [0,      1,    2*x, 3*x**2,      0,      0],
-                 [0,     -1,   -2*x,    H54,      0,      0],
-                 [0,      0,     -2,   -6*x,      0,      0]])
+                [[0,    H12,    H13,      0,      1,      x],
+                 [0,    H22,    H23,      0,      0,      1],
+                 [1,    H32,    H33,    H34,      0,      0],
+                 [0,    H42,    H43,    H44,      0,      0],
+                 [0,    H52,    H53,    H54,      0,      0],
+                 [0,    H62,    H63,    H64,      0,      0]])
 
         return zh
 
@@ -648,32 +852,50 @@ class Eigensystem:
         A11 = self.A11
         B11 = self.B11
         kA55 = self.kA55
+        D11 = self.D11
         E0 = self.E0
+        D = self.D
+
+        # Unpack weak layer properties
+        Ew = self.weak['E']
+        nuw = self.weak['nu']
+        rhoweak = self.weak['rho']
+
+        # Unpack layering  information
+        m = self.m
+        mz = self.mz
+
+        # Unpack general variables
+        g = self.g
+        Pi = np.pi
+
 
         # Unpack geometric properties
         h = self.h
         t = self.t
         zs = self.zs
 
-        # Assemble particular integral vectors
+        # Assemble particular integral vectors in accordance with Mathematica scripts
         if bed:
             zp = np.array([
-                [(qt + pt)/kt + h*qt*(h + t - 2*zs)/(4*kA55)
-                    + h*pt*(2*h + t)/(4*kA55)],
+                [- t * (2 * pt + (2 * g * m + g * t * rhoweak) * np.sin(np.deg2rad(phi))) * (1 + nuw) / (Ew) ],
                 [0],
-                [(qn + pn)/kn],
+                [t * (2 * (-pn  + g * m  * np.cos(np.deg2rad(phi)))  + g * t *np.cos(np.deg2rad(phi)) * rhoweak )* ( 1+nuw) * (-1 + 2 * nuw) / (2 * Ew * (-1 + nuw))],
                 [0],
-                [-(qt*(h + t - 2*zs) + pt*(2*h + t))/(2*kA55)],
+                [(2 * h * pt - g * (2 * mz + m *  t) *np.sin(np.deg2rad(phi))) / (2 * D)],
+                [0],
+                [-(8 * g * t**2 * np.sin(np.deg2rad(phi)) * rhoweak * ( 1 + nuw)) / (Pi**3 * Ew)],
+                [0],
+                [(4 * g * t**2 * np.cos(np.deg2rad(phi)) * rhoweak * (1 + nuw) * (-1 + 2 * nuw)) / (Pi**3 * Ew * (-1 + nuw))],
                 [0]])
         else:
             zp = np.array([
-                [(-3*(qt + pt)/A11 - B11*(qn + pn)*x/E0)/6*x**2],
-                [(-2*(qt + pt)/A11 - B11*(qn + pn)*x/E0)/2*x],
-                [-A11*(qn + pn)*x**4/(24*E0)],
-                [-A11*(qn + pn)*x**3/(6*E0)],
-                [A11*(qn + pn)*x**3/(6*E0)
-                 + ((zs - B11/A11)*qt - h*pt/2 - (qn + pn)*x)/kA55],
-                [(qn + pn)*(A11*x**2/(2*E0) - 1/kA55)]])
+                [D11/(2*E0) * (pt + qt) * x**2 + B11/(2*E0) * (h/2 * pt - zs * qt) * x**2 - B11/(6*E0) * (pn + qn) * x**3],
+                [D11/(  E0) * (pt + qt) * x    + B11/(  E0) * (h/2 * pt - zs * qt) * x    - B11/(2*E0) * (pn + qn) * x**2],
+                [-(pn+qn)/(2*kA55) * x**2 + B11/(6*E0) * (pt + qt) * x**3 + A11/(6 * E0)*(h/2 * pt - zs * qt) * x**3 - A11/(24*E0)*(pn+qn)*x**4],
+                [-(pn+qn)/(  kA55) * x    + B11/(2*E0) * (pt + qt) * x**2 + A11/(2 * E0)*(h/2 * pt - zs * qt) * x**2 - A11/( 6*E0)*(pn+qn)*x**3],
+                [- B11/(2*E0) * (pt+qt) * x**2 - A11/(2*E0) * (h/2 * pt - zs * qt) * x**2 + A11/(6*E0) * (pn + qn) * x**3],
+                [- B11/(  E0) * (pt+qt) * x    - A11/(  E0) * (h/2 * pt - zs * qt) * x    + A11/(2*E0) * (pn + qn) * x**2]])
 
         return zp
 
@@ -698,7 +920,7 @@ class Eigensystem:
         Returns
         -------
         z : ndarray
-            Solution vector (6xN) at position x.
+            Solution vector (6xN) or (10xN) at position x.
         """
         if isinstance(x, (list, tuple, np.ndarray)):
             z = np.concatenate([
