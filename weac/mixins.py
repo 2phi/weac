@@ -831,7 +831,7 @@ class SlabContactMixin:
             self.td = self.calc_lC()
         elif self.mode in ['D']:
             self.td = self.calc_lD()
-        print('td', self.td)
+        #print('td', self.td)
 
     def calc_touchdown_system(self,a,cf,ratio,phi):
         """Calculate touchdown"""
@@ -1486,7 +1486,7 @@ class OutputMixin:
         qt = self.calc_qt()
         # use +/- and us[0]/us[-1] according to system and phi
         # compute total external potential
-        Pi_ext = -qn*(segments['li'][0] + segments['li'][1])*np.average(w0) \
+        Pi_ext = - qn*(segments['li'][0] + segments['li'][1])*np.average(w0) \
             - qn*(L - (segments['li'][0] + segments['li'][1]))*self.tc
         # Ensure
         if self.system in ['pst-']:
@@ -1500,7 +1500,7 @@ class OutputMixin:
 
         return Pi_ext
 
-    def internal_potential(self, C, phi, L, pos, **segments):
+    def internal_potential(self, C, phi, L, **segments):
         """
         Compute total internal potential (pst only).
 
@@ -1548,15 +1548,42 @@ class OutputMixin:
                 + L*self.kn/2/nweak*np.sum([wi**2 for wi in wweak]) \
                 + L*self.kt/2/nweak*np.sum([ui**2 for ui in uweak])
         # energy share from substitute rotation spring
-        if self.mode in ['C','D']:
-            if pos in ['r', 'right']:
-                Pi_int += 1/2*M[-1]*(self.psi(zq)[-1])**2
-            elif pos in ['l', 'left']:
-                Pi_int += 1/2*M[0]*(self.psi(zq)[0])**2
-        if self.system not in ['pst-', '-pst']:
+        if self.system in ['pst-']:
+            Pi_int += 1/2*M[-1]*(self.psi(zq)[-1])**2
+        elif self.system in ['-pst']:
+            Pi_int += 1/2*M[0]*(self.psi(zq)[0])**2
+        else:
             print('Input error: Only pst-setup implemented at the moment.')
 
         return Pi_int
+
+    def total_potential(self, C, phi, L, **segments):
+        """
+        Returns total differential potential
+    
+        Arguments
+        ---------
+        C : ndarray
+            Matrix(6xN) of solution constants for a system of N
+            segements. Columns contain the 6 constants of each segement.
+        phi : float
+            Inclination of the slab (°).
+        L : float, optional
+            Total length of model (mm).
+        segments : dict
+            Dictionary with lists of touchdown booleans (tdi), segement
+            lengths (li), skier weights (mi), and foundation booleans
+            in the cracked (ki) and uncracked (k0) configurations.
+
+        Returns
+        -------
+        Pi : float
+            Total differential potential (Nmm).
+        """
+        Pi_int = self.internal_potential(C, phi, L, **segments)
+        Pi_ext = self.external_potential(C, phi, L, **segments)
+        
+        return Pi_int + Pi_ext
 
     def get_weaklayer_shearstress(self, x, z, unit='MPa', removeNaNs=False):
         """
