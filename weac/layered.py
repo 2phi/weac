@@ -21,7 +21,7 @@ class Layered(FieldQuantitiesMixin, SlabContactMixin, SolutionMixin, AnalysisMix
     analysis from AnalysisMixin().
     """
 
-    def __init__(self, system='pst-', layers=None, a=0, cf=0.5, ratio=16, phi=0):
+    def __init__(self, system='pst-', layers=None, L=1000, a=0, cf=0.5, phi=0):
         """
         Initialize model with user input.
 
@@ -44,4 +44,4 @@ class Layered(FieldQuantitiesMixin, SlabContactMixin, SolutionMixin, AnalysisMix
         self.set_beam_properties(layers if layers else [[240, 200], ])
         self.set_foundation_properties()
         self.calc_fundamental_system()
-        self.calc_touchdown_system(a,cf,ratio,phi)
+        self.calc_touchdown_system(L,a,cf,phi)

@@ -1,68 +1,70 @@
-"""
-Driver Code for Weac - PST
-"""
+"""Driver Code for Weac - PST system with touchdown and calculation of the energy release rate"""
 # Third party imports
 import numpy as np
+import matplotlib.pyplot as plt
 
 # Project imports
 import weac
 
-# === DEFINE SLAB LAYERING ============================================
+# Functions
+def plot_data(x, y1, name):
+    plt.plot(x, y1, label=name[:-4])
+    plt.xlabel(r'$\mathrm{crack\ length\ a\ (mm)}$')
+    plt.ylabel(r'$\mathrm{touchdown\ length\ \lambda\ (mm)}$')
+    plt.legend()
+    #plt.show()
+    plt.tight_layout()
+    plt.savefig('scratch/'+name)
+    plt.close()
 
-# Either use custom profile
-myprofile = [[126, 570]]  # (N) last slab layer above weak layer
+# System characteristics
+PST = '190208_BUN_PST1'
+rho = 247                                       # Slab density (kg/m3)
+height = 940                                    # Slab height (mm)
+totallength = 8500                              # Total length (mm)
+da = 100.0                                      # Crack length increment
+cracklength = np.arange(0.0,totallength,da)     # Crack length (mm)
+ccl = 770
+cal = 3400
+inclination = 0                                 # Slope inclination (°); pos angle downslope cut in pst-
+myprofile = [[rho,height]]                      # Slab layering
 
-# Or select a predefined profile from database
-# myprofile = 'medium'
+# Initiante postprocessing arrays
+Gdif = np.array([])
+#Pi = np.array([])
+td = np.array([])
 
-# Example with a crack cut from the right-hand side.
+for i in cracklength:
+    # Create model instance
+    pst_cut_right = weac.Layered(system='-pst', layers=myprofile, \
+            L=totallength, a=float(i), cf=1.0, phi=inclination)
+    # Obtain lists of segment lengths, locations of foundations, and position
+    seg_pst = pst_cut_right.calc_segments(
+        L=totallength)['crack']
+    # Assemble system of linear equations and solve the boundary-value problem for free constants.
+    C_pst = pst_cut_right.assemble_and_solve(
+        phi=inclination, **seg_pst)
+    # Prepare the output by rasterizing the solution vector at all horizontal positions xsl (slab)
+    xsl_pst, z_pst, xwl_pst = pst_cut_right.rasterize_solution(
+        C=C_pst, phi=inclination, num=totallength/10, **seg_pst)
+    # Calculate energy release rate
+    Gdif = np.append(Gdif, pst_cut_right.gdif(C_pst, inclination,**seg_pst)[0])
+    #Pi = np.append(Pi, pst_cut_right.total_potential(C_pst, phi=inclination, L=totallength, **seg_pst))
+    td = np.append(td, pst_cut_right.td)
+    # Plot contour
+    #weac.plot.contours(pst_cut_right, x=xsl_pst, z=z_pst, i=i, window=totallength, scale=50)
+    # Plot displacements
+    #weac.plot.displacements(pst_cut_right, x=xsl_pst, z=z_pst, i=i, **seg_pst)
+    # Plot stresses
+    #weac.plot.stresses(pst_cut_right, x=xsl_pst, z=z_pst, i=i, **seg_pst)
 
-# +-----------------------------+-----+
-# |                             |     |
-# |             1               |  2  |
-# |                             |     |
-# +-----------------------------+-----+
-#  |||||||||||||||||||||||||||||
-# --------------------------------------
+# Plot energy release rates
+plot_data(cracklength[1:-1],Gdif[1:-1],PST+'_G.png')
+# Plot touchdown length
+plot_data(cracklength,td,PST+'_td.png')
 
-# Input
-totallength = 5000                      # Total length (mm)
-cracklength = 2000.0                       # Crack length (mm)
-inclination = 0                      # Slope inclination (°)
-
-# === CREATE MODEL INSTANCES ==========================================
-# Propagation saw test cut from the right side with custom layering
-pst_cut_right = weac.Layered(system='pst-', layers=myprofile, \
-        a=cracklength, cf=1.0/3, ratio=16, phi=inclination)
-
-# === INSPECT LAYERING ================================================
-#weac.plot.slab_profile(pst_cut_right)
-
-# Obtain lists of segment lengths, locations of foundations,
-# and position and magnitude of skier loads from inputs. We
-# can choose to analyze the situtation before a crack appears
-# even if a cracklength > 0 is set by replacing the 'crack'
-# key thorugh the 'nocrack' key.
-seg_pst = pst_cut_right.calc_segments(
-    L=totallength)['crack']
-
-# Assemble system of linear equations and solve the
-# boundary-value problem for free constants.
-
-C_pst = pst_cut_right.assemble_and_solve(
-    phi=inclination, **seg_pst)
-
-# Prepare the output by rasterizing the solution vector at all
-# horizontal positions xsl (slab). The result is returned in the
-# form of the ndarray z. Also provides xwl (weak layer) that only
-# contains x-coordinates that are supported by a foundation.
-xsl_pst, z_pst, xwl_pst = pst_cut_right.rasterize_solution(
-    C=C_pst, phi=inclination, num=totallength/10, **seg_pst)
-
-plot = 1
-if plot:
-    # === VISUALIZE RESULTS =====================================
-    weac.plot.contours(pst_cut_right, x=xsl_pst, z=z_pst, window=totallength, scale=10)
-    weac.plot.displacements(pst_cut_right, x=xsl_pst, z=z_pst, **seg_pst)
-    weac.plot.stresses(pst_cut_right, x=xwl_pst, z=z_pst, **seg_pst)
-    weac.plot.section_forces(pst_cut_right, x=xsl_pst, z=z_pst, **seg_pst)
+# Save data to file
+data_td = np.column_stack((cracklength,td))
+np.savetxt('scratch/'+PST+'_td.txt', data_td)
+data_G = np.column_stack((cracklength,Gdif))
+np.savetxt('scratch/'+PST+'_G.txt', data_G)
