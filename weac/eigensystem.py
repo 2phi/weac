@@ -257,9 +257,6 @@ class Eigensystem:
         self.kn = E/self.t                              # Normal stiffness
         self.kt = G/self.t                              # Shear stiffness
 
-        # Weak-layer stiffness increment factor for collapse
-        self.ratio = ratio
-
     def get_ply_coordinates(self):
         """
         Calculate ply (layer) z-coordinates.
