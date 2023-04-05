@@ -88,9 +88,9 @@ Cite the repository as:
 Rosendahl, P. L. & Weissgraeber, P. (2022). Weak Layer Anticrack Nucleation Model (WEAC). Zenodo. https://doi.org/10.5281/zenodo.5773113
 ```
 
-Read the [📄 whitepaper](https://doi.org/10.5194/tc-17-1475-2023) for model derivations, illustrations, dimensions, material properties, and kinematics:
+Read the [📄 white paper](https://doi.org/10.5194/tc-17-1475-2023) for model derivations, illustrations, dimensions, material properties, and kinematics:
 
-- Weißgraeber, P. & Rosendahl, P. L. (2022). A closed-form model for layered snow slabs. The Cryosphere Discussions (preprint), https://doi.org/10.5194/tc-2022-140
+- Weißgraeber, P. & Rosendahl, P. L. (2023). A closed-form model for layered snow slabs. The Cryosphere, 17(4), 1475–1496. https://doi.org/10.5194/tc-17-1475-2023
 
 For more background info, please refer to the companion papers:
 
