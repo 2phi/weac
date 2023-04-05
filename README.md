@@ -79,7 +79,7 @@
 <!-- ABOUT THE PROJECT -->
 ## About the project
 
-WEAC implements closed-form analytical models for the [mechanical analysis of dry-snow slabs on compliant weak layers](https://doi.org/10.5194/tc-14-115-2020), the [prediction of anticrack onset](https://doi.org/10.5194/tc-14-131-2020), and, in particular, allows for the analysis of stratified snow covers. The model covers propagation saw tests (a), and uncracked (b) or cracked (c) skier-loaded buried weak layers.
+WEAC implements closed-form analytical models for the [mechanical analysis of dry-snow slabs on compliant weak layers](https://doi.org/10.5194/tc-14-115-2020), the [prediction of anticrack onset](https://doi.org/10.5194/tc-14-131-2020), and, in particular, allows for the [analysis of stratified snow covers](https://doi.org/10.5194/tc-17-1475-2023). The model covers propagation saw tests (a), and uncracked (b) or cracked (c) skier-loaded buried weak layers.
 
 <img src="https://github.com/2phi/weac/raw/main/img/systems.png" alt="Systems" width="500"/>
 
@@ -88,7 +88,7 @@ Cite the repository as:
 Rosendahl, P. L. & Weissgraeber, P. (2022). Weak Layer Anticrack Nucleation Model (WEAC). Zenodo. https://doi.org/10.5281/zenodo.5773113
 ```
 
-Read the [📄 whitepaper](https://doi.org/10.5194/tc-2022-140) for model derivations, illustrations, dimensions, material properties, and kinematics:
+Read the [📄 whitepaper](https://doi.org/10.5194/tc-17-1475-2023) for model derivations, illustrations, dimensions, material properties, and kinematics:
 
 - Weißgraeber, P. & Rosendahl, P. L. (2022). A closed-form model for layered snow slabs. The Cryosphere Discussions (preprint), https://doi.org/10.5194/tc-2022-140
 
@@ -250,7 +250,7 @@ See the [open issues](https://github.com/2phi/weac/issues) for a list of propose
 <!-- LICENSE -->
 ## License
 
-Copyright 2phi GbR, 2020-2022.
+Copyright 2phi GbR, 2020-2023.
 
 We currently do not offer an open source license. Please contact us for private licensing options.
 

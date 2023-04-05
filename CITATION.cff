@@ -33,11 +33,11 @@ preferred-citation:
   - family-names: "Rosendahl"
     given-names: "Philipp Laurens"
     orcid: "https://orcid.org/0000-0002-6587-875X"
-  doi: "10.5194/tc-2022-140"
+  doi: "10.5194/tc-17-1475-2023" 
   journal: "The Cryosphere"
-  start: 0 # First page number
-  end: 0 # Last page number
+  start: 1475 # First page number
+  end: 1496 # Last page number
   title: "A closed-form model for layered snow slabs"
-  issue: 1
-  volume: 0
-  year: 2022
+  issue: 4
+  volume: 17
+  year: 2023
