@@ -173,7 +173,7 @@ def slab_profile(instance):
     ax1.set_xlim(500, 0)
 
     ax1.fill_betweenx(y, 0, x)
-    
+
     # Save figure
     save_plot(name='profile')
 
@@ -188,7 +188,8 @@ def slab_profile(instance):
 
 def deformed(instance, xsl, xwl, z, phi, dz=2, scale=100,
              window=np.inf, pad=2, levels=300, aspect=2,
-             field='principal', normalize=True, dark=False):
+             field='principal', normalize=True, dark=False,
+             filename='cont'):
     """
     Plot 2D deformed solution with displacement or stress fields.
 
@@ -387,7 +388,10 @@ def deformed(instance, xsl, xwl, z, phi, dz=2, scale=100,
                  label=label, aspect=35)
 
     # Save figure
-    save_plot(name='cont')
+    save_plot(name=filename)
+
+    # Clear Canvas
+    plt.close()
 
     # Reset plot styles
     plt.rcdefaults()
@@ -401,6 +405,7 @@ def plot_data(
         ax2data=None, ax2label=None,
         labelpos=None, vlines=True,
         li=False, mi=False, ki=False,
+        mode=False, kR=False,
         xlabel=r'Horizontal position $x$ (cm)'):
     """Plot data. Base function."""
     # Figure setup
@@ -490,6 +495,9 @@ def plot_data(
     # Save figure
     save_plot(name)
 
+    # Clear canvas
+    plt.close()
+
     # Reset plot styles
     plt.rcdefaults()
 
@@ -497,7 +505,7 @@ def plot_data(
 # === PLOT WRAPPERS ===========================================================
 
 
-def displacements(instance, x, z, **segments):
+def displacements(instance, x, z, i, **segments):
     """Wrap for dispalcements plot."""
     data = [
         [x/10, instance.u(z, z0=0, unit='mm'), r'$u_0\ (\mathrm{mm})$'],
@@ -505,10 +513,10 @@ def displacements(instance, x, z, **segments):
         [x/10, instance.psi(z, unit='degrees'), r'$\psi\ (^\circ)$ '],
     ]
     plot_data(ax1label=r'Displacements', ax1data=data,
-              name='disp', **segments)
+              name='disp'+str(i), **segments)
 
 
-def section_forces(instance, x, z, **segments):
+def section_forces(instance, x, z, i, **segments):
     """Wrap section forces plot."""
     data = [
         [x/10, instance.N(z), r'$N$'],
@@ -516,17 +524,17 @@ def section_forces(instance, x, z, **segments):
         [x/10, instance.V(z), r'$V$']
     ]
     plot_data(ax1label=r'Section forces', ax1data=data,
-              name='forc', **segments)
+              name='forc'+str(i), **segments)
 
 
-def stresses(instance, x, z, **segments):
+def stresses(instance, x, z, i, **segments):
     """Wrap stress plot."""
     data = [
         [x/10, instance.tau(z, unit='kPa'), r'$\tau$'],
         [x/10, instance.sig(z, unit='kPa'), r'$\sigma$']
     ]
     plot_data(ax1label=r'Stress (kPa)', ax1data=data,
-              name='stress', **segments)
+              name='stress'+str(i), **segments)
 
 
 def stress_criteria(x, stress, **segments):
@@ -605,7 +613,7 @@ def save_plot(name):
     name : string
         Name for the figure.
     """
-    filename = name + '.pdf'
+    filename = name + '.png'
     # Show figure if on jupyter notebook
     if isnotebook():
         plt.show()
