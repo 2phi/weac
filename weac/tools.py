@@ -142,6 +142,32 @@ def gerling(rho, C0=6.0, C1=4.6):
     """
     return C0*1e-10*rho**C1
 
+
+def bergfeld(rho, rho0=917, C0=6.5, C1=4.4):
+    """
+    Compute Young's modulus from density according to Bergfeld et al. (2023).
+
+    Arguments
+    ---------
+    rho : float or ndarray
+        Density (kg/m^3).
+    rho0 : float, optional
+        Density of ice (kg/m^3). Default is 917.
+    C0 : float, optional
+        Multiplicative constant of Young modulus parametrization
+        according to Bergfeld et al. (2023). Default is 6.5.
+    C1 : float, optional
+        Exponent of Young modulus parameterization according to
+        Bergfeld et al. (2023). Default is 4.4.
+
+    Returns
+    -------
+    E : float or ndarray
+        Young's modulus (MPa).
+    """
+    return C0*1e3*(rho/rho0)**C1
+
+
 def tensile_strength_slab(rho, unit='kPa'):
     """
     Estimate the tensile strenght of a slab layer from its density.

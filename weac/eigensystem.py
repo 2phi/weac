@@ -6,7 +6,7 @@
 import numpy as np
 
 # Project imports
-from weac.tools import gerling, calc_center_of_gravity, load_dummy_profile
+from weac.tools import bergfeld, calc_center_of_gravity, load_dummy_profile
 
 
 class Eigensystem:
@@ -180,7 +180,7 @@ class Eigensystem:
         if update:
             self.calc_fundamental_system()
 
-    def set_beam_properties(self, layers, phi=0, C0=6.0, C1=4.60,
+    def set_beam_properties(self, layers, phi=0, C0=6.5, C1=4.4,
                             nu=0.25, update=False):
         """
         Set material and properties geometry of beam (slab).
@@ -196,10 +196,10 @@ class Eigensystem:
             Inclination of the slab (degrees).
         C0 : float, optional
             Multiplicative constant of Young modulus parametrization
-            according to Gerling et al. (2017). Default is 6.0.
+            according to Bergfeld et al. (2023). Default is 6.0.
         C1 : float, optional
             Exponent of Young modulus parameterization according to
-            Gerling et al. (2017). Default is 4.6.
+            Bergfeld et al. (2023). Default is 4.6.
         nu : float, optional
             Possion's ratio. Default is 0.25
         update : bool, optional
@@ -212,7 +212,7 @@ class Eigensystem:
         else:
             # Compute Young's modulus from density parametrization
             layers = np.array(layers)
-            E = gerling(layers[:, 0], C0=C0, C1=C1)  # Young's modulus
+            E = bergfeld(layers[:, 0], C0=C0, C1=C1)  # Young's modulus
 
         # Derive other elastic properties
         nu = nu*np.ones(layers.shape[0])         # Global poisson's ratio
