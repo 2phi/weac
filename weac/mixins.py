@@ -7,6 +7,7 @@ from functools import partial
 
 # Third party imports
 import numpy as np
+from scipy.optimize import brentq
 from scipy.integrate import romberg, cumulative_trapezoid
 
 # Module imports
@@ -495,48 +496,6 @@ class SlabContactMixin:
     cracklength-tresholds and element lengths.
     """
     # pylint: disable=too-many-instance-attributes
-    def bisection(self, f, a, b, tol=1e-3, max_iter=100):
-        """
-        Find a root of function f in the interval [a, b] using the bisection method.
-
-        Parameters
-        ----------
-        f : function
-            The function to find a root of.
-        a, b : float
-            The interval in which to search for a root.
-        tol : float, optional
-            The desired tolerance for the root.
-        max_iter : int, optional
-            The maximum number of iterations to perform.
-
-        Returns
-        -------
-        root : float or None
-            The estimated root of the function, or None if no root was found
-            within the given number of iterations.
-        """
-        # Ensure that the sign of f(a) and f(b) are different
-        fa, fb = f(a), f(b)
-        if fa * fb >= 0:
-            return fb
-        # Perform the bisection method
-        for i in range(max_iter):
-            c = (a + b) / 2
-            fc = f(c)
-            # Check if we have found a root
-            if abs(c-b) < tol:
-                return c
-            # Update the interval to search in
-            if fa * fc < 0:
-                b = c
-                fb = fc
-            else:
-                a = c
-                fa = fc
-        # If we haven't found a root, raise an error
-        raise ValueError("Bisection method did not converge \
-                        within the maximum number of iterations.")
 
     def set_columnlength(self,L):
         """
@@ -567,7 +526,7 @@ class SlabContactMixin:
         Arguments
         ---------
         cf : float
-            Collapse-factor. Ratio of the collapsed to the
+            Collapse-factor. Ratio of the crack height to the
             uncollapsed weak-layer height.
         """
         # subtract displacement under constact load from collapsed wl height
@@ -651,12 +610,13 @@ class SlabContactMixin:
                     'mi': np.array([0]), \
                     'ki': np.array([True,  True])}
         # solve system of equations
-        constants = self.assemble_and_solve(phi=self.phi, **segments)
+        constants = self.assemble_and_solve(phi=0, **segments)
         # calculate stiffness
         xsl_pst, z_pst, xwl_pst = self.rasterize_solution(
-            C=constants, phi=self.phi, num=1, **segments)
+            C=constants, phi=0, num=1, **segments)
         _ = xsl_pst, xwl_pst
         if dof in ['rot']:
+            # print('psi: ', self.psi(z_pst)[0])
             k = abs(1/self.psi(z_pst)[0])
         if dof in ['trans']:
             k = abs(1/self.w(z_pst)[0])
@@ -692,6 +652,8 @@ class SlabContactMixin:
             # Spring stiffness supported segment
             kRl= self.substitute_stiffness(L-x, 'supported', 'rot')
             kNl = self.substitute_stiffness(L-x, 'supported', 'trans')
+            # print('kNl:', kNl)
+            # print('kRl:', kRl)
             c1 = 1/(8*bs)
             c2 = 1/(2*kRl)
             c3 = 1/(2*ss)
@@ -699,8 +661,8 @@ class SlabContactMixin:
             c5 = -tc/qn
             return c1*x**4 + c2*x**3 + c3*x**2 + c4*x + c5
 
-        # Call bisection method
-        a1 = self.bisection(polynomial,0.001,0.99*L)
+        # Find root
+        a1 = brentq(polynomial, L/1000, 999/1000*L)
 
         return a1
 
@@ -742,8 +704,8 @@ class SlabContactMixin:
             c7 = - 144*bs**2*ss*kRl*kNl*tc
             return c1*x**6 + c2*x**5 + c3*x**4 + c4*x**3 + c5*x**2 + c6*x + c7
 
-        # Call bisection method
-        a2 = self.bisection(polynomial,0,0.99*L)
+        # Find root
+        a2 = brentq(polynomial, L/1000, 999/1000*L)
 
         return a2
 
@@ -806,8 +768,8 @@ class SlabContactMixin:
             c7 = - 144*bs**2*ss*kNl*tc*(kRl + kRr)
             return c1*x**6 + c2*x**5 + c3*x**4 + c4*x**3 + c5*x**2 + c6*x + c7
 
-        # Call bisection method
-        lC = self.bisection(polynomial,1,0.99*L)
+        # Find root
+        lC = brentq(polynomial, a/1000, 999/1000*a)
 
         return lC
 
@@ -830,8 +792,7 @@ class SlabContactMixin:
         elif a2 < self.a:
             mode = 'C'
         self.mode = mode
-        #print('transitions at', a1, a2)
-        #print('stage', mode)
+        # print('transitions at', a1, a2)
 
     def calc_touchdown_length(self):
         """Calculate touchdown length"""
@@ -1206,14 +1167,14 @@ class SolutionMixin:
         for i in range(nS):
             # Length, foundation and position of segment i
             l, k, pos = li[i], ki[i], pi[i]
-            # Set displacement BC in stages B and C
-            if not k and bool(self.mode in ['B', 'C']):
+            # Set displacement BC in stage B
+            if not k and bool(self.mode in ['B']):
                 if i==0:
                     rhs[:3] = np.vstack([0,0,self.tc])
                 if i == (nS - 1):
                     rhs[-3:] = np.vstack([0,0,self.tc])
-            # Set normal force and displacement BC for stage D
-            if not k and bool(self.mode in ['D']):
+            # Set normal force and displacement BC for stage C
+            if not k and bool(self.mode in ['C']):
                 N = self.calc_qt()*(self.a-self.td)
                 if i==0:
                     rhs[:3] = np.vstack([-N,0,self.tc])
@@ -1223,9 +1184,11 @@ class SolutionMixin:
         # Rhs for substitute spring stiffness
         if self.system in ['rot']:
             # apply arbitrary moment of 1 at left boundary
+            rhs = rhs*0
             rhs[1] = 1
         if self.system in ['trans']:
             # apply arbitrary force of 1 at left boundary
+            rhs = rhs*0
             rhs[2] = 1
 
         # --- SOLVE -----------------------------------------------------------
