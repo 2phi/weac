@@ -14,6 +14,9 @@ identifiers:
   - description: Collection of archived snapshots of all versions of WEAC
     type: doi
     value: 10.5281/zenodo.5773113
+  - description: Release v2.4 for the analysis of slope-normal and vertical PST boundary conditions
+    type: doi
+    value: 10.5281/zenodo.10555144
   - description: Release v2.2 with consistent coordinate systems
     type: doi
     value: 10.5281/zenodo.5907134
