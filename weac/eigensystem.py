@@ -96,11 +96,12 @@ class Eigensystem:
 
         Arguments
         ---------
-        system : {'pst-', '-pst', 'skier', 'skiers'}, optional
+        system : {'pst-', '-pst', 'vpst-', '-vpst', 'skier', 'skiers'}, optional
             Type of system to analyse: PST cut from the right (pst-),
-            PST cut form the left (-pst), one skier on infinite
-            slab (skier) or multiple skiers on infinite slab (skeirs).
-            Default is 'pst-'.
+            PST cut form the left (-pst), PST with vertical faces cut
+            from the right (vpst-), PST with vertical faces cut from the
+            left (-vpst), one skier on infinite slab (skier) or multiple
+            skiers on infinite slab (skiers). Default is 'pst-'.
         layers : list, optional
             2D list of layer densities and thicknesses. Columns are
             density (kg/m^3) and thickness (mm). One row corresponds
@@ -110,7 +111,7 @@ class Eigensystem:
         self.g = 9810           # Gravitaiton (mm/s^2)
         self.lski = 1000        # Effective out-of-plane length of skis (mm)
         self.tol = 1e-3         # Relative Romberg integration tolerance
-        self.system = system    # 'pst-', '-pst', 'skier', 'skiers'
+        self.system = system    # 'pst-', '-pst', 'vpst-', '-vpst', 'skier', 'skiers'
 
         # Initialize weak-layer attributes that will be filled later
         self.weak = False       # Weak-layer properties dictionary
@@ -141,9 +142,9 @@ class Eigensystem:
         self.sR = False         # Stability shift of real eigenvalues
 
         # Initialize touchdown attributes
+        self.touchdown = False  # Flag whether touchdown is possible
         self.lC = False         # Minimum length of substratum contact (mm)
-        self.lS = False         # Maximum length of span between
-                                # between bedded and touchdowned boundary (mm)
+        self.lS = False         # Maximum span between bedded and touchdown (mm)
         self.ratio = False      # Stiffness ratio of collalpsed to uncollapsed weak-layer
         self.beta = False       # Ratio of slab to bedding stiffness
 
@@ -221,7 +222,7 @@ class Eigensystem:
 
         # Compute total slab thickness and center of gravity
         self.h, self.zs = calc_center_of_gravity(layers)
-
+        
         # Assemble layering into matrix (top to bottom)
         # Columns are density (kg/m^3), layer thickness (mm)
         # Young's modulus (MPa), shear modulus (MPa), and
@@ -509,15 +510,19 @@ class Eigensystem:
                 First coefficient for sixth order term,
                 second coefficient for fith order term and so on.
             """
-            a1 = self.kA55**2*kR1*kN1*q0
-            a2 = 6*self.kA55*(self.D11*self.kA55 + kR1*kR2)*kN1*q0
-            a3 = 30*self.D11*self.kA55*(kR1 + kR2)*kN1*q0
-            a4 = 24*self.D11*(2*self.kA55**2*kR1 + 3*self.D11*self.kA55*kN1 + 3*kR1*kR2*kN1)*q0
-            a5 = 72*self.D11*(self.D11*(self.kA55**2 + (kR1 + kR2)*kN1)*q0 \
-                + self.kA55*kR1*(2*kR2*q0 - self.kA55*kN1*self.tc))
-            a6 = 144*self.D11*self.kA55*(self.D11*(kR1 + kR2)*q0 \
-                - (self.D11*self.kA55 + kR1*kR2)*kN1*self.tc)
-            a7 = - 144*self.D11**2*self.kA55*(kR1 + kR2)*kN1*self.tc
+            kA55 = self.kA55
+            D11 = self.D11
+            tc = self.tc
+            
+            a1 = kA55**2*kR1*kN1*q0
+            a2 = 6*kA55*(D11*kA55 + kR1*kR2)*kN1*q0
+            a3 = 30*D11*kA55*(kR1 + kR2)*kN1*q0
+            a4 = 24*D11*(2*kA55**2*kR1 + 3*D11*kA55*kN1 + 3*kR1*kR2*kN1)*q0
+            a5 = 72*D11*(D11*(kA55**2 + (kR1 + kR2)*kN1)*q0 \
+                + kA55*kR1*(2*kR2*q0 - kA55*kN1*tc))
+            a6 = 144*D11*kA55*(D11*(kR1 + kR2)*q0 \
+                - (D11*kA55 + kR1*kR2)*kN1*tc)
+            a7 = - 144*D11**2*kA55*(kR1 + kR2)*kN1*tc
             return [a1,a2,a3,a4,a5,a6,a7]
 
         # Get spring stiffnesses for adjacent segment with intact weak-layer
@@ -692,7 +697,7 @@ class Eigensystem:
         A11 = self.A11
         B11 = self.B11
         kA55 = self.kA55
-        E0 = self.K0
+        K0 = self.K0
 
         # Unpack geometric properties
         h = self.h
@@ -711,13 +716,13 @@ class Eigensystem:
                 [0]])
         else:
             zp = np.array([
-                [(-3*(qt + pt)/A11 - B11*(qn + pn)*x/E0)/6*x**2],
-                [(-2*(qt + pt)/A11 - B11*(qn + pn)*x/E0)/2*x],
-                [-A11*(qn + pn)*x**4/(24*E0)],
-                [-A11*(qn + pn)*x**3/(6*E0)],
-                [A11*(qn + pn)*x**3/(6*E0)
+                [(-3*(qt + pt)/A11 - B11*(qn + pn)*x/K0)/6*x**2],
+                [(-2*(qt + pt)/A11 - B11*(qn + pn)*x/K0)/2*x],
+                [-A11*(qn + pn)*x**4/(24*K0)],
+                [-A11*(qn + pn)*x**3/(6*K0)],
+                [A11*(qn + pn)*x**3/(6*K0)
                  + ((zs - B11/A11)*qt - h*pt/2 - (qn + pn)*x)/kA55],
-                [(qn + pn)*(A11*x**2/(2*E0) - 1/kA55)]])
+                [(qn + pn)*(A11*x**2/(2*K0) - 1/kA55)]])
 
         return zp
 

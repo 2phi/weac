@@ -349,7 +349,7 @@ def deformed(instance, xsl, xwl, z, phi, dz=2, scale=100,
              'k', linewidth=1)
 
     # Plot deformed weak-layer outline
-    if instance.system in ['-pst', 'pst-']:
+    if instance.system in ['-pst', 'pst-', '-vpst', 'vpst-']:
         nanmask = np.isfinite(xwl)
         plt.plot(outline(Xwl[:, nanmask] + scale*Uwl[:, nanmask]),
                  outline(Zwl[:, nanmask] + scale*Wwl[:, nanmask]),

@@ -4,13 +4,12 @@
 # Standard library imports
 from functools import partial
 
-
 # Third party imports
 import numpy as np
 from scipy.integrate import romberg, cumulative_trapezoid
 
 # Module imports
-from weac.tools import tensile_strength_slab
+from weac.tools import tensile_strength_slab, calc_vertical_bc_center_of_gravity
 
 
 class FieldQuantitiesMixin:
@@ -510,15 +509,16 @@ class SolutionMixin:
             A - free end, B - intermediate touchdown,
             C - full touchdown (maximum clamped end).
         """
-        # Classify boundary type by element length
-        if l <= self.lC:
-            mode = 'A'
-        elif self.lC < l <= self.lS:
-            mode = 'B'
-        elif self.lS < l:
-            mode = 'C'
-
-        return mode
+        if self.touchdown:
+            # Classify boundary type by element length
+            if l <= self.lC:
+                return 'A'
+            elif self.lC < l <= self.lS:
+                return 'B'
+            elif self.lS < l:
+                return 'C'
+        else:
+            return 'A'
 
     def reduce_stiffness(self, l=0, mode='A'):
         """
@@ -586,28 +586,39 @@ class SolutionMixin:
             if not k:
                 if mode in ['A']:
                     # Free end
-                    bc = np.array([self.N(z),
-                                   self.M(z),
-                                   self.V(z)
-                                   ])
+                    bc = np.array([
+                        self.N(z),
+                        self.M(z),
+                        self.V(z)
+                    ])
                 elif mode in ['B', 'C'] and pos in ['r', 'right']:
                     # Touchdown right
-                    bc = np.array([self.N(z),
-                                   self.M(z) + kf*kR*self.psi(z),
-                                   self.w(z)
-                                   ])
+                    bc = np.array([
+                        self.N(z),
+                        self.M(z) + kf*kR*self.psi(z),
+                        self.w(z)
+                    ])
                 elif mode in ['B', 'C'] and pos in ['l', 'left']:
                     # Touchdown left
-                    bc = np.array([self.N(z),
-                                   self.M(z) - kf*kR*self.psi(z),
-                                   self.w(z)
-                                   ])
+                    bc = np.array([
+                        self.N(z),
+                        self.M(z) - kf*kR*self.psi(z),
+                        self.w(z)
+                    ])
             else:
                 # Free end
-                bc = np.array([self.N(z),
-                                self.M(z),
-                                self.V(z)
-                                ])
+                bc = np.array([
+                    self.N(z),
+                    self.M(z),
+                    self.V(z)
+                ])
+        # Set boundary conditions for PST-systems with vertical faces
+        elif self.system in ['-vpst', 'vpst-']:
+            bc = np.array([
+                self.N(z),
+                self.M(z),
+                self.V(z)
+            ])
         # Set boundary conditions for SKIER-systems
         elif self.system in ['skier', 'skiers']:
             # Infinite end (vanishing complementary solution)
@@ -653,40 +664,40 @@ class SolutionMixin:
         """
         if pos in ('l', 'left'):
             eqs = np.array([
-                self.bc(zl, l, k, pos)[0],             # Left boundary condition
-                self.bc(zl, l, k, pos)[1],             # Left boundary condition
-                self.bc(zl, l, k, pos)[2],             # Left boundary condition
-                self.u(zr, z0=0),           # ui(xi = li)
-                self.w(zr),                 # wi(xi = li)
-                self.psi(zr),               # psii(xi = li)
-                self.N(zr),                 # Ni(xi = li)
-                self.M(zr),                 # Mi(xi = li)
-                self.V(zr)])                # Vi(xi = li)
+                self.bc(zl, l, k, pos)[0],      # Left boundary condition
+                self.bc(zl, l, k, pos)[1],      # Left boundary condition
+                self.bc(zl, l, k, pos)[2],      # Left boundary condition
+                self.u(zr, z0=0),               # ui(xi = li)
+                self.w(zr),                     # wi(xi = li)
+                self.psi(zr),                   # psii(xi = li)
+                self.N(zr),                     # Ni(xi = li)
+                self.M(zr),                     # Mi(xi = li)
+                self.V(zr)])                    # Vi(xi = li)
         elif pos in ('m', 'mid'):
             eqs = np.array([
-                -self.u(zl, z0=0),          # -ui(xi = 0)
-                -self.w(zl),                # -wi(xi = 0)
-                -self.psi(zl),              # -psii(xi = 0)
-                -self.N(zl),                # -Ni(xi = 0)
-                -self.M(zl),                # -Mi(xi = 0)
-                -self.V(zl),                # -Vi(xi = 0)
-                self.u(zr, z0=0),           # ui(xi = li)
-                self.w(zr),                 # wi(xi = li)
-                self.psi(zr),               # psii(xi = li)
-                self.N(zr),                 # Ni(xi = li)
-                self.M(zr),                 # Mi(xi = li)
-                self.V(zr)])                # Vi(xi = li)
+                -self.u(zl, z0=0),              # -ui(xi = 0)
+                -self.w(zl),                    # -wi(xi = 0)
+                -self.psi(zl),                  # -psii(xi = 0)
+                -self.N(zl),                    # -Ni(xi = 0)
+                -self.M(zl),                    # -Mi(xi = 0)
+                -self.V(zl),                    # -Vi(xi = 0)
+                self.u(zr, z0=0),               # ui(xi = li)
+                self.w(zr),                     # wi(xi = li)
+                self.psi(zr),                   # psii(xi = li)
+                self.N(zr),                     # Ni(xi = li)
+                self.M(zr),                     # Mi(xi = li)
+                self.V(zr)])                    # Vi(xi = li)
         elif pos in ('r', 'right'):
             eqs = np.array([
-                -self.u(zl, z0=0),          # -ui(xi = 0)
-                -self.w(zl),                # -wi(xi = 0)
-                -self.psi(zl),              # -psii(xi = 0)
-                -self.N(zl),                # -Ni(xi = 0)
-                -self.M(zl),                # -Mi(xi = 0)
-                -self.V(zl),                # -Vi(xi = 0)
-                self.bc(zr, l, k, pos)[0],             # Right boundary condition
-                self.bc(zr, l, k, pos)[1],             # Right boundary condition
-                self.bc(zr, l, k, pos)[2]])            # Right boundary condition
+                -self.u(zl, z0=0),              # -ui(xi = 0)
+                -self.w(zl),                    # -wi(xi = 0)
+                -self.psi(zl),                  # -psii(xi = 0)
+                -self.N(zl),                    # -Ni(xi = 0)
+                -self.M(zl),                    # -Mi(xi = 0)
+                -self.V(zl),                    # -Vi(xi = 0)
+                self.bc(zr, l, k, pos)[0],      # Right boundary condition
+                self.bc(zr, l, k, pos)[1],      # Right boundary condition
+                self.bc(zr, l, k, pos)[2]])     # Right boundary condition
         else:
             raise ValueError(
                 (f'Invalid position argument {pos} given. '
@@ -719,10 +730,10 @@ class SolutionMixin:
             Used for system 'skiers'.
         L : float, optional
             Total length of model (mm). Used for systems 'pst-', '-pst',
-            and 'skier'.
+            'vpst-', '-vpst', and 'skier'.
         a : float, optional
-            Crack length (mm).  Used for systems 'pst-', '-pst', and
-            'skier'.
+            Crack length (mm). Used for systems 'pst-', '-pst',  'pst-',
+            '-pst', and 'skier'.
         phi : float, optional
             Inclination (degree).
         m : float, optional
@@ -752,12 +763,22 @@ class SolutionMixin:
             ki = np.array(ki)                           # Crack
             k0 = np.array(k0)                           # No crack
         elif self.system == 'pst-':
-            li = np.array([L - a, lU])                   # Segment lengths
+            li = np.array([L - a, lU])                  # Segment lengths
             mi = np.array([0])                          # Skier weights
             ki = np.array([True, False])                # Crack
             k0 = np.array([True, True])                 # No crack
         elif self.system == '-pst':
-            li = np.array([lU, L - a])                   # Segment lengths
+            li = np.array([lU, L - a])                  # Segment lengths
+            mi = np.array([0])                          # Skier weights
+            ki = np.array([False, True])                # Crack
+            k0 = np.array([True, True])                 # No crack
+        elif self.system == 'vpst-':
+            li = np.array([L - a, a])                   # Segment lengths
+            mi = np.array([0])                          # Skier weights
+            ki = np.array([True, False])                # Crack
+            k0 = np.array([True, True])                 # No crack
+        elif self.system == '-vpst':
+            li = np.array([a, L - a])                   # Segment lengths
             mi = np.array([0])                          # Skier weights
             ki = np.array([False, True])                # Crack
             k0 = np.array([True, True])                 # No crack
@@ -820,7 +841,7 @@ class SolutionMixin:
             raise ValueError('Make sure len(li)=N, len(ki)=N, and '
                              'len(mi)=N-1 for a system of N segments.')
 
-        if self.system not in ['pst-', '-pst']:
+        if self.system not in ['pst-', '-pst', 'vpst-', '-vpst']:
             # Boundary segments must be on foundation for infinite BCs
             if not all([ki[0], ki[-1]]):
                 raise ValueError('Provide supported boundary segments in '
@@ -885,17 +906,34 @@ class SolutionMixin:
         if self.system not in ['pst-', '-pst']:
             rhs[:3] = self.bc(self.zp(x=0, phi=phi, bed=ki[0]))
             rhs[-3:] = self.bc(self.zp(x=li[-1], phi=phi, bed=ki[-1]))
-
-        # Loop through segments to set touchdown at rhs
-        for i in range(nS):
-            # Length, foundation and position of segment i
-            l, k, pos = li[i], ki[i], pi[i]
-            mode = self.mode_td(l=l)
-            if not k and bool(mode in ['B', 'C']):
-                if i==0:
-                    rhs[:3] = np.vstack([0,0,self.tc])
-                if i == (nS - 1):
-                    rhs[-3:] = np.vstack([0,0,self.tc])
+            
+        # Set rhs for vertical faces
+        if self.system in ['vpst-', '-vpst']:
+            # Calculate center of gravity and mass of
+            # added or cut off slab segement
+            xs, zs, m = calc_vertical_bc_center_of_gravity(self.slab, phi)
+            # Convert slope angle to radians
+            phi = np.deg2rad(phi)
+            # Translate inbto section forces and moments
+            N = -self.g*m*np.sin(phi)
+            M = -self.g*m*(xs*np.cos(phi) + zs*np.sin(phi))
+            V = self.g*m*np.cos(phi)
+            # Add to right-hand side
+            rhs[:3] = np.vstack([N, M, V])          # left end
+            rhs[-3:] = np.vstack([N, M, V])         # right end
+            
+        # Set touchdown boundary conditions
+        elif self.system in ['pst-', '-pst']:
+            # Loop through segments to set touchdown at rhs
+            for i in range(nS):
+                # Length, foundation and position of segment i
+                l, k, pos = li[i], ki[i], pi[i]
+                mode = self.mode_td(l=l)
+                if not k and bool(mode in ['B', 'C']):
+                    if i==0:
+                        rhs[:3] = np.vstack([0,0,self.tc])
+                    if i == (nS - 1):
+                        rhs[-3:] = np.vstack([0,0,self.tc])
 
         # --- SOLVE -----------------------------------------------------------
 
@@ -1091,7 +1129,7 @@ class AnalysisMixin:
             # Solution at crack tip
             z = self.z(li[idx], C[:, [idx]], li[idx], phi, bed=ki[idx])
             # Mode I and II differential energy release rates
-            Gdif[1:, j] = self.Gi(z, unit=unit), self.Gii(z, unit=unit)
+            Gdif[1:, j] = np.concatenate((self.Gi(z, unit=unit), self.Gii(z, unit=unit)))
 
         # Sum mode I and II contributions
         Gdif[0, :] = Gdif[1, :] + Gdif[2, :]

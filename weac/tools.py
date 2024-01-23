@@ -49,6 +49,7 @@ def load_dummy_profile(profile_id):
         'e':      [hard,   soft,   soft],
         'f':      [soft,   soft,   hard],
         # Homogeneous
+        'h':      [medium,   medium,   medium],
         'soft':   [soft,   soft,   soft],
         'medium': [medium, medium, medium],
         'hard':   [hard,   hard,   hard],
@@ -75,7 +76,7 @@ def calc_center_of_gravity(layers):
 
     Arguments
     ---------
-    layers : list
+    layers : ndarray
         2D list of layer densities and thicknesses. Columns are
         density (kg/m^3) and thickness (mm). One row corresponds
         to one layer.
@@ -88,10 +89,10 @@ def calc_center_of_gravity(layers):
         Z-coordinate of center of gravity (mm).
     """
     # Layering info for center of gravity calculation (bottom to top)
-    n = layers.shape[0]                 # Number of layers
-    rho = np.flipud(layers[:, 0])       # Layer densities
-    h = np.flipud(layers[:, 1])          # Layer thicknesses
-    H = sum(h)                          # Total slab thickness
+    n = layers.shape[0]                    # Number of layers
+    rho = 1e-12*np.flipud(layers[:, 0])    # Layer densities (kg/m^3 -> t/mm^3)
+    h = np.flipud(layers[:, 1])            # Layer thicknesses
+    H = sum(h)                             # Total slab thickness
     # Layer center coordinates (bottom to top)
     zi = [H/2 - sum(h[0:j]) - h[j]/2 for j in range(n)]
     # Z-coordinate of the center of gravity
@@ -99,6 +100,61 @@ def calc_center_of_gravity(layers):
     # Return slab thickness and center of gravity
     return H, zs
 
+
+def calc_vertical_bc_center_of_gravity(slab, phi):
+    """
+    Calculate center of gravity of triangular slab segements for vertical PSTs.
+
+    Parameters
+    ----------
+    slab : ndarray
+        List of layer densities, thicknesses, and elastic properties.
+        Columns are density (kg/m^3), thickness (mm), Young's modulus
+        (MPa), shear modulus (MPa), and Poisson's ratio. One row corresponds
+        to one layer.
+    phi : fload
+        Slope angle (deg).
+
+    Returns
+    -------
+    xs : float
+        Horizontal coordinate of center of gravity (mm).
+    zs : float
+        Vertical coordinate of center of gravity (mm).
+    w : ndarray
+        Weight of the slab segment that is cut off or added (t).
+    """
+    # Convert slope angle to radians
+    phi = np.deg2rad(phi)
+    
+    # Catch flat-field case
+    if phi == 0:
+        xs = 0
+        zs = 0
+        w = 0
+    else:
+        # Layering info for center of gravity calculation (top to bottom)
+        n = slab.shape[0]               # Number of slab
+        rho = 1e-12*slab[:, 0]          # Layer densities (kg/m^3 -> t/mm^3)
+        hi = slab[:, 1]                 # Layer thicknesses
+        H = sum(hi)                     # Total slab thickness
+        # Layer coordinates z_i (top to bottom)
+        z = np.array([-H/2 + sum(hi[0:j]) for j in range(n + 1)])
+        zi = z[:-1]                         # z_i
+        zii = z[1:]                         # z_{i+1}
+        # Center of gravity of all layers (top to bottom)
+        zsi = zi + hi/3*(3/2*H - zi - 2*zii)/(H - zi - zii)
+        # Surface area of all layers (top to bottom)
+        Ai = hi/2*(H - zi - zii)*np.tan(phi)
+        # Center of gravity in vertical direction
+        zs = sum(zsi*rho*Ai)/sum(rho*Ai)
+        # Center of gravity in horizontal direction
+        xs = (H/2 - zs)*np.tan(phi/2)
+        # Weight of added or cut off slab segments (t)
+        w = sum(Ai*rho)
+    
+    # Return center of gravity and weight of slab segment
+    return xs, zs, w
 
 def scapozza(rho):
     """

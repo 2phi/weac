@@ -26,11 +26,12 @@ class Layered(FieldQuantitiesMixin, SolutionMixin, AnalysisMixin,
 
         Arguments
         ---------
-        system : {'pst-', '-pst', 'skier', 'skiers'}, optional
+        system : {'pst-', '-pst', 'vpst-', '-vpst', 'skier', 'skiers'}, optional
             Type of system to analyse: PST cut from the right (pst-),
-            PST cut form the left (-pst), one skier on infinite
-            slab (skier) or multiple skiers on infinite slab (skiers).
-            Default is 'pst-'.
+            PST cut form the left (-pst), PST with vertical faces cut
+            from the right (vpst-), PST with vertical faces cut from the
+            left (-vpst), one skier on infinite slab (skier) or multiple
+            skiers on infinite slab (skiers). Default is 'pst-'.
         layers : list, optional
             2D list of layer densities and thicknesses. Columns are
             density(kg/m ^ 3) and thickness(mm). One row corresponds
