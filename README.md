@@ -189,14 +189,17 @@ x_cm, tau_kPa = skier.get_weaklayer_shearstress(x=xwl, z=z, unit='kPa')
 
 See the [open issues](https://github.com/2phi/weac/issues) for a list of proposed features and known issues.
 
-### v2.5
+### v2.6
 - [ ] Finite fracture mechanics implementation for layered snow covers
 
-### v2.4
+### v2.5
 - [ ] Implement anistropic weak layer
 - [ ] Add demo gif
 
 ## Release history
+
+### v2.4
+- Choose between slope-normal (`'-pst'`, `'pst-'`) or vertial (`'-vpst'`, `'vpst-'`) PST boundary conditions
 
 ### v2.3
 - Stress plots on deformed contours
@@ -250,7 +253,7 @@ See the [open issues](https://github.com/2phi/weac/issues) for a list of propose
 <!-- LICENSE -->
 ## License
 
-Copyright 2phi GbR, 2020-2023.
+Copyright 2phi GbR, 2020-2024.
 
 We currently do not offer an open source license. Please contact us for private licensing options.
 
