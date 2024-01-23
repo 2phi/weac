@@ -586,28 +586,39 @@ class SolutionMixin:
             if not k:
                 if mode in ['A']:
                     # Free end
-                    bc = np.array([self.N(z),
-                                   self.M(z),
-                                   self.V(z)
-                                   ])
+                    bc = np.array([
+                        self.N(z),
+                        self.M(z),
+                        self.V(z)
+                    ])
                 elif mode in ['B', 'C'] and pos in ['r', 'right']:
                     # Touchdown right
-                    bc = np.array([self.N(z),
-                                   self.M(z) + kf*kR*self.psi(z),
-                                   self.w(z)
-                                   ])
+                    bc = np.array([
+                        self.N(z),
+                        self.M(z) + kf*kR*self.psi(z),
+                        self.w(z)
+                    ])
                 elif mode in ['B', 'C'] and pos in ['l', 'left']:
                     # Touchdown left
-                    bc = np.array([self.N(z),
-                                   self.M(z) - kf*kR*self.psi(z),
-                                   self.w(z)
-                                   ])
+                    bc = np.array([
+                        self.N(z),
+                        self.M(z) - kf*kR*self.psi(z),
+                        self.w(z)
+                    ])
             else:
                 # Free end
-                bc = np.array([self.N(z),
-                                self.M(z),
-                                self.V(z)
-                                ])
+                bc = np.array([
+                    self.N(z),
+                    self.M(z),
+                    self.V(z)
+                ])
+        # Set boundary conditions for PST-systems with vertical faces
+        elif self.system in ['-vpst', 'vpst-']:
+            bc = np.array([
+                self.N(z),
+                self.M(z),
+                self.V(z)
+            ])
         # Set boundary conditions for SKIER-systems
         elif self.system in ['skier', 'skiers']:
             # Infinite end (vanishing complementary solution)
@@ -653,40 +664,40 @@ class SolutionMixin:
         """
         if pos in ('l', 'left'):
             eqs = np.array([
-                self.bc(zl, l, k, pos)[0],             # Left boundary condition
-                self.bc(zl, l, k, pos)[1],             # Left boundary condition
-                self.bc(zl, l, k, pos)[2],             # Left boundary condition
-                self.u(zr, z0=0),           # ui(xi = li)
-                self.w(zr),                 # wi(xi = li)
-                self.psi(zr),               # psii(xi = li)
-                self.N(zr),                 # Ni(xi = li)
-                self.M(zr),                 # Mi(xi = li)
-                self.V(zr)])                # Vi(xi = li)
+                self.bc(zl, l, k, pos)[0],      # Left boundary condition
+                self.bc(zl, l, k, pos)[1],      # Left boundary condition
+                self.bc(zl, l, k, pos)[2],      # Left boundary condition
+                self.u(zr, z0=0),               # ui(xi = li)
+                self.w(zr),                     # wi(xi = li)
+                self.psi(zr),                   # psii(xi = li)
+                self.N(zr),                     # Ni(xi = li)
+                self.M(zr),                     # Mi(xi = li)
+                self.V(zr)])                    # Vi(xi = li)
         elif pos in ('m', 'mid'):
             eqs = np.array([
-                -self.u(zl, z0=0),          # -ui(xi = 0)
-                -self.w(zl),                # -wi(xi = 0)
-                -self.psi(zl),              # -psii(xi = 0)
-                -self.N(zl),                # -Ni(xi = 0)
-                -self.M(zl),                # -Mi(xi = 0)
-                -self.V(zl),                # -Vi(xi = 0)
-                self.u(zr, z0=0),           # ui(xi = li)
-                self.w(zr),                 # wi(xi = li)
-                self.psi(zr),               # psii(xi = li)
-                self.N(zr),                 # Ni(xi = li)
-                self.M(zr),                 # Mi(xi = li)
-                self.V(zr)])                # Vi(xi = li)
+                -self.u(zl, z0=0),              # -ui(xi = 0)
+                -self.w(zl),                    # -wi(xi = 0)
+                -self.psi(zl),                  # -psii(xi = 0)
+                -self.N(zl),                    # -Ni(xi = 0)
+                -self.M(zl),                    # -Mi(xi = 0)
+                -self.V(zl),                    # -Vi(xi = 0)
+                self.u(zr, z0=0),               # ui(xi = li)
+                self.w(zr),                     # wi(xi = li)
+                self.psi(zr),                   # psii(xi = li)
+                self.N(zr),                     # Ni(xi = li)
+                self.M(zr),                     # Mi(xi = li)
+                self.V(zr)])                    # Vi(xi = li)
         elif pos in ('r', 'right'):
             eqs = np.array([
-                -self.u(zl, z0=0),          # -ui(xi = 0)
-                -self.w(zl),                # -wi(xi = 0)
-                -self.psi(zl),              # -psii(xi = 0)
-                -self.N(zl),                # -Ni(xi = 0)
-                -self.M(zl),                # -Mi(xi = 0)
-                -self.V(zl),                # -Vi(xi = 0)
-                self.bc(zr, l, k, pos)[0],             # Right boundary condition
-                self.bc(zr, l, k, pos)[1],             # Right boundary condition
-                self.bc(zr, l, k, pos)[2]])            # Right boundary condition
+                -self.u(zl, z0=0),              # -ui(xi = 0)
+                -self.w(zl),                    # -wi(xi = 0)
+                -self.psi(zl),                  # -psii(xi = 0)
+                -self.N(zl),                    # -Ni(xi = 0)
+                -self.M(zl),                    # -Mi(xi = 0)
+                -self.V(zl),                    # -Vi(xi = 0)
+                self.bc(zr, l, k, pos)[0],      # Right boundary condition
+                self.bc(zr, l, k, pos)[1],      # Right boundary condition
+                self.bc(zr, l, k, pos)[2]])     # Right boundary condition
         else:
             raise ValueError(
                 (f'Invalid position argument {pos} given. '
