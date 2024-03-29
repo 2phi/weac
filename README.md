@@ -255,7 +255,7 @@ See the [open issues](https://github.com/2phi/weac/issues) for a list of propose
 
 Copyright 2phi GbR, 2020-2024.
 
-We currently do not offer an open source license. Please contact us for private licensing options.
+We currently do not offer an open-source license. Please contact us for private licensing options.
 
 
 <!-- CONTACT -->
