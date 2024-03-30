@@ -1220,19 +1220,6 @@ class SolutionMixin:
             # Add to right-hand side
             rhs[:3] = np.vstack([N, M, V])          # left end
             rhs[-3:] = np.vstack([N, M, V])         # right end
-            
-        # Set touchdown boundary conditions
-        elif self.system in ['pst-', '-pst']:
-            # Loop through segments to set touchdown at rhs
-            for i in range(nS):
-                # Length, foundation and position of segment i
-                l, k, pos = li[i], ki[i], pi[i]
-                mode = self.mode_td(l=l)
-                if not k and bool(mode in ['B', 'C']):
-                    if i==0:
-                        rhs[:3] = np.vstack([0,0,self.tc])
-                    if i == (nS - 1):
-                        rhs[-3:] = np.vstack([0,0,self.tc])
 
         # Loop through segments to set touchdown conditions at rhs
         for i in range(nS):
