@@ -7,6 +7,7 @@ from IPython import get_ipython
 
 # Third party imports
 import numpy as np
+import weac
 
 
 def time():
@@ -249,3 +250,62 @@ def tensile_strength_slab(rho, unit='kPa'):
     rho_ice = 917
     # Sigrist's equation is given in kPa
     return convert[unit]*240*(rho/rho_ice)**2.44
+
+def touchdown_distance(
+        layers: np.ndarray | str | None = None,
+        C0: float = 6.5,
+        C1: float = 4.4,
+        Ewl: float = 0.25,
+        t: float = 10,
+        phi: float = 0):
+    """
+    Calculate cut length at first contanct and steady-state touchdown distance.
+
+    Arguments
+    ---------
+    layers : list, optional
+        2D list of layer densities and thicknesses. Columns are
+        density(kg/m ^ 3) and thickness(mm). One row corresponds
+        to one layer. Default is [[240, 200], ].
+    C0 : float, optional
+        Multiplicative constant of Young modulus parametrization
+        according to Bergfeld et al. (2023). Default is 6.5.
+    C1 : float, optional
+        Exponent of Young modulus parameterization according to
+        Bergfeld et al. (2023). Default is 4.4.
+    Ewl : float, optional
+        Young's modulus of the weak layer (MPa). Default is 0.25.
+    t : float, optional
+        Thickness of the weak layer (mm). Default is 10.
+    phi : float, optional
+        Inclination of the slab (°). Default is 0.
+        
+    Returns
+    -------
+    first_contact : float
+        Cut length at first contact (mm).
+    steady_state : float
+        Steady-state touchdown distance (mm).
+    """
+    # Check if layering is defined
+    layers = layers if layers else [[240, 200], ]
+
+    # Initialize model with user input
+    touchdown = weac.Layered(system='pst-', touchdown=True)
+
+    # Set material properties
+    touchdown.set_foundation_properties(E=Ewl, t=t, update=True)
+    touchdown.set_beam_properties(layers=layers, C0=C0, C1=C1, update=True)
+
+    # Assemble very long dummy PST to compute crack length where the slab
+    # first comes in contact with base layer after weak-layer collapse
+    touchdown.calc_segments(L=1e5, a=0, phi=phi)
+    first_contact = touchdown.calc_a1()
+
+    # Compute steady-state touchdown distance in a dummy PST with a cut
+    # of 5 times the first contact distance
+    touchdown.calc_segments(L=1e5, a=5*first_contact, phi=phi)
+    steady_state = touchdown.calc_lC()
+
+    # Return first-contact cut length and steady-state touchdown distance (mm)
+    return first_contact, steady_state
