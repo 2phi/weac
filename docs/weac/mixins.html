@@ -28,13 +28,14 @@
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">&#34;&#34;&#34;Mixins for the elastic analysis of layered snow slabs.&#34;&#34;&#34;
-# pylint: disable=invalid-name,too-many-locals,too-many-arguments
+# pylint: disable=invalid-name,too-many-locals,too-many-arguments,too-many-lines
 
 # Standard library imports
 from functools import partial
 
 # Third party imports
 import numpy as np
+from scipy.optimize import brentq
 from scipy.integrate import romberg, cumulative_trapezoid
 
 # Module imports
@@ -514,6 +515,335 @@ class FieldQuantitiesMixin:
         &#34;&#34;&#34;
         return self.dz_dxdx(z, phi)[5, :]
 
+
+class SlabContactMixin:
+    &#34;&#34;&#34;
+    Mixin for handling the touchdown situation in a PST.
+
+    Provides Methods for the calculation of substitute spring stiffnesses,
+    cracklength-tresholds and element lengths.
+    &#34;&#34;&#34;
+    # pylint: disable=too-many-instance-attributes
+
+    def set_columnlength(self,L):
+        &#34;&#34;&#34;
+        Set cracklength.
+
+        Arguments
+        ---------
+        L : float
+            Column length of a PST (mm).
+        &#34;&#34;&#34;
+        self.L = L
+
+    def set_cracklength(self,a):
+        &#34;&#34;&#34;
+        Set cracklength.
+
+        Arguments
+        ---------
+        a : float
+            Cracklength in a PST (mm).
+        &#34;&#34;&#34;
+        self.a = a
+
+    def set_tc(self,cf):
+        &#34;&#34;&#34;
+        Set height of the crack.
+
+        Arguments
+        ---------
+        cf : float
+            Collapse-factor. Ratio of the crack height to the
+            uncollapsed weak-layer height.
+        &#34;&#34;&#34;
+        # subtract displacement under constact load from collapsed wl height
+        qn = self.calc_qn()
+        self.tc = cf*self.t - qn/self.kn
+
+    def set_phi(self,phi):
+        &#34;&#34;&#34;
+        Set inclination of the slab.
+
+        Arguments
+        ---------
+        phi : float
+            Inclination of the slab (°).
+        &#34;&#34;&#34;
+        self.phi = phi
+
+    def set_stiffness_ratio(self, ratio=1000):
+        &#34;&#34;&#34;
+        Set ratio between collapsed and uncollapsed weak-layer stiffness.
+
+        Parameters
+        ----------
+        ratio : int, optional
+            Stiffness ratio between collapsed and uncollapsed weak layer.
+            Default is 1000.
+        &#34;&#34;&#34;
+        self.ratio = ratio
+
+    def calc_qn(self):
+        &#34;&#34;&#34;
+        Calc total surface normal load.
+
+        Returns
+        -------
+        float
+            Total surface normal load (N/mm).
+        &#34;&#34;&#34;
+        return self.get_weight_load(self.phi)[0] + self.get_surface_load(self.phi)[0]
+
+    def calc_qt(self):
+        &#34;&#34;&#34;
+        Calc total surface normal load.
+
+        Returns
+        -------
+        float
+            Total surface normal load (N/mm).
+        &#34;&#34;&#34;
+        return self.get_weight_load(self.phi)[1] + self.get_surface_load(self.phi)[1]
+
+    def substitute_stiffness(self, L, support=&#39;rested&#39;, dof=&#39;rot&#39;):
+        &#34;&#34;&#34;
+        Calc substitute stiffness for beam on elastic foundation. 
+
+        Arguments
+        ---------
+        L : float
+            Total length of the PST-column (mm).
+        support : string
+            Type of segment foundation. Defaults to &#39;rested&#39;.
+        dof : string 
+            Type of substitute spring, either &#39;rot&#39; or &#39;trans&#39;. Defaults to &#39;rot&#39;.
+
+        Returns
+        -------
+        k : stiffness of substitute spring.
+        &#34;&#34;&#34;
+        # adjust system to substitute system
+        if dof in [&#39;rot&#39;]:
+            tempsys = self.system
+            self.system = &#39;rot&#39;
+        if dof in [&#39;trans&#39;]:
+            tempsys = self.system
+            self.system = &#39;trans&#39;
+
+        # Change eigensystem for rested segment
+        if support in [&#39;rested&#39;]:
+            tempkn = self.kn
+            tempkt = self.kt
+            self.kn = self.ratio*self.kn
+            self.kt = self.ratio*self.kt
+            self.calc_system_matrix()
+            self.calc_eigensystem()
+
+        # prepare list of segment characteristics
+        segments = {&#39;li&#39;: np.array([L,  0.]),
+                    &#39;mi&#39;: np.array([0]),
+                    &#39;ki&#39;: np.array([True,  True])}
+        # solve system of equations
+        constants = self.assemble_and_solve(phi=0, **segments)
+        # calculate stiffness
+        _, z_pst, _ = self.rasterize_solution(
+            C=constants, phi=0, num=1, **segments)
+        if dof in [&#39;rot&#39;]:
+            k = abs(1/self.psi(z_pst)[0])
+        if dof in [&#39;trans&#39;]:
+            k = abs(1/self.w(z_pst)[0])
+
+        # Reset to previous system and eigensystem
+        self.system = tempsys
+        if support in [&#39;rested&#39;]:
+            self.kn = tempkn
+            self.kt = tempkt
+            self.calc_system_matrix()
+            self.calc_eigensystem()
+
+        return k
+
+    def calc_a1(self):
+        &#34;&#34;&#34;
+        Calc transition lengths a1 (aAB).
+
+        Returns
+        -------
+        a1 : float
+            Length of the crack for transition of stage A to stage B (mm).
+        &#34;&#34;&#34;
+        # Unpack variables
+        bs = -(self.B11**2/self.A11 - self.D11)
+        ss = self.kA55
+        L = self.L
+        tc = self.tc
+        qn = self.calc_qn()
+
+        # Create polynomial expression
+        def polynomial(x):
+            # Spring stiffness supported segment
+            kRl = self.substitute_stiffness(L-x, &#39;supported&#39;, &#39;rot&#39;)
+            kNl = self.substitute_stiffness(L-x, &#39;supported&#39;, &#39;trans&#39;)
+            c1 = 1/(8*bs)
+            c2 = 1/(2*kRl)
+            c3 = 1/(2*ss)
+            c4 = 1/kNl
+            c5 = -tc/qn
+            return c1*x**4 + c2*x**3 + c3*x**2 + c4*x + c5
+
+        # Find root
+        a1 = brentq(polynomial, L/1000, 999/1000*L)
+
+        return a1
+
+    def calc_a2(self):
+        &#34;&#34;&#34;
+        Calc transition lengths a2 (aBC).
+
+        Returns
+        -------
+        a2 : float
+            Length of the crack for transition of stage B to stage C (mm).
+        &#34;&#34;&#34;
+        # Unpack variables
+        bs = -(self.B11**2/self.A11 - self.D11)
+        ss = self.kA55
+        L = self.L
+        tc = self.tc
+        qn = self.calc_qn()
+
+        # Create polynomial function
+        def polynomial(x):
+            # Spring stiffness supported segment
+            kRl = self.substitute_stiffness(L-x, &#39;supported&#39;, &#39;rot&#39;)
+            kNl = self.substitute_stiffness(L-x, &#39;supported&#39;, &#39;trans&#39;)
+            c1 = ss**2*kRl*kNl*qn
+            c2 = 6*ss**2*bs*kNl*qn
+            c3 = 30*bs*ss*kRl*kNl*qn
+            c4 = 24*bs*qn*(
+                2*ss**2*kRl \
+                + 3*bs*ss*kNl)
+            c5 = 72*bs*(
+                bs*qn*(
+                    ss**2 \
+                    + kRl*kNl) \
+                - ss**2*kRl*kNl*tc)
+            c6 = 144*bs*ss*(
+                bs*kRl*qn \
+                - bs*ss*kNl*tc)
+            c7 = - 144*bs**2*ss*kRl*kNl*tc
+            return c1*x**6 + c2*x**5 + c3*x**4 + c4*x**3 + c5*x**2 + c6*x + c7
+
+        # Find root
+        a2 = brentq(polynomial, L/1000, 999/1000*L)
+
+        return a2
+
+    def calc_lA(self):
+        &#34;&#34;&#34;
+        Calculate the length of the touchdown element in mode A.
+        &#34;&#34;&#34;
+        lA = self.a
+
+        return lA
+
+    def calc_lB(self):
+        &#34;&#34;&#34;
+        Calculate the length of the touchdown element in mode B.
+        &#34;&#34;&#34;
+        lB = self.a
+
+        return lB
+
+    def calc_lC(self):
+        &#34;&#34;&#34;
+        Calculate the length of the touchdown element in mode C.
+        &#34;&#34;&#34;
+        # Unpack variables
+        bs = -(self.B11**2/self.A11 - self.D11)
+        ss = self.kA55
+        L = self.L
+        a = self.a
+        tc = self.tc
+        qn = self.calc_qn()
+
+        def polynomial(x):
+            # Spring stiffness supported segment
+            kRl = self.substitute_stiffness(L-a, &#39;supported&#39;, &#39;rot&#39;)
+            kNl = self.substitute_stiffness(L-a, &#39;supported&#39;, &#39;trans&#39;)
+            # Spring stiffness rested segment
+            kRr = self.substitute_stiffness(a-x, &#39;rested&#39;, &#39;rot&#39;)
+            # define constants
+            c1 = ss**2*kRl*kNl*qn
+            c2 = 6*ss*kNl*qn*(
+                bs*ss \
+                + kRl*kRr)
+            c3 = 30*bs*ss*kNl*qn*(kRl + kRr)
+            c4 = 24*bs*qn*(
+                2*ss**2*kRl \
+                + 3*bs*ss*kNl \
+                + 3*kRl*kRr*kNl)
+            c5 = 72*bs*(
+                bs*qn*(
+                    ss**2 \
+                    + kNl*(kRl + kRr)) \
+                + ss*kRl*(
+                    2*kRr*qn \
+                    - ss*kNl*tc))
+            c6 = 144*bs*ss*(
+                bs*qn*(kRl + kRr) \
+                - kNl*tc*(
+                    bs*ss \
+                    + kRl*kRr))
+            c7 = - 144*bs**2*ss*kNl*tc*(kRl + kRr)
+            return c1*x**6 + c2*x**5 + c3*x**4 + c4*x**3 + c5*x**2 + c6*x + c7
+
+        # Find root
+        lC = brentq(polynomial, a/1000, 999/1000*a)
+
+        return lC
+
+    def set_touchdown_attributes(self, L, a, cf, phi, ratio):
+        &#34;&#34;&#34;Set class attributes for touchdown consideration&#34;&#34;&#34;
+        self.set_columnlength(L)
+        self.set_cracklength(a)
+        self.set_tc(cf)
+        self.set_phi(phi)
+        self.set_stiffness_ratio(ratio)
+
+    def calc_touchdown_mode(self):
+        &#34;&#34;&#34;Calculate touchdown-mode from thresholds&#34;&#34;&#34;
+        if self.touchdown:
+            # Calculate stage transitions
+            a1 = self.calc_a1()
+            a2 = self.calc_a2()
+            # Assign stage
+            if self.a &lt;= a1:
+                mode = &#39;A&#39;
+            elif a1 &lt; self.a &lt;= a2:
+                mode = &#39;B&#39;
+            elif a2 &lt; self.a:
+                mode = &#39;C&#39;
+            self.mode = mode
+        else:
+            self.mode = &#39;A&#39;
+
+    def calc_touchdown_length(self):
+        &#34;&#34;&#34;Calculate touchdown length&#34;&#34;&#34;
+        if self.mode in [&#39;A&#39;]:
+            self.td = self.calc_lA()
+        elif self.mode in [&#39;B&#39;]:
+            self.td = self.calc_lB()
+        elif self.mode in [&#39;C&#39;]:
+            self.td = self.calc_lC()
+
+    def calc_touchdown_system(self, L, a, cf, phi, ratio=1000):
+        &#34;&#34;&#34;Calculate touchdown&#34;&#34;&#34;
+        self.set_touchdown_attributes(L, a, cf, phi, ratio)
+        self.calc_touchdown_mode()
+        self.calc_touchdown_length()
+
 class SolutionMixin:
     &#34;&#34;&#34;
     Mixin for the solution of boundary value problems.
@@ -522,64 +852,7 @@ class SolutionMixin:
     and for the computation of the free constants.
     &#34;&#34;&#34;
 
-    def mode_td(self, l=0):
-        &#34;&#34;&#34;
-        Identify the mode of the pst-boundary.
-
-        Arguments
-        ---------
-        l : float, optional
-            Length of the segment in consideration. Default is zero.
-
-        Returns
-        -------
-        mode : string
-            Contains the mode for the boundary of the segment:
-            A - free end, B - intermediate touchdown,
-            C - full touchdown (maximum clamped end).
-        &#34;&#34;&#34;
-        if self.touchdown:
-            # Classify boundary type by element length
-            if l &lt;= self.lC:
-                return &#39;A&#39;
-            elif self.lC &lt; l &lt;= self.lS:
-                return &#39;B&#39;
-            elif self.lS &lt; l:
-                return &#39;C&#39;
-        else:
-            return &#39;A&#39;
-
-    def reduce_stiffness(self, l=0, mode=&#39;A&#39;):
-        &#34;&#34;&#34;
-        Determines the reduction factor for a rotational spring.
-
-        Arguments
-        ---------
-        l : float, optional
-            Length of the segment in consideration. Default is zero.
-        mode : string, optional
-            Contains the mode for the boundary of the segment:
-            A - free end, B - intermediate touchdown, C - full touchdown.
-            Default is A.
-
-        Returns
-        -------
-        kf : float
-            Reduction factor.
-        &#34;&#34;&#34;
-        # Reduction to zero for free end bc
-        if mode in [&#39;A&#39;]:
-            kf = 0
-        # Reduction factor for touchdown
-        if mode in [&#39;B&#39;, &#39;C&#39;]:
-            l = l - self.lC
-            # Beta needs to take into account different weak-layer spring stiffness
-            beta = self.beta*self.ratio**(1/4)
-            kf=(np.cos(2*beta*l)+np.cosh(2*beta*l)-2)/(np.sin(2*beta*l)+np.sinh(2*beta*l))
-
-        return kf
-
-    def bc(self, z, l=0, k=False, pos=&#39;mid&#39;):
+    def bc(self, z, k=False, pos=&#39;mid&#39;):
         &#34;&#34;&#34;
         Provide equations for free (pst) or infinite (skiers) ends.
 
@@ -603,37 +876,44 @@ class SolutionMixin:
         bc : ndarray
             Boundary condition vector (lenght 3) at position x.
         &#34;&#34;&#34;
-        # Check mode for free end
-        mode = self.mode_td(l=l)
-        # Get spring stiffness reduction factor
-        kf = self.reduce_stiffness(l=l, mode=mode)
-        # Get spring stiffness for collapsed weak-layer
-        kR = self.calc_rot_spring(collapse=True)
 
         # Set boundary conditions for PST-systems
         if self.system in [&#39;pst-&#39;, &#39;-pst&#39;]:
             if not k:
-                if mode in [&#39;A&#39;]:
+                if self.mode in [&#39;A&#39;]:
                     # Free end
-                    bc = np.array([
-                        self.N(z),
-                        self.M(z),
-                        self.V(z)
-                    ])
-                elif mode in [&#39;B&#39;, &#39;C&#39;] and pos in [&#39;r&#39;, &#39;right&#39;]:
+                    bc = np.array([self.N(z),
+                                   self.M(z),
+                                   self.V(z)
+                                   ])
+                elif self.mode in [&#39;B&#39;] and pos in [&#39;r&#39;, &#39;right&#39;]:
                     # Touchdown right
-                    bc = np.array([
-                        self.N(z),
-                        self.M(z) + kf*kR*self.psi(z),
-                        self.w(z)
-                    ])
-                elif mode in [&#39;B&#39;, &#39;C&#39;] and pos in [&#39;l&#39;, &#39;left&#39;]:
+                    bc = np.array([self.N(z),
+                                   self.M(z),
+                                   self.w(z)
+                                   ])
+                elif self.mode in [&#39;B&#39;] and pos in [&#39;l&#39;, &#39;left&#39;]:   # Kann dieser Block
+                    # Touchdown left                                # verschwinden? Analog zu &#39;A&#39;
+                    bc = np.array([self.N(z),
+                                   self.M(z),
+                                   self.w(z)
+                                   ])
+                elif self.mode in [&#39;C&#39;] and pos in [&#39;r&#39;, &#39;right&#39;]:
+                    # Spring stiffness
+                    kR = self.substitute_stiffness(self.a - self.td, &#39;rested&#39;, &#39;rot&#39;)
+                    # Touchdown right
+                    bc = np.array([self.N(z),
+                                   self.M(z) + kR*self.psi(z),
+                                   self.w(z)
+                                   ])
+                elif self.mode in [&#39;C&#39;] and pos in [&#39;l&#39;, &#39;left&#39;]:
+                    # Spring stiffness
+                    kR = self.substitute_stiffness(self.a - self.td, &#39;rested&#39;, &#39;rot&#39;)
                     # Touchdown left
-                    bc = np.array([
-                        self.N(z),
-                        self.M(z) - kf*kR*self.psi(z),
-                        self.w(z)
-                    ])
+                    bc = np.array([self.N(z),
+                                   self.M(z) - kR*self.psi(z),
+                                   self.w(z)
+                                   ])
             else:
                 # Free end
                 bc = np.array([
@@ -655,6 +935,12 @@ class SolutionMixin:
                            self.w(z),
                            self.psi(z)
                            ])
+        # Set boundary conditions for substitute spring calculus
+        elif self.system in [&#39;rot&#39;, &#39;trans&#39;]:
+            bc = np.array([self.N(z),
+                            self.M(z),
+                            self.V(z)
+                            ])
         else:
             raise ValueError(
                 &#39;Boundary conditions not defined for&#39;
@@ -662,7 +948,7 @@ class SolutionMixin:
 
         return bc
 
-    def eqs(self, zl, zr, l=0, k=False, pos=&#39;mid&#39;):
+    def eqs(self, zl, zr, k=False, pos=&#39;mid&#39;):
         &#34;&#34;&#34;
         Provide boundary or transmission conditions for beam segments.
 
@@ -672,8 +958,6 @@ class SolutionMixin:
             Solution vector (6x1) at left end of beam segement.
         zr : ndarray
             Solution vector (6x1) at right end of beam segement.
-        l : float, optional
-            Length of the segment in consideration. Default is zero.
         k : boolean
             Indicates whether segment has foundation(True) or not (False).
             Default is False.
@@ -693,15 +977,15 @@ class SolutionMixin:
         &#34;&#34;&#34;
         if pos in (&#39;l&#39;, &#39;left&#39;):
             eqs = np.array([
-                self.bc(zl, l, k, pos)[0],      # Left boundary condition
-                self.bc(zl, l, k, pos)[1],      # Left boundary condition
-                self.bc(zl, l, k, pos)[2],      # Left boundary condition
-                self.u(zr, z0=0),               # ui(xi = li)
-                self.w(zr),                     # wi(xi = li)
-                self.psi(zr),                   # psii(xi = li)
-                self.N(zr),                     # Ni(xi = li)
-                self.M(zr),                     # Mi(xi = li)
-                self.V(zr)])                    # Vi(xi = li)
+                self.bc(zl, k, pos)[0],             # Left boundary condition
+                self.bc(zl, k, pos)[1],             # Left boundary condition
+                self.bc(zl, k, pos)[2],             # Left boundary condition
+                self.u(zr, z0=0),           # ui(xi = li)
+                self.w(zr),                 # wi(xi = li)
+                self.psi(zr),               # psii(xi = li)
+                self.N(zr),                 # Ni(xi = li)
+                self.M(zr),                 # Mi(xi = li)
+                self.V(zr)])                # Vi(xi = li)
         elif pos in (&#39;m&#39;, &#39;mid&#39;):
             eqs = np.array([
                 -self.u(zl, z0=0),              # -ui(xi = 0)
@@ -718,15 +1002,15 @@ class SolutionMixin:
                 self.V(zr)])                    # Vi(xi = li)
         elif pos in (&#39;r&#39;, &#39;right&#39;):
             eqs = np.array([
-                -self.u(zl, z0=0),              # -ui(xi = 0)
-                -self.w(zl),                    # -wi(xi = 0)
-                -self.psi(zl),                  # -psii(xi = 0)
-                -self.N(zl),                    # -Ni(xi = 0)
-                -self.M(zl),                    # -Mi(xi = 0)
-                -self.V(zl),                    # -Vi(xi = 0)
-                self.bc(zr, l, k, pos)[0],      # Right boundary condition
-                self.bc(zr, l, k, pos)[1],      # Right boundary condition
-                self.bc(zr, l, k, pos)[2]])     # Right boundary condition
+                -self.u(zl, z0=0),          # -ui(xi = 0)
+                -self.w(zl),                # -wi(xi = 0)
+                -self.psi(zl),              # -psii(xi = 0)
+                -self.N(zl),                # -Ni(xi = 0)
+                -self.M(zl),                # -Mi(xi = 0)
+                -self.V(zl),                # -Vi(xi = 0)
+                self.bc(zr, k, pos)[0],             # Right boundary condition
+                self.bc(zr, k, pos)[1],             # Right boundary condition
+                self.bc(zr, k, pos)[2]])            # Right boundary condition
         else:
             raise ValueError(
                 (f&#39;Invalid position argument {pos} given. &#39;
@@ -734,8 +1018,19 @@ class SolutionMixin:
                  &#39;or left, mid and right.&#39;))
         return eqs
 
-    def calc_segments(self, tdi=False, li=False, mi=False, ki=False, k0=False,
-                      L=1e4, a=0, m=0, **kwargs):
+    def calc_segments(
+            self,
+            li: list[float] | list[int] |bool = False,
+            mi: list[float] | list[int] |bool = False,
+            ki: list[bool] | bool = False,
+            k0: list[bool] | bool = False,
+            L: float = 1e4,
+            a: float = 0,
+            m: float = 0,
+            phi: float = 0,
+            cf: float = 0.5,
+            ratio: float = 1000,
+            **kwargs):
         &#34;&#34;&#34;
         Assemble lists defining the segments.
 
@@ -768,6 +1063,12 @@ class SolutionMixin:
         m : float, optional
             Weight of skier (kg) in the axial center of the model.
             Used for system &#39;skier&#39;.
+        cf : float, optional
+            Collapse factor. Ratio of the crack height to the uncollapsed
+            weak-layer height. Used for systems &#39;pst-&#39;, &#39;-pst&#39;. Default is 0.5.
+        ratio : float, optional
+            Stiffness ratio between collapsed and uncollapsed weak layer.
+            Default is 1000.
 
         Returns
         -------
@@ -778,12 +1079,9 @@ class SolutionMixin:
         &#34;&#34;&#34;
 
         _ = kwargs                                      # Unused arguments
-        # Set unbedded segment length
-        mode = self.mode_td(l=a)
-        if mode in [&#39;A&#39;, &#39;B&#39;]:
-            lU = a
-        if mode in [&#39;C&#39;]:
-            lU = self.lS
+
+        # Precompute touchdown properties
+        self.calc_touchdown_system(L=L, a=a, cf=cf, phi=phi, ratio=ratio)
 
         # Assemble list defining the segments
         if self.system == &#39;skiers&#39;:
@@ -792,12 +1090,12 @@ class SolutionMixin:
             ki = np.array(ki)                           # Crack
             k0 = np.array(k0)                           # No crack
         elif self.system == &#39;pst-&#39;:
-            li = np.array([L - a, lU])                  # Segment lengths
+            li = np.array([L - self.a, self.td])        # Segment lengths
             mi = np.array([0])                          # Skier weights
             ki = np.array([True, False])                # Crack
             k0 = np.array([True, True])                 # No crack
         elif self.system == &#39;-pst&#39;:
-            li = np.array([lU, L - a])                  # Segment lengths
+            li = np.array([self.td, L - self.a])        # Segment lengths
             mi = np.array([0])                          # Skier weights
             ki = np.array([False, True])                # Crack
             k0 = np.array([True, True])                 # No crack
@@ -812,8 +1110,8 @@ class SolutionMixin:
             ki = np.array([False, True])                # Crack
             k0 = np.array([True, True])                 # No crack
         elif self.system == &#39;skier&#39;:
-            lb = (L - a)/2                              # Half supported length
-            lf = a/2                                    # Half free length
+            lb = (L - self.a)/2                         # Half bedded length
+            lf = self.a/2                               # Half free length
             li = np.array([lb, lf, lf, lb])             # Segment lengths
             mi = np.array([0, m, 0])                    # Skier weights
             ki = np.array([True, False, False, True])   # Crack
@@ -870,7 +1168,7 @@ class SolutionMixin:
             raise ValueError(&#39;Make sure len(li)=N, len(ki)=N, and &#39;
                              &#39;len(mi)=N-1 for a system of N segments.&#39;)
 
-        if self.system not in [&#39;pst-&#39;, &#39;-pst&#39;, &#39;vpst-&#39;, &#39;-vpst&#39;]:
+        if self.system not in [&#39;pst-&#39;, &#39;-pst&#39;, &#39;vpst-&#39;, &#39;-vpst&#39;, &#39;rot&#39;, &#39;trans&#39;]:
             # Boundary segments must be on foundation for infinite BCs
             if not all([ki[0], ki[-1]]):
                 raise ValueError(&#39;Provide supported boundary segments in &#39;
@@ -885,6 +1183,7 @@ class SolutionMixin:
 
         # Determine size of linear system of equations
         nS = len(li)            # Number of beam segments
+
         nDOF = 6                # Number of free constants per segment
 
         # Add dummy segment if only one segment provided
@@ -913,11 +1212,11 @@ class SolutionMixin:
             zhi = self.eqs(
                 zl=self.zh(x=0, l=l, bed=k),
                 zr=self.zh(x=l, l=l, bed=k),
-                l=l, k=k, pos=pos)
+                k=k, pos=pos)
             zpi = self.eqs(
                 zl=self.zp(x=0, phi=phi, bed=k),
                 zr=self.zp(x=l, phi=phi, bed=k),
-                l=l, k=k, pos=pos)
+                k=k, pos=pos)
             # Rows for left-hand side assembly
             start = 0 if i == 0 else 3
             stop = 6 if i == nS - 1 else 9
@@ -932,7 +1231,7 @@ class SolutionMixin:
             # Right-hand side for transmission from segment i-1 to segment i
             rhs[6*i:6*i + 3] = np.vstack([Ft, -Ft*self.h/2, Fn])
         # Set rhs so that complementary integral vanishes at boundaries
-        if self.system not in [&#39;pst-&#39;, &#39;-pst&#39;]:
+        if self.system not in [&#39;pst-&#39;, &#39;-pst&#39;, &#39;rested&#39;]:
             rhs[:3] = self.bc(self.zp(x=0, phi=phi, bed=ki[0]))
             rhs[-3:] = self.bc(self.zp(x=li[-1], phi=phi, bed=ki[-1]))
             
@@ -950,19 +1249,34 @@ class SolutionMixin:
             # Add to right-hand side
             rhs[:3] = np.vstack([N, M, V])          # left end
             rhs[-3:] = np.vstack([N, M, V])         # right end
-            
-        # Set touchdown boundary conditions
-        elif self.system in [&#39;pst-&#39;, &#39;-pst&#39;]:
-            # Loop through segments to set touchdown at rhs
-            for i in range(nS):
-                # Length, foundation and position of segment i
-                l, k, pos = li[i], ki[i], pi[i]
-                mode = self.mode_td(l=l)
-                if not k and bool(mode in [&#39;B&#39;, &#39;C&#39;]):
-                    if i==0:
-                        rhs[:3] = np.vstack([0,0,self.tc])
-                    if i == (nS - 1):
-                        rhs[-3:] = np.vstack([0,0,self.tc])
+
+        # Loop through segments to set touchdown conditions at rhs
+        for i in range(nS):
+            # Length, foundation and position of segment i
+            l, k, pos = li[i], ki[i], pi[i]
+            # Set displacement BC in stage B
+            if not k and bool(self.mode in [&#39;B&#39;]):
+                if i==0:
+                    rhs[:3] = np.vstack([0,0,self.tc])
+                if i == (nS - 1):
+                    rhs[-3:] = np.vstack([0,0,self.tc])
+            # Set normal force and displacement BC for stage C
+            if not k and bool(self.mode in [&#39;C&#39;]):
+                N = self.calc_qt()*(self.a - self.td)
+                if i==0:
+                    rhs[:3] = np.vstack([-N,0,self.tc])
+                if i == (nS - 1):
+                    rhs[-3:] = np.vstack([N,0,self.tc])
+
+        # Rhs for substitute spring stiffness
+        if self.system in [&#39;rot&#39;]:
+            # apply arbitrary moment of 1 at left boundary
+            rhs = rhs*0
+            rhs[1] = 1
+        if self.system in [&#39;trans&#39;]:
+            # apply arbitrary force of 1 at left boundary
+            rhs = rhs*0
+            rhs[2] = 1
 
         # --- SOLVE -----------------------------------------------------------
 
@@ -980,7 +1294,14 @@ class AnalysisMixin:
     elastic foundations.
     &#34;&#34;&#34;
 
-    def rasterize_solution(self, C, phi, li, ki, num=250, **kwargs):
+    def rasterize_solution(
+            self,
+            C: np.ndarray,
+            phi: float,
+            li: list[float] | bool,
+            ki: list[bool] | bool,
+            num: int = 250,
+            **kwargs):
         &#34;&#34;&#34;
         Compute rasterized solution vector.
 
@@ -1013,6 +1334,7 @@ class AnalysisMixin:
         _ = kwargs
 
         # Drop zero-length segments
+        li = abs(li)
         isnonzero = li &gt; 0
         C, ki, li = C[:, isnonzero], ki[isnonzero], li[isnonzero]
 
@@ -1032,7 +1354,7 @@ class AnalysisMixin:
         # Loop through segments
         for i, l in enumerate(li):
             # Get local x-coordinates of segment i
-            xi = np.linspace(0, l, num=nq[i], endpoint=(i == li.size - 1))
+            xi = np.linspace(0, l, num=nq[i], endpoint=(i == li.size - 1))  # pylint: disable=superfluous-parens
             # Compute start and end coordinates of segment i
             x0 = lic[i]
             # Assemble global coordinate vector
@@ -1495,6 +1817,137 @@ class OutputMixin:
     Provides convenience methods for the assembly of output lists
     such as rasterized displacements or rasterized stresses.
     &#34;&#34;&#34;
+    def external_potential(self, C, phi, L, **segments):
+        &#34;&#34;&#34;
+        Compute total external potential (pst only).
+
+        Arguments
+        ---------
+        C : ndarray
+            Matrix(6xN) of solution constants for a system of N
+            segements. Columns contain the 6 constants of each segement.
+        phi : float
+            Inclination of the slab (°).
+        L : float, optional
+            Total length of model (mm).
+        segments : dict
+            Dictionary with lists of touchdown booleans (tdi), segement
+            lengths (li), skier weights (mi), and foundation booleans
+            in the cracked (ki) and uncracked (k0) configurations.
+
+        Returns
+        -------
+        Pi_ext : float
+            Total external potential (Nmm).
+        &#34;&#34;&#34;
+        # Rasterize solution
+        xq, zq, xb = self.rasterize_solution(C=C, phi=phi, **segments)
+        _ = xq, xb
+        # Compute displacements where weight loads are applied
+        w0 = self.w(zq)
+        us = self.u(zq, z0=self.zs)
+        # Get weight loads
+        qn = self.calc_qn()
+        qt = self.calc_qt()
+        # use +/- and us[0]/us[-1] according to system and phi
+        # compute total external potential
+        Pi_ext = - qn*(segments[&#39;li&#39;][0] + segments[&#39;li&#39;][1])*np.average(w0) \
+            - qn*(L - (segments[&#39;li&#39;][0] + segments[&#39;li&#39;][1]))*self.tc
+        # Ensure
+        if self.system in [&#39;pst-&#39;]:
+            ub = us[-1]
+        elif self.system in [&#39;-pst&#39;]:
+            ub = us[0]
+        Pi_ext += - qt*(segments[&#39;li&#39;][0] + segments[&#39;li&#39;][1])*np.average(us) \
+            - qt*(L - (segments[&#39;li&#39;][0] + segments[&#39;li&#39;][1]))*ub
+        if self.system not in [&#39;pst-&#39;, &#39;-pst&#39;]:
+            print(&#39;Input error: Only pst-setup implemented at the moment.&#39;)
+
+        return Pi_ext
+
+    def internal_potential(self, C, phi, L, **segments):
+        &#34;&#34;&#34;
+        Compute total internal potential (pst only).
+
+        Arguments
+        ---------
+        C : ndarray
+            Matrix(6xN) of solution constants for a system of N
+            segements. Columns contain the 6 constants of each segement.
+        phi : float
+            Inclination of the slab (°).
+        L : float, optional
+            Total length of model (mm).
+        segments : dict
+            Dictionary with lists of touchdown booleans (tdi), segement
+            lengths (li), skier weights (mi), and foundation booleans
+            in the cracked (ki) and uncracked (k0) configurations.
+
+        Returns
+        -------
+        Pi_int : float
+            Total internal potential (Nmm).
+        &#34;&#34;&#34;
+        # Rasterize solution
+        xq, zq, xb = self.rasterize_solution(C=C, phi=phi, **segments)
+
+        # Compute section forces
+        N, M, V = self.N(zq), self.M(zq), self.V(zq)
+
+        # Drop parts of the solution that are not a foundation
+        zweak = zq[:, ~np.isnan(xb)]
+        xweak = xb[~np.isnan(xb)]
+
+        # Compute weak layer displacements
+        wweak = self.w(zweak)
+        uweak = self.u(zweak, z0=self.h/2)
+
+        # Compute stored energy of the slab (monte-carlo integration)
+        n = len(xq)
+        nweak = len(xweak)
+        # energy share from moment, shear force, wl normal and tangential springs
+        Pi_int = L/2/n/self.A11*np.sum([Ni**2 for Ni in N]) \
+                + L/2/n/(self.D11-self.B11**2/self.A11)*np.sum([Mi**2 for Mi in M]) \
+                + L/2/n/self.kA55*np.sum([Vi**2 for Vi in V]) \
+                + L*self.kn/2/nweak*np.sum([wi**2 for wi in wweak]) \
+                + L*self.kt/2/nweak*np.sum([ui**2 for ui in uweak])
+        # energy share from substitute rotation spring
+        if self.system in [&#39;pst-&#39;]:
+            Pi_int += 1/2*M[-1]*(self.psi(zq)[-1])**2
+        elif self.system in [&#39;-pst&#39;]:
+            Pi_int += 1/2*M[0]*(self.psi(zq)[0])**2
+        else:
+            print(&#39;Input error: Only pst-setup implemented at the moment.&#39;)
+
+        return Pi_int
+
+    def total_potential(self, C, phi, L, **segments):
+        &#34;&#34;&#34;
+        Returns total differential potential
+    
+        Arguments
+        ---------
+        C : ndarray
+            Matrix(6xN) of solution constants for a system of N
+            segements. Columns contain the 6 constants of each segement.
+        phi : float
+            Inclination of the slab (°).
+        L : float, optional
+            Total length of model (mm).
+        segments : dict
+            Dictionary with lists of touchdown booleans (tdi), segement
+            lengths (li), skier weights (mi), and foundation booleans
+            in the cracked (ki) and uncracked (k0) configurations.
+
+        Returns
+        -------
+        Pi : float
+            Total differential potential (Nmm).
+        &#34;&#34;&#34;
+        Pi_int = self.internal_potential(C, phi, L, **segments)
+        Pi_ext = self.external_potential(C, phi, L, **segments)
+
+        return Pi_int + Pi_ext
 
     def get_weaklayer_shearstress(self, x, z, unit=&#39;MPa&#39;, removeNaNs=False):
         &#34;&#34;&#34;
@@ -1690,7 +2143,14 @@ elastic foundations.</p></div>
     elastic foundations.
     &#34;&#34;&#34;
 
-    def rasterize_solution(self, C, phi, li, ki, num=250, **kwargs):
+    def rasterize_solution(
+            self,
+            C: np.ndarray,
+            phi: float,
+            li: list[float] | bool,
+            ki: list[bool] | bool,
+            num: int = 250,
+            **kwargs):
         &#34;&#34;&#34;
         Compute rasterized solution vector.
 
@@ -1723,6 +2183,7 @@ elastic foundations.</p></div>
         _ = kwargs
 
         # Drop zero-length segments
+        li = abs(li)
         isnonzero = li &gt; 0
         C, ki, li = C[:, isnonzero], ki[isnonzero], li[isnonzero]
 
@@ -1742,7 +2203,7 @@ elastic foundations.</p></div>
         # Loop through segments
         for i, l in enumerate(li):
             # Get local x-coordinates of segment i
-            xi = np.linspace(0, l, num=nq[i], endpoint=(i == li.size - 1))
+            xi = np.linspace(0, l, num=nq[i], endpoint=(i == li.size - 1))  # pylint: disable=superfluous-parens
             # Compute start and end coordinates of segment i
             x0 = lic[i]
             # Assemble global coordinate vector
@@ -2872,7 +3333,7 @@ is requested.</dd>
 </details>
 </dd>
 <dt id="weac.mixins.AnalysisMixin.rasterize_solution"><code class="name flex">
-<span>def <span class="ident">rasterize_solution</span></span>(<span>self, C, phi, li, ki, num=250, **kwargs)</span>
+<span>def <span class="ident">rasterize_solution</span></span>(<span>self, C: numpy.ndarray, phi: float, li: list[float] | bool, ki: list[bool] | bool, num: int = 250, **kwargs)</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Compute rasterized solution vector.</p>
@@ -2905,7 +3366,14 @@ points xq.</dd>
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def rasterize_solution(self, C, phi, li, ki, num=250, **kwargs):
+<pre><code class="python">def rasterize_solution(
+        self,
+        C: np.ndarray,
+        phi: float,
+        li: list[float] | bool,
+        ki: list[bool] | bool,
+        num: int = 250,
+        **kwargs):
     &#34;&#34;&#34;
     Compute rasterized solution vector.
 
@@ -2938,6 +3406,7 @@ points xq.</dd>
     _ = kwargs
 
     # Drop zero-length segments
+    li = abs(li)
     isnonzero = li &gt; 0
     C, ki, li = C[:, isnonzero], ki[isnonzero], li[isnonzero]
 
@@ -2957,7 +3426,7 @@ points xq.</dd>
     # Loop through segments
     for i, l in enumerate(li):
         # Get local x-coordinates of segment i
-        xi = np.linspace(0, l, num=nq[i], endpoint=(i == li.size - 1))
+        xi = np.linspace(0, l, num=nq[i], endpoint=(i == li.size - 1))  # pylint: disable=superfluous-parens
         # Compute start and end coordinates of segment i
         x0 = lic[i]
         # Assemble global coordinate vector
@@ -4471,6 +4940,137 @@ such as rasterized displacements or rasterized stresses.</p></div>
     Provides convenience methods for the assembly of output lists
     such as rasterized displacements or rasterized stresses.
     &#34;&#34;&#34;
+    def external_potential(self, C, phi, L, **segments):
+        &#34;&#34;&#34;
+        Compute total external potential (pst only).
+
+        Arguments
+        ---------
+        C : ndarray
+            Matrix(6xN) of solution constants for a system of N
+            segements. Columns contain the 6 constants of each segement.
+        phi : float
+            Inclination of the slab (°).
+        L : float, optional
+            Total length of model (mm).
+        segments : dict
+            Dictionary with lists of touchdown booleans (tdi), segement
+            lengths (li), skier weights (mi), and foundation booleans
+            in the cracked (ki) and uncracked (k0) configurations.
+
+        Returns
+        -------
+        Pi_ext : float
+            Total external potential (Nmm).
+        &#34;&#34;&#34;
+        # Rasterize solution
+        xq, zq, xb = self.rasterize_solution(C=C, phi=phi, **segments)
+        _ = xq, xb
+        # Compute displacements where weight loads are applied
+        w0 = self.w(zq)
+        us = self.u(zq, z0=self.zs)
+        # Get weight loads
+        qn = self.calc_qn()
+        qt = self.calc_qt()
+        # use +/- and us[0]/us[-1] according to system and phi
+        # compute total external potential
+        Pi_ext = - qn*(segments[&#39;li&#39;][0] + segments[&#39;li&#39;][1])*np.average(w0) \
+            - qn*(L - (segments[&#39;li&#39;][0] + segments[&#39;li&#39;][1]))*self.tc
+        # Ensure
+        if self.system in [&#39;pst-&#39;]:
+            ub = us[-1]
+        elif self.system in [&#39;-pst&#39;]:
+            ub = us[0]
+        Pi_ext += - qt*(segments[&#39;li&#39;][0] + segments[&#39;li&#39;][1])*np.average(us) \
+            - qt*(L - (segments[&#39;li&#39;][0] + segments[&#39;li&#39;][1]))*ub
+        if self.system not in [&#39;pst-&#39;, &#39;-pst&#39;]:
+            print(&#39;Input error: Only pst-setup implemented at the moment.&#39;)
+
+        return Pi_ext
+
+    def internal_potential(self, C, phi, L, **segments):
+        &#34;&#34;&#34;
+        Compute total internal potential (pst only).
+
+        Arguments
+        ---------
+        C : ndarray
+            Matrix(6xN) of solution constants for a system of N
+            segements. Columns contain the 6 constants of each segement.
+        phi : float
+            Inclination of the slab (°).
+        L : float, optional
+            Total length of model (mm).
+        segments : dict
+            Dictionary with lists of touchdown booleans (tdi), segement
+            lengths (li), skier weights (mi), and foundation booleans
+            in the cracked (ki) and uncracked (k0) configurations.
+
+        Returns
+        -------
+        Pi_int : float
+            Total internal potential (Nmm).
+        &#34;&#34;&#34;
+        # Rasterize solution
+        xq, zq, xb = self.rasterize_solution(C=C, phi=phi, **segments)
+
+        # Compute section forces
+        N, M, V = self.N(zq), self.M(zq), self.V(zq)
+
+        # Drop parts of the solution that are not a foundation
+        zweak = zq[:, ~np.isnan(xb)]
+        xweak = xb[~np.isnan(xb)]
+
+        # Compute weak layer displacements
+        wweak = self.w(zweak)
+        uweak = self.u(zweak, z0=self.h/2)
+
+        # Compute stored energy of the slab (monte-carlo integration)
+        n = len(xq)
+        nweak = len(xweak)
+        # energy share from moment, shear force, wl normal and tangential springs
+        Pi_int = L/2/n/self.A11*np.sum([Ni**2 for Ni in N]) \
+                + L/2/n/(self.D11-self.B11**2/self.A11)*np.sum([Mi**2 for Mi in M]) \
+                + L/2/n/self.kA55*np.sum([Vi**2 for Vi in V]) \
+                + L*self.kn/2/nweak*np.sum([wi**2 for wi in wweak]) \
+                + L*self.kt/2/nweak*np.sum([ui**2 for ui in uweak])
+        # energy share from substitute rotation spring
+        if self.system in [&#39;pst-&#39;]:
+            Pi_int += 1/2*M[-1]*(self.psi(zq)[-1])**2
+        elif self.system in [&#39;-pst&#39;]:
+            Pi_int += 1/2*M[0]*(self.psi(zq)[0])**2
+        else:
+            print(&#39;Input error: Only pst-setup implemented at the moment.&#39;)
+
+        return Pi_int
+
+    def total_potential(self, C, phi, L, **segments):
+        &#34;&#34;&#34;
+        Returns total differential potential
+    
+        Arguments
+        ---------
+        C : ndarray
+            Matrix(6xN) of solution constants for a system of N
+            segements. Columns contain the 6 constants of each segement.
+        phi : float
+            Inclination of the slab (°).
+        L : float, optional
+            Total length of model (mm).
+        segments : dict
+            Dictionary with lists of touchdown booleans (tdi), segement
+            lengths (li), skier weights (mi), and foundation booleans
+            in the cracked (ki) and uncracked (k0) configurations.
+
+        Returns
+        -------
+        Pi : float
+            Total differential potential (Nmm).
+        &#34;&#34;&#34;
+        Pi_int = self.internal_potential(C, phi, L, **segments)
+        Pi_ext = self.external_potential(C, phi, L, **segments)
+
+        return Pi_int + Pi_ext
 
     def get_weaklayer_shearstress(self, x, z, unit=&#39;MPa&#39;, removeNaNs=False):
         &#34;&#34;&#34;
@@ -4644,6 +5244,83 @@ such as rasterized displacements or rasterized stresses.</p></div>
 </ul>
 <h3>Methods</h3>
 <dl>
+<dt id="weac.mixins.OutputMixin.external_potential"><code class="name flex">
+<span>def <span class="ident">external_potential</span></span>(<span>self, C, phi, L, **segments)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Compute total external potential (pst only).</p>
+<h2 id="arguments">Arguments</h2>
+<dl>
+<dt><strong><code>C</code></strong> :&ensp;<code>ndarray</code></dt>
+<dd>Matrix(6xN) of solution constants for a system of N
+segements. Columns contain the 6 constants of each segement.</dd>
+<dt><strong><code>phi</code></strong> :&ensp;<code>float</code></dt>
+<dd>Inclination of the slab (°).</dd>
+<dt><strong><code>L</code></strong> :&ensp;<code>float</code>, optional</dt>
+<dd>Total length of model (mm).</dd>
+<dt><strong><code>segments</code></strong> :&ensp;<code>dict</code></dt>
+<dd>Dictionary with lists of touchdown booleans (tdi), segement
+lengths (li), skier weights (mi), and foundation booleans
+in the cracked (ki) and uncracked (k0) configurations.</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><strong><code>Pi_ext</code></strong> :&ensp;<code>float</code></dt>
+<dd>Total external potential (Nmm).</dd>
+</dl></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def external_potential(self, C, phi, L, **segments):
+    &#34;&#34;&#34;
+    Compute total external potential (pst only).
+
+    Arguments
+    ---------
+    C : ndarray
+        Matrix(6xN) of solution constants for a system of N
+        segements. Columns contain the 6 constants of each segement.
+    phi : float
+        Inclination of the slab (°).
+    L : float, optional
+        Total length of model (mm).
+    segments : dict
+        Dictionary with lists of touchdown booleans (tdi), segement
+        lengths (li), skier weights (mi), and foundation booleans
+        in the cracked (ki) and uncracked (k0) configurations.
+
+    Returns
+    -------
+    Pi_ext : float
+        Total external potential (Nmm).
+    &#34;&#34;&#34;
+    # Rasterize solution
+    xq, zq, xb = self.rasterize_solution(C=C, phi=phi, **segments)
+    _ = xq, xb
+    # Compute displacements where weight loads are applied
+    w0 = self.w(zq)
+    us = self.u(zq, z0=self.zs)
+    # Get weight loads
+    qn = self.calc_qn()
+    qt = self.calc_qt()
+    # use +/- and us[0]/us[-1] according to system and phi
+    # compute total external potential
+    Pi_ext = - qn*(segments[&#39;li&#39;][0] + segments[&#39;li&#39;][1])*np.average(w0) \
+        - qn*(L - (segments[&#39;li&#39;][0] + segments[&#39;li&#39;][1]))*self.tc
+    # Ensure
+    if self.system in [&#39;pst-&#39;]:
+        ub = us[-1]
+    elif self.system in [&#39;-pst&#39;]:
+        ub = us[0]
+    Pi_ext += - qt*(segments[&#39;li&#39;][0] + segments[&#39;li&#39;][1])*np.average(us) \
+        - qt*(L - (segments[&#39;li&#39;][0] + segments[&#39;li&#39;][1]))*ub
+    if self.system not in [&#39;pst-&#39;, &#39;-pst&#39;]:
+        print(&#39;Input error: Only pst-setup implemented at the moment.&#39;)
+
+    return Pi_ext</code></pre>
+</details>
+</dd>
 <dt id="weac.mixins.OutputMixin.get_slab_deflection"><code class="name flex">
 <span>def <span class="ident">get_slab_deflection</span></span>(<span>self, x, z, unit='mm')</span>
 </code></dt>
@@ -4953,6 +5630,1042 @@ Default is mid.</dd>
     return x, tau</code></pre>
 </details>
 </dd>
+<dt id="weac.mixins.OutputMixin.internal_potential"><code class="name flex">
+<span>def <span class="ident">internal_potential</span></span>(<span>self, C, phi, L, **segments)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Compute total internal potential (pst only).</p>
+<h2 id="arguments">Arguments</h2>
+<dl>
+<dt><strong><code>C</code></strong> :&ensp;<code>ndarray</code></dt>
+<dd>Matrix(6xN) of solution constants for a system of N
+segements. Columns contain the 6 constants of each segement.</dd>
+<dt><strong><code>phi</code></strong> :&ensp;<code>float</code></dt>
+<dd>Inclination of the slab (°).</dd>
+<dt><strong><code>L</code></strong> :&ensp;<code>float</code>, optional</dt>
+<dd>Total length of model (mm).</dd>
+<dt><strong><code>segments</code></strong> :&ensp;<code>dict</code></dt>
+<dd>Dictionary with lists of touchdown booleans (tdi), segement
+lengths (li), skier weights (mi), and foundation booleans
+in the cracked (ki) and uncracked (k0) configurations.</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><strong><code>Pi_int</code></strong> :&ensp;<code>float</code></dt>
+<dd>Total internal potential (Nmm).</dd>
+</dl></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def internal_potential(self, C, phi, L, **segments):
+    &#34;&#34;&#34;
+    Compute total internal potential (pst only).
+
+    Arguments
+    ---------
+    C : ndarray
+        Matrix(6xN) of solution constants for a system of N
+        segements. Columns contain the 6 constants of each segement.
+    phi : float
+        Inclination of the slab (°).
+    L : float, optional
+        Total length of model (mm).
+    segments : dict
+        Dictionary with lists of touchdown booleans (tdi), segement
+        lengths (li), skier weights (mi), and foundation booleans
+        in the cracked (ki) and uncracked (k0) configurations.
+
+    Returns
+    -------
+    Pi_int : float
+        Total internal potential (Nmm).
+    &#34;&#34;&#34;
+    # Rasterize solution
+    xq, zq, xb = self.rasterize_solution(C=C, phi=phi, **segments)
+
+    # Compute section forces
+    N, M, V = self.N(zq), self.M(zq), self.V(zq)
+
+    # Drop parts of the solution that are not a foundation
+    zweak = zq[:, ~np.isnan(xb)]
+    xweak = xb[~np.isnan(xb)]
+
+    # Compute weak layer displacements
+    wweak = self.w(zweak)
+    uweak = self.u(zweak, z0=self.h/2)
+
+    # Compute stored energy of the slab (monte-carlo integration)
+    n = len(xq)
+    nweak = len(xweak)
+    # energy share from moment, shear force, wl normal and tangential springs
+    Pi_int = L/2/n/self.A11*np.sum([Ni**2 for Ni in N]) \
+            + L/2/n/(self.D11-self.B11**2/self.A11)*np.sum([Mi**2 for Mi in M]) \
+            + L/2/n/self.kA55*np.sum([Vi**2 for Vi in V]) \
+            + L*self.kn/2/nweak*np.sum([wi**2 for wi in wweak]) \
+            + L*self.kt/2/nweak*np.sum([ui**2 for ui in uweak])
+    # energy share from substitute rotation spring
+    if self.system in [&#39;pst-&#39;]:
+        Pi_int += 1/2*M[-1]*(self.psi(zq)[-1])**2
+    elif self.system in [&#39;-pst&#39;]:
+        Pi_int += 1/2*M[0]*(self.psi(zq)[0])**2
+    else:
+        print(&#39;Input error: Only pst-setup implemented at the moment.&#39;)
+
+    return Pi_int</code></pre>
+</details>
+</dd>
+<dt id="weac.mixins.OutputMixin.total_potential"><code class="name flex">
+<span>def <span class="ident">total_potential</span></span>(<span>self, C, phi, L, **segments)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Returns total differential potential</p>
+<h2 id="arguments">Arguments</h2>
+<dl>
+<dt><strong><code>C</code></strong> :&ensp;<code>ndarray</code></dt>
+<dd>Matrix(6xN) of solution constants for a system of N
+segements. Columns contain the 6 constants of each segement.</dd>
+<dt><strong><code>phi</code></strong> :&ensp;<code>float</code></dt>
+<dd>Inclination of the slab (°).</dd>
+<dt><strong><code>L</code></strong> :&ensp;<code>float</code>, optional</dt>
+<dd>Total length of model (mm).</dd>
+<dt><strong><code>segments</code></strong> :&ensp;<code>dict</code></dt>
+<dd>Dictionary with lists of touchdown booleans (tdi), segement
+lengths (li), skier weights (mi), and foundation booleans
+in the cracked (ki) and uncracked (k0) configurations.</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><strong><code>Pi</code></strong> :&ensp;<code>float</code></dt>
+<dd>Total differential potential (Nmm).</dd>
+</dl></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def total_potential(self, C, phi, L, **segments):
+    &#34;&#34;&#34;
+    Returns total differential potential
+
+    Arguments
+    ---------
+    C : ndarray
+        Matrix(6xN) of solution constants for a system of N
+        segements. Columns contain the 6 constants of each segement.
+    phi : float
+        Inclination of the slab (°).
+    L : float, optional
+        Total length of model (mm).
+    segments : dict
+        Dictionary with lists of touchdown booleans (tdi), segement
+        lengths (li), skier weights (mi), and foundation booleans
+        in the cracked (ki) and uncracked (k0) configurations.
+
+    Returns
+    -------
+    Pi : float
+        Total differential potential (Nmm).
+    &#34;&#34;&#34;
+    Pi_int = self.internal_potential(C, phi, L, **segments)
+    Pi_ext = self.external_potential(C, phi, L, **segments)
+
+    return Pi_int + Pi_ext</code></pre>
+</details>
+</dd>
+</dl>
+</dd>
+<dt id="weac.mixins.SlabContactMixin"><code class="flex name class">
+<span>class <span class="ident">SlabContactMixin</span></span>
+</code></dt>
+<dd>
+<div class="desc"><p>Mixin for handling the touchdown situation in a PST.</p>
+<p>Provides Methods for the calculation of substitute spring stiffnesses,
+cracklength-tresholds and element lengths.</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class SlabContactMixin:
+    &#34;&#34;&#34;
+    Mixin for handling the touchdown situation in a PST.
+
+    Provides Methods for the calculation of substitute spring stiffnesses,
+    cracklength-tresholds and element lengths.
+    &#34;&#34;&#34;
+    # pylint: disable=too-many-instance-attributes
+
+    def set_columnlength(self,L):
+        &#34;&#34;&#34;
+        Set cracklength.
+
+        Arguments
+        ---------
+        L : float
+            Column length of a PST (mm).
+        &#34;&#34;&#34;
+        self.L = L
+
+    def set_cracklength(self,a):
+        &#34;&#34;&#34;
+        Set cracklength.
+
+        Arguments
+        ---------
+        a : float
+            Cracklength in a PST (mm).
+        &#34;&#34;&#34;
+        self.a = a
+
+    def set_tc(self,cf):
+        &#34;&#34;&#34;
+        Set height of the crack.
+
+        Arguments
+        ---------
+        cf : float
+            Collapse-factor. Ratio of the crack height to the
+            uncollapsed weak-layer height.
+        &#34;&#34;&#34;
+        # subtract displacement under constact load from collapsed wl height
+        qn = self.calc_qn()
+        self.tc = cf*self.t - qn/self.kn
+
+    def set_phi(self,phi):
+        &#34;&#34;&#34;
+        Set inclination of the slab.
+
+        Arguments
+        ---------
+        phi : float
+            Inclination of the slab (°).
+        &#34;&#34;&#34;
+        self.phi = phi
+
+    def set_stiffness_ratio(self, ratio=1000):
+        &#34;&#34;&#34;
+        Set ratio between collapsed and uncollapsed weak-layer stiffness.
+
+        Parameters
+        ----------
+        ratio : int, optional
+            Stiffness ratio between collapsed and uncollapsed weak layer.
+            Default is 1000.
+        &#34;&#34;&#34;
+        self.ratio = ratio
+
+    def calc_qn(self):
+        &#34;&#34;&#34;
+        Calc total surface normal load.
+
+        Returns
+        -------
+        float
+            Total surface normal load (N/mm).
+        &#34;&#34;&#34;
+        return self.get_weight_load(self.phi)[0] + self.get_surface_load(self.phi)[0]
+
+    def calc_qt(self):
+        &#34;&#34;&#34;
+        Calc total surface normal load.
+
+        Returns
+        -------
+        float
+            Total surface normal load (N/mm).
+        &#34;&#34;&#34;
+        return self.get_weight_load(self.phi)[1] + self.get_surface_load(self.phi)[1]
+
+    def substitute_stiffness(self, L, support=&#39;rested&#39;, dof=&#39;rot&#39;):
+        &#34;&#34;&#34;
+        Calc substitute stiffness for beam on elastic foundation. 
+
+        Arguments
+        ---------
+        L : float
+            Total length of the PST-column (mm).
+        support : string
+            Type of segment foundation. Defaults to &#39;rested&#39;.
+        dof : string 
+            Type of substitute spring, either &#39;rot&#39; or &#39;trans&#39;. Defaults to &#39;rot&#39;.
+
+        Returns
+        -------
+        k : stiffness of substitute spring.
+        &#34;&#34;&#34;
+        # adjust system to substitute system
+        if dof in [&#39;rot&#39;]:
+            tempsys = self.system
+            self.system = &#39;rot&#39;
+        if dof in [&#39;trans&#39;]:
+            tempsys = self.system
+            self.system = &#39;trans&#39;
+
+        # Change eigensystem for rested segment
+        if support in [&#39;rested&#39;]:
+            tempkn = self.kn
+            tempkt = self.kt
+            self.kn = self.ratio*self.kn
+            self.kt = self.ratio*self.kt
+            self.calc_system_matrix()
+            self.calc_eigensystem()
+
+        # prepare list of segment characteristics
+        segments = {&#39;li&#39;: np.array([L,  0.]),
+                    &#39;mi&#39;: np.array([0]),
+                    &#39;ki&#39;: np.array([True,  True])}
+        # solve system of equations
+        constants = self.assemble_and_solve(phi=0, **segments)
+        # calculate stiffness
+        _, z_pst, _ = self.rasterize_solution(
+            C=constants, phi=0, num=1, **segments)
+        if dof in [&#39;rot&#39;]:
+            k = abs(1/self.psi(z_pst)[0])
+        if dof in [&#39;trans&#39;]:
+            k = abs(1/self.w(z_pst)[0])
+
+        # Reset to previous system and eigensystem
+        self.system = tempsys
+        if support in [&#39;rested&#39;]:
+            self.kn = tempkn
+            self.kt = tempkt
+            self.calc_system_matrix()
+            self.calc_eigensystem()
+
+        return k
+
+    def calc_a1(self):
+        &#34;&#34;&#34;
+        Calc transition lengths a1 (aAB).
+
+        Returns
+        -------
+        a1 : float
+            Length of the crack for transition of stage A to stage B (mm).
+        &#34;&#34;&#34;
+        # Unpack variables
+        bs = -(self.B11**2/self.A11 - self.D11)
+        ss = self.kA55
+        L = self.L
+        tc = self.tc
+        qn = self.calc_qn()
+
+        # Create polynomial expression
+        def polynomial(x):
+            # Spring stiffness supported segment
+            kRl = self.substitute_stiffness(L-x, &#39;supported&#39;, &#39;rot&#39;)
+            kNl = self.substitute_stiffness(L-x, &#39;supported&#39;, &#39;trans&#39;)
+            c1 = 1/(8*bs)
+            c2 = 1/(2*kRl)
+            c3 = 1/(2*ss)
+            c4 = 1/kNl
+            c5 = -tc/qn
+            return c1*x**4 + c2*x**3 + c3*x**2 + c4*x + c5
+
+        # Find root
+        a1 = brentq(polynomial, L/1000, 999/1000*L)
+
+        return a1
+
+    def calc_a2(self):
+        &#34;&#34;&#34;
+        Calc transition lengths a2 (aBC).
+
+        Returns
+        -------
+        a2 : float
+            Length of the crack for transition of stage B to stage C (mm).
+        &#34;&#34;&#34;
+        # Unpack variables
+        bs = -(self.B11**2/self.A11 - self.D11)
+        ss = self.kA55
+        L = self.L
+        tc = self.tc
+        qn = self.calc_qn()
+
+        # Create polynomial function
+        def polynomial(x):
+            # Spring stiffness supported segment
+            kRl = self.substitute_stiffness(L-x, &#39;supported&#39;, &#39;rot&#39;)
+            kNl = self.substitute_stiffness(L-x, &#39;supported&#39;, &#39;trans&#39;)
+            c1 = ss**2*kRl*kNl*qn
+            c2 = 6*ss**2*bs*kNl*qn
+            c3 = 30*bs*ss*kRl*kNl*qn
+            c4 = 24*bs*qn*(
+                2*ss**2*kRl \
+                + 3*bs*ss*kNl)
+            c5 = 72*bs*(
+                bs*qn*(
+                    ss**2 \
+                    + kRl*kNl) \
+                - ss**2*kRl*kNl*tc)
+            c6 = 144*bs*ss*(
+                bs*kRl*qn \
+                - bs*ss*kNl*tc)
+            c7 = - 144*bs**2*ss*kRl*kNl*tc
+            return c1*x**6 + c2*x**5 + c3*x**4 + c4*x**3 + c5*x**2 + c6*x + c7
+
+        # Find root
+        a2 = brentq(polynomial, L/1000, 999/1000*L)
+
+        return a2
+
+    def calc_lA(self):
+        &#34;&#34;&#34;
+        Calculate the length of the touchdown element in mode A.
+        &#34;&#34;&#34;
+        lA = self.a
+
+        return lA
+
+    def calc_lB(self):
+        &#34;&#34;&#34;
+        Calculate the length of the touchdown element in mode B.
+        &#34;&#34;&#34;
+        lB = self.a
+
+        return lB
+
+    def calc_lC(self):
+        &#34;&#34;&#34;
+        Calculate the length of the touchdown element in mode C.
+        &#34;&#34;&#34;
+        # Unpack variables
+        bs = -(self.B11**2/self.A11 - self.D11)
+        ss = self.kA55
+        L = self.L
+        a = self.a
+        tc = self.tc
+        qn = self.calc_qn()
+
+        def polynomial(x):
+            # Spring stiffness supported segment
+            kRl = self.substitute_stiffness(L-a, &#39;supported&#39;, &#39;rot&#39;)
+            kNl = self.substitute_stiffness(L-a, &#39;supported&#39;, &#39;trans&#39;)
+            # Spring stiffness rested segment
+            kRr = self.substitute_stiffness(a-x, &#39;rested&#39;, &#39;rot&#39;)
+            # define constants
+            c1 = ss**2*kRl*kNl*qn
+            c2 = 6*ss*kNl*qn*(
+                bs*ss \
+                + kRl*kRr)
+            c3 = 30*bs*ss*kNl*qn*(kRl + kRr)
+            c4 = 24*bs*qn*(
+                2*ss**2*kRl \
+                + 3*bs*ss*kNl \
+                + 3*kRl*kRr*kNl)
+            c5 = 72*bs*(
+                bs*qn*(
+                    ss**2 \
+                    + kNl*(kRl + kRr)) \
+                + ss*kRl*(
+                    2*kRr*qn \
+                    - ss*kNl*tc))
+            c6 = 144*bs*ss*(
+                bs*qn*(kRl + kRr) \
+                - kNl*tc*(
+                    bs*ss \
+                    + kRl*kRr))
+            c7 = - 144*bs**2*ss*kNl*tc*(kRl + kRr)
+            return c1*x**6 + c2*x**5 + c3*x**4 + c4*x**3 + c5*x**2 + c6*x + c7
+
+        # Find root
+        lC = brentq(polynomial, a/1000, 999/1000*a)
+
+        return lC
+
+    def set_touchdown_attributes(self, L, a, cf, phi, ratio):
+        &#34;&#34;&#34;Set class attributes for touchdown consideration&#34;&#34;&#34;
+        self.set_columnlength(L)
+        self.set_cracklength(a)
+        self.set_tc(cf)
+        self.set_phi(phi)
+        self.set_stiffness_ratio(ratio)
+
+    def calc_touchdown_mode(self):
+        &#34;&#34;&#34;Calculate touchdown-mode from thresholds&#34;&#34;&#34;
+        if self.touchdown:
+            # Calculate stage transitions
+            a1 = self.calc_a1()
+            a2 = self.calc_a2()
+            # Assign stage
+            if self.a &lt;= a1:
+                mode = &#39;A&#39;
+            elif a1 &lt; self.a &lt;= a2:
+                mode = &#39;B&#39;
+            elif a2 &lt; self.a:
+                mode = &#39;C&#39;
+            self.mode = mode
+        else:
+            self.mode = &#39;A&#39;
+
+    def calc_touchdown_length(self):
+        &#34;&#34;&#34;Calculate touchdown length&#34;&#34;&#34;
+        if self.mode in [&#39;A&#39;]:
+            self.td = self.calc_lA()
+        elif self.mode in [&#39;B&#39;]:
+            self.td = self.calc_lB()
+        elif self.mode in [&#39;C&#39;]:
+            self.td = self.calc_lC()
+
+    def calc_touchdown_system(self, L, a, cf, phi, ratio=1000):
+        &#34;&#34;&#34;Calculate touchdown&#34;&#34;&#34;
+        self.set_touchdown_attributes(L, a, cf, phi, ratio)
+        self.calc_touchdown_mode()
+        self.calc_touchdown_length()</code></pre>
+</details>
+<h3>Subclasses</h3>
+<ul class="hlist">
+<li><a title="weac.layered.Layered" href="layered.html#weac.layered.Layered">Layered</a></li>
+</ul>
+<h3>Methods</h3>
+<dl>
+<dt id="weac.mixins.SlabContactMixin.calc_a1"><code class="name flex">
+<span>def <span class="ident">calc_a1</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Calc transition lengths a1 (aAB).</p>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><strong><code>a1</code></strong> :&ensp;<code>float</code></dt>
+<dd>Length of the crack for transition of stage A to stage B (mm).</dd>
+</dl></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def calc_a1(self):
+    &#34;&#34;&#34;
+    Calc transition lengths a1 (aAB).
+
+    Returns
+    -------
+    a1 : float
+        Length of the crack for transition of stage A to stage B (mm).
+    &#34;&#34;&#34;
+    # Unpack variables
+    bs = -(self.B11**2/self.A11 - self.D11)
+    ss = self.kA55
+    L = self.L
+    tc = self.tc
+    qn = self.calc_qn()
+
+    # Create polynomial expression
+    def polynomial(x):
+        # Spring stiffness supported segment
+        kRl = self.substitute_stiffness(L-x, &#39;supported&#39;, &#39;rot&#39;)
+        kNl = self.substitute_stiffness(L-x, &#39;supported&#39;, &#39;trans&#39;)
+        c1 = 1/(8*bs)
+        c2 = 1/(2*kRl)
+        c3 = 1/(2*ss)
+        c4 = 1/kNl
+        c5 = -tc/qn
+        return c1*x**4 + c2*x**3 + c3*x**2 + c4*x + c5
+
+    # Find root
+    a1 = brentq(polynomial, L/1000, 999/1000*L)
+
+    return a1</code></pre>
+</details>
+</dd>
+<dt id="weac.mixins.SlabContactMixin.calc_a2"><code class="name flex">
+<span>def <span class="ident">calc_a2</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Calc transition lengths a2 (aBC).</p>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><strong><code>a2</code></strong> :&ensp;<code>float</code></dt>
+<dd>Length of the crack for transition of stage B to stage C (mm).</dd>
+</dl></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def calc_a2(self):
+    &#34;&#34;&#34;
+    Calc transition lengths a2 (aBC).
+
+    Returns
+    -------
+    a2 : float
+        Length of the crack for transition of stage B to stage C (mm).
+    &#34;&#34;&#34;
+    # Unpack variables
+    bs = -(self.B11**2/self.A11 - self.D11)
+    ss = self.kA55
+    L = self.L
+    tc = self.tc
+    qn = self.calc_qn()
+
+    # Create polynomial function
+    def polynomial(x):
+        # Spring stiffness supported segment
+        kRl = self.substitute_stiffness(L-x, &#39;supported&#39;, &#39;rot&#39;)
+        kNl = self.substitute_stiffness(L-x, &#39;supported&#39;, &#39;trans&#39;)
+        c1 = ss**2*kRl*kNl*qn
+        c2 = 6*ss**2*bs*kNl*qn
+        c3 = 30*bs*ss*kRl*kNl*qn
+        c4 = 24*bs*qn*(
+            2*ss**2*kRl \
+            + 3*bs*ss*kNl)
+        c5 = 72*bs*(
+            bs*qn*(
+                ss**2 \
+                + kRl*kNl) \
+            - ss**2*kRl*kNl*tc)
+        c6 = 144*bs*ss*(
+            bs*kRl*qn \
+            - bs*ss*kNl*tc)
+        c7 = - 144*bs**2*ss*kRl*kNl*tc
+        return c1*x**6 + c2*x**5 + c3*x**4 + c4*x**3 + c5*x**2 + c6*x + c7
+
+    # Find root
+    a2 = brentq(polynomial, L/1000, 999/1000*L)
+
+    return a2</code></pre>
+</details>
+</dd>
+<dt id="weac.mixins.SlabContactMixin.calc_lA"><code class="name flex">
+<span>def <span class="ident">calc_lA</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Calculate the length of the touchdown element in mode A.</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def calc_lA(self):
+    &#34;&#34;&#34;
+    Calculate the length of the touchdown element in mode A.
+    &#34;&#34;&#34;
+    lA = self.a
+
+    return lA</code></pre>
+</details>
+</dd>
+<dt id="weac.mixins.SlabContactMixin.calc_lB"><code class="name flex">
+<span>def <span class="ident">calc_lB</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Calculate the length of the touchdown element in mode B.</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def calc_lB(self):
+    &#34;&#34;&#34;
+    Calculate the length of the touchdown element in mode B.
+    &#34;&#34;&#34;
+    lB = self.a
+
+    return lB</code></pre>
+</details>
+</dd>
+<dt id="weac.mixins.SlabContactMixin.calc_lC"><code class="name flex">
+<span>def <span class="ident">calc_lC</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Calculate the length of the touchdown element in mode C.</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def calc_lC(self):
+    &#34;&#34;&#34;
+    Calculate the length of the touchdown element in mode C.
+    &#34;&#34;&#34;
+    # Unpack variables
+    bs = -(self.B11**2/self.A11 - self.D11)
+    ss = self.kA55
+    L = self.L
+    a = self.a
+    tc = self.tc
+    qn = self.calc_qn()
+
+    def polynomial(x):
+        # Spring stiffness supported segment
+        kRl = self.substitute_stiffness(L-a, &#39;supported&#39;, &#39;rot&#39;)
+        kNl = self.substitute_stiffness(L-a, &#39;supported&#39;, &#39;trans&#39;)
+        # Spring stiffness rested segment
+        kRr = self.substitute_stiffness(a-x, &#39;rested&#39;, &#39;rot&#39;)
+        # define constants
+        c1 = ss**2*kRl*kNl*qn
+        c2 = 6*ss*kNl*qn*(
+            bs*ss \
+            + kRl*kRr)
+        c3 = 30*bs*ss*kNl*qn*(kRl + kRr)
+        c4 = 24*bs*qn*(
+            2*ss**2*kRl \
+            + 3*bs*ss*kNl \
+            + 3*kRl*kRr*kNl)
+        c5 = 72*bs*(
+            bs*qn*(
+                ss**2 \
+                + kNl*(kRl + kRr)) \
+            + ss*kRl*(
+                2*kRr*qn \
+                - ss*kNl*tc))
+        c6 = 144*bs*ss*(
+            bs*qn*(kRl + kRr) \
+            - kNl*tc*(
+                bs*ss \
+                + kRl*kRr))
+        c7 = - 144*bs**2*ss*kNl*tc*(kRl + kRr)
+        return c1*x**6 + c2*x**5 + c3*x**4 + c4*x**3 + c5*x**2 + c6*x + c7
+
+    # Find root
+    lC = brentq(polynomial, a/1000, 999/1000*a)
+
+    return lC</code></pre>
+</details>
+</dd>
+<dt id="weac.mixins.SlabContactMixin.calc_qn"><code class="name flex">
+<span>def <span class="ident">calc_qn</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Calc total surface normal load.</p>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>float</code></dt>
+<dd>Total surface normal load (N/mm).</dd>
+</dl></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def calc_qn(self):
+    &#34;&#34;&#34;
+    Calc total surface normal load.
+
+    Returns
+    -------
+    float
+        Total surface normal load (N/mm).
+    &#34;&#34;&#34;
+    return self.get_weight_load(self.phi)[0] + self.get_surface_load(self.phi)[0]</code></pre>
+</details>
+</dd>
+<dt id="weac.mixins.SlabContactMixin.calc_qt"><code class="name flex">
+<span>def <span class="ident">calc_qt</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Calc total surface normal load.</p>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>float</code></dt>
+<dd>Total surface normal load (N/mm).</dd>
+</dl></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def calc_qt(self):
+    &#34;&#34;&#34;
+    Calc total surface normal load.
+
+    Returns
+    -------
+    float
+        Total surface normal load (N/mm).
+    &#34;&#34;&#34;
+    return self.get_weight_load(self.phi)[1] + self.get_surface_load(self.phi)[1]</code></pre>
+</details>
+</dd>
+<dt id="weac.mixins.SlabContactMixin.calc_touchdown_length"><code class="name flex">
+<span>def <span class="ident">calc_touchdown_length</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Calculate touchdown length</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def calc_touchdown_length(self):
+    &#34;&#34;&#34;Calculate touchdown length&#34;&#34;&#34;
+    if self.mode in [&#39;A&#39;]:
+        self.td = self.calc_lA()
+    elif self.mode in [&#39;B&#39;]:
+        self.td = self.calc_lB()
+    elif self.mode in [&#39;C&#39;]:
+        self.td = self.calc_lC()</code></pre>
+</details>
+</dd>
+<dt id="weac.mixins.SlabContactMixin.calc_touchdown_mode"><code class="name flex">
+<span>def <span class="ident">calc_touchdown_mode</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Calculate touchdown-mode from thresholds</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def calc_touchdown_mode(self):
+    &#34;&#34;&#34;Calculate touchdown-mode from thresholds&#34;&#34;&#34;
+    if self.touchdown:
+        # Calculate stage transitions
+        a1 = self.calc_a1()
+        a2 = self.calc_a2()
+        # Assign stage
+        if self.a &lt;= a1:
+            mode = &#39;A&#39;
+        elif a1 &lt; self.a &lt;= a2:
+            mode = &#39;B&#39;
+        elif a2 &lt; self.a:
+            mode = &#39;C&#39;
+        self.mode = mode
+    else:
+        self.mode = &#39;A&#39;</code></pre>
+</details>
+</dd>
+<dt id="weac.mixins.SlabContactMixin.calc_touchdown_system"><code class="name flex">
+<span>def <span class="ident">calc_touchdown_system</span></span>(<span>self, L, a, cf, phi, ratio=1000)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Calculate touchdown</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def calc_touchdown_system(self, L, a, cf, phi, ratio=1000):
+    &#34;&#34;&#34;Calculate touchdown&#34;&#34;&#34;
+    self.set_touchdown_attributes(L, a, cf, phi, ratio)
+    self.calc_touchdown_mode()
+    self.calc_touchdown_length()</code></pre>
+</details>
+</dd>
+<dt id="weac.mixins.SlabContactMixin.set_columnlength"><code class="name flex">
+<span>def <span class="ident">set_columnlength</span></span>(<span>self, L)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Set cracklength.</p>
+<h2 id="arguments">Arguments</h2>
+<dl>
+<dt><strong><code>L</code></strong> :&ensp;<code>float</code></dt>
+<dd>Column length of a PST (mm).</dd>
+</dl></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def set_columnlength(self,L):
+    &#34;&#34;&#34;
+    Set cracklength.
+
+    Arguments
+    ---------
+    L : float
+        Column length of a PST (mm).
+    &#34;&#34;&#34;
+    self.L = L</code></pre>
+</details>
+</dd>
+<dt id="weac.mixins.SlabContactMixin.set_cracklength"><code class="name flex">
+<span>def <span class="ident">set_cracklength</span></span>(<span>self, a)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Set cracklength.</p>
+<h2 id="arguments">Arguments</h2>
+<dl>
+<dt><strong><code>a</code></strong> :&ensp;<code>float</code></dt>
+<dd>Cracklength in a PST (mm).</dd>
+</dl></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def set_cracklength(self,a):
+    &#34;&#34;&#34;
+    Set cracklength.
+
+    Arguments
+    ---------
+    a : float
+        Cracklength in a PST (mm).
+    &#34;&#34;&#34;
+    self.a = a</code></pre>
+</details>
+</dd>
+<dt id="weac.mixins.SlabContactMixin.set_phi"><code class="name flex">
+<span>def <span class="ident">set_phi</span></span>(<span>self, phi)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Set inclination of the slab.</p>
+<h2 id="arguments">Arguments</h2>
+<dl>
+<dt><strong><code>phi</code></strong> :&ensp;<code>float</code></dt>
+<dd>Inclination of the slab (°).</dd>
+</dl></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def set_phi(self,phi):
+    &#34;&#34;&#34;
+    Set inclination of the slab.
+
+    Arguments
+    ---------
+    phi : float
+        Inclination of the slab (°).
+    &#34;&#34;&#34;
+    self.phi = phi</code></pre>
+</details>
+</dd>
+<dt id="weac.mixins.SlabContactMixin.set_stiffness_ratio"><code class="name flex">
+<span>def <span class="ident">set_stiffness_ratio</span></span>(<span>self, ratio=1000)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Set ratio between collapsed and uncollapsed weak-layer stiffness.</p>
+<h2 id="parameters">Parameters</h2>
+<dl>
+<dt><strong><code>ratio</code></strong> :&ensp;<code>int</code>, optional</dt>
+<dd>Stiffness ratio between collapsed and uncollapsed weak layer.
+Default is 1000.</dd>
+</dl></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def set_stiffness_ratio(self, ratio=1000):
+    &#34;&#34;&#34;
+    Set ratio between collapsed and uncollapsed weak-layer stiffness.
+
+    Parameters
+    ----------
+    ratio : int, optional
+        Stiffness ratio between collapsed and uncollapsed weak layer.
+        Default is 1000.
+    &#34;&#34;&#34;
+    self.ratio = ratio</code></pre>
+</details>
+</dd>
+<dt id="weac.mixins.SlabContactMixin.set_tc"><code class="name flex">
+<span>def <span class="ident">set_tc</span></span>(<span>self, cf)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Set height of the crack.</p>
+<h2 id="arguments">Arguments</h2>
+<dl>
+<dt><strong><code>cf</code></strong> :&ensp;<code>float</code></dt>
+<dd>Collapse-factor. Ratio of the crack height to the
+uncollapsed weak-layer height.</dd>
+</dl></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def set_tc(self,cf):
+    &#34;&#34;&#34;
+    Set height of the crack.
+
+    Arguments
+    ---------
+    cf : float
+        Collapse-factor. Ratio of the crack height to the
+        uncollapsed weak-layer height.
+    &#34;&#34;&#34;
+    # subtract displacement under constact load from collapsed wl height
+    qn = self.calc_qn()
+    self.tc = cf*self.t - qn/self.kn</code></pre>
+</details>
+</dd>
+<dt id="weac.mixins.SlabContactMixin.set_touchdown_attributes"><code class="name flex">
+<span>def <span class="ident">set_touchdown_attributes</span></span>(<span>self, L, a, cf, phi, ratio)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Set class attributes for touchdown consideration</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def set_touchdown_attributes(self, L, a, cf, phi, ratio):
+    &#34;&#34;&#34;Set class attributes for touchdown consideration&#34;&#34;&#34;
+    self.set_columnlength(L)
+    self.set_cracklength(a)
+    self.set_tc(cf)
+    self.set_phi(phi)
+    self.set_stiffness_ratio(ratio)</code></pre>
+</details>
+</dd>
+<dt id="weac.mixins.SlabContactMixin.substitute_stiffness"><code class="name flex">
+<span>def <span class="ident">substitute_stiffness</span></span>(<span>self, L, support='rested', dof='rot')</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Calc substitute stiffness for beam on elastic foundation. </p>
+<h2 id="arguments">Arguments</h2>
+<dl>
+<dt><strong><code>L</code></strong> :&ensp;<code>float</code></dt>
+<dd>Total length of the PST-column (mm).</dd>
+<dt><strong><code>support</code></strong> :&ensp;<code>string</code></dt>
+<dd>Type of segment foundation. Defaults to 'rested'.</dd>
+<dt><strong><code>dof</code></strong> :&ensp;<code>string </code></dt>
+<dd>Type of substitute spring, either 'rot' or 'trans'. Defaults to 'rot'.</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<p>k : stiffness of substitute spring.</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def substitute_stiffness(self, L, support=&#39;rested&#39;, dof=&#39;rot&#39;):
+    &#34;&#34;&#34;
+    Calc substitute stiffness for beam on elastic foundation. 
+
+    Arguments
+    ---------
+    L : float
+        Total length of the PST-column (mm).
+    support : string
+        Type of segment foundation. Defaults to &#39;rested&#39;.
+    dof : string 
+        Type of substitute spring, either &#39;rot&#39; or &#39;trans&#39;. Defaults to &#39;rot&#39;.
+
+    Returns
+    -------
+    k : stiffness of substitute spring.
+    &#34;&#34;&#34;
+    # adjust system to substitute system
+    if dof in [&#39;rot&#39;]:
+        tempsys = self.system
+        self.system = &#39;rot&#39;
+    if dof in [&#39;trans&#39;]:
+        tempsys = self.system
+        self.system = &#39;trans&#39;
+
+    # Change eigensystem for rested segment
+    if support in [&#39;rested&#39;]:
+        tempkn = self.kn
+        tempkt = self.kt
+        self.kn = self.ratio*self.kn
+        self.kt = self.ratio*self.kt
+        self.calc_system_matrix()
+        self.calc_eigensystem()
+
+    # prepare list of segment characteristics
+    segments = {&#39;li&#39;: np.array([L,  0.]),
+                &#39;mi&#39;: np.array([0]),
+                &#39;ki&#39;: np.array([True,  True])}
+    # solve system of equations
+    constants = self.assemble_and_solve(phi=0, **segments)
+    # calculate stiffness
+    _, z_pst, _ = self.rasterize_solution(
+        C=constants, phi=0, num=1, **segments)
+    if dof in [&#39;rot&#39;]:
+        k = abs(1/self.psi(z_pst)[0])
+    if dof in [&#39;trans&#39;]:
+        k = abs(1/self.w(z_pst)[0])
+
+    # Reset to previous system and eigensystem
+    self.system = tempsys
+    if support in [&#39;rested&#39;]:
+        self.kn = tempkn
+        self.kt = tempkt
+        self.calc_system_matrix()
+        self.calc_eigensystem()
+
+    return k</code></pre>
+</details>
+</dd>
 </dl>
 </dd>
 <dt id="weac.mixins.SolutionMixin"><code class="flex name class">
@@ -4974,64 +6687,7 @@ and for the computation of the free constants.</p></div>
     and for the computation of the free constants.
     &#34;&#34;&#34;
 
-    def mode_td(self, l=0):
-        &#34;&#34;&#34;
-        Identify the mode of the pst-boundary.
-
-        Arguments
-        ---------
-        l : float, optional
-            Length of the segment in consideration. Default is zero.
-
-        Returns
-        -------
-        mode : string
-            Contains the mode for the boundary of the segment:
-            A - free end, B - intermediate touchdown,
-            C - full touchdown (maximum clamped end).
-        &#34;&#34;&#34;
-        if self.touchdown:
-            # Classify boundary type by element length
-            if l &lt;= self.lC:
-                return &#39;A&#39;
-            elif self.lC &lt; l &lt;= self.lS:
-                return &#39;B&#39;
-            elif self.lS &lt; l:
-                return &#39;C&#39;
-        else:
-            return &#39;A&#39;
-
-    def reduce_stiffness(self, l=0, mode=&#39;A&#39;):
-        &#34;&#34;&#34;
-        Determines the reduction factor for a rotational spring.
-
-        Arguments
-        ---------
-        l : float, optional
-            Length of the segment in consideration. Default is zero.
-        mode : string, optional
-            Contains the mode for the boundary of the segment:
-            A - free end, B - intermediate touchdown, C - full touchdown.
-            Default is A.
-
-        Returns
-        -------
-        kf : float
-            Reduction factor.
-        &#34;&#34;&#34;
-        # Reduction to zero for free end bc
-        if mode in [&#39;A&#39;]:
-            kf = 0
-        # Reduction factor for touchdown
-        if mode in [&#39;B&#39;, &#39;C&#39;]:
-            l = l - self.lC
-            # Beta needs to take into account different weak-layer spring stiffness
-            beta = self.beta*self.ratio**(1/4)
-            kf=(np.cos(2*beta*l)+np.cosh(2*beta*l)-2)/(np.sin(2*beta*l)+np.sinh(2*beta*l))
-
-        return kf
-
-    def bc(self, z, l=0, k=False, pos=&#39;mid&#39;):
+    def bc(self, z, k=False, pos=&#39;mid&#39;):
         &#34;&#34;&#34;
         Provide equations for free (pst) or infinite (skiers) ends.
 
@@ -5055,37 +6711,44 @@ and for the computation of the free constants.</p></div>
         bc : ndarray
             Boundary condition vector (lenght 3) at position x.
         &#34;&#34;&#34;
-        # Check mode for free end
-        mode = self.mode_td(l=l)
-        # Get spring stiffness reduction factor
-        kf = self.reduce_stiffness(l=l, mode=mode)
-        # Get spring stiffness for collapsed weak-layer
-        kR = self.calc_rot_spring(collapse=True)
 
         # Set boundary conditions for PST-systems
         if self.system in [&#39;pst-&#39;, &#39;-pst&#39;]:
             if not k:
-                if mode in [&#39;A&#39;]:
+                if self.mode in [&#39;A&#39;]:
                     # Free end
-                    bc = np.array([
-                        self.N(z),
-                        self.M(z),
-                        self.V(z)
-                    ])
-                elif mode in [&#39;B&#39;, &#39;C&#39;] and pos in [&#39;r&#39;, &#39;right&#39;]:
+                    bc = np.array([self.N(z),
+                                   self.M(z),
+                                   self.V(z)
+                                   ])
+                elif self.mode in [&#39;B&#39;] and pos in [&#39;r&#39;, &#39;right&#39;]:
                     # Touchdown right
-                    bc = np.array([
-                        self.N(z),
-                        self.M(z) + kf*kR*self.psi(z),
-                        self.w(z)
-                    ])
-                elif mode in [&#39;B&#39;, &#39;C&#39;] and pos in [&#39;l&#39;, &#39;left&#39;]:
+                    bc = np.array([self.N(z),
+                                   self.M(z),
+                                   self.w(z)
+                                   ])
+                elif self.mode in [&#39;B&#39;] and pos in [&#39;l&#39;, &#39;left&#39;]:   # Kann dieser Block
+                    # Touchdown left                                # verschwinden? Analog zu &#39;A&#39;
+                    bc = np.array([self.N(z),
+                                   self.M(z),
+                                   self.w(z)
+                                   ])
+                elif self.mode in [&#39;C&#39;] and pos in [&#39;r&#39;, &#39;right&#39;]:
+                    # Spring stiffness
+                    kR = self.substitute_stiffness(self.a - self.td, &#39;rested&#39;, &#39;rot&#39;)
+                    # Touchdown right
+                    bc = np.array([self.N(z),
+                                   self.M(z) + kR*self.psi(z),
+                                   self.w(z)
+                                   ])
+                elif self.mode in [&#39;C&#39;] and pos in [&#39;l&#39;, &#39;left&#39;]:
+                    # Spring stiffness
+                    kR = self.substitute_stiffness(self.a - self.td, &#39;rested&#39;, &#39;rot&#39;)
                     # Touchdown left
-                    bc = np.array([
-                        self.N(z),
-                        self.M(z) - kf*kR*self.psi(z),
-                        self.w(z)
-                    ])
+                    bc = np.array([self.N(z),
+                                   self.M(z) - kR*self.psi(z),
+                                   self.w(z)
+                                   ])
             else:
                 # Free end
                 bc = np.array([
@@ -5107,6 +6770,12 @@ and for the computation of the free constants.</p></div>
                            self.w(z),
                            self.psi(z)
                            ])
+        # Set boundary conditions for substitute spring calculus
+        elif self.system in [&#39;rot&#39;, &#39;trans&#39;]:
+            bc = np.array([self.N(z),
+                            self.M(z),
+                            self.V(z)
+                            ])
         else:
             raise ValueError(
                 &#39;Boundary conditions not defined for&#39;
@@ -5114,7 +6783,7 @@ and for the computation of the free constants.</p></div>
 
         return bc
 
-    def eqs(self, zl, zr, l=0, k=False, pos=&#39;mid&#39;):
+    def eqs(self, zl, zr, k=False, pos=&#39;mid&#39;):
         &#34;&#34;&#34;
         Provide boundary or transmission conditions for beam segments.
 
@@ -5124,8 +6793,6 @@ and for the computation of the free constants.</p></div>
             Solution vector (6x1) at left end of beam segement.
         zr : ndarray
             Solution vector (6x1) at right end of beam segement.
-        l : float, optional
-            Length of the segment in consideration. Default is zero.
         k : boolean
             Indicates whether segment has foundation(True) or not (False).
             Default is False.
@@ -5145,15 +6812,15 @@ and for the computation of the free constants.</p></div>
         &#34;&#34;&#34;
         if pos in (&#39;l&#39;, &#39;left&#39;):
             eqs = np.array([
-                self.bc(zl, l, k, pos)[0],      # Left boundary condition
-                self.bc(zl, l, k, pos)[1],      # Left boundary condition
-                self.bc(zl, l, k, pos)[2],      # Left boundary condition
-                self.u(zr, z0=0),               # ui(xi = li)
-                self.w(zr),                     # wi(xi = li)
-                self.psi(zr),                   # psii(xi = li)
-                self.N(zr),                     # Ni(xi = li)
-                self.M(zr),                     # Mi(xi = li)
-                self.V(zr)])                    # Vi(xi = li)
+                self.bc(zl, k, pos)[0],             # Left boundary condition
+                self.bc(zl, k, pos)[1],             # Left boundary condition
+                self.bc(zl, k, pos)[2],             # Left boundary condition
+                self.u(zr, z0=0),           # ui(xi = li)
+                self.w(zr),                 # wi(xi = li)
+                self.psi(zr),               # psii(xi = li)
+                self.N(zr),                 # Ni(xi = li)
+                self.M(zr),                 # Mi(xi = li)
+                self.V(zr)])                # Vi(xi = li)
         elif pos in (&#39;m&#39;, &#39;mid&#39;):
             eqs = np.array([
                 -self.u(zl, z0=0),              # -ui(xi = 0)
@@ -5170,15 +6837,15 @@ and for the computation of the free constants.</p></div>
                 self.V(zr)])                    # Vi(xi = li)
         elif pos in (&#39;r&#39;, &#39;right&#39;):
             eqs = np.array([
-                -self.u(zl, z0=0),              # -ui(xi = 0)
-                -self.w(zl),                    # -wi(xi = 0)
-                -self.psi(zl),                  # -psii(xi = 0)
-                -self.N(zl),                    # -Ni(xi = 0)
-                -self.M(zl),                    # -Mi(xi = 0)
-                -self.V(zl),                    # -Vi(xi = 0)
-                self.bc(zr, l, k, pos)[0],      # Right boundary condition
-                self.bc(zr, l, k, pos)[1],      # Right boundary condition
-                self.bc(zr, l, k, pos)[2]])     # Right boundary condition
+                -self.u(zl, z0=0),          # -ui(xi = 0)
+                -self.w(zl),                # -wi(xi = 0)
+                -self.psi(zl),              # -psii(xi = 0)
+                -self.N(zl),                # -Ni(xi = 0)
+                -self.M(zl),                # -Mi(xi = 0)
+                -self.V(zl),                # -Vi(xi = 0)
+                self.bc(zr, k, pos)[0],             # Right boundary condition
+                self.bc(zr, k, pos)[1],             # Right boundary condition
+                self.bc(zr, k, pos)[2]])            # Right boundary condition
         else:
             raise ValueError(
                 (f&#39;Invalid position argument {pos} given. &#39;
@@ -5186,8 +6853,19 @@ and for the computation of the free constants.</p></div>
                  &#39;or left, mid and right.&#39;))
         return eqs
 
-    def calc_segments(self, tdi=False, li=False, mi=False, ki=False, k0=False,
-                      L=1e4, a=0, m=0, **kwargs):
+    def calc_segments(
+            self,
+            li: list[float] | list[int] |bool = False,
+            mi: list[float] | list[int] |bool = False,
+            ki: list[bool] | bool = False,
+            k0: list[bool] | bool = False,
+            L: float = 1e4,
+            a: float = 0,
+            m: float = 0,
+            phi: float = 0,
+            cf: float = 0.5,
+            ratio: float = 1000,
+            **kwargs):
         &#34;&#34;&#34;
         Assemble lists defining the segments.
 
@@ -5220,6 +6898,12 @@ and for the computation of the free constants.</p></div>
         m : float, optional
             Weight of skier (kg) in the axial center of the model.
             Used for system &#39;skier&#39;.
+        cf : float, optional
+            Collapse factor. Ratio of the crack height to the uncollapsed
+            weak-layer height. Used for systems &#39;pst-&#39;, &#39;-pst&#39;. Default is 0.5.
+        ratio : float, optional
+            Stiffness ratio between collapsed and uncollapsed weak layer.
+            Default is 1000.
 
         Returns
         -------
@@ -5230,12 +6914,9 @@ and for the computation of the free constants.</p></div>
         &#34;&#34;&#34;
 
         _ = kwargs                                      # Unused arguments
-        # Set unbedded segment length
-        mode = self.mode_td(l=a)
-        if mode in [&#39;A&#39;, &#39;B&#39;]:
-            lU = a
-        if mode in [&#39;C&#39;]:
-            lU = self.lS
+
+        # Precompute touchdown properties
+        self.calc_touchdown_system(L=L, a=a, cf=cf, phi=phi, ratio=ratio)
 
         # Assemble list defining the segments
         if self.system == &#39;skiers&#39;:
@@ -5244,12 +6925,12 @@ and for the computation of the free constants.</p></div>
             ki = np.array(ki)                           # Crack
             k0 = np.array(k0)                           # No crack
         elif self.system == &#39;pst-&#39;:
-            li = np.array([L - a, lU])                  # Segment lengths
+            li = np.array([L - self.a, self.td])        # Segment lengths
             mi = np.array([0])                          # Skier weights
             ki = np.array([True, False])                # Crack
             k0 = np.array([True, True])                 # No crack
         elif self.system == &#39;-pst&#39;:
-            li = np.array([lU, L - a])                  # Segment lengths
+            li = np.array([self.td, L - self.a])        # Segment lengths
             mi = np.array([0])                          # Skier weights
             ki = np.array([False, True])                # Crack
             k0 = np.array([True, True])                 # No crack
@@ -5264,8 +6945,8 @@ and for the computation of the free constants.</p></div>
             ki = np.array([False, True])                # Crack
             k0 = np.array([True, True])                 # No crack
         elif self.system == &#39;skier&#39;:
-            lb = (L - a)/2                              # Half supported length
-            lf = a/2                                    # Half free length
+            lb = (L - self.a)/2                         # Half bedded length
+            lf = self.a/2                               # Half free length
             li = np.array([lb, lf, lf, lb])             # Segment lengths
             mi = np.array([0, m, 0])                    # Skier weights
             ki = np.array([True, False, False, True])   # Crack
@@ -5322,7 +7003,7 @@ and for the computation of the free constants.</p></div>
             raise ValueError(&#39;Make sure len(li)=N, len(ki)=N, and &#39;
                              &#39;len(mi)=N-1 for a system of N segments.&#39;)
 
-        if self.system not in [&#39;pst-&#39;, &#39;-pst&#39;, &#39;vpst-&#39;, &#39;-vpst&#39;]:
+        if self.system not in [&#39;pst-&#39;, &#39;-pst&#39;, &#39;vpst-&#39;, &#39;-vpst&#39;, &#39;rot&#39;, &#39;trans&#39;]:
             # Boundary segments must be on foundation for infinite BCs
             if not all([ki[0], ki[-1]]):
                 raise ValueError(&#39;Provide supported boundary segments in &#39;
@@ -5337,6 +7018,7 @@ and for the computation of the free constants.</p></div>
 
         # Determine size of linear system of equations
         nS = len(li)            # Number of beam segments
+
         nDOF = 6                # Number of free constants per segment
 
         # Add dummy segment if only one segment provided
@@ -5365,11 +7047,11 @@ and for the computation of the free constants.</p></div>
             zhi = self.eqs(
                 zl=self.zh(x=0, l=l, bed=k),
                 zr=self.zh(x=l, l=l, bed=k),
-                l=l, k=k, pos=pos)
+                k=k, pos=pos)
             zpi = self.eqs(
                 zl=self.zp(x=0, phi=phi, bed=k),
                 zr=self.zp(x=l, phi=phi, bed=k),
-                l=l, k=k, pos=pos)
+                k=k, pos=pos)
             # Rows for left-hand side assembly
             start = 0 if i == 0 else 3
             stop = 6 if i == nS - 1 else 9
@@ -5384,7 +7066,7 @@ and for the computation of the free constants.</p></div>
             # Right-hand side for transmission from segment i-1 to segment i
             rhs[6*i:6*i + 3] = np.vstack([Ft, -Ft*self.h/2, Fn])
         # Set rhs so that complementary integral vanishes at boundaries
-        if self.system not in [&#39;pst-&#39;, &#39;-pst&#39;]:
+        if self.system not in [&#39;pst-&#39;, &#39;-pst&#39;, &#39;rested&#39;]:
             rhs[:3] = self.bc(self.zp(x=0, phi=phi, bed=ki[0]))
             rhs[-3:] = self.bc(self.zp(x=li[-1], phi=phi, bed=ki[-1]))
             
@@ -5402,19 +7084,34 @@ and for the computation of the free constants.</p></div>
             # Add to right-hand side
             rhs[:3] = np.vstack([N, M, V])          # left end
             rhs[-3:] = np.vstack([N, M, V])         # right end
-            
-        # Set touchdown boundary conditions
-        elif self.system in [&#39;pst-&#39;, &#39;-pst&#39;]:
-            # Loop through segments to set touchdown at rhs
-            for i in range(nS):
-                # Length, foundation and position of segment i
-                l, k, pos = li[i], ki[i], pi[i]
-                mode = self.mode_td(l=l)
-                if not k and bool(mode in [&#39;B&#39;, &#39;C&#39;]):
-                    if i==0:
-                        rhs[:3] = np.vstack([0,0,self.tc])
-                    if i == (nS - 1):
-                        rhs[-3:] = np.vstack([0,0,self.tc])
+
+        # Loop through segments to set touchdown conditions at rhs
+        for i in range(nS):
+            # Length, foundation and position of segment i
+            l, k, pos = li[i], ki[i], pi[i]
+            # Set displacement BC in stage B
+            if not k and bool(self.mode in [&#39;B&#39;]):
+                if i==0:
+                    rhs[:3] = np.vstack([0,0,self.tc])
+                if i == (nS - 1):
+                    rhs[-3:] = np.vstack([0,0,self.tc])
+            # Set normal force and displacement BC for stage C
+            if not k and bool(self.mode in [&#39;C&#39;]):
+                N = self.calc_qt()*(self.a - self.td)
+                if i==0:
+                    rhs[:3] = np.vstack([-N,0,self.tc])
+                if i == (nS - 1):
+                    rhs[-3:] = np.vstack([N,0,self.tc])
+
+        # Rhs for substitute spring stiffness
+        if self.system in [&#39;rot&#39;]:
+            # apply arbitrary moment of 1 at left boundary
+            rhs = rhs*0
+            rhs[1] = 1
+        if self.system in [&#39;trans&#39;]:
+            # apply arbitrary force of 1 at left boundary
+            rhs = rhs*0
+            rhs[2] = 1
 
         # --- SOLVE -----------------------------------------------------------
 
@@ -5595,7 +7292,7 @@ segements. Columns contain the 6 constants of each segement.</dd>
         raise ValueError(&#39;Make sure len(li)=N, len(ki)=N, and &#39;
                          &#39;len(mi)=N-1 for a system of N segments.&#39;)
 
-    if self.system not in [&#39;pst-&#39;, &#39;-pst&#39;, &#39;vpst-&#39;, &#39;-vpst&#39;]:
+    if self.system not in [&#39;pst-&#39;, &#39;-pst&#39;, &#39;vpst-&#39;, &#39;-vpst&#39;, &#39;rot&#39;, &#39;trans&#39;]:
         # Boundary segments must be on foundation for infinite BCs
         if not all([ki[0], ki[-1]]):
             raise ValueError(&#39;Provide supported boundary segments in &#39;
@@ -5610,6 +7307,7 @@ segements. Columns contain the 6 constants of each segement.</dd>
 
     # Determine size of linear system of equations
     nS = len(li)            # Number of beam segments
+
     nDOF = 6                # Number of free constants per segment
 
     # Add dummy segment if only one segment provided
@@ -5638,11 +7336,11 @@ segements. Columns contain the 6 constants of each segement.</dd>
         zhi = self.eqs(
             zl=self.zh(x=0, l=l, bed=k),
             zr=self.zh(x=l, l=l, bed=k),
-            l=l, k=k, pos=pos)
+            k=k, pos=pos)
         zpi = self.eqs(
             zl=self.zp(x=0, phi=phi, bed=k),
             zr=self.zp(x=l, phi=phi, bed=k),
-            l=l, k=k, pos=pos)
+            k=k, pos=pos)
         # Rows for left-hand side assembly
         start = 0 if i == 0 else 3
         stop = 6 if i == nS - 1 else 9
@@ -5657,7 +7355,7 @@ segements. Columns contain the 6 constants of each segement.</dd>
         # Right-hand side for transmission from segment i-1 to segment i
         rhs[6*i:6*i + 3] = np.vstack([Ft, -Ft*self.h/2, Fn])
     # Set rhs so that complementary integral vanishes at boundaries
-    if self.system not in [&#39;pst-&#39;, &#39;-pst&#39;]:
+    if self.system not in [&#39;pst-&#39;, &#39;-pst&#39;, &#39;rested&#39;]:
         rhs[:3] = self.bc(self.zp(x=0, phi=phi, bed=ki[0]))
         rhs[-3:] = self.bc(self.zp(x=li[-1], phi=phi, bed=ki[-1]))
         
@@ -5675,19 +7373,34 @@ segements. Columns contain the 6 constants of each segement.</dd>
         # Add to right-hand side
         rhs[:3] = np.vstack([N, M, V])          # left end
         rhs[-3:] = np.vstack([N, M, V])         # right end
-        
-    # Set touchdown boundary conditions
-    elif self.system in [&#39;pst-&#39;, &#39;-pst&#39;]:
-        # Loop through segments to set touchdown at rhs
-        for i in range(nS):
-            # Length, foundation and position of segment i
-            l, k, pos = li[i], ki[i], pi[i]
-            mode = self.mode_td(l=l)
-            if not k and bool(mode in [&#39;B&#39;, &#39;C&#39;]):
-                if i==0:
-                    rhs[:3] = np.vstack([0,0,self.tc])
-                if i == (nS - 1):
-                    rhs[-3:] = np.vstack([0,0,self.tc])
+
+    # Loop through segments to set touchdown conditions at rhs
+    for i in range(nS):
+        # Length, foundation and position of segment i
+        l, k, pos = li[i], ki[i], pi[i]
+        # Set displacement BC in stage B
+        if not k and bool(self.mode in [&#39;B&#39;]):
+            if i==0:
+                rhs[:3] = np.vstack([0,0,self.tc])
+            if i == (nS - 1):
+                rhs[-3:] = np.vstack([0,0,self.tc])
+        # Set normal force and displacement BC for stage C
+        if not k and bool(self.mode in [&#39;C&#39;]):
+            N = self.calc_qt()*(self.a - self.td)
+            if i==0:
+                rhs[:3] = np.vstack([-N,0,self.tc])
+            if i == (nS - 1):
+                rhs[-3:] = np.vstack([N,0,self.tc])
+
+    # Rhs for substitute spring stiffness
+    if self.system in [&#39;rot&#39;]:
+        # apply arbitrary moment of 1 at left boundary
+        rhs = rhs*0
+        rhs[1] = 1
+    if self.system in [&#39;trans&#39;]:
+        # apply arbitrary force of 1 at left boundary
+        rhs = rhs*0
+        rhs[2] = 1
 
     # --- SOLVE -----------------------------------------------------------
 
@@ -5698,7 +7411,7 @@ segements. Columns contain the 6 constants of each segement.</dd>
 </details>
 </dd>
 <dt id="weac.mixins.SolutionMixin.bc"><code class="name flex">
-<span>def <span class="ident">bc</span></span>(<span>self, z, l=0, k=False, pos='mid')</span>
+<span>def <span class="ident">bc</span></span>(<span>self, z, k=False, pos='mid')</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Provide equations for free (pst) or infinite (skiers) ends.</p>
@@ -5726,7 +7439,7 @@ segement (right, r). Default is 'mid'.</dd>
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def bc(self, z, l=0, k=False, pos=&#39;mid&#39;):
+<pre><code class="python">def bc(self, z, k=False, pos=&#39;mid&#39;):
     &#34;&#34;&#34;
     Provide equations for free (pst) or infinite (skiers) ends.
 
@@ -5750,37 +7463,44 @@ segement (right, r). Default is 'mid'.</dd>
     bc : ndarray
         Boundary condition vector (lenght 3) at position x.
     &#34;&#34;&#34;
-    # Check mode for free end
-    mode = self.mode_td(l=l)
-    # Get spring stiffness reduction factor
-    kf = self.reduce_stiffness(l=l, mode=mode)
-    # Get spring stiffness for collapsed weak-layer
-    kR = self.calc_rot_spring(collapse=True)
 
     # Set boundary conditions for PST-systems
     if self.system in [&#39;pst-&#39;, &#39;-pst&#39;]:
         if not k:
-            if mode in [&#39;A&#39;]:
+            if self.mode in [&#39;A&#39;]:
                 # Free end
-                bc = np.array([
-                    self.N(z),
-                    self.M(z),
-                    self.V(z)
-                ])
-            elif mode in [&#39;B&#39;, &#39;C&#39;] and pos in [&#39;r&#39;, &#39;right&#39;]:
+                bc = np.array([self.N(z),
+                               self.M(z),
+                               self.V(z)
+                               ])
+            elif self.mode in [&#39;B&#39;] and pos in [&#39;r&#39;, &#39;right&#39;]:
                 # Touchdown right
-                bc = np.array([
-                    self.N(z),
-                    self.M(z) + kf*kR*self.psi(z),
-                    self.w(z)
-                ])
-            elif mode in [&#39;B&#39;, &#39;C&#39;] and pos in [&#39;l&#39;, &#39;left&#39;]:
+                bc = np.array([self.N(z),
+                               self.M(z),
+                               self.w(z)
+                               ])
+            elif self.mode in [&#39;B&#39;] and pos in [&#39;l&#39;, &#39;left&#39;]:   # Kann dieser Block
+                # Touchdown left                                # verschwinden? Analog zu &#39;A&#39;
+                bc = np.array([self.N(z),
+                               self.M(z),
+                               self.w(z)
+                               ])
+            elif self.mode in [&#39;C&#39;] and pos in [&#39;r&#39;, &#39;right&#39;]:
+                # Spring stiffness
+                kR = self.substitute_stiffness(self.a - self.td, &#39;rested&#39;, &#39;rot&#39;)
+                # Touchdown right
+                bc = np.array([self.N(z),
+                               self.M(z) + kR*self.psi(z),
+                               self.w(z)
+                               ])
+            elif self.mode in [&#39;C&#39;] and pos in [&#39;l&#39;, &#39;left&#39;]:
+                # Spring stiffness
+                kR = self.substitute_stiffness(self.a - self.td, &#39;rested&#39;, &#39;rot&#39;)
                 # Touchdown left
-                bc = np.array([
-                    self.N(z),
-                    self.M(z) - kf*kR*self.psi(z),
-                    self.w(z)
-                ])
+                bc = np.array([self.N(z),
+                               self.M(z) - kR*self.psi(z),
+                               self.w(z)
+                               ])
         else:
             # Free end
             bc = np.array([
@@ -5802,6 +7522,12 @@ segement (right, r). Default is 'mid'.</dd>
                        self.w(z),
                        self.psi(z)
                        ])
+    # Set boundary conditions for substitute spring calculus
+    elif self.system in [&#39;rot&#39;, &#39;trans&#39;]:
+        bc = np.array([self.N(z),
+                        self.M(z),
+                        self.V(z)
+                        ])
     else:
         raise ValueError(
             &#39;Boundary conditions not defined for&#39;
@@ -5811,7 +7537,7 @@ segement (right, r). Default is 'mid'.</dd>
 </details>
 </dd>
 <dt id="weac.mixins.SolutionMixin.calc_segments"><code class="name flex">
-<span>def <span class="ident">calc_segments</span></span>(<span>self, tdi=False, li=False, mi=False, ki=False, k0=False, L=10000.0, a=0, m=0, **kwargs)</span>
+<span>def <span class="ident">calc_segments</span></span>(<span>self, li: list[float] | list[int] | bool = False, mi: list[float] | list[int] | bool = False, ki: list[bool] | bool = False, k0: list[bool] | bool = False, L: float = 10000.0, a: float = 0, m: float = 0, phi: float = 0, cf: float = 0.5, ratio: float = 1000, **kwargs)</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Assemble lists defining the segments.</p>
@@ -5844,6 +7570,12 @@ Used for system 'skiers'.</dd>
 <dt><strong><code>m</code></strong> :&ensp;<code>float</code>, optional</dt>
 <dd>Weight of skier (kg) in the axial center of the model.
 Used for system 'skier'.</dd>
+<dt><strong><code>cf</code></strong> :&ensp;<code>float</code>, optional</dt>
+<dd>Collapse factor. Ratio of the crack height to the uncollapsed
+weak-layer height. Used for systems 'pst-', '-pst'. Default is 0.5.</dd>
+<dt><strong><code>ratio</code></strong> :&ensp;<code>float</code>, optional</dt>
+<dd>Stiffness ratio between collapsed and uncollapsed weak layer.
+Default is 1000.</dd>
 </dl>
 <h2 id="returns">Returns</h2>
 <dl>
@@ -5856,8 +7588,19 @@ in the cracked (ki) and uncracked (k0) configurations.</dd>
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def calc_segments(self, tdi=False, li=False, mi=False, ki=False, k0=False,
-                  L=1e4, a=0, m=0, **kwargs):
+<pre><code class="python">def calc_segments(
+        self,
+        li: list[float] | list[int] |bool = False,
+        mi: list[float] | list[int] |bool = False,
+        ki: list[bool] | bool = False,
+        k0: list[bool] | bool = False,
+        L: float = 1e4,
+        a: float = 0,
+        m: float = 0,
+        phi: float = 0,
+        cf: float = 0.5,
+        ratio: float = 1000,
+        **kwargs):
     &#34;&#34;&#34;
     Assemble lists defining the segments.
 
@@ -5890,6 +7633,12 @@ in the cracked (ki) and uncracked (k0) configurations.</dd>
     m : float, optional
         Weight of skier (kg) in the axial center of the model.
         Used for system &#39;skier&#39;.
+    cf : float, optional
+        Collapse factor. Ratio of the crack height to the uncollapsed
+        weak-layer height. Used for systems &#39;pst-&#39;, &#39;-pst&#39;. Default is 0.5.
+    ratio : float, optional
+        Stiffness ratio between collapsed and uncollapsed weak layer.
+        Default is 1000.
 
     Returns
     -------
@@ -5900,12 +7649,9 @@ in the cracked (ki) and uncracked (k0) configurations.</dd>
     &#34;&#34;&#34;
 
     _ = kwargs                                      # Unused arguments
-    # Set unbedded segment length
-    mode = self.mode_td(l=a)
-    if mode in [&#39;A&#39;, &#39;B&#39;]:
-        lU = a
-    if mode in [&#39;C&#39;]:
-        lU = self.lS
+
+    # Precompute touchdown properties
+    self.calc_touchdown_system(L=L, a=a, cf=cf, phi=phi, ratio=ratio)
 
     # Assemble list defining the segments
     if self.system == &#39;skiers&#39;:
@@ -5914,12 +7660,12 @@ in the cracked (ki) and uncracked (k0) configurations.</dd>
         ki = np.array(ki)                           # Crack
         k0 = np.array(k0)                           # No crack
     elif self.system == &#39;pst-&#39;:
-        li = np.array([L - a, lU])                  # Segment lengths
+        li = np.array([L - self.a, self.td])        # Segment lengths
         mi = np.array([0])                          # Skier weights
         ki = np.array([True, False])                # Crack
         k0 = np.array([True, True])                 # No crack
     elif self.system == &#39;-pst&#39;:
-        li = np.array([lU, L - a])                  # Segment lengths
+        li = np.array([self.td, L - self.a])        # Segment lengths
         mi = np.array([0])                          # Skier weights
         ki = np.array([False, True])                # Crack
         k0 = np.array([True, True])                 # No crack
@@ -5934,8 +7680,8 @@ in the cracked (ki) and uncracked (k0) configurations.</dd>
         ki = np.array([False, True])                # Crack
         k0 = np.array([True, True])                 # No crack
     elif self.system == &#39;skier&#39;:
-        lb = (L - a)/2                              # Half supported length
-        lf = a/2                                    # Half free length
+        lb = (L - self.a)/2                         # Half bedded length
+        lf = self.a/2                               # Half free length
         li = np.array([lb, lf, lf, lb])             # Segment lengths
         mi = np.array([0, m, 0])                    # Skier weights
         ki = np.array([True, False, False, True])   # Crack
@@ -5952,7 +7698,7 @@ in the cracked (ki) and uncracked (k0) configurations.</dd>
 </details>
 </dd>
 <dt id="weac.mixins.SolutionMixin.eqs"><code class="name flex">
-<span>def <span class="ident">eqs</span></span>(<span>self, zl, zr, l=0, k=False, pos='mid')</span>
+<span>def <span class="ident">eqs</span></span>(<span>self, zl, zr, k=False, pos='mid')</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Provide boundary or transmission conditions for beam segments.</p>
@@ -5962,8 +7708,6 @@ in the cracked (ki) and uncracked (k0) configurations.</dd>
 <dd>Solution vector (6x1) at left end of beam segement.</dd>
 <dt><strong><code>zr</code></strong> :&ensp;<code>ndarray</code></dt>
 <dd>Solution vector (6x1) at right end of beam segement.</dd>
-<dt><strong><code>l</code></strong> :&ensp;<code>float</code>, optional</dt>
-<dd>Length of the segment in consideration. Default is zero.</dd>
 <dt><strong><code>k</code></strong> :&ensp;<code>boolean</code></dt>
 <dd>Indicates whether segment has foundation(True) or not (False).
 Default is False.</dd>
@@ -5985,7 +7729,7 @@ for center segments.</dd>
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def eqs(self, zl, zr, l=0, k=False, pos=&#39;mid&#39;):
+<pre><code class="python">def eqs(self, zl, zr, k=False, pos=&#39;mid&#39;):
     &#34;&#34;&#34;
     Provide boundary or transmission conditions for beam segments.
 
@@ -5995,8 +7739,6 @@ for center segments.</dd>
         Solution vector (6x1) at left end of beam segement.
     zr : ndarray
         Solution vector (6x1) at right end of beam segement.
-    l : float, optional
-        Length of the segment in consideration. Default is zero.
     k : boolean
         Indicates whether segment has foundation(True) or not (False).
         Default is False.
@@ -6016,15 +7758,15 @@ for center segments.</dd>
     &#34;&#34;&#34;
     if pos in (&#39;l&#39;, &#39;left&#39;):
         eqs = np.array([
-            self.bc(zl, l, k, pos)[0],      # Left boundary condition
-            self.bc(zl, l, k, pos)[1],      # Left boundary condition
-            self.bc(zl, l, k, pos)[2],      # Left boundary condition
-            self.u(zr, z0=0),               # ui(xi = li)
-            self.w(zr),                     # wi(xi = li)
-            self.psi(zr),                   # psii(xi = li)
-            self.N(zr),                     # Ni(xi = li)
-            self.M(zr),                     # Mi(xi = li)
-            self.V(zr)])                    # Vi(xi = li)
+            self.bc(zl, k, pos)[0],             # Left boundary condition
+            self.bc(zl, k, pos)[1],             # Left boundary condition
+            self.bc(zl, k, pos)[2],             # Left boundary condition
+            self.u(zr, z0=0),           # ui(xi = li)
+            self.w(zr),                 # wi(xi = li)
+            self.psi(zr),               # psii(xi = li)
+            self.N(zr),                 # Ni(xi = li)
+            self.M(zr),                 # Mi(xi = li)
+            self.V(zr)])                # Vi(xi = li)
     elif pos in (&#39;m&#39;, &#39;mid&#39;):
         eqs = np.array([
             -self.u(zl, z0=0),              # -ui(xi = 0)
@@ -6041,124 +7783,21 @@ for center segments.</dd>
             self.V(zr)])                    # Vi(xi = li)
     elif pos in (&#39;r&#39;, &#39;right&#39;):
         eqs = np.array([
-            -self.u(zl, z0=0),              # -ui(xi = 0)
-            -self.w(zl),                    # -wi(xi = 0)
-            -self.psi(zl),                  # -psii(xi = 0)
-            -self.N(zl),                    # -Ni(xi = 0)
-            -self.M(zl),                    # -Mi(xi = 0)
-            -self.V(zl),                    # -Vi(xi = 0)
-            self.bc(zr, l, k, pos)[0],      # Right boundary condition
-            self.bc(zr, l, k, pos)[1],      # Right boundary condition
-            self.bc(zr, l, k, pos)[2]])     # Right boundary condition
+            -self.u(zl, z0=0),          # -ui(xi = 0)
+            -self.w(zl),                # -wi(xi = 0)
+            -self.psi(zl),              # -psii(xi = 0)
+            -self.N(zl),                # -Ni(xi = 0)
+            -self.M(zl),                # -Mi(xi = 0)
+            -self.V(zl),                # -Vi(xi = 0)
+            self.bc(zr, k, pos)[0],             # Right boundary condition
+            self.bc(zr, k, pos)[1],             # Right boundary condition
+            self.bc(zr, k, pos)[2]])            # Right boundary condition
     else:
         raise ValueError(
             (f&#39;Invalid position argument {pos} given. &#39;
              &#39;Valid segment positions are l, m, and r, &#39;
              &#39;or left, mid and right.&#39;))
     return eqs</code></pre>
-</details>
-</dd>
-<dt id="weac.mixins.SolutionMixin.mode_td"><code class="name flex">
-<span>def <span class="ident">mode_td</span></span>(<span>self, l=0)</span>
-</code></dt>
-<dd>
-<div class="desc"><p>Identify the mode of the pst-boundary.</p>
-<h2 id="arguments">Arguments</h2>
-<dl>
-<dt><strong><code>l</code></strong> :&ensp;<code>float</code>, optional</dt>
-<dd>Length of the segment in consideration. Default is zero.</dd>
-</dl>
-<h2 id="returns">Returns</h2>
-<dl>
-<dt><strong><code>mode</code></strong> :&ensp;<code>string</code></dt>
-<dd>Contains the mode for the boundary of the segment:
-A - free end, B - intermediate touchdown,
-C - full touchdown (maximum clamped end).</dd>
-</dl></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">def mode_td(self, l=0):
-    &#34;&#34;&#34;
-    Identify the mode of the pst-boundary.
-
-    Arguments
-    ---------
-    l : float, optional
-        Length of the segment in consideration. Default is zero.
-
-    Returns
-    -------
-    mode : string
-        Contains the mode for the boundary of the segment:
-        A - free end, B - intermediate touchdown,
-        C - full touchdown (maximum clamped end).
-    &#34;&#34;&#34;
-    if self.touchdown:
-        # Classify boundary type by element length
-        if l &lt;= self.lC:
-            return &#39;A&#39;
-        elif self.lC &lt; l &lt;= self.lS:
-            return &#39;B&#39;
-        elif self.lS &lt; l:
-            return &#39;C&#39;
-    else:
-        return &#39;A&#39;</code></pre>
-</details>
-</dd>
-<dt id="weac.mixins.SolutionMixin.reduce_stiffness"><code class="name flex">
-<span>def <span class="ident">reduce_stiffness</span></span>(<span>self, l=0, mode='A')</span>
-</code></dt>
-<dd>
-<div class="desc"><p>Determines the reduction factor for a rotational spring.</p>
-<h2 id="arguments">Arguments</h2>
-<dl>
-<dt><strong><code>l</code></strong> :&ensp;<code>float</code>, optional</dt>
-<dd>Length of the segment in consideration. Default is zero.</dd>
-<dt><strong><code>mode</code></strong> :&ensp;<code>string</code>, optional</dt>
-<dd>Contains the mode for the boundary of the segment:
-A - free end, B - intermediate touchdown, C - full touchdown.
-Default is A.</dd>
-</dl>
-<h2 id="returns">Returns</h2>
-<dl>
-<dt><strong><code>kf</code></strong> :&ensp;<code>float</code></dt>
-<dd>Reduction factor.</dd>
-</dl></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">def reduce_stiffness(self, l=0, mode=&#39;A&#39;):
-    &#34;&#34;&#34;
-    Determines the reduction factor for a rotational spring.
-
-    Arguments
-    ---------
-    l : float, optional
-        Length of the segment in consideration. Default is zero.
-    mode : string, optional
-        Contains the mode for the boundary of the segment:
-        A - free end, B - intermediate touchdown, C - full touchdown.
-        Default is A.
-
-    Returns
-    -------
-    kf : float
-        Reduction factor.
-    &#34;&#34;&#34;
-    # Reduction to zero for free end bc
-    if mode in [&#39;A&#39;]:
-        kf = 0
-    # Reduction factor for touchdown
-    if mode in [&#39;B&#39;, &#39;C&#39;]:
-        l = l - self.lC
-        # Beta needs to take into account different weak-layer spring stiffness
-        beta = self.beta*self.ratio**(1/4)
-        kf=(np.cos(2*beta*l)+np.cosh(2*beta*l)-2)/(np.sin(2*beta*l)+np.sinh(2*beta*l))
-
-    return kf</code></pre>
 </details>
 </dd>
 </dl>
@@ -6224,22 +7863,45 @@ Default is A.</dd>
 <li>
 <h4><code><a title="weac.mixins.OutputMixin" href="#weac.mixins.OutputMixin">OutputMixin</a></code></h4>
 <ul class="">
+<li><code><a title="weac.mixins.OutputMixin.external_potential" href="#weac.mixins.OutputMixin.external_potential">external_potential</a></code></li>
 <li><code><a title="weac.mixins.OutputMixin.get_slab_deflection" href="#weac.mixins.OutputMixin.get_slab_deflection">get_slab_deflection</a></code></li>
 <li><code><a title="weac.mixins.OutputMixin.get_slab_displacement" href="#weac.mixins.OutputMixin.get_slab_displacement">get_slab_displacement</a></code></li>
 <li><code><a title="weac.mixins.OutputMixin.get_slab_rotation" href="#weac.mixins.OutputMixin.get_slab_rotation">get_slab_rotation</a></code></li>
 <li><code><a title="weac.mixins.OutputMixin.get_weaklayer_normalstress" href="#weac.mixins.OutputMixin.get_weaklayer_normalstress">get_weaklayer_normalstress</a></code></li>
 <li><code><a title="weac.mixins.OutputMixin.get_weaklayer_shearstress" href="#weac.mixins.OutputMixin.get_weaklayer_shearstress">get_weaklayer_shearstress</a></code></li>
+<li><code><a title="weac.mixins.OutputMixin.internal_potential" href="#weac.mixins.OutputMixin.internal_potential">internal_potential</a></code></li>
+<li><code><a title="weac.mixins.OutputMixin.total_potential" href="#weac.mixins.OutputMixin.total_potential">total_potential</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="weac.mixins.SlabContactMixin" href="#weac.mixins.SlabContactMixin">SlabContactMixin</a></code></h4>
+<ul class="">
+<li><code><a title="weac.mixins.SlabContactMixin.calc_a1" href="#weac.mixins.SlabContactMixin.calc_a1">calc_a1</a></code></li>
+<li><code><a title="weac.mixins.SlabContactMixin.calc_a2" href="#weac.mixins.SlabContactMixin.calc_a2">calc_a2</a></code></li>
+<li><code><a title="weac.mixins.SlabContactMixin.calc_lA" href="#weac.mixins.SlabContactMixin.calc_lA">calc_lA</a></code></li>
+<li><code><a title="weac.mixins.SlabContactMixin.calc_lB" href="#weac.mixins.SlabContactMixin.calc_lB">calc_lB</a></code></li>
+<li><code><a title="weac.mixins.SlabContactMixin.calc_lC" href="#weac.mixins.SlabContactMixin.calc_lC">calc_lC</a></code></li>
+<li><code><a title="weac.mixins.SlabContactMixin.calc_qn" href="#weac.mixins.SlabContactMixin.calc_qn">calc_qn</a></code></li>
+<li><code><a title="weac.mixins.SlabContactMixin.calc_qt" href="#weac.mixins.SlabContactMixin.calc_qt">calc_qt</a></code></li>
+<li><code><a title="weac.mixins.SlabContactMixin.calc_touchdown_length" href="#weac.mixins.SlabContactMixin.calc_touchdown_length">calc_touchdown_length</a></code></li>
+<li><code><a title="weac.mixins.SlabContactMixin.calc_touchdown_mode" href="#weac.mixins.SlabContactMixin.calc_touchdown_mode">calc_touchdown_mode</a></code></li>
+<li><code><a title="weac.mixins.SlabContactMixin.calc_touchdown_system" href="#weac.mixins.SlabContactMixin.calc_touchdown_system">calc_touchdown_system</a></code></li>
+<li><code><a title="weac.mixins.SlabContactMixin.set_columnlength" href="#weac.mixins.SlabContactMixin.set_columnlength">set_columnlength</a></code></li>
+<li><code><a title="weac.mixins.SlabContactMixin.set_cracklength" href="#weac.mixins.SlabContactMixin.set_cracklength">set_cracklength</a></code></li>
+<li><code><a title="weac.mixins.SlabContactMixin.set_phi" href="#weac.mixins.SlabContactMixin.set_phi">set_phi</a></code></li>
+<li><code><a title="weac.mixins.SlabContactMixin.set_stiffness_ratio" href="#weac.mixins.SlabContactMixin.set_stiffness_ratio">set_stiffness_ratio</a></code></li>
+<li><code><a title="weac.mixins.SlabContactMixin.set_tc" href="#weac.mixins.SlabContactMixin.set_tc">set_tc</a></code></li>
+<li><code><a title="weac.mixins.SlabContactMixin.set_touchdown_attributes" href="#weac.mixins.SlabContactMixin.set_touchdown_attributes">set_touchdown_attributes</a></code></li>
+<li><code><a title="weac.mixins.SlabContactMixin.substitute_stiffness" href="#weac.mixins.SlabContactMixin.substitute_stiffness">substitute_stiffness</a></code></li>
 </ul>
 </li>
 <li>
 <h4><code><a title="weac.mixins.SolutionMixin" href="#weac.mixins.SolutionMixin">SolutionMixin</a></code></h4>
-<ul class="two-column">
+<ul class="">
 <li><code><a title="weac.mixins.SolutionMixin.assemble_and_solve" href="#weac.mixins.SolutionMixin.assemble_and_solve">assemble_and_solve</a></code></li>
 <li><code><a title="weac.mixins.SolutionMixin.bc" href="#weac.mixins.SolutionMixin.bc">bc</a></code></li>
 <li><code><a title="weac.mixins.SolutionMixin.calc_segments" href="#weac.mixins.SolutionMixin.calc_segments">calc_segments</a></code></li>
 <li><code><a title="weac.mixins.SolutionMixin.eqs" href="#weac.mixins.SolutionMixin.eqs">eqs</a></code></li>
-<li><code><a title="weac.mixins.SolutionMixin.mode_td" href="#weac.mixins.SolutionMixin.mode_td">mode_td</a></code></li>
-<li><code><a title="weac.mixins.SolutionMixin.reduce_stiffness" href="#weac.mixins.SolutionMixin.reduce_stiffness">reduce_stiffness</a></code></li>
 </ul>
 </li>
 </ul>
