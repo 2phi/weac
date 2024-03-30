@@ -9,8 +9,8 @@ from weac.mixins import OutputMixin
 from weac.eigensystem import Eigensystem
 
 
-class Layered(FieldQuantitiesMixin, SlabContactMixin, SolutionMixin, AnalysisMixin,
-              OutputMixin, Eigensystem):
+class Layered(FieldQuantitiesMixin, SlabContactMixin, SolutionMixin,
+              AnalysisMixin, OutputMixin, Eigensystem):
     """
     Layered beam on elastic foundation model application interface.
 
@@ -21,7 +21,7 @@ class Layered(FieldQuantitiesMixin, SlabContactMixin, SolutionMixin, AnalysisMix
     analysis from AnalysisMixin().
     """
 
-    def __init__(self, system='pst-', layers=None, L=1000, a=0, cf=0.5, phi=0):
+    def __init__(self, system='pst-', layers=None, touchdown=False):
         """
         Initialize model with user input.
 
@@ -38,10 +38,9 @@ class Layered(FieldQuantitiesMixin, SlabContactMixin, SolutionMixin, AnalysisMix
             to one layer. Default is [[240, 200], ].
         """
         # Call parent __init__
-        super().__init__(system=system)
+        super().__init__(system=system, touchdown=touchdown)
 
         # Set material properties and set up model
         self.set_beam_properties(layers if layers else [[240, 200], ])
         self.set_foundation_properties()
         self.calc_fundamental_system()
-        self.calc_touchdown_system(L,a,cf,phi)
