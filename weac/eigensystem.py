@@ -90,7 +90,7 @@ class Eigensystem:
         Describes the stiffnesses of weak-layer and slab.
     """
 
-    def __init__(self, system='pst-'):
+    def __init__(self, system='pst-', touchdown=False):
         """
         Initialize eigensystem with user input.
 
@@ -107,48 +107,54 @@ class Eigensystem:
             to one layer. Default is [[240, 200], ].
         """
         # Assign global attributes
-        self.g = 9810           # Gravitaiton (mm/s^2)
-        self.lski = 1000        # Effective out-of-plane length of skis (mm)
-        self.tol = 1e-3         # Relative Romberg integration tolerance
-        self.system = system    # 'pst-', '-pst', 'skier', 'skiers'
+        self.g = 9810               # Gravitaiton (mm/s^2)
+        self.lski = 1000            # Effective out-of-plane length of skis (mm)
+        self.tol = 1e-3             # Relative Romberg integration tolerance
+        self.system = system        # 'pst-', '-pst', 'skier', 'skiers'
 
         # Initialize weak-layer attributes that will be filled later
-        self.weak = False       # Weak-layer properties dictionary
-        self.t = False          # Weak-layer thickness (mm)
-        self.kn = False         # Weak-layer compressive stiffness
-        self.kt = False         # Weak-layer shear stiffness
+        self.weak = False           # Weak-layer properties dictionary
+        self.t = False              # Weak-layer thickness (mm)
+        self.kn = False             # Weak-layer compressive stiffness
+        self.kt = False             # Weak-layer shear stiffness
 
         # Initialize slab attributes
-        self.p = 0              # Surface line load (N/mm)
-        self.slab = False       # Slab properties dictionary
-        self.k = False          # Slab shear correction factor
-        self.h = False          # Total slab height (mm)
-        self.zs = False         # Z-coordinate of slab center of gravity (mm)
-        self.phi = False        # Slab inclination (°)
-        self.A11 = False        # Slab extensional stiffness
-        self.B11 = False        # Slab bending-extension coupling stiffness
-        self.D11 = False        # Slab bending stiffness
-        self.kA55 = False       # Slab shear stiffness
-        self.K0 = False         # Stiffness determinant
+        self.p = 0                  # Surface line load (N/mm)
+        self.slab = False           # Slab properties dictionary
+        self.k = False              # Slab shear correction factor
+        self.h = False              # Total slab height (mm)
+        self.zs = False             # Z-coordinate of slab center of gravity (mm)
+        self.phi = False            # Slab inclination (°)
+        self.A11 = False            # Slab extensional stiffness
+        self.B11 = False            # Slab bending-extension coupling stiffness
+        self.D11 = False            # Slab bending stiffness
+        self.kA55 = False           # Slab shear stiffness
+        self.K0 = False             # Stiffness determinant
 
         # Inizialize eigensystem attributes
-        self.ewC = False        # Complex eigenvalues
-        self.ewR = False        # Real eigenvalues
-        self.evC = False        # Complex eigenvectors
-        self.evR = False        # Real eigenvectors
-        self.sC = False         # Stability shift of complex eigenvalues
-        self.sR = False         # Stability shift of real eigenvalues
+        self.ewC = False            # Complex eigenvalues
+        self.ewR = False            # Real eigenvalues
+        self.evC = False            # Complex eigenvectors
+        self.evR = False            # Real eigenvectors
+        self.sC = False             # Stability shift of complex eigenvalues
+        self.sR = False             # Stability shift of real eigenvalues
 
         # Initialize touchdown attributes
-        self.a = False          # Cracklength
-        self.tc = False         # Weak-layer collapse height (mm)
-        self.ratio = False      # Stiffness ratio of collapsed to uncollapsed weak-layer
-        self.betaU = False      # Ratio of slab to bedding stiffness (uncollapsed)
-        self.betaC = False      # Ratio of slab to bedding stiffness (collapsed)
-        self.mode = False       # Touchdown-mode can be either A, B, C or D
-        self.td = False         # Touchdown length
+        self.touchdown = touchdown  # Flag whether touchdown is possible
+        self.a = False              # Cracklength
+        self.tc = False             # Weak-layer collapse height (mm)
+        self.ratio = False          # Stiffness ratio of collapsed to uncollapsed weak-layer
+        self.betaU = False          # Ratio of slab to bedding stiffness (uncollapsed)
+        self.betaC = False          # Ratio of slab to bedding stiffness (collapsed)
+        self.mode = False           # Touchdown-mode can be either A, B, C or D
+        self.td = False             # Touchdown length
 
-    def set_foundation_properties(self, t=10.0, E=0.25, nu=0.25, update=False):
+    def set_foundation_properties(
+            self,
+            t: float = 10.0,
+            E: float = 0.25,
+            nu: float = 0.25,
+            update: bool = False):
         """
         Set material properties and geometry of foundation (weak layer).
 

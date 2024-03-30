@@ -2,14 +2,16 @@
 # pylint: disable=invalid-name,too-many-locals,too-many-branches
 # pylint: disable=too-many-arguments,too-many-statements
 
-# Third party imports
+# Standard library imports
 import os
-import numpy as np
-import matplotlib.pyplot as plt
-import matplotlib.colors as mc
 import colorsys
 
-# Project imports
+# Third party imports
+import matplotlib.colors as mc
+import matplotlib.pyplot as plt
+import numpy as np
+
+# Local application imports
 from weac.tools import isnotebook
 
 # === SET PLOT STYLES =========================================================
@@ -379,7 +381,7 @@ def deformed(instance, xsl, xwl, z, phi, dz=2, scale=100,
 
     # Plot labels
     plt.gca().set_xlabel(r'lateral position $x$ (cm) $\longrightarrow$')
-    plt.gca().set_ylabel('depth below surface\n' r'$\longleftarrow $ $d$ (cm)')
+    plt.gca().set_ylabel('depth below surface\n' + r'$\longleftarrow $ $d$ (cm)')
     plt.title(fr'${scale}\!\times\!$ scaled deformations (cm)', size=10)
 
     # Show colorbar
@@ -405,7 +407,6 @@ def plot_data(
         ax2data=None, ax2label=None,
         labelpos=None, vlines=True,
         li=False, mi=False, ki=False,
-        mode=False, kR=False,
         xlabel=r'Horizontal position $x$ (cm)'):
     """Plot data. Base function."""
     # Figure setup
@@ -505,7 +506,7 @@ def plot_data(
 # === PLOT WRAPPERS ===========================================================
 
 
-def displacements(instance, x, z, i, **segments):
+def displacements(instance, x, z, i='', **segments):
     """Wrap for dispalcements plot."""
     data = [
         [x/10, instance.u(z, z0=0, unit='mm'), r'$u_0\ (\mathrm{mm})$'],
@@ -513,10 +514,10 @@ def displacements(instance, x, z, i, **segments):
         [x/10, instance.psi(z, unit='degrees'), r'$\psi\ (^\circ)$ '],
     ]
     plot_data(ax1label=r'Displacements', ax1data=data,
-              name='disp'+str(i), **segments)
+              name='disp' + str(i), **segments)
 
 
-def section_forces(instance, x, z, i, **segments):
+def section_forces(instance, x, z, i='', **segments):
     """Wrap section forces plot."""
     data = [
         [x/10, instance.N(z), r'$N$'],
@@ -524,17 +525,17 @@ def section_forces(instance, x, z, i, **segments):
         [x/10, instance.V(z), r'$V$']
     ]
     plot_data(ax1label=r'Section forces', ax1data=data,
-              name='forc'+str(i), **segments)
+              name='forc' + str(i), **segments)
 
 
-def stresses(instance, x, z, i, **segments):
+def stresses(instance, x, z, i='', **segments):
     """Wrap stress plot."""
     data = [
         [x/10, instance.tau(z, unit='kPa'), r'$\tau$'],
         [x/10, instance.sig(z, unit='kPa'), r'$\sigma$']
     ]
     plot_data(ax1label=r'Stress (kPa)', ax1data=data,
-              name='stress'+str(i), **segments)
+              name='stress' + str(i), **segments)
 
 
 def stress_criteria(x, stress, **segments):
