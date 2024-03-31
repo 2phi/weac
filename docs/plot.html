@@ -31,14 +31,16 @@
 # pylint: disable=invalid-name,too-many-locals,too-many-branches
 # pylint: disable=too-many-arguments,too-many-statements
 
-# Third party imports
+# Standard library imports
 import os
-import numpy as np
-import matplotlib.pyplot as plt
-import matplotlib.colors as mc
 import colorsys
 
-# Project imports
+# Third party imports
+import matplotlib.colors as mc
+import matplotlib.pyplot as plt
+import numpy as np
+
+# Local application imports
 from weac.tools import isnotebook
 
 # === SET PLOT STYLES =========================================================
@@ -202,7 +204,7 @@ def slab_profile(instance):
     ax1.set_xlim(500, 0)
 
     ax1.fill_betweenx(y, 0, x)
-    
+
     # Save figure
     save_plot(name=&#39;profile&#39;)
 
@@ -217,7 +219,8 @@ def slab_profile(instance):
 
 def deformed(instance, xsl, xwl, z, phi, dz=2, scale=100,
              window=np.inf, pad=2, levels=300, aspect=2,
-             field=&#39;principal&#39;, normalize=True, dark=False):
+             field=&#39;principal&#39;, normalize=True, dark=False,
+             filename=&#39;cont&#39;):
     &#34;&#34;&#34;
     Plot 2D deformed solution with displacement or stress fields.
 
@@ -278,6 +281,7 @@ def deformed(instance, xsl, xwl, z, phi, dz=2, scale=100,
 
     # Calculate top-to-bottom vertical positions (mm) in beam coordinate system
     zi = instance.get_zmesh(dz=dz)[:, 0]
+    h = instance.h
 
     # Compute slab displacements on grid (cm)
     Usl = np.vstack([instance.u(z, z0=z0, unit=&#39;cm&#39;) for z0 in zi])
@@ -289,7 +293,7 @@ def deformed(instance, xsl, xwl, z, phi, dz=2, scale=100,
         xwl = xwl - max(xwl)/2
 
     # Compute slab grid coordinates with vertical origin at top surface (cm)
-    Xsl, Zsl = np.meshgrid(1e-1*(xsl), 1e-1*zi)
+    Xsl, Zsl = np.meshgrid(1e-1*(xsl), 1e-1*(zi + h/2))
 
     # Get x-coordinate of maximum deflection w (cm) and derive plot limits
     xfocus = xsl[np.max(np.argmax(Wsl, axis=1))]/10
@@ -301,7 +305,7 @@ def deformed(instance, xsl, xwl, z, phi, dz=2, scale=100,
     zmin = np.min(Zsl) - pad
 
     # Compute weak-layer grid coordinates (cm)
-    Xwl, Zwl = np.meshgrid(1e-1*xwl, [1e-1*zi[-1], zmax])
+    Xwl, Zwl = np.meshgrid(1e-1*xwl, [1e-1*(zi[-1] + h/2), zmax])
 
     # Assemble weak-layer displacement field (top and bottom)
     Uwl = np.row_stack([Usl[-1, :], np.zeros(xwl.shape[0])])
@@ -377,7 +381,7 @@ def deformed(instance, xsl, xwl, z, phi, dz=2, scale=100,
              &#39;k&#39;, linewidth=1)
 
     # Plot deformed weak-layer outline
-    if instance.system in [&#39;-pst&#39;, &#39;pst-&#39;]:
+    if instance.system in [&#39;-pst&#39;, &#39;pst-&#39;, &#39;-vpst&#39;, &#39;vpst-&#39;]:
         nanmask = np.isfinite(xwl)
         plt.plot(outline(Xwl[:, nanmask] + scale*Uwl[:, nanmask]),
                  outline(Zwl[:, nanmask] + scale*Wwl[:, nanmask]),
@@ -406,7 +410,7 @@ def deformed(instance, xsl, xwl, z, phi, dz=2, scale=100,
 
     # Plot labels
     plt.gca().set_xlabel(r&#39;lateral position $x$ (cm) $\longrightarrow$&#39;)
-    plt.gca().set_ylabel(&#39;depth below surface\n&#39; r&#39;$\longleftarrow $ $d$ (cm)&#39;)
+    plt.gca().set_ylabel(&#39;depth below surface\n&#39; + r&#39;$\longleftarrow $ $d$ (cm)&#39;)
     plt.title(fr&#39;${scale}\!\times\!$ scaled deformations (cm)&#39;, size=10)
 
     # Show colorbar
@@ -415,7 +419,10 @@ def deformed(instance, xsl, xwl, z, phi, dz=2, scale=100,
                  label=label, aspect=35)
 
     # Save figure
-    save_plot(name=&#39;cont&#39;)
+    save_plot(name=filename)
+
+    # Clear Canvas
+    plt.close()
 
     # Reset plot styles
     plt.rcdefaults()
@@ -518,6 +525,9 @@ def plot_data(
     # Save figure
     save_plot(name)
 
+    # Clear canvas
+    plt.close()
+
     # Reset plot styles
     plt.rcdefaults()
 
@@ -525,7 +535,7 @@ def plot_data(
 # === PLOT WRAPPERS ===========================================================
 
 
-def displacements(instance, x, z, **segments):
+def displacements(instance, x, z, i=&#39;&#39;, **segments):
     &#34;&#34;&#34;Wrap for dispalcements plot.&#34;&#34;&#34;
     data = [
         [x/10, instance.u(z, z0=0, unit=&#39;mm&#39;), r&#39;$u_0\ (\mathrm{mm})$&#39;],
@@ -533,10 +543,10 @@ def displacements(instance, x, z, **segments):
         [x/10, instance.psi(z, unit=&#39;degrees&#39;), r&#39;$\psi\ (^\circ)$ &#39;],
     ]
     plot_data(ax1label=r&#39;Displacements&#39;, ax1data=data,
-              name=&#39;disp&#39;, **segments)
+              name=&#39;disp&#39; + str(i), **segments)
 
 
-def section_forces(instance, x, z, **segments):
+def section_forces(instance, x, z, i=&#39;&#39;, **segments):
     &#34;&#34;&#34;Wrap section forces plot.&#34;&#34;&#34;
     data = [
         [x/10, instance.N(z), r&#39;$N$&#39;],
@@ -544,17 +554,17 @@ def section_forces(instance, x, z, **segments):
         [x/10, instance.V(z), r&#39;$V$&#39;]
     ]
     plot_data(ax1label=r&#39;Section forces&#39;, ax1data=data,
-              name=&#39;forc&#39;, **segments)
+              name=&#39;forc&#39; + str(i), **segments)
 
 
-def stresses(instance, x, z, **segments):
+def stresses(instance, x, z, i=&#39;&#39;, **segments):
     &#34;&#34;&#34;Wrap stress plot.&#34;&#34;&#34;
     data = [
         [x/10, instance.tau(z, unit=&#39;kPa&#39;), r&#39;$\tau$&#39;],
         [x/10, instance.sig(z, unit=&#39;kPa&#39;), r&#39;$\sigma$&#39;]
     ]
     plot_data(ax1label=r&#39;Stress (kPa)&#39;, ax1data=data,
-              name=&#39;stress&#39;, **segments)
+              name=&#39;stress&#39; + str(i), **segments)
 
 
 def stress_criteria(x, stress, **segments):
@@ -633,7 +643,7 @@ def save_plot(name):
     name : string
         Name for the figure.
     &#34;&#34;&#34;
-    filename = name + &#39;.pdf&#39;
+    filename = name + &#39;.png&#39;
     # Show figure if on jupyter notebook
     if isnotebook():
         plt.show()
@@ -699,7 +709,7 @@ def save_plot(name):
 </details>
 </dd>
 <dt id="weac.plot.deformed"><code class="name flex">
-<span>def <span class="ident">deformed</span></span>(<span>instance, xsl, xwl, z, phi, dz=2, scale=100, window=inf, pad=2, levels=300, aspect=2, field='principal', normalize=True, dark=False)</span>
+<span>def <span class="ident">deformed</span></span>(<span>instance, xsl, xwl, z, phi, dz=2, scale=100, window=inf, pad=2, levels=300, aspect=2, field='principal', normalize=True, dark=False, filename='cont')</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Plot 2D deformed solution with displacement or stress fields.</p>
@@ -751,7 +761,8 @@ strength. Only available with field='principal'. Default is True.</dd>
 </summary>
 <pre><code class="python">def deformed(instance, xsl, xwl, z, phi, dz=2, scale=100,
              window=np.inf, pad=2, levels=300, aspect=2,
-             field=&#39;principal&#39;, normalize=True, dark=False):
+             field=&#39;principal&#39;, normalize=True, dark=False,
+             filename=&#39;cont&#39;):
     &#34;&#34;&#34;
     Plot 2D deformed solution with displacement or stress fields.
 
@@ -812,6 +823,7 @@ strength. Only available with field='principal'. Default is True.</dd>
 
     # Calculate top-to-bottom vertical positions (mm) in beam coordinate system
     zi = instance.get_zmesh(dz=dz)[:, 0]
+    h = instance.h
 
     # Compute slab displacements on grid (cm)
     Usl = np.vstack([instance.u(z, z0=z0, unit=&#39;cm&#39;) for z0 in zi])
@@ -823,7 +835,7 @@ strength. Only available with field='principal'. Default is True.</dd>
         xwl = xwl - max(xwl)/2
 
     # Compute slab grid coordinates with vertical origin at top surface (cm)
-    Xsl, Zsl = np.meshgrid(1e-1*(xsl), 1e-1*zi)
+    Xsl, Zsl = np.meshgrid(1e-1*(xsl), 1e-1*(zi + h/2))
 
     # Get x-coordinate of maximum deflection w (cm) and derive plot limits
     xfocus = xsl[np.max(np.argmax(Wsl, axis=1))]/10
@@ -835,7 +847,7 @@ strength. Only available with field='principal'. Default is True.</dd>
     zmin = np.min(Zsl) - pad
 
     # Compute weak-layer grid coordinates (cm)
-    Xwl, Zwl = np.meshgrid(1e-1*xwl, [1e-1*zi[-1], zmax])
+    Xwl, Zwl = np.meshgrid(1e-1*xwl, [1e-1*(zi[-1] + h/2), zmax])
 
     # Assemble weak-layer displacement field (top and bottom)
     Uwl = np.row_stack([Usl[-1, :], np.zeros(xwl.shape[0])])
@@ -911,7 +923,7 @@ strength. Only available with field='principal'. Default is True.</dd>
              &#39;k&#39;, linewidth=1)
 
     # Plot deformed weak-layer outline
-    if instance.system in [&#39;-pst&#39;, &#39;pst-&#39;]:
+    if instance.system in [&#39;-pst&#39;, &#39;pst-&#39;, &#39;-vpst&#39;, &#39;vpst-&#39;]:
         nanmask = np.isfinite(xwl)
         plt.plot(outline(Xwl[:, nanmask] + scale*Uwl[:, nanmask]),
                  outline(Zwl[:, nanmask] + scale*Wwl[:, nanmask]),
@@ -940,7 +952,7 @@ strength. Only available with field='principal'. Default is True.</dd>
 
     # Plot labels
     plt.gca().set_xlabel(r&#39;lateral position $x$ (cm) $\longrightarrow$&#39;)
-    plt.gca().set_ylabel(&#39;depth below surface\n&#39; r&#39;$\longleftarrow $ $d$ (cm)&#39;)
+    plt.gca().set_ylabel(&#39;depth below surface\n&#39; + r&#39;$\longleftarrow $ $d$ (cm)&#39;)
     plt.title(fr&#39;${scale}\!\times\!$ scaled deformations (cm)&#39;, size=10)
 
     # Show colorbar
@@ -949,14 +961,17 @@ strength. Only available with field='principal'. Default is True.</dd>
                  label=label, aspect=35)
 
     # Save figure
-    save_plot(name=&#39;cont&#39;)
+    save_plot(name=filename)
+
+    # Clear Canvas
+    plt.close()
 
     # Reset plot styles
     plt.rcdefaults()</code></pre>
 </details>
 </dd>
 <dt id="weac.plot.displacements"><code class="name flex">
-<span>def <span class="ident">displacements</span></span>(<span>instance, x, z, **segments)</span>
+<span>def <span class="ident">displacements</span></span>(<span>instance, x, z, i='', **segments)</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Wrap for dispalcements plot.</p></div>
@@ -964,7 +979,7 @@ strength. Only available with field='principal'. Default is True.</dd>
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def displacements(instance, x, z, **segments):
+<pre><code class="python">def displacements(instance, x, z, i=&#39;&#39;, **segments):
     &#34;&#34;&#34;Wrap for dispalcements plot.&#34;&#34;&#34;
     data = [
         [x/10, instance.u(z, z0=0, unit=&#39;mm&#39;), r&#39;$u_0\ (\mathrm{mm})$&#39;],
@@ -972,7 +987,7 @@ strength. Only available with field='principal'. Default is True.</dd>
         [x/10, instance.psi(z, unit=&#39;degrees&#39;), r&#39;$\psi\ (^\circ)$ &#39;],
     ]
     plot_data(ax1label=r&#39;Displacements&#39;, ax1data=data,
-              name=&#39;disp&#39;, **segments)</code></pre>
+              name=&#39;disp&#39; + str(i), **segments)</code></pre>
 </details>
 </dd>
 <dt id="weac.plot.err_comp"><code class="name flex">
@@ -1189,6 +1204,9 @@ strength. Only available with field='principal'. Default is True.</dd>
     # Save figure
     save_plot(name)
 
+    # Clear canvas
+    plt.close()
+
     # Reset plot styles
     plt.rcdefaults()</code></pre>
 </details>
@@ -1216,7 +1234,7 @@ strength. Only available with field='principal'. Default is True.</dd>
     name : string
         Name for the figure.
     &#34;&#34;&#34;
-    filename = name + &#39;.pdf&#39;
+    filename = name + &#39;.png&#39;
     # Show figure if on jupyter notebook
     if isnotebook():
         plt.show()
@@ -1230,7 +1248,7 @@ strength. Only available with field='principal'. Default is True.</dd>
 </details>
 </dd>
 <dt id="weac.plot.section_forces"><code class="name flex">
-<span>def <span class="ident">section_forces</span></span>(<span>instance, x, z, **segments)</span>
+<span>def <span class="ident">section_forces</span></span>(<span>instance, x, z, i='', **segments)</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Wrap section forces plot.</p></div>
@@ -1238,7 +1256,7 @@ strength. Only available with field='principal'. Default is True.</dd>
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def section_forces(instance, x, z, **segments):
+<pre><code class="python">def section_forces(instance, x, z, i=&#39;&#39;, **segments):
     &#34;&#34;&#34;Wrap section forces plot.&#34;&#34;&#34;
     data = [
         [x/10, instance.N(z), r&#39;$N$&#39;],
@@ -1246,7 +1264,7 @@ strength. Only available with field='principal'. Default is True.</dd>
         [x/10, instance.V(z), r&#39;$V$&#39;]
     ]
     plot_data(ax1label=r&#39;Section forces&#39;, ax1data=data,
-              name=&#39;forc&#39;, **segments)</code></pre>
+              name=&#39;forc&#39; + str(i), **segments)</code></pre>
 </details>
 </dd>
 <dt id="weac.plot.set_plotstyles"><code class="name flex">
@@ -1361,7 +1379,7 @@ strength. Only available with field='principal'. Default is True.</dd>
     ax1.set_xlim(500, 0)
 
     ax1.fill_betweenx(y, 0, x)
-    
+
     # Save figure
     save_plot(name=&#39;profile&#39;)
 
@@ -1391,7 +1409,7 @@ strength. Only available with field='principal'. Default is True.</dd>
 </details>
 </dd>
 <dt id="weac.plot.stresses"><code class="name flex">
-<span>def <span class="ident">stresses</span></span>(<span>instance, x, z, **segments)</span>
+<span>def <span class="ident">stresses</span></span>(<span>instance, x, z, i='', **segments)</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Wrap stress plot.</p></div>
@@ -1399,14 +1417,14 @@ strength. Only available with field='principal'. Default is True.</dd>
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def stresses(instance, x, z, **segments):
+<pre><code class="python">def stresses(instance, x, z, i=&#39;&#39;, **segments):
     &#34;&#34;&#34;Wrap stress plot.&#34;&#34;&#34;
     data = [
         [x/10, instance.tau(z, unit=&#39;kPa&#39;), r&#39;$\tau$&#39;],
         [x/10, instance.sig(z, unit=&#39;kPa&#39;), r&#39;$\sigma$&#39;]
     ]
     plot_data(ax1label=r&#39;Stress (kPa)&#39;, ax1data=data,
-              name=&#39;stress&#39;, **segments)</code></pre>
+              name=&#39;stress&#39; + str(i), **segments)</code></pre>
 </details>
 </dd>
 <dt id="weac.plot.tight_central_distribution"><code class="name flex">

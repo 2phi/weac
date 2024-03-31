@@ -31,14 +31,15 @@
 
 # Project imports
 from weac.mixins import FieldQuantitiesMixin
+from weac.mixins import SlabContactMixin
 from weac.mixins import SolutionMixin
 from weac.mixins import AnalysisMixin
 from weac.mixins import OutputMixin
 from weac.eigensystem import Eigensystem
 
 
-class Layered(FieldQuantitiesMixin, SolutionMixin, AnalysisMixin,
-              OutputMixin, Eigensystem):
+class Layered(FieldQuantitiesMixin, SlabContactMixin, SolutionMixin,
+              AnalysisMixin, OutputMixin, Eigensystem):
     &#34;&#34;&#34;
     Layered beam on elastic foundation model application interface.
 
@@ -49,30 +50,30 @@ class Layered(FieldQuantitiesMixin, SolutionMixin, AnalysisMixin,
     analysis from AnalysisMixin().
     &#34;&#34;&#34;
 
-    def __init__(self, system=&#39;pst-&#39;, layers=None, phi=0):
+    def __init__(self, system=&#39;pst-&#39;, layers=None, touchdown=False):
         &#34;&#34;&#34;
         Initialize model with user input.
 
         Arguments
         ---------
-        system : {&#39;pst-&#39;, &#39;-pst&#39;, &#39;skier&#39;, &#39;skiers&#39;}, optional
+        system : {&#39;pst-&#39;, &#39;-pst&#39;, &#39;vpst-&#39;, &#39;-vpst&#39;, &#39;skier&#39;, &#39;skiers&#39;}, optional
             Type of system to analyse: PST cut from the right (pst-),
-            PST cut form the left (-pst), one skier on infinite
-            slab (skier) or multiple skiers on infinite slab (skiers).
-            Default is &#39;pst-&#39;.
+            PST cut form the left (-pst), PST with vertical faces cut
+            from the right (vpst-), PST with vertical faces cut from the
+            left (-vpst), one skier on infinite slab (skier) or multiple
+            skiers on infinite slab (skiers). Default is &#39;pst-&#39;.
         layers : list, optional
             2D list of layer densities and thicknesses. Columns are
             density(kg/m ^ 3) and thickness(mm). One row corresponds
             to one layer. Default is [[240, 200], ].
         &#34;&#34;&#34;
         # Call parent __init__
-        super().__init__(system=system)
+        super().__init__(system=system, touchdown=touchdown)
 
         # Set material properties and set up model
-        self.set_beam_properties(layers if layers else [[240, 200], ], phi)
+        self.set_beam_properties(layers if layers else [[240, 200], ])
         self.set_foundation_properties()
-        self.calc_fundamental_system()
-        self.calc_touchdown_system()</code></pre>
+        self.calc_fundamental_system()</code></pre>
 </details>
 </section>
 <section>
@@ -86,7 +87,7 @@ class Layered(FieldQuantitiesMixin, SolutionMixin, AnalysisMixin,
 <dl>
 <dt id="weac.layered.Layered"><code class="flex name class">
 <span>class <span class="ident">Layered</span></span>
-<span>(</span><span>system='pst-', layers=None, phi=0)</span>
+<span>(</span><span>system='pst-', layers=None, touchdown=False)</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Layered beam on elastic foundation model application interface.</p>
@@ -98,11 +99,12 @@ analysis from AnalysisMixin().</p>
 <p>Initialize model with user input.</p>
 <h2 id="arguments">Arguments</h2>
 <dl>
-<dt><strong><code>system</code></strong> :&ensp;<code>{'pst-', '-pst', 'skier', 'skiers'}</code>, optional</dt>
+<dt><strong><code>system</code></strong> :&ensp;<code>{'pst-', '-pst', 'vpst-', '-vpst', 'skier', 'skiers'}</code>, optional</dt>
 <dd>Type of system to analyse: PST cut from the right (pst-),
-PST cut form the left (-pst), one skier on infinite
-slab (skier) or multiple skiers on infinite slab (skiers).
-Default is 'pst-'.</dd>
+PST cut form the left (-pst), PST with vertical faces cut
+from the right (vpst-), PST with vertical faces cut from the
+left (-vpst), one skier on infinite slab (skier) or multiple
+skiers on infinite slab (skiers). Default is 'pst-'.</dd>
 <dt><strong><code>layers</code></strong> :&ensp;<code>list</code>, optional</dt>
 <dd>2D list of layer densities and thicknesses. Columns are
 density(kg/m ^ 3) and thickness(mm). One row corresponds
@@ -112,8 +114,8 @@ to one layer. Default is [[240, 200], ].</dd>
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">class Layered(FieldQuantitiesMixin, SolutionMixin, AnalysisMixin,
-              OutputMixin, Eigensystem):
+<pre><code class="python">class Layered(FieldQuantitiesMixin, SlabContactMixin, SolutionMixin,
+              AnalysisMixin, OutputMixin, Eigensystem):
     &#34;&#34;&#34;
     Layered beam on elastic foundation model application interface.
 
@@ -124,34 +126,35 @@ to one layer. Default is [[240, 200], ].</dd>
     analysis from AnalysisMixin().
     &#34;&#34;&#34;
 
-    def __init__(self, system=&#39;pst-&#39;, layers=None, phi=0):
+    def __init__(self, system=&#39;pst-&#39;, layers=None, touchdown=False):
         &#34;&#34;&#34;
         Initialize model with user input.
 
         Arguments
         ---------
-        system : {&#39;pst-&#39;, &#39;-pst&#39;, &#39;skier&#39;, &#39;skiers&#39;}, optional
+        system : {&#39;pst-&#39;, &#39;-pst&#39;, &#39;vpst-&#39;, &#39;-vpst&#39;, &#39;skier&#39;, &#39;skiers&#39;}, optional
             Type of system to analyse: PST cut from the right (pst-),
-            PST cut form the left (-pst), one skier on infinite
-            slab (skier) or multiple skiers on infinite slab (skiers).
-            Default is &#39;pst-&#39;.
+            PST cut form the left (-pst), PST with vertical faces cut
+            from the right (vpst-), PST with vertical faces cut from the
+            left (-vpst), one skier on infinite slab (skier) or multiple
+            skiers on infinite slab (skiers). Default is &#39;pst-&#39;.
         layers : list, optional
             2D list of layer densities and thicknesses. Columns are
             density(kg/m ^ 3) and thickness(mm). One row corresponds
             to one layer. Default is [[240, 200], ].
         &#34;&#34;&#34;
         # Call parent __init__
-        super().__init__(system=system)
+        super().__init__(system=system, touchdown=touchdown)
 
         # Set material properties and set up model
-        self.set_beam_properties(layers if layers else [[240, 200], ], phi)
+        self.set_beam_properties(layers if layers else [[240, 200], ])
         self.set_foundation_properties()
-        self.calc_fundamental_system()
-        self.calc_touchdown_system()</code></pre>
+        self.calc_fundamental_system()</code></pre>
 </details>
 <h3>Ancestors</h3>
 <ul class="hlist">
 <li><a title="weac.mixins.FieldQuantitiesMixin" href="mixins.html#weac.mixins.FieldQuantitiesMixin">FieldQuantitiesMixin</a></li>
+<li><a title="weac.mixins.SlabContactMixin" href="mixins.html#weac.mixins.SlabContactMixin">SlabContactMixin</a></li>
 <li><a title="weac.mixins.SolutionMixin" href="mixins.html#weac.mixins.SolutionMixin">SolutionMixin</a></li>
 <li><a title="weac.mixins.AnalysisMixin" href="mixins.html#weac.mixins.AnalysisMixin">AnalysisMixin</a></li>
 <li><a title="weac.mixins.OutputMixin" href="mixins.html#weac.mixins.OutputMixin">OutputMixin</a></li>
@@ -186,14 +189,33 @@ to one layer. Default is [[240, 200], ].</dd>
 <li><code><a title="weac.mixins.FieldQuantitiesMixin.w" href="mixins.html#weac.mixins.FieldQuantitiesMixin.w">w</a></code></li>
 </ul>
 </li>
+<li><code><b><a title="weac.mixins.SlabContactMixin" href="mixins.html#weac.mixins.SlabContactMixin">SlabContactMixin</a></b></code>:
+<ul class="hlist">
+<li><code><a title="weac.mixins.SlabContactMixin.calc_a1" href="mixins.html#weac.mixins.SlabContactMixin.calc_a1">calc_a1</a></code></li>
+<li><code><a title="weac.mixins.SlabContactMixin.calc_a2" href="mixins.html#weac.mixins.SlabContactMixin.calc_a2">calc_a2</a></code></li>
+<li><code><a title="weac.mixins.SlabContactMixin.calc_lA" href="mixins.html#weac.mixins.SlabContactMixin.calc_lA">calc_lA</a></code></li>
+<li><code><a title="weac.mixins.SlabContactMixin.calc_lB" href="mixins.html#weac.mixins.SlabContactMixin.calc_lB">calc_lB</a></code></li>
+<li><code><a title="weac.mixins.SlabContactMixin.calc_lC" href="mixins.html#weac.mixins.SlabContactMixin.calc_lC">calc_lC</a></code></li>
+<li><code><a title="weac.mixins.SlabContactMixin.calc_qn" href="mixins.html#weac.mixins.SlabContactMixin.calc_qn">calc_qn</a></code></li>
+<li><code><a title="weac.mixins.SlabContactMixin.calc_qt" href="mixins.html#weac.mixins.SlabContactMixin.calc_qt">calc_qt</a></code></li>
+<li><code><a title="weac.mixins.SlabContactMixin.calc_touchdown_length" href="mixins.html#weac.mixins.SlabContactMixin.calc_touchdown_length">calc_touchdown_length</a></code></li>
+<li><code><a title="weac.mixins.SlabContactMixin.calc_touchdown_mode" href="mixins.html#weac.mixins.SlabContactMixin.calc_touchdown_mode">calc_touchdown_mode</a></code></li>
+<li><code><a title="weac.mixins.SlabContactMixin.calc_touchdown_system" href="mixins.html#weac.mixins.SlabContactMixin.calc_touchdown_system">calc_touchdown_system</a></code></li>
+<li><code><a title="weac.mixins.SlabContactMixin.set_columnlength" href="mixins.html#weac.mixins.SlabContactMixin.set_columnlength">set_columnlength</a></code></li>
+<li><code><a title="weac.mixins.SlabContactMixin.set_cracklength" href="mixins.html#weac.mixins.SlabContactMixin.set_cracklength">set_cracklength</a></code></li>
+<li><code><a title="weac.mixins.SlabContactMixin.set_phi" href="mixins.html#weac.mixins.SlabContactMixin.set_phi">set_phi</a></code></li>
+<li><code><a title="weac.mixins.SlabContactMixin.set_stiffness_ratio" href="mixins.html#weac.mixins.SlabContactMixin.set_stiffness_ratio">set_stiffness_ratio</a></code></li>
+<li><code><a title="weac.mixins.SlabContactMixin.set_tc" href="mixins.html#weac.mixins.SlabContactMixin.set_tc">set_tc</a></code></li>
+<li><code><a title="weac.mixins.SlabContactMixin.set_touchdown_attributes" href="mixins.html#weac.mixins.SlabContactMixin.set_touchdown_attributes">set_touchdown_attributes</a></code></li>
+<li><code><a title="weac.mixins.SlabContactMixin.substitute_stiffness" href="mixins.html#weac.mixins.SlabContactMixin.substitute_stiffness">substitute_stiffness</a></code></li>
+</ul>
+</li>
 <li><code><b><a title="weac.mixins.SolutionMixin" href="mixins.html#weac.mixins.SolutionMixin">SolutionMixin</a></b></code>:
 <ul class="hlist">
 <li><code><a title="weac.mixins.SolutionMixin.assemble_and_solve" href="mixins.html#weac.mixins.SolutionMixin.assemble_and_solve">assemble_and_solve</a></code></li>
 <li><code><a title="weac.mixins.SolutionMixin.bc" href="mixins.html#weac.mixins.SolutionMixin.bc">bc</a></code></li>
 <li><code><a title="weac.mixins.SolutionMixin.calc_segments" href="mixins.html#weac.mixins.SolutionMixin.calc_segments">calc_segments</a></code></li>
 <li><code><a title="weac.mixins.SolutionMixin.eqs" href="mixins.html#weac.mixins.SolutionMixin.eqs">eqs</a></code></li>
-<li><code><a title="weac.mixins.SolutionMixin.mode_td" href="mixins.html#weac.mixins.SolutionMixin.mode_td">mode_td</a></code></li>
-<li><code><a title="weac.mixins.SolutionMixin.reduce_stiffness" href="mixins.html#weac.mixins.SolutionMixin.reduce_stiffness">reduce_stiffness</a></code></li>
 </ul>
 </li>
 <li><code><b><a title="weac.mixins.AnalysisMixin" href="mixins.html#weac.mixins.AnalysisMixin">AnalysisMixin</a></b></code>:
@@ -211,26 +233,23 @@ to one layer. Default is [[240, 200], ].</dd>
 </li>
 <li><code><b><a title="weac.mixins.OutputMixin" href="mixins.html#weac.mixins.OutputMixin">OutputMixin</a></b></code>:
 <ul class="hlist">
+<li><code><a title="weac.mixins.OutputMixin.external_potential" href="mixins.html#weac.mixins.OutputMixin.external_potential">external_potential</a></code></li>
 <li><code><a title="weac.mixins.OutputMixin.get_slab_deflection" href="mixins.html#weac.mixins.OutputMixin.get_slab_deflection">get_slab_deflection</a></code></li>
 <li><code><a title="weac.mixins.OutputMixin.get_slab_displacement" href="mixins.html#weac.mixins.OutputMixin.get_slab_displacement">get_slab_displacement</a></code></li>
 <li><code><a title="weac.mixins.OutputMixin.get_slab_rotation" href="mixins.html#weac.mixins.OutputMixin.get_slab_rotation">get_slab_rotation</a></code></li>
 <li><code><a title="weac.mixins.OutputMixin.get_weaklayer_normalstress" href="mixins.html#weac.mixins.OutputMixin.get_weaklayer_normalstress">get_weaklayer_normalstress</a></code></li>
 <li><code><a title="weac.mixins.OutputMixin.get_weaklayer_shearstress" href="mixins.html#weac.mixins.OutputMixin.get_weaklayer_shearstress">get_weaklayer_shearstress</a></code></li>
+<li><code><a title="weac.mixins.OutputMixin.internal_potential" href="mixins.html#weac.mixins.OutputMixin.internal_potential">internal_potential</a></code></li>
+<li><code><a title="weac.mixins.OutputMixin.total_potential" href="mixins.html#weac.mixins.OutputMixin.total_potential">total_potential</a></code></li>
 </ul>
 </li>
 <li><code><b><a title="weac.eigensystem.Eigensystem" href="eigensystem.html#weac.eigensystem.Eigensystem">Eigensystem</a></b></code>:
 <ul class="hlist">
-<li><code><a title="weac.eigensystem.Eigensystem.calc_beta" href="eigensystem.html#weac.eigensystem.Eigensystem.calc_beta">calc_beta</a></code></li>
-<li><code><a title="weac.eigensystem.Eigensystem.calc_contact_length" href="eigensystem.html#weac.eigensystem.Eigensystem.calc_contact_length">calc_contact_length</a></code></li>
 <li><code><a title="weac.eigensystem.Eigensystem.calc_eigensystem" href="eigensystem.html#weac.eigensystem.Eigensystem.calc_eigensystem">calc_eigensystem</a></code></li>
 <li><code><a title="weac.eigensystem.Eigensystem.calc_foundation_stiffness" href="eigensystem.html#weac.eigensystem.Eigensystem.calc_foundation_stiffness">calc_foundation_stiffness</a></code></li>
 <li><code><a title="weac.eigensystem.Eigensystem.calc_fundamental_system" href="eigensystem.html#weac.eigensystem.Eigensystem.calc_fundamental_system">calc_fundamental_system</a></code></li>
 <li><code><a title="weac.eigensystem.Eigensystem.calc_laminate_stiffness_matrix" href="eigensystem.html#weac.eigensystem.Eigensystem.calc_laminate_stiffness_matrix">calc_laminate_stiffness_matrix</a></code></li>
-<li><code><a title="weac.eigensystem.Eigensystem.calc_rot_spring" href="eigensystem.html#weac.eigensystem.Eigensystem.calc_rot_spring">calc_rot_spring</a></code></li>
-<li><code><a title="weac.eigensystem.Eigensystem.calc_span_length" href="eigensystem.html#weac.eigensystem.Eigensystem.calc_span_length">calc_span_length</a></code></li>
 <li><code><a title="weac.eigensystem.Eigensystem.calc_system_matrix" href="eigensystem.html#weac.eigensystem.Eigensystem.calc_system_matrix">calc_system_matrix</a></code></li>
-<li><code><a title="weac.eigensystem.Eigensystem.calc_touchdown_system" href="eigensystem.html#weac.eigensystem.Eigensystem.calc_touchdown_system">calc_touchdown_system</a></code></li>
-<li><code><a title="weac.eigensystem.Eigensystem.calc_trans_spring" href="eigensystem.html#weac.eigensystem.Eigensystem.calc_trans_spring">calc_trans_spring</a></code></li>
 <li><code><a title="weac.eigensystem.Eigensystem.get_load_vector" href="eigensystem.html#weac.eigensystem.Eigensystem.get_load_vector">get_load_vector</a></code></li>
 <li><code><a title="weac.eigensystem.Eigensystem.get_ply_coordinates" href="eigensystem.html#weac.eigensystem.Eigensystem.get_ply_coordinates">get_ply_coordinates</a></code></li>
 <li><code><a title="weac.eigensystem.Eigensystem.get_skier_load" href="eigensystem.html#weac.eigensystem.Eigensystem.get_skier_load">get_skier_load</a></code></li>

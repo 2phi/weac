@@ -35,7 +35,7 @@
 import numpy as np
 
 # Project imports
-from weac.tools import gerling, calc_center_of_gravity, load_dummy_profile
+from weac.tools import bergfeld, calc_center_of_gravity, load_dummy_profile
 
 
 class Eigensystem:
@@ -119,17 +119,18 @@ class Eigensystem:
         Describes the stiffnesses of weak-layer and slab.
     &#34;&#34;&#34;
 
-    def __init__(self, system=&#39;pst-&#39;):
+    def __init__(self, system=&#39;pst-&#39;, touchdown=False):
         &#34;&#34;&#34;
         Initialize eigensystem with user input.
 
         Arguments
         ---------
-        system : {&#39;pst-&#39;, &#39;-pst&#39;, &#39;skier&#39;, &#39;skiers&#39;}, optional
+        system : {&#39;pst-&#39;, &#39;-pst&#39;, &#39;vpst-&#39;, &#39;-vpst&#39;, &#39;skier&#39;, &#39;skiers&#39;}, optional
             Type of system to analyse: PST cut from the right (pst-),
-            PST cut form the left (-pst), one skier on infinite
-            slab (skier) or multiple skiers on infinite slab (skeirs).
-            Default is &#39;pst-&#39;.
+            PST cut form the left (-pst), PST with vertical faces cut
+            from the right (vpst-), PST with vertical faces cut from the
+            left (-vpst), one skier on infinite slab (skier) or multiple
+            skiers on infinite slab (skiers). Default is &#39;pst-&#39;.
         layers : list, optional
             2D list of layer densities and thicknesses. Columns are
             density (kg/m^3) and thickness (mm). One row corresponds
@@ -139,44 +140,51 @@ class Eigensystem:
         self.g = 9810           # Gravitaiton (mm/s^2)
         self.lski = 1000        # Effective out-of-plane length of skis (mm)
         self.tol = 1e-3         # Relative Romberg integration tolerance
-        self.system = system    # &#39;pst-&#39;, &#39;-pst&#39;, &#39;skier&#39;, &#39;skiers&#39;
+        self.system = system    # &#39;pst-&#39;, &#39;-pst&#39;, &#39;vpst-&#39;, &#39;-vpst&#39;, &#39;skier&#39;, &#39;skiers&#39;
 
         # Initialize weak-layer attributes that will be filled later
-        self.weak = False       # Weak-layer properties dictionary
-        self.t = False          # Weak-layer thickness (mm)
-        self.kn = False         # Weak-layer compressive stiffness
-        self.kt = False         # Weak-layer shear stiffness
-        self.tc = False         # Weak-layer collapse height (mm)
+        self.weak = False           # Weak-layer properties dictionary
+        self.t = False              # Weak-layer thickness (mm)
+        self.kn = False             # Weak-layer compressive stiffness
+        self.kt = False             # Weak-layer shear stiffness
 
         # Initialize slab attributes
-        self.p = 0              # Surface line load (N/mm)
-        self.slab = False       # Slab properties dictionary
-        self.k = False          # Slab shear correction factor
-        self.h = False          # Total slab height (mm)
-        self.zs = False         # Z-coordinate of slab center of gravity (mm)
-        self.phi = False        # Slab inclination (°)
-        self.A11 = False        # Slab extensional stiffness
-        self.B11 = False        # Slab bending-extension coupling stiffness
-        self.D11 = False        # Slab bending stiffness
-        self.kA55 = False       # Slab shear stiffness
-        self.K0 = False         # Stiffness determinant
+        self.p = 0                  # Surface line load (N/mm)
+        self.slab = False           # Slab properties dictionary
+        self.k = False              # Slab shear correction factor
+        self.h = False              # Total slab height (mm)
+        self.zs = False             # Z-coordinate of slab center of gravity (mm)
+        self.phi = False            # Slab inclination (°)
+        self.A11 = False            # Slab extensional stiffness
+        self.B11 = False            # Slab bending-extension coupling stiffness
+        self.D11 = False            # Slab bending stiffness
+        self.kA55 = False           # Slab shear stiffness
+        self.K0 = False             # Stiffness determinant
 
         # Inizialize eigensystem attributes
-        self.ewC = False        # Complex eigenvalues
-        self.ewR = False        # Real eigenvalues
-        self.evC = False        # Complex eigenvectors
-        self.evR = False        # Real eigenvectors
-        self.sC = False         # Stability shift of complex eigenvalues
-        self.sR = False         # Stability shift of real eigenvalues
+        self.ewC = False            # Complex eigenvalues
+        self.ewR = False            # Real eigenvalues
+        self.evC = False            # Complex eigenvectors
+        self.evR = False            # Real eigenvectors
+        self.sC = False             # Stability shift of complex eigenvalues
+        self.sR = False             # Stability shift of real eigenvalues
 
         # Initialize touchdown attributes
-        self.lC = False         # Minimum length of substratum contact (mm)
-        self.lS = False         # Maximum length of span between
-                                # between bedded and touchdowned boundary (mm)
-        self.ratio = False      # Stiffness ratio of collalpsed to uncollapsed weak-layer
-        self.beta = False       # Ratio of slab to bedding stiffness
+        self.touchdown = touchdown  # Flag whether touchdown is possible
+        self.a = False              # Cracklength
+        self.tc = False             # Weak-layer collapse height (mm)
+        self.ratio = False          # Stiffness ratio of collapsed to uncollapsed weak-layer
+        self.betaU = False          # Ratio of slab to bedding stiffness (uncollapsed)
+        self.betaC = False          # Ratio of slab to bedding stiffness (collapsed)
+        self.mode = False           # Touchdown-mode can be either A, B, C or D
+        self.td = False             # Touchdown length
 
-    def set_foundation_properties(self, t=30, cf=0.5, E=0.25, nu=0.25, update=False):
+    def set_foundation_properties(
+            self,
+            t: float = 10.0,
+            E: float = 0.25,
+            nu: float = 0.25,
+            update: bool = False):
         &#34;&#34;&#34;
         Set material properties and geometry of foundation (weak layer).
 
@@ -197,7 +205,6 @@ class Eigensystem:
         &#34;&#34;&#34;
         # Geometry
         self.t = t              # Weak-layer thickness (mm)
-        self.tc = cf*self.t     # Weak-layer collapse height (mm)
 
         # Material properties
         self.weak = {
@@ -209,7 +216,7 @@ class Eigensystem:
         if update:
             self.calc_fundamental_system()
 
-    def set_beam_properties(self, layers, phi=0, C0=6.0, C1=4.60,
+    def set_beam_properties(self, layers, phi=0, C0=6.5, C1=4.4,
                             nu=0.25, update=False):
         &#34;&#34;&#34;
         Set material and properties geometry of beam (slab).
@@ -221,14 +228,12 @@ class Eigensystem:
             Columns are density (kg/m^3) and thickness (mm). One row
             corresponds to one layer. If entered as str, last split
             must be available in database.
-        phi : float
-            Inclination of the slab (degrees).
         C0 : float, optional
             Multiplicative constant of Young modulus parametrization
-            according to Gerling et al. (2017). Default is 6.0.
+            according to Bergfeld et al. (2023). Default is 6.0.
         C1 : float, optional
             Exponent of Young modulus parameterization according to
-            Gerling et al. (2017). Default is 4.6.
+            Bergfeld et al. (2023). Default is 4.6.
         nu : float, optional
             Possion&#39;s ratio. Default is 0.25
         update : bool, optional
@@ -241,7 +246,7 @@ class Eigensystem:
         else:
             # Compute Young&#39;s modulus from density parametrization
             layers = np.array(layers)
-            E = gerling(layers[:, 0], C0=C0, C1=C1)  # Young&#39;s modulus
+            E = bergfeld(layers[:, 0], C0=C0, C1=C1)  # Young&#39;s modulus
 
         # Derive other elastic properties
         nu = nu*np.ones(layers.shape[0])         # Global poisson&#39;s ratio
@@ -250,15 +255,12 @@ class Eigensystem:
 
         # Compute total slab thickness and center of gravity
         self.h, self.zs = calc_center_of_gravity(layers)
-
+        
         # Assemble layering into matrix (top to bottom)
         # Columns are density (kg/m^3), layer thickness (mm)
         # Young&#39;s modulus (MPa), shear modulus (MPa), and
         # Poisson&#39;s ratio
         self.slab = np.vstack([layers.T, E, G, nu]).T
-
-        # Set beam inclination
-        self.phi = phi
 
         # Recalculate the fundamental system after properties have changed
         if update:
@@ -281,7 +283,7 @@ class Eigensystem:
         &#34;&#34;&#34;
         self.p = p
 
-    def calc_foundation_stiffness(self, ratio=16):
+    def calc_foundation_stiffness(self):
         &#34;&#34;&#34;Compute foundation normal and shear stiffness.&#34;&#34;&#34;
         # Elastic moduli (MPa) under plane-strain conditions
         G = self.weak[&#39;E&#39;]/(2*(1 + self.weak[&#39;nu&#39;]))    # Shear modulus
@@ -290,9 +292,6 @@ class Eigensystem:
         # Foundation (weak layer) stiffnesses (N/mm^3)
         self.kn = E/self.t                              # Normal stiffness
         self.kt = G/self.t                              # Shear stiffness
-
-        # Weak-layer stiffness increment factor for collapse
-        self.ratio = ratio
 
     def get_ply_coordinates(self):
         &#34;&#34;&#34;
@@ -507,142 +506,6 @@ class Eigensystem:
 
         return Fn, Ft
 
-    def calc_beta(self):
-        &#34;&#34;&#34;
-        Calculate beta.
-
-        Returns
-        -------
-        beta : float
-            Weak-layer to slab stiffness relation factor.
-        &#34;&#34;&#34;
-        # (Intact) weak-layer to slab stiffness relation factor
-        self.beta = (self.kn/(4*self.D11))**(1/4)
-
-    def calc_span_length(self):
-        &#34;&#34;&#34;
-        Calculate span from layer and weak layer properties and load situation.
-
-        Returns
-        -------
-        lS : float
-            Span of the element between bedded element and touchdown for full touchdown.
-        &#34;&#34;&#34;
-        def polynomial():
-            &#34;&#34;&#34;
-            Calculate the coefficients of a sixth order polynomial equation.
-
-            Returns
-            -------
-            list
-                First coefficient for sixth order term,
-                second coefficient for fith order term and so on.
-            &#34;&#34;&#34;
-            a1 = self.kA55**2*kR1*kN1*q0
-            a2 = 6*self.kA55*(self.D11*self.kA55 + kR1*kR2)*kN1*q0
-            a3 = 30*self.D11*self.kA55*(kR1 + kR2)*kN1*q0
-            a4 = 24*self.D11*(2*self.kA55**2*kR1 + 3*self.D11*self.kA55*kN1 + 3*kR1*kR2*kN1)*q0
-            a5 = 72*self.D11*(self.D11*(self.kA55**2 + (kR1 + kR2)*kN1)*q0 \
-                + self.kA55*kR1*(2*kR2*q0 - self.kA55*kN1*self.tc))
-            a6 = 144*self.D11*self.kA55*(self.D11*(kR1 + kR2)*q0 \
-                - (self.D11*self.kA55 + kR1*kR2)*kN1*self.tc)
-            a7 = - 144*self.D11**2*self.kA55*(kR1 + kR2)*kN1*self.tc
-            return [a1,a2,a3,a4,a5,a6,a7]
-
-        # Get spring stiffnesses for adjacent segment with intact weak-layer
-        kR1 = self.calc_rot_spring(collapse=False)
-        kN1 = self.calc_trans_spring()
-        # Get spring stiffnesses for adjacent segment with collapsed weak-layer
-        kR2 = self.calc_rot_spring(collapse=True)
-        # Get surface normal load components
-        qn = self.get_weight_load(self.phi)[0]
-        pn = self.get_surface_load(self.phi)[0]
-        q0 = qn + pn
-        # Calculate positive real roots
-        pos = (np.roots(polynomial()).imag == 0) &amp; (np.roots(polynomial()).real &gt; 0)
-        self.lS = np.roots(polynomial())[pos].real[0]
-
-    def calc_contact_length(self):
-        &#34;&#34;&#34;
-        Calculate segment length where max slab deflection equals tc.
-
-        Returns
-        -------
-        lC : float
-            Maximum length without substratum contact.
-        &#34;&#34;&#34;
-        def polynomial():
-            &#34;&#34;&#34;
-            Calculate the coefficients of a fourth order polynomial equation.
-
-            Returns
-            -------
-            list
-                First coefficient for fourth order term,
-                second coefficient for third order term and so on.
-            &#34;&#34;&#34;
-            a1 = 1/(8*self.D11)*q0
-            a2 = 1/(2*kR1)*q0
-            a3 = 1/(2*self.kA55)*q0
-            a4 = 1/kN1*q0
-            a5 = -self.tc
-            return [a1,a2,a3,a4,a5]
-
-        # Get spring stiffnesses for adjacent segment intact intact weak-layer
-        kR1 = self.calc_rot_spring(collapse=False)
-        kN1 = self.calc_trans_spring()
-        # Get surface normal load components
-        qn = self.get_weight_load(self.phi)[0]
-        pn = self.get_surface_load(self.phi)[0]
-        q0 = qn + pn
-        # Calculate positive real roots
-        pos = (np.roots(polynomial()).imag == 0) &amp; (np.roots(polynomial()).real &gt; 0)
-        self.lC = np.roots(polynomial())[pos].real[0]
-
-    def calc_rot_spring(self, collapse=True):
-        &#34;&#34;&#34;
-        Calculate rotational spring stiffness from layer properties.
-
-        Arguments
-        ---------
-        collapse : boolean
-            Indicates whether weak-layer is collapsed.
-
-        Returns
-        -------
-        kR : float
-            Rotational spring stiffness (Nmm/mm/rad).
-        &#34;&#34;&#34;
-        # get ratio for foundation stiffness after collapse
-        if collapse:
-            ratio = self.ratio
-        else:
-            ratio = 1
-        # calc spring stiffness
-        kR = self.D11*self.beta*ratio**(1/4)
-
-        return kR
-
-    def calc_trans_spring(self):
-        &#34;&#34;&#34;
-        Calculate translational spring stiffness from layer properties.
-
-        Returns
-        -------
-        kN : float
-            Translational spring stiffness (N/mm^2).
-        &#34;&#34;&#34;
-        # calc translational spring stiffness for bedded euler-bernoulli-beam
-        kN = 2*self.D11*self.beta**3
-
-        return kN
-
-    def calc_touchdown_system(self):
-        &#34;&#34;&#34;Calculate the lenghts for touchdown evaluation&#34;&#34;&#34;
-        self.calc_beta()
-        self.calc_span_length()
-        self.calc_contact_length()
-
     def zh(self, x, l=0, bed=True):
         &#34;&#34;&#34;
         Compute bedded or free complementary solution at position x.
@@ -721,7 +584,7 @@ class Eigensystem:
         A11 = self.A11
         B11 = self.B11
         kA55 = self.kA55
-        E0 = self.K0
+        K0 = self.K0
 
         # Unpack geometric properties
         h = self.h
@@ -740,13 +603,13 @@ class Eigensystem:
                 [0]])
         else:
             zp = np.array([
-                [(-3*(qt + pt)/A11 - B11*(qn + pn)*x/E0)/6*x**2],
-                [(-2*(qt + pt)/A11 - B11*(qn + pn)*x/E0)/2*x],
-                [-A11*(qn + pn)*x**4/(24*E0)],
-                [-A11*(qn + pn)*x**3/(6*E0)],
-                [A11*(qn + pn)*x**3/(6*E0)
+                [(-3*(qt + pt)/A11 - B11*(qn + pn)*x/K0)/6*x**2],
+                [(-2*(qt + pt)/A11 - B11*(qn + pn)*x/K0)/2*x],
+                [-A11*(qn + pn)*x**4/(24*K0)],
+                [-A11*(qn + pn)*x**3/(6*K0)],
+                [A11*(qn + pn)*x**3/(6*K0)
                  + ((zs - B11/A11)*qt - h*pt/2 - (qn + pn)*x)/kA55],
-                [(qn + pn)*(A11*x**2/(2*E0) - 1/kA55)]])
+                [(qn + pn)*(A11*x**2/(2*K0) - 1/kA55)]])
 
         return zp
 
@@ -794,7 +657,7 @@ class Eigensystem:
 <dl>
 <dt id="weac.eigensystem.Eigensystem"><code class="flex name class">
 <span>class <span class="ident">Eigensystem</span></span>
-<span>(</span><span>system='pst-')</span>
+<span>(</span><span>system='pst-', touchdown=False)</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Base class for a layered beam on an elastic foundation.</p>
@@ -876,11 +739,12 @@ to collapsed state.</dd>
 <p>Initialize eigensystem with user input.</p>
 <h2 id="arguments">Arguments</h2>
 <dl>
-<dt><strong><code>system</code></strong> :&ensp;<code>{'pst-', '-pst', 'skier', 'skiers'}</code>, optional</dt>
+<dt><strong><code>system</code></strong> :&ensp;<code>{'pst-', '-pst', 'vpst-', '-vpst', 'skier', 'skiers'}</code>, optional</dt>
 <dd>Type of system to analyse: PST cut from the right (pst-),
-PST cut form the left (-pst), one skier on infinite
-slab (skier) or multiple skiers on infinite slab (skeirs).
-Default is 'pst-'.</dd>
+PST cut form the left (-pst), PST with vertical faces cut
+from the right (vpst-), PST with vertical faces cut from the
+left (-vpst), one skier on infinite slab (skier) or multiple
+skiers on infinite slab (skiers). Default is 'pst-'.</dd>
 <dt><strong><code>layers</code></strong> :&ensp;<code>list</code>, optional</dt>
 <dd>2D list of layer densities and thicknesses. Columns are
 density (kg/m^3) and thickness (mm). One row corresponds
@@ -971,17 +835,18 @@ to one layer. Default is [[240, 200], ].</dd>
         Describes the stiffnesses of weak-layer and slab.
     &#34;&#34;&#34;
 
-    def __init__(self, system=&#39;pst-&#39;):
+    def __init__(self, system=&#39;pst-&#39;, touchdown=False):
         &#34;&#34;&#34;
         Initialize eigensystem with user input.
 
         Arguments
         ---------
-        system : {&#39;pst-&#39;, &#39;-pst&#39;, &#39;skier&#39;, &#39;skiers&#39;}, optional
+        system : {&#39;pst-&#39;, &#39;-pst&#39;, &#39;vpst-&#39;, &#39;-vpst&#39;, &#39;skier&#39;, &#39;skiers&#39;}, optional
             Type of system to analyse: PST cut from the right (pst-),
-            PST cut form the left (-pst), one skier on infinite
-            slab (skier) or multiple skiers on infinite slab (skeirs).
-            Default is &#39;pst-&#39;.
+            PST cut form the left (-pst), PST with vertical faces cut
+            from the right (vpst-), PST with vertical faces cut from the
+            left (-vpst), one skier on infinite slab (skier) or multiple
+            skiers on infinite slab (skiers). Default is &#39;pst-&#39;.
         layers : list, optional
             2D list of layer densities and thicknesses. Columns are
             density (kg/m^3) and thickness (mm). One row corresponds
@@ -991,44 +856,51 @@ to one layer. Default is [[240, 200], ].</dd>
         self.g = 9810           # Gravitaiton (mm/s^2)
         self.lski = 1000        # Effective out-of-plane length of skis (mm)
         self.tol = 1e-3         # Relative Romberg integration tolerance
-        self.system = system    # &#39;pst-&#39;, &#39;-pst&#39;, &#39;skier&#39;, &#39;skiers&#39;
+        self.system = system    # &#39;pst-&#39;, &#39;-pst&#39;, &#39;vpst-&#39;, &#39;-vpst&#39;, &#39;skier&#39;, &#39;skiers&#39;
 
         # Initialize weak-layer attributes that will be filled later
-        self.weak = False       # Weak-layer properties dictionary
-        self.t = False          # Weak-layer thickness (mm)
-        self.kn = False         # Weak-layer compressive stiffness
-        self.kt = False         # Weak-layer shear stiffness
-        self.tc = False         # Weak-layer collapse height (mm)
+        self.weak = False           # Weak-layer properties dictionary
+        self.t = False              # Weak-layer thickness (mm)
+        self.kn = False             # Weak-layer compressive stiffness
+        self.kt = False             # Weak-layer shear stiffness
 
         # Initialize slab attributes
-        self.p = 0              # Surface line load (N/mm)
-        self.slab = False       # Slab properties dictionary
-        self.k = False          # Slab shear correction factor
-        self.h = False          # Total slab height (mm)
-        self.zs = False         # Z-coordinate of slab center of gravity (mm)
-        self.phi = False        # Slab inclination (°)
-        self.A11 = False        # Slab extensional stiffness
-        self.B11 = False        # Slab bending-extension coupling stiffness
-        self.D11 = False        # Slab bending stiffness
-        self.kA55 = False       # Slab shear stiffness
-        self.K0 = False         # Stiffness determinant
+        self.p = 0                  # Surface line load (N/mm)
+        self.slab = False           # Slab properties dictionary
+        self.k = False              # Slab shear correction factor
+        self.h = False              # Total slab height (mm)
+        self.zs = False             # Z-coordinate of slab center of gravity (mm)
+        self.phi = False            # Slab inclination (°)
+        self.A11 = False            # Slab extensional stiffness
+        self.B11 = False            # Slab bending-extension coupling stiffness
+        self.D11 = False            # Slab bending stiffness
+        self.kA55 = False           # Slab shear stiffness
+        self.K0 = False             # Stiffness determinant
 
         # Inizialize eigensystem attributes
-        self.ewC = False        # Complex eigenvalues
-        self.ewR = False        # Real eigenvalues
-        self.evC = False        # Complex eigenvectors
-        self.evR = False        # Real eigenvectors
-        self.sC = False         # Stability shift of complex eigenvalues
-        self.sR = False         # Stability shift of real eigenvalues
+        self.ewC = False            # Complex eigenvalues
+        self.ewR = False            # Real eigenvalues
+        self.evC = False            # Complex eigenvectors
+        self.evR = False            # Real eigenvectors
+        self.sC = False             # Stability shift of complex eigenvalues
+        self.sR = False             # Stability shift of real eigenvalues
 
         # Initialize touchdown attributes
-        self.lC = False         # Minimum length of substratum contact (mm)
-        self.lS = False         # Maximum length of span between
-                                # between bedded and touchdowned boundary (mm)
-        self.ratio = False      # Stiffness ratio of collalpsed to uncollapsed weak-layer
-        self.beta = False       # Ratio of slab to bedding stiffness
+        self.touchdown = touchdown  # Flag whether touchdown is possible
+        self.a = False              # Cracklength
+        self.tc = False             # Weak-layer collapse height (mm)
+        self.ratio = False          # Stiffness ratio of collapsed to uncollapsed weak-layer
+        self.betaU = False          # Ratio of slab to bedding stiffness (uncollapsed)
+        self.betaC = False          # Ratio of slab to bedding stiffness (collapsed)
+        self.mode = False           # Touchdown-mode can be either A, B, C or D
+        self.td = False             # Touchdown length
 
-    def set_foundation_properties(self, t=30, cf=0.5, E=0.25, nu=0.25, update=False):
+    def set_foundation_properties(
+            self,
+            t: float = 10.0,
+            E: float = 0.25,
+            nu: float = 0.25,
+            update: bool = False):
         &#34;&#34;&#34;
         Set material properties and geometry of foundation (weak layer).
 
@@ -1049,7 +921,6 @@ to one layer. Default is [[240, 200], ].</dd>
         &#34;&#34;&#34;
         # Geometry
         self.t = t              # Weak-layer thickness (mm)
-        self.tc = cf*self.t     # Weak-layer collapse height (mm)
 
         # Material properties
         self.weak = {
@@ -1061,7 +932,7 @@ to one layer. Default is [[240, 200], ].</dd>
         if update:
             self.calc_fundamental_system()
 
-    def set_beam_properties(self, layers, phi=0, C0=6.0, C1=4.60,
+    def set_beam_properties(self, layers, phi=0, C0=6.5, C1=4.4,
                             nu=0.25, update=False):
         &#34;&#34;&#34;
         Set material and properties geometry of beam (slab).
@@ -1073,14 +944,12 @@ to one layer. Default is [[240, 200], ].</dd>
             Columns are density (kg/m^3) and thickness (mm). One row
             corresponds to one layer. If entered as str, last split
             must be available in database.
-        phi : float
-            Inclination of the slab (degrees).
         C0 : float, optional
             Multiplicative constant of Young modulus parametrization
-            according to Gerling et al. (2017). Default is 6.0.
+            according to Bergfeld et al. (2023). Default is 6.0.
         C1 : float, optional
             Exponent of Young modulus parameterization according to
-            Gerling et al. (2017). Default is 4.6.
+            Bergfeld et al. (2023). Default is 4.6.
         nu : float, optional
             Possion&#39;s ratio. Default is 0.25
         update : bool, optional
@@ -1093,7 +962,7 @@ to one layer. Default is [[240, 200], ].</dd>
         else:
             # Compute Young&#39;s modulus from density parametrization
             layers = np.array(layers)
-            E = gerling(layers[:, 0], C0=C0, C1=C1)  # Young&#39;s modulus
+            E = bergfeld(layers[:, 0], C0=C0, C1=C1)  # Young&#39;s modulus
 
         # Derive other elastic properties
         nu = nu*np.ones(layers.shape[0])         # Global poisson&#39;s ratio
@@ -1102,15 +971,12 @@ to one layer. Default is [[240, 200], ].</dd>
 
         # Compute total slab thickness and center of gravity
         self.h, self.zs = calc_center_of_gravity(layers)
-
+        
         # Assemble layering into matrix (top to bottom)
         # Columns are density (kg/m^3), layer thickness (mm)
         # Young&#39;s modulus (MPa), shear modulus (MPa), and
         # Poisson&#39;s ratio
         self.slab = np.vstack([layers.T, E, G, nu]).T
-
-        # Set beam inclination
-        self.phi = phi
 
         # Recalculate the fundamental system after properties have changed
         if update:
@@ -1133,7 +999,7 @@ to one layer. Default is [[240, 200], ].</dd>
         &#34;&#34;&#34;
         self.p = p
 
-    def calc_foundation_stiffness(self, ratio=16):
+    def calc_foundation_stiffness(self):
         &#34;&#34;&#34;Compute foundation normal and shear stiffness.&#34;&#34;&#34;
         # Elastic moduli (MPa) under plane-strain conditions
         G = self.weak[&#39;E&#39;]/(2*(1 + self.weak[&#39;nu&#39;]))    # Shear modulus
@@ -1142,9 +1008,6 @@ to one layer. Default is [[240, 200], ].</dd>
         # Foundation (weak layer) stiffnesses (N/mm^3)
         self.kn = E/self.t                              # Normal stiffness
         self.kt = G/self.t                              # Shear stiffness
-
-        # Weak-layer stiffness increment factor for collapse
-        self.ratio = ratio
 
     def get_ply_coordinates(self):
         &#34;&#34;&#34;
@@ -1359,142 +1222,6 @@ to one layer. Default is [[240, 200], ].</dd>
 
         return Fn, Ft
 
-    def calc_beta(self):
-        &#34;&#34;&#34;
-        Calculate beta.
-
-        Returns
-        -------
-        beta : float
-            Weak-layer to slab stiffness relation factor.
-        &#34;&#34;&#34;
-        # (Intact) weak-layer to slab stiffness relation factor
-        self.beta = (self.kn/(4*self.D11))**(1/4)
-
-    def calc_span_length(self):
-        &#34;&#34;&#34;
-        Calculate span from layer and weak layer properties and load situation.
-
-        Returns
-        -------
-        lS : float
-            Span of the element between bedded element and touchdown for full touchdown.
-        &#34;&#34;&#34;
-        def polynomial():
-            &#34;&#34;&#34;
-            Calculate the coefficients of a sixth order polynomial equation.
-
-            Returns
-            -------
-            list
-                First coefficient for sixth order term,
-                second coefficient for fith order term and so on.
-            &#34;&#34;&#34;
-            a1 = self.kA55**2*kR1*kN1*q0
-            a2 = 6*self.kA55*(self.D11*self.kA55 + kR1*kR2)*kN1*q0
-            a3 = 30*self.D11*self.kA55*(kR1 + kR2)*kN1*q0
-            a4 = 24*self.D11*(2*self.kA55**2*kR1 + 3*self.D11*self.kA55*kN1 + 3*kR1*kR2*kN1)*q0
-            a5 = 72*self.D11*(self.D11*(self.kA55**2 + (kR1 + kR2)*kN1)*q0 \
-                + self.kA55*kR1*(2*kR2*q0 - self.kA55*kN1*self.tc))
-            a6 = 144*self.D11*self.kA55*(self.D11*(kR1 + kR2)*q0 \
-                - (self.D11*self.kA55 + kR1*kR2)*kN1*self.tc)
-            a7 = - 144*self.D11**2*self.kA55*(kR1 + kR2)*kN1*self.tc
-            return [a1,a2,a3,a4,a5,a6,a7]
-
-        # Get spring stiffnesses for adjacent segment with intact weak-layer
-        kR1 = self.calc_rot_spring(collapse=False)
-        kN1 = self.calc_trans_spring()
-        # Get spring stiffnesses for adjacent segment with collapsed weak-layer
-        kR2 = self.calc_rot_spring(collapse=True)
-        # Get surface normal load components
-        qn = self.get_weight_load(self.phi)[0]
-        pn = self.get_surface_load(self.phi)[0]
-        q0 = qn + pn
-        # Calculate positive real roots
-        pos = (np.roots(polynomial()).imag == 0) &amp; (np.roots(polynomial()).real &gt; 0)
-        self.lS = np.roots(polynomial())[pos].real[0]
-
-    def calc_contact_length(self):
-        &#34;&#34;&#34;
-        Calculate segment length where max slab deflection equals tc.
-
-        Returns
-        -------
-        lC : float
-            Maximum length without substratum contact.
-        &#34;&#34;&#34;
-        def polynomial():
-            &#34;&#34;&#34;
-            Calculate the coefficients of a fourth order polynomial equation.
-
-            Returns
-            -------
-            list
-                First coefficient for fourth order term,
-                second coefficient for third order term and so on.
-            &#34;&#34;&#34;
-            a1 = 1/(8*self.D11)*q0
-            a2 = 1/(2*kR1)*q0
-            a3 = 1/(2*self.kA55)*q0
-            a4 = 1/kN1*q0
-            a5 = -self.tc
-            return [a1,a2,a3,a4,a5]
-
-        # Get spring stiffnesses for adjacent segment intact intact weak-layer
-        kR1 = self.calc_rot_spring(collapse=False)
-        kN1 = self.calc_trans_spring()
-        # Get surface normal load components
-        qn = self.get_weight_load(self.phi)[0]
-        pn = self.get_surface_load(self.phi)[0]
-        q0 = qn + pn
-        # Calculate positive real roots
-        pos = (np.roots(polynomial()).imag == 0) &amp; (np.roots(polynomial()).real &gt; 0)
-        self.lC = np.roots(polynomial())[pos].real[0]
-
-    def calc_rot_spring(self, collapse=True):
-        &#34;&#34;&#34;
-        Calculate rotational spring stiffness from layer properties.
-
-        Arguments
-        ---------
-        collapse : boolean
-            Indicates whether weak-layer is collapsed.
-
-        Returns
-        -------
-        kR : float
-            Rotational spring stiffness (Nmm/mm/rad).
-        &#34;&#34;&#34;
-        # get ratio for foundation stiffness after collapse
-        if collapse:
-            ratio = self.ratio
-        else:
-            ratio = 1
-        # calc spring stiffness
-        kR = self.D11*self.beta*ratio**(1/4)
-
-        return kR
-
-    def calc_trans_spring(self):
-        &#34;&#34;&#34;
-        Calculate translational spring stiffness from layer properties.
-
-        Returns
-        -------
-        kN : float
-            Translational spring stiffness (N/mm^2).
-        &#34;&#34;&#34;
-        # calc translational spring stiffness for bedded euler-bernoulli-beam
-        kN = 2*self.D11*self.beta**3
-
-        return kN
-
-    def calc_touchdown_system(self):
-        &#34;&#34;&#34;Calculate the lenghts for touchdown evaluation&#34;&#34;&#34;
-        self.calc_beta()
-        self.calc_span_length()
-        self.calc_contact_length()
-
     def zh(self, x, l=0, bed=True):
         &#34;&#34;&#34;
         Compute bedded or free complementary solution at position x.
@@ -1573,7 +1300,7 @@ to one layer. Default is [[240, 200], ].</dd>
         A11 = self.A11
         B11 = self.B11
         kA55 = self.kA55
-        E0 = self.K0
+        K0 = self.K0
 
         # Unpack geometric properties
         h = self.h
@@ -1592,13 +1319,13 @@ to one layer. Default is [[240, 200], ].</dd>
                 [0]])
         else:
             zp = np.array([
-                [(-3*(qt + pt)/A11 - B11*(qn + pn)*x/E0)/6*x**2],
-                [(-2*(qt + pt)/A11 - B11*(qn + pn)*x/E0)/2*x],
-                [-A11*(qn + pn)*x**4/(24*E0)],
-                [-A11*(qn + pn)*x**3/(6*E0)],
-                [A11*(qn + pn)*x**3/(6*E0)
+                [(-3*(qt + pt)/A11 - B11*(qn + pn)*x/K0)/6*x**2],
+                [(-2*(qt + pt)/A11 - B11*(qn + pn)*x/K0)/2*x],
+                [-A11*(qn + pn)*x**4/(24*K0)],
+                [-A11*(qn + pn)*x**3/(6*K0)],
+                [A11*(qn + pn)*x**3/(6*K0)
                  + ((zs - B11/A11)*qt - h*pt/2 - (qn + pn)*x)/kA55],
-                [(qn + pn)*(A11*x**2/(2*E0) - 1/kA55)]])
+                [(qn + pn)*(A11*x**2/(2*K0) - 1/kA55)]])
 
         return zp
 
@@ -1641,85 +1368,6 @@ to one layer. Default is [[240, 200], ].</dd>
 </ul>
 <h3>Methods</h3>
 <dl>
-<dt id="weac.eigensystem.Eigensystem.calc_beta"><code class="name flex">
-<span>def <span class="ident">calc_beta</span></span>(<span>self)</span>
-</code></dt>
-<dd>
-<div class="desc"><p>Calculate beta.</p>
-<h2 id="returns">Returns</h2>
-<dl>
-<dt><strong><code>beta</code></strong> :&ensp;<code>float</code></dt>
-<dd>Weak-layer to slab stiffness relation factor.</dd>
-</dl></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">def calc_beta(self):
-    &#34;&#34;&#34;
-    Calculate beta.
-
-    Returns
-    -------
-    beta : float
-        Weak-layer to slab stiffness relation factor.
-    &#34;&#34;&#34;
-    # (Intact) weak-layer to slab stiffness relation factor
-    self.beta = (self.kn/(4*self.D11))**(1/4)</code></pre>
-</details>
-</dd>
-<dt id="weac.eigensystem.Eigensystem.calc_contact_length"><code class="name flex">
-<span>def <span class="ident">calc_contact_length</span></span>(<span>self)</span>
-</code></dt>
-<dd>
-<div class="desc"><p>Calculate segment length where max slab deflection equals tc.</p>
-<h2 id="returns">Returns</h2>
-<dl>
-<dt><strong><code>lC</code></strong> :&ensp;<code>float</code></dt>
-<dd>Maximum length without substratum contact.</dd>
-</dl></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">def calc_contact_length(self):
-    &#34;&#34;&#34;
-    Calculate segment length where max slab deflection equals tc.
-
-    Returns
-    -------
-    lC : float
-        Maximum length without substratum contact.
-    &#34;&#34;&#34;
-    def polynomial():
-        &#34;&#34;&#34;
-        Calculate the coefficients of a fourth order polynomial equation.
-
-        Returns
-        -------
-        list
-            First coefficient for fourth order term,
-            second coefficient for third order term and so on.
-        &#34;&#34;&#34;
-        a1 = 1/(8*self.D11)*q0
-        a2 = 1/(2*kR1)*q0
-        a3 = 1/(2*self.kA55)*q0
-        a4 = 1/kN1*q0
-        a5 = -self.tc
-        return [a1,a2,a3,a4,a5]
-
-    # Get spring stiffnesses for adjacent segment intact intact weak-layer
-    kR1 = self.calc_rot_spring(collapse=False)
-    kN1 = self.calc_trans_spring()
-    # Get surface normal load components
-    qn = self.get_weight_load(self.phi)[0]
-    pn = self.get_surface_load(self.phi)[0]
-    q0 = qn + pn
-    # Calculate positive real roots
-    pos = (np.roots(polynomial()).imag == 0) &amp; (np.roots(polynomial()).real &gt; 0)
-    self.lC = np.roots(polynomial())[pos].real[0]</code></pre>
-</details>
-</dd>
 <dt id="weac.eigensystem.Eigensystem.calc_eigensystem"><code class="name flex">
 <span>def <span class="ident">calc_eigensystem</span></span>(<span>self)</span>
 </code></dt>
@@ -1748,7 +1396,7 @@ to one layer. Default is [[240, 200], ].</dd>
 </details>
 </dd>
 <dt id="weac.eigensystem.Eigensystem.calc_foundation_stiffness"><code class="name flex">
-<span>def <span class="ident">calc_foundation_stiffness</span></span>(<span>self, ratio=16)</span>
+<span>def <span class="ident">calc_foundation_stiffness</span></span>(<span>self)</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Compute foundation normal and shear stiffness.</p></div>
@@ -1756,7 +1404,7 @@ to one layer. Default is [[240, 200], ].</dd>
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def calc_foundation_stiffness(self, ratio=16):
+<pre><code class="python">def calc_foundation_stiffness(self):
     &#34;&#34;&#34;Compute foundation normal and shear stiffness.&#34;&#34;&#34;
     # Elastic moduli (MPa) under plane-strain conditions
     G = self.weak[&#39;E&#39;]/(2*(1 + self.weak[&#39;nu&#39;]))    # Shear modulus
@@ -1764,10 +1412,7 @@ to one layer. Default is [[240, 200], ].</dd>
 
     # Foundation (weak layer) stiffnesses (N/mm^3)
     self.kn = E/self.t                              # Normal stiffness
-    self.kt = G/self.t                              # Shear stiffness
-
-    # Weak-layer stiffness increment factor for collapse
-    self.ratio = ratio</code></pre>
+    self.kt = G/self.t                              # Shear stiffness</code></pre>
 </details>
 </dd>
 <dt id="weac.eigensystem.Eigensystem.calc_fundamental_system"><code class="name flex">
@@ -1819,108 +1464,6 @@ to one layer. Default is [[240, 200], ].</dd>
     self.D11 = D11
     self.kA55 = kA55
     self.K0 = B11**2 - A11*D11</code></pre>
-</details>
-</dd>
-<dt id="weac.eigensystem.Eigensystem.calc_rot_spring"><code class="name flex">
-<span>def <span class="ident">calc_rot_spring</span></span>(<span>self, collapse=True)</span>
-</code></dt>
-<dd>
-<div class="desc"><p>Calculate rotational spring stiffness from layer properties.</p>
-<h2 id="arguments">Arguments</h2>
-<dl>
-<dt><strong><code>collapse</code></strong> :&ensp;<code>boolean</code></dt>
-<dd>Indicates whether weak-layer is collapsed.</dd>
-</dl>
-<h2 id="returns">Returns</h2>
-<dl>
-<dt><strong><code>kR</code></strong> :&ensp;<code>float</code></dt>
-<dd>Rotational spring stiffness (Nmm/mm/rad).</dd>
-</dl></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">def calc_rot_spring(self, collapse=True):
-    &#34;&#34;&#34;
-    Calculate rotational spring stiffness from layer properties.
-
-    Arguments
-    ---------
-    collapse : boolean
-        Indicates whether weak-layer is collapsed.
-
-    Returns
-    -------
-    kR : float
-        Rotational spring stiffness (Nmm/mm/rad).
-    &#34;&#34;&#34;
-    # get ratio for foundation stiffness after collapse
-    if collapse:
-        ratio = self.ratio
-    else:
-        ratio = 1
-    # calc spring stiffness
-    kR = self.D11*self.beta*ratio**(1/4)
-
-    return kR</code></pre>
-</details>
-</dd>
-<dt id="weac.eigensystem.Eigensystem.calc_span_length"><code class="name flex">
-<span>def <span class="ident">calc_span_length</span></span>(<span>self)</span>
-</code></dt>
-<dd>
-<div class="desc"><p>Calculate span from layer and weak layer properties and load situation.</p>
-<h2 id="returns">Returns</h2>
-<dl>
-<dt><strong><code>lS</code></strong> :&ensp;<code>float</code></dt>
-<dd>Span of the element between bedded element and touchdown for full touchdown.</dd>
-</dl></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">def calc_span_length(self):
-    &#34;&#34;&#34;
-    Calculate span from layer and weak layer properties and load situation.
-
-    Returns
-    -------
-    lS : float
-        Span of the element between bedded element and touchdown for full touchdown.
-    &#34;&#34;&#34;
-    def polynomial():
-        &#34;&#34;&#34;
-        Calculate the coefficients of a sixth order polynomial equation.
-
-        Returns
-        -------
-        list
-            First coefficient for sixth order term,
-            second coefficient for fith order term and so on.
-        &#34;&#34;&#34;
-        a1 = self.kA55**2*kR1*kN1*q0
-        a2 = 6*self.kA55*(self.D11*self.kA55 + kR1*kR2)*kN1*q0
-        a3 = 30*self.D11*self.kA55*(kR1 + kR2)*kN1*q0
-        a4 = 24*self.D11*(2*self.kA55**2*kR1 + 3*self.D11*self.kA55*kN1 + 3*kR1*kR2*kN1)*q0
-        a5 = 72*self.D11*(self.D11*(self.kA55**2 + (kR1 + kR2)*kN1)*q0 \
-            + self.kA55*kR1*(2*kR2*q0 - self.kA55*kN1*self.tc))
-        a6 = 144*self.D11*self.kA55*(self.D11*(kR1 + kR2)*q0 \
-            - (self.D11*self.kA55 + kR1*kR2)*kN1*self.tc)
-        a7 = - 144*self.D11**2*self.kA55*(kR1 + kR2)*kN1*self.tc
-        return [a1,a2,a3,a4,a5,a6,a7]
-
-    # Get spring stiffnesses for adjacent segment with intact weak-layer
-    kR1 = self.calc_rot_spring(collapse=False)
-    kN1 = self.calc_trans_spring()
-    # Get spring stiffnesses for adjacent segment with collapsed weak-layer
-    kR2 = self.calc_rot_spring(collapse=True)
-    # Get surface normal load components
-    qn = self.get_weight_load(self.phi)[0]
-    pn = self.get_surface_load(self.phi)[0]
-    q0 = qn + pn
-    # Calculate positive real roots
-    pos = (np.roots(polynomial()).imag == 0) &amp; (np.roots(polynomial()).real &gt; 0)
-    self.lS = np.roots(polynomial())[pos].real[0]</code></pre>
 </details>
 </dd>
 <dt id="weac.eigensystem.Eigensystem.calc_system_matrix"><code class="name flex">
@@ -1982,51 +1525,6 @@ and rearranged to z' = -(A ^ -1)Bz + (A ^ -1)d = Kz + q</p>
          [K61,  0,    0,  K64,  K65,    0]]
 
     return np.array(K)</code></pre>
-</details>
-</dd>
-<dt id="weac.eigensystem.Eigensystem.calc_touchdown_system"><code class="name flex">
-<span>def <span class="ident">calc_touchdown_system</span></span>(<span>self)</span>
-</code></dt>
-<dd>
-<div class="desc"><p>Calculate the lenghts for touchdown evaluation</p></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">def calc_touchdown_system(self):
-    &#34;&#34;&#34;Calculate the lenghts for touchdown evaluation&#34;&#34;&#34;
-    self.calc_beta()
-    self.calc_span_length()
-    self.calc_contact_length()</code></pre>
-</details>
-</dd>
-<dt id="weac.eigensystem.Eigensystem.calc_trans_spring"><code class="name flex">
-<span>def <span class="ident">calc_trans_spring</span></span>(<span>self)</span>
-</code></dt>
-<dd>
-<div class="desc"><p>Calculate translational spring stiffness from layer properties.</p>
-<h2 id="returns">Returns</h2>
-<dl>
-<dt><strong><code>kN</code></strong> :&ensp;<code>float</code></dt>
-<dd>Translational spring stiffness (N/mm^2).</dd>
-</dl></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">def calc_trans_spring(self):
-    &#34;&#34;&#34;
-    Calculate translational spring stiffness from layer properties.
-
-    Returns
-    -------
-    kN : float
-        Translational spring stiffness (N/mm^2).
-    &#34;&#34;&#34;
-    # calc translational spring stiffness for bedded euler-bernoulli-beam
-    kN = 2*self.D11*self.beta**3
-
-    return kN</code></pre>
 </details>
 </dd>
 <dt id="weac.eigensystem.Eigensystem.get_load_vector"><code class="name flex">
@@ -2260,7 +1758,7 @@ downward pointing z-axis (z-list will be negative to positive).</dd>
 </details>
 </dd>
 <dt id="weac.eigensystem.Eigensystem.set_beam_properties"><code class="name flex">
-<span>def <span class="ident">set_beam_properties</span></span>(<span>self, layers, phi=0, C0=6.0, C1=4.6, nu=0.25, update=False)</span>
+<span>def <span class="ident">set_beam_properties</span></span>(<span>self, layers, phi=0, C0=6.5, C1=4.4, nu=0.25, update=False)</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Set material and properties geometry of beam (slab).</p>
@@ -2271,14 +1769,12 @@ downward pointing z-axis (z-list will be negative to positive).</dd>
 Columns are density (kg/m^3) and thickness (mm). One row
 corresponds to one layer. If entered as str, last split
 must be available in database.</dd>
-<dt><strong><code>phi</code></strong> :&ensp;<code>float</code></dt>
-<dd>Inclination of the slab (degrees).</dd>
 <dt><strong><code>C0</code></strong> :&ensp;<code>float</code>, optional</dt>
 <dd>Multiplicative constant of Young modulus parametrization
-according to Gerling et al. (2017). Default is 6.0.</dd>
+according to Bergfeld et al. (2023). Default is 6.0.</dd>
 <dt><strong><code>C1</code></strong> :&ensp;<code>float</code>, optional</dt>
 <dd>Exponent of Young modulus parameterization according to
-Gerling et al. (2017). Default is 4.6.</dd>
+Bergfeld et al. (2023). Default is 4.6.</dd>
 <dt><strong><code>nu</code></strong> :&ensp;<code>float</code>, optional</dt>
 <dd>Possion's ratio. Default is 0.25</dd>
 <dt><strong><code>update</code></strong> :&ensp;<code>bool</code>, optional</dt>
@@ -2289,7 +1785,7 @@ foundation properties have changed.</dd>
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def set_beam_properties(self, layers, phi=0, C0=6.0, C1=4.60,
+<pre><code class="python">def set_beam_properties(self, layers, phi=0, C0=6.5, C1=4.4,
                         nu=0.25, update=False):
     &#34;&#34;&#34;
     Set material and properties geometry of beam (slab).
@@ -2301,14 +1797,12 @@ foundation properties have changed.</dd>
         Columns are density (kg/m^3) and thickness (mm). One row
         corresponds to one layer. If entered as str, last split
         must be available in database.
-    phi : float
-        Inclination of the slab (degrees).
     C0 : float, optional
         Multiplicative constant of Young modulus parametrization
-        according to Gerling et al. (2017). Default is 6.0.
+        according to Bergfeld et al. (2023). Default is 6.0.
     C1 : float, optional
         Exponent of Young modulus parameterization according to
-        Gerling et al. (2017). Default is 4.6.
+        Bergfeld et al. (2023). Default is 4.6.
     nu : float, optional
         Possion&#39;s ratio. Default is 0.25
     update : bool, optional
@@ -2321,7 +1815,7 @@ foundation properties have changed.</dd>
     else:
         # Compute Young&#39;s modulus from density parametrization
         layers = np.array(layers)
-        E = gerling(layers[:, 0], C0=C0, C1=C1)  # Young&#39;s modulus
+        E = bergfeld(layers[:, 0], C0=C0, C1=C1)  # Young&#39;s modulus
 
     # Derive other elastic properties
     nu = nu*np.ones(layers.shape[0])         # Global poisson&#39;s ratio
@@ -2330,15 +1824,12 @@ foundation properties have changed.</dd>
 
     # Compute total slab thickness and center of gravity
     self.h, self.zs = calc_center_of_gravity(layers)
-
+    
     # Assemble layering into matrix (top to bottom)
     # Columns are density (kg/m^3), layer thickness (mm)
     # Young&#39;s modulus (MPa), shear modulus (MPa), and
     # Poisson&#39;s ratio
     self.slab = np.vstack([layers.T, E, G, nu]).T
-
-    # Set beam inclination
-    self.phi = phi
 
     # Recalculate the fundamental system after properties have changed
     if update:
@@ -2346,7 +1837,7 @@ foundation properties have changed.</dd>
 </details>
 </dd>
 <dt id="weac.eigensystem.Eigensystem.set_foundation_properties"><code class="name flex">
-<span>def <span class="ident">set_foundation_properties</span></span>(<span>self, t=30, cf=0.5, E=0.25, nu=0.25, update=False)</span>
+<span>def <span class="ident">set_foundation_properties</span></span>(<span>self, t: float = 10.0, E: float = 0.25, nu: float = 0.25, update: bool = False)</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Set material properties and geometry of foundation (weak layer).</p>
@@ -2369,7 +1860,12 @@ foundation properties have changed.</dd>
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def set_foundation_properties(self, t=30, cf=0.5, E=0.25, nu=0.25, update=False):
+<pre><code class="python">def set_foundation_properties(
+        self,
+        t: float = 10.0,
+        E: float = 0.25,
+        nu: float = 0.25,
+        update: bool = False):
     &#34;&#34;&#34;
     Set material properties and geometry of foundation (weak layer).
 
@@ -2390,7 +1886,6 @@ foundation properties have changed.</dd>
     &#34;&#34;&#34;
     # Geometry
     self.t = t              # Weak-layer thickness (mm)
-    self.tc = cf*self.t     # Weak-layer collapse height (mm)
 
     # Material properties
     self.weak = {
@@ -2628,7 +2123,7 @@ is True.</dd>
     A11 = self.A11
     B11 = self.B11
     kA55 = self.kA55
-    E0 = self.K0
+    K0 = self.K0
 
     # Unpack geometric properties
     h = self.h
@@ -2647,13 +2142,13 @@ is True.</dd>
             [0]])
     else:
         zp = np.array([
-            [(-3*(qt + pt)/A11 - B11*(qn + pn)*x/E0)/6*x**2],
-            [(-2*(qt + pt)/A11 - B11*(qn + pn)*x/E0)/2*x],
-            [-A11*(qn + pn)*x**4/(24*E0)],
-            [-A11*(qn + pn)*x**3/(6*E0)],
-            [A11*(qn + pn)*x**3/(6*E0)
+            [(-3*(qt + pt)/A11 - B11*(qn + pn)*x/K0)/6*x**2],
+            [(-2*(qt + pt)/A11 - B11*(qn + pn)*x/K0)/2*x],
+            [-A11*(qn + pn)*x**4/(24*K0)],
+            [-A11*(qn + pn)*x**3/(6*K0)],
+            [A11*(qn + pn)*x**3/(6*K0)
              + ((zs - B11/A11)*qt - h*pt/2 - (qn + pn)*x)/kA55],
-            [(qn + pn)*(A11*x**2/(2*E0) - 1/kA55)]])
+            [(qn + pn)*(A11*x**2/(2*K0) - 1/kA55)]])
 
     return zp</code></pre>
 </details>
@@ -2679,17 +2174,11 @@ is True.</dd>
 <li>
 <h4><code><a title="weac.eigensystem.Eigensystem" href="#weac.eigensystem.Eigensystem">Eigensystem</a></code></h4>
 <ul class="">
-<li><code><a title="weac.eigensystem.Eigensystem.calc_beta" href="#weac.eigensystem.Eigensystem.calc_beta">calc_beta</a></code></li>
-<li><code><a title="weac.eigensystem.Eigensystem.calc_contact_length" href="#weac.eigensystem.Eigensystem.calc_contact_length">calc_contact_length</a></code></li>
 <li><code><a title="weac.eigensystem.Eigensystem.calc_eigensystem" href="#weac.eigensystem.Eigensystem.calc_eigensystem">calc_eigensystem</a></code></li>
 <li><code><a title="weac.eigensystem.Eigensystem.calc_foundation_stiffness" href="#weac.eigensystem.Eigensystem.calc_foundation_stiffness">calc_foundation_stiffness</a></code></li>
 <li><code><a title="weac.eigensystem.Eigensystem.calc_fundamental_system" href="#weac.eigensystem.Eigensystem.calc_fundamental_system">calc_fundamental_system</a></code></li>
 <li><code><a title="weac.eigensystem.Eigensystem.calc_laminate_stiffness_matrix" href="#weac.eigensystem.Eigensystem.calc_laminate_stiffness_matrix">calc_laminate_stiffness_matrix</a></code></li>
-<li><code><a title="weac.eigensystem.Eigensystem.calc_rot_spring" href="#weac.eigensystem.Eigensystem.calc_rot_spring">calc_rot_spring</a></code></li>
-<li><code><a title="weac.eigensystem.Eigensystem.calc_span_length" href="#weac.eigensystem.Eigensystem.calc_span_length">calc_span_length</a></code></li>
 <li><code><a title="weac.eigensystem.Eigensystem.calc_system_matrix" href="#weac.eigensystem.Eigensystem.calc_system_matrix">calc_system_matrix</a></code></li>
-<li><code><a title="weac.eigensystem.Eigensystem.calc_touchdown_system" href="#weac.eigensystem.Eigensystem.calc_touchdown_system">calc_touchdown_system</a></code></li>
-<li><code><a title="weac.eigensystem.Eigensystem.calc_trans_spring" href="#weac.eigensystem.Eigensystem.calc_trans_spring">calc_trans_spring</a></code></li>
 <li><code><a title="weac.eigensystem.Eigensystem.get_load_vector" href="#weac.eigensystem.Eigensystem.get_load_vector">get_load_vector</a></code></li>
 <li><code><a title="weac.eigensystem.Eigensystem.get_ply_coordinates" href="#weac.eigensystem.Eigensystem.get_ply_coordinates">get_ply_coordinates</a></code></li>
 <li><code><a title="weac.eigensystem.Eigensystem.get_skier_load" href="#weac.eigensystem.Eigensystem.get_skier_load">get_skier_load</a></code></li>

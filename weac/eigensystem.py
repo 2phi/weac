@@ -187,7 +187,7 @@ class Eigensystem:
         if update:
             self.calc_fundamental_system()
 
-    def set_beam_properties(self, layers, phi=0, C0=6.5, C1=4.4,
+    def set_beam_properties(self, layers, C0=6.5, C1=4.4,
                             nu=0.25, update=False):
         """
         Set material and properties geometry of beam (slab).
@@ -201,7 +201,7 @@ class Eigensystem:
             must be available in database.
         C0 : float, optional
             Multiplicative constant of Young modulus parametrization
-            according to Bergfeld et al. (2023). Default is 6.0.
+            according to Bergfeld et al. (2023). Default is 6.5.
         C1 : float, optional
             Exponent of Young modulus parameterization according to
             Bergfeld et al. (2023). Default is 4.6.
@@ -226,7 +226,7 @@ class Eigensystem:
 
         # Compute total slab thickness and center of gravity
         self.h, self.zs = calc_center_of_gravity(layers)
-        
+
         # Assemble layering into matrix (top to bottom)
         # Columns are density (kg/m^3), layer thickness (mm)
         # Young's modulus (MPa), shear modulus (MPa), and

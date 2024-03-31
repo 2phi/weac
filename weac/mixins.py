@@ -1205,7 +1205,7 @@ class SolutionMixin:
         if self.system not in ['pst-', '-pst', 'rested']:
             rhs[:3] = self.bc(self.zp(x=0, phi=phi, bed=ki[0]))
             rhs[-3:] = self.bc(self.zp(x=li[-1], phi=phi, bed=ki[-1]))
-            
+
         # Set rhs for vertical faces
         if self.system in ['vpst-', '-vpst']:
             # Calculate center of gravity and mass of

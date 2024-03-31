@@ -36,6 +36,7 @@ from IPython import get_ipython
 
 # Third party imports
 import numpy as np
+import weac
 
 
 def time():
@@ -78,6 +79,7 @@ def load_dummy_profile(profile_id):
         &#39;e&#39;:      [hard,   soft,   soft],
         &#39;f&#39;:      [soft,   soft,   hard],
         # Homogeneous
+        &#39;h&#39;:      [medium,   medium,   medium],
         &#39;soft&#39;:   [soft,   soft,   soft],
         &#39;medium&#39;: [medium, medium, medium],
         &#39;hard&#39;:   [hard,   hard,   hard],
@@ -104,7 +106,7 @@ def calc_center_of_gravity(layers):
 
     Arguments
     ---------
-    layers : list
+    layers : ndarray
         2D list of layer densities and thicknesses. Columns are
         density (kg/m^3) and thickness (mm). One row corresponds
         to one layer.
@@ -117,10 +119,10 @@ def calc_center_of_gravity(layers):
         Z-coordinate of center of gravity (mm).
     &#34;&#34;&#34;
     # Layering info for center of gravity calculation (bottom to top)
-    n = layers.shape[0]                 # Number of layers
-    rho = np.flipud(layers[:, 0])       # Layer densities
-    h = np.flipud(layers[:, 1])          # Layer thicknesses
-    H = sum(h)                          # Total slab thickness
+    n = layers.shape[0]                    # Number of layers
+    rho = 1e-12*np.flipud(layers[:, 0])    # Layer densities (kg/m^3 -&gt; t/mm^3)
+    h = np.flipud(layers[:, 1])            # Layer thicknesses
+    H = sum(h)                             # Total slab thickness
     # Layer center coordinates (bottom to top)
     zi = [H/2 - sum(h[0:j]) - h[j]/2 for j in range(n)]
     # Z-coordinate of the center of gravity
@@ -128,6 +130,61 @@ def calc_center_of_gravity(layers):
     # Return slab thickness and center of gravity
     return H, zs
 
+
+def calc_vertical_bc_center_of_gravity(slab, phi):
+    &#34;&#34;&#34;
+    Calculate center of gravity of triangular slab segements for vertical PSTs.
+
+    Parameters
+    ----------
+    slab : ndarray
+        List of layer densities, thicknesses, and elastic properties.
+        Columns are density (kg/m^3), thickness (mm), Young&#39;s modulus
+        (MPa), shear modulus (MPa), and Poisson&#39;s ratio. One row corresponds
+        to one layer.
+    phi : fload
+        Slope angle (deg).
+
+    Returns
+    -------
+    xs : float
+        Horizontal coordinate of center of gravity (mm).
+    zs : float
+        Vertical coordinate of center of gravity (mm).
+    w : ndarray
+        Weight of the slab segment that is cut off or added (t).
+    &#34;&#34;&#34;
+    # Convert slope angle to radians
+    phi = np.deg2rad(phi)
+    
+    # Catch flat-field case
+    if phi == 0:
+        xs = 0
+        zs = 0
+        w = 0
+    else:
+        # Layering info for center of gravity calculation (top to bottom)
+        n = slab.shape[0]               # Number of slab
+        rho = 1e-12*slab[:, 0]          # Layer densities (kg/m^3 -&gt; t/mm^3)
+        hi = slab[:, 1]                 # Layer thicknesses
+        H = sum(hi)                     # Total slab thickness
+        # Layer coordinates z_i (top to bottom)
+        z = np.array([-H/2 + sum(hi[0:j]) for j in range(n + 1)])
+        zi = z[:-1]                         # z_i
+        zii = z[1:]                         # z_{i+1}
+        # Center of gravity of all layers (top to bottom)
+        zsi = zi + hi/3*(3/2*H - zi - 2*zii)/(H - zi - zii)
+        # Surface area of all layers (top to bottom)
+        Ai = hi/2*(H - zi - zii)*np.tan(phi)
+        # Center of gravity in vertical direction
+        zs = sum(zsi*rho*Ai)/sum(rho*Ai)
+        # Center of gravity in horizontal direction
+        xs = (H/2 - zs)*np.tan(phi/2)
+        # Weight of added or cut off slab segments (t)
+        w = sum(Ai*rho)
+    
+    # Return center of gravity and weight of slab segment
+    return xs, zs, w
 
 def scapozza(rho):
     &#34;&#34;&#34;
@@ -171,6 +228,32 @@ def gerling(rho, C0=6.0, C1=4.6):
     &#34;&#34;&#34;
     return C0*1e-10*rho**C1
 
+
+def bergfeld(rho, rho0=917, C0=6.5, C1=4.4):
+    &#34;&#34;&#34;
+    Compute Young&#39;s modulus from density according to Bergfeld et al. (2023).
+
+    Arguments
+    ---------
+    rho : float or ndarray
+        Density (kg/m^3).
+    rho0 : float, optional
+        Density of ice (kg/m^3). Default is 917.
+    C0 : float, optional
+        Multiplicative constant of Young modulus parametrization
+        according to Bergfeld et al. (2023). Default is 6.5.
+    C1 : float, optional
+        Exponent of Young modulus parameterization according to
+        Bergfeld et al. (2023). Default is 4.4.
+
+    Returns
+    -------
+    E : float or ndarray
+        Young&#39;s modulus (MPa).
+    &#34;&#34;&#34;
+    return C0*1e3*(rho/rho0)**C1
+
+
 def tensile_strength_slab(rho, unit=&#39;kPa&#39;):
     &#34;&#34;&#34;
     Estimate the tensile strenght of a slab layer from its density.
@@ -195,7 +278,66 @@ def tensile_strength_slab(rho, unit=&#39;kPa&#39;):
         }
     rho_ice = 917
     # Sigrist&#39;s equation is given in kPa
-    return convert[unit]*240*(rho/rho_ice)**2.44</code></pre>
+    return convert[unit]*240*(rho/rho_ice)**2.44
+
+def touchdown_distance(
+        layers: np.ndarray | str | None = None,
+        C0: float = 6.5,
+        C1: float = 4.4,
+        Ewl: float = 0.25,
+        t: float = 10,
+        phi: float = 0):
+    &#34;&#34;&#34;
+    Calculate cut length at first contanct and steady-state touchdown distance.
+
+    Arguments
+    ---------
+    layers : list, optional
+        2D list of layer densities and thicknesses. Columns are
+        density(kg/m ^ 3) and thickness(mm). One row corresponds
+        to one layer. Default is [[240, 200], ].
+    C0 : float, optional
+        Multiplicative constant of Young modulus parametrization
+        according to Bergfeld et al. (2023). Default is 6.5.
+    C1 : float, optional
+        Exponent of Young modulus parameterization according to
+        Bergfeld et al. (2023). Default is 4.4.
+    Ewl : float, optional
+        Young&#39;s modulus of the weak layer (MPa). Default is 0.25.
+    t : float, optional
+        Thickness of the weak layer (mm). Default is 10.
+    phi : float, optional
+        Inclination of the slab (°). Default is 0.
+        
+    Returns
+    -------
+    first_contact : float
+        Cut length at first contact (mm).
+    steady_state : float
+        Steady-state touchdown distance (mm).
+    &#34;&#34;&#34;
+    # Check if layering is defined
+    layers = layers if layers else [[240, 200], ]
+
+    # Initialize model with user input
+    touchdown = weac.Layered(system=&#39;pst-&#39;, touchdown=True)
+
+    # Set material properties
+    touchdown.set_foundation_properties(E=Ewl, t=t, update=True)
+    touchdown.set_beam_properties(layers=layers, C0=C0, C1=C1, update=True)
+
+    # Assemble very long dummy PST to compute crack length where the slab
+    # first comes in contact with base layer after weak-layer collapse
+    touchdown.calc_segments(L=1e5, a=0, phi=phi)
+    first_contact = touchdown.calc_a1()
+
+    # Compute steady-state touchdown distance in a dummy PST with a cut
+    # of 5 times the first contact distance
+    touchdown.calc_segments(L=1e5, a=5*first_contact, phi=phi)
+    steady_state = touchdown.calc_lC()
+
+    # Return first-contact cut length and steady-state touchdown distance (mm)
+    return first_contact, steady_state</code></pre>
 </details>
 </section>
 <section>
@@ -205,6 +347,58 @@ def tensile_strength_slab(rho, unit=&#39;kPa&#39;):
 <section>
 <h2 class="section-title" id="header-functions">Functions</h2>
 <dl>
+<dt id="weac.tools.bergfeld"><code class="name flex">
+<span>def <span class="ident">bergfeld</span></span>(<span>rho, rho0=917, C0=6.5, C1=4.4)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Compute Young's modulus from density according to Bergfeld et al. (2023).</p>
+<h2 id="arguments">Arguments</h2>
+<dl>
+<dt><strong><code>rho</code></strong> :&ensp;<code>float</code> or <code>ndarray</code></dt>
+<dd>Density (kg/m^3).</dd>
+<dt><strong><code>rho0</code></strong> :&ensp;<code>float</code>, optional</dt>
+<dd>Density of ice (kg/m^3). Default is 917.</dd>
+<dt><strong><code>C0</code></strong> :&ensp;<code>float</code>, optional</dt>
+<dd>Multiplicative constant of Young modulus parametrization
+according to Bergfeld et al. (2023). Default is 6.5.</dd>
+<dt><strong><code>C1</code></strong> :&ensp;<code>float</code>, optional</dt>
+<dd>Exponent of Young modulus parameterization according to
+Bergfeld et al. (2023). Default is 4.4.</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><strong><code>E</code></strong> :&ensp;<code>float</code> or <code>ndarray</code></dt>
+<dd>Young's modulus (MPa).</dd>
+</dl></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def bergfeld(rho, rho0=917, C0=6.5, C1=4.4):
+    &#34;&#34;&#34;
+    Compute Young&#39;s modulus from density according to Bergfeld et al. (2023).
+
+    Arguments
+    ---------
+    rho : float or ndarray
+        Density (kg/m^3).
+    rho0 : float, optional
+        Density of ice (kg/m^3). Default is 917.
+    C0 : float, optional
+        Multiplicative constant of Young modulus parametrization
+        according to Bergfeld et al. (2023). Default is 6.5.
+    C1 : float, optional
+        Exponent of Young modulus parameterization according to
+        Bergfeld et al. (2023). Default is 4.4.
+
+    Returns
+    -------
+    E : float or ndarray
+        Young&#39;s modulus (MPa).
+    &#34;&#34;&#34;
+    return C0*1e3*(rho/rho0)**C1</code></pre>
+</details>
+</dd>
 <dt id="weac.tools.calc_center_of_gravity"><code class="name flex">
 <span>def <span class="ident">calc_center_of_gravity</span></span>(<span>layers)</span>
 </code></dt>
@@ -212,7 +406,7 @@ def tensile_strength_slab(rho, unit=&#39;kPa&#39;):
 <div class="desc"><p>Calculate z-coordinate of the center of gravity.</p>
 <h2 id="arguments">Arguments</h2>
 <dl>
-<dt><strong><code>layers</code></strong> :&ensp;<code>list</code></dt>
+<dt><strong><code>layers</code></strong> :&ensp;<code>ndarray</code></dt>
 <dd>2D list of layer densities and thicknesses. Columns are
 density (kg/m^3) and thickness (mm). One row corresponds
 to one layer.</dd>
@@ -234,7 +428,7 @@ to one layer.</dd>
 
     Arguments
     ---------
-    layers : list
+    layers : ndarray
         2D list of layer densities and thicknesses. Columns are
         density (kg/m^3) and thickness (mm). One row corresponds
         to one layer.
@@ -247,16 +441,100 @@ to one layer.</dd>
         Z-coordinate of center of gravity (mm).
     &#34;&#34;&#34;
     # Layering info for center of gravity calculation (bottom to top)
-    n = layers.shape[0]                 # Number of layers
-    rho = np.flipud(layers[:, 0])       # Layer densities
-    h = np.flipud(layers[:, 1])          # Layer thicknesses
-    H = sum(h)                          # Total slab thickness
+    n = layers.shape[0]                    # Number of layers
+    rho = 1e-12*np.flipud(layers[:, 0])    # Layer densities (kg/m^3 -&gt; t/mm^3)
+    h = np.flipud(layers[:, 1])            # Layer thicknesses
+    H = sum(h)                             # Total slab thickness
     # Layer center coordinates (bottom to top)
     zi = [H/2 - sum(h[0:j]) - h[j]/2 for j in range(n)]
     # Z-coordinate of the center of gravity
     zs = sum(zi*h*rho)/sum(h*rho)
     # Return slab thickness and center of gravity
     return H, zs</code></pre>
+</details>
+</dd>
+<dt id="weac.tools.calc_vertical_bc_center_of_gravity"><code class="name flex">
+<span>def <span class="ident">calc_vertical_bc_center_of_gravity</span></span>(<span>slab, phi)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Calculate center of gravity of triangular slab segements for vertical PSTs.</p>
+<h2 id="parameters">Parameters</h2>
+<dl>
+<dt><strong><code>slab</code></strong> :&ensp;<code>ndarray</code></dt>
+<dd>List of layer densities, thicknesses, and elastic properties.
+Columns are density (kg/m^3), thickness (mm), Young's modulus
+(MPa), shear modulus (MPa), and Poisson's ratio. One row corresponds
+to one layer.</dd>
+<dt><strong><code>phi</code></strong> :&ensp;<code>fload</code></dt>
+<dd>Slope angle (deg).</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><strong><code>xs</code></strong> :&ensp;<code>float</code></dt>
+<dd>Horizontal coordinate of center of gravity (mm).</dd>
+<dt><strong><code>zs</code></strong> :&ensp;<code>float</code></dt>
+<dd>Vertical coordinate of center of gravity (mm).</dd>
+<dt><strong><code>w</code></strong> :&ensp;<code>ndarray</code></dt>
+<dd>Weight of the slab segment that is cut off or added (t).</dd>
+</dl></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def calc_vertical_bc_center_of_gravity(slab, phi):
+    &#34;&#34;&#34;
+    Calculate center of gravity of triangular slab segements for vertical PSTs.
+
+    Parameters
+    ----------
+    slab : ndarray
+        List of layer densities, thicknesses, and elastic properties.
+        Columns are density (kg/m^3), thickness (mm), Young&#39;s modulus
+        (MPa), shear modulus (MPa), and Poisson&#39;s ratio. One row corresponds
+        to one layer.
+    phi : fload
+        Slope angle (deg).
+
+    Returns
+    -------
+    xs : float
+        Horizontal coordinate of center of gravity (mm).
+    zs : float
+        Vertical coordinate of center of gravity (mm).
+    w : ndarray
+        Weight of the slab segment that is cut off or added (t).
+    &#34;&#34;&#34;
+    # Convert slope angle to radians
+    phi = np.deg2rad(phi)
+    
+    # Catch flat-field case
+    if phi == 0:
+        xs = 0
+        zs = 0
+        w = 0
+    else:
+        # Layering info for center of gravity calculation (top to bottom)
+        n = slab.shape[0]               # Number of slab
+        rho = 1e-12*slab[:, 0]          # Layer densities (kg/m^3 -&gt; t/mm^3)
+        hi = slab[:, 1]                 # Layer thicknesses
+        H = sum(hi)                     # Total slab thickness
+        # Layer coordinates z_i (top to bottom)
+        z = np.array([-H/2 + sum(hi[0:j]) for j in range(n + 1)])
+        zi = z[:-1]                         # z_i
+        zii = z[1:]                         # z_{i+1}
+        # Center of gravity of all layers (top to bottom)
+        zsi = zi + hi/3*(3/2*H - zi - 2*zii)/(H - zi - zii)
+        # Surface area of all layers (top to bottom)
+        Ai = hi/2*(H - zi - zii)*np.tan(phi)
+        # Center of gravity in vertical direction
+        zs = sum(zsi*rho*Ai)/sum(rho*Ai)
+        # Center of gravity in horizontal direction
+        xs = (H/2 - zs)*np.tan(phi/2)
+        # Weight of added or cut off slab segments (t)
+        w = sum(Ai*rho)
+    
+    # Return center of gravity and weight of slab segment
+    return xs, zs, w</code></pre>
 </details>
 </dd>
 <dt id="weac.tools.gerling"><code class="name flex">
@@ -360,6 +638,7 @@ Gerling et al. (2017). Default is 4.6.</dd>
         &#39;e&#39;:      [hard,   soft,   soft],
         &#39;f&#39;:      [soft,   soft,   hard],
         # Homogeneous
+        &#39;h&#39;:      [medium,   medium,   medium],
         &#39;soft&#39;:   [soft,   soft,   soft],
         &#39;medium&#39;: [medium, medium, medium],
         &#39;hard&#39;:   [hard,   hard,   hard],
@@ -482,6 +761,101 @@ Gerling et al. (2017). Default is 4.6.</dd>
     return 1e3*timer()</code></pre>
 </details>
 </dd>
+<dt id="weac.tools.touchdown_distance"><code class="name flex">
+<span>def <span class="ident">touchdown_distance</span></span>(<span>layers: numpy.ndarray | str | None = None, C0: float = 6.5, C1: float = 4.4, Ewl: float = 0.25, t: float = 10, phi: float = 0)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Calculate cut length at first contanct and steady-state touchdown distance.</p>
+<h2 id="arguments">Arguments</h2>
+<dl>
+<dt><strong><code>layers</code></strong> :&ensp;<code>list</code>, optional</dt>
+<dd>2D list of layer densities and thicknesses. Columns are
+density(kg/m ^ 3) and thickness(mm). One row corresponds
+to one layer. Default is [[240, 200], ].</dd>
+<dt><strong><code>C0</code></strong> :&ensp;<code>float</code>, optional</dt>
+<dd>Multiplicative constant of Young modulus parametrization
+according to Bergfeld et al. (2023). Default is 6.5.</dd>
+<dt><strong><code>C1</code></strong> :&ensp;<code>float</code>, optional</dt>
+<dd>Exponent of Young modulus parameterization according to
+Bergfeld et al. (2023). Default is 4.4.</dd>
+<dt><strong><code>Ewl</code></strong> :&ensp;<code>float</code>, optional</dt>
+<dd>Young's modulus of the weak layer (MPa). Default is 0.25.</dd>
+<dt><strong><code>t</code></strong> :&ensp;<code>float</code>, optional</dt>
+<dd>Thickness of the weak layer (mm). Default is 10.</dd>
+<dt><strong><code>phi</code></strong> :&ensp;<code>float</code>, optional</dt>
+<dd>Inclination of the slab (°). Default is 0.</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><strong><code>first_contact</code></strong> :&ensp;<code>float</code></dt>
+<dd>Cut length at first contact (mm).</dd>
+<dt><strong><code>steady_state</code></strong> :&ensp;<code>float</code></dt>
+<dd>Steady-state touchdown distance (mm).</dd>
+</dl></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def touchdown_distance(
+        layers: np.ndarray | str | None = None,
+        C0: float = 6.5,
+        C1: float = 4.4,
+        Ewl: float = 0.25,
+        t: float = 10,
+        phi: float = 0):
+    &#34;&#34;&#34;
+    Calculate cut length at first contanct and steady-state touchdown distance.
+
+    Arguments
+    ---------
+    layers : list, optional
+        2D list of layer densities and thicknesses. Columns are
+        density(kg/m ^ 3) and thickness(mm). One row corresponds
+        to one layer. Default is [[240, 200], ].
+    C0 : float, optional
+        Multiplicative constant of Young modulus parametrization
+        according to Bergfeld et al. (2023). Default is 6.5.
+    C1 : float, optional
+        Exponent of Young modulus parameterization according to
+        Bergfeld et al. (2023). Default is 4.4.
+    Ewl : float, optional
+        Young&#39;s modulus of the weak layer (MPa). Default is 0.25.
+    t : float, optional
+        Thickness of the weak layer (mm). Default is 10.
+    phi : float, optional
+        Inclination of the slab (°). Default is 0.
+        
+    Returns
+    -------
+    first_contact : float
+        Cut length at first contact (mm).
+    steady_state : float
+        Steady-state touchdown distance (mm).
+    &#34;&#34;&#34;
+    # Check if layering is defined
+    layers = layers if layers else [[240, 200], ]
+
+    # Initialize model with user input
+    touchdown = weac.Layered(system=&#39;pst-&#39;, touchdown=True)
+
+    # Set material properties
+    touchdown.set_foundation_properties(E=Ewl, t=t, update=True)
+    touchdown.set_beam_properties(layers=layers, C0=C0, C1=C1, update=True)
+
+    # Assemble very long dummy PST to compute crack length where the slab
+    # first comes in contact with base layer after weak-layer collapse
+    touchdown.calc_segments(L=1e5, a=0, phi=phi)
+    first_contact = touchdown.calc_a1()
+
+    # Compute steady-state touchdown distance in a dummy PST with a cut
+    # of 5 times the first contact distance
+    touchdown.calc_segments(L=1e5, a=5*first_contact, phi=phi)
+    steady_state = touchdown.calc_lC()
+
+    # Return first-contact cut length and steady-state touchdown distance (mm)
+    return first_contact, steady_state</code></pre>
+</details>
+</dd>
 </dl>
 </section>
 <section>
@@ -500,13 +874,16 @@ Gerling et al. (2017). Default is 4.6.</dd>
 </li>
 <li><h3><a href="#header-functions">Functions</a></h3>
 <ul class="">
+<li><code><a title="weac.tools.bergfeld" href="#weac.tools.bergfeld">bergfeld</a></code></li>
 <li><code><a title="weac.tools.calc_center_of_gravity" href="#weac.tools.calc_center_of_gravity">calc_center_of_gravity</a></code></li>
+<li><code><a title="weac.tools.calc_vertical_bc_center_of_gravity" href="#weac.tools.calc_vertical_bc_center_of_gravity">calc_vertical_bc_center_of_gravity</a></code></li>
 <li><code><a title="weac.tools.gerling" href="#weac.tools.gerling">gerling</a></code></li>
 <li><code><a title="weac.tools.isnotebook" href="#weac.tools.isnotebook">isnotebook</a></code></li>
 <li><code><a title="weac.tools.load_dummy_profile" href="#weac.tools.load_dummy_profile">load_dummy_profile</a></code></li>
 <li><code><a title="weac.tools.scapozza" href="#weac.tools.scapozza">scapozza</a></code></li>
 <li><code><a title="weac.tools.tensile_strength_slab" href="#weac.tools.tensile_strength_slab">tensile_strength_slab</a></code></li>
 <li><code><a title="weac.tools.time" href="#weac.tools.time">time</a></code></li>
+<li><code><a title="weac.tools.touchdown_distance" href="#weac.tools.touchdown_distance">touchdown_distance</a></code></li>
 </ul>
 </li>
 </ul>
