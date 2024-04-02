@@ -26,17 +26,17 @@ jobs:
         python -m pip install --upgrade pip
         pip install sphinx sphinxawesome_theme
 
-    - name: Generate API Documentation with sphinx-apidoc
+    - name: Generate API documentation with sphinx-apidoc
       run: |
         cd docs/sphinx
         sphinx-apidoc -o . ../../weac --force --separate
 
-    - name: Build Sphinx Documentation
+    - name: Build Sphinx documentation
       run: |
         make clean html
 
-    - name: Copy Built Documentation to docs/
+    - name: Copy built documentation to docs/
       run: |
-        cp -rf build/html/* ../../docs
+        cp -rf _build/html/* ../../docs
 
     # Add steps to commit and push the updated documentation
