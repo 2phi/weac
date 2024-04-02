@@ -251,6 +251,12 @@ See the [open issues](https://github.com/2phi/weac/issues) for a list of propose
 
 
 <!-- LICENSE -->
+## Workflows
+[![Publish Python 🐍 releases 📦 to PyPI ](https://github.com/2phi/weac/actions/workflows/release.yml/badge.svg)](https://github.com/2phi/weac/actions/workflows/release.yml)<br>
+[![Build and publish Sphinx 🪬 documentation ](https://github.com/2phi/weac/actions/workflows/docs.yml/badge.svg)](https://github.com/2phi/weac/actions/workflows/docs.yml)
+
+
+<!-- LICENSE -->
 ## License
 
 Copyright 2phi GbR, 2020-2024.
