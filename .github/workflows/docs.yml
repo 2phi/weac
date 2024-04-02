@@ -29,7 +29,7 @@ jobs:
     - name: Clean old html files
       run: |
         cd docs/
-        rm -r _* *.html *.js *.inv
+        rm -rf _* *.html *.js *.inv
 
     - name: Generate API documentation with sphinx-apidoc
       run: |
