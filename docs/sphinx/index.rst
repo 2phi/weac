@@ -1,7 +1,4 @@
-.. WEAC documentation master file, created by
-   sphinx-quickstart on Sun Mar 31 21:47:09 2024.
-   You can adapt this file completely to your liking, but it should at least
-   contain the root `toctree` directive.
+.. WEAC documentation master file.
 
 WEAC documentation
 ==================
@@ -21,15 +18,6 @@ or clone the repo::
     git clone https://github.com/2phi/weac
 
 for local use.
-
-.. Needs
-.. -----
-
-.. - `Python <https://www.python.org/downloads/release/python-3100/>`_ ≥ 3.10
-.. - `Numpy <https://numpy.org/>`_ for matrix operations
-.. - `Scipy <https://www.scipy.org/>`_ for solving optimization problems
-.. - `Pandas <https://pandas.pydata.org/>`_ for data handling
-.. - `Matplotlib <https://matplotlib.org/>`_ for plotting
 
 
 Package contents

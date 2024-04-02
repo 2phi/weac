@@ -44,4 +44,8 @@ jobs:
       run: |
         cp -rf _build/html/* ../../docs
 
-    # Add steps to commit and push the updated documentation
+    - name: Commit and push documentation
+      run: |
+        git add docs/
+        git commit -m "Update documentation" || echo "No changes to commit"
+        git push origin main
