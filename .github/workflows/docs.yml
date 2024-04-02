@@ -33,7 +33,7 @@ jobs:
 
     - name: Generate API documentation with sphinx-apidoc
       run: |
-        cd sphinx/
+        cd docs/sphinx/
         sphinx-apidoc -o . ../../weac --force --separate
 
     - name: Build Sphinx documentation
