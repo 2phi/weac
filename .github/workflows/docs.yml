@@ -24,7 +24,7 @@ jobs:
     - name: Install Sphinx and extensions
       run: |
         python -m pip install --upgrade pip
-        pip install sphinx sphinxawesome_theme weac
+        pip install sphinx sphinxawesome_theme IPython
 
     - name: Clean old html files
       run: |
