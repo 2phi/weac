@@ -17,7 +17,7 @@ jobs:
       uses: actions/checkout@v4
 
     - name: Set up Python
-      uses: actions/setup-python@v4
+      uses: actions/setup-python@v5
       with:
         python-version: '3.x'
 
@@ -28,13 +28,11 @@ jobs:
 
     - name: Clean old html files
       run: |
-        cd docs/
-        rm -rf _* *.html *.js *.inv
+        rm -rf docs/_* docs/*.html docs/*.js docs/*.inv
 
     - name: Generate API documentation with sphinx-apidoc
       run: |
-        cd docs/sphinx/
-        sphinx-apidoc -o . ../../weac --force --separate
+        sphinx-apidoc -o docs/sphinx/ weac --force --separate
 
     - name: Build Sphinx documentation
       run: |
@@ -43,8 +41,7 @@ jobs:
 
     - name: Copy built documentation to docs/
       run: |
-        cd docs/sphinx
-        cp -rf _build/html/* ../../docs
+        cp -rf docs/sphinx/_build/html/* docs/
 
     - name: Commit and push documentation
       run: |
