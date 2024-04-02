@@ -26,9 +26,14 @@ jobs:
         python -m pip install --upgrade pip
         pip install sphinx sphinxawesome_theme
 
+    - name: Clean old html files
+      run: |
+        cd docs/
+        rm -r _* *.html *.js *.inv
+
     - name: Generate API documentation with sphinx-apidoc
       run: |
-        cd docs/sphinx
+        cd sphinx/
         sphinx-apidoc -o . ../../weac --force --separate
 
     - name: Build Sphinx documentation
