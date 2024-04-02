@@ -38,10 +38,12 @@ jobs:
 
     - name: Build Sphinx documentation
       run: |
+        cd docs/sphinx
         make clean html
 
     - name: Copy built documentation to docs/
       run: |
+        cd docs/sphinx
         cp -rf _build/html/* ../../docs
 
     - name: Commit and push documentation
