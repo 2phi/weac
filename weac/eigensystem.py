@@ -152,7 +152,7 @@ class Eigensystem:
 
     def set_foundation_properties(
             self,
-            t: float = 10.0,
+            t: float = 30.0,
             E: float = 0.25,
             nu: float = 0.25,
             update: bool = False):
