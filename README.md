@@ -189,14 +189,24 @@ x_cm, tau_kPa = skier.get_weaklayer_shearstress(x=xwl, z=z, unit='kPa')
 
 See the [open issues](https://github.com/2phi/weac/issues) for a list of proposed features and known issues.
 
-### v2.6
+### v3.0
+
+- [ ] New mathematical foundation to improve the weak-layer representation
+- [ ] Complex terrain through the addition of out-of-plane tilt
+- [ ] Up, down, and cross-slope cracks
+
+### v2.7
 - [ ] Finite fracture mechanics implementation for layered snow covers
 
-### v2.5
+### v2.6
 - [ ] Implement anistropic weak layer
 - [ ] Add demo gif
 
 ## Release history
+
+### v2.5
+- Analyze slab touchdown in PST experiments by setting `touchdown=True`
+- Completely redesigned and significantly improved API documentation
 
 ### v2.4
 - Choose between slope-normal (`'-pst'`, `'pst-'`) or vertial (`'-vpst'`, `'vpst-'`) PST boundary conditions
