@@ -37,6 +37,8 @@ class Layered(FieldQuantitiesMixin, SlabContactMixin, SolutionMixin,
             2D list of layer densities and thicknesses. Columns are
             density(kg/m ^ 3) and thickness(mm). One row corresponds
             to one layer. Default is [[240, 200], ].
+        touchdown : bool, optional
+            Set True if slab touchdown is to be considered. Default is False.
         """
         # Call parent __init__
         super().__init__(system=system, touchdown=touchdown)
