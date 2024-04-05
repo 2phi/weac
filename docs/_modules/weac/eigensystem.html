@@ -313,7 +313,7 @@
 <a class="viewcode-back" href="../../weac.eigensystem.html#weac.eigensystem.Eigensystem.set_foundation_properties">[docs]</a>
 </span><span id="line-153">    <span class="k">def</span> <span class="nf">set_foundation_properties</span><span class="p">(</span>
 </span><span id="line-154">            <span class="bp">self</span><span class="p">,</span>
-</span><span id="line-155">            <span class="n">t</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">10.0</span><span class="p">,</span>
+</span><span id="line-155">            <span class="n">t</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">30.0</span><span class="p">,</span>
 </span><span id="line-156">            <span class="n">E</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.25</span><span class="p">,</span>
 </span><span id="line-157">            <span class="n">nu</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.25</span><span class="p">,</span>
 </span><span id="line-158">            <span class="n">update</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">):</span>
@@ -351,7 +351,7 @@
 </span><span id="line-189">
 <div class="viewcode-block" id="Eigensystem.set_beam_properties">
 <a class="viewcode-back" href="../../weac.eigensystem.html#weac.eigensystem.Eigensystem.set_beam_properties">[docs]</a>
-</span><span id="line-190">    <span class="k">def</span> <span class="nf">set_beam_properties</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">layers</span><span class="p">,</span> <span class="n">phi</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">C0</span><span class="o">=</span><span class="mf">6.5</span><span class="p">,</span> <span class="n">C1</span><span class="o">=</span><span class="mf">4.4</span><span class="p">,</span>
+</span><span id="line-190">    <span class="k">def</span> <span class="nf">set_beam_properties</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">layers</span><span class="p">,</span> <span class="n">C0</span><span class="o">=</span><span class="mf">6.5</span><span class="p">,</span> <span class="n">C1</span><span class="o">=</span><span class="mf">4.4</span><span class="p">,</span>
 </span><span id="line-191">                            <span class="n">nu</span><span class="o">=</span><span class="mf">0.25</span><span class="p">,</span> <span class="n">update</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
 </span><span id="line-192"><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="line-193"><span class="sd">        Set material and properties geometry of beam (slab).</span>
@@ -365,7 +365,7 @@
 </span><span id="line-201"><span class="sd">            must be available in database.</span>
 </span><span id="line-202"><span class="sd">        C0 : float, optional</span>
 </span><span id="line-203"><span class="sd">            Multiplicative constant of Young modulus parametrization</span>
-</span><span id="line-204"><span class="sd">            according to Bergfeld et al. (2023). Default is 6.0.</span>
+</span><span id="line-204"><span class="sd">            according to Bergfeld et al. (2023). Default is 6.5.</span>
 </span><span id="line-205"><span class="sd">        C1 : float, optional</span>
 </span><span id="line-206"><span class="sd">            Exponent of Young modulus parameterization according to</span>
 </span><span id="line-207"><span class="sd">            Bergfeld et al. (2023). Default is 4.6.</span>
@@ -390,7 +390,7 @@
 </span><span id="line-226">
 </span><span id="line-227">        <span class="c1"># Compute total slab thickness and center of gravity</span>
 </span><span id="line-228">        <span class="bp">self</span><span class="o">.</span><span class="n">h</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">zs</span> <span class="o">=</span> <span class="n">calc_center_of_gravity</span><span class="p">(</span><span class="n">layers</span><span class="p">)</span>
-</span><span id="line-229">        
+</span><span id="line-229">
 </span><span id="line-230">        <span class="c1"># Assemble layering into matrix (top to bottom)</span>
 </span><span id="line-231">        <span class="c1"># Columns are density (kg/m^3), layer thickness (mm)</span>
 </span><span id="line-232">        <span class="c1"># Young&#39;s modulus (MPa), shear modulus (MPa), and</span>
