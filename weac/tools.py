@@ -302,10 +302,14 @@ def touchdown_distance(
     touchdown.calc_segments(L=1e5, a=0, phi=phi)
     first_contact = touchdown.calc_a1()
 
+    # Compute cut length associated to transition from stage B to C, 
+    # associated with the maximum of the ERR  
+    length_BC = touchdown.calc_a2()
+
     # Compute steady-state touchdown distance in a dummy PST with a cut
     # of 5 times the first contact distance
     touchdown.calc_segments(L=1e5, a=5*first_contact, phi=phi)
     steady_state = touchdown.calc_lC()
 
     # Return first-contact cut length and steady-state touchdown distance (mm)
-    return first_contact, steady_state
+    return first_contact, length_BC, steady_state
