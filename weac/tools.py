@@ -284,6 +284,9 @@ def touchdown_distance(
     -------
     first_contact : float
         Cut length at first contact (mm).
+    full_contact : float
+        Cut length at which the slab comes into full contact (more than
+        a singular point) with the base layer (mm).
     steady_state : float
         Steady-state touchdown distance (mm).
     """
@@ -302,10 +305,15 @@ def touchdown_distance(
     touchdown.calc_segments(L=1e5, a=0, phi=phi)
     first_contact = touchdown.calc_a1()
 
+    # Compute ut length at which the slab comes into full contact (more
+    # than a singular point) with the base layer
+    full_contact = touchdown.calc_a2()
+
     # Compute steady-state touchdown distance in a dummy PST with a cut
     # of 5 times the first contact distance
     touchdown.calc_segments(L=1e5, a=5*first_contact, phi=phi)
     steady_state = touchdown.calc_lC()
 
-    # Return first-contact cut length and steady-state touchdown distance (mm)
-    return first_contact, steady_state
+    # Return first-contact cut length, full-contact cut length,
+    # and steady-state touchdown distance (mm)
+    return first_contact, full_contact, steady_state
