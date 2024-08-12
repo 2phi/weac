@@ -10,13 +10,13 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta charset="utf-8" />
   <meta name="theme-color" media="(prefers-color-scheme: light)" content="white" />
-  <meta name="theme-color" metia="(prefers-color-scheme: dark)" content="black" />
+  <meta name="theme-color" media="(prefers-color-scheme: dark)" content="black" />
   
     <title>weac.tools | WEAC 2.5.2 documentation</title>
     <meta property="og:title" content="weac.tools | WEAC 2.5.2 documentation" />
     <meta name="twitter:title" content="weac.tools | WEAC 2.5.2 documentation" />
       <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=a3258c64" />
-      <link rel="stylesheet" type="text/css" href="../../_static/theme.css?v=5b4133db" />
+      <link rel="stylesheet" type="text/css" href="../../_static/theme.css?v=ecdfb4fc" />
       <link rel="icon" href="../../_static/favicon.ico" />
         <link rel="search" title="Search" href="../../search.html" />
         <link rel="index" title="Index" href="../../genindex.html" />
@@ -75,7 +75,8 @@
       <nav class="flex items-center space-x-1">
         <button @click="darkMode = darkMode === 'light' ? 'dark' : 'light'"
           class="relative inline-flex items-center justify-center px-0 text-sm font-medium transition-colors rounded-md hover:bg-accent hover:text-accent-foreground h-9 w-9"
-          type="button">
+          type="button"
+          aria-label="Color theme switcher">
           <svg xmlns="http://www.w3.org/2000/svg" height="24" width="24" viewBox="0 96 960 960" fill="currentColor"
             class="absolute transition-all scale-100 rotate-0 dark:-rotate-90 dark:scale-0">
             <path
@@ -470,31 +471,39 @@
 </span><span id="line-284"><span class="sd">    -------</span>
 </span><span id="line-285"><span class="sd">    first_contact : float</span>
 </span><span id="line-286"><span class="sd">        Cut length at first contact (mm).</span>
-</span><span id="line-287"><span class="sd">    steady_state : float</span>
-</span><span id="line-288"><span class="sd">        Steady-state touchdown distance (mm).</span>
-</span><span id="line-289"><span class="sd">    &quot;&quot;&quot;</span>
-</span><span id="line-290">    <span class="c1"># Check if layering is defined</span>
-</span><span id="line-291">    <span class="n">layers</span> <span class="o">=</span> <span class="n">layers</span> <span class="k">if</span> <span class="n">layers</span> <span class="k">else</span> <span class="p">[[</span><span class="mi">240</span><span class="p">,</span> <span class="mi">200</span><span class="p">],</span> <span class="p">]</span>
-</span><span id="line-292">
-</span><span id="line-293">    <span class="c1"># Initialize model with user input</span>
-</span><span id="line-294">    <span class="n">touchdown</span> <span class="o">=</span> <span class="n">weac</span><span class="o">.</span><span class="n">Layered</span><span class="p">(</span><span class="n">system</span><span class="o">=</span><span class="s1">&#39;pst-&#39;</span><span class="p">,</span> <span class="n">touchdown</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</span><span id="line-287"><span class="sd">    full_contact : float</span>
+</span><span id="line-288"><span class="sd">        Cut length at which the slab comes into full contact (more than</span>
+</span><span id="line-289"><span class="sd">        a singular point) with the base layer (mm).</span>
+</span><span id="line-290"><span class="sd">    steady_state : float</span>
+</span><span id="line-291"><span class="sd">        Steady-state touchdown distance (mm).</span>
+</span><span id="line-292"><span class="sd">    &quot;&quot;&quot;</span>
+</span><span id="line-293">    <span class="c1"># Check if layering is defined</span>
+</span><span id="line-294">    <span class="n">layers</span> <span class="o">=</span> <span class="n">layers</span> <span class="k">if</span> <span class="n">layers</span> <span class="k">else</span> <span class="p">[[</span><span class="mi">240</span><span class="p">,</span> <span class="mi">200</span><span class="p">],</span> <span class="p">]</span>
 </span><span id="line-295">
-</span><span id="line-296">    <span class="c1"># Set material properties</span>
-</span><span id="line-297">    <span class="n">touchdown</span><span class="o">.</span><span class="n">set_foundation_properties</span><span class="p">(</span><span class="n">E</span><span class="o">=</span><span class="n">Ewl</span><span class="p">,</span> <span class="n">t</span><span class="o">=</span><span class="n">t</span><span class="p">,</span> <span class="n">update</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-</span><span id="line-298">    <span class="n">touchdown</span><span class="o">.</span><span class="n">set_beam_properties</span><span class="p">(</span><span class="n">layers</span><span class="o">=</span><span class="n">layers</span><span class="p">,</span> <span class="n">C0</span><span class="o">=</span><span class="n">C0</span><span class="p">,</span> <span class="n">C1</span><span class="o">=</span><span class="n">C1</span><span class="p">,</span> <span class="n">update</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-</span><span id="line-299">
-</span><span id="line-300">    <span class="c1"># Assemble very long dummy PST to compute crack length where the slab</span>
-</span><span id="line-301">    <span class="c1"># first comes in contact with base layer after weak-layer collapse</span>
-</span><span id="line-302">    <span class="n">touchdown</span><span class="o">.</span><span class="n">calc_segments</span><span class="p">(</span><span class="n">L</span><span class="o">=</span><span class="mf">1e5</span><span class="p">,</span> <span class="n">a</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">phi</span><span class="o">=</span><span class="n">phi</span><span class="p">)</span>
-</span><span id="line-303">    <span class="n">first_contact</span> <span class="o">=</span> <span class="n">touchdown</span><span class="o">.</span><span class="n">calc_a1</span><span class="p">()</span>
-</span><span id="line-304">
-</span><span id="line-305">    <span class="c1"># Compute steady-state touchdown distance in a dummy PST with a cut</span>
-</span><span id="line-306">    <span class="c1"># of 5 times the first contact distance</span>
-</span><span id="line-307">    <span class="n">touchdown</span><span class="o">.</span><span class="n">calc_segments</span><span class="p">(</span><span class="n">L</span><span class="o">=</span><span class="mf">1e5</span><span class="p">,</span> <span class="n">a</span><span class="o">=</span><span class="mi">5</span><span class="o">*</span><span class="n">first_contact</span><span class="p">,</span> <span class="n">phi</span><span class="o">=</span><span class="n">phi</span><span class="p">)</span>
-</span><span id="line-308">    <span class="n">steady_state</span> <span class="o">=</span> <span class="n">touchdown</span><span class="o">.</span><span class="n">calc_lC</span><span class="p">()</span>
-</span><span id="line-309">
-</span><span id="line-310">    <span class="c1"># Return first-contact cut length and steady-state touchdown distance (mm)</span>
-</span><span id="line-311">    <span class="k">return</span> <span class="n">first_contact</span><span class="p">,</span> <span class="n">steady_state</span></div>
+</span><span id="line-296">    <span class="c1"># Initialize model with user input</span>
+</span><span id="line-297">    <span class="n">touchdown</span> <span class="o">=</span> <span class="n">weac</span><span class="o">.</span><span class="n">Layered</span><span class="p">(</span><span class="n">system</span><span class="o">=</span><span class="s1">&#39;pst-&#39;</span><span class="p">,</span> <span class="n">touchdown</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</span><span id="line-298">
+</span><span id="line-299">    <span class="c1"># Set material properties</span>
+</span><span id="line-300">    <span class="n">touchdown</span><span class="o">.</span><span class="n">set_foundation_properties</span><span class="p">(</span><span class="n">E</span><span class="o">=</span><span class="n">Ewl</span><span class="p">,</span> <span class="n">t</span><span class="o">=</span><span class="n">t</span><span class="p">,</span> <span class="n">update</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</span><span id="line-301">    <span class="n">touchdown</span><span class="o">.</span><span class="n">set_beam_properties</span><span class="p">(</span><span class="n">layers</span><span class="o">=</span><span class="n">layers</span><span class="p">,</span> <span class="n">C0</span><span class="o">=</span><span class="n">C0</span><span class="p">,</span> <span class="n">C1</span><span class="o">=</span><span class="n">C1</span><span class="p">,</span> <span class="n">update</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</span><span id="line-302">
+</span><span id="line-303">    <span class="c1"># Assemble very long dummy PST to compute crack length where the slab</span>
+</span><span id="line-304">    <span class="c1"># first comes in contact with base layer after weak-layer collapse</span>
+</span><span id="line-305">    <span class="n">touchdown</span><span class="o">.</span><span class="n">calc_segments</span><span class="p">(</span><span class="n">L</span><span class="o">=</span><span class="mf">1e5</span><span class="p">,</span> <span class="n">a</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">phi</span><span class="o">=</span><span class="n">phi</span><span class="p">)</span>
+</span><span id="line-306">    <span class="n">first_contact</span> <span class="o">=</span> <span class="n">touchdown</span><span class="o">.</span><span class="n">calc_a1</span><span class="p">()</span>
+</span><span id="line-307">
+</span><span id="line-308">    <span class="c1"># Compute ut length at which the slab comes into full contact (more</span>
+</span><span id="line-309">    <span class="c1"># than a singular point) with the base layer</span>
+</span><span id="line-310">    <span class="n">full_contact</span> <span class="o">=</span> <span class="n">touchdown</span><span class="o">.</span><span class="n">calc_a2</span><span class="p">()</span>
+</span><span id="line-311">
+</span><span id="line-312">    <span class="c1"># Compute steady-state touchdown distance in a dummy PST with a cut</span>
+</span><span id="line-313">    <span class="c1"># of 5 times the first contact distance</span>
+</span><span id="line-314">    <span class="n">touchdown</span><span class="o">.</span><span class="n">calc_segments</span><span class="p">(</span><span class="n">L</span><span class="o">=</span><span class="mf">1e5</span><span class="p">,</span> <span class="n">a</span><span class="o">=</span><span class="mi">5</span><span class="o">*</span><span class="n">first_contact</span><span class="p">,</span> <span class="n">phi</span><span class="o">=</span><span class="n">phi</span><span class="p">)</span>
+</span><span id="line-315">    <span class="n">steady_state</span> <span class="o">=</span> <span class="n">touchdown</span><span class="o">.</span><span class="n">calc_lC</span><span class="p">()</span>
+</span><span id="line-316">
+</span><span id="line-317">    <span class="c1"># Return first-contact cut length, full-contact cut length,</span>
+</span><span id="line-318">    <span class="c1"># and steady-state touchdown distance (mm)</span>
+</span><span id="line-319">    <span class="k">return</span> <span class="n">first_contact</span><span class="p">,</span> <span class="n">full_contact</span><span class="p">,</span> <span class="n">steady_state</span></div>
 
 </span></code></pre></div>
     </div></div>
@@ -510,9 +519,9 @@
   </div>
   
     <script src="../../_static/documentation_options.js?v=afc61bbc"></script>
-    <script src="../../_static/doctools.js?v=888ff710"></script>
+    <script src="../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
-    <script defer="defer" src="../../_static/theme.js?v=40b7bc71"></script>
+    <script defer="defer" src="../../_static/theme.js?v=e82a16a3"></script>
   
 </body>
 </html>
