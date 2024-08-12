@@ -120,12 +120,11 @@ git clone https://github.com/2phi/weac
 ```
 for local use.
 
-Needs
+Needs (see also [requirements.txt](https://github.com/2phi/weac/blob/main/weac/requirements.txt)):
 - [Python](https://www.python.org/downloads/release/python-3100/) &ge; 3.10
-- [Numpy](https://numpy.org/) for matrix operations
-- [Scipy](https://www.scipy.org/) for solving optimization problems
-- [Pandas](https://pandas.pydata.org/) for data handling
-- [Matplotlib](https://matplotlib.org/) for plotting
+- [Numpy](https://numpy.org/) &ge; 2.0.1
+- [Scipy](https://www.scipy.org/) &ge; 1.14.0
+- [Matplotlib](https://matplotlib.org/) &ge; 3.9.1
 
 <!-- USAGE EXAMPLES -->
 ## Usage
@@ -260,7 +259,7 @@ See the [open issues](https://github.com/2phi/weac/issues) for a list of propose
 5. Open a pull request
 
 
-<!-- LICENSE -->
+<!-- WORKFLOWS -->
 ## Workflows
 [![Publish Python 🐍 releases 📦 to PyPI ](https://github.com/2phi/weac/actions/workflows/release.yml/badge.svg)](https://github.com/2phi/weac/actions/workflows/release.yml)<br>
 [![Build and publish Sphinx 🪬 documentation ](https://github.com/2phi/weac/actions/workflows/docs.yml/badge.svg)](https://github.com/2phi/weac/actions/workflows/docs.yml)
