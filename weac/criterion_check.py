@@ -1,9 +1,5 @@
-import pandas as pd
 import numpy as np
-import os
 import ast
-import matplotlib.pyplot as plt
-import matplotlib.image as mpimg
 import weac
 import time
 from scipy.optimize import root_scalar
@@ -126,8 +122,6 @@ def apply_check_first_criterion(row, envelope='adam_unpublished', scaling_factor
 
 
 # Likely kill the above
-
-
 
 
 
@@ -278,9 +272,6 @@ def check_coupled_criterion_anticrack_nucleation(snow_profile, phi, skier_weight
     """
     
     
-    
-    
-    # Time tracker
     start_time = time.time()
     elapsed_times = []
 
@@ -306,11 +297,9 @@ def check_coupled_criterion_anticrack_nucleation(snow_profile, phi, skier_weight
     
     
     if (dist_min > 1): 
-        print("Entire solution is cracked without any additional load - all points are outside the envelope")
         crack_length = length
         skier_weight = 0
         
-        # Add 1000 to the start and end of `li`
         li_complete_crack = [50000] + li + [50000]
 
         # Create `ki_complete_crack` with False and add True at start and end
@@ -384,11 +373,8 @@ def check_coupled_criterion_anticrack_nucleation(snow_profile, phi, skier_weight
             err = np.abs(g_delta - 1)
 
             if iteration_count == 1 and (g_delta > 1 or err < 0.02):
-                print(f"EXCEPTION: Energy criterion is fulfilled at minimum critical skier load: crack length: {crack_length} mm, Critical Skier Weight: {skier_weight} kg, Distance to energy envelope: {g_delta} J/m^2, Max Distance to Stress Envelope: {dist_max}")
                 pure_stress_criteria = True
                 return True, crack_length, skier_weight, c_skier, c_C, c_segments, c_x_cm, c_sigma_kPa, c_tau_kPa, iteration_count, elapsed_times, skier_weights, crack_lengths, False, pure_stress_criteria, critical_skier_weight, g_delta, dist_max, g_delta_values, dist_max_values
-
-            print(f"START OF ITERATION {iteration_count}: crack length: {crack_length} mm, Skier Weight: {skier_weight} kg, Max Distance to Failure: {dist_max}, Distance to energy envelope: {g_delta}")
 
             # 
             if g_delta < 1:
@@ -405,32 +391,20 @@ def check_coupled_criterion_anticrack_nucleation(snow_profile, phi, skier_weight
                 new_crack_length, li, ki = find_new_anticrack_length(snow_profile, skier_weight, phi, li, ki, envelope=envelope, scaling_factor=scaling_factor, E=E, order_of_magnitude = order_of_magnitude, density = density, t=t)
                 crack_length = new_crack_length
 
-                print(f"END OF ITERATION: g_delta: {g_delta} J/m^2, Old skier weight: {skier_weight} kg, Scaling: {scaling}, New skier weight: {skier_weight} kg, crack length: {crack_length} mm, li = {li}, ki = {ki}")
-
         # End of loop: convergence or max iterations reached
         if iteration_count < max_iterations and any(ki):
             if crack_length > 0:
-                print(f"CONVERGENCE: crack length: {crack_length} mm, Critical Skier Weight: {skier_weight} kg, Distance to energy envelope: {g_delta} J/m^2, Max Distance to Stress Envelope: {dist_max}, Segments: {c_segments}")
-                return True, crack_length, skier_weight, c_skier, c_C, c_segments, c_x_cm, c_sigma_kPa, c_tau_kPa, iteration_count, elapsed_times, skier_weights, crack_lengths, False, False, critical_skier_weight, g_delta_last, dist_max, g_delta_values, dist_max_values
+                return True, crack_length, skier_weight, c_skier, c_C, c_segments, c_x_cm, c_sigma_kPa, c_tau_kPa, iteration_count, elapsed_times, skier_weights, crack_lengths, False, False, critical_skier_weight, g_delta, dist_max, g_delta_values, dist_max_values
             else:
-                print("Crack length is zero and our skier load is lower than minimum critical load; redoing the algorithm with the dampened version.")
-                #skier_weight_average = np.average(skier_weights)
-                #variance = np.var(np.asarray(skier_weights), ddof=1)
                 return check_coupled_criterion_anticrack_nucleation_dampened(snow_profile, phi, skier_weight, dampening = 1, envelope=envelope, scaling_factor=scaling_factor, E = E, order_of_magnitude = order_of_magnitude, t=t)
 
         elif not any(ki):
-            print("We are outside the envelope at all points.")
             return True, crack_length, skier_weight, c_skier, c_C, c_segments, c_x_cm, c_sigma_kPa, c_tau_kPa, iteration_count, elapsed_times, skier_weights, crack_lengths, False, False, critical_skier_weight, g_delta_last, dist_min, g_delta_values, dist_min_values
 
         else:
-            print("Maximum iterations reached without convergence.")
-            
             return check_coupled_criterion_anticrack_nucleation_dampened(snow_profile, phi, skier_weight, dampening = 1, envelope=envelope, scaling_factor=scaling_factor, E = E, order_of_magnitude = order_of_magnitude, density = density)
         
     else:
-        print(f"Entire solution is uncracked - all points are inside the envelope with max distance to envelope: {dist_max}")
-        
-        print(f"Since the distance to failure: {dist_max} is NOT close to the boundary, causing an avalanche is unlikely")
         return False, 0, critical_skier_weight, skier, C, segments, x_cm, sigma_kPa, tau_kPa, iteration_count, elapsed_times, skier_weights, crack_lengths, False, False, critical_skier_weight, 0, dist_max, g_delta_values, dist_max_values
 
     
@@ -606,14 +580,7 @@ def check_coupled_criterion_anticrack_nucleation_dampened(snow_profile, phi, ski
             k0 = [True] * len(ki)
             incr_energy = c_skier.ginc(C0=C, C1=c_C, phi=phi, **c_segments, k0=k0)
             g_delta_max_weight = fracture_toughness_criterion(1000 * incr_energy[1], 1000 * incr_energy[2])
-            
-            
-        print(f"\033[91m MAX WEIGHT: {max_skier_weight} \033[0m")
-        print(f"\033[91m MAX WEIGHT: {max_skier_weight} \033[0m")
-        print(f"\033[91m MAX WEIGHT: {max_skier_weight} \033[0m")
-        print(f"\033[91m MAX WEIGHT: {max_skier_weight} \033[0m")
-        print(f"\033[91m MAX WEIGHT: {max_skier_weight} \033[0m")
-        
+             
 
         while abs(err) > 0.002 and iteration_count < max_iterations and any(ki):
             iteration_count += 1
@@ -647,11 +614,9 @@ def check_coupled_criterion_anticrack_nucleation_dampened(snow_profile, phi, ski
             err = abs(g_delta - 1)
 
             if iteration_count == 1 and g_delta > 1:
-                print(f"EXCEPTION: Energy criterion met immediately. Critical skier weight: {skier_weight} kg, crack length: {crack_length} mm.")
                 pure_stress_criteria = True
                 return True, crack_length, skier_weight, c_skier, c_C, c_segments, c_x_cm, c_sigma_kPa, c_tau_kPa, iteration_count, elapsed_times, skier_weights, crack_lengths, False, pure_stress_criteria, critical_skier_weight, g_delta, dist_max, g_delta_values, dist_max_values
 
-            print(f"Iteration {iteration_count}: skier weight: {skier_weight:.2f} kg, crack length: {crack_length} mm, g_delta_NEW: {g_delta:.4f}, error: {err:.4f}, SEGMENTS {c_segments}")
 
             # Adjust skier weight using dampened scaling
             if g_delta < 1:
@@ -677,21 +642,14 @@ def check_coupled_criterion_anticrack_nucleation_dampened(snow_profile, phi, ski
                 new_crack_length, li, ki = find_new_anticrack_length(snow_profile, skier_weight, phi, li, ki, envelope=envelope, scaling_factor=scaling_factor, E=E, order_of_magnitude = order_of_magnitude, density = density, t=t)
                 crack_length = new_crack_length
 
-                print(f"END OF ITERATION: g_delta: {g_delta} J/m^2, Old skier weight: {old_skier_weight} kg, Scaling: {scaling}, New skier weight: {skier_weight} kg, crack length: {crack_length} mm, li = {li}, ki = {ki}")
-
-
         # Check final convergence
         if iteration_count < max_iterations and any(ki):
-            print(f"CONVERGENCE: crack length: {crack_length} mm, Critical Skier Weight: {skier_weight} kg, Distance to energy envelope: {g_delta} J/m^2, Max Distance to Stress Envelope: {dist_max}, Segments: {c_segments}")
             return True, crack_length, skier_weight, c_skier, c_C, c_segments, c_x_cm, c_sigma_kPa, c_tau_kPa, iteration_count, elapsed_times, skier_weights, crack_lengths, False, False, critical_skier_weight, g_delta, dist_max, g_delta_values, dist_max_values
 
-
         else:
-            print("Maximum iterations reached without convergence.")
             return False, crack_length, skier_weight, c_skier, c_C, c_segments, c_x_cm, c_sigma_kPa, c_tau_kPa, iteration_count, elapsed_times, skier_weights, crack_lengths, False, False, critical_skier_weight, g_delta, dist_max, g_delta_values, dist_max_values
 
     else:
-        print("We are inside the envelope for all points")
         return False, 0, critical_skier_weight, skier, C, segments, x_cm, sigma_kPa, tau_kPa, 0, elapsed_times, skier_weights, crack_lengths, False, False, critical_skier_weight, 0, dist_max, g_delta_values, dist_max_values
         
     
@@ -699,52 +657,52 @@ def check_coupled_criterion_anticrack_nucleation_dampened(snow_profile, phi, ski
 
 def stress_envelope(sigma, tau, envelope='adam_unpublished', scaling_factor=1, order_of_magnitude = 1, density = 250):
     
-   """
-    Evaluate the stress envelope for given stress components.
-
-    Parameters
-    ----------
-    sigma : array-like
-        Normal stress components (kPa). Must be non-negative.
-    tau : array-like
-        Shear stress components (kPa). Must be non-negative.
-    envelope : str, optional
-        Type of stress envelope to evaluate. Options include:
-        - 'adam_unpublished' (default): Adam unpublished results .
-        - 'schottner': Schottner's envelope.
-        - 'mede_s-RG1', 'mede_s-RG2', 'mede_s-FCDH': Mede's criterion with
-          different parameterizations for specific snow types.
-    scaling_factor : float, optional
-        Scaling factor applied to the envelope equations. Default is 1.
-    order_of_magnitude : float, optional
-        Exponent used for scaling in certain envelopes. Default is 1.
-    density : float, optional
-        Snow density (kg/m³). Used in certain envelope calculations.
-        Default is 250 kg/m³.
-
-    Returns
-    -------
-    results : ndarray
-        Non-dimensional stress evaluation values. For most envelopes,
-        values greater than 1 indicate failure, while values less than 1
-        indicate stability.
-
-    Notes
-    -----
-    - Mede's envelopes ('mede_s-RG1', 'mede_s-RG2', 'mede_s-FCDH') are derived from the work of Mede et al. (2018), "Snow Failure Modes Under Mixed Loading," published in Geophysical Research Letters.
-    - Schöttner's envelope ('schottner') is based on the preprint by Schöttner et al. (2025), "On the Compressive Strength of Weak Snow Layers of Depth Hoar".
-    - The 'adam_unpublished' envelope scales linearly above a density baseline by a 'scaling_factor',
-      unless modified by 'order_of_magnitude'.
-    - Mede's criteria ('mede_s-RG1', 'mede_s-RG2', 'mede_s-FCDH') define
-      failure based on a piecewise function of stress ranges.
-
-    Raises
-    ------
-    ValueError
-        If an invalid `envelope` type is provided.
     """
-    
-    
+        Evaluate the stress envelope for given stress components.
+
+        Parameters
+        ----------
+        sigma : array-like
+            Normal stress components (kPa). Must be non-negative.
+        tau : array-like
+            Shear stress components (kPa). Must be non-negative.
+        envelope : str, optional
+            Type of stress envelope to evaluate. Options include:
+            - 'adam_unpublished' (default): Adam unpublished results .
+            - 'schottner': Schottner's envelope.
+            - 'mede_s-RG1', 'mede_s-RG2', 'mede_s-FCDH': Mede's criterion with
+            different parameterizations for specific snow types.
+        scaling_factor : float, optional
+            Scaling factor applied to the envelope equations. Default is 1.
+        order_of_magnitude : float, optional
+            Exponent used for scaling in certain envelopes. Default is 1.
+        density : float, optional
+            Snow density (kg/m³). Used in certain envelope calculations.
+            Default is 250 kg/m³.
+
+        Returns
+        -------
+        results : ndarray
+            Non-dimensional stress evaluation values. For most envelopes,
+            values greater than 1 indicate failure, while values less than 1
+            indicate stability.
+
+        Notes
+        -----
+        - Mede's envelopes ('mede_s-RG1', 'mede_s-RG2', 'mede_s-FCDH') are derived from the work of Mede et al. (2018), "Snow Failure Modes Under Mixed Loading," published in Geophysical Research Letters.
+        - Schöttner's envelope ('schottner') is based on the preprint by Schöttner et al. (2025), "On the Compressive Strength of Weak Snow Layers of Depth Hoar".
+        - The 'adam_unpublished' envelope scales linearly above a density baseline by a 'scaling_factor',
+        unless modified by 'order_of_magnitude'.
+        - Mede's criteria ('mede_s-RG1', 'mede_s-RG2', 'mede_s-FCDH') define
+        failure based on a piecewise function of stress ranges.
+
+        Raises
+        ------
+        ValueError
+            If an invalid `envelope` type is provided.
+        
+    """
+   
     sigma = np.abs(np.asarray(sigma))
     tau = np.abs(np.asarray(tau))
     results = np.zeros_like(sigma)
@@ -902,12 +860,6 @@ def find_roots_around_x(x_value, skier, C, li, phi, sigma_kPa, tau_kPa, x_cm, en
     
     # Find indices where the envelope function transitions from positive to negative
     transition_indices = np.where(np.diff(np.sign(discrete_dist_to_fail)))[0]
-    print("Transition indices:")
-    print(transition_indices)
-    print(discrete_dist_to_fail[transition_indices])
-    
-    
-    print(discrete_dist_to_fail)
     
     # Lists to store indices and values of local minima and maxima
     local_minima_indices = []
@@ -926,14 +878,6 @@ def find_roots_around_x(x_value, skier, C, li, phi, sigma_kPa, tau_kPa, x_cm, en
         elif discrete_dist_to_fail[i] < discrete_dist_to_fail[i - 1] and discrete_dist_to_fail[i] < discrete_dist_to_fail[i + 1]:
             local_minima_indices.append(i)
             local_minima_values.append(discrete_dist_to_fail[i])
-
-    # Print the results
-    print(f"\033[91m Local Minima Indices: {local_minima_indices} \033[0m")
-    print("Local Minima Values:", local_minima_values)
-    print("Local Maxima Indices:", local_maxima_indices)
-    print("Local Maxima Values:", local_maxima_values)
-
-
     
     # Extract the corresponding x_cm values at those transition indices
     root_candidates = []
@@ -944,11 +888,6 @@ def find_roots_around_x(x_value, skier, C, li, phi, sigma_kPa, tau_kPa, x_cm, en
         root_candidates.append((10*x_left, 10*x_right))
         # Adding one millimetre on each side
 
-    # Print the root candidates
-    print("Root candidates based on envelope function transitions:")
-    for x_left, x_right in root_candidates:
-        print(f"From x = {x_left} to x = {x_right}")
-
     # Search for roots within the identified candidates
     roots = []
     for x_left, x_right in root_candidates:
@@ -956,7 +895,6 @@ def find_roots_around_x(x_value, skier, C, li, phi, sigma_kPa, tau_kPa, x_cm, en
             root_result = root_scalar(func, bracket=[x_left, x_right], method='brentq')
             if root_result.converged:
                 roots.append(root_result.root)
-                print(f"Root found at x = {root_result.root}")
         except ValueError:
             print(f"No root found between x = {x_left} and x = {x_right}.")
 
@@ -1126,40 +1064,24 @@ def find_new_anticrack_length(snow_profile, skier_weight, phi, li, ki, envelope=
     
     li = [midpoint, midpoint]
     ki = [True, True]
-    
-    # Kill if needed
-
-    print("INSIDE FIND NEW CRACK LENGTH METHOD")
-    print(f"Total Length: {total_length}")
-    print(f"Midpoint: {midpoint}")
-    
-    
 
     skier, C, segments, x_cm, sigma_kPa, tau_kPa = create_skier_object(
         snow_profile, skier_weight, phi, li, ki, crack_case='nocrack', E=E, t=t
         ) 
 
     all_points_are_outside = np.min(stress_envelope(sigma_kPa, tau_kPa, envelope=envelope, scaling_factor=scaling_factor, order_of_magnitude = order_of_magnitude, density = density)) > 1
-    print(f"All Points Are Outside Envelope: {all_points_are_outside}")
 
     roots_x = find_roots_around_x(midpoint, skier, C, li, phi, sigma_kPa, tau_kPa, x_cm, envelope=envelope, scaling_factor=scaling_factor, order_of_magnitude = order_of_magnitude, density = density)
-    print(f"Roots Found: {roots_x}")
 
     if len(roots_x) > 0:
         segment_boundaries = [0] + roots_x + [total_length]
         li_temp = np.diff(segment_boundaries).tolist()  # Convert to a list
         ki_temp = [True] * (len(segment_boundaries) - 1) 
 
-        print(f"Segment Boundaries: {segment_boundaries}")
-        print(f"li_temp: {li_temp}")
-        print(f"Initial ki_temp: {ki_temp}")
-
         # Create a boolean list indicating root positions
         is_root = [False] * len(segment_boundaries)
         for root in roots_x:
             is_root[segment_boundaries.index(root)] = True
-
-        print(f"Root Positions (is_root): {is_root}")
 
         # Iterate over the roots to determine cracked segments
         nbr_roots = len(roots_x)
@@ -1178,25 +1100,18 @@ def find_new_anticrack_length(snow_profile, skier_weight, phi, li, ki, envelope=
                 
                 # A cracked segment, if there exists more than one, will always switch between cracked and uncracked
 
-        print(f"Updated ki_temp After Checking Roots: {ki_temp}")
-
         # Proceed to split li and ki at the midpoint
         li, ki = split_segments_at_midpoint(li_temp, ki_temp)
-        print(f"Split li: {li}")
-        print(f"Split ki: {ki}")
 
     elif all_points_are_outside:
-        print("All points are outside the envelope. No cracks.")
         ki = [False] * len(ki)
     else:
-        print("No roots found. Returning original segment lengths but now uncracked")
         # No changes to li and ki
         li = li
         ki = [True]*len(ki)
 
     # Calculate new crack length
     new_crack_length = sum(length for length, foundation in zip(li, ki) if not foundation)
-    print(f"New Crack Length: {new_crack_length}")
 
     return new_crack_length, li, ki
 
@@ -1328,10 +1243,6 @@ def find_minimum_force(snow_profile, phi, li, ki, envelope='adam_unpublished', s
     crack_case = 'nocrack'
     skier_weight = 1  # Starting weight of skier
 
-    print("Starting the minimum force calculation...")
-    print(f"Initial Skier Weight: {skier_weight}")
-    print(f"Initial Crack Case: {crack_case}")
-
     skier, C, segments, x_cm, sigma_kPa, tau_kPa = create_skier_object(
         snow_profile, skier_weight, phi, li, ki, crack_case='nocrack', E = E, t=t
     )
@@ -1339,10 +1250,8 @@ def find_minimum_force(snow_profile, phi, li, ki, envelope='adam_unpublished', s
     # Calculate the distance to failure
     dist_max = np.max(stress_envelope(sigma_kPa, tau_kPa, envelope=envelope, scaling_factor=scaling_factor, order_of_magnitude = order_of_magnitude, density = density))
     dist_min = np.min(stress_envelope(sigma_kPa, tau_kPa, envelope=envelope, scaling_factor=scaling_factor, order_of_magnitude = order_of_magnitude, density = density))
-    print(f"Initial Distance to Failure: {dist_max}")
     
     if dist_min >= 1:
-        print("Exception: we are outside the stress envelope in all points without any additional load")
         # We are outside the stress envelope without any additional skier weight
         return skier_weight, skier, C, segments, x_cm, sigma_kPa, tau_kPa, dist_max, dist_min
 
@@ -1351,9 +1260,7 @@ def find_minimum_force(snow_profile, phi, li, ki, envelope='adam_unpublished', s
     # Thursday changed 0.015 to 0.005
 
     while np.abs(dist_max - 1) > 0.005 and iteration_count < 50:   # While no point is outside the envelope
-        print("Distance to failure is below threshold; increasing skier weight...")
         skier_weight = skier_weight / (dist_max)
-        print(f"Updated Skier Weight: {skier_weight}")
 
         # Recreate the skier object with the updated weight
         skier, C, segments, x_cm, sigma_kPa, tau_kPa = create_skier_object(
@@ -1363,20 +1270,13 @@ def find_minimum_force(snow_profile, phi, li, ki, envelope='adam_unpublished', s
         # Recalculate the distance to failure
         dist_max = np.max(stress_envelope(sigma_kPa, tau_kPa, envelope=envelope, scaling_factor=scaling_factor, order_of_magnitude = order_of_magnitude, density = density))
         dist_min = np.min(stress_envelope(sigma_kPa, tau_kPa, envelope=envelope, scaling_factor=scaling_factor, order_of_magnitude = order_of_magnitude, density = density))
-        print(f"New Distance to Failure: {dist_max}")
         iteration_count = iteration_count + 1
 
     if iteration_count == 50:
-        print("Did not find critical skier weight. Calling dampened version.")
-        print(f"\033[91m CALLING DAMPENED find_min_force_dampened_v3 \033[0m")
         skier_weight, skier, C, segments, x_cm, sigma_kPa, tau_kPa, dist_max, dist_min = find_minimum_force_dampened(snow_profile, phi, li, ki, envelope=envelope, scaling_factor=scaling_factor, E = E, order_of_magnitude = order_of_magnitude, dampening = 1, density = density, t=t)
         
 
     # Once the loop exits, it means we have found the critical skier weight
-    print("Critical skier weight found. Exiting the calculation.")
-    print(f"Final Skier Weight: {skier_weight}")
-    print(f"Final Distance to Failure: {dist_max}")
-
     return skier_weight, skier, C, segments, x_cm, sigma_kPa, tau_kPa, dist_max, dist_min
 
 
@@ -1446,10 +1346,6 @@ def find_minimum_force_dampened(snow_profile, phi, li, ki, envelope='adam_unpubl
     crack_case = 'nocrack'
     skier_weight = 1  # Starting weight of skier
 
-    print("Starting the minimum force calculation...")
-    print(f"Initial Skier Weight: {skier_weight}")
-    print(f"Initial Crack Case: {crack_case}")
-
     skier, C, segments, x_cm, sigma_kPa, tau_kPa = create_skier_object(
         snow_profile, skier_weight, phi, li, ki, crack_case='nocrack', E = E, t=t
     )
@@ -1457,10 +1353,8 @@ def find_minimum_force_dampened(snow_profile, phi, li, ki, envelope='adam_unpubl
     # Calculate the distance to failure
     dist_max = np.max(stress_envelope(sigma_kPa, tau_kPa, envelope=envelope, scaling_factor=scaling_factor, order_of_magnitude = order_of_magnitude, density = density))
     dist_min = np.min(stress_envelope(sigma_kPa, tau_kPa, envelope=envelope, scaling_factor=scaling_factor, order_of_magnitude = order_of_magnitude, density = density))
-    print(f"Initial Distance to Failure: {dist_max}")
     
     if dist_min >= 1:
-        print("Exception: we are outside the stress envelope in all points without any additional load")
         # We are outside the stress envelope without any additional skier weight
         return skier_weight, skier, C, segments, x_cm, sigma_kPa, tau_kPa, dist_max, dist_min
 
@@ -1469,9 +1363,7 @@ def find_minimum_force_dampened(snow_profile, phi, li, ki, envelope='adam_unpubl
     # Changed to 0.01 Thursday
 
     while np.abs(dist_max - 1) > 0.01 and iteration_count < 50:   # While no point is outside the envelope
-        print("Distance to failure is below threshold; increasing skier weight...")
         skier_weight = (dampening + 1) * skier_weight / (dampening + dist_max)
-        print(f"Updated Skier Weight: {skier_weight}")
 
         # Recreate the skier object with the updated weight
         skier, C, segments, x_cm, sigma_kPa, tau_kPa = create_skier_object(
@@ -1481,24 +1373,17 @@ def find_minimum_force_dampened(snow_profile, phi, li, ki, envelope='adam_unpubl
         # Recalculate the distance to failure
         dist_max = np.max(stress_envelope(sigma_kPa, tau_kPa, envelope=envelope, scaling_factor=scaling_factor, order_of_magnitude = order_of_magnitude, density = density))
         dist_min = np.min(stress_envelope(sigma_kPa, tau_kPa, envelope=envelope, scaling_factor=scaling_factor, order_of_magnitude = order_of_magnitude, density = density))
-        print(f"New Distance to Failure: {dist_max}")
         iteration_count = iteration_count + 1
 
     if iteration_count == 50:
-        print(f"Did not find critical skier weight. Calling dampened version with dampening {dampening}.")
-        print(f"\033[91m CALLING DAMPENED AGAIN find_min_force_dampened_v3 with dampening {dampening+1} \033[0m")
-        
+
         if dampening < 5:
             skier_weight, skier, C, segments, x_cm, sigma_kPa, tau_kPa, dist_max, dist_min = find_minimum_force_dampened(snow_profile, phi, li, ki, envelope=envelope, scaling_factor=scaling_factor, E = E, order_of_magnitude = order_of_magnitude, dampening = dampening + 1, density = density, t=t)
             
         else:
-            print(f"\033[91m COULD NOT FIND CRITICAL SKIER WEIGHT \033[0m")
             return 0, skier, C, segments, x_cm, sigma_kPa, tau_kPa, dist_max, dist_min
 
     # Once the loop exits, it means we have found the critical skier weight
-    print("Critical skier weight found. Exiting the calculation.")
-    print(f"Final Skier Weight: {skier_weight}")
-    print(f"Final Distance to Failure: {dist_max}")
 
     return skier_weight, skier, C, segments, x_cm, sigma_kPa, tau_kPa, dist_max, dist_min
 
@@ -1550,7 +1435,6 @@ def find_min_crack_length_self_propagation(snow_profile, phi, E, t, initial_inte
     )
     
     if result.converged:
-        print(f"Root found: crack_length = {result.root}")
         return result.root
     else:
         print("Root search did not converge.")
@@ -1957,8 +1841,6 @@ def create_skier_object(snow_profile, skier_weight_x, phi, li_x, ki_x, crack_cas
                             k0=k0                 # Use the boolean flags
                             )[crack_case]     # Switch between 'crack' or 'nocrack'
 
-    print(f"SEGMENT SOLUTIONS?: {segments}")
-
     # Solve and rasterize the solution
     C = skier.assemble_and_solve(phi=phi, **segments)
     xsl_skier, z_skier, xwl_skier = skier.rasterize_solution(C=C, phi=(phi), num=800, **segments)
@@ -2016,49 +1898,3 @@ def fracture_toughness_criterion(G_sigma, G_tau):
     
     return g_delta
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-# Think this is a kill
-
-
-def determine_segment_cracking(roots_x, total_length):
-    # Check if we have any roots
-    if len(roots_x) > 0:
-        # Create segment boundaries including total_length
-        segment_boundaries = [0] + roots_x + [total_length]
-        li_temp = np.diff(segment_boundaries)
-
-        # Initialize the helper vector to track cracked segments
-        ki_temp = [True] * (len(li_temp) - 1)  # There will be one less segment than boundaries
-
-        # Create a boolean list indicating root positions
-        is_root = [False] * len(segment_boundaries)
-
-        # Set True for each root in the middle
-        for root in roots_x:
-            is_root[segment_boundaries.index(root)] = True
-
-        # We should have at least two roots here to determine segments
-        nbr_roots = len(roots_x)
-
-        # Iterate over the roots to determine cracked segments
-        for i in range(1, nbr_roots):  # Start from the second root
-            # Check if the current and previous boundaries are both roots
-            if is_root[i] and is_root[i - 1]:
-                ki_temp[i - 1] = False  # Mark the segment as cracked
-
-        return ki_temp, is_root
-    else:
-        return [], []  # Return empty lists if no roots are found
