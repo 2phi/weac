@@ -18,9 +18,6 @@ dist/
 # IDE setup
 .vscode/
 
-# Driver code
-skierinduced.py
-
 # misc
 *.stats
 plots/
