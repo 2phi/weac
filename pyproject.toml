@@ -2,8 +2,47 @@
 requires = ["setuptools", "wheel"]
 build-backend = "setuptools.build_meta"
 
+[project]
+name = "weac"
+version = "2.6.0"
+authors = [
+    {name = "2phi GbR", email = "mail@2phi.de"},
+]
+description = "Weak layer anticrack nucleation model"
+readme = "README.md"
+requires-python = ">=3.10"
+license = {text = "Proprietary"}
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: Other/Proprietary License",
+    "Operating System :: OS Independent",
+    "Topic :: Scientific/Engineering",
+]
+dependencies = [
+    "matplotlib>=3.9.1",
+    "numpy>=2.0.1",
+    "scipy>=1.14.0",
+]
+
+[project.urls]
+Homepage = "https://github.com/2phi/weac"
+Demo = "https://github.com/2phi/weac/blob/main/demo/demo.ipynb"
+Documentation = "https://2phi.github.io/weac"
+"Issues and feature requests" = "https://github.com/2phi/weac/issues"
+
+[project.optional-dependencies]
+interactive = ["jupyter", "ipython>=8.12.3"]
+docs = ["sphinx", "sphinxawesome-theme"]
+
+[tool.setuptools]
+packages = ["weac"]
+package-data = {"*" = ["CITATION.cff"], "img" = ["*.png"]}
+
 [tool.ruff]
 ignore = ["E741"]
 
 [tool.pylint.typecheck]
 generated-members = "matplotlib.cm.*"
+
+[tool.pycodestyle]
+ignore = ["E121", "E123", "E126", "E211", "E226", "E24", "E704", "W503", "W504", "E741"]
