@@ -12,11 +12,11 @@
   <meta name="theme-color" media="(prefers-color-scheme: light)" content="white" />
   <meta name="theme-color" media="(prefers-color-scheme: dark)" content="black" />
   
-    <title>Search | WEAC 2.5.2 documentation</title>
-    <meta property="og:title" content="Search | WEAC 2.5.2 documentation" />
-    <meta name="twitter:title" content="Search | WEAC 2.5.2 documentation" />
-      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=a3258c64" />
-      <link rel="stylesheet" type="text/css" href="_static/theme.css?v=ecdfb4fc" />
+    <title>Search | WEAC 2.6.0 documentation</title>
+    <meta property="og:title" content="Search | WEAC 2.6.0 documentation" />
+    <meta name="twitter:title" content="Search | WEAC 2.6.0 documentation" />
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=83348fa5" />
+      <link rel="stylesheet" type="text/css" href="_static/theme.css?v=42baaae4" />
       <link rel="icon" href="_static/favicon.ico" />
         <link rel="search" title="Search" href="#" />
         <link rel="index" title="Index" href="genindex.html" />
@@ -34,7 +34,7 @@
       if (!userPreference) {localStorage.setItem('darkMode', mode)}
     </script>
 </head>
-<body x-data="{ showSidebar: false }" class="min-h-screen font-sans antialiased bg-background text-foreground" :class="{ 'overflow-hidden': showSidebar }">
+  <body x-data="{ showSidebar: false, showScrollTop: false }" class="min-h-screen font-sans antialiased bg-background text-foreground" :class="{ 'overflow-hidden': showSidebar }"@scroll.window="showScrollTop = pageYOffset > 100">
     <div x-cloak x-show="showSidebar" class="fixed inset-0 z-50 overflow-hidden bg-background/80 backdrop-blur-sm md:hidden" @click.self="showSidebar = false"></div><div id="page" class="relative flex flex-col min-h-screen"><a href="#content" class="absolute top-0 left-0 z-[100] block bg-background p-4 text-xl transition -translate-x-full opacity-0 focus:translate-x-0 focus:opacity-100">
       Skip to content
     </a><header
@@ -42,7 +42,7 @@
     <div class="hidden mr-4 md:flex">
       <a href="index.html" class="flex items-center mr-6">
           <img width="24" height="24" class="mr-2 hidden dark:block" src="_static/logo-dark.png" alt="Logo" />
-        <img width="24" height="24" class="mr-2 dark:hidden" src="_static/logo-light.png" alt="Logo" /><span class="hidden font-bold sm:inline-block text-clip whitespace-nowrap">WEAC 2.5.2 documentation</span>
+        <img width="24" height="24" class="mr-2 dark:hidden" src="_static/logo-light.png" alt="Logo" /><span class="hidden font-bold sm:inline-block text-clip whitespace-nowrap">WEAC 2.6.0 documentation</span>
       </a></div><button
       class="inline-flex items-center justify-center h-10 px-0 py-2 mr-2 text-base font-medium transition-colors rounded-md hover:text-accent-foreground hover:bg-transparent md:hidden"
       type="button" @click="showSidebar = true">
@@ -99,7 +99,7 @@
 
     <a href="index.html" class="!justify-start text-sm md:!hidden bg-background">
         <img width="16" height="16" class="mr-2 hidden dark:block" src="_static/logo-dark.png" alt="Logo" />
-        <img width="16" height="16" class="mr-2 dark:hidden" src="_static/logo-light.png" alt="Logo" /><span class="font-bold text-clip whitespace-nowrap">WEAC 2.5.2 documentation</span>
+        <img width="16" height="16" class="mr-2 dark:hidden" src="_static/logo-light.png" alt="Logo" /><span class="font-bold text-clip whitespace-nowrap">WEAC 2.6.0 documentation</span>
     </a>
 
     <div class="relative overflow-hidden md:overflow-auto my-4 md:my-0 h-[calc(100vh-8rem)] md:h-auto">
@@ -134,7 +134,7 @@
      class="flex items-center mb-4 space-x-1 text-sm text-muted-foreground">
   <a class="overflow-hidden text-ellipsis whitespace-nowrap hover:text-foreground"
      href="index.html">
-    <span class="hidden md:inline">WEAC 2.5.2 documentation</span>
+    <span class="hidden md:inline">WEAC 2.6.0 documentation</span>
     <svg xmlns="http://www.w3.org/2000/svg"
          height="18"
          width="18"
@@ -166,13 +166,28 @@
 </div>
 </div>
 </footer>
-  </div>
+  </div><button id="scrolltop"
+        x-cloak
+        @click="window.scrollTo({top: 0, behavior: 'smooth'})"
+        class="fixed bottom-8 right-8 p-2 z-10 rounded-sm bg-gray-700 text-xs text-white transition-all duration-1000 hover:bg-gray-950 focus:bg-gray-950"
+        :class="{'opacity-0 invisible' : !showScrollTop}"
+>
+  <svg xmlns="http://www.w3.org/2000/svg"
+       height="14"
+       viewBox="0 96 960 960"
+       width="14"
+       class="inline fill-current mb-[2px]"
+       aria-hidden="true">
+    <path d="M450 896V370L202 618l-42-42 320-320 320 320-42 42-248-248v526h-60Z" />
+  </svg>
+  Back to top
+</button>
   
   
-    <script src="_static/documentation_options.js?v=afc61bbc"></script>
-    <script src="_static/doctools.js?v=9a2dae69"></script>
+    <script src="_static/documentation_options.js?v=ae39cb24"></script>
+    <script src="_static/doctools.js?v=9bcbadda"></script>
     <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
-    <script defer="defer" src="_static/theme.js?v=e82a16a3"></script>
+    <script defer="defer" src="_static/theme.js?v=073f68d9"></script>
   
   <script src="_static/searchtools.js" defer></script>
   <script src="_static/language_data.js" defer></script>
