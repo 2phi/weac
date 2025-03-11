@@ -46,3 +46,27 @@ generated-members = "matplotlib.cm.*"
 
 [tool.pycodestyle]
 ignore = ["E121", "E123", "E126", "E211", "E226", "E24", "E704", "W503", "W504", "E741"]
+
+[tool.bumpversion]
+current_version = "2.6.0"
+tag = true
+commit = true
+
+[[tool.bumpversion.files]]
+filename = "pyproject.toml"
+
+[[tool.bumpversion.files]]
+filename = "CITATION.cff"
+
+[[tool.bumpversion.files]]
+filename = "weac/__init__.py"
+search = "__version__ = '{current_version}'"
+replace = "__version__ = '{new_version}'"
+
+[[tool.bumpversion.files]]
+filename = "demo/demo.ipynb"
+
+[[tool.bumpversion.files]]
+filename = "docs/sphinx/conf.py"
+search = "release = '{current_version}'"
+replace = "release = '{new_version}'"
