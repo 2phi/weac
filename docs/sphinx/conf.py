@@ -10,7 +10,7 @@
 project = 'WEAC'
 copyright = '2024, 2phi GbR'
 author = 'P.L. Rosendahl, P. Weissgraeber, F. Rheinschmidt, J. Schneider'
-release = '2.6.0'
+release = '2.6.1'
 github_url = 'https://github.com/2phi/weac'
 
 
