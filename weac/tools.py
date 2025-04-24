@@ -236,7 +236,7 @@ def bergfeld(rho, rho0=917, C0=6.5, C1=4.4):
 
 def tensile_strength_slab(rho, unit="kPa"):
     """
-    Estimate the tensile strenght of a slab layer from its density.
+    Estimate the tensile strength of a slab layer from its density.
 
     Uses the density parametrization of Sigrist (2006).
 
@@ -250,7 +250,7 @@ def tensile_strength_slab(rho, unit="kPa"):
     Returns
     -------
     ndarray
-        Tensile strenght in specified unit.
+        Tensile strength in specified unit.
     """
     convert = {"kPa": 1, "MPa": 1e-3, "m": 1, "mm": 1e3, "cm": 1e2}
     rho_ice = 917
