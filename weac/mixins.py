@@ -883,7 +883,7 @@ class SolutionMixin:
             bc = np.array([self.N(z), self.M(z), self.V(z)])
         else:
             raise ValueError(
-                "Boundary conditions not defined for" f"system of type {self.system}."
+                f"Boundary conditions not defined forsystem of type {self.system}."
             )
 
         return bc
