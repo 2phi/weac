@@ -54,7 +54,17 @@ packages = ["weac"]
 package-data = {"*" = ["CITATION.cff"], "img" = ["*.png"]}
 
 [tool.ruff]
+line-length = 89
+target-version = "py312"
+
+[tool.ruff.lint]
 ignore = ["E741"]
+
+[tool.ruff.lint.per-file-ignores]
+"**/*.ipynb" = ["F403", "F405"]
+
+[tool.ruff.format]
+line-ending = "lf"
 
 [tool.pylint.typecheck]
 generated-members = "matplotlib.cm.*"

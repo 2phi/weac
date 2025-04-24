@@ -6,6 +6,7 @@ import os
 import unittest
 
 import matplotlib.pyplot as plt
+import numpy as np
 
 import weac.plot
 from weac.layered import Layered
@@ -38,6 +39,8 @@ class TestPlot(unittest.TestCase):
         # Create plots directory if it doesn't exist
         if not os.path.exists("plots"):
             os.makedirs("plots")
+
+        self.compliance = np.array([[1.0, 0.0], [0.0, 1.0]])
 
     def tearDown(self):
         """Clean up after tests."""

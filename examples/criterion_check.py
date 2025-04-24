@@ -1191,18 +1191,19 @@ def find_roots_around_x(
         If no root can be found within the identified bracket.
     """
 
-    # Define the lambda function for the root function
-    func = lambda x: root_function(
-        x,
-        skier,
-        C,
-        li,
-        phi,
-        envelope=envelope,
-        scaling_factor=scaling_factor,
-        order_of_magnitude=order_of_magnitude,
-        density=density,
-    )
+    # Define the function for the root function
+    def func(x):
+        return root_function(
+            x,
+            skier,
+            C,
+            li,
+            phi,
+            envelope=envelope,
+            scaling_factor=scaling_factor,
+            order_of_magnitude=order_of_magnitude,
+            density=density,
+        )
 
     # Calculate the discrete distance to failure using the envelope function
     discrete_dist_to_fail = (

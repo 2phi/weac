@@ -883,7 +883,7 @@ class SolutionMixin:
             bc = np.array([self.N(z), self.M(z), self.V(z)])
         else:
             raise ValueError(
-                "Boundary conditions not defined for" f"system of type {self.system}."
+                f"Boundary conditions not defined for system of type {self.system}."
             )
 
         return bc
@@ -1441,9 +1441,7 @@ class AnalysisMixin:
             # Solution at crack tip
             z = self.z(li[idx], C[:, [idx]], li[idx], phi, bed=ki[idx])
             # Mode I and II differential energy release rates
-            Gdif[1:, j] = np.concatenate(
-                (self.Gi(z, unit=unit), self.Gii(z, unit=unit))
-            )
+            Gdif[1:, j] = np.concatenate((self.Gi(z, unit=unit), self.Gii(z, unit=unit)))
 
         # Sum mode I and II contributions
         Gdif[0, :] = Gdif[1, :] + Gdif[2, :]
@@ -1481,10 +1479,7 @@ class AnalysisMixin:
         nlayer = np.ceil((z[1:] - z[:-1]) / dz).astype(np.int32) + 1
         # Calculate grid points as list of z-coordinates (mm)
         zi = np.hstack(
-            [
-                np.linspace(z[i], z[i + 1], n, endpoint=True)
-                for i, n in enumerate(nlayer)
-            ]
+            [np.linspace(z[i], z[i + 1], n, endpoint=True) for i, n in enumerate(nlayer)]
         )
         # Get lists of corresponding elastic properties (E, nu, rho)
         si = np.repeat(self.slab[:, [2, 4, 0]], nlayer, axis=0)
