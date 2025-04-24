@@ -16,7 +16,6 @@ permissions:
 
 jobs:
   build:
-    name: documentation
     runs-on: ubuntu-latest
     environment: docs-deploy
 
