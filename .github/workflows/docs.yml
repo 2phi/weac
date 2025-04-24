@@ -54,14 +54,16 @@ jobs:
       run: |
         git config --local user.email "action@github.com"
         git config --local user.name "GitHub Action"
-        # Check out the github-pages (documentation) branch (create if it doesn't exist)
-        git checkout -B documentation
+        # Create a new orphan branch with no history
+        git checkout --orphan temp_docs
+        # Remove everything
+        git rm -rf .
         # Copy the documentation to the root directory
         cp -rf docs/sphinx/_build/html/* .
         # Add .nojekyll file to tell GitHub not to process with Jekyll
         touch .nojekyll
         # Add all changes
         git add -A .
-        git commit -m "Update documentation" || echo "No changes to commit"
-        git pull --rebase origin documentation || echo "No existing branch to pull"
-        git push origin documentation
+        git commit -m "Update documentation"
+        # Force push to documentation branch
+        git push -f origin temp_docs:documentation
