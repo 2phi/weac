@@ -46,6 +46,69 @@ class TestClass(FieldQuantitiesMixin, SolutionMixin, SlabContactMixin, Eigensyst
         self.p = 0  # surface line load
         self.phi = 0  # inclination angle
 
+        self.z_coord = np.array([0.0, 1.0])
+
+    def test_w(self):
+        """Test calculation of deflection."""
+        # Test with default parameters
+        result = self.w(self.Z)
+        self.assertIsInstance(result, np.ndarray)
+        self.assertEqual(result.shape, (5,))  # Should match number of positions
+        self.assertTrue(np.allclose(result, 3))  # Third row of Z
+
+        # Test with different units
+        result_mm = self.w(self.Z, unit="mm")
+        result_cm = self.w(self.Z, unit="cm")
+        self.assertTrue(np.allclose(result_mm, result_cm * 10))
+
+    def test_dw_dx(self):
+        """Test calculation of deflection derivative."""
+        # Test with default parameters
+        result = self.dw_dx(self.Z)
+        self.assertIsInstance(result, np.ndarray)
+        self.assertEqual(result.shape, (5,))  # Should match number of positions
+        self.assertTrue(np.allclose(result, 4))  # Fourth row of Z
+
+    def test_psi(self):
+        """Test calculation of rotation."""
+        # Test with default parameters
+        result = self.psi(self.Z)
+        self.assertIsInstance(result, np.ndarray)
+        self.assertEqual(result.shape, (5,))  # Should match number of positions
+        self.assertTrue(np.allclose(result, 5))  # Fifth row of Z
+
+        # Test with different units
+        result_rad = self.psi(self.Z, unit="rad")
+        result_deg = self.psi(self.Z, unit="degrees")
+        self.assertTrue(np.allclose(result_rad, np.deg2rad(result_deg)))
+
+    def test_calc_segments(self):
+        """Test calculation of segments."""
+        # Test with default parameters
+        crack_segments = self.calc_segments(L=1000, a=300)
+
+        # Check that the segments dictionary contains expected keys
+        self.assertIn("crack", crack_segments)
+        self.assertIn("li", crack_segments["crack"])
+        self.assertIn("ki", crack_segments["crack"])
+        self.assertIn("mi", crack_segments["crack"])
+
+        # Check segment lengths
+        self.assertEqual(
+            len(crack_segments["crack"]["li"]), 2
+        )  # Should have 2 segments for pst-
+        self.assertEqual(crack_segments["crack"]["li"][0], 700)  # First segment length
+        self.assertEqual(
+            crack_segments["crack"]["li"][1], 300
+        )  # Second segment length (crack length)
+
+    def test_energy_release_rate_ratio(self):
+        """Test calculation of energy release rate ratio."""
+        # Test with default parameters
+        result = self.layered.energy_release_rate_ratio(self.stress, self.stress_slope)
+        self.assertIsInstance(result, float)
+        self.assertTrue(np.allclose(result, self.expected_ratio))
+
 
 class TestFieldQuantitiesMixin(unittest.TestCase):
     """Test cases for FieldQuantitiesMixin."""

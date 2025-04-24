@@ -28,8 +28,10 @@ jobs:
         python -m pip install -e ".[dev]"
 
     - name: Run pylint analysis
+      # Note: We're ignoring complexity issues (R0902-R0917) as they are common in scientific computing
+      # where functions often need many parameters for mathematical operations
       run: |
-        python -m pylint --output-format=parseable --output=pylint-report.txt weac/ tests/
+        python -m pylint --output-format=parseable --output=pylint-report.txt --disable=R0902,R0904,R0912,R0913,R0915,R0917 weac/ tests/
         echo
         echo 'Error type counts:'
         grep -oP '[A-Z]\d+\([a-z\-]+\)' pylint-report.txt | sort | uniq -c | sort -nr

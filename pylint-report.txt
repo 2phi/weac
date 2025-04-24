@@ -1,0 +1,56 @@
+************* Module weac.mixins
+weac/mixins.py:24: [R0022(useless-option-value), ] Useless option value for 'disable', 'no-self-use' was moved to an optional extension, see https://pylint.readthedocs.io/en/latest/whatsnew/2/2.14/summary.html#removed-checkers.
+weac/mixins.py:104: [R0022(useless-option-value), ] Useless option value for 'enable', 'no-self-use' was moved to an optional extension, see https://pylint.readthedocs.io/en/latest/whatsnew/2/2.14/summary.html#removed-checkers.
+weac/mixins.py:85: [E0606(possibly-used-before-assignment), FieldQuantitiesMixin.psi] Possibly using variable 'psi' before assignment
+weac/mixins.py:16: [R0904(too-many-public-methods), FieldQuantitiesMixin] Too many public methods (23/20)
+weac/mixins.py:628: [E0606(possibly-used-before-assignment), SlabContactMixin.substitute_stiffness] Possibly using variable 'tempsys' before assignment
+weac/mixins.py:635: [E0606(possibly-used-before-assignment), SlabContactMixin.substitute_stiffness] Possibly using variable 'k' before assignment
+weac/mixins.py:775: [R0917(too-many-positional-arguments), SlabContactMixin.set_touchdown_attributes] Too many positional arguments (6/5)
+weac/mixins.py:796: [E0606(possibly-used-before-assignment), SlabContactMixin.calc_touchdown_mode] Possibly using variable 'mode' before assignment
+weac/mixins.py:809: [R0917(too-many-positional-arguments), SlabContactMixin.calc_touchdown_system] Too many positional arguments (6/5)
+weac/mixins.py:889: [E0606(possibly-used-before-assignment), SolutionMixin.bc] Possibly using variable 'bc' before assignment
+weac/mixins.py:973: [R0917(too-many-positional-arguments), SolutionMixin.calc_segments] Too many positional arguments (11/5)
+weac/mixins.py:1083: [R0912(too-many-branches), SolutionMixin.assemble_and_solve] Too many branches (19/12)
+weac/mixins.py:1083: [R0915(too-many-statements), SolutionMixin.assemble_and_solve] Too many statements (61/50)
+weac/mixins.py:1260: [R0917(too-many-positional-arguments), AnalysisMixin.rasterize_solution] Too many positional arguments (6/5)
+weac/mixins.py:1345: [R0917(too-many-positional-arguments), AnalysisMixin.ginc] Too many positional arguments (7/5)
+weac/mixins.py:1401: [R0917(too-many-positional-arguments), AnalysisMixin.gdif] Too many positional arguments (6/5)
+weac/mixins.py:1653: [R0917(too-many-positional-arguments), AnalysisMixin.principal_stress_slab] Too many positional arguments (7/5)
+weac/mixins.py:1715: [R0917(too-many-positional-arguments), AnalysisMixin.principal_stress_weaklayer] Too many positional arguments (6/5)
+weac/mixins.py:1825: [E0606(possibly-used-before-assignment), OutputMixin.external_potential] Possibly using variable 'ub' before assignment
+************* Module weac.plot
+weac/plot.py:203: [R0917(too-many-positional-arguments), deformed] Too many positional arguments (15/5)
+weac/plot.py:393: [E1101(no-member), deformed] Module 'matplotlib.cm' has no 'RdBu_r' member
+weac/plot.py:445: [R0917(too-many-positional-arguments), plot_data] Too many positional arguments (11/5)
+weac/plot.py:660: [R1711(useless-return), save_plot] Useless return at end of function or method
+************* Module weac.tools
+weac/tools.py:29: [R1705(no-else-return), isnotebook] Unnecessary "elif" after "return", remove the leading "el" from "elif"
+weac/tools.py:261: [R0913(too-many-arguments), touchdown_distance] Too many arguments (6/5)
+weac/tools.py:261: [R0917(too-many-positional-arguments), touchdown_distance] Too many positional arguments (6/5)
+************* Module weac.eigensystem
+weac/eigensystem.py:187: [R0917(too-many-positional-arguments), Eigensystem.set_beam_properties] Too many positional arguments (6/5)
+weac/eigensystem.py:627: [R0917(too-many-positional-arguments), Eigensystem.z] Too many positional arguments (6/5)
+************* Module tests.test_layered
+tests/test_layered.py:104: [C0103(invalid-name), TestLayered.test_assemble_and_solve] Variable name "C" doesn't conform to snake_case naming style
+tests/test_layered.py:111: [C0103(invalid-name), TestLayered.test_assemble_and_solve] Variable name "C_slope" doesn't conform to snake_case naming style
+tests/test_layered.py:126: [C0103(invalid-name), TestLayered.test_rasterize_solution] Variable name "C" doesn't conform to snake_case naming style
+tests/test_layered.py:153: [C0103(invalid-name), TestLayered.test_gdif] Variable name "C" doesn't conform to snake_case naming style
+tests/test_layered.py:156: [C0103(invalid-name), TestLayered.test_gdif] Variable name "G" doesn't conform to snake_case naming style
+tests/test_layered.py:176: [C0103(invalid-name), TestLayered.test_ginc] Variable name "C0" doesn't conform to snake_case naming style
+tests/test_layered.py:177: [C0103(invalid-name), TestLayered.test_ginc] Variable name "C1" doesn't conform to snake_case naming style
+tests/test_layered.py:180: [C0103(invalid-name), TestLayered.test_ginc] Variable name "G" doesn't conform to snake_case naming style
+************* Module tests.test_plot
+tests/test_plot.py:31: [C0103(invalid-name), TestPlot.setUp] Attribute name "C" doesn't conform to snake_case naming style
+************* Module tests.test_mixins
+tests/test_mixins.py:43: [C0301(line-too-long), ] Line too long (103/100)
+tests/test_mixins.py:23: [C0103(invalid-name), TestClass.__init__] Attribute name "Z" doesn't conform to snake_case naming style
+tests/test_mixins.py:13: [R0902(too-many-instance-attributes), TestClass] Too many instance attributes (17/7)
+************* Module tests.test_tools
+tests/test_tools.py:1: [R0401(cyclic-import), ] Cyclic import (weac -> weac.inverse -> weac.eigensystem -> weac.tools)
+tests/test_tools.py:1: [R0401(cyclic-import), ] Cyclic import (weac -> weac.inverse -> weac.mixins -> weac.tools)
+tests/test_tools.py:1: [R0401(cyclic-import), ] Cyclic import (weac -> weac.layered -> weac.eigensystem -> weac.tools)
+tests/test_tools.py:1: [R0401(cyclic-import), ] Cyclic import (weac -> weac.plot -> weac.tools)
+
+-----------------------------------
+Your code has been rated at 9.45/10
+
