@@ -231,7 +231,11 @@ class FieldQuantitiesMixin:
             Weak-layer shear stress tau (in specified unit).
         """
         convert = {"kPa": 1e3, "MPa": 1}
-        return -convert[unit] * self.kt * (self.dw_dx(Z) * self.t / 2 - self.u(Z, z0=self.h / 2))
+        return (
+            -convert[unit]
+            * self.kt
+            * (self.dw_dx(Z) * self.t / 2 - self.u(Z, z0=self.h / 2))
+        )
 
     def eps(self, Z):
         """
@@ -691,7 +695,9 @@ class SlabContactMixin:
             c5 = 72 * bs * (bs * qn * (ss**2 + kRl * kNl) - ss**2 * kRl * kNl * tc)
             c6 = 144 * bs * ss * (bs * kRl * qn - bs * ss * kNl * tc)
             c7 = -144 * bs**2 * ss * kRl * kNl * tc
-            return c1 * x**6 + c2 * x**5 + c3 * x**4 + c4 * x**3 + c5 * x**2 + c6 * x + c7
+            return (
+                c1 * x**6 + c2 * x**5 + c3 * x**4 + c4 * x**3 + c5 * x**2 + c6 * x + c7
+            )
 
         # Find root
         a2 = brentq(polynomial, L / 1000, 999 / 1000 * L)
@@ -736,7 +742,12 @@ class SlabContactMixin:
             c1 = ss**2 * kRl * kNl * qn
             c2 = 6 * ss * kNl * qn * (bs * ss + kRl * kRr)
             c3 = 30 * bs * ss * kNl * qn * (kRl + kRr)
-            c4 = 24 * bs * qn * (2 * ss**2 * kRl + 3 * bs * ss * kNl + 3 * kRl * kRr * kNl)
+            c4 = (
+                24
+                * bs
+                * qn
+                * (2 * ss**2 * kRl + 3 * bs * ss * kNl + 3 * kRl * kRr * kNl)
+            )
             c5 = (
                 72
                 * bs
@@ -745,9 +756,16 @@ class SlabContactMixin:
                     + ss * kRl * (2 * kRr * qn - ss * kNl * tc)
                 )
             )
-            c6 = 144 * bs * ss * (bs * qn * (kRl + kRr) - kNl * tc * (bs * ss + kRl * kRr))
+            c6 = (
+                144
+                * bs
+                * ss
+                * (bs * qn * (kRl + kRr) - kNl * tc * (bs * ss + kRl * kRr))
+            )
             c7 = -144 * bs**2 * ss * kNl * tc * (kRl + kRr)
-            return c1 * x**6 + c2 * x**5 + c3 * x**4 + c4 * x**3 + c5 * x**2 + c6 * x + c7
+            return (
+                c1 * x**6 + c2 * x**5 + c3 * x**4 + c4 * x**3 + c5 * x**2 + c6 * x + c7
+            )
 
         # Find root
         lC = brentq(polynomial, a / 1000, 999 / 1000 * a)
@@ -864,7 +882,9 @@ class SolutionMixin:
         elif self.system in ["rot", "trans"]:
             bc = np.array([self.N(z), self.M(z), self.V(z)])
         else:
-            raise ValueError("Boundary conditions not defined for" f"system of type {self.system}.")
+            raise ValueError(
+                "Boundary conditions not defined for" f"system of type {self.system}."
+            )
 
         return bc
 
@@ -1100,7 +1120,8 @@ class SolutionMixin:
         # Mismatch of number of segements and transisions
         if len(li) != len(ki) or len(li) - 1 != len(mi):
             raise ValueError(
-                "Make sure len(li)=N, len(ki)=N, and " "len(mi)=N-1 for a system of N segments."
+                "Make sure len(li)=N, len(ki)=N, and "
+                "len(mi)=N-1 for a system of N segments."
             )
 
         if self.system not in ["pst-", "-pst", "vpst-", "-vpst", "rot", "trans"]:
@@ -1150,7 +1171,9 @@ class SolutionMixin:
             # Length, foundation and position of segment i
             l, k, pos = li[i], ki[i], pi[i]
             # Transmission conditions at left and right segment ends
-            zhi = self.eqs(zl=self.zh(x=0, l=l, bed=k), zr=self.zh(x=l, l=l, bed=k), k=k, pos=pos)
+            zhi = self.eqs(
+                zl=self.zh(x=0, l=l, bed=k), zr=self.zh(x=l, l=l, bed=k), k=k, pos=pos
+            )
             zpi = self.eqs(
                 zl=self.zp(x=0, phi=phi, bed=k),
                 zr=self.zp(x=l, phi=phi, bed=k),
@@ -1622,7 +1645,9 @@ class AnalysisMixin:
         # Return shear stress txz in specified unit
         return convert[unit] * Szz
 
-    def principal_stress_slab(self, Z, phi, dz=2, unit="kPa", val="max", normalize=False):
+    def principal_stress_slab(
+        self, Z, phi, dz=2, unit="kPa", val="max", normalize=False
+    ):
         """
         Compute maxium or minimum principal stress in slab layers.
 
@@ -1682,7 +1707,9 @@ class AnalysisMixin:
         # Return absolute principal stresses
         return Ps
 
-    def principal_stress_weaklayer(self, Z, sc=2.6, unit="kPa", val="min", normalize=False):
+    def principal_stress_weaklayer(
+        self, Z, sc=2.6, unit="kPa", val="min", normalize=False
+    ):
         """
         Compute maxium or minimum principal stress in the weak layer.
 
@@ -1840,7 +1867,11 @@ class OutputMixin:
         # energy share from moment, shear force, wl normal and tangential springs
         Pi_int = (
             L / 2 / n / self.A11 * np.sum([Ni**2 for Ni in N])
-            + L / 2 / n / (self.D11 - self.B11**2 / self.A11) * np.sum([Mi**2 for Mi in M])
+            + L
+            / 2
+            / n
+            / (self.D11 - self.B11**2 / self.A11)
+            * np.sum([Mi**2 for Mi in M])
             + L / 2 / n / self.kA55 * np.sum([Vi**2 for Vi in V])
             + L * self.kn / 2 / nweak * np.sum([wi**2 for wi in wweak])
             + L * self.kt / 2 / nweak * np.sum([ui**2 for ui in uweak])

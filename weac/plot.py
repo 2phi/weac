@@ -3,8 +3,8 @@
 # pylint: disable=too-many-arguments,too-many-statements
 
 # Standard library imports
-import os
 import colorsys
+import os
 
 # Third party imports
 import matplotlib.colors as mc
@@ -572,9 +572,7 @@ def section_forces(instance, x, z, i="", **segments):
         [x / 10, instance.M(z), r"$M$"],
         [x / 10, instance.V(z), r"$V$"],
     ]
-    plot_data(
-        ax1label=r"Section forces", ax1data=data, name="forc" + str(i), **segments
-    )
+    plot_data(ax1label=r"Section forces", ax1data=data, name="forc" + str(i), **segments)
 
 
 def stresses(instance, x, z, i="", **segments):
@@ -583,9 +581,7 @@ def stresses(instance, x, z, i="", **segments):
         [x / 10, instance.tau(z, unit="kPa"), r"$\tau$"],
         [x / 10, instance.sig(z, unit="kPa"), r"$\sigma$"],
     ]
-    plot_data(
-        ax1label=r"Stress (kPa)", ax1data=data, name="stress" + str(i), **segments
-    )
+    plot_data(ax1label=r"Stress (kPa)", ax1data=data, name="stress" + str(i), **segments)
 
 
 def stress_criteria(x, stress, **segments):
