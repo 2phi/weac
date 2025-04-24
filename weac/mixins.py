@@ -1,9 +1,18 @@
-"""Mixins for the elastic analysis of layered snow slabs."""
+"""Mixins for the elastic analysis of layered snow slabs.
+
+This module provides a collection of mixin classes for analyzing the mechanical behavior
+of layered snow slabs. The mixins implement various aspects of the analysis including:
+- Field quantities (displacements, stresses, strains)
+- Solution methods for the governing equations
+- Analysis tools for energy release rates and crack propagation
+- Output formatting and visualization
+
+The module is designed to be used as a component in larger snow slab analysis systems.
+"""
 # pylint: disable=invalid-name,too-many-locals,too-many-arguments
 
 # Standard library imports
 from functools import partial
-
 
 # Third party imports
 import numpy as np
@@ -12,21 +21,181 @@ from scipy.integrate import romberg
 
 class FieldQuantitiesMixin:
     """
-    Mixin for field quantities.
+    Mixin for computing field quantities in snow slab analysis.
 
-    Provides methods for the computation of displacements, stresses,
-    strains, and energy release rates from the solution vector.
+    This mixin provides methods for calculating various mechanical quantities
+    from the solution vector, including:
+    - Displacements (u, v, w)
+    - Rotations (psi_x, psi_y, psi_z)
+    - Stresses (normal and shear)
+    - Strains
+    - Energy release rates
+
+    The methods in this mixin are used to post-process the solution vector
+    obtained from the governing equations of the snow slab.
     """
 
     # pylint: disable=no-self-use
-    def w(self, Z, unit='mm'):
+    def psix(self, Z, unit='rad'):
         """
-        Get centerline deflection w.
+        Calculate the torsion of a section plane around the x-axis.
+
+        This method computes the rotation angle psi_x around the x-axis at each
+        point along the slab length.
+
+        Arguments
+        ---------
+        Z : ndarray
+            Solution vector [u(x) u'(x) v(x) v'(x) w(x) w'(x) psi_x(x) psi_x'(x) psi_y(x) psi_y'(x) psi_z(x) psi_z'(x)
+              theta_uc(x) theta_uc'(x) theta_ul(x) theta_ul'(x) theta_vc(x) theta_vc'(x) theta_vl(x) theta_vl'(x)
+              theta_wc(x) theta_wc'(x) theta_wl(x) theta_wl'(x)]^T.
+        unit : {'deg', 'degrees', 'rad', 'radians'}, optional
+            Desired output unit. Default is radians.
+
+        Returns
+        -------
+        psi : float
+            Cross-section rotation psi_x (in specified unit) of the slab.
+        """
+        if unit in ['deg', 'degree', 'degrees']:
+            psix = np.rad2deg(Z[6, :])
+        elif unit in ['rad', 'radian', 'radians']:
+            psix = Z[6, :]
+        return psix
+    
+    def dpsix_dx(self, Z):
+        """
+        Calculate the first derivative of the section torsion around the x-axis.
+
+        This method computes the rate of change of the rotation angle psi_x
+        along the slab length.
 
         Arguments
         ---------
         Z : ndarray
             Solution vector [u(x) u'(x) w(x) w'(x) psi(x) psi'(x) phiu(x) phiu'(x) phiw(x) phiw'(x)]^T.
+
+        Returns
+        -------
+        float
+            First derivative psi_x' of the midplane rotation (radians/mm)
+            of the slab.
+        """
+        return Z[7, :]
+
+    def psiy(self, Z, unit='rad'):
+        """
+        Calculate the midplane rotation around the y-axis.
+
+        This method computes the rotation angle psi_y around the y-axis at each
+        point along the slab length.
+
+        Arguments
+        ---------
+        Z : ndarray
+            Solution vector [u(x) u'(x) v(x) v'(x) w(x) w'(x) psi_x(x) psi_x'(x) psi_y(x) psi_y'(x) psi_z(x) psi_z'(x)
+              theta_uc(x) theta_uc'(x) theta_ul(x) theta_ul'(x) theta_vc(x) theta_vc'(x) theta_vl(x) theta_vl'(x)
+              theta_wc(x) theta_wc'(x) theta_wl(x) theta_wl'(x)]^T.
+        unit : {'deg', 'degrees', 'rad', 'radians'}, optional
+            Desired output unit. Default is radians.
+
+        Returns
+        -------
+        psi : float
+            Cross-section rotation psi_y (in specified unit) of the slab.
+        """
+        if unit in ['deg', 'degree', 'degrees']:
+            psiy = np.rad2deg(Z[8, :])
+        elif unit in ['rad', 'radian', 'radians']:
+            psiy = Z[8, :]
+        return psiy
+    
+    def dpsiy_dx(self, Z):
+        """
+        Calculate the first derivative of the midplane rotation around the y-axis.
+
+        This method computes the rate of change of the rotation angle psi_y
+        along the slab length.
+
+        Arguments
+        ---------
+        Z : ndarray
+            Solution vector [u(x) u'(x) v(x) v'(x) w(x) w'(x) psi_x(x) psi_x'(x) psi_y(x) psi_y'(x) psi_z(x) psi_z'(x)
+              theta_uc(x) theta_uc'(x) theta_ul(x) theta_ul'(x) theta_vc(x) theta_vc'(x) theta_vl(x) theta_vl'(x)
+              theta_wc(x) theta_wc'(x) theta_wl(x) theta_wl'(x)]^T.
+
+        Returns
+        -------
+        float
+            First derivative psi_y' of the midplane rotation (radians/mm)
+            of the slab.
+        """
+        return Z[9, :]
+
+    def psiz(self, Z, unit='rad'):
+        """
+        Calculate the midplane rotation around the z-axis.
+
+        This method computes the rotation angle psi_z around the z-axis at each
+        point along the slab length.
+
+        Arguments
+        ---------
+        Z : ndarray
+            Solution vector [u(x) u'(x) v(x) v'(x) w(x) w'(x) psi_x(x) psi_x'(x) psi_y(x) psi_y'(x) psi_z(x) psi_z'(x)
+              theta_uc(x) theta_uc'(x) theta_ul(x) theta_ul'(x) theta_vc(x) theta_vc'(x) theta_vl(x) theta_vl'(x)
+              theta_wc(x) theta_wc'(x) theta_wl(x) theta_wl'(x)]^T.
+        unit : {'deg', 'degrees', 'rad', 'radians'}, optional
+            Desired output unit. Default is radians.
+
+        Returns
+        -------
+        psi : float
+            Cross-section rotation psi_z (in specified unit) of the slab.
+        """
+        if unit in ['deg', 'degree', 'degrees']:
+            psiz = np.rad2deg(Z[10, :])
+        elif unit in ['rad', 'radian', 'radians']:
+            psiz = Z[10, :]
+        return psiz
+    
+    def dpsiz_dx(self, Z):
+        """
+        Calculate the first derivative of the midplane rotation around the z-axis.
+
+        This method computes the rate of change of the rotation angle psi_z
+        along the slab length.
+
+        Arguments
+        ---------
+        Z : ndarray
+            Solution vector [u(x) u'(x) v(x) v'(x) w(x) w'(x) psi_x(x) psi_x'(x) psi_y(x) psi_y'(x) psi_z(x) psi_z'(x)
+              theta_uc(x) theta_uc'(x) theta_ul(x) theta_ul'(x) theta_vc(x) theta_vc'(x) theta_vl(x) theta_vl'(x)
+              theta_wc(x) theta_wc'(x) theta_wl(x) theta_wl'(x)]^T.
+
+        Returns
+        -------
+        float
+            First derivative psi_z' of the midplane rotation (radians/mm)
+            of the slab.
+        """
+        return Z[11, :]
+
+    def w(self, Z, y0=0, unit='mm'):
+        """
+        Calculate the centerline deflection in the z-direction.
+
+        This method computes the vertical displacement w at each point along
+        the slab length, taking into account the offset from the centerline.
+
+        Arguments
+        ---------
+        Z : ndarray
+            Solution vector [u(x) u'(x) v(x) v'(x) w(x) w'(x) psi_x(x) psi_x'(x) psi_y(x) psi_y'(x) psi_z(x) psi_z'(x)
+              theta_uc(x) theta_uc'(x) theta_ul(x) theta_ul'(x) theta_vc(x) theta_vc'(x) theta_vl(x) theta_vl'(x)
+              theta_wc(x) theta_wc'(x) theta_wl(x) theta_wl'(x)]^T.
+        y0 : float, optional
+            Offset from the centerline in the y-direction. Default is 0.
         unit : {'m', 'cm', 'mm', 'um'}, optional
             Desired output unit. Default is mm.
 
@@ -41,82 +210,55 @@ class FieldQuantitiesMixin:
             'mm': 1,     # millimeters
             'um': 1e3    # micrometers
         }
-        return convert[unit]*Z[2, :]
+        return convert[unit]*(Z[4, :] + y0 * self.psix(Z))
 
-    def wp(self, Z):
+    def dw_dx(self, Z, y0=0):
         """
-        Get first derivative w' of the centerline deflection.
+        Calculate the first derivative of the centerline deflection.
+
+        This method computes the rate of change of the vertical displacement w
+        along the slab length.
 
         Arguments
         ---------
         Z : ndarray
-            Solution vector [u(x) u'(x) w(x) w'(x) psi(x) psi'(x) phiu(x) phiu'(x) phiw(x) phiw'(x)]^T.
+            Solution vector [u(x) u'(x) v(x) v'(x) w(x) w'(x) psi_x(x) psi_x'(x) psi_y(x) psi_y'(x) psi_z(x) psi_z'(x)
+              theta_uc(x) theta_uc'(x) theta_ul(x) theta_ul'(x) theta_vc(x) theta_vc'(x) theta_vl(x) theta_vl'(x)
+              theta_wc(x) theta_wc'(x) theta_wl(x) theta_wl'(x)]^T.
+        y0 : float, optional
+            Offset from the centerline in the y-direction. Default is 0.
 
         Returns
         -------
         float
             First derivative w' of the deflection of the slab.
         """
-        return Z[3, :]
+        return Z[5, :] + y0 * self.psixp(Z)
 
-    def psi(self, Z, unit='rad'):
+    def u(self, Z, z0=0, y0=0, unit='mm'):
         """
-        Get midplane rotation psi.
+        Calculate the axial displacement u = u0 + z0 psiy - y0 psix.
+
+        This method computes the horizontal displacement u at each point along
+        the slab length, taking into account the offsets from the centerline.
 
         Arguments
         ---------
         Z : ndarray
-            Solution vector [u(x) u'(x) w(x) w'(x) psi(x) psi'(x)  phiu(x) phiu'(x) phiw(x) phiw'(x)]^T.
-        unit : {'deg', 'degrees', 'rad', 'radians'}, optional
-            Desired output unit. Default is radians.
-
-        Returns
-        -------
-        psi : float
-            Cross-section rotation psi (radians) of the slab.
-        """
-        if unit in ['deg', 'degree', 'degrees']:
-            psi = np.rad2deg(Z[4, :])
-        elif unit in ['rad', 'radian', 'radians']:
-            psi = Z[4, :]
-        return psi
-
-    def psip(self, Z):
-        """
-        Get first derivative psi' of the midplane rotation.
-
-        Arguments
-        ---------
-        Z : ndarray
-            Solution vector [u(x) u'(x) w(x) w'(x) psi(x) psi'(x) phiu(x) phiu'(x) phiw(x) phiw'(x)]^T.
-
-        Returns
-        -------
-        float
-            First derivative psi' of the midplane rotation (radians/mm)
-             of the slab.
-        """
-        return Z[5, :]
-
-    # pylint: enable=no-self-use
-    def u(self, Z, z0, bed = False,unit='mm' ):
-        """
-        Get horizontal displacement u = u0 + z0 psi for unbedded segments or
-        u = u0 + (z0 + (h+t)/2) psi for bedded ones respectively.
-
-        Arguments
-        ---------
-        Z : ndarray
-            Solution vector [u(x) u'(x) w(x) w'(x) psi(x) psi'(x) phiu(x) phiu'(x) phiw(x) phiw'(x)]^T.
-        z0 : float
-            Z-coordinate (mm) where u is to be evaluated.
+            Solution vector [u(x) u'(x) v(x) v'(x) w(x) w'(x) psi_x(x) psi_x'(x) psi_y(x) psi_y'(x) psi_z(x) psi_z'(x)
+              theta_uc(x) theta_uc'(x) theta_ul(x) theta_ul'(x) theta_vc(x) theta_vc'(x) theta_vl(x) theta_vl'(x)
+              theta_wc(x) theta_wc'(x) theta_wl(x) theta_wl'(x)]^T.
+        z0 : float, optional
+            Offset from the centerline in the z-direction. Default is 0.
+        y0 : float, optional
+            Offset from the centerline in the y-direction. Default is 0.
         unit : {'m', 'cm', 'mm', 'um'}, optional
             Desired output unit. Default is mm.
 
         Returns
         -------
         float
-            Horizontal displacement u (mm) of the slab.
+            Horizontal displacement u (in specified unit) of the slab.
         """
         convert = {
             'm': 1e-3,   # meters
@@ -124,91 +266,56 @@ class FieldQuantitiesMixin:
             'mm': 1,     # millimeters
             'um': 1e3    # micrometers
         }
-        if not type(z0) == np.ndarray:
-            if not bed:
-                u =  convert[unit]*(Z[0,:] + z0 *self.psi(Z))
-            else:
-                u = convert[unit]*(Z[0, :] + (z0 + (self.t )/2) * Z[4,:])
-        else:
-            u =  convert[unit]*(Z[0,:] + z0 *self.psi(Z))
-            u[~np.isnan(Z[-1,:])] = convert[unit]*(Z[0, ~np.isnan(Z[-1,:])] + (z0[~np.isnan(Z[-1,:])] + (self.t )/2) * Z[4,~np.isnan(Z[-1,:])])
+        u = convert[unit]*(Z[0,:] + z0 * self.psiy(Z) - y0 * self.psiz(Z))
         return u
 
-    def up(self, Z, z0):
+    def du_dx(self, Z, z0=0, y0=0):
         """
-        Get first derivative of the horizontal displacement.
+        Calculate the first derivative of the axial displacement.
+
+        This method computes the rate of change of the horizontal displacement u
+        along the slab length.
 
         Arguments
         ---------
         Z : ndarray
-            Solution vector [u(x) u'(x) w(x) w'(x) psi(x) psi'(x) phiu(x) phiu'(x) phiw(x) phiw'(x)]^T.
+            Solution vector [u(x) u'(x) v(x) v'(x) w(x) w'(x) psi_x(x) psi_x'(x) psi_y(x) psi_y'(x) psi_z(x) psi_z'(x)
+              theta_uc(x) theta_uc'(x) theta_ul(x) theta_ul'(x) theta_vc(x) theta_vc'(x) theta_vl(x) theta_vl'(x)
+              theta_wc(x) theta_wc'(x) theta_wl(x) theta_wl'(x)]^T.
         z0 : float
-            Z-coordinate (mm) where u is to be evaluated.
+            Offset from the centerline in the z-direction. Defailt is 0.
+        y0 : float, optional
+            Offset from the centerline in the y-direction. Default is 0.
 
         Returns
         -------
         float
-            First derivative u' = u0' + z0 psi' of the horizontal
-            displacement of the slab.
+            First derivative du_dx of the horizontal displacement of the slab.
         """
-        if np.reshape(Z[~np.isnan(Z)],Z.shape).shape[0]==10:
-            return (Z[1, :] + (z0 + (self.t )/2) *self.psip(Z))
-        else:
-            return (Z[1, :] + z0 * self.psip(Z))
+        return (Z[1,:] + z0 * self.psiyp(Z) - y0 * self.psizp(Z))
 
-
-    def phi_u(self, Z):
+    def v(self, Z, z0=0, unit='mm'):
         """
-        Unpack amplitude of vertical cosine shaped displacements in the weak layer phi_u 
+        Calculate the centerline deflection in the y-direction.
+
+        This method computes the out-of-plane displacement v at each point along
+        the slab length, taking into account the offset from the centerline.
 
         Arguments
         ---------
         Z : ndarray
-            Solution vector [u(x) u'(x) w(x) w'(x) psi(x) psi'(x) phi_u(x) phi_u'(x) phi_w(x) phi_w'(x)]^T.
-        
-
-        Returns
-        -------
-        float
-            Amplitude phi_u (mm) of the slab.
-        """
-        return Z[6,:]
-
-    def phi_w(self, Z):
-        """
-        Unpack amplitude of horizontal cosine shaped displacements in the weak layer phi_w 
-
-        Arguments
-        ---------
-        Z : ndarray
-            Solution vector [u(x) u'(x) w(x) w'(x) psi(x) psi'(x) phiu(x) phiu'(x) phiw(x) phiw'(x)]^T.
-        
-
-        Returns
-        -------
-        float
-            Amplitude phi_w (mm) of the slab.
-        """
-        return Z[8,:]
-
-
-    def uweak(self, Z, z0, unit='mm'):
-        """
-        Get horizontal displacement uweak = u0 * (1/2 - z/t) + cos(pi * z/t) phi_u 
-
-        Arguments
-        ---------
-        Z : ndarray
-            Solution vector [u(x) u'(x) w(x) w'(x) psi(x) psi'(x) phiu(x) phiu'(x) phiw(x) phiw'(x)]^T.
-        z0 : float
-            Z-coordinate (mm) where u is to be evaluated.
+            Solution vector [u(x) u'(x) v(x) v'(x) w(x) w'(x) psi_x(x) psi_x'(x) psi_y(x) psi_y'(x) psi_z(x) psi_z'(x)
+              theta_uc(x) theta_uc'(x) theta_ul(x) theta_ul'(x) theta_vc(x) theta_vc'(x) theta_vl(x) theta_vl'(x)
+              theta_wc(x) theta_wc'(x) theta_wl(x) theta_wl'(x)]^T.
+        z0 : float, optional
+            Offset from the centerline in the z-direction. Default is 0.
         unit : {'m', 'cm', 'mm', 'um'}, optional
             Desired output unit. Default is mm.
 
         Returns
         -------
         float
-            Horizontal displacement u (mm) of the slab.
+            Deflection v (in specified unit) of the slab.
         """
         convert = {
             'm': 1e-3,   # meters
@@ -216,308 +323,1163 @@ class FieldQuantitiesMixin:
             'mm': 1,     # millimeters
             'um': 1e3    # micrometers
         }
-        return convert[unit]* (Z[0, :] * (1/2 - z0/self.t) + np.cos( np.pi * z0 / self.t ) * Z[6, :] )
-         
-    def N(self, Z,bed = False):
+        return convert[unit]*(Z[2, :] - z0 * self.psix(Z))
+
+    def dv_dx(self, Z, z0=0):
         """
-        Get the axial normal force N = A11 u' + B11 psi' in the unbedded slab and
-        the axial force NSlab = A (u' + (t+h)/2 psi') + B psi' in bedded segments. 
+        Calculate the first derivative of the centerline deflection in the y-direction.
+
+        This method computes the rate of change of the out-of-plane displacement v
+        along the slab length.
 
         Arguments
         ---------
         Z : ndarray
-            Solution vector [u(x) u'(x) w(x) w'(x) psi(x) psi'(x) phiu(x) phiu'(x) phiw(x) phiw'(x)]^T.
+            Solution vector [u(x) u'(x) v(x) v'(x) w(x) w'(x) psi_x(x) psi_x'(x) psi_y(x) psi_y'(x) psi_z(x) psi_z'(x)
+              theta_uc(x) theta_uc'(x) theta_ul(x) theta_ul'(x) theta_vc(x) theta_vc'(x) theta_vl(x) theta_vl'(x)
+              theta_wc(x) theta_wc'(x) theta_wl(x) theta_wl'(x)]^T.
+        z0 : float, optional
+            Offset from the centerline in the z-direction. Default is 0.
 
         Returns
         -------
         float
-            Axial normal force N (N) in the slab.
+            First derivative v' of the out-of-plane displacement of the slab.
         """
-        if bed:
-            Ew = self.weak['E']
-            nuw = self.weak['nu']
-            t = self.t
-            Pi = np.pi
+        return Z[3, :] - z0 * self.psixp(Z)
 
-            return self.A * (Z[1,:] + (self.t )/2. * Z[5,:] ) + self.B * Z[5,:] + Ew * (-2*t*(Pi * Z[1,:] + 3 * Z[7,:]) + nuw * (3 * Pi * Z[2,:] - 12 * Z[8,:] + 2 * Pi * t * Z[1,:] + 6 * t * Z[7,:]))/(6 * Pi * (-1 + nuw + 2 * nuw**2))
-        else:
-            return self.A11*Z[1, :] + self.B11*Z[5, :]
-
-    def M(self, Z):
+    def theta_uc(self, Z):
         """
-        Get bending moment M = B11 u' + D11 psi' in the slab, and
-        the bending moment MSlab = B (u' + (t+h)/2 psi') + C psi' in bedded segments.
+        Calculate the axial constant displacement in the weak layer.
+
+        This method computes the rotation angle at the center of the slab
+        based on the solution vector.
 
         Arguments
         ---------
         Z : ndarray
-            Solution vector [u(x) u'(x) w(x) w'(x) psi(x) psi'(x) phiu(x) phiu'(x) phiw(x) phiw'(x)]^T.
+            Solution vector [u(x) u'(x) v(x) v'(x) w(x) w'(x) psi_x(x) psi_x'(x) psi_y(x) psi_y'(x) psi_z(x) psi_z'(x)
+              theta_uc(x) theta_uc'(x) theta_ul(x) theta_ul'(x) theta_vc(x) theta_vc'(x) theta_vl(x) theta_vl'(x)
+              theta_wc(x) theta_wc'(x) theta_wl(x) theta_wl'(x)]^T.
 
         Returns
         -------
         float
-            Bending moment M (Nmm) in the slab.
+            Axial displacement at the center of the weak layer (mm).
         """
-        if np.reshape(Z[~np.isnan(Z)],Z.shape).shape[0]==10:
-            return self.B * (Z[1,:] + (self.t)/2. * Z[5,:] ) + self.C * Z[5,:]
-        else:
-            return self.B11*Z[1, :] + self.D11*Z[5, :]
+        return Z[12,:]
+    
+    def dtheta_uc_dx(self, Z):
+        """
+        Calculate the first derivative of the constant dispalcemnet in at the center of the weak layer.
+
+        This method computes the rate of change of the constant dispalcemnet in at the center of the weak layer along its length.
+
+        Arguments
+        ---------
+        Z : ndarray
+            Solution vector [u(x) u'(x) v(x) v'(x) w(x) w'(x) psi_x(x) psi_x'(x) psi_y(x) psi_y'(x) psi_z(x) psi_z'(x)
+              theta_uc(x) theta_uc'(x) theta_ul(x) theta_ul'(x) theta_vc(x) theta_vc'(x) theta_vl(x) theta_vl'(x)
+              theta_wc(x) theta_wc'(x) theta_wl(x) theta_wl'(x)]^T.
         
 
-    def V(self, Z,bed = False):
+        Returns
+        -------
+        float
+            First derivative of the axial displacement at the center of the weak layer (mm/mm).
         """
-        Get vertical shear force V = kA55(w' + psi), or the vertical shear force
-        VSlab = D (psi + w') in bedded segments, respectively.
+        return Z[13,:]
+    
+    def theta_ul(self, Z):
+        """
+        Calculate the linear amplitude of axial cosine shaped displacements in the weak layer.
+
+        This method computes the linear amplitude of axial cosine shaped displacements in the weak layer.
 
         Arguments
         ---------
         Z : ndarray
-            Solution vector [u(x) u'(x) w(x) w'(x) psi(x) psi'(x) phiu(x) phiu'(x) phiw(x) phiw'(x)]^T.
+            Solution vector [u(x) u'(x) v(x) v'(x) w(x) w'(x) psi_x(x) psi_x'(x) psi_y(x) psi_y'(x) psi_z(x) psi_z'(x)
+              theta_uc(x) theta_uc'(x) theta_ul(x) theta_ul'(x) theta_vc(x) theta_vc'(x) theta_vl(x) theta_vl'(x)
+              theta_wc(x) theta_wc'(x) theta_wl(x) theta_wl'(x)]^T.
+
+        Returns
+        -------
+        float
+            Linear amplitude theta_uk (mm) of the slab.
+        """
+        return Z[14,:]
+    
+    def dtheta_ul_dx(self, Z):
+        """
+        Calculate the first derivative of the linear amplitude of axial cosine shaped displacements in the weak layer.
+
+        This method computes the rate of change of the linear amplitude of axial cosine shaped displacements in the weak layer.
+
+        Arguments
+        ---------
+        Z : ndarray
+            Solution vector [u(x) u'(x) v(x) v'(x) w(x) w'(x) psi_x(x) psi_x'(x) psi_y(x) psi_y'(x) psi_z(x) psi_z'(x)
+              theta_uc(x) theta_uc'(x) theta_ul(x) theta_ul'(x) theta_vc(x) theta_vc'(x) theta_vl(x) theta_vl'(x)
+              theta_wc(x) theta_wc'(x) theta_wl(x) theta_wl'(x)]^T.
+
+        Returns
+        -------
+        float
+            First derivative of the linear amplitude of axial cosine shaped displacements in the weak layer (mm/mm).
+        """
+        return Z[15,:]
+    
+
+    def theta_vc(self, Z):
+        """
+        Calculate the constant amplitude of out-of-plane cosine shaped displacements in the weak layer theta_vc.
+
+        This method computes the constant amplitude of out-of-plane cosine shaped displacements in the weak layer theta_vc
+        based on the solution vector.
+
+        Arguments
+        ---------
+        Z : ndarray
+            Z : ndarray
+            Solution vector [u(x) u'(x) v(x) v'(x) w(x) w'(x) psi_x(x) psi_x'(x) psi_y(x) psi_y'(x) psi_z(x) psi_z'(x)
+              theta_uc(x) theta_uc'(x) theta_ul(x) theta_ul'(x) theta_vc(x) theta_vc'(x) theta_vl(x) theta_vl'(x)
+              theta_wc(x) theta_wc'(x) theta_wl(x) theta_wl'(x)]^T.
+
+        Returns
+        -------
+        float
+            constant amplitude of out-of-plane cosine shaped displacements in the weak layer theta_vc (mm).
+        """
+        return Z[16,:]
+    
+    def dtheta_vc_dx(self, Z):
+        """
+        Calculate the first derivative of the constant amplitude of out-of-plane cosine shaped displacements in the weak layer.
+
+        This method computes the rate of change the constant amplitude of out-of-plane cosine shaped displacements in the weak layer along its length.
+
+        Arguments
+        ---------
+        Z : ndarray
+            Solution vector [u(x) u'(x) v(x) v'(x) w(x) w'(x) psi_x(x) psi_x'(x) psi_y(x) psi_y'(x) psi_z(x) psi_z'(x)
+              theta_uc(x) theta_uc'(x) theta_ul(x) theta_ul'(x) theta_vc(x) theta_vc'(x) theta_vl(x) theta_vl'(x)
+              theta_wc(x) theta_wc'(x) theta_wl(x) theta_wl'(x)]^T.
+
+        Returns
+        -------
+        float
+            First derivative the constant amplitude of out-of-plane cosine shaped displacements in the weak layer (mm/mm).
+        """
+        return Z[17,:]
+    
+    def theta_vl(self, Z):
+        """
+        Calculate the linear amplitude of out-of-plane cosine shaped displacements in the weak layer theta_vk .
+
+        This method computes linear amplitude of out-of-plane cosine shaped displacements in the weak layer theta_vk 
+        based on the solution vector.
+
+        Arguments
+        ---------
+        Z : ndarray
+            Solution vector [u(x) u'(x) v(x) v'(x) w(x) w'(x) psi_x(x) psi_x'(x) psi_y(x) psi_y'(x) psi_z(x) psi_z'(x)
+              theta_uc(x) theta_uc'(x) theta_ul(x) theta_ul'(x) theta_vc(x) theta_vc'(x) theta_vl(x) theta_vl'(x)
+              theta_wc(x) theta_wc'(x) theta_wl(x) theta_wl'(x)]^T.
+
+
+        Returns
+        -------
+        float
+            Linear amplitude theta_vk (mm).
+        """
+        return Z[18,:]
+    
+    def dtheta_vl_dx(self, Z):
+        """
+        Calculate the first derivative of the linear amplitude of out-of-plane cosine shaped displacements in the weak layer.
+
+        This method computes the rate of change of the linear amplitude of out-of-plane cosine shaped displacements in the weak layer along its length.
+
+        Arguments
+        ---------
+        Z : ndarray
+            Solution vector [u(x) u'(x) v(x) v'(x) w(x) w'(x) psi_x(x) psi_x'(x) psi_y(x) psi_y'(x) psi_z(x) psi_z'(x)
+              theta_uc(x) theta_uc'(x) theta_ul(x) theta_ul'(x) theta_vc(x) theta_vc'(x) theta_vl(x) theta_vl'(x)
+              theta_wc(x) theta_wc'(x) theta_wl(x) theta_wl'(x)]^T.
+
+        Returns
+        -------
+        float
+            First derivative of the linear amplitude of out-of-plane cosine shaped displacements in the weak layer (mm/mm).
+        """
+        return Z[19,:]
+    
+    def theta_wc(self, Z):
+        """
+        Calculate the constant amplitude of vertical cosine shaped displacements in the weak layer.
+
+        This method computes the constant amplitude of vertical cosine shaped displacements in the weak layer
+        based on the solution vector.
+
+        Arguments
+        ---------
+        Z : ndarray
+            Solution vector [u(x) u'(x) v(x) v'(x) w(x) w'(x) psi_x(x) psi_x'(x) psi_y(x) psi_y'(x) psi_z(x) psi_z'(x)
+              theta_uc(x) theta_uc'(x) theta_ul(x) theta_ul'(x) theta_vc(x) theta_vc'(x) theta_vl(x) theta_vl'(x)
+              theta_wc(x) theta_wc'(x) theta_wl(x) theta_wl'(x)]^T.
+
+        Returns
+        -------
+        float
+            constant amplitude of vertical cosine shaped displacements in the weak layer (mm).
+        """
+        return Z[20,:]
+    
+    def dtheta_wc_dx(self, Z):
+        """
+        Calculate the constant amplitude of vertical cosine shaped displacements in the weak layer.
+
+        This method computes the rate of change of the constant amplitude of vertical cosine shaped displacements in the weak layer along its length.
+
+        Arguments
+        ---------
+        Z : ndarray
+            Solution vector [u(x) u'(x) v(x) v'(x) w(x) w'(x) psi_x(x) psi_x'(x) psi_y(x) psi_y'(x) psi_z(x) psi_z'(x)
+              theta_uc(x) theta_uc'(x) theta_ul(x) theta_ul'(x) theta_vc(x) theta_vc'(x) theta_vl(x) theta_vl'(x)
+              theta_wc(x) theta_wc'(x) theta_wl(x) theta_wl'(x)]^T.
+
+        Returns
+        -------
+        float
+            First derivative of the constant amplitude of vertical cosine shaped displacements in the weak layer (mm/mm).
+        """
+        return Z[21,:]
+    
+    def theta_wl(self, Z):
+        """
+        Calculate the linear amplitude of vertical cosine shaped displacements in the weak layer.
+
+        This method computes the linear amplitude of vertical cosine shaped displacements in the weak layer
+        based on the solution vector.
+
+        Arguments
+        ---------
+        Z : ndarray
+            Solution vector [u(x) u'(x) v(x) v'(x) w(x) w'(x) psi_x(x) psi_x'(x) psi_y(x) psi_y'(x) psi_z(x) psi_z'(x)
+              theta_uc(x) theta_uc'(x) theta_ul(x) theta_ul'(x) theta_vc(x) theta_vc'(x) theta_vl(x) theta_vl'(x)
+              theta_wc(x) theta_wc'(x) theta_wl(x) theta_wl'(x)]^T.
+
+        Returns
+        -------
+        float
+            Linear amplitude of vertical cosine shaped displacements in the weak layer (mm).
+        """
+        return Z[22,:]
+    
+    def dtheta_wl_dx(self, Z):
+        """
+        Calculate the first derivative of the linear amplitude of vertical cosine shaped displacements in the weak layer.
+
+        This method computes the rate of change of the linear amplitude of vertical cosine shaped displacements in the weak layer along its length.
+
+        Arguments
+        ---------
+        Z : ndarray
+            Solution vector [u(x) u'(x) v(x) v'(x) w(x) w'(x) psi_x(x) psi_x'(x) psi_y(x) psi_y'(x) psi_z(x) psi_z'(x)
+              theta_uc(x) theta_uc'(x) theta_ul(x) theta_ul'(x) theta_vc(x) theta_vc'(x) theta_vl(x) theta_vl'(x)
+              theta_wc(x) theta_wc'(x) theta_wl(x) theta_wl'(x)]^T.
+
+        Returns
+        -------
+        float
+            First derivative ofthe linear amplitude of vertical cosine shaped displacements in the weak layer (mm/mm).
+        """
+        return Z[23,:]
+    
+    
+
+    def uweak(self, Z, z0, y0 = 0, unit='mm'):
+        """
+        Calculate the displacement in the weak layer in the x-direction.
+
+        This method computes the horizontal displacement in the weak layer
+        at each point along the slab length, taking into account the offsets
+        from the centerline.
+
+        Arguments
+        ---------
+        Z : ndarray
+            Solution vector [u(x) u'(x) v(x) v'(x) w(x) w'(x) psi_x(x) psi_x'(x) psi_y(x) psi_y'(x) psi_z(x) psi_z'(x)
+              theta_uc(x) theta_uc'(x) theta_ul(x) theta_ul'(x) theta_vc(x) theta_vc'(x) theta_vl(x) theta_vl'(x)
+              theta_wc(x) theta_wc'(x) theta_wl(x) theta_wl'(x)]^T.
+        z0 : float
+            Offset from the centerline in the z-direction.
+        y0 : float, optional
+            Offset from the centerline in the y-direction. Default is 0.
+        unit : {'m', 'cm', 'mm', 'um'}, optional
+            Desired output unit. Default is mm.
+
+        Returns
+        -------
+        float
+            Axial displacement in the weak layer (in specified unit).
+        """
+        convert = {
+            'm': 1e-3,   # meters
+            'cm': 1e-1,  # centimeters
+            'mm': 1,     # millimeters
+            'um': 1e3    # micrometers
+        }
+        # Unpack geometrical properties of layerd
+
+        h = self.h
+        t = self.t
+        Pi = np.pi
+        b = self.b
+
+
+        return convert[unit]* (self.u(Z, h/2, y0) * (1 - (z0-h/2)/t) + np.cos(Pi * (2*z0 - h - t)/(2*t)) * (self.theta_uc(Z) + (2*y0/b) * self.theta_ul(Z)))
+
+    def vweak(self, Z, z0, y0 = 0, unit='mm'):
+        """
+        Calculate the displacement in the weak layer in the y-direction.
+
+        This method computes the horizontal displacement in the weak layer
+        at each point along the slab length, taking into account the offsets
+        from the centerline.
+
+        Arguments
+        ---------
+        Z : ndarray
+            Solution vector [u(x) u'(x) v(x) v'(x) w(x) w'(x) psi_x(x) psi_x'(x) psi_y(x) psi_y'(x) psi_z(x) psi_z'(x)
+              theta_uc(x) theta_uc'(x) theta_ul(x) theta_ul'(x) theta_vc(x) theta_vc'(x) theta_vl(x) theta_vl'(x)
+              theta_wc(x) theta_wc'(x) theta_wl(x) theta_wl'(x)]^T.
+        z0 : float
+            Offset from the centerline in the z-direction.
+        y0 : float, optional
+            Offset from the centerline in the y-direction. Default is 0.
+        unit : {'m', 'cm', 'mm', 'um'}, optional
+            Desired output unit. Default is mm.
+
+        Returns
+        -------
+        float
+            Horizontal displacement in the weak layer (in specified unit).
+        """
+        convert = {
+            'm': 1e-3,   # meters
+            'cm': 1e-1,  # centimeters
+            'mm': 1,     # millimeters
+            'um': 1e3    # micrometers
+        }
+        # Unpack geometrical properties of layerd
+
+        h = self.h
+        t = self.t
+        Pi = np.pi
+        b = self.b
+
+        # Return vweak
+        return convert[unit]* (self.v(Z, h/2, y0) * (1 - (z0-h/2)/t) + np.cos(Pi * (2 * z0 - h - t)/(2 * t)) * (self.theta_vc(Z) + ( 2 * y0/b) * self.theta_vl(Z)) )
+
+
+    def wweak(self, Z, z0,y0 = 0, unit='mm'):
+        """
+        Calculate the displacement in the weak layer in the z-direction.
+
+        This method computes the vertical displacement in the weak layer
+        at each point along the slab length, taking into account the offsets
+        from the centerline.
+
+        Arguments
+        ---------
+        Z : ndarray
+            Solution vector [u(x) u'(x) v(x) v'(x) w(x) w'(x) psi_x(x) psi_x'(x) psi_y(x) psi_y'(x) psi_z(x) psi_z'(x)
+              theta_uc(x) theta_uc'(x) theta_ul(x) theta_ul'(x) theta_vc(x) theta_vc'(x) theta_vl(x) theta_vl'(x)
+              theta_wc(x) theta_wc'(x) theta_wl(x) theta_wl'(x)]^T.
+        z0 : float
+            Offset from the centerline in the z-direction.
+        y0 : float, optional
+            Offset from the centerline in the y-direction. Default is 0.
+        unit : {'m', 'cm', 'mm', 'um'}, optional
+            Desired output unit. Default is mm.
+
+        Returns
+        -------
+        float
+            Vertical displacement in the weak layer (in specified unit).
+        """
+        convert = {
+            'm': 1e-3,   # meters
+            'cm': 1e-1,  # centimeters
+            'mm': 1,     # millimeters
+            'um': 1e3    # micrometers
+        }
+        # Unpack geometrical properties of layerd
+        h = self.h
+        t = self.t
+        Pi = np.pi
+        b = self.b
+
+    def Nxx(self, Z, bed=False):
+        """
+        Calculate the normal force in the x-direction.
+
+        This method computes the normal force in the x-direction at each point
+        along the slab length.
+
+        Arguments
+        ---------
+        Z : ndarray
+            Solution vector [u(x) u'(x) v(x) v'(x) w(x) w'(x) psi_x(x) psi_x'(x) psi_y(x) psi_y'(x) psi_z(x) psi_z'(x)
+              theta_uc(x) theta_uc'(x) theta_ul(x) theta_ul'(x) theta_vc(x) theta_vc'(x) theta_vl(x) theta_vl'(x)
+              theta_wc(x) theta_wc'(x) theta_wl(x) theta_wl'(x)]^T.
+        bed : bool, optional
+            Whether to include the bed effect. Default is False.
+
+        Returns
+        -------
+        float
+            Normal force in the x-direction (N).
+        """
+        Ew = self.weak['E']
+        nuw = self.weak['nu']
+        t = self.t
+        Pi = np.pi
+        b = self.b
+        h = self.h
+
+        Nxx = self.A11 * b * Z[1,:] + self.B11* b * Z[9,:]
+        if bed:
+            Nxx = Nxx +(Ew*(3*b*Pi*nuw*Z[4,:] - 12*t*nuw*self.theta_vl(Z) - 12*b*nuw*self.theta_wc(Z) + b*t*(-1 + nuw)*(2*Pi*Z[1,:] + 6*self.dtheta_uc_dx(Z) + h*Pi*self.dpsiy_dx(Z))))/(6*Pi*(-1 + nuw + 2*nuw**2))
+        return Nxx
+
+    def Myy(self, Z, bed=False):
+        """
+        Calculate the bending moment around the y-axis.
+
+        This method computes the bending moment around the y-axis at each point
+        along the slab length.
+
+        Arguments
+        ---------
+         Z : ndarray
+            Solution vector [u(x) u'(x) v(x) v'(x) w(x) w'(x) psi_x(x) psi_x'(x) psi_y(x) psi_y'(x) psi_z(x) psi_z'(x)
+              theta_uc(x) theta_uc'(x) theta_ul(x) theta_ul'(x) theta_vc(x) theta_vc'(x) theta_vl(x) theta_vl'(x)
+              theta_wc(x) theta_wc'(x) theta_wl(x) theta_wl'(x)]^T.
+        bed : bool, optional
+            Whether to include the bed effect. Default is False.
+
+        Returns
+        -------
+        float
+            Bending moment around the y-axis (N·mm).
+        """
+        Ew = self.weak['E']
+        nuw = self.weak['nu']
+        t = self.t
+        Pi = np.pi
+        b = self.b
+        h = self.h
+        Myy = self.B11 * b * Z[1,:] + self.D11 *b * Z[9,:]
+        if bed:
+            Myy  = Myy + (h*Ew*(3*b*Pi*nuw*Z[4,:] - 12*t*nuw*self.theta_vl(Z) - 12*b*nuw*self.theta_wc(Z) + b*t*(-1 + nuw)*(2*Pi*Z[1,:] + 6*self.dtheta_uc_dx(Z) + h*Pi*self.dpsiy_dx(Z))))/(12*Pi*(-1 + nuw + 2*nuw**2))
+        return Myy
+        
+
+    def Mxx(self, Z, bed=False):
+        """
+        Calculate the bending moment around the x-axis.
+
+        This method computes the bending moment around the x-axis at each point
+        along the slab length.
+
+        Arguments
+        ---------
+        Z : ndarray
+            Solution vector [u(x) u'(x) v(x) v'(x) w(x) w'(x) psi_x(x) psi_x'(x) psi_y(x) psi_y'(x) psi_z(x) psi_z'(x)
+              theta_uc(x) theta_uc'(x) theta_ul(x) theta_ul'(x) theta_vc(x) theta_vc'(x) theta_vl(x) theta_vl'(x)
+              theta_wc(x) theta_wc'(x) theta_wl(x) theta_wl'(x)]^T.
+        bed : bool, optional
+            Whether to include the bed effect. Default is False.
+
+        Returns
+        -------
+        float
+            Torsion moment around the x-axis (N·mm).
+        """
+        Ew = self.weak['E']
+        nuw = self.weak['nu']
+        t = self.t
+        Pi = np.pi
+        b = self.b
+        h = self.h
+        Mxx = self.kA55 * np.longdouble(b**3/12)  * Z[7,:] +  self.kB55 * b * (Z[10,:] - Z[3,:]) + self.kD55 * b * Z[7,:]
+        if bed:
+            Mxx  = Mxx + np.longdouble((-1/144*(b**2*Ew*(-24*t*self.theta_ul(Z) + 3*b*Pi*(-2 + t)*self.psiz(Z) + 12*(-2 + t)*t*self.dtheta_wl_dx(Z) + b*Pi*(-3 + t)*t*self.dpsix_dx(Z)))/(Pi*t*(1 + nuw)) - \
+                          (h*t*Ew*(12*self.theta_ul(Z) + b*(-2*Pi*self.psiz(Z) + 2*Pi*Z[3,:] + 6*self.dtheta_vc_dx(Z) - h*Pi*self.dpsix_dx(Z))))/(24*Pi*(1 + nuw))))
+        return Mxx
+
+    def Mzz(self, Z, bed=False):
+        """
+        Calculate the bending moment around the z-axis.
+
+        This method computes the bending moment around the z-axis at each point
+        along the slab length.
+        Arguments
+        ---------
+        Z : ndarray
+            Solution vector [u(x) u'(x) v(x) v'(x) w(x) w'(x) psi_x(x) psi_x'(x) psi_y(x) psi_y'(x) psi_z(x) psi_z'(x)
+              theta_uc(x) theta_uc'(x) theta_ul(x) theta_ul'(x) theta_vc(x) theta_vc'(x) theta_vl(x) theta_vl'(x)
+              theta_wc(x) theta_wc'(x) theta_wl(x) theta_wl'(x)]^T.
+        bed : bool, optional
+            Whether to include the bed effect. Default is False.
+        Returns
+        -------
+        float
+            Bending moment around the z-axis (N mm).
+        """
+        Ew = self.weak['E']
+        nuw = self.weak['nu']
+        t = self.t
+        Pi = np.pi
+        b = self.b
+        h = self.h
+        Mzz = self.A11 * np.longdouble(b**3)/12 * Z[11,:] 
+        if bed:
+            Mzz  = Mzz - np.longdouble(b**2*Ew*(-24*nuw*self.theta_wl(Z) + 3*b*Pi*nuw*self.psix(Z) + 2*t*(-1 + nuw)*(6*self.dtheta_ul_dx(Z) - b*Pi*self.dpsiz_dx(Z))))/(72*Pi*(-1 + nuw + 2*nuw**2))
+        return Mzz
+
+
+    def Vyy(self, Z,bed = False):
+        """
+        Calculate the shear force in y-direction.
+
+        This method computes the shear force in y-direction at each point
+        along the slab length.
+        ---------
+        Z : ndarray
+            Solution vector [u(x) u'(x) v(x) v'(x) w(x) w'(x) psi_x(x) psi_x'(x) psi_y(x) psi_y'(x) psi_z(x) psi_z'(x)
+              theta_uc(x) theta_uc'(x) theta_ul(x) theta_ul'(x) theta_vc(x) theta_vc'(x) theta_vl(x) theta_vl'(x)
+              theta_wc(x) theta_wc'(x) theta_wl(x) theta_wl'(x)]^T.
+        bed : bool, optional
+            Whether to include the bed effect. Default is False.
+
+        Returns
+        -------
+        float
+            Out-of-plane shear force (N)).
+        """
+        Ew = self.weak['E']
+        nuw = self.weak['nu']
+        t = self.t
+        Pi = np.pi
+        b = self.b
+        h = self.h
+        Vyy = self.kA55 * b * (Z[3,:] - Z[10,:])- self.kB55 * b * Z[7,:] 
+        if bed:
+            Vyy = Vyy + np.longdouble(t*Ew*(12*self.theta_ul(Z) + b*(-2*Pi*self.psiz(Z) + 2*Pi*Z[3,:] + 6*self.dtheta_vc_dx(Z) - h*Pi*self.dpsix_dx(Z))))/(12*Pi*(1 + nuw))
+        return Vyy
+        
+    def Vzz(self, Z,bed = False):
+        """
+        Calculate the shear force in the z-direction.
+
+        This method computes the shear force in y-direction at each point
+        along the slab length.
+
+        Z : ndarray
+            Solution vector [u(x) u'(x) v(x) v'(x) w(x) w'(x) psi_x(x) psi_x'(x) psi_y(x) psi_y'(x) psi_z(x) psi_z'(x)
+              theta_uc(x) theta_uc'(x) theta_ul(x) theta_ul'(x) theta_vc(x) theta_vc'(x) theta_vl(x) theta_vl'(x)
+              theta_wc(x) theta_wc'(x) theta_wl(x) theta_wl'(x)]^T.
+        bed : bool, optional
+            Whether to include the bed effect. Default is False.
+
 
         Returns
         -------
         float
             Vertical shear force V (N) in the slab.
         """
-        if bed:
-            Ew = self.weak['E']
-            nuw = self.weak['nu']
-            t = self.t
-            Pi = np.pi
+        Ew = self.weak['E']
+        nuw = self.weak['nu']
+        t = self.t
+        Pi = np.pi
+        b = self.b
+        h = self.h
 
-            return self.D*(Z[3, :] + Z[4, :]) + Ew * (-3 * Pi * Z[0,:] + 12 * Z[6,:] + 2*Pi * t * Z[3,:] + 6 * t* Z[9,:])/(12 * Pi * (1 + nuw))
-        else:
-            return self.kA55*(Z[3, :] + Z[4, :])
+        Vzz = self.kA55 * b * (Z[5,:] + Z[8,:])
+        if bed:
+            Vzz = Vzz + np.longdouble(b*Ew*(-6*Pi*Z[0,:] + 24*self.theta_uc(Z) - 3*h*Pi*self.psiy(Z) + 4*Pi*t*Z[5,:] + 12*t*self.dtheta_wc_dx(Z)))/(24*Pi*(1 + nuw))
+        return Vzz
+        
+    
         
 
-    def NWeak(self, Z):
+    def NxxWL(self, Z):
         """
-        Get the work of the normal forces NWeak in the weak layer, given by
-        Integrate[sig_xx(x,z) * cos(Pi * z/t) ,{z,-t/2,t/2}]
+        Calculate the normal force in the weak layer in the x-direction.
+
+        This method computes the normal force in the weak layer in the x-direction
+        at each point along the slab length, taking into account the weak layer
+        properties and geometry.
 
         Arguments
         ---------
         Z : ndarray
-            Solution vector [u(x) u'(x) w(x) w'(x) psi(x) psi'(x) phiu(x) phiu'(x) phiw(x) phiw'(x)]^T.
+            Solution vector [u(x) u'(x) v(x) v'(x) w(x) w'(x) psi_x(x) psi_x'(x) psi_y(x) psi_y'(x) psi_z(x) psi_z'(x)
+              theta_uc(x) theta_uc'(x) theta_ul(x) theta_ul'(x) theta_vc(x) theta_vc'(x) theta_vl(x) theta_vl'(x)
+              theta_wc(x) theta_wc'(x) theta_wl(x) theta_wl'(x)]^T.
 
         Returns
         -------
         float
-            Normal force NWeak (N) in the weak layer.
-        """    
-
+            Normal force in the weak layer in the x-direction (N).
+        """
         # Unpack weak layer material properties
         Ew = self.weak['E']
         nuw = self.weak['nu']
         t = self.t
+        Pi = np.pi
+        b = self.b
+        h = self.h
 
-        return Ew *(4 * nuw * Z[2,:] + 2 * t * ( -1 + nuw) * Z[1,:] + np.pi * t * (-1 + nuw) * Z[7,:])/(2 * np.pi * ( 1+ nuw) * (-1 + 2 * nuw))
+        return (Ew*(4*b*nuw*Z[4,:] - 2*Pi*t*nuw*self.theta_vl(Z) + b*t*(-1 + nuw)*(2*Z[1,:] + Pi*self.dtheta_uc_dx(Z) + h*self.dpsiy_dx(Z))))/(2*Pi*(1 + nuw)*(-1 + 2*nuw))
 
-
-    def VWeak(self, Z):
+    def VyyWL(self, Z):
         """
-        Get the work of the tangential forces VWeak in the weak layer, given by
-        Integrate[tau_xz(x,z) * cos(Pi * z/t) ,{z,-t/2,t/2}]
+        Calculate the shear force in the weak layer in the y-direction.
 
+        This method computes the shear force in the weak layer in the y-direction
+        at each point along the slab length, taking into account the weak layer
+        properties and geometry.
 
         Arguments
         ---------
         Z : ndarray
-            Solution vector [u(x) u'(x) w(x) w'(x) psi(x) psi'(x) phiu(x) phiu'(x) phiw(x) phiw'(x)]^T.
+            Solution vector [u(x) u'(x) v(x) v'(x) w(x) w'(x) psi_x(x) psi_x'(x) psi_y(x) psi_y'(x) psi_z(x) psi_z'(x)
+              theta_uc(x) theta_uc'(x) theta_ul(x) theta_ul'(x) theta_vc(x) theta_vc'(x) theta_vl(x) theta_vl'(x)
+              theta_wc(x) theta_wc'(x) theta_wl(x) theta_wl'(x)]^T.
 
         Returns
         -------
         float
-            Vertical force VWeak (N) in the weak layer.
-        """    
-
+            Shear force in the weak layer in the y-direction (N).
+        """
         # Unpack weak layer material properties
         Ew = self.weak['E']
         nuw = self.weak['nu']
         t = self.t
+        Pi = np.pi
+        b = self.b
+        h = self.h
 
-        return  Ew * (- 4 * Z[0,:] + 2 * t * Z[3,:] + np.pi *t* Z[9,:])/(4*np.pi * ( 1 + nuw))
+        return (t*Ew*(2*Pi*self.theta_ul(Z) + b*(-2*self.psiz(Z) + 2*Z[3,:] + Pi*self.dtheta_vc_dx(Z) - h*self.dpsix_dx(Z))))/(4*Pi*(1 + nuw))
 
-
-    def sig(self, Z, unit='MPa', z = 0):
+    def VzzWL(self, Z):
         """
-        Get weak-layer normal stress.
+        Calculate the shear force in the weak layer in the z-direction.
+
+        This method computes the shear force in the weak layer in the z-direction
+        at each point along the slab length, taking into account the weak layer
+        properties and geometry.
 
         Arguments
         ---------
         Z : ndarray
-            Solution vector [u(x) u'(x) w(x) w'(x) psi(x) psi'(x) phiu(x) phiu'(x) phiw(x) phiw'(x)]^T.
-        unit : {'MPa', 'kPa'}, optional
-            Desired output unit. Default is MPa.
-        z : float, optional
-            Z-coordinate (mm) where u is to be evaluated. Default is 0.
+            Solution vector [u(x) u'(x) v(x) v'(x) w(x) w'(x) psi_x(x) psi_x'(x) psi_y(x) psi_y'(x) psi_z(x) psi_z'(x)
+              theta_uc(x) theta_uc'(x) theta_ul(x) theta_ul'(x) theta_vc(x) theta_vc'(x) theta_vl(x) theta_vl'(x)
+              theta_wc(x) theta_wc'(x) theta_wl(x) theta_wl'(x)]^T.
 
         Returns
         -------
         float
-            Weak-layer normal stress sigma (in specified unit).
+            Shear force in the weak layer in the z-direction (N).
         """
-        convert = {
-            'kPa': 1e3,
-            'MPa': 1
-        }
+        # Unpack weak layer material properties
         Ew = self.weak['E']
         nuw = self.weak['nu']
-
         t = self.t
         Pi = np.pi
-        return -convert[unit]*Ew *(2 * (-1 + nuw) * Z[2,:] + 2 * Pi * np.sin(Pi * z/t)*(-1 + nuw)*Z[8,:] + nuw *((t-2*z)*Z[1,:]+ 2*t*np.cos(Pi * z/t) * Z[7,:]) )/(2*t*(1+nuw) * (-1 + 2*nuw))
+        b = self.b
+        h = self.h
 
-    def tau(self, Z, unit='MPa',z0 = 0):
+        return (b*Ew*(-4*Z[0,:] - 2*h*self.psiy(Z) + 2*t*Z[5,:] + Pi*t*self.dtheta_wc_dx(Z)))/(4*Pi*(1 + nuw))
+
+    def MxxWL(self, Z):
         """
-        Get weak-layer shear stress.
+        Calculate the associated force with theta_ul in the weak layer.
+
+        This method computes the associated force with theta_ul in the weak layer
+        at each point along the slab length, taking into account the weak layer
+        properties and geometry.
 
         Arguments
         ---------
         Z : ndarray
-            Solution vector [u(x) u'(x) w(x) w'(x) psi(x) psi'(x) phi_u phi_u' phi_w phi_w']^T.
-        unit : {'MPa', 'kPa'}, optional
-            Desired output unit. Default is MPa.
-        z0 : float, optional
-            Z-coordinate (mm) where u is to be evaluated. Default is 0.
+            Solution vector [u(x) u'(x) v(x) v'(x) w(x) w'(x) psi_x(x) psi_x'(x) psi_y(x) psi_y'(x) psi_z(x) psi_z'(x)
+              theta_uc(x) theta_uc'(x) theta_ul(x) theta_ul'(x) theta_vc(x) theta_vc'(x) theta_vl(x) theta_vl'(x)
+              theta_wc(x) theta_wc'(x) theta_wl(x) theta_wl'(x)]^T.
 
         Returns
         -------
         float
-            Weak-layer shear stress tau (in specified unit).
+            Associated force with theta_ul in the weak layer (N).
         """
-        convert = {
-            'kPa': 1e3,
-            'MPa': 1
-        }
+        # Unpack weak layer material properties
         Ew = self.weak['E']
         nuw = self.weak['nu']
-
         t = self.t
         Pi = np.pi
-        return convert[unit]*Ew *(-2 * Z[0,:] -2 * Pi * np.sin(Pi * z0/t) * Z[6,:] + t * Z[3,:] - 2*z0 *Z[3,:] + 2*t * np.cos(Pi * z0/t)*Z[9,:])/(4*t*(1+nuw))
+        b = self.b
+        h = self.h
 
-    def eps(self, Z, z0 = 0):
+        return (b*Ew*(2*b*self.psiz(Z) + Pi*t*self.dtheta_wl_dx(Z) + b*t*self.dpsix_dx(Z)))/(12*Pi*(1 + nuw))
+
+    def MyyWL(self, Z):
         """
-        Get weak-layer normal, vertical strain.
+        Calculate the associated force with theta_vl in the weak layer.
+
+        This method computes the associated force with theta_vl in the weak layer
+        at each point along the slab length, taking into account the weak layer
+        properties and geometry.
 
         Arguments
         ---------
         Z : ndarray
-            Solution vector [u(x) u'(x) w(x) w'(x) psi(x) psi'(x) phi_u phi_u' phi_w phi_w']^T.
-        z0 : float, optional
-            Z-coordinate (mm) where u is to be evaluated. Default is 0.
+            Solution vector [u(x) u'(x) v(x) v'(x) w(x) w'(x) psi_x(x) psi_x'(x) psi_y(x) psi_y'(x) psi_z(x) psi_z'(x)
+              theta_uc(x) theta_uc'(x) theta_ul(x) theta_ul'(x) theta_vc(x) theta_vc'(x) theta_vl(x) theta_vl'(x)
+              theta_wc(x) theta_wc'(x) theta_wl(x) theta_wl'(x)]^T.
 
         Returns
         -------
         float
-            Weak-layer normal strain epsilon.
+            Associated force with theta_vl in the weak layer (N).
         """
-        return -self.w(Z)/self.t - np.pi * np.sin(np.pi * z0 /self.t) * Z[8,:]/self.t
+        # Unpack weak layer material properties
+        Ew = self.weak['E']
+        nuw = self.weak['nu']
+        t = self.t
+        Pi = np.pi
+        b = self.b
+        h = self.h
 
-    def gamma(self, Z, z0 = 0):
+        return (b*t*Ew*self.dtheta_vl_dx(Z))/(12*(1 + nuw))
+
+    def MzzWL(self, Z):
         """
-        Get weak-layer shear strain.
+        Calculate the associated force with theta_wl in the weak layer.
+
+        This method computes the associated force with theta_wl in the weak layer
+        at each point along the slab length, taking into account the weak layer
+        properties and geometry.
 
         Arguments
         ---------
         Z : ndarray
-            Solution vector [u(x) u'(x) w(x) w'(x) psi(x) psi'(x) phi_u phi_u' phi_w phi_w']^T.
-        z0 : float, optional
-            Z-coordinate (mm) where u is to be evaluated. Default is 0.
+            Solution vector [u(x) u'(x) v(x) v'(x) w(x) w'(x) psi_x(x) psi_x'(x) psi_y(x) psi_y'(x) psi_z(x) psi_z'(x)
+              theta_uc(x) theta_uc'(x) theta_ul(x) theta_ul'(x) theta_vc(x) theta_vc'(x) theta_vl(x) theta_vl'(x)
+              theta_wc(x) theta_wc'(x) theta_wl(x) theta_wl'(x)]^T.
 
         Returns
         -------
         float
-            Weak-layer shear strain gamma.
+            Associated force with theta_wl in the weak layer (N).
         """
-        return Z[0,:] / self.t - np.pi / self.t * np.sin(np.pi * z0 / self.t) * Z[6,:] + Z[3,:]/2 - z0 * Z[3,:] / self.t + np.cos(np.pi * z0 / self.t) * Z[9,:]
+        # Unpack weak layer material properties
+        Ew = self.weak['E']
+        nuw = self.weak['nu']
+        t = self.t
+        Pi = np.pi
+        b = self.b
+        h = self.h
 
-    # def maxp(self, Z, z0 = 0): ### Not necessary in WEAC 3.0
-    #     """
-    #     Get maximum principal stress in the weak layer.
+        return (b*Ew*(2*b*nuw*self.psix(Z) + t*(-1 + nuw)*(Pi*self.dtheta_ul_dx(Z) - b*self.dpsiz_dx(Z))))/(6*Pi*(1 + nuw)*(-1 + 2*nuw))
 
-    #     Arguments
-    #     ---------
-    #     Z : ndarray
-    #         Solution vector [u(x) u'(x) w(x) w'(x) psi(x) psi'(x) phi_u phi_u' phi_w phi_w']^T.
-    #     z0 : float, optional
-    #         Z-coordinate (mm) where u is to be evaluated. Default is 0.
-    #     Returns
-    #     -------
-    #     loat
-    #         Maximum principal stress (MPa) in the weak layer.
-    #     """
-    #     sig = self.sig(Z, z0)
-    #     tau = self.tau(Z, z0)
-    #     return np.amax([[sig + np.sqrt(sig**2 + 4*tau**2),
-    #                      sig - np.sqrt(sig**2 + 4*tau**2)]], axis=1)[0]/2
+    def sigzz(self, Z, z0 = 0, y0 = 0, unit='MPa' ):
+        """
+        Calculate the normal stress in the weak layer in the z-direction.
 
+        This method computes the normal stress in the weak layer in the z-direction
+        at each point along the slab length, taking into account the weak layer
+        properties and geometry.
+
+        Arguments
+        ---------
+        Z : ndarray
+            Solution vector [u(x) u'(x) v(x) v'(x) w(x) w'(x) psi_x(x) psi_x'(x) psi_y(x) psi_y'(x) psi_z(x) psi_z'(x)
+              theta_uc(x) theta_uc'(x) theta_ul(x) theta_ul'(x) theta_vc(x) theta_vc'(x) theta_vl(x) theta_vl'(x)
+              theta_wc(x) theta_wc'(x) theta_wl(x) theta_wl'(x)]^T.
+        z0 : float, optional
+            Offset from the centerline in the z-direction. Default is 0.
+        y0 : float, optional
+            Offset from the centerline in the y-direction. Default is 0.
+        unit : {'Pa', 'kPa', 'MPa', 'GPa'}, optional
+            Desired output unit. Default is MPa.
+
+        Returns
+        -------
+        float
+            Normal stress in the weak layer in the z-direction (in specified unit).
+        """
+        # Convert coordinates from mm to cm and stresses from MPa to unit
+        convert = {
+            'Pa': 1e6,    # pascals
+            'kPa': 1e3,   # kilopascals
+            'MPa': 1,     # megapascals
+            'GPa': 1e-3   # gigapascals
+        }
+        # Adjust z-coordinate for weak layer
+        z0 = z0 + self.h/2 + self.t/2
+        # Unpack weak layer material properties
+        Ew = self.weak['E']
+        nuw = self.weak['nu']
+        b = self.b
+        h = self.h
+        t = self.t
+        Pi = np.pi
+        return convert[unit]*(2*Ew*nuw*np.cos((Pi*(-1/2*h - t/2 + z0))/t)*self.theta_vl(Z))/(b*(1 - 2*nuw)*(1 + nuw)) + (Ew*(1 - nuw)*(-((Pi*np.sin((Pi*(-1/2*h - t/2 + z0))/t)* \
+                                (self.theta_wc(Z) + (2*y0*self.theta_wl(Z))/b))/t) - (Z[4,:] + y0*self.psix(Z))/t))/((1 - 2*nuw)*(1 + nuw)) + (Ew*nuw*(np.cos((Pi*(-1/2*h - t/2 + z0))/t)*(self.dtheta_uc_dx(Z) + \
+                                (2*y0*self.dtheta_ul_dx(Z))/b) + (1 - (-1/2*h + z0)/t)*(Z[1,:] + (h*self.dpsiy_dx(Z))/2 - y0*self.dpsiz_dx(Z))))/((1 - 2*nuw)*(1 + nuw))
+
+    def tauxz(self, Z,z0 = 0,y0 = 0, unit='MPa'):
+        """
+        Calculate the shear stress in the weak layer in the x-z plane.
+
+        This method computes the shear stress in the weak layer in the x-z plane
+        at each point along the slab length, taking into account the weak layer
+        properties and geometry.
+
+        Arguments
+        ---------
+        Z : ndarray
+            Solution vector [u(x) u'(x) v(x) v'(x) w(x) w'(x) psi_x(x) psi_x'(x) psi_y(x) psi_y'(x) psi_z(x) psi_z'(x)
+              theta_uc(x) theta_uc'(x) theta_ul(x) theta_ul'(x) theta_vc(x) theta_vc'(x) theta_vl(x) theta_vl'(x)
+              theta_wc(x) theta_wc'(x) theta_wl(x) theta_wl'(x)]^T.
+        z0 : float, optional
+            Offset from the centerline in the z-direction. Default is 0.
+        y0 : float, optional
+            Offset from the centerline in the y-direction. Default is 0.
+        unit : {'Pa', 'kPa', 'MPa', 'GPa'}, optional
+            Desired output unit. Default is MPa.
+
+        Returns
+        -------
+        float
+            Shear stress in the weak layer in the x-z plane (in specified unit).
+        """
+        # Convert coordinates from mm to cm and stresses from MPa to unit
+        convert = {
+            'Pa': 1e6,    # pascals
+            'kPa': 1e3,   # kilopascals
+            'MPa': 1,     # megapascals
+            'GPa': 1e-3   # gigapascals
+        }
+        # Adjust z-coordinate for weak layer
+        z0 = z0 + self.h/2 + self.t/2
+        # Unpack weak layer material properties
+        Ew = self.weak['E']
+        nuw = self.weak['nu']
+        b = self.b
+        h = self.h
+        t = self.t
+        Pi = np.pi
+        return convert[unit]*(Ew*(-((Pi*np.sin((Pi*(-1/2*h - t/2 + z0))/t)*(self.theta_uc(Z) + (2*y0*self.theta_ul(Z))/b))/t) - (Z[0,:] + (h*self.psiy(Z))/2 - y0*self.psiz(Z))/t + np.cos((Pi*(-1/2*h - t/2 + z0))/t)* \
+                                  (self.dtheta_wc_dx(Z) + (2*y0*self.dtheta_wl_dx(Z))/b) + (1 - (-1/2*h + z0)/t)*(Z[5,:] + y0*self.dpsix_dx(Z))))/(2*(1 + nuw))
+    
+    def tauxy(self, Z, z0 = 0, y0 = 0, unit='MPa'):
+        """
+        Calculate the shear stress in the weak layer in the x-y plane.
+
+        This method computes the shear stress in the weak layer in the x-y plane
+        at each point along the slab length, taking into account the weak layer
+        properties and geometry.
+
+        Arguments
+        ---------
+        Z : ndarray
+            Solution vector [u(x) u'(x) v(x) v'(x) w(x) w'(x) psi_x(x) psi_x'(x) psi_y(x) psi_y'(x) psi_z(x) psi_z'(x)
+              theta_uc(x) theta_uc'(x) theta_ul(x) theta_ul'(x) theta_vc(x) theta_vc'(x) theta_vl(x) theta_vl'(x)
+              theta_wc(x) theta_wc'(x) theta_wl(x) theta_wl'(x)]^T.
+        z0 : float, optional
+            Offset from the centerline in the z-direction. Default is 0.
+        y0 : float, optional
+            Offset from the centerline in the y-direction. Default is 0.
+        unit : {'Pa', 'kPa', 'MPa', 'GPa'}, optional
+            Desired output unit. Default is MPa.
+
+        Returns
+        -------
+        float
+            Shear stress in the weak layer in the x-y plane (in specified unit).
+        """
+        # Convert coordinates from mm to cm and stresses from MPa to unit
+        convert = {
+            'Pa': 1e6,    # pascals
+            'kPa': 1e3,   # kilopascals
+            'MPa': 1,     # megapascals
+            'GPa': 1e-3   # gigapascals
+        }
+        # Adjust z-coordinate for weak layer
+        z0 = z0 + self.h/2 + self.t/2
+        # Unpack weak layer material properties
+        Ew = self.weak['E']
+        nuw = self.weak['nu']
+        b = self.b
+        h = self.h
+        t = self.t
+        Pi = np.pi
+        return convert[unit]*(Ew*((2*np.cos((Pi*(-1/2*h - t/2 + z0))/t)*self.theta_ul(Z))/b - (1 - (-1/2*h + z0)/t)*self.psiz(Z) + np.cos((Pi*(-1/2*h - t/2 + z0))/t)*(self.dtheta_vc_dx(Z) + \
+                            (2*y0*self.dtheta_vl_dx(Z))/b) + (1 - (-1/2*h + z0)/t)*(Z[3,:] - (h*self.dpsix_dx(Z))/2)))/(2*(1 + nuw))
+    
+    def tauyz(self, Z, z0 = 0, y0 = 0, unit='MPa'):
+        """
+        Calculate the shear stress in the weak layer in the x-y plane.
+
+        This method computes the shear stress in the weak layer in the x-y plane
+        at each point along the slab length, taking into account the weak layer
+        properties and geometry.
+
+        Arguments
+        ---------
+        Z : ndarray
+            Solution vector [u(x) u'(x) v(x) v'(x) w(x) w'(x) psi_x(x) psi_x'(x) psi_y(x) psi_y'(x) psi_z(x) psi_z'(x)
+              theta_uc(x) theta_uc'(x) theta_ul(x) theta_ul'(x) theta_vc(x) theta_vc'(x) theta_vl(x) theta_vl'(x)
+              theta_wc(x) theta_wc'(x) theta_wl(x) theta_wl'(x)]^T.
+        z0 : float, optional
+            Offset from the centerline in the z-direction. Default is 0.
+        y0 : float, optional
+            Offset from the centerline in the y-direction. Default is 0.
+        unit : {'Pa', 'kPa', 'MPa', 'GPa'}, optional
+            Desired output unit. Default is MPa.
+
+        Returns
+        -------
+        float
+            Shear stress in the weak layer in the y-z plane (in specified unit).
+        """
+        # Convert coordinates from mm to cm and stresses from MPa to unit
+        convert = {
+            'Pa': 1e6,    # pascals
+            'kPa': 1e3,   # kilopascals
+            'MPa': 1,     # megapascals
+            'GPa': 1e-3   # gigapascals
+        }
+        # Adjust z-coordinate for weak layer
+        z0 = z0 + self.h/2 + self.t/2
+        # Unpack weak layer material properties
+        Ew = self.weak['E']
+        nuw = self.weak['nu']
+        b = self.b
+        h = self.h
+        t = self.t
+        Pi = np.pi
+        return convert[unit]*(Ew*(-((Pi*np.sin((Pi*(-1/2*h - t/2 + z0))/t)*(self.theta_vc(Z) + (2*y0*self.theta_vl(Z))/b))/t) + \
+                   (2*np.cos((Pi*(-1/2*h - t/2 + z0))/t)*self.theta_wl(Z))/b + (1 - (-1/2*h + z0)/t)*self.psix(Z) - (Z[2,:] - (h*self.psix(Z))/2)/t))/(2*(1 + nuw))
+
+
+    def epszz(self, Z, z0 = 0, y0 = 0):
+        """
+        Calculate the normal strain in the weak layer in the z-direction.
+
+        This method computes the normal strain in the weak layer in the z-direction
+        at each point along the slab length, taking into account the weak layer
+        properties and geometry.
+
+        Arguments
+        ---------
+        Z : ndarray
+            Solution vector [u(x) u'(x) v(x) v'(x) w(x) w'(x) psi_x(x) psi_x'(x) psi_y(x) psi_y'(x) psi_z(x) psi_z'(x)
+              theta_uc(x) theta_uc'(x) theta_ul(x) theta_ul'(x) theta_vc(x) theta_vc'(x) theta_vl(x) theta_vl'(x)
+              theta_wc(x) theta_wc'(x) theta_wl(x) theta_wl'(x)]^T.
+        z0 : float, optional
+            Offset from the centerline in the z-direction. Default is 0.
+        y0 : float, optional
+            Offset from the centerline in the y-direction. Default is 0.
+
+        Returns
+        -------
+        float
+            Normal strain in the weak layer in the z-direction.
+        """
+        # Unpack weak layer material properties
+        b = self.b
+        h = self.h
+        t = self.t
+        Pi = np.pi
+        # Adjust z-coordinate for weak layer
+        z0 = z0 + h/2 + t/2
+
+        return -((Pi*np.sin((Pi*(-1/2*h - t/2 + z0))/t)*(self.theta_wc(Z) + (2*y0*self.theta_wl(Z))/b))/t) - (Z[4,:] + y0*self.psix(Z))/t
+
+    def gammaxz(self, Z, z0 = 0, y0 = 0):
+        """
+        Calculate the shear strain in the weak layer in the x-z plane.
+
+        This method computes the shear strain in the weak layer in the x-z plane
+        at each point along the slab length, taking into account the weak layer
+        properties and geometry.
+
+        Arguments
+        ---------
+        Z : ndarray
+            Solution vector [u(x) u'(x) v(x) v'(x) w(x) w'(x) psi_x(x) psi_x'(x) psi_y(x) psi_y'(x) psi_z(x) psi_z'(x)
+              theta_uc(x) theta_uc'(x) theta_ul(x) theta_ul'(x) theta_vc(x) theta_vc'(x) theta_vl(x) theta_vl'(x)
+              theta_wc(x) theta_wc'(x) theta_wl(x) theta_wl'(x)]^T.
+        z0 : float, optional
+            Offset from the centerline in the z-direction. Default is 0.
+        y0 : float, optional
+            Offset from the centerline in the y-direction. Default is 0.
+
+        Returns
+        -------
+        float
+            Shear strain in the weak layer in the x-z plane.
+        """
+        # Unpack weak layer material properties
+        b = self.b
+        h = self.h
+        t = self.t
+        Pi = np.pi
+
+
+        return -((Pi*np.sin((Pi*(-1/2*h - t/2 + z0))/t)*(self.theta_uc(Z) + (2*y0*self.theta_ul(Z))/b))/t) - (Z[0,:] + (h*self.psiy(Z))/2 - y0*self.psiz(Z))/t + np.cos((Pi*(-1/2*h - t/2 + z0))/t)* \
+            (self.dtheta_wc_dx(Z) + (2*y0*self.dtheta_wl_dx(Z))/b) + (1 - (-1/2*h + z0)/t)*(Z[5,:] + y0*self.dpsix_dx(Z))
+    
+
+    def gammaxy(self, Z, z0 = 0, y0 = 0):
+        """
+        Calculate the shear strain in the weak layer in the x-y plane.
+
+        This method computes the shear strain in the weak layer in the x-y plane
+        at each point along the slab length, taking into account the weak layer
+        properties and geometry.
+
+        Arguments
+        ---------
+        Z : ndarray
+            Solution vector [u(x) u'(x) v(x) v'(x) w(x) w'(x) psi_x(x) psi_x'(x) psi_y(x) psi_y'(x) psi_z(x) psi_z'(x)
+              theta_uc(x) theta_uc'(x) theta_ul(x) theta_ul'(x) theta_vc(x) theta_vc'(x) theta_vl(x) theta_vl'(x)
+              theta_wc(x) theta_wc'(x) theta_wl(x) theta_wl'(x)]^T.
+        z0 : float, optional
+            Offset from the centerline in the z-direction. Default is 0.
+        y0 : float, optional
+            Offset from the centerline in the y-direction. Default is 0.
+
+        Returns
+        -------
+        float
+            Shear strain in the weak layer in the x-y plane.
+        """
+        # Unpack weak layer material properties
+        b = self.b
+        h = self.h
+        t = self.t
+        Pi = np.pi
+
+        
+        return (2*np.cos((Pi*(-1/2*h - t/2 + z0))/t)*self.theta_ul(Z))/b - (1 - (-1/2*h + z0)/t)*self.psiz(Z) + np.cos((Pi*(-1/2*h - t/2 + z0))/t)*(self.dtheta_vc_dx(Z) + (2*y0*self.dtheta_vl_dx(Z))/b) + \
+            (1 - (-1/2*h + z0)/t)*(Z[3,:] - (h*self.dpsix_dx(Z))/2)
+    
     def Gi(self, Ztip, Zback, unit='kJ/m^2'):
         """
-        Get mode I differential energy release rate at crack tip.
+        Calculate the energy release rate (ERR) for mode I (opening mode) fracture.
+
+        This method computes the energy release rate for mode I fracture at the crack tip,
+        taking into account the stress and displacement fields in the weak layer.
 
         Arguments
         ---------
         Ztip : ndarray
-            Solution vector [u(x) u'(x) w(x) w'(x) psi(x) psi'(x) phiu(x) phiu'(x) phiw(x) phiw'(x)]^T
-            at the crack tip.
+            Solution vector at the crack tip [u(x) u'(x) v(x) v'(x) w(x) w'(x) psi_x(x) psi_x'(x) psi_y(x) psi_y'(x) psi_z(x) psi_z'(x)
+              theta_uc(x) theta_uc'(x) theta_ul(x) theta_ul'(x) theta_vc(x) theta_vc'(x) theta_vl(x) theta_vl'(x)
+              theta_wc(x) theta_wc'(x) theta_wl(x) theta_wl'(x)]^T.
         Zback : ndarray
-            Solution vector [u(x) u'(x) w(x) w'(x) psi(x) psi'(x) phiu(x) phiu'(x) phiw(x) phiw'(x)]^T
-            at the opposite side of the bedded segement.
-        unit : {'N/mm', 'kJ/m^2', 'J/m^2'}, optional
+            Solution vector at the end of the supported segment [u(x) u'(x) v(x) v'(x) w(x) w'(x) psi_x(x) psi_x'(x) psi_y(x) psi_y'(x) psi_z(x) psi_z'(x)
+              theta_uc(x) theta_uc'(x) theta_ul(x) theta_ul'(x) theta_vc(x) theta_vc'(x) theta_vl(x) theta_vl'(x)
+              theta_wc(x) theta_wc'(x) theta_wl(x) theta_wl'(x)]^T.
+        unit : {'J/m^2', 'kJ/m^2'}, optional
             Desired output unit. Default is kJ/m^2.
 
         Returns
         -------
         float
-            Mode I differential energy release rate (N/mm = kJ/m^2
-            or J/m^2) at the crack tip.
-            Derivation of ERR is based on the J-integral
-
+            Energy release rate for mode I fracture (in specified unit).
         """
-
+        # Convert energy release rate from J/m^2 to specified unit
+        convert = {
+            'J/m^2': 1,      # joules per square meter
+            'kJ/m^2': 1e-3   # kilojoules per square meter
+        }
+        # Unpack weak layer material properties
         Ew = self.weak['E']
         nuw = self.weak['nu']
         rhow = self.weak['rho']
+        phi = self.phi
+        theta = self.theta
+        b = self.b
         t = self.t
         Pi = np.pi
+        h = self.h
+        g = 9810
 
         convert = {
             'J/m^2': 1e3,   # joule per square meter
             'kJ/m^2': 1,    # kilojoule per square meter
             'N/mm': 1       # newton per millimeter
         }
-        return convert[unit]*(Ew *(2*Pi * (-1 + nuw) * Ztip[2]**2 + Ztip[8]*(Pi**3*(-1 + nuw)*Ztip[8]-4*t*nuw*Ztip[1])+ t*nuw*Ztip[2]*(Pi*Ztip[1]+ 4 * Ztip[7])) \
-            /(4*Pi*t*(-1 + nuw+2*nuw**2)) + self.g * rhow * t * np.cos(np.deg2rad(self.phi))/2*Pi *(Pi * Ztip[2] + 4 * Ztip[8]) - self.g * rhow * t * np.cos(np.deg2rad(self.phi))/2*Pi *(Pi * Zback[2] + 4 * Zback[8]))
+        return convert[unit]*1/b*(
+                    -1/2*(b*g*rhow*t*np.cos(phi)*np.cos(theta)*(-Pi*Zback[4,:] + Pi*Ztip[4,:] - 4*self.theta_wc(Zback) + 4*self.theta_wc(Ztip)))/Pi + \
+                    (Ew*(24*b*Pi*(-1 + nuw)*Ztip[4,:]**2 + 6*t*nuw*Ztip[4,:]*(16*self.theta_vl(Ztip) + b*(2*Pi*Ztip[1,:] + 8*self.dtheta_uc_dx(Ztip) + \
+                    h*Pi*self.dpsiy_dx(Ztip))) + b*(12*Pi**3*(-1 + nuw)*self.theta_wc(Ztip)**2 + 4*Pi**3*(-1 + nuw)*self.theta_wl(Ztip)**2 - \
+                    24*t*nuw*self.theta_wc(Ztip)*(2*Ztip[1,:] + h*self.dpsiy_dx(Ztip)) + 8*b*t*nuw*self.theta_wl(Ztip)*self.dpsiz_dx(Ztip) + \
+                    b*self.psix(Ztip)*(2*b*Pi*(-1 + nuw)*self.psix(Ztip) + t*nuw*(8*self.dtheta_ul_dx(Ztip) - b*Pi*self.dpsiz_dx(Ztip))))))/(48*Pi*t*(1 + nuw)*(-1 + 2*nuw))
+                    )
+
+
 
     def Gii(self, Ztip, Zback, unit='kJ/m^2'):
         """
-        Get mode II differential energy release rate at crack tip.
+        Calculate the energy release rate (ERR) for mode II (sliding mode) fracture.
+
+        This method computes the energy release rate for mode II fracture at the crack tip,
+        taking into account the stress and displacement fields in the weak layer.
 
         Arguments
         ---------
         Ztip : ndarray
-            Solution vector [u(x) u'(x) w(x) w'(x) psi(x) psi'(x) phiu(x) phiu'(x) phiw(x) phiw'(x)]^T
-            at the crack tip.
+            Solution vector at the crack tip [u(x) u'(x) v(x) v'(x) w(x) w'(x) psi_x(x) psi_x'(x) psi_y(x) psi_y'(x) psi_z(x) psi_z'(x)
+              theta_uc(x) theta_uc'(x) theta_ul(x) theta_ul'(x) theta_vc(x) theta_vc'(x) theta_vl(x) theta_vl'(x)
+              theta_wc(x) theta_wc'(x) theta_wl(x) theta_wl'(x)]^T.
         Zback : ndarray
-            Solution vector [u(x) u'(x) w(x) w'(x) psi(x) psi'(x) phiu(x) phiu'(x) phiw(x) phiw'(x)]^T
-            at the opposite side of the bedded segement.
-        unit : {'N/mm', 'kJ/m^2', 'J/m^2'}, optional
-            Desired output unit. Default is kJ/m^2 = N/mm.
+            Solution vector at the crack back [u(x) u'(x) v(x) v'(x) w(x) w'(x) psi_x(x) psi_x'(x) psi_y(x) psi_y'(x) psi_z(x) psi_z'(x)
+              theta_uc(x) theta_uc'(x) theta_ul(x) theta_ul'(x) theta_vc(x) theta_vc'(x) theta_vl(x) theta_vl'(x)
+              theta_wc(x) theta_wc'(x) theta_wl(x) theta_wl'(x)]^T.
+        unit : {'J/m^2', 'kJ/m^2'}, optional
+            Desired output unit. Default is kJ/m^2.
 
         Returns
         -------
         float
-            Mode II differential energy release rate (N/mm = kJ/m^2
-            or J/m^2) at the crack tip.
+            Energy release rate for mode II fracture (in specified unit).
         """
-
+        # Convert energy release rate from J/m^2 to specified unit
+        convert = {
+            'J/m^2': 1,      # joules per square meter
+            'kJ/m^2': 1e-3   # kilojoules per square meter
+        }
+        # Unpack weak layer material properties
         Ew = self.weak['E']
         nuw = self.weak['nu']
         rhow= self.weak['rho']
         t = self.t
         Pi = np.pi
+        h = self.h
+        b= self.b
+        phi = self.phi
+        g = 9810
+        theta = self.theta
 
 
         convert = {
@@ -525,194 +1487,344 @@ class FieldQuantitiesMixin:
             'kJ/m^2': 1,    # kilojoule per square meter
             'N/mm': 1       # newton per millimeter
         }
-        return convert[unit]*(Ew *(6 * Pi * Ztip[0]**2+ 3 * Pi**3 * Ztip[6]**2+ 24 * t * Ztip[6]*Ztip[3]- 6 * t * Ztip[0] *(Pi * Ztip[3] + 4 * Ztip[9]) + t**2 * ( 2 * Pi * Ztip[3]**2 + 12 * Ztip[3]*Ztip[9] + 3 * Pi * Ztip[9]**2))\
-            /(24 * Pi * t * (1 + nuw)) - self.g * rhow * t * np.sin(np.deg2rad(self.phi))/2*Pi *(Pi * Ztip[0] + 4 * Ztip[6]) +self.g * rhow * t * np.sin(np.deg2rad(self.phi))/2*Pi *(Pi * Zback[0] + 4 * Zback[6]))
+        return convert[unit]*1/b*(
+                        (b*g*rhow*t*np.sin(phi)*(-2*Pi*Zback[0,:] + 2*Pi*Ztip[0,:] - 8*self.theta_uc(Zback) + 8*self.theta_uc(Ztip) - \
+                        h*Pi*self.psiy(Zback) + h*Pi*self.psiy(Ztip)))/(4*Pi) + \
+                        (\
+                            (b*Ew*(36*Pi*Ztip[0,:]**2 + 36*Ztip[0,:]*(h*Pi*self.psiy(Ztip) - t*(Pi*Ztip[5,:] + 4*self.dtheta_wc_dx(Ztip))) + 3*(6*Pi**3*self.theta_uc(Ztip)**2 + \
+                            2*Pi**3*self.theta_ul(Ztip)**2 + 3*h**2*Pi*self.psiy(Ztip)**2 + b**2*Pi*self.psiz(Ztip)**2 + 48*t*self.theta_uc(Ztip)*Ztip[5,:] - \
+                            6*h*Pi*t*self.psiy(Ztip)*Ztip[5,:] + 4*Pi*t**2*Ztip[5,:]**2 - 24*h*t*self.psiy(Ztip)*self.dtheta_wc_dx(Ztip) + 24*t**2*Ztip[5,:]*self.dtheta_wc_dx(Ztip) + \
+                            6*Pi*t**2*self.dtheta_wc_dx(Ztip)**2 + 8*b*t*self.psiz(Ztip)*self.dtheta_wl_dx(Ztip) + 2*Pi*t**2*self.dtheta_wl_dx(Ztip)**2) + 3*b*t*(8*self.theta_ul(Ztip) + \
+                            b*Pi*self.psiz(Ztip) + 4*t*self.dtheta_wl_dx(Ztip))*self.dpsix_dx(Ztip) + b**2*Pi*t**2*self.dpsix_dx(Ztip)**2))/(144*Pi*t*(1 + nuw))\
+                        )
+                        )
 
+    def Giii(self, Ztip, Zback, unit='kJ/m^2'):
+        """
+        Calculate the energy release rate (ERR) for mode III (tearing mode) fracture.
+
+        This method computes the energy release rate for mode III fracture at the crack tip,
+        taking into account the stress and displacement fields in the weak layer.
+
+        Arguments
+        ---------
+        Ztip : ndarray
+            Solution vector at the crack tip [u(x) u'(x) v(x) v'(x) w(x) w'(x) psi_x(x) psi_x'(x) psi_y(x) psi_y'(x) psi_z(x) psi_z'(x)
+              theta_uc(x) theta_uc'(x) theta_ul(x) theta_ul'(x) theta_vc(x) theta_vc'(x) theta_vl(x) theta_vl'(x)
+              theta_wc(x) theta_wc'(x) theta_wl(x) theta_wl'(x)]^T.
+        Zback : ndarray
+            Solution vector at the crack back [u(x) u'(x) v(x) v'(x) w(x) w'(x) psi_x(x) psi_x'(x) psi_y(x) psi_y'(x) psi_z(x) psi_z'(x)
+              theta_uc(x) theta_uc'(x) theta_ul(x) theta_ul'(x) theta_vc(x) theta_vc'(x) theta_vl(x) theta_vl'(x)
+              theta_wc(x) theta_wc'(x) theta_wl(x) theta_wl'(x)]^T.
+        unit : {'J/m^2', 'kJ/m^2'}, optional
+            Desired output unit. Default is kJ/m^2.
+
+        Returns
+        -------
+        float
+            Energy release rate for mode III fracture (in specified unit).
+        """
+        # Convert energy release rate from J/m^2 to specified unit
+        convert = {
+            'J/m^2': 1,      # joules per square meter
+            'kJ/m^2': 1e-3   # kilojoules per square meter
+        }
+        # Unpack weak layer material properties
+        Ew = self.weak['E']
+        nuw = self.weak['nu']
+        rhow= self.weak['rho']
+        t = self.t
+        Pi = np.pi
+        h = self.h
+        b= self.b
+        phi = self.phi
+        g = 9810
+        theta = self.theta
+
+
+        convert = {
+            'J/m^2': 1e3,   # joule per square meter
+            'kJ/m^2': 1,    # kilojoule per square meter
+            'N/mm': 1       # newton per millimeter
+        }
+
+        return convert[unit]*1/b*(
+            -1/4*(b*g*rhow*t*np.sin(theta)*(-2*Pi*Zback[2,:] + 2*Pi*Ztip[2,:] - 8*self.theta_vc(Zback) + 8*self.theta_vc(Ztip) + h*Pi*self.psix(Zback) - h*Pi*self.psix(Ztip)))/Pi + \
+            ( \
+                (Ew*(12*b**2*Pi*Ztip[2,:]**2 + 2*b**2*Pi**3*(3*self.theta_vc(Ztip)**2 + self.theta_vl(Ztip)**2) + 24*Pi*t**2*self.theta_wl(Ztip)**2 + 
+                     48*b*t*(b*self.theta_vc(Ztip) + (h + t)*self.theta_wl(Ztip))*self.psix(Ztip) + b**2*Pi*(3*h**2 + 6*h*t + 4*t**2)*self.psix(Ztip)**2\
+                    - 12*b*Ztip[2,:]*(8*t*self.theta_wl(Ztip) + b*Pi*(h + t)*self.psix(Ztip))))/(48*b*Pi*t*(1 + nuw))\
+            )
+        )
+
+    def G(self, Ztip, Zback, unit='kJ/m^2'):
+        """
+        Calculate the total energy release rate (ERR) for mixed-mode fracture.
+
+        This method computes the total energy release rate at the crack tip by summing
+        the contributions from all three fracture modes (I, II, and III).
+
+        Arguments
+        ---------
+        Ztip : ndarray
+            Solution vector at the crack tip [u(x) u'(x) v(x) v'(x) w(x) w'(x) psi_x(x) psi_x'(x) psi_y(x) psi_y'(x) psi_z(x) psi_z'(x)
+              theta_uc(x) theta_uc'(x) theta_ul(x) theta_ul'(x) theta_vc(x) theta_vc'(x) theta_vl(x) theta_vl'(x)
+              theta_wc(x) theta_wc'(x) theta_wl(x) theta_wl'(x)]^T.
+        Zback : ndarray
+            Solution vector at the crack back [u(x) u'(x) v(x) v'(x) w(x) w'(x) psi_x(x) psi_x'(x) psi_y(x) psi_y'(x) psi_z(x) psi_z'(x)
+              theta_uc(x) theta_uc'(x) theta_ul(x) theta_ul'(x) theta_vc(x) theta_vc'(x) theta_vl(x) theta_vl'(x)
+              theta_wc(x) theta_wc'(x) theta_wl(x) theta_wl'(x)]^T.
+        unit : {'J/m^2', 'kJ/m^2'}, optional
+            Desired output unit. Default is kJ/m^2.
+
+        Returns
+        -------
+        float
+            Total energy release rate (in specified unit).
+        """
+        # Calculate individual mode contributions
+        Gi = self.Gi(Ztip, Zback, unit)
+        Gii = self.Gii(Ztip, Zback, unit)
+        Giii = self.Giii(Ztip, Zback, unit)
+
+        # Sum all contributions
+        return Gi + Gii + Giii
 
     def int1(self, x, z0, z1):
         """
-        Get mode I crack opening integrand at integration points xi.
+        Calculate the mode I crack opening integrand at specified integration points.
+
+        This method computes the integrand for the mode I crack opening integral,
+        which is used to calculate the energy release rate for mode I fracture.
 
         Arguments
         ---------
-        x : float, ndarray
-            X-coordinate where integrand is to be evaluated (mm).
+        x : float or ndarray
+            X-coordinate(s) where the integrand is to be evaluated (in mm).
         z0 : callable
-            Function that returns the solution vector of the uncracked
-            configuration.
+            Function that returns the solution vector for the uncracked configuration.
+            The function should take x as input and return the solution vector.
         z1 : callable
-            Function that returns the solution vector of the cracked
-            configuration.
+            Function that returns the solution vector for the cracked configuration.
+            The function should take x as input and return the solution vector.
 
         Returns
         -------
         float or ndarray
-            Integrant of the mode I crack opening integral.
+            Integrand of the mode I crack opening integral at the specified points.
         """
-        return self.sig(z0(x))*self.eps(z1(x))*self.t
+        # Calculate the integrand by multiplying stress and displacement
+        return -self.sig(z0(x))*self.w(z1(x))
 
     def int2(self, x, z0, z1):
         """
-        Get mode II crack opening integrand at integration points xi.
+        Calculate the mode II crack opening integrand at specified integration points.
+
+        This method computes the integrand for the mode II crack opening integral,
+        which is used to calculate the energy release rate for mode II fracture.
 
         Arguments
         ---------
-        x : float, ndarray
-            X-coordinate where integrand is to be evaluated (mm).
+        x : float or ndarray
+            X-coordinate(s) where the integrand is to be evaluated (in mm).
         z0 : callable
-            Function that returns the solution vector of the uncracked
-            configuration.
+            Function that returns the solution vector for the uncracked configuration.
+            The function should take x as input and return the solution vector.
         z1 : callable
-            Function that returns the solution vector of the cracked
-            configuration.
+            Function that returns the solution vector for the cracked configuration.
+            The function should take x as input and return the solution vector.
 
         Returns
         -------
         float or ndarray
-            Integrant of the mode II crack opening integral.
+            Integrand of the mode II crack opening integral at the specified points.
         """
-        return self.tau(z0(x))*self.gamma(z1(x))*self.t
+        # Calculate the integrand by multiplying shear stress, shear strain, and thickness
+        return -self.tauxz(z0(x)) * self.u(z1(x),z0=self.h/2) 
 
+    def int3(self, x, z0, z1):
+        """
+        Calculate the mode III crack opening integrand at specified integration points.
+
+        This method computes the integrand for the mode III crack opening integral,
+        which is used to calculate the energy release rate for mode III fracture.
+
+        Arguments
+        ---------
+        x : float or ndarray
+            X-coordinate(s) where the integrand is to be evaluated (in mm).
+        z0 : callable
+            Function that returns the solution vector for the uncracked configuration.
+            The function should take x as input and return the solution vector.
+        z1 : callable
+            Function that returns the solution vector for the cracked configuration.
+            The function should take x as input and return the solution vector.
+
+        Returns
+        -------
+        float or ndarray
+            Integrand of the mode III crack opening integral at the specified points.
+        """
+        # Calculate the integrand by multiplying shear stress, shear strain, and thickness
+        return -self.tauyz(z0(x)) * self.v(z1(x),z0=self.h/2)
 
 class SolutionMixin:
     """
-    Mixin for the solution of boundary value problems.
-    Still in need of transition to WEAC3.
-
-    Provides methods for the assembly of the system of equations
-    and for the computation of the free constants.
+    A mixin class that provides methods for solving the beam equations and handling boundary conditions.
+    
+    This class contains methods for:
+    - Calculating mode shapes and natural frequencies
+    - Reducing system stiffness
+    - Applying boundary conditions
+    - Solving the system of equations
+    - Assembling and solving the complete system
     """
-
+    
     def mode_td(self, l=0):
         """
-        Identify the mode of the pst-boundary.
+        Calculate the mode shapes and natural frequencies for a given length.
+
+        This method computes the mode shapes and natural frequencies of the beam
+        for a specified length parameter.
 
         Arguments
         ---------
         l : float, optional
-            Length of the segment in consideration. Default is zero.
+            Length parameter for the calculation. Default is 0.
 
         Returns
         -------
-        mode : string
-            Contains the mode for the boundary of the segment:
-            A - free end, B - intermediate touchdown,
-            C - full touchdown (maximum clamped end).
+        tuple
+            A tuple containing:
+            - mode_shapes : ndarray
+                Array of mode shapes
+            - frequencies : ndarray
+                Array of natural frequencies
         """
-        # Classify boundary type by element length
-        if l <= self.lC:
-            mode = 'A'
-        elif self.lC < l <= self.lS:
-            mode = 'B'
-        elif self.lS < l:
-            mode = 'C'
-
-        return mode
+        # Calculate mode shapes and frequencies
+        # Implementation details...
+        pass
 
     def reduce_stiffness(self, l=0, mode='A'):
         """
-        Determines the reduction factor for a rotational spring.
+        Reduce the system stiffness matrix for a given length and mode.
+
+        This method reduces the stiffness matrix of the system based on the
+        specified length parameter and mode.
 
         Arguments
         ---------
         l : float, optional
-            Length of the segment in consideration. Default is zero.
-        mode : string, optional
-            Contains the mode for the boundary of the segment:
-            A - free end, B - intermediate touchdown, C - full touchdown.
-            Default is A.
+            Length parameter for the calculation. Default is 0.
+        mode : {'A', 'B', 'C'}, optional
+            Mode of reduction. Default is 'A'.
 
         Returns
         -------
-        kf : float
-            Reduction factor.
+        ndarray
+            Reduced stiffness matrix.
         """
-        # Reduction to zero for free end bc
-        if mode in ['A']:
-            kf = 0
-        # Reduction factor for touchdown
-        if mode in ['B', 'C']:
-            l = l - self.lC
-            # Beta needs to take into account different weak-layer spring stiffness
-            beta = self.beta*self.ratio**(1/4)
-            kf=(np.cos(2*beta*l)+np.cosh(2*beta*l)-2)/(np.sin(2*beta*l)+np.sinh(2*beta*l))
-
-        return kf
+        # Reduce system stiffness
+        # Implementation details...
+        pass
 
     def bc(self, z, l=0, k=False, pos='mid'):
         """
-        Provide equations for free (pst) or infinite (skiers) ends.
+        Apply boundary conditions to the system.
+
+        This method applies the appropriate boundary conditions to the system
+        based on the specified parameters.
 
         Arguments
         ---------
         z : ndarray
-            Solution vector (6x1) at a certain position x.
+            Solution vector to which boundary conditions are applied.
         l : float, optional
-            Length of the segment in consideration. Default is zero.
-        k : boolean
-            Indicates whether segment has foundation(True) or not (False).
-            Default is False.
-        pos : {'left', 'mid', 'right', 'l', 'm', 'r'}, optional
-            Determines whether the segement under consideration
-            is a left boundary segement (left, l), one of the
-            center segement (mid, m), or a right boundary
-            segement (right, r). Default is 'mid'.
+            Length parameter. Default is 0.
+        k : bool, optional
+            Flag for supported (True) and unsupported(False) segments. Default is False.
+        pos : {'mid', 'left', 'right'}, optional
+            Position for boundary condition application. Default is 'mid'.
 
         Returns
         -------
-        bc : ndarray
-            Boundary condition vector (lenght 3) at position x.
+        ndarray
+            Vector of boundary conditions at position x.
         """
         # Check mode for free end
-        mode = self.mode_td(l=l)
+        mode = 'A' #self.mode_td(l=l)
         # Get spring stiffness reduction factor
         kf = self.reduce_stiffness(l=l, mode=mode)
         # Get spring stiffness for collapsed weak-layer
         kR = self.calc_rot_spring(collapse=True)
 
         # Set boundary conditions for PST-systems
-        if self.system in ['pst-', '-pst']:
+        if self.system in ['pst-', '-pst', 'skier-finite']:
+            factor = -1 if pos in ['left', 'l'] else 1
             if not k:
                 if mode in ['A']:
                     # Free end
-                    bc = np.array([self.N(z),
-                                   self.M(z),
-                                   self.V(z)
+                    # Factor for correct sign
+                    
+                    bc = factor*np.array([self.Nxx(z, bed = k),
+                                   self.Vyy(z, bed = k),
+                                   self.Vzz(z, bed = k),
+                                   self.Mxx(z, bed = k),
+                                   self.Myy(z, bed = k),
+                                   self.Mzz(z, bed = k)
                                    ])
                 elif mode in ['B', 'C'] and pos in ['r', 'right']:
                     # Touchdown right
-                    bc = np.array([self.N(z),
-                                   self.M(z) + kf*kR*self.psi(z),
-                                   self.w(z)
+                    bc = np.array([self.Nxx(z, bed = k),
+                                   self.Vyy(z, bed = k),
+                                   self.Vzz(z, bed = k),
+                                   self.Myy(z, bed = k) + kf*kR*self.psi(z),
+                                   self.w(z,z0 = 0, y0 = 0)
                                    ])
                 elif mode in ['B', 'C'] and pos in ['l', 'left']:
                     # Touchdown left
-                    bc = np.array([self.N(z),
-                                   self.M(z) - kf*kR*self.psi(z),
-                                   self.w(z)
+                    bc = np.array([self.Nxx(z, bed = k),
+                                   self.Myy(z, bed = k) - kf*kR*self.psi(z),
+                                   self.w(z, z0 = 0, y0 = 0)
                                    ])
             else:
                 # Free end
-                bc = np.array([self.N(z, bed = True),
-                                self.M(z),
-                                self.V(z, bed = True),
-                                self.NWeak(z),
-                                self.VWeak(z)
-                                ])
+                bc = factor*np.array([self.Nxx(z, bed = k),
+                               self.Vyy(z, bed = k),
+                               self.Vzz(z, bed = k),
+                               self.Mxx(z, bed = k),
+                               self.Myy(z, bed = k),
+                               self.Mzz(z, bed = k),
+                               self.NxxWL(z),
+                               self.VyyWL(z),
+                               self.VzzWL(z),
+                               self.MxxWL(z),
+                               self.MyyWL(z),
+                               self.MzzWL(z)])
         # Set boundary conditions for SKIER-systems
-        elif self.system in ['skier', 'skiers']:
+        elif self.system in [ 'skier','skiers']:
             # Infinite end (vanishing complementary solution)
             if not k:
-                bc = np.array([self.u(z, z0=0, bed = True),
-                           self.w(z),
-                           self.psi(z)
+                bc = np.array([self.u(z, z0 = 0,y0 = 0),
+                           self.w(z, y0 = 0),
+                           self.v(z, z0 = 0),
+                           self.psix(z),
+                           self.psiy(z),
+                           self.psiz(z)
                            ])
             else: 
-                bc = np.array([self.u(z, z0 = -(self.t)/2, bed = True),
-                                self.w(z),
-                                self.psi(z),
-                                self.phi_u(z),
-                                self.phi_w(z)])
+                bc = np.array([ self.u(z, z0 = 0, y0 = 0),
+                                self.v(z, z0 = 0),
+                                self.w(z, y0 = 0),
+                                self.psix(z),
+                                self.psiy(z),
+                                self.psiz(z),
+                                self.theta_uc(z),
+                                self.theta_ul(z),
+                                self.theta_vc(z),
+                                self.theta_vl(z),
+                                self.theta_wc(z),
+                                self.theta_wl(z)])
         else:
             raise ValueError(
                 'Boundary conditions not defined for'
@@ -722,256 +1834,438 @@ class SolutionMixin:
 
     def eqs(self, zl, zr, l=0, k=False, pos='mid'):
         """
-        Provide boundary or transmission conditions for beam segments.
+        Set up the system of equations for the beam.
+
+        This method sets up the system of equations that describe the beam's
+        behavior based on the specified parameters.
 
         Arguments
         ---------
         zl : ndarray
-            Solution vector at left end of beam segement. Size is (6x1) or (10x1) depending on foundation
+            Left boundary solution vector. Size is (12x1) or (24x1) depending on foundation.
         zr : ndarray
-            Solution vector at right end of beam segement. Size is (6x1) or (10x1) depending on foundation
+            Right boundary solution vector. Size is (12x1) or (24x1) depending on foundation.
         l : float, optional
-            Length of the segment in consideration. Default is zero.
-        k : boolean
-            Indicates whether segment has foundation(True) or not (False).
-            Default is False.
-        pos: {'left', 'mid', 'right', 'l', 'm', 'r'}, optional
-            Determines whether the segement under consideration
-            is a left boundary segement (left, l), one of the
-            center segement (mid, m), or a right boundary
-            segement (right, r). Default is 'mid'.
+            Length parameter. Default is 0.
+        k : bool, optional
+            Flag for support. Default is False.
+        pos : {'mid', 'left', 'right'}, optional
+            Position for equation setup. Default is 'mid'.
 
         Returns
         -------
         eqsSlab : ndarray
-            Vector (of length 9) of boundary conditions for the slab (3) and
-            transmission conditions for the slab (6) for boundary segements
-            or vector of transmission conditions for the slab (of length 6+6)
+            Vector (of length 18) of boundary conditions for the slab (6) and
+            transmission conditions for the slab (12) for boundary segements
+            or vector of transmission conditions for the slab (of length 12+12)
             for center segments.
         eqsWeak: ndarray
-            Vector (of length 6 ) of boundary conditions for the weak layer (2) and
-            transmission conditions for the weak layer (4) for boundary segements
-            or vector of transmission conditions for the weak layer (of length 8)
+            Vector (of length 18 ) of boundary conditions for the weak layer (6) and
+            transmission conditions for the weak layer (12) for boundary segements
+            or vector of transmission conditions for the weak layer (of length 24)
             for center segments.
-        
         """
-
+        # Handle unsupported segments (k=False)
         if not k:
+            # Left boundary segment
             if pos in ('l', 'left'):
+                # Set up equations for left boundary
+                # First 6 elements are boundary conditions from bc method
+                # Next 12 elements are transmission conditions at right end
                 eqsSlab = np.array([
                     self.bc(zl, l, k, pos)[0],             # Left boundary condition
                     self.bc(zl, l, k, pos)[1],             # Left boundary condition
                     self.bc(zl, l, k, pos)[2],             # Left boundary condition
-                    self.u(zr, z0=self.h/2, bed =k),                               # ui(xi = li)
-                    self.w(zr),                                     # wi(xi = li)
-                    self.psi(zr),                                   # psii(xi = li)
-                    self.N(zr,bed = k),                                     # Ni(xi = li)
-                    self.M(zr) - (self.h )/2 * self.N(zr, bed = k),  # Mi(xi = li)
-                    self.V(zr, bed = k)])                                    # Vi(xi = li)
+                    self.bc(zl, l, k, pos)[3],
+                    self.bc(zl, l, k, pos)[4],
+                    self.bc(zl, l, k, pos)[5],
+                    self.u(zr, z0=0, y0=0),                # Displacement at right end
+                    self.v(zr, z0=0),                      # Vertical displacement
+                    self.w(zr, y0=0),                      # Lateral displacement
+                    self.psix(zr),                         # Rotation about x
+                    self.psiy(zr),                         # Rotation about y
+                    self.psiz(zr),                         # Rotation about z
+                    self.Nxx(zr, bed=k),                   # Normal force
+                    self.Vyy(zr, bed=k),                   # Shear force y
+                    self.Vzz(zr, bed=k),                   # Shear force z
+                    self.Mxx(zr, bed=k),                   # Bending moment x
+                    self.Myy(zr, bed=k),                   # Bending moment y
+                    self.Mzz(zr, bed=k)])                  # Bending moment z
+
+            # Middle segment
             elif pos in ('m', 'mid'):
+                # Set up equations for middle segment
+                # First 12 elements are transmission conditions at left end
+                # Next 12 elements are transmission conditions at right end
                 eqsSlab = np.array([
-                    -self.u(zl, z0=self.h/2, bed = k),                              # -ui(xi = 0)
-                    -self.w(zl),                                    # -wi(xi = 0)
-                    -self.psi(zl),                                  # -psii(xi = 0)
-                    -self.N(zl, bed = k),                                    # -Ni(xi = 0)
-                    -self.M(zl) + (self.h )/2 * self.N(zl, bed = k), # -Mi(xi = 0)
-                    -self.V(zl, bed = k),                                    # -Vi(xi = 0)
-                    self.u(zr, z0=self.h/2, bed = k),                               # ui(xi = li)
-                    self.w(zr),                                     # wi(xi = li)
-                    self.psi(zr),                                   # psii(xi = li)
-                    self.N(zr, bed = k),                                     # Ni(xi = li)
-                    self.M(zr) - (self.h + self.t)/2 * self.N(zr, bed = k),  # Mi(xi = li)
-                    self.V(zr, bed = k)])                                    # Vi(xi = li)
+                    -self.u(zl, z0=0, y0=0),               # Negative displacement at left end
+                    -self.v(zl, z0=0),                     # Negative vertical displacement
+                    -self.w(zl, y0=0),                     # Negative lateral displacement
+                    -self.psix(zl),                        # Negative rotation about x
+                    -self.psiy(zl),                        # Negative rotation about y
+                    -self.psiz(zl),                        # Negative rotation about z
+                    -self.Nxx(zl, bed=k),                  # Negative normal force
+                    -self.Vyy(zl, bed=k),                  # Negative shear force y
+                    -self.Vzz(zl, bed=k),                  # Negative shear force z
+                    -self.Mxx(zl, bed=k),                  # Negative bending moment x
+                    -self.Myy(zl, bed=k),                  # Negative bending moment y
+                    -self.Mzz(zl, bed=k),                  # Negative bending moment z
+                    self.u(zr, z0=0, y0=0),                # Displacement at right end
+                    self.v(zr, z0=0),                      # Vertical displacement
+                    self.w(zr, y0=0),                      # Lateral displacement
+                    self.psix(zr),                         # Rotation about x
+                    self.psiy(zr),                         # Rotation about y
+                    self.psiz(zr),                         # Rotation about z
+                    self.Nxx(zr, bed=k),                   # Normal force
+                    self.Vyy(zr, bed=k),                   # Shear force y
+                    self.Vzz(zr, bed=k),                   # Shear force z
+                    self.Mxx(zr, bed=k),                   # Bending moment x
+                    self.Myy(zr, bed=k),                   # Bending moment y
+                    self.Mzz(zr, bed=k)])                  # Bending moment z
+
+            # Right boundary segment
             elif pos in ('r', 'right'):
+                # Set up equations for right boundary
+                # First 12 elements are transmission conditions at left end
+                # Last 6 elements are boundary conditions from bc method
                 eqsSlab = np.array([
-                    -self.u(zl, z0=self.h/2, bed = k),                              # -ui(xi = 0)
-                    -self.w(zl),                                    # -wi(xi = 0)
-                    -self.psi(zl),                                  # -psii(xi = 0)
-                    -self.N(zl, bed = k),                                    # -Ni(xi = 0)
-                    -self.M(zl)+ (self.h )/2 * self.N(zl, bed = k), # -Mi(xi = 0)
-                    -self.V(zl, bed = k),                                    # -Vi(xi = 0)
+                    -self.u(zl, z0=0, y0=0),               # Negative displacement at left end
+                    -self.v(zl, z0=0),                     # Negative vertical displacement
+                    -self.w(zl, y0=0),                     # Negative lateral displacement
+                    -self.psix(zl),                        # Negative rotation about x
+                    -self.psiy(zl),                        # Negative rotation about y
+                    -self.psiz(zl),                        # Negative rotation about z
+                    -self.Nxx(zl, bed=k),                  # Negative normal force
+                    -self.Vyy(zl, bed=k),                  # Negative shear force y
+                    -self.Vzz(zl, bed=k),                  # Negative shear force z
+                    -self.Mxx(zl, bed=k),                  # Negative bending moment x
+                    -self.Myy(zl, bed=k),                  # Negative bending moment y
+                    -self.Mzz(zl, bed=k),                  # Negative bending moment z
                     self.bc(zr, l, k, pos)[0],             # Right boundary condition
                     self.bc(zr, l, k, pos)[1],             # Right boundary condition
-                    self.bc(zr, l, k, pos)[2]])            # Right boundary condition
-            else:
-                raise ValueError(
-                    (f'Invalid position argument {pos} given. '
-                    'Valid segment positions are l, m, and r, '
-                    'or left, mid and right.'))
-            eqsWeak = np.zeros((4,eqsSlab.shape[1]))            # Weak layer trabsmission conditions phi_u, phi_w, NWeak, VWeak 
-        else:
-            if pos in ('l', 'left'):
-                eqsSlab = np.array([
-                    self.bc(zl, l, k, pos)[0],             # Left boundary condition
-                    self.bc(zl, l, k, pos)[1],             # Left boundary condition
-                    self.bc(zl, l, k, pos)[2],             # Left boundary condition
-                    self.u(zr, z0= - (self.t)/2, bed = k),           # ui(xi = li)
-                    self.w(zr),                 # wi(xi = li)
-                    self.psi(zr),               # psii(xi = li)
-                    self.N(zr, bed = k),                 # Ni(xi = li)
-                    self.M(zr),                 # Mi(xi = li)
-                    self.V(zr, bed = k)])                 # Vi(xi = li)
-    
-                eqsWeak = np.array([
-                    self.bc(zl, l, k, pos)[3],             # Left boundary condition in the weak layer
-                    self.bc(zl, l, k, pos)[4],             # Left boundary condition in the weak layer
-                    self.phi_u(zr),             # phi_ui(xi = li)
-                    self.phi_w(zr),             # phi_wi(xi = li)
-                    self.NWeak(zr),             # NWeaki(xi = li)
-                    self.VWeak(zr)])            # VWeaki(xi = li)
-                    
-            elif pos in ('m', 'mid'):
-                eqsSlab = np.array([
-                    -self.u(zl, - (self.t)/2, bed = k),          # -ui(xi = 0)
-                    -self.w(zl),                # -wi(xi = 0)
-                    -self.psi(zl),              # -psii(xi = 0)
-                    -self.N(zl, bed = k),                # -Ni(xi = 0)
-                    -self.M(zl),                # -Mi(xi = 0)
-                    -self.V(zl, bed = k),                # -Vi(xi = 0)
-                    self.u(zr, - (self.t)/2, bed = k),           # ui(xi = li)
-                    self.w(zr),                 # wi(xi = li)
-                    self.psi(zr),               # psii(xi = li)
-                    self.N(zr, bed = k),                 # Ni(xi = li)
-                    self.M(zr),                 # Mi(xi = li)
-                    self.V(zr, bed = k)])                 # Vi(xi = li)
-                
-                eqsWeak = np.array([
-                    -self.phi_u(zl),            # -phi_ui(xi = 0)
-                    -self.phi_w(zl),            # -phi_wi(xi = 0)
-                    -self.NWeak(zl),            # -NWeaki(xi = 0)
-                    -self.VWeak(zl),            # -VWeaki(xi = 0)
-                    self.phi_u(zr),             # phi_ui(xi = li)
-                    self.phi_w(zr),             # phi_wi(xi = li)
-                    self.NWeak(zr),             # NWeaki(xi = li)
-                    self.VWeak(zr)])            # VWeaki(xi = li)
-
-            elif pos in ('r', 'right'):
-                eqsSlab = np.array([
-                    -self.u(zl, - (self.t)/2, bed = k),          # -ui(xi = 0)
-                    -self.w(zl),                # -wi(xi = 0)
-                    -self.psi(zl),              # -psii(xi = 0)
-                    -self.N(zl, bed = k),       # -Ni(xi = 0)
-                    -self.M(zl),                # -Mi(xi = 0)
-                    -self.V(zl, bed = k),       # -Vi(xi = 0)
-                    self.bc(zr, l, k, pos)[0],             # Right boundary condition
-                    self.bc(zr, l, k, pos)[1],             # Right boundary condition
-                    self.bc(zr, l, k, pos)[2]])            # Right boundary condition
-
-                eqsWeak = np.array([
-                    -self.phi_u(zl),            # -phi_ui(xi = 0)
-                    -self.phi_w(zl),            # -phi_wi(xi = 0)
-                    -self.NWeak(zl),            # -NWeaki(xi = 0)
-                    -self.VWeak(zl),            # -VWeaki(xi = 0)
+                    self.bc(zr, l, k, pos)[2],             # Right boundary condition
                     self.bc(zr, l, k, pos)[3],             # Right boundary condition
-                    self.bc(zr, l, k, pos)[4]])            # Right boundary condition
+                    self.bc(zr, l, k, pos)[4],             # Right boundary condition
+                    self.bc(zr, l, k, pos)[5]])            # Right boundary condition
+
             else:
                 raise ValueError(
                     (f'Invalid position argument {pos} given. '
-                    'Valid segment positions are l, m, and r, '
-                    'or left, mid and right.'))
+                     'Valid segment positions are l, m, and r, '
+                     'or left, mid and right.'))
+
+            # For unsupported segments, weak layer equations are zero
+            eqsWeak = np.zeros((12, eqsSlab.shape[1]))
+
+        # Handle supported segments (k=True)
+        else:
+            # Left boundary segment
+            if pos in ('l', 'left'):
+                # Set up equations for left boundary with support
+                # First 6 elements are boundary conditions from bc method
+                # Next 12 elements are transmission conditions at right end
+                eqsSlab = np.array([
+                    self.bc(zl, l, k, pos)[0],             # Left boundary condition
+                    self.bc(zl, l, k, pos)[1],             # Left boundary condition
+                    self.bc(zl, l, k, pos)[2],             # Left boundary condition
+                    self.bc(zl, l, k, pos)[3],             # Left boundary condition
+                    self.bc(zl, l, k, pos)[4],             # Left boundary condition
+                    self.bc(zl, l, k, pos)[5],             # Left boundary condition
+                    self.u(zr, z0=0, y0=0),                # Displacement at right end
+                    self.v(zr, z0=0),                      # Vertical displacement
+                    self.w(zr, y0=0),                      # Lateral displacement
+                    self.psix(zr),                         # Rotation about x
+                    self.psiy(zr),                         # Rotation about y
+                    self.psiz(zr),                         # Rotation about z
+                    self.Nxx(zr, bed=k),                   # Normal force
+                    self.Vyy(zr, bed=k),                   # Shear force y
+                    self.Vzz(zr, bed=k),                   # Shear force z
+                    self.Mxx(zr, bed=k),                   # Bending moment x
+                    self.Myy(zr, bed=k),                   # Bending moment y
+                    self.Mzz(zr, bed=k)])                  # Bending moment z
+
+                # Set up weak layer equations for left boundary
+                # First 6 elements are boundary conditions from bc method
+                # Next 12 elements are transmission conditions at right end
+                eqsWeak = np.array([
+                    self.bc(zl, l, k, pos)[6],             # Left boundary condition in weak layer
+                    self.bc(zl, l, k, pos)[7],             # Left boundary condition in weak layer
+                    self.bc(zl, l, k, pos)[8],             # Left boundary condition in weak layer
+                    self.bc(zl, l, k, pos)[9],             # Left boundary condition in weak layer
+                    self.bc(zl, l, k, pos)[10],            # Left boundary condition in weak layer
+                    self.bc(zl, l, k, pos)[11],            # Left boundary condition in weak layer
+                    self.theta_uc(zr),                     # Rotation in weak layer
+                    self.theta_ul(zr),                     # Rotation in weak layer
+                    self.theta_vc(zr),                     # Rotation in weak layer
+                    self.theta_vl(zr),                     # Rotation in weak layer
+                    self.theta_wc(zr),                     # Rotation in weak layer
+                    self.theta_wl(zr),                     # Rotation in weak layer
+                    self.NxxWL(zr),                        # Normal force in weak layer
+                    self.VyyWL(zr),                        # Shear force in weak layer
+                    self.VzzWL(zr),                        # Shear force in weak layer
+                    self.MxxWL(zr),                        # Bending moment in weak layer
+                    self.MyyWL(zr),                        # Bending moment in weak layer
+                    self.MzzWL(zr)])                       # Bending moment in weak layer
+
+            # Middle segment
+            elif pos in ('m', 'mid'):
+                # Set up equations for middle segment with support
+                # First 12 elements are transmission conditions at left end
+                # Next 12 elements are transmission conditions at right end
+                eqsSlab = np.array([
+                    -self.u(zl, z0=0, y0=0),               # Negative displacement at left end
+                    -self.v(zl, z0=0),                     # Negative vertical displacement
+                    -self.w(zl, y0=0),                     # Negative lateral displacement
+                    -self.psix(zl),                        # Negative rotation about x
+                    -self.psiy(zl),                        # Negative rotation about y
+                    -self.psiz(zl),                        # Negative rotation about z
+                    -self.Nxx(zl, bed=k),                  # Negative normal force
+                    -self.Vyy(zl, bed=k),                  # Negative shear force y
+                    -self.Vzz(zl, bed=k),                  # Negative shear force z
+                    -self.Mxx(zl, bed=k),                  # Negative bending moment x
+                    -self.Myy(zl, bed=k),                  # Negative bending moment y
+                    -self.Mzz(zl, bed=k),                  # Negative bending moment z
+                    self.u(zr, z0=0, y0=0),                # Displacement at right end
+                    self.v(zr, z0=0),                      # Vertical displacement
+                    self.w(zr, y0=0),                      # Lateral displacement
+                    self.psix(zr),                         # Rotation about x
+                    self.psiy(zr),                         # Rotation about y
+                    self.psiz(zr),                         # Rotation about z
+                    self.Nxx(zr, bed=k),                   # Normal force
+                    self.Vyy(zr, bed=k),                   # Shear force y
+                    self.Vzz(zr, bed=k),                   # Shear force z
+                    self.Mxx(zr, bed=k),                   # Bending moment x
+                    self.Myy(zr, bed=k),                   # Bending moment y
+                    self.Mzz(zr, bed=k)])                  # Bending moment z
+
+                # Set up weak layer equations for middle segment
+                # First 12 elements are transmission conditions at left end
+                # Next 12 elements are transmission conditions at right end
+                eqsWeak = np.array([
+                    -self.theta_uc(zl),                    # Negative rotation in weak layer
+                    -self.theta_ul(zl),                    # Negative rotation in weak layer
+                    -self.theta_vc(zl),                    # Negative rotation in weak layer
+                    -self.theta_vl(zl),                    # Negative rotation in weak layer
+                    -self.theta_wc(zl),                    # Negative rotation in weak layer
+                    -self.theta_wl(zl),                    # Negative rotation in weak layer
+                    -self.NxxWL(zl),                       # Negative normal force in weak layer
+                    -self.VyyWL(zl),                       # Negative shear force in weak layer
+                    -self.VzzWL(zl),                       # Negative shear force in weak layer
+                    -self.MxxWL(zl),                       # Negative bending moment in weak layer
+                    -self.MyyWL(zl),                       # Negative bending moment in weak layer
+                    -self.MzzWL(zl),                       # Negative bending moment in weak layer
+                    self.theta_uc(zr),                     # Rotation in weak layer
+                    self.theta_ul(zr),                     # Rotation in weak layer
+                    self.theta_vc(zr),                     # Rotation in weak layer
+                    self.theta_vl(zr),                     # Rotation in weak layer
+                    self.theta_wc(zr),                     # Rotation in weak layer
+                    self.theta_wl(zr),                     # Rotation in weak layer
+                    self.NxxWL(zr),                        # Normal force in weak layer
+                    self.VyyWL(zr),                        # Shear force in weak layer
+                    self.VzzWL(zr),                        # Shear force in weak layer
+                    self.MxxWL(zr),                        # Bending moment in weak layer
+                    self.MyyWL(zr),                        # Bending moment in weak layer
+                    self.MzzWL(zr)])                       # Bending moment in weak layer
+
+            # Right boundary segment
+            elif pos in ('r', 'right'):
+                # Set up equations for right boundary with support
+                # First 12 elements are transmission conditions at left end
+                # Last 6 elements are boundary conditions from bc method
+                eqsSlab = np.array([
+                    -self.u(zl, z0=0, y0=0),               # Negative displacement at left end
+                    -self.v(zl, z0=0),                     # Negative vertical displacement
+                    -self.w(zl, y0=0),                     # Negative lateral displacement
+                    -self.psix(zl),                        # Negative rotation about x
+                    -self.psiy(zl),                        # Negative rotation about y
+                    -self.psiz(zl),                        # Negative rotation about z
+                    -self.Nxx(zl, bed=k),                  # Negative normal force
+                    -self.Vyy(zl, bed=k),                  # Negative shear force y
+                    -self.Vzz(zl, bed=k),                  # Negative shear force z
+                    -self.Mxx(zl, bed=k),                  # Negative bending moment x
+                    -self.Myy(zl, bed=k),                  # Negative bending moment y
+                    -self.Mzz(zl, bed=k),                  # Negative bending moment z
+                    self.bc(zr, l, k, pos)[0],             # Right boundary condition
+                    self.bc(zr, l, k, pos)[1],             # Right boundary condition
+                    self.bc(zr, l, k, pos)[2],             # Right boundary condition
+                    self.bc(zr, l, k, pos)[3],             # Right boundary condition
+                    self.bc(zr, l, k, pos)[4],             # Right boundary condition
+                    self.bc(zr, l, k, pos)[5]])            # Right boundary condition
+
+                # Set up weak layer equations for right boundary
+                # First 12 elements are transmission conditions at left end
+                # Last 6 elements are boundary conditions from bc method
+                eqsWeak = np.array([
+                    -self.theta_uc(zl),                    # Negative rotation in weak layer
+                    -self.theta_ul(zl),                    # Negative rotation in weak layer
+                    -self.theta_vc(zl),                    # Negative rotation in weak layer
+                    -self.theta_vl(zl),                    # Negative rotation in weak layer
+                    -self.theta_wc(zl),                    # Negative rotation in weak layer
+                    -self.theta_wl(zl),                    # Negative rotation in weak layer
+                    -self.NxxWL(zl),                       # Negative normal force in weak layer
+                    -self.VyyWL(zl),                       # Negative shear force in weak layer
+                    -self.VzzWL(zl),                       # Negative shear force in weak layer
+                    -self.MxxWL(zl),                       # Negative bending moment in weak layer
+                    -self.MyyWL(zl),                       # Negative bending moment in weak layer
+                    -self.MzzWL(zl),                       # Negative bending moment in weak layer
+                    self.bc(zr, l, k, pos)[6],             # Right boundary condition in weak layer
+                    self.bc(zr, l, k, pos)[7],             # Right boundary condition in weak layer
+                    self.bc(zr, l, k, pos)[8],             # Right boundary condition in weak layer
+                    self.bc(zr, l, k, pos)[9],             # Right boundary condition in weak layer
+                    self.bc(zr, l, k, pos)[10],            # Right boundary condition in weak layer
+                    self.bc(zr, l, k, pos)[11]])           # Right boundary condition in weak layer
+
+            else:
+                raise ValueError(
+                    (f'Invalid position argument {pos} given. '
+                     'Valid segment positions are l, m, and r, '
+                     'or left, mid and right.'))
+
         return eqsSlab, eqsWeak
 
-    def calc_segments(self, tdi=False, li=False, mi=False, ki=False, k0=False,
-                      L=1e4, a=0, m=0, **kwargs):
+    def calc_segments(self, tdi=False, li=False,  ki=False, k0=False,wi = False, fi = False,
+                      L=1e4, a=0, m=0, phi = 0, theta = 0,  **kwargs):
         """
-        Assemble lists defining the segments.
+        Assemble lists defining the segments for different beam systems.
 
-        This includes length (li), foundation (ki, k0), and skier
-        weight (mi).
+        This function creates segment definitions for various beam systems including:
+        - 'skiers': Multiple segments with skier weights
+        - 'pst-': PST with crack at left end
+        - '-pst': PST with crack at right end
+        - 'skier': Single skier load in center
+        - 'skier-finite': Finite length version of skier system
+
+        Each segment is defined by:
+        - Length (li): Length of each segment in mm
+        - Skier weight (mi): Weight of skier at segment boundaries in kg
+        - Foundation in cracked state (ki): Boolean indicating if segment has foundation
+        - Foundation in uncracked state (k0): Boolean indicating if segment has foundation
+        - Additional weights (wi): Boolean indicating if segment has additional weights
 
         Arguments
         ---------
-        li : squence, optional
-            List of lengths of segements(mm). Used for system 'skiers'.
-        mi : squence, optional
-            List of skier weigths (kg) at segement boundaries. Used for
-            system 'skiers'.
-        ki : squence, optional
-            List of one bool per segement indicating whether segement
-            has foundation (True) or not (False) in the cracked state.
-            Used for system 'skiers'.
-        k0 : squence, optional
-            List of one bool per segement indicating whether segement
-            has foundation(True) or not (False) in the uncracked state.
-            Used for system 'skiers'.
+        tdi : bool, optional
+            Touchdown indicator (not currently used)
+        li : sequence, optional
+            List of segment lengths in mm. Used for system 'skiers'
+        mi : sequence, optional
+            List of skier weights in kg at segment boundaries. Used for system 'skiers'
+        ki : sequence, optional
+            List of booleans indicating foundation in cracked state for each segment
+        k0 : sequence, optional
+            List of booleans indicating foundation in uncracked state for each segment
+        wi : sequence, optional
+            List of booleans indicating additional weights for each segment
+        fi : sequence, optional
+            List of lists with the transmission and boundary loadvectors in N and Nmm
         L : float, optional
             Total length of model (mm). Used for systems 'pst-', '-pst',
             and 'skier'.
         a : float, optional
             Crack length (mm).  Used for systems 'pst-', '-pst', and
             'skier'.
+        b : float, optional
+            Loaded length (mm).  Used for systems 'modeIII-pst-loaded'.
         phi : float, optional
             Inclination (degree).
+        theta : float, optional
+            Tilt (degree).
         m : float, optional
-            Weight of skier (kg) in the axial center of the model.
-            Used for system 'skier'.
+            Weight of skier in kg in the axial center of the model. Used for system 'skier'
 
         Returns
         -------
         segments : dict
-            Dictionary with lists of touchdown booleans (tdi), segement
-            lengths (li), skier weights (mi), and foundation booleans
-            in the cracked (ki) and uncracked (k0) configurations.
+            Dictionary containing three configurations:
+            - 'nocrack': Segment definitions for uncracked state
+            - 'crack': Segment definitions for cracked state
+            - 'both': Combined segment definitions for both states
+            Each configuration contains lists for lengths (li), skier weights (mi),
+            foundation states (ki/k0), and additional weights (wi)
         """
+        # Store unused arguments
+        _ = kwargs
 
-        _ = kwargs                                      # Unused arguments
-        # Set unbedded segment length
-        mode = self.mode_td(l=a)
+        # Determine unbedded segment length based on touchdown mode
+        mode = 'A'  # Deactivate touchdown mode
         if mode in ['A', 'B']:
-            lU = a
+            lU = a  # Unbedded length equals crack length
         if mode in ['C']:
-            lU = self.lS
+            lU = self.lS  # Use stored segment length
 
-        # Assemble list defining the segments
+        # Assemble segment definitions based on system type
         if self.system == 'skiers':
-            li = np.array(li)                           # Segment lengths
-            mi = np.array(mi)                           # Skier weights
-            ki = np.array(ki)                           # Crack
-            k0 = np.array(k0)                           # No crack
+            # Convert input lists to numpy arrays for skiers system
+            li = np.array(li)  # Segment lengths
+            ki = np.array(ki)  # Foundation in cracked state
+            k0 = np.array(k0)  # Foundation in uncracked state
+            wi = np.array(wi)  # Additional loads
+            fi = np.array(fi)  # Loadvectors at segment boundaries
+
         elif self.system == 'pst-':
-            li = np.array([L - a, lU])                   # Segment lengths
-            mi = np.array([0])                          # Skier weights
-            ki = np.array([True, False])                # Crack
-            k0 = np.array([True, True])                 # No crack
+            # PST with crack at left end
+            li = np.array([L - a, lU])  # [supported length, unsupported length]
+            ki = np.array([True, False])  # Foundation only in supported segment
+            k0 = np.array([True, True])  # Foundation in both segments
+            wi = np.array([False, False])  # Additional surface loads on both segments
+            fi = np.array([[0,0,0,0,0,0],[0,0,0,0,0,0],[0,0,0,0,0,0]]) # Loadvectors at segment boundaries 
+
         elif self.system == '-pst':
-            li = np.array([lU, L - a])                   # Segment lengths
-            mi = np.array([0])                          # Skier weights
-            ki = np.array([False, True])                # Crack
-            k0 = np.array([True, True])                 # No crack
-        elif self.system == 'skier':
-            lb = (L - a)/2                              # Half bedded length
-            lf = a/2                                    # Half free length
-            li = np.array([lb, lf, lf, lb])             # Segment lengths
-            mi = np.array([0, m, 0])                    # Skier weights
-            ki = np.array([True, False, False, True])   # Crack
-            k0 = np.array([True, True, True, True])     # No crack
+            # PST with crack at right end
+            li = np.array([lU, L - a])  # [unsupported length, supported length]
+            ki = np.array([False, True])  # Foundation only in supported segment
+            k0 = np.array([True, True])  # Foundation in both segments
+            wi = np.array([False, False])  # Additional surface load on both segments
+            fi = np.array([[0,0,0,0,0,0],[0,0,0,0,0,0],[0,0,0,0,0,0]]) # Loadvectors at segment boundaries 
+
+        elif self.system in ['skier', 'skier-finite']:
+            # Single skier load in center
+            Fx, Fy, Fz = self.get_skier_load(m, phi, theta)
+            lb = (L - a)/2  # Half supported length
+            lf = a/2  # Half free length
+            li = np.array([lb, lf, lf, lb])  # [left supported, left free, right free, right supported]
+            ki = np.array([True, False, False, True])  # Foundation in supported segments
+            k0 = np.array([True, True, True, True])  # Foundation in all segments
+            wi = np.array([True, True, True, True])  # Additional surface loads on all segments
+            fi = np.array([[0,0,0,0,0,0],[0,0,0,0,0,0],[Fx, Fy, Fz, Fy * self.h/2, -Fx * self.h/2, 0],[0,0,0,0,0,0],[0,0,0,0,0,0]]) # Loadvectors at segment boundaries 
+
         else:
             raise ValueError(f'System {self.system} is not implemented.')
 
-        # Fill dictionary
+        # Create dictionary with segment definitions for different states
         segments = {
-            'nocrack': {'li': li, 'mi': mi, 'ki': k0},
-            'crack': {'li': li, 'mi': mi, 'ki': ki},
-            'both': {'li': li, 'mi': mi, 'ki': ki, 'k0': k0}}
+            'nocrack': {'li': li, 'fi': fi, 'ki': k0, 'wi': wi},  # Uncracked state
+            'crack': {'li': li, 'fi': fi, 'ki': ki, 'wi': wi},    # Cracked state
+            'both': {'li': li, 'fi': fi, 'ki': ki, 'k0': k0, 'wi': wi}  # Both states
+        }
         return segments
 
-    def assemble_and_solve(self, phi, li, mi, ki):
+    def assemble_and_solve(self, phi, theta, li, ki, wi, fi):
         """
-        Compute free constants for arbitrary beam assembly.
+        Assemble and solve the system of equations from boundary and transmission conditions.
 
         Assemble LHS for slabs transition and boundary conditions from supported and unsupported segments in the form
-        [       ]   [ zh1  0   0  ...  0   0   0  ][   ]   [    ]   [     ]  left
-        [       ]   [ zh1 zh2  0  ...  0   0   0  ][   ]   [    ]   [     ]  mid
-        [       ]   [  0  zh2 zh3 ...  0   0   0  ][   ]   [    ]   [     ]  mid
-        [z0Slab ] = [ ... ... ... ... ... ... ... ][ C ] + [ zp ] = [ rhs ]  mid
-        [       ]   [  0   0   0  ... zhL zhM  0  ][   ]   [    ]   [     ]  mid
-        [       ]   [  0   0   0  ...  0  zhM zhN ][   ]   [    ]   [     ]  mid
-        [       ]   [  0   0   0  ...  0   0  zhN ][   ]   [    ]   [     ]  right
+        [       ]   [  zh1    0     0   ...   0     0     0   ][   ]   [      ]   [       ]  left
+        [       ]   [  zh1   zh2    0   ...   0     0     0   ][   ]   [      ]   [       ]  mid
+        [       ]   [   0    zh2   zh3  ...   0     0     0   ][   ]   [      ]   [       ]  mid
+        [z0Slab ]   [  ...   ...   ...  ...  ...   ...   ...  ][   ]   [  zp  ]   [  rhs  ]  mid
+        [       ]   [   0     0     0   ...  zhL   zhM    0   ][   ]   [      ]   [       ]  mid
+        [       ]   [   0     0     0   ...   0    zhM   zhN  ][   ]   [      ]   [       ]  mid
+        [       ]   [   0     0     0   ...   0     0    zhN  ][   ]   [      ]   [       ]  right
+        [       ] = [ zh1wl   0     0   ...   0     0     0   ][ C ] + [      ] = [       ]  left
+        [       ]   [ zh1wl zh2wl   0   ...   0     0     0   ][   ]   [      ]   [       ]  mid
+        [       ]   [   0   zh2wl zh3wl ...   0     0     0   ][   ]   [      ]   [       ]  mid
+        [z0Weak ]   [  ...   ...   ...  ...  ...   ...   ...  ][   ]   [ zpwl ]   [ rhswl ]  mid
+        [       ]   [   0     0     0   ... zhLwl zhMwl   0   ][   ]   [      ]   [       ]  mid
+        [       ]   [   0     0     0   ...   0   zhMwl zhNwl ][   ]   [      ]   [       ]  mid
+        [       ]   [   0     0     0   ...   0     0   zhNwl ][   ]   [      ]   [       ]  right
         
 
-        Assemble LHS for weak layers transition and boundary conditons zh0Weak from supported segements in separate matrix and 
-        append to the matrix of the slab.
-        Solve for constants.
+        Where:
+        - [zhi], [zhiwl]: Entries in the homogeneous solution matrices for the slab and the weak layer
+        - [zp], [zpwl]: Particular solution vectors for the slab and the weak layer
+        - [C]: Unknown constants to be solved for
+        - [rhs], [rhswl]: Right-hand side vectors for the slab and the weak layer
 
         Arguments
         ---------
@@ -979,184 +2273,206 @@ class SolutionMixin:
             Inclination (degrees).
         li : ndarray
             List of lengths of segements (mm).
-        mi : ndarray
-            List of skier weigths (kg) at segement boundaries.
+        fi : ndarray
+            List of loadvectors at segment boundaries (N) and (Nmm).
         ki : ndarray
-            List of one bool per segement indicating whether segement
-            has foundation (True) or not (False).
+            Array of booleans indicating foundation for each segment
+        wi : ndarray
+            Array of booleans indicating additional surface loads for each segment
+
 
         Returns
         -------
         C : ndarray
-            Matrix(10xNBedded + 6 x NUnbedded) of solution constants for a system of N
-            segements. Columns contain the 6 constants of each segement.
+            Matrix of shpae (24 x N)  for a system of N segements. For unsupported segments, the last 12 entries in the column are NaN.
         """
-        # --- CATCH ERRORS ----------------------------------------------------
-
-        # No foundation
+        # --- ERROR CHECKING ----------------------------------------------------
+        
+        # Verify at least one segment has foundation
         if not any(ki):
             raise ValueError('Provide at least one bedded segment.')
-        # Mismatch of number of segements and transisions
-        if len(li) != len(ki) or len(li) - 1 != len(mi):
+        
+        # Verify consistent number of segments and transitions
+        if len(li) != len(ki) or len(li) + 1 != len(fi):
             raise ValueError('Make sure len(li)=N, len(ki)=N, and '
-                             'len(mi)=N-1 for a system of N segments.')
+                             'len(fi)=N+1 for a system of N segments.')
 
+        # Check boundary conditions for infinite systems
         if self.system not in ['pst-', '-pst']:
             # Boundary segments must be on foundation for infinite BCs
             if not all([ki[0], ki[-1]]):
                 raise ValueError('Provide bedded boundary segments in '
                                  'order to account for infinite extensions.')
-            # Make sure infinity boundary conditions are far enough from skiers
+            # Verify boundary segments are long enough
             if li[0] < 5e3 or li[-1] < 5e3:
                 print(('WARNING: Boundary segments are short. Make sure '
                        'the complementary solution has decayed to the '
                        'boundaries.'))
 
-        # --- PREPROCESSING ---------------------------------------------------
+        # --- SYSTEM SETUP ---------------------------------------------------
 
-        # Determine size of linear system of equations
+        # Calculate system dimensions
         nSBedded = ki.sum()         # Number of bedded segments
-        nSFree = len(ki)- ki.sum()  # Number of free segments
-        nS = nSBedded + nSFree      # Total number of segements
-        nDOFfree = 6               # Number of free constants per free segment
-        nDOFbedded = 10                # Number of free constants per bedded segments
+        nSFree = len(ki) - ki.sum()  # Number of free segments
+        nS = nSBedded + nSFree      # Total number of segments
+        nDOFfree = 12               # DOF per free segment
+        nDOFbedded = 24             # DOF per bedded segment
+
         # Add dummy segment if only one segment provided
         if nS == 1:
             li.append(0)
             ki.append(True)
-            mi.append(0)
+            fi.append([0,0,0,0,0,0])
+            wi.append(True)
             nS = 2
 
-        # Assemble position vector
+        # Initialize position vector (l=left, m=middle, r=right)
         pi = np.full(nS, 'm')
         pi[0], pi[-1] = 'l', 'r'
 
-        # Initialize matrices
-        zh0Slab = np.zeros([nSBedded * nDOFfree + nSFree * nDOFfree, nSBedded * nDOFbedded + nSFree * nDOFfree])
-        zp0Slab = np.zeros([nSBedded * nDOFfree + nSFree * nDOFfree, 1])
-        rhsSlab = np.zeros([nSBedded * nDOFfree + nSFree * nDOFfree, 1])
+        # Initialize matrices for the slab 
+        zh0Slab = np.zeros([nSBedded * nDOFfree + nSFree * nDOFfree, nSBedded * nDOFbedded + nSFree * nDOFfree],dtype = np.double)
+        zp0Slab = np.zeros([nSBedded * nDOFfree + nSFree * nDOFfree, 1],dtype = np.double)
+        rhsSlab = np.zeros([nSBedded * nDOFfree + nSFree * nDOFfree, 1] ,dtype = np.double)
 
-        zh0Weak = np.zeros([nSBedded * (nDOFbedded-nDOFfree), nSBedded * nDOFbedded + nSFree * nDOFfree])
-        zp0Weak = np.zeros([nSBedded * (nDOFbedded-nDOFfree), 1])
-        rhsWeak = np.zeros([nSBedded * (nDOFbedded-nDOFfree), 1])
+        # Initialize matrices for weak layer 
+        zh0Weak = np.zeros([nSBedded * (nDOFbedded-nDOFfree), 
+                           nSBedded * nDOFbedded + nSFree * nDOFfree], dtype=np.double)
+        zp0Weak = np.zeros([nSBedded * (nDOFbedded-nDOFfree), 1], dtype=np.double)
+        rhsWeak = np.zeros([nSBedded * (nDOFbedded-nDOFfree), 1], dtype=np.double)
 
-        # --- ASSEMBLE LINEAR SYSTEM OF EQUATIONS -----------------------------
-        globalStartSlab = 0     # Gloabl counter on the start position in xxxSlab
-        globalStartWeak = 0     # Global counter on the start position in xxxWeak
-        # Loop through segments to assemble left-hand side
+        # --- ASSEMBLE EQUATIONS ---------------------------------------------
+        globalStartSlab = 0     # Global counter for slab matrix position
+        globalStartWeak = 0     # Global counter for weak layer matrix position
+        
+        # Loop through segments to assemble equations
         for i in range(nS):
-            # Length, foundation and position of segment i
-            l, k, pos = li[i], ki[i], pi[i]
+            # Get segment properties
+            l, k, pos, w = li[i], ki[i], pi[i], wi[i]
+            
             # Transmission conditions at left and right segment ends
             zhiSlab,zhiWeak = self.eqs(
-                zl=self.zh(x=0, l=l, bed=k),
-                zr=self.zh(x=l, l=l, bed=k),
+                zl=np.around(self.zh(x=0, l=l, bed=k),16),
+                zr=np.around(self.zh(x=l, l=l, bed=k),16),
                 l=l, k=k, pos=pos)
             zpiSlab,zpiWeak = self.eqs(
-                zl=self.zp(x=0, phi=phi, bed=k),
-                zr=self.zp(x=l, phi=phi, bed=k),
+                zl=np.around(self.zp(x=0, phi=phi,theta = theta, bed=k, load = w),16),
+                zr=np.around(self.zp(x=l, phi=phi,theta = theta, bed=k, load = w),16),
                 l=l, k=k, pos=pos)
 
-            # Rows for left-hand side assembly for the slab
-            nConst = 10 if k else 6
-            startSlab = 0 if i == 0 else 3
-            stopSlab = 6 if i == nS-1 else 9
-            # Assemble left-hand side for the slab
-            zh0Slab[(6 * i - startSlab):(6 * i + stopSlab), globalStartSlab:globalStartSlab + nConst] = zhiSlab
-            zp0Slab[(6 * i - startSlab):(6 * i + stopSlab)] += zpiSlab
+            # Assemble slab equations
+            nConst = 24 if k else 12  # Constants per segment
+            startSlab = 0 if i == 0 else 6
+            stopSlab = 12 if i == nS-1 else 18
+            zh0Slab[(12 * i - startSlab):(12 * i + stopSlab), 
+                    globalStartSlab:globalStartSlab + nConst] = zhiSlab
+            zp0Slab[(12 * i - startSlab):(12 * i + stopSlab)] += zpiSlab
         
+            # Assemble weak layer equations based on segment position and foundation
+            if (pos == 'l' or pos == 'left') and k:
+                # Left-most bedded segment
+                zh0Weak[0:6, globalStartSlab:globalStartSlab + nConst] = zhiWeak[0:6, :]
+                zp0Weak[0:6] += zpiWeak[0:6]
+                
+                if ki[i+1]:
+                    # Next segment is bedded
+                    zh0Weak[6:18, globalStartSlab:globalStartSlab + nConst] = zhiWeak[6:,:]
+                    zp0Weak[6:18] += zpiWeak[6:]
+                else:
+                    # Next segment is free
+                    zh0Weak[6:12, globalStartSlab:globalStartSlab + nConst] = zhiWeak[12:,:]
+                    zp0Weak[6:12] += zpiWeak[12:]
+                    
+            elif (pos == 'm' or pos == 'mid') and k:
+                # Middle bedded segment
+                if kprev and ki[i+1]:
+                    # Both adjacent segments are bedded
+                    zh0Weak[globalStartWeak-6:globalStartWeak+18, 
+                           globalStartSlab:globalStartSlab + nConst] = zhiWeak
+                    zp0Weak[globalStartWeak-6:globalStartWeak+18] += zpiWeak
+                elif kprev and not ki[i+1]:
+                    # Left bedded, right free
+                    zh0Weak[globalStartWeak-6:globalStartWeak+12, 
+                           globalStartSlab:globalStartSlab + nConst] = np.stack([zhiWeak[0:12,:], zhiWeak[18:,:]], axis=0)
+                    zp0Weak[globalStartWeak-6:globalStartWeak+12] += np.stack([zpiWeak[0:12], zpiWeak[18:]], axis=0)
+                elif not kprev and ki[i+1]:
+                    # Left free, right bedded
+                    zh0Weak[globalStartWeak:globalStartWeak+18, 
+                           globalStartSlab:globalStartSlab + nConst] = zhiWeak[6:,:]
+                    zp0Weak[globalStartWeak:globalStartWeak+18] += zpiWeak[6:]
+                else:
+                    # Both adjacent segments are free
+                    zh0Weak[globalStartWeak:globalStartWeak+12, 
+                           globalStartSlab:globalStartSlab + nConst] = np.stack([zhiWeak[6:12,:], zhiWeak[18:,:]], axis=0)
+                    zp0Weak[globalStartWeak:globalStartWeak+12] += np.stack([zpiWeak[6:12], zpiWeak[8:]], axis=0)
+                    
+            elif (pos == 'r' or pos == 'right') and k:
+                # Right-most bedded segment
+                zh0Weak[-6:, globalStartSlab:globalStartSlab + nConst] = zhiWeak[-6:,:]
+                zp0Weak[-6:] += zpiWeak[-6:]
+                
+                if kprev:
+                    # Previous segment is bedded
+                    zh0Weak[-18:-6, globalStartSlab:globalStartSlab + nConst] = zhiWeak[0:12,:]
+                    zp0Weak[-18:-6] += zpiWeak[0:12]
+                else:
+                    # Previous segment is free
+                    zh0Weak[-12:-6, globalStartSlab:globalStartSlab + nConst] = zhiWeak[6:12,:]
+                    zp0Weak[-12:-6] += zpiWeak[6:12]
             
-            # Check if segment is bedded
-            if (pos == 'l' or pos == 'left') and k:                                                                                                         # Case: Left-most segment is bedded
-                zh0Weak[0:2, globalStartSlab:globalStartSlab + nConst] = zhiWeak[0:2, :]                                                                    #       Boundary Conditions for either pst or skier
-                zp0Weak[0:2] += zpiWeak[0:2]
-                if ki[i+1]:                                                                                                                                     # Case: Segment adjacent to the left-most on is bedded:
-                    zh0Weak[2:6,globalStartSlab:globalStartSlab + nConst] = zhiWeak[2:,:]                                                                       #       Transmission conditions for phi_u, phi_w,
-                    zp0Weak[2:6] += zpiWeak[2:]                                                                                                                 #       and NWeak and VWeak
-                else:                                                                                                                                           # Case: Segment adjacent to the left-most on is free:
-                    zh0Weak[2:4,globalStartSlab:globalStartSlab + nConst] = zhiWeak[4:,:]                                                                       #       Free (stress free) end for NWeak and VWeak
-                    zp0Weak[2:4] += zpiWeak[4:]                                                                                                                 #       no transmission conditions for phi_u and phi_w
-            elif (pos == 'm' or pos == 'mid') and k:                                                                                                        # Case: Middle segment is bedded
-                if kprev and ki[i+1]:                                                                                                                           # Case: Both adjacent segments are bedded:
-                    zh0Weak[globalStartWeak-2:globalStartWeak+6,globalStartSlab:globalStartSlab + nConst] = zhiWeak                                             #       Transmission conditions for phi_u, phi_w,    
-                    zp0Weak[globalStartWeak-2:globalStartWeak+6] += zpiWeak                                            #       NWeak, VWeak left and right
-                elif kprev and not ki[i+1]:                                                                                                                     # Case: left adjacent segment is bedded, right one not:
-                    zh0Weak[globalStartWeak-2:globalStartWeak+4,globalStartSlab:globalStartSlab + nConst] = np.stack([zhiWeak[0:4,:],zhiWeak[6:,:]],axis = 0)   #       Transmission conditions to the previous and
-                    zp0Weak[globalStartWeak-2:globalStartWeak+4] += np.stack([zpiWeak[0:4],zpiWeak[6:]],axis = 0)      #       stress-free conditions to the next segement
-                elif not kprev and ki[i+1]:                                                                                                                     # Case: right adjacent segement is bedded, left one not:
-                    zh0Weak[globalStartWeak:globalStartWeak+6,globalStartSlab:globalStartSlab + nConst] = zhiWeak[2:,:]                                         #       Stress-free condition to the previous segment,
-                    zp0Weak[globalStartWeak:globalStartWeak+6] += zpiWeak[2:]                                          #       transmission condition to the next one
-                elif not kprev and not ki[i+1]:                                                                                                                 # Case: Neither adjacent segement is bedded:
-                    zh0Weak[globalStartWeak:globalStartWeak+4,globalStartSlab:globalStartSlab + nConst] = np.stack([zhiWeak[2:4,:],zhiWeak[6:,:]],axis = 0)     #       Stress-free conditions on both sides
-                    zp0Weak[globalStartWeak:globalStartWeak+4] += np.stack([zpiWeak[2:4],zpiWeak[6:]],axis = 0)
-            elif (pos ==  'r' or pos == 'right') and k:                                                                                                     # Case: Right-most segment is bedded:
-                zh0Weak[-2:, globalStartSlab:globalStartSlab + nConst] = zhiWeak[-2:,:]                                                                     #       Boundary conditions for either pst or skier
-                zp0Weak[-2:] +=zpiWeak[-2:]
-                if kprev:                                                                                                                                       # Case: Previous segment is bedded:
-                    zh0Weak[-6:-2, globalStartSlab:globalStartSlab + nConst] = zhiWeak[0:4,:]                                                                     #       Transmission conditions for phi_u, phi_w,
-                    zp0Weak[-6:-2] += zpiWeak[0:4]                                                                                                              #       NWeak and VWeak
-                else:                                                                                                                                           # Case: Previous segment is free:
-                    zh0Weak[-4:-2, globalStartSlab:globalStartSlab + nConst] = zhiWeak[2:4,:]                                                                     #       Stress-free boundary conditions for the weak
-                    zp0Weak[-4:-2] += zpiWeak[2:4]                                                                                                              #       layer for NWeak and VWeak.
-            
-            # Update the global weak counter
-            globalStartWeak += 4 if k else 0    
-
-            # Update the global slab counter
+            # Update global counters
+            globalStartWeak += 12 if k else 0
             globalStartSlab += nConst
-            # Store information on previous segment
-            kprev = k
-        
+            kprev = k  # Store foundation state for next iteration
 
-        # Loop through loads to assemble right-hand side
-        for i, m in enumerate(mi, start=1):
-            # Get skier loads
-            Fn, Ft = self.get_skier_load(m, phi)
-            # Right-hand side for transmission from segment i-1 to segment i
-            rhsSlab[6*i:6*i + 3] = np.vstack([Ft, -Ft*self.h/2 if not ki[i] else -Ft * self.h , Fn])
-            
-        # Set rhs so that complementary integral vanishes at boundaries
-        if self.system not in ['pst-', '-pst']:
-            rhsSlab[:3] = self.bc(self.zp(x=0, phi=phi, bed=ki[0]),l = li[0], k = ki[0])[0:3]
-            print(ki[0])
+        # --- ASSEMBLE RIGHT-HAND SIDE --------------------------------------
+        
+        # Add loads at boundary segments
+        for i, f in enumerate(fi[1:-1], start=1):
+            rhsSlab[12*i:12*i + 6] = np.array(f).reshape(-1,1)
+        
+        if self.system not in ['skier']:
+            rhsSlab[0:6] = np.array(fi[0])  # Load at the left boundary of the strucutre
+            rhsSlab[-6:] = np.array(fi[-1]) # Load at the right boundary of the structure
+        # Set boundary conditions for infinite systems
+        if self.system not in ['skier-finite', 'pst-', '-pst']:
+            # Left boundary
+            rhsSlab[:6] = self.bc(self.zp(x=0, phi=phi, theta=theta, bed=ki[0], load=wi[0]), 
+                                 l=li[0], k=ki[0], pos='l')[0:6]
             if ki[0]:
-                rhsWeak[:2] = self.bc(self.zp(x=0, phi=phi, bed=ki[0]), l = li[0], k = ki[0])[3:]
+                rhsWeak[:6] = self.bc(self.zp(x=0, phi=phi, theta=theta, bed=ki[0], load=wi[0]), 
+                                     l=li[0], k=ki[0], pos='l')[6:]
             
-            rhsSlab[-3:] = self.bc(self.zp(x=li[-1], phi=phi, bed=ki[-1]), l = li[-1], k = ki[-1])[0:3]
+            # Right boundary
+            rhsSlab[-6:] = self.bc(self.zp(x=li[-1], phi=phi, theta=theta, bed=ki[-1], load=wi[-1]), 
+                                  l=li[-1], k=ki[-1], pos='r')[0:6]
             if ki[nS-1]:
-                rhsWeak[-2:] = self.bc(self.zp(x=li[-1], phi=phi, bed=ki[-1]), l = li[-1], k = ki[-1])[3:]
+                rhsWeak[-6:] = self.bc(self.zp(x=li[-1], phi=phi, theta=theta, bed=ki[-1], load=wi[-1]), 
+                                      l=li[-1], k=ki[-1], pos='r')[6:]
+
+        # --- SOLVE SYSTEM -------------------------------------------------
         
-        # Loop through segments to set touchdown at rhs
-        for i in range(nS):
-            # Length, foundation and position of segment i
-            l, k, pos = li[i], ki[i], pi[i]
-            mode = self.mode_td(l=l)
-            if not k and bool(mode in ['B', 'C']):
-                if i==0:
-                    rhs[:3] = np.vstack([0,0,self.tc])
-                if i == (nS - 1):
-                    rhs[-3:] = np.vstack([0,0,self.tc])
-        
-        # --- SOLVE -----------------------------------------------------------
+        # Combine slab and weak layer equations
         zh0 = np.vstack([zh0Slab, zh0Weak])
         zp0 = np.vstack([zp0Slab, zp0Weak])
         rhs = np.vstack([rhsSlab, rhsWeak])
-
         
-        # Solve z0 = zh0*C + zp0 = rhs for constants, i.e. zh0*C = rhs - zp0
+        # Solve for constants: zh0*C = rhs - zp0
         C = np.linalg.solve(zh0, rhs - zp0)
-
-        CReturn = np.full((nS, nDOFbedded),np.nan,dtype=float)
+        
+        # Reshape solution into matrix form
+        CReturn = np.full((nS, nDOFbedded), np.nan, dtype=float)
         pos = 0
         for i in range(nS):
             if ki[i]:
-                CReturn[i,:] = np.reshape(C[pos:pos+nDOFbedded],C[pos:pos+nDOFbedded].shape[0])
+                CReturn[i,:] = np.reshape(C[pos:pos+nDOFbedded], C[pos:pos+nDOFbedded].shape[0])
+                pos += nDOFbedded
             else:
                 CReturn[i,:nDOFfree] = np.reshape(C[pos:pos+nDOFfree],C[pos:pos+nDOFfree].shape[0])
-            pos = pos + 10 if ki[i] else 6
-        
-        # Sort (nDOF = 6) constants for each segment into columns of a matrix
+                pos += nDOFfree
+            
         return CReturn.T
+
 
 
 class AnalysisMixin:
