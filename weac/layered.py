@@ -20,7 +20,7 @@ class Layered(FieldQuantitiesMixin, SolutionMixin, AnalysisMixin,
     analysis from AnalysisMixin().
     """
 
-    def __init__(self, system='pst-', layers=None, phi=0):
+    def __init__(self, system='pst-', layers=None, phi=0, theta=0, b=290):
         """
         Initialize model with user input.
 
@@ -40,7 +40,6 @@ class Layered(FieldQuantitiesMixin, SolutionMixin, AnalysisMixin,
         super().__init__(system=system)
 
         # Set material properties and set up model
-        self.set_beam_properties(layers if layers else [[240, 200], ], phi)
-        self.set_foundation_properties()
+        self.set_beam_properties(layers if layers else [[240, 200], ], phi=phi, theta=theta, b=b)
         self.calc_fundamental_system()
-        self.calc_touchdown_system()
+        #self.calc_touchdown_system()
