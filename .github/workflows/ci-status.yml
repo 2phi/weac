@@ -1,0 +1,41 @@
+name: CI status check 🚀
+
+on:
+  pull_request:
+    branches: [ main, develop ]
+
+jobs:
+  format:
+    uses: ./.github/workflows/format.yml
+
+  pylint:
+    uses: ./.github/workflows/pylint.yml
+
+  tests:
+    uses: ./.github/workflows/tests.yml
+
+  after-jobs:
+    needs: [format, pylint, tests]
+    runs-on: ubuntu-latest
+    if: success()
+    outputs:
+      success: ${{ steps.setoutput.outputs.success }}
+    steps:
+      - id: setoutput
+        run: echo "success=true" >> $GITHUB_OUTPUT
+
+  status-check:
+    runs-on: ubuntu-latest
+    if: always()
+    needs: [format, pylint, tests, after-jobs]
+    steps:
+      - name: Check if all jobs passed
+        run: |
+          passed="${{ needs.after-jobs.outputs.success }}"
+          if [[ $passed == "true" ]]; then
+            echo "All CI checks passed successfully"
+            exit 0
+          else
+            echo "One or more CI checks failed"
+            exit 1
+          fi 

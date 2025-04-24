@@ -8,6 +8,8 @@ on:
   # Run tests on pull_request events only for main and develop branches
   pull_request:
     branches: [ main, develop ]
+  # Allow this workflow to be called by other workflows
+  workflow_call:
 
 jobs:
   test:
