@@ -54,6 +54,9 @@ packages = ["weac"]
 package-data = {"*" = ["CITATION.cff"], "img" = ["*.png"]}
 
 [tool.ruff]
+line-length = 100
+
+[tool.ruff.lint]
 ignore = ["E741"]
 
 [tool.pylint.typecheck]
