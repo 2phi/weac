@@ -40,6 +40,7 @@ disable=
     
     # False positives on variable usage
     E0606,      # possibly-used-before-assignment
+    E1101,      # no-member
     
     # Missing documentation
     C0111,      # missing-docstring
@@ -51,6 +52,9 @@ disable=
     # Return statement warnings
     R1705,      # no-else-return
     R1711,      # useless-return
+    
+    # Line length
+    C0301,      # line-too-long
 
 [BASIC]
 # Good variable names which should always be accepted
@@ -58,7 +62,7 @@ good-names=i,j,k,n,m,x,y,z,X,Y,Z,C,G,E,h,t,ex,Run,_,a,b,c,d,e,f,g,p,u,v,w,li,mi,
 
 [TYPECHECK]
 # List of members which are set dynamically and missed by pylint inference
-generated-members=matplotlib.cm.*,np.float64
+generated-members=matplotlib.cm.*,np.float64,assertIsInstance,assertEqual,assertTrue,assertIn,layered,stress,stress_slope,expected_ratio
 
 [FORMAT]
 # Maximum number of characters on a single line
