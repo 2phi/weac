@@ -106,10 +106,28 @@
 <div class="mr-1">/</div><span aria-current="page" class="font-medium text-foreground overflow-hidden text-ellipsis whitespace-nowrap">weac.layered module</span>
 </nav>
 <div id="content" role="main">
-<section id="weac-layered-module">
-<h1>weac.layered module<a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#weac-layered-module">¶</a></h1>
+<section id="module-weac.layered">
+<span id="weac-layered-module"></span><h1>weac.layered module<a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#module-weac.layered">¶</a></h1>
+<p>Class for the elastic analysis of layered snow slabs.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="weac.layered.Layered">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">weac.layered.</span></span><span class="sig-name descname"><span class="pre">Layered</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">system</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'pst-'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">layers</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">touchdown</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/weac/layered.html#Layered"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#weac.layered.Layered" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#weac.layered.Layered'">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="weac.mixins.html#weac.mixins.FieldQuantitiesMixin" title="weac.mixins.FieldQuantitiesMixin"><code class="xref py py-class docutils literal notranslate"><span class="pre">FieldQuantitiesMixin</span></code></a>, <a class="reference internal" href="weac.mixins.html#weac.mixins.SlabContactMixin" title="weac.mixins.SlabContactMixin"><code class="xref py py-class docutils literal notranslate"><span class="pre">SlabContactMixin</span></code></a>, <a class="reference internal" href="weac.mixins.html#weac.mixins.SolutionMixin" title="weac.mixins.SolutionMixin"><code class="xref py py-class docutils literal notranslate"><span class="pre">SolutionMixin</span></code></a>, <a class="reference internal" href="weac.mixins.html#weac.mixins.AnalysisMixin" title="weac.mixins.AnalysisMixin"><code class="xref py py-class docutils literal notranslate"><span class="pre">AnalysisMixin</span></code></a>, <a class="reference internal" href="weac.mixins.html#weac.mixins.OutputMixin" title="weac.mixins.OutputMixin"><code class="xref py py-class docutils literal notranslate"><span class="pre">OutputMixin</span></code></a>, <a class="reference internal" href="weac.eigensystem.html#weac.eigensystem.Eigensystem" title="weac.eigensystem.Eigensystem"><code class="xref py py-class docutils literal notranslate"><span class="pre">Eigensystem</span></code></a></p>
+<p>Layered beam on elastic foundation model application interface.</p>
+<p>Inherits methods for the eigensystem calculation from the base
+class Eigensystem(), methods for the calculation of field
+quantities from FieldQuantitiesMixin(), methods for the solution
+of the system from SolutionMixin() and methods for the output
+analysis from AnalysisMixin().</p>
+</dd></dl>
 </section>
-</div></div>
+</div></div><aside class="hidden text-sm xl:block" id="right-sidebar">
+<div class="sticky top-16 -mt-10 max-h-[calc(100vh-5rem)] overflow-y-auto pt-6 space-y-2"><p class="font-medium">On this page</p>
+<ul>
+<li><a :data-current="activeSection === '#weac.layered.Layered'" class="reference internal" href="#weac.layered.Layered"><code class="docutils literal notranslate"><span class="pre">Layered</span></code></a></li>
+</ul>
+</div>
+</aside>
 </main>
 </div>
 </div><footer class="py-6 border-t border-border md:py-0">
