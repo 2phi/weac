@@ -9,6 +9,7 @@ on:
 
 jobs:
   pylint:
+    name: lint
     runs-on: ubuntu-latest
     strategy:
       matrix:
