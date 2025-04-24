@@ -9,6 +9,7 @@ on:
 
 jobs:
   pylint:
+    name: Static code analysis 🔎
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4
