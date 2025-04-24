@@ -7,10 +7,17 @@ on:
     paths:
       - 'weac/**'
       - 'docs/sphinx/**'
+  pull_request:
+    branches: [ main, develop ]
+  workflow_dispatch:
+
+permissions:
+  contents: write
 
 jobs:
-  build-docs:
-    runs-on: macos-latest
+  build:
+    runs-on: ubuntu-latest
+    environment: docs-deploy
 
     steps:
     - name: Check out the repository
@@ -43,8 +50,17 @@ jobs:
       run: |
         cp -rf docs/sphinx/_build/html/* docs/
 
-    - name: Commit and push documentation
+    - name: Commit and push changes
       run: |
-        git add docs/
+        git config --local user.email "action@github.com"
+        git config --local user.name "GitHub Action"
+        # Check out the github-pages (documentation) branch (create if it doesn't exist)
+        git checkout -B documentation
+        # Copy the documentation to the root directory
+        cp -rf docs/sphinx/_build/html/* .
+        # Add .nojekyll file to tell GitHub not to process with Jekyll
+        touch .nojekyll
+        # Add all changes
+        git add -A .
         git commit -m "Update documentation" || echo "No changes to commit"
-        git push origin main
+        git push -f origin documentation
