@@ -1,4 +1,4 @@
-name: Static Code Analysis
+name: Static code analysis 🔎
 
 on:
   push:

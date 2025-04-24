@@ -1,4 +1,4 @@
-name: Format
+name: Make sure code is ruff-formatted 🐶
 
 on:
   push:
