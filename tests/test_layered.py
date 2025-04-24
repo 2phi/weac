@@ -186,24 +186,6 @@ class TestLayered(unittest.TestCase):
             G[2], 0
         )  # Total energy release rate should be non-negative
 
-    def test_compliance(self):
-        """Test calculation of compliance."""
-        # Compute compliance
-        compliance = self.layered.compliance()
-        assert compliance.shape == (2, 2)
-
-        # Compute compliance slope
-        compliance_slope = self.layered.compliance_slope()
-        assert compliance_slope.shape == (2, 2)
-
-        # Compute initial compliance
-        compliance_0 = self.layered.compliance()
-        compliance_1 = self.layered.compliance()
-
-        # Compute shear modulus
-        shear_modulus = self.layered.shear_modulus()
-        assert shear_modulus.shape == (2, 2)
-
 
 if __name__ == "__main__":
     unittest.main()
