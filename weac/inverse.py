@@ -9,8 +9,9 @@ from weac.mixins import OutputMixin
 from weac.eigensystem import Eigensystem
 
 
-class Inverse(FieldQuantitiesMixin, SolutionMixin, AnalysisMixin,
-              OutputMixin, Eigensystem):
+class Inverse(
+    FieldQuantitiesMixin, SolutionMixin, AnalysisMixin, OutputMixin, Eigensystem
+):
     """
     Fit the elastic properties of the layers of a snowpack.
 
@@ -25,8 +26,7 @@ class Inverse(FieldQuantitiesMixin, SolutionMixin, AnalysisMixin,
     analysis from AnalysisMixin().
     """
 
-    def __init__(
-            self, system='pst-', layers=None, parameters=(6.0, 4.6, 0.25)):
+    def __init__(self, system="pst-", layers=None, parameters=(6.0, 4.6, 0.25)):
         """
         Initialize model with user input.
 
