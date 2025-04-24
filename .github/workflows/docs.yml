@@ -54,12 +54,18 @@ jobs:
       run: |
         git config --local user.email "action@github.com"
         git config --local user.name "GitHub Action"
+        
+        # First, save the built documentation to a temporary location
+        mkdir -p /tmp/sphinx-docs
+        cp -rf docs/sphinx/_build/html/* /tmp/sphinx-docs/
+        
         # Create a new orphan branch with no history
         git checkout --orphan temp_docs
         # Remove everything
         git rm -rf .
-        # Copy the documentation to the root directory
-        cp -rf docs/sphinx/_build/html/* .
+        
+        # Copy the documentation from the temporary location
+        cp -rf /tmp/sphinx-docs/* .
         # Add .nojekyll file to tell GitHub not to process with Jekyll
         touch .nojekyll
         # Add all changes
