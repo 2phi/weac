@@ -11,9 +11,6 @@ jobs=4
 # Allow loading of arbitrary C extensions
 unsafe-load-any-extension=no
 
-# Enable optimization of expressions
-optimize-ast=no
-
 [MESSAGES CONTROL]
 # Disable the message, report, category or checker with the given id(s). 
 disable=
