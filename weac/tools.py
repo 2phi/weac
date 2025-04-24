@@ -252,18 +252,11 @@ def tensile_strength_slab(rho, unit="kPa"):
     ndarray
         Tensile strenght in specified unit.
     """
-    convert = {"kPa": 1, "MPa": 1e-3}
+    convert = {"kPa": 1, "MPa": 1e-3, "m": 1, "mm": 1e3, "cm": 1e2}
     rho_ice = 917
     # Sigrist's equation is given in kPa
     value = convert[unit] * 240 * (rho / rho_ice) ** 2.44
-
-    if unit == "m":
-        return value
-    if unit == "mm":
-        return value * 1e3
-    if unit == "cm":
-        return value * 1e2
-    raise ValueError(f"Unknown unit: {unit}")
+    return value
 
 
 def touchdown_distance(

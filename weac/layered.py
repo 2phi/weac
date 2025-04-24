@@ -1,6 +1,8 @@
 """Class for the elastic analysis of layered snow slabs."""
 
 # Project imports
+import numpy as np
+
 from weac.eigensystem import Eigensystem
 from weac.mixins import (
     AnalysisMixin,
@@ -61,3 +63,36 @@ class Layered(
         )
         self.set_foundation_properties()
         self.calc_fundamental_system()
+
+    def compliance(self):
+        """
+        Calculate the compliance matrix.
+
+        Returns
+        -------
+        ndarray
+            Compliance matrix.
+        """
+        return np.linalg.inv(self.A11)
+
+    def compliance_slope(self):
+        """
+        Calculate the compliance matrix slope.
+
+        Returns
+        -------
+        ndarray
+            Compliance matrix slope.
+        """
+        return np.linalg.inv(self.A11_slope)
+
+    def shear_modulus(self):
+        """
+        Calculate the shear modulus matrix.
+
+        Returns
+        -------
+        ndarray
+            Shear modulus matrix.
+        """
+        return self.kA55
