@@ -106,10 +106,200 @@
 <div class="mr-1">/</div><span aria-current="page" class="font-medium text-foreground overflow-hidden text-ellipsis whitespace-nowrap">weac.plot module</span>
 </nav>
 <div id="content" role="main">
-<section id="weac-plot-module">
-<h1>weac.plot module<a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#weac-plot-module">¶</a></h1>
+<section id="module-weac.plot">
+<span id="weac-plot-module"></span><h1>weac.plot module<a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#module-weac.plot">¶</a></h1>
+<p>Plotting resources for the WEak Layer AntiCrack nucleation model.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="weac.plot.MidpointNormalize">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">weac.plot.</span></span><span class="sig-name descname"><span class="pre">MidpointNormalize</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">vmin</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vmax</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">midpoint</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">clip</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/weac/plot.html#MidpointNormalize"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#weac.plot.MidpointNormalize" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#weac.plot.MidpointNormalize'">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Normalize</span></code></p>
+<p>Colormap normalization to a specified midpoint. Default is 0.</p>
+</dd></dl>
+<dl class="py function">
+<dt class="sig sig-object py" id="weac.plot.adjust_lightness">
+<span class="sig-prename descclassname"><span class="pre">weac.plot.</span></span><span class="sig-name descname"><span class="pre">adjust_lightness</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">color</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">amount</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.5</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/weac/plot.html#adjust_lightness"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#weac.plot.adjust_lightness" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#weac.plot.adjust_lightness'">¶</a></dt>
+<dd><p>Adjust color lightness.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>color</strong> (<em>str</em><em> or </em><em>tuple</em>) – Matplotlib colorname, hex string, or RGB value tuple.</p></li>
+<li><p><strong>amount</strong> (<em>float</em><em>, </em><em>optional</em>) – Amount of lightening: &gt;1 lightens, &lt;1 darkens. Default is 0.5.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>RGB color tuple.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>tuple</p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="py function">
+<dt class="sig sig-object py" id="weac.plot.deformed">
+<span class="sig-prename descclassname"><span class="pre">weac.plot.</span></span><span class="sig-name descname"><span class="pre">deformed</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">instance</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">xsl</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">xwl</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">z</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">phi</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dz</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scale</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">100</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">window</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">inf</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pad</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">levels</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">300</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">aspect</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">field</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'principal'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">normalize</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dark</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filename</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'cont'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/weac/plot.html#deformed"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#weac.plot.deformed" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#weac.plot.deformed'">¶</a></dt>
+<dd><p>Plot 2D deformed solution with displacement or stress fields.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>instance</strong> (<em>object</em>) – Instance of layered class.</p></li>
+<li><p><strong>xsl</strong> (<em>ndarray</em>) – Discretized slab x-coordinates (mm).</p></li>
+<li><p><strong>xwl</strong> (<em>ndarray</em>) – Discretized weak-layer x-coordinates (mm).</p></li>
+<li><p><strong>z</strong> (<em>ndarray</em>) – Solution vectors at positions x as columns of matrix z.</p></li>
+<li><p><strong>phi</strong> (<em>float</em>) – Inclination (degrees). Counterclockwise positive.</p></li>
+<li><p><strong>dz</strong> (<em>float</em><em>, </em><em>optional</em>) – Element size along z-axis (mm) for stress plot. Default is 2 mm.</p></li>
+<li><p><strong>scale</strong> (<em>int</em><em>, </em><em>optional</em>) – Scaling factor for the visualization of displacements. Default
+is 100.</p></li>
+<li><p><strong>window</strong> (<em>int</em><em>, </em><em>optional</em>) – Plot window (cm) around maximum vertical deflection. Default
+is inf (full view).</p></li>
+<li><p><strong>pad</strong> (<em>float</em><em>, </em><em>optional</em>) – Padding around shown geometry. Default is 2.</p></li>
+<li><p><strong>levels</strong> (<em>int</em><em>, </em><em>optional</em>) – Number of isolevels. Default is 300.</p></li>
+<li><p><strong>aspect</strong> (<em>int</em><em>, </em><em>optional</em>) – Aspect ratio of the displayed geometry. 1 is true to scale.
+Default is 2.</p></li>
+<li><p><strong>field</strong> (<em>{'u'</em><em>, </em><em>'w'</em><em>, </em><em>'Sxx'</em><em>, </em><em>'Txz'</em><em>, </em><em>'Szz'</em><em>, </em><em>'principal'}</em><em>, </em><em>optional</em>) – Field quantity for contour plot. Axial deformation ‘u’, vertical
+deflection ‘w’, axial normal stress ‘Sxx’, shear stress ‘Txz’,
+transverse normal stress ‘Szz’, or principal stresses ‘principal’.</p></li>
+<li><p><strong>normalize</strong> (<em>bool</em><em>, </em><em>optional</em>) – Toggle layerwise normalization of principal stresses to respective
+strength. Only available with field=’principal’. Default is True.</p></li>
+<li><p><strong>dark</strong> (<em>bool</em><em>, </em><em>optional</em>) – Toggle display on dark figure background. Default is False.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>ValueError</strong> – If invalid stress or displacement field is requested.</p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="py function">
+<dt class="sig sig-object py" id="weac.plot.displacements">
+<span class="sig-prename descclassname"><span class="pre">weac.plot.</span></span><span class="sig-name descname"><span class="pre">displacements</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">instance</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">z</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">i</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">segments</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/weac/plot.html#displacements"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#weac.plot.displacements" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#weac.plot.displacements'">¶</a></dt>
+<dd><p>Wrap for dispalcements plot.</p>
+</dd></dl>
+<dl class="py function">
+<dt class="sig sig-object py" id="weac.plot.err_comp">
+<span class="sig-prename descclassname"><span class="pre">weac.plot.</span></span><span class="sig-name descname"><span class="pre">err_comp</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">da</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Gdif</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Ginc</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mode</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/weac/plot.html#err_comp"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#weac.plot.err_comp" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#weac.plot.err_comp'">¶</a></dt>
+<dd><p>Wrap energy release rate plot.</p>
+</dd></dl>
+<dl class="py function">
+<dt class="sig sig-object py" id="weac.plot.err_modes">
+<span class="sig-prename descclassname"><span class="pre">weac.plot.</span></span><span class="sig-name descname"><span class="pre">err_modes</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">da</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">G</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">kind</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'inc'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/weac/plot.html#err_modes"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#weac.plot.err_modes" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#weac.plot.err_modes'">¶</a></dt>
+<dd><p>Wrap energy release rate plot.</p>
+</dd></dl>
+<dl class="py function">
+<dt class="sig sig-object py" id="weac.plot.fea_disp">
+<span class="sig-prename descclassname"><span class="pre">weac.plot.</span></span><span class="sig-name descname"><span class="pre">fea_disp</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">instance</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">z</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fea</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/weac/plot.html#fea_disp"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#weac.plot.fea_disp" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#weac.plot.fea_disp'">¶</a></dt>
+<dd><p>Wrap dispalcements plot.</p>
+</dd></dl>
+<dl class="py function">
+<dt class="sig sig-object py" id="weac.plot.fea_stress">
+<span class="sig-prename descclassname"><span class="pre">weac.plot.</span></span><span class="sig-name descname"><span class="pre">fea_stress</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">instance</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">xb</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">zb</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fea</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/weac/plot.html#fea_stress"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#weac.plot.fea_stress" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#weac.plot.fea_stress'">¶</a></dt>
+<dd><p>Wrap stress plot.</p>
+</dd></dl>
+<dl class="py function">
+<dt class="sig sig-object py" id="weac.plot.outline">
+<span class="sig-prename descclassname"><span class="pre">weac.plot.</span></span><span class="sig-name descname"><span class="pre">outline</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">grid</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/weac/plot.html#outline"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#weac.plot.outline" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#weac.plot.outline'">¶</a></dt>
+<dd><p>Extract outline values of a 2D array (matrix, grid).</p>
+</dd></dl>
+<dl class="py function">
+<dt class="sig sig-object py" id="weac.plot.plot_data">
+<span class="sig-prename descclassname"><span class="pre">weac.plot.</span></span><span class="sig-name descname"><span class="pre">plot_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ax1data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ax1label</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ax2data</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ax2label</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">labelpos</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vlines</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">li</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mi</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ki</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">xlabel</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'Horizontal</span> <span class="pre">position</span> <span class="pre">$x$</span> <span class="pre">(cm)'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/weac/plot.html#plot_data"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#weac.plot.plot_data" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#weac.plot.plot_data'">¶</a></dt>
+<dd><p>Plot data. Base function.</p>
+</dd></dl>
+<dl class="py function">
+<dt class="sig sig-object py" id="weac.plot.save_plot">
+<span class="sig-prename descclassname"><span class="pre">weac.plot.</span></span><span class="sig-name descname"><span class="pre">save_plot</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/weac/plot.html#save_plot"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#weac.plot.save_plot" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#weac.plot.save_plot'">¶</a></dt>
+<dd><p>Show or save plot depending on interpreter</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>name</strong> (<em>string</em>) – Name for the figure.</p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="py function">
+<dt class="sig sig-object py" id="weac.plot.section_forces">
+<span class="sig-prename descclassname"><span class="pre">weac.plot.</span></span><span class="sig-name descname"><span class="pre">section_forces</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">instance</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">z</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">i</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">segments</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/weac/plot.html#section_forces"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#weac.plot.section_forces" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#weac.plot.section_forces'">¶</a></dt>
+<dd><p>Wrap section forces plot.</p>
+</dd></dl>
+<dl class="py function">
+<dt class="sig sig-object py" id="weac.plot.set_plotstyles">
+<span class="sig-prename descclassname"><span class="pre">weac.plot.</span></span><span class="sig-name descname"><span class="pre">set_plotstyles</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/weac/plot.html#set_plotstyles"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#weac.plot.set_plotstyles" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#weac.plot.set_plotstyles'">¶</a></dt>
+<dd><p>Define styles plot markers, labels and colors.</p>
+</dd></dl>
+<dl class="py function">
+<dt class="sig sig-object py" id="weac.plot.significant_digits">
+<span class="sig-prename descclassname"><span class="pre">weac.plot.</span></span><span class="sig-name descname"><span class="pre">significant_digits</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">decimal</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/weac/plot.html#significant_digits"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#weac.plot.significant_digits" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#weac.plot.significant_digits'">¶</a></dt>
+<dd><p>Get the number of significant digits.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>decimal</strong> (<em>float</em>) – Decimal number.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Number of significant digits.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="py function">
+<dt class="sig sig-object py" id="weac.plot.slab_profile">
+<span class="sig-prename descclassname"><span class="pre">weac.plot.</span></span><span class="sig-name descname"><span class="pre">slab_profile</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">instance</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/weac/plot.html#slab_profile"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#weac.plot.slab_profile" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#weac.plot.slab_profile'">¶</a></dt>
+<dd><p>Create bar chart of slab profile.</p>
+</dd></dl>
+<dl class="py function">
+<dt class="sig sig-object py" id="weac.plot.stress_criteria">
+<span class="sig-prename descclassname"><span class="pre">weac.plot.</span></span><span class="sig-name descname"><span class="pre">stress_criteria</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stress</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">segments</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/weac/plot.html#stress_criteria"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#weac.plot.stress_criteria" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#weac.plot.stress_criteria'">¶</a></dt>
+<dd><p>Wrap plot of stress and energy criteria.</p>
+</dd></dl>
+<dl class="py function">
+<dt class="sig sig-object py" id="weac.plot.stresses">
+<span class="sig-prename descclassname"><span class="pre">weac.plot.</span></span><span class="sig-name descname"><span class="pre">stresses</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">instance</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">z</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">i</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">segments</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/weac/plot.html#stresses"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#weac.plot.stresses" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#weac.plot.stresses'">¶</a></dt>
+<dd><p>Wrap stress plot.</p>
+</dd></dl>
+<dl class="py function">
+<dt class="sig sig-object py" id="weac.plot.tight_central_distribution">
+<span class="sig-prename descclassname"><span class="pre">weac.plot.</span></span><span class="sig-name descname"><span class="pre">tight_central_distribution</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">limit</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">samples</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">100</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tightness</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.5</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/weac/plot.html#tight_central_distribution"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#weac.plot.tight_central_distribution" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#weac.plot.tight_central_distribution'">¶</a></dt>
+<dd><p>Provide values within a given interval distributed tightly around 0.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>limit</strong> (<em>float</em>) – Maximum and minimum of value range.</p></li>
+<li><p><strong>samples</strong> (<em>int</em><em>, </em><em>optional</em>) – Number of values. Default is 100.</p></li>
+<li><p><strong>tightness</strong> (<em>int</em><em>, </em><em>optional</em>) – Degree of value densification at center. 1.0 corresponds
+to equal spacing. Default is 1.5.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Array of values more tightly spaced around 0.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>ndarray</p>
+</dd>
+</dl>
+</dd></dl>
 </section>
-</div></div>
+</div></div><aside class="hidden text-sm xl:block" id="right-sidebar">
+<div class="sticky top-16 -mt-10 max-h-[calc(100vh-5rem)] overflow-y-auto pt-6 space-y-2"><p class="font-medium">On this page</p>
+<ul>
+<li><a :data-current="activeSection === '#weac.plot.MidpointNormalize'" class="reference internal" href="#weac.plot.MidpointNormalize"><code class="docutils literal notranslate"><span class="pre">MidpointNormalize</span></code></a></li>
+<li><a :data-current="activeSection === '#weac.plot.adjust_lightness'" class="reference internal" href="#weac.plot.adjust_lightness"><code class="docutils literal notranslate"><span class="pre">adjust_lightness()</span></code></a></li>
+<li><a :data-current="activeSection === '#weac.plot.deformed'" class="reference internal" href="#weac.plot.deformed"><code class="docutils literal notranslate"><span class="pre">deformed()</span></code></a></li>
+<li><a :data-current="activeSection === '#weac.plot.displacements'" class="reference internal" href="#weac.plot.displacements"><code class="docutils literal notranslate"><span class="pre">displacements()</span></code></a></li>
+<li><a :data-current="activeSection === '#weac.plot.err_comp'" class="reference internal" href="#weac.plot.err_comp"><code class="docutils literal notranslate"><span class="pre">err_comp()</span></code></a></li>
+<li><a :data-current="activeSection === '#weac.plot.err_modes'" class="reference internal" href="#weac.plot.err_modes"><code class="docutils literal notranslate"><span class="pre">err_modes()</span></code></a></li>
+<li><a :data-current="activeSection === '#weac.plot.fea_disp'" class="reference internal" href="#weac.plot.fea_disp"><code class="docutils literal notranslate"><span class="pre">fea_disp()</span></code></a></li>
+<li><a :data-current="activeSection === '#weac.plot.fea_stress'" class="reference internal" href="#weac.plot.fea_stress"><code class="docutils literal notranslate"><span class="pre">fea_stress()</span></code></a></li>
+<li><a :data-current="activeSection === '#weac.plot.outline'" class="reference internal" href="#weac.plot.outline"><code class="docutils literal notranslate"><span class="pre">outline()</span></code></a></li>
+<li><a :data-current="activeSection === '#weac.plot.plot_data'" class="reference internal" href="#weac.plot.plot_data"><code class="docutils literal notranslate"><span class="pre">plot_data()</span></code></a></li>
+<li><a :data-current="activeSection === '#weac.plot.save_plot'" class="reference internal" href="#weac.plot.save_plot"><code class="docutils literal notranslate"><span class="pre">save_plot()</span></code></a></li>
+<li><a :data-current="activeSection === '#weac.plot.section_forces'" class="reference internal" href="#weac.plot.section_forces"><code class="docutils literal notranslate"><span class="pre">section_forces()</span></code></a></li>
+<li><a :data-current="activeSection === '#weac.plot.set_plotstyles'" class="reference internal" href="#weac.plot.set_plotstyles"><code class="docutils literal notranslate"><span class="pre">set_plotstyles()</span></code></a></li>
+<li><a :data-current="activeSection === '#weac.plot.significant_digits'" class="reference internal" href="#weac.plot.significant_digits"><code class="docutils literal notranslate"><span class="pre">significant_digits()</span></code></a></li>
+<li><a :data-current="activeSection === '#weac.plot.slab_profile'" class="reference internal" href="#weac.plot.slab_profile"><code class="docutils literal notranslate"><span class="pre">slab_profile()</span></code></a></li>
+<li><a :data-current="activeSection === '#weac.plot.stress_criteria'" class="reference internal" href="#weac.plot.stress_criteria"><code class="docutils literal notranslate"><span class="pre">stress_criteria()</span></code></a></li>
+<li><a :data-current="activeSection === '#weac.plot.stresses'" class="reference internal" href="#weac.plot.stresses"><code class="docutils literal notranslate"><span class="pre">stresses()</span></code></a></li>
+<li><a :data-current="activeSection === '#weac.plot.tight_central_distribution'" class="reference internal" href="#weac.plot.tight_central_distribution"><code class="docutils literal notranslate"><span class="pre">tight_central_distribution()</span></code></a></li>
+</ul>
+</div>
+</aside>
 </main>
 </div>
 </div><footer class="py-6 border-t border-border md:py-0">

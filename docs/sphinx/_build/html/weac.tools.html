@@ -105,10 +105,195 @@
 <div class="mr-1">/</div><span aria-current="page" class="font-medium text-foreground overflow-hidden text-ellipsis whitespace-nowrap">weac.tools module</span>
 </nav>
 <div id="content" role="main">
-<section id="weac-tools-module">
-<h1>weac.tools module<a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#weac-tools-module">¶</a></h1>
+<section id="module-weac.tools">
+<span id="weac-tools-module"></span><h1>weac.tools module<a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#module-weac.tools">¶</a></h1>
+<p>Helper functions for the WEak Layer AntiCrack nucleation model.</p>
+<dl class="py function">
+<dt class="sig sig-object py" id="weac.tools.bergfeld">
+<span class="sig-prename descclassname"><span class="pre">weac.tools.</span></span><span class="sig-name descname"><span class="pre">bergfeld</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">rho</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rho0</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">917</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">C0</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">6.5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">C1</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">4.4</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/weac/tools.html#bergfeld"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#weac.tools.bergfeld" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#weac.tools.bergfeld'">¶</a></dt>
+<dd><p>Compute Young’s modulus from density according to Bergfeld et al. (2023).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>rho</strong> (<em>float</em><em> or </em><em>ndarray</em>) – Density (kg/m^3).</p></li>
+<li><p><strong>rho0</strong> (<em>float</em><em>, </em><em>optional</em>) – Density of ice (kg/m^3). Default is 917.</p></li>
+<li><p><strong>C0</strong> (<em>float</em><em>, </em><em>optional</em>) – Multiplicative constant of Young modulus parametrization
+according to Bergfeld et al. (2023). Default is 6.5.</p></li>
+<li><p><strong>C1</strong> (<em>float</em><em>, </em><em>optional</em>) – Exponent of Young modulus parameterization according to
+Bergfeld et al. (2023). Default is 4.4.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>E</strong> – Young’s modulus (MPa).</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>float or ndarray</p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="py function">
+<dt class="sig sig-object py" id="weac.tools.calc_center_of_gravity">
+<span class="sig-prename descclassname"><span class="pre">weac.tools.</span></span><span class="sig-name descname"><span class="pre">calc_center_of_gravity</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">layers</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/weac/tools.html#calc_center_of_gravity"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#weac.tools.calc_center_of_gravity" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#weac.tools.calc_center_of_gravity'">¶</a></dt>
+<dd><p>Calculate z-coordinate of the center of gravity.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>layers</strong> (<em>ndarray</em>) – 2D list of layer densities and thicknesses. Columns are
+density (kg/m^3) and thickness (mm). One row corresponds
+to one layer.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><ul class="simple">
+<li><p><strong>H</strong> (<em>float</em>) – Total slab thickness (mm).</p></li>
+<li><p><strong>zs</strong> (<em>float</em>) – Z-coordinate of center of gravity (mm).</p></li>
+</ul>
+</p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="py function">
+<dt class="sig sig-object py" id="weac.tools.calc_vertical_bc_center_of_gravity">
+<span class="sig-prename descclassname"><span class="pre">weac.tools.</span></span><span class="sig-name descname"><span class="pre">calc_vertical_bc_center_of_gravity</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">slab</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">phi</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/weac/tools.html#calc_vertical_bc_center_of_gravity"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#weac.tools.calc_vertical_bc_center_of_gravity" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#weac.tools.calc_vertical_bc_center_of_gravity'">¶</a></dt>
+<dd><p>Calculate center of gravity of triangular slab segements for vertical PSTs.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>slab</strong> (<em>ndarray</em>) – List of layer densities, thicknesses, and elastic properties.
+Columns are density (kg/m^3), thickness (mm), Young’s modulus
+(MPa), shear modulus (MPa), and Poisson’s ratio. One row corresponds
+to one layer.</p></li>
+<li><p><strong>phi</strong> (<em>fload</em>) – Slope angle (deg).</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><ul class="simple">
+<li><p><strong>xs</strong> (<em>float</em>) – Horizontal coordinate of center of gravity (mm).</p></li>
+<li><p><strong>zs</strong> (<em>float</em>) – Vertical coordinate of center of gravity (mm).</p></li>
+<li><p><strong>w</strong> (<em>ndarray</em>) – Weight of the slab segment that is cut off or added (t).</p></li>
+</ul>
+</p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="py function">
+<dt class="sig sig-object py" id="weac.tools.gerling">
+<span class="sig-prename descclassname"><span class="pre">weac.tools.</span></span><span class="sig-name descname"><span class="pre">gerling</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">rho</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">C0</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">6.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">C1</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">4.6</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/weac/tools.html#gerling"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#weac.tools.gerling" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#weac.tools.gerling'">¶</a></dt>
+<dd><p>Compute Young’s modulus from density according to Gerling et al. 2017.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>rho</strong> (<em>float</em><em> or </em><em>ndarray</em>) – Density (kg/m^3).</p></li>
+<li><p><strong>C0</strong> (<em>float</em><em>, </em><em>optional</em>) – Multiplicative constant of Young modulus parametrization
+according to Gerling et al. (2017). Default is 6.0.</p></li>
+<li><p><strong>C1</strong> (<em>float</em><em>, </em><em>optional</em>) – Exponent of Young modulus parameterization according to
+Gerling et al. (2017). Default is 4.6.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>E</strong> – Young’s modulus (MPa).</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>float or ndarray</p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="py function">
+<dt class="sig sig-object py" id="weac.tools.isnotebook">
+<span class="sig-prename descclassname"><span class="pre">weac.tools.</span></span><span class="sig-name descname"><span class="pre">isnotebook</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/weac/tools.html#isnotebook"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#weac.tools.isnotebook" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#weac.tools.isnotebook'">¶</a></dt>
+<dd><p>Identify shell environment.</p>
+</dd></dl>
+<dl class="py function">
+<dt class="sig sig-object py" id="weac.tools.load_dummy_profile">
+<span class="sig-prename descclassname"><span class="pre">weac.tools.</span></span><span class="sig-name descname"><span class="pre">load_dummy_profile</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">profile_id</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/weac/tools.html#load_dummy_profile"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#weac.tools.load_dummy_profile" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#weac.tools.load_dummy_profile'">¶</a></dt>
+<dd><p>Define standard layering types for comparison.</p>
+</dd></dl>
+<dl class="py function">
+<dt class="sig sig-object py" id="weac.tools.scapozza">
+<span class="sig-prename descclassname"><span class="pre">weac.tools.</span></span><span class="sig-name descname"><span class="pre">scapozza</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">rho</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/weac/tools.html#scapozza"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#weac.tools.scapozza" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#weac.tools.scapozza'">¶</a></dt>
+<dd><p>Compute Young’s modulus (MPa) from density (kg/m^3).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>rho</strong> (<em>float</em><em> or </em><em>ndarray</em>) – Density (kg/m^3).</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>E</strong> – Young’s modulus (MPa).</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>float or ndarray</p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="py function">
+<dt class="sig sig-object py" id="weac.tools.tensile_strength_slab">
+<span class="sig-prename descclassname"><span class="pre">weac.tools.</span></span><span class="sig-name descname"><span class="pre">tensile_strength_slab</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">rho</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">unit</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'kPa'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/weac/tools.html#tensile_strength_slab"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#weac.tools.tensile_strength_slab" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#weac.tools.tensile_strength_slab'">¶</a></dt>
+<dd><p>Estimate the tensile strenght of a slab layer from its density.</p>
+<p>Uses the density parametrization of Sigrist (2006).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>rho</strong> (<em>ndarray</em><em>, </em><em>float</em>) – Layer density (kg/m^3).</p></li>
+<li><p><strong>unit</strong> (<em>str</em><em>, </em><em>optional</em>) – Desired output unit of the layer strength. Default is ‘kPa’.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Tensile strenght in specified unit.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>ndarray</p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="py function">
+<dt class="sig sig-object py" id="weac.tools.time">
+<span class="sig-prename descclassname"><span class="pre">weac.tools.</span></span><span class="sig-name descname"><span class="pre">time</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/weac/tools.html#time"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#weac.tools.time" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#weac.tools.time'">¶</a></dt>
+<dd><p>Return current time in milliseconds.</p>
+</dd></dl>
+<dl class="py function">
+<dt class="sig sig-object py" id="weac.tools.touchdown_distance">
+<span class="sig-prename descclassname"><span class="pre">weac.tools.</span></span><span class="sig-name descname"><span class="pre">touchdown_distance</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">layers</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">C0</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">6.5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">C1</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">4.4</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Ewl</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.25</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">t</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">10</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">phi</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/weac/tools.html#touchdown_distance"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#weac.tools.touchdown_distance" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#weac.tools.touchdown_distance'">¶</a></dt>
+<dd><p>Calculate cut length at first contanct and steady-state touchdown distance.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>layers</strong> (<em>list</em><em>, </em><em>optional</em>) – 2D list of layer densities and thicknesses. Columns are
+density(kg/m ^ 3) and thickness(mm). One row corresponds
+to one layer. Default is [[240, 200], ].</p></li>
+<li><p><strong>C0</strong> (<em>float</em><em>, </em><em>optional</em>) – Multiplicative constant of Young modulus parametrization
+according to Bergfeld et al. (2023). Default is 6.5.</p></li>
+<li><p><strong>C1</strong> (<em>float</em><em>, </em><em>optional</em>) – Exponent of Young modulus parameterization according to
+Bergfeld et al. (2023). Default is 4.4.</p></li>
+<li><p><strong>Ewl</strong> (<em>float</em><em>, </em><em>optional</em>) – Young’s modulus of the weak layer (MPa). Default is 0.25.</p></li>
+<li><p><strong>t</strong> (<em>float</em><em>, </em><em>optional</em>) – Thickness of the weak layer (mm). Default is 10.</p></li>
+<li><p><strong>phi</strong> (<em>float</em><em>, </em><em>optional</em>) – Inclination of the slab (°). Default is 0.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><ul class="simple">
+<li><p><strong>first_contact</strong> (<em>float</em>) – Cut length at first contact (mm).</p></li>
+<li><p><strong>full_contact</strong> (<em>float</em>) – Cut length at which the slab comes into full contact (more than
+a singular point) with the base layer (mm).</p></li>
+<li><p><strong>steady_state</strong> (<em>float</em>) – Steady-state touchdown distance (mm).</p></li>
+</ul>
+</p>
+</dd>
+</dl>
+</dd></dl>
 </section>
-</div></div>
+</div></div><aside class="hidden text-sm xl:block" id="right-sidebar">
+<div class="sticky top-16 -mt-10 max-h-[calc(100vh-5rem)] overflow-y-auto pt-6 space-y-2"><p class="font-medium">On this page</p>
+<ul>
+<li><a :data-current="activeSection === '#weac.tools.bergfeld'" class="reference internal" href="#weac.tools.bergfeld"><code class="docutils literal notranslate"><span class="pre">bergfeld()</span></code></a></li>
+<li><a :data-current="activeSection === '#weac.tools.calc_center_of_gravity'" class="reference internal" href="#weac.tools.calc_center_of_gravity"><code class="docutils literal notranslate"><span class="pre">calc_center_of_gravity()</span></code></a></li>
+<li><a :data-current="activeSection === '#weac.tools.calc_vertical_bc_center_of_gravity'" class="reference internal" href="#weac.tools.calc_vertical_bc_center_of_gravity"><code class="docutils literal notranslate"><span class="pre">calc_vertical_bc_center_of_gravity()</span></code></a></li>
+<li><a :data-current="activeSection === '#weac.tools.gerling'" class="reference internal" href="#weac.tools.gerling"><code class="docutils literal notranslate"><span class="pre">gerling()</span></code></a></li>
+<li><a :data-current="activeSection === '#weac.tools.isnotebook'" class="reference internal" href="#weac.tools.isnotebook"><code class="docutils literal notranslate"><span class="pre">isnotebook()</span></code></a></li>
+<li><a :data-current="activeSection === '#weac.tools.load_dummy_profile'" class="reference internal" href="#weac.tools.load_dummy_profile"><code class="docutils literal notranslate"><span class="pre">load_dummy_profile()</span></code></a></li>
+<li><a :data-current="activeSection === '#weac.tools.scapozza'" class="reference internal" href="#weac.tools.scapozza"><code class="docutils literal notranslate"><span class="pre">scapozza()</span></code></a></li>
+<li><a :data-current="activeSection === '#weac.tools.tensile_strength_slab'" class="reference internal" href="#weac.tools.tensile_strength_slab"><code class="docutils literal notranslate"><span class="pre">tensile_strength_slab()</span></code></a></li>
+<li><a :data-current="activeSection === '#weac.tools.time'" class="reference internal" href="#weac.tools.time"><code class="docutils literal notranslate"><span class="pre">time()</span></code></a></li>
+<li><a :data-current="activeSection === '#weac.tools.touchdown_distance'" class="reference internal" href="#weac.tools.touchdown_distance"><code class="docutils literal notranslate"><span class="pre">touchdown_distance()</span></code></a></li>
+</ul>
+</div>
+</aside>
 </main>
 </div>
 </div><footer class="py-6 border-t border-border md:py-0">
