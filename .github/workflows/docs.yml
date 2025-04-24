@@ -16,6 +16,7 @@ permissions:
 
 jobs:
   build:
+    name: documentation
     runs-on: ubuntu-latest
     environment: docs-deploy
 
@@ -23,53 +24,44 @@ jobs:
     - name: Check out the repository
       uses: actions/checkout@v4
 
-    - name: Set up Python
+    - name: Set up Python 3.12
       uses: actions/setup-python@v5
       with:
-        python-version: '3.x'
+        python-version: '3.12'
 
-    - name: Install Sphinx and extensions
+    - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
-        pip install sphinx sphinxawesome_theme weac IPython
+        pip install sphinx sphinxawesome_theme IPython
+        pip install -e .
 
-    - name: Clean old html files
+    - name: Build documentation
       run: |
-        rm -rf docs/_* docs/*.html docs/*.js docs/*.inv
-
-    - name: Generate API documentation with sphinx-apidoc
-      run: |
+        # Generate API docs
         sphinx-apidoc -o docs/sphinx/ weac --force --separate
-
-    - name: Build Sphinx documentation
-      run: |
+        
+        # Build HTML docs
         cd docs/sphinx
         make clean html
+        
+        # Copy to docs directory
+        cp -rf _build/html/* ../../docs/
 
-    - name: Copy built documentation to docs/
-      run: |
-        cp -rf docs/sphinx/_build/html/* docs/
-
-    - name: Commit and push changes
+    - name: Deploy documentation
+      if: github.event_name == 'push' && github.ref == 'refs/heads/main'
       run: |
         git config --local user.email "action@github.com"
         git config --local user.name "GitHub Action"
         
-        # First, save the built documentation to a temporary location
-        mkdir -p /tmp/sphinx-docs
-        cp -rf docs/sphinx/_build/html/* /tmp/sphinx-docs/
-        
-        # Create a new orphan branch with no history
+        # Create orphan branch for docs
         git checkout --orphan temp_docs
-        # Remove everything
         git rm -rf .
         
-        # Copy the documentation from the temporary location
-        cp -rf /tmp/sphinx-docs/* .
-        # Add .nojekyll file to tell GitHub not to process with Jekyll
+        # Copy docs and add nojekyll file
+        cp -rf docs/sphinx/_build/html/* .
         touch .nojekyll
-        # Add all changes
+        
+        # Commit and push
         git add -A .
         git commit -m "Update documentation"
-        # Force push to documentation branch
         git push -f origin temp_docs:documentation
