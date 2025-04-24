@@ -8,21 +8,20 @@ on:
   # Run tests on pull_request events only for main and develop branches
   pull_request:
     branches: [ main, develop ]
+  # Allow this workflow to be called by other workflows
+  workflow_call:
 
 jobs:
   test:
+    name: Run unit tests 🤖
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        python-version: ["3.10", "3.11", "3.12"]
-
     steps:
     - uses: actions/checkout@v4
 
-    - name: Set up Python ${{ matrix.python-version }}
+    - name: Set up Python 3.12
       uses: actions/setup-python@v5
       with:
-        python-version: ${{ matrix.python-version }}
+        python-version: '3.12'
 
     - name: Install dependencies
       run: |

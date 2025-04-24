@@ -7,44 +7,61 @@ on:
     paths:
       - 'weac/**'
       - 'docs/sphinx/**'
+  pull_request:
+    branches: [ main, develop ]
+  workflow_dispatch:
+
+permissions:
+  contents: write
 
 jobs:
-  build-docs:
-    runs-on: macos-latest
+  build:
+    name: Build and publish Sphinx 🪬 documentation
+    runs-on: ubuntu-latest
+    environment: docs-deploy
 
     steps:
     - name: Check out the repository
       uses: actions/checkout@v4
 
-    - name: Set up Python
+    - name: Set up Python 3.12
       uses: actions/setup-python@v5
       with:
-        python-version: '3.x'
+        python-version: '3.12'
 
-    - name: Install Sphinx and extensions
+    - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
-        pip install sphinx sphinxawesome_theme weac IPython
+        pip install sphinx sphinxawesome_theme IPython
+        pip install -e .
 
-    - name: Clean old html files
+    - name: Build documentation
       run: |
-        rm -rf docs/_* docs/*.html docs/*.js docs/*.inv
-
-    - name: Generate API documentation with sphinx-apidoc
-      run: |
+        # Generate API docs
         sphinx-apidoc -o docs/sphinx/ weac --force --separate
-
-    - name: Build Sphinx documentation
-      run: |
+        
+        # Build HTML docs
         cd docs/sphinx
         make clean html
+        
+        # Copy to docs directory
+        cp -rf _build/html/* ../../docs/
 
-    - name: Copy built documentation to docs/
+    - name: Deploy documentation
+      if: github.event_name == 'push' && github.ref == 'refs/heads/main'
       run: |
-        cp -rf docs/sphinx/_build/html/* docs/
-
-    - name: Commit and push documentation
-      run: |
-        git add docs/
-        git commit -m "Update documentation" || echo "No changes to commit"
-        git push origin main
+        git config --local user.email "action@github.com"
+        git config --local user.name "GitHub Action"
+        
+        # Create orphan branch for docs
+        git checkout --orphan temp_docs
+        git rm -rf .
+        
+        # Copy docs and add nojekyll file
+        cp -rf docs/sphinx/_build/html/* .
+        touch .nojekyll
+        
+        # Commit and push
+        git add -A .
+        git commit -m "Update documentation"
+        git push -f origin temp_docs:documentation
