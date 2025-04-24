@@ -63,4 +63,5 @@ jobs:
         # Add all changes
         git add -A .
         git commit -m "Update documentation" || echo "No changes to commit"
-        git push -f origin documentation
+        git pull --rebase origin documentation || echo "No existing branch to pull"
+        git push origin documentation
