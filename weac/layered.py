@@ -30,7 +30,9 @@ class Layered(
     analysis from AnalysisMixin().
     """
 
-    def __init__(self, system='pst-', layers=None, phi=0, theta = 0, b = 290, touchdown = False):
+    def __init__(
+        self, system="pst-", layers=None, phi=0, theta=0, b=290, touchdown=False
+    ):
         """
         Initialize model with user input.
 
@@ -50,6 +52,15 @@ class Layered(
         super().__init__(system=system)
 
         # Set material properties and set up model
-        self.set_beam_properties(layers if layers else [[240, 200], ], phi = phi, theta=theta, b=b)
+        self.set_beam_properties(
+            layers
+            if layers
+            else [
+                [240, 200],
+            ],
+            phi=phi,
+            theta=theta,
+            b=b,
+        )
         self.set_foundation_properties()
         self.calc_fundamental_system()
