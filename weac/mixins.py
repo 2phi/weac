@@ -9,7 +9,7 @@ import numpy as np
 from scipy.integrate import cumulative_trapezoid, quad
 
 # Module imports
-from weac.tools import tensile_strength_slab
+from weac.tools import calc_vertical_bc_center_of_gravity, tensile_strength_slab
 
 
 class FieldQuantitiesMixin:
@@ -3030,6 +3030,22 @@ class SolutionMixin:
                     k=ki[-1],
                     pos="r",
                 )[6:]
+            if self.system in ["-vpst", "vpst-"]:
+                # Calculate center of gravity and mass of
+                # added or cut off slab segemen
+                if theta != 0:
+                    print(
+                        "Error: " + self.system + " not implemented for biaxial bending"
+                    )
+                xs, zs, m = calc_vertical_bc_center_of_gravity(self.slab, phi)
+                # Convert slope angle to radians
+                phi = np.deg2rad(phi)
+                # Translate inbto section forces and moments
+                Nx = -self.g * m * np.sin(phi)
+                My = -self.g * m * (xs * np.cos(phi) + zs * np.sin(phi))
+                Vz = self.g * m * np.cos(phi)
+                rhsSlab[:6] = np.vstack([Nx, 0, Vz, 0, My, 0])
+                rhsSlab[-6:] = np.vstack([Nx, 0, Vz, 0, My, 0])
 
         # --- SOLVE SYSTEM -------------------------------------------------
 
