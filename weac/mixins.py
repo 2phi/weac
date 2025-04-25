@@ -7,10 +7,10 @@ from functools import partial
 # Third party imports
 import numpy as np
 from scipy.integrate import cumulative_trapezoid, quad
-from scipy.optimize import brentq
 
 # Module imports
-from weac.tools import calc_vertical_bc_center_of_gravity, tensile_strength_slab
+from weac.tools import tensile_strength_slab
+
 
 class FieldQuantitiesMixin:
     """
@@ -29,7 +29,7 @@ class FieldQuantitiesMixin:
     """
 
     # pylint: disable=no-self-use
-    def psix(self, Z, unit='rad'):
+    def psix(self, Z, unit="rad"):
         """
         Calculate the torsion of a section plane around the x-axis.
 
@@ -50,12 +50,12 @@ class FieldQuantitiesMixin:
         psi : float
             Cross-section rotation psi_x (in specified unit) of the slab.
         """
-        if unit in ['deg', 'degree', 'degrees']:
+        if unit in ["deg", "degree", "degrees"]:
             psix = np.rad2deg(Z[6, :])
-        elif unit in ['rad', 'radian', 'radians']:
+        elif unit in ["rad", "radian", "radians"]:
             psix = Z[6, :]
         return psix
-    
+
     def dpsix_dx(self, Z):
         """
         Calculate the first derivative of the section torsion around the x-axis.
@@ -76,7 +76,7 @@ class FieldQuantitiesMixin:
         """
         return Z[7, :]
 
-    def psiy(self, Z, unit='rad'):
+    def psiy(self, Z, unit="rad"):
         """
         Calculate the midplane rotation around the y-axis.
 
@@ -97,12 +97,12 @@ class FieldQuantitiesMixin:
         psi : float
             Cross-section rotation psi_y (in specified unit) of the slab.
         """
-        if unit in ['deg', 'degree', 'degrees']:
+        if unit in ["deg", "degree", "degrees"]:
             psiy = np.rad2deg(Z[8, :])
-        elif unit in ['rad', 'radian', 'radians']:
+        elif unit in ["rad", "radian", "radians"]:
             psiy = Z[8, :]
         return psiy
-    
+
     def dpsiy_dx(self, Z):
         """
         Calculate the first derivative of the midplane rotation around the y-axis.
@@ -125,7 +125,7 @@ class FieldQuantitiesMixin:
         """
         return Z[9, :]
 
-    def psiz(self, Z, unit='rad'):
+    def psiz(self, Z, unit="rad"):
         """
         Calculate the midplane rotation around the z-axis.
 
@@ -146,12 +146,12 @@ class FieldQuantitiesMixin:
         psi : float
             Cross-section rotation psi_z (in specified unit) of the slab.
         """
-        if unit in ['deg', 'degree', 'degrees']:
+        if unit in ["deg", "degree", "degrees"]:
             psiz = np.rad2deg(Z[10, :])
-        elif unit in ['rad', 'radian', 'radians']:
+        elif unit in ["rad", "radian", "radians"]:
             psiz = Z[10, :]
         return psiz
-    
+
     def dpsiz_dx(self, Z):
         """
         Calculate the first derivative of the midplane rotation around the z-axis.
@@ -174,7 +174,7 @@ class FieldQuantitiesMixin:
         """
         return Z[11, :]
 
-    def w(self, Z, y0=0, unit='mm'):
+    def w(self, Z, y0=0, unit="mm"):
         """
         Calculate the centerline deflection in the z-direction.
 
@@ -198,12 +198,12 @@ class FieldQuantitiesMixin:
             Deflection w (in specified unit) of the slab.
         """
         convert = {
-            'm': 1e-3,   # meters
-            'cm': 1e-1,  # centimeters
-            'mm': 1,     # millimeters
-            'um': 1e3    # micrometers
+            "m": 1e-3,  # meters
+            "cm": 1e-1,  # centimeters
+            "mm": 1,  # millimeters
+            "um": 1e3,  # micrometers
         }
-        return convert[unit]*(Z[4, :] + y0 * self.psix(Z))
+        return convert[unit] * (Z[4, :] + y0 * self.psix(Z))
 
     def dw_dx(self, Z, y0=0):
         """
@@ -228,7 +228,7 @@ class FieldQuantitiesMixin:
         """
         return Z[5, :] + y0 * self.dpsix_dx(Z)
 
-    def u(self, Z, z0=0, y0=0, unit='mm'):
+    def u(self, Z, z0=0, y0=0, unit="mm"):
         """
         Calculate the axial displacement u = u0 + z0 psiy - y0 psix.
 
@@ -254,12 +254,12 @@ class FieldQuantitiesMixin:
             Horizontal displacement u (in specified unit) of the slab.
         """
         convert = {
-            'm': 1e-3,   # meters
-            'cm': 1e-1,  # centimeters
-            'mm': 1,     # millimeters
-            'um': 1e3    # micrometers
+            "m": 1e-3,  # meters
+            "cm": 1e-1,  # centimeters
+            "mm": 1,  # millimeters
+            "um": 1e3,  # micrometers
         }
-        u = convert[unit]*(Z[0,:] + z0 * self.psiy(Z) - y0 * self.psiz(Z))
+        u = convert[unit] * (Z[0, :] + z0 * self.psiy(Z) - y0 * self.psiz(Z))
         return u
 
     def du_dx(self, Z, z0=0, y0=0):
@@ -285,9 +285,9 @@ class FieldQuantitiesMixin:
         float
             First derivative du_dx of the horizontal displacement of the slab.
         """
-        return (Z[1,:] + z0 * self.dpsiy_dx(Z) - y0 * self.dpsiz_dx(Z))
+        return Z[1, :] + z0 * self.dpsiy_dx(Z) - y0 * self.dpsiz_dx(Z)
 
-    def v(self, Z, z0=0, unit='mm'):
+    def v(self, Z, z0=0, unit="mm"):
         """
         Calculate the centerline deflection in the y-direction.
 
@@ -311,12 +311,12 @@ class FieldQuantitiesMixin:
             Deflection v (in specified unit) of the slab.
         """
         convert = {
-            'm': 1e-3,   # meters
-            'cm': 1e-1,  # centimeters
-            'mm': 1,     # millimeters
-            'um': 1e3    # micrometers
+            "m": 1e-3,  # meters
+            "cm": 1e-1,  # centimeters
+            "mm": 1,  # millimeters
+            "um": 1e3,  # micrometers
         }
-        return convert[unit]*(Z[2, :] - z0 * self.psix(Z))
+        return convert[unit] * (Z[2, :] - z0 * self.psix(Z))
 
     def dv_dx(self, Z, z0=0):
         """
@@ -360,8 +360,8 @@ class FieldQuantitiesMixin:
         float
             Axial displacement at the center of the weak layer (mm).
         """
-        return Z[12,:]
-    
+        return Z[12, :]
+
     def dtheta_uc_dx(self, Z):
         """
         Calculate the first derivative of the constant dispalcemnet in at the center of the weak layer.
@@ -374,15 +374,15 @@ class FieldQuantitiesMixin:
             Solution vector [u(x) u'(x) v(x) v'(x) w(x) w'(x) psi_x(x) psi_x'(x) psi_y(x) psi_y'(x) psi_z(x) psi_z'(x)
               theta_uc(x) theta_uc'(x) theta_ul(x) theta_ul'(x) theta_vc(x) theta_vc'(x) theta_vl(x) theta_vl'(x)
               theta_wc(x) theta_wc'(x) theta_wl(x) theta_wl'(x)]^T.
-        
+
 
         Returns
         -------
         float
             First derivative of the axial displacement at the center of the weak layer (mm/mm).
         """
-        return Z[13,:]
-    
+        return Z[13, :]
+
     def theta_ul(self, Z):
         """
         Calculate the linear amplitude of axial cosine shaped displacements in the weak layer.
@@ -401,8 +401,8 @@ class FieldQuantitiesMixin:
         float
             Linear amplitude theta_uk (mm) of the slab.
         """
-        return Z[14,:]
-    
+        return Z[14, :]
+
     def dtheta_ul_dx(self, Z):
         """
         Calculate the first derivative of the linear amplitude of axial cosine shaped displacements in the weak layer.
@@ -421,8 +421,7 @@ class FieldQuantitiesMixin:
         float
             First derivative of the linear amplitude of axial cosine shaped displacements in the weak layer (mm/mm).
         """
-        return Z[15,:]
-    
+        return Z[15, :]
 
     def theta_vc(self, Z):
         """
@@ -444,8 +443,8 @@ class FieldQuantitiesMixin:
         float
             constant amplitude of out-of-plane cosine shaped displacements in the weak layer theta_vc (mm).
         """
-        return Z[16,:]
-    
+        return Z[16, :]
+
     def dtheta_vc_dx(self, Z):
         """
         Calculate the first derivative of the constant amplitude of out-of-plane cosine shaped displacements in the weak layer.
@@ -464,13 +463,13 @@ class FieldQuantitiesMixin:
         float
             First derivative the constant amplitude of out-of-plane cosine shaped displacements in the weak layer (mm/mm).
         """
-        return Z[17,:]
-    
+        return Z[17, :]
+
     def theta_vl(self, Z):
         """
         Calculate the linear amplitude of out-of-plane cosine shaped displacements in the weak layer theta_vk .
 
-        This method computes linear amplitude of out-of-plane cosine shaped displacements in the weak layer theta_vk 
+        This method computes linear amplitude of out-of-plane cosine shaped displacements in the weak layer theta_vk
         based on the solution vector.
 
         Arguments
@@ -486,8 +485,8 @@ class FieldQuantitiesMixin:
         float
             Linear amplitude theta_vk (mm).
         """
-        return Z[18,:]
-    
+        return Z[18, :]
+
     def dtheta_vl_dx(self, Z):
         """
         Calculate the first derivative of the linear amplitude of out-of-plane cosine shaped displacements in the weak layer.
@@ -506,8 +505,8 @@ class FieldQuantitiesMixin:
         float
             First derivative of the linear amplitude of out-of-plane cosine shaped displacements in the weak layer (mm/mm).
         """
-        return Z[19,:]
-    
+        return Z[19, :]
+
     def theta_wc(self, Z):
         """
         Calculate the constant amplitude of vertical cosine shaped displacements in the weak layer.
@@ -527,8 +526,8 @@ class FieldQuantitiesMixin:
         float
             constant amplitude of vertical cosine shaped displacements in the weak layer (mm).
         """
-        return Z[20,:]
-    
+        return Z[20, :]
+
     def dtheta_wc_dx(self, Z):
         """
         Calculate the constant amplitude of vertical cosine shaped displacements in the weak layer.
@@ -547,8 +546,8 @@ class FieldQuantitiesMixin:
         float
             First derivative of the constant amplitude of vertical cosine shaped displacements in the weak layer (mm/mm).
         """
-        return Z[21,:]
-    
+        return Z[21, :]
+
     def theta_wl(self, Z):
         """
         Calculate the linear amplitude of vertical cosine shaped displacements in the weak layer.
@@ -568,8 +567,8 @@ class FieldQuantitiesMixin:
         float
             Linear amplitude of vertical cosine shaped displacements in the weak layer (mm).
         """
-        return Z[22,:]
-    
+        return Z[22, :]
+
     def dtheta_wl_dx(self, Z):
         """
         Calculate the first derivative of the linear amplitude of vertical cosine shaped displacements in the weak layer.
@@ -588,11 +587,9 @@ class FieldQuantitiesMixin:
         float
             First derivative ofthe linear amplitude of vertical cosine shaped displacements in the weak layer (mm/mm).
         """
-        return Z[23,:]
-    
-    
+        return Z[23, :]
 
-    def uweak(self, Z, z0, y0 = 0, unit='mm'):
+    def uweak(self, Z, z0, y0=0, unit="mm"):
         """
         Calculate the displacement in the weak layer in the x-direction.
 
@@ -619,10 +616,10 @@ class FieldQuantitiesMixin:
             Axial displacement in the weak layer (in specified unit).
         """
         convert = {
-            'm': 1e-3,   # meters
-            'cm': 1e-1,  # centimeters
-            'mm': 1,     # millimeters
-            'um': 1e3    # micrometers
+            "m": 1e-3,  # meters
+            "cm": 1e-1,  # centimeters
+            "mm": 1,  # millimeters
+            "um": 1e3,  # micrometers
         }
         # Unpack geometrical properties of layerd
 
@@ -631,10 +628,13 @@ class FieldQuantitiesMixin:
         Pi = np.pi
         b = self.b
 
+        return convert[unit] * (
+            self.u(Z, h / 2, y0) * (1 - (z0 - h / 2) / t)
+            + np.cos(Pi * (2 * z0 - h - t) / (2 * t))
+            * (self.theta_uc(Z) + (2 * y0 / b) * self.theta_ul(Z))
+        )
 
-        return convert[unit]* (self.u(Z, h/2, y0) * (1 - (z0-h/2)/t) + np.cos(Pi * (2*z0 - h - t)/(2*t)) * (self.theta_uc(Z) + (2*y0/b) * self.theta_ul(Z)))
-
-    def vweak(self, Z, z0, y0 = 0, unit='mm'):
+    def vweak(self, Z, z0, y0=0, unit="mm"):
         """
         Calculate the displacement in the weak layer in the y-direction.
 
@@ -661,10 +661,10 @@ class FieldQuantitiesMixin:
             Horizontal displacement in the weak layer (in specified unit).
         """
         convert = {
-            'm': 1e-3,   # meters
-            'cm': 1e-1,  # centimeters
-            'mm': 1,     # millimeters
-            'um': 1e3    # micrometers
+            "m": 1e-3,  # meters
+            "cm": 1e-1,  # centimeters
+            "mm": 1,  # millimeters
+            "um": 1e3,  # micrometers
         }
         # Unpack geometrical properties of layerd
 
@@ -674,10 +674,13 @@ class FieldQuantitiesMixin:
         b = self.b
 
         # Return vweak
-        return convert[unit]* (self.v(Z, h/2, y0) * (1 - (z0-h/2)/t) + np.cos(Pi * (2 * z0 - h - t)/(2 * t)) * (self.theta_vc(Z) + ( 2 * y0/b) * self.theta_vl(Z)) )
+        return convert[unit] * (
+            self.v(Z, h / 2, y0) * (1 - (z0 - h / 2) / t)
+            + np.cos(Pi * (2 * z0 - h - t) / (2 * t))
+            * (self.theta_vc(Z) + (2 * y0 / b) * self.theta_vl(Z))
+        )
 
-
-    def wweak(self, Z, z0,y0 = 0, unit='mm'):
+    def wweak(self, Z, z0, y0=0, unit="mm"):
         """
         Calculate the displacement in the weak layer in the z-direction.
 
@@ -704,10 +707,10 @@ class FieldQuantitiesMixin:
             Vertical displacement in the weak layer (in specified unit).
         """
         convert = {
-            'm': 1e-3,   # meters
-            'cm': 1e-1,  # centimeters
-            'mm': 1,     # millimeters
-            'um': 1e3    # micrometers
+            "m": 1e-3,  # meters
+            "cm": 1e-1,  # centimeters
+            "mm": 1,  # millimeters
+            "um": 1e3,  # micrometers
         }
         # Unpack geometrical properties of layerd
         h = self.h
@@ -736,16 +739,31 @@ class FieldQuantitiesMixin:
         float
             Normal force in the x-direction (N).
         """
-        Ew = self.weak['E']
-        nuw = self.weak['nu']
+        Ew = self.weak["E"]
+        nuw = self.weak["nu"]
         t = self.t
         Pi = np.pi
         b = self.b
         h = self.h
 
-        Nxx = self.A11 * b * Z[1,:] + self.B11* b * Z[9,:]
+        Nxx = self.A11 * b * Z[1, :] + self.B11 * b * Z[9, :]
         if bed:
-            Nxx = Nxx +(Ew*(3*b*Pi*nuw*Z[4,:] - 12*t*nuw*self.theta_vl(Z) - 12*b*nuw*self.theta_wc(Z) + b*t*(-1 + nuw)*(2*Pi*Z[1,:] + 6*self.dtheta_uc_dx(Z) + h*Pi*self.dpsiy_dx(Z))))/(6*Pi*(-1 + nuw + 2*nuw**2))
+            Nxx = Nxx + (
+                Ew
+                * (
+                    3 * b * Pi * nuw * Z[4, :]
+                    - 12 * t * nuw * self.theta_vl(Z)
+                    - 12 * b * nuw * self.theta_wc(Z)
+                    + b
+                    * t
+                    * (-1 + nuw)
+                    * (
+                        2 * Pi * Z[1, :]
+                        + 6 * self.dtheta_uc_dx(Z)
+                        + h * Pi * self.dpsiy_dx(Z)
+                    )
+                )
+            ) / (6 * Pi * (-1 + nuw + 2 * nuw**2))
         return Nxx
 
     def Myy(self, Z, bed=False):
@@ -769,17 +787,32 @@ class FieldQuantitiesMixin:
         float
             Bending moment around the y-axis (N·mm).
         """
-        Ew = self.weak['E']
-        nuw = self.weak['nu']
+        Ew = self.weak["E"]
+        nuw = self.weak["nu"]
         t = self.t
         Pi = np.pi
         b = self.b
         h = self.h
-        Myy = self.B11 * b * Z[1,:] + self.D11 *b * Z[9,:]
+        Myy = self.B11 * b * Z[1, :] + self.D11 * b * Z[9, :]
         if bed:
-            Myy  = Myy + (h*Ew*(3*b*Pi*nuw*Z[4,:] - 12*t*nuw*self.theta_vl(Z) - 12*b*nuw*self.theta_wc(Z) + b*t*(-1 + nuw)*(2*Pi*Z[1,:] + 6*self.dtheta_uc_dx(Z) + h*Pi*self.dpsiy_dx(Z))))/(12*Pi*(-1 + nuw + 2*nuw**2))
+            Myy = Myy + (
+                h
+                * Ew
+                * (
+                    3 * b * Pi * nuw * Z[4, :]
+                    - 12 * t * nuw * self.theta_vl(Z)
+                    - 12 * b * nuw * self.theta_wc(Z)
+                    + b
+                    * t
+                    * (-1 + nuw)
+                    * (
+                        2 * Pi * Z[1, :]
+                        + 6 * self.dtheta_uc_dx(Z)
+                        + h * Pi * self.dpsiy_dx(Z)
+                    )
+                )
+            ) / (12 * Pi * (-1 + nuw + 2 * nuw**2))
         return Myy
-        
 
     def Mxx(self, Z, bed=False):
         """
@@ -802,16 +835,51 @@ class FieldQuantitiesMixin:
         float
             Torsion moment around the x-axis (N·mm).
         """
-        Ew = self.weak['E']
-        nuw = self.weak['nu']
+        Ew = self.weak["E"]
+        nuw = self.weak["nu"]
         t = self.t
         Pi = np.pi
         b = self.b
         h = self.h
-        Mxx = self.kA55 * np.longdouble(b**3/12)  * Z[7,:] +  self.kB55 * b * (Z[10,:] - Z[3,:]) + self.kD55 * b * Z[7,:]
+        Mxx = (
+            self.kA55 * np.longdouble(b**3 / 12) * Z[7, :]
+            + self.kB55 * b * (Z[10, :] - Z[3, :])
+            + self.kD55 * b * Z[7, :]
+        )
         if bed:
-            Mxx  = Mxx + np.longdouble((-1/144*(b**2*Ew*(-24*t*self.theta_ul(Z) + 3*b*Pi*(-2 + t)*self.psiz(Z) + 12*(-2 + t)*t*self.dtheta_wl_dx(Z) + b*Pi*(-3 + t)*t*self.dpsix_dx(Z)))/(Pi*t*(1 + nuw)) - \
-                          (h*t*Ew*(12*self.theta_ul(Z) + b*(-2*Pi*self.psiz(Z) + 2*Pi*Z[3,:] + 6*self.dtheta_vc_dx(Z) - h*Pi*self.dpsix_dx(Z))))/(24*Pi*(1 + nuw))))
+            Mxx = Mxx + np.longdouble(
+                (
+                    -1
+                    / 144
+                    * (
+                        b**2
+                        * Ew
+                        * (
+                            -24 * t * self.theta_ul(Z)
+                            + 3 * b * Pi * (-2 + t) * self.psiz(Z)
+                            + 12 * (-2 + t) * t * self.dtheta_wl_dx(Z)
+                            + b * Pi * (-3 + t) * t * self.dpsix_dx(Z)
+                        )
+                    )
+                    / (Pi * t * (1 + nuw))
+                    - (
+                        h
+                        * t
+                        * Ew
+                        * (
+                            12 * self.theta_ul(Z)
+                            + b
+                            * (
+                                -2 * Pi * self.psiz(Z)
+                                + 2 * Pi * Z[3, :]
+                                + 6 * self.dtheta_vc_dx(Z)
+                                - h * Pi * self.dpsix_dx(Z)
+                            )
+                        )
+                    )
+                    / (24 * Pi * (1 + nuw))
+                )
+            )
         return Mxx
 
     def Mzz(self, Z, bed=False):
@@ -833,19 +901,29 @@ class FieldQuantitiesMixin:
         float
             Bending moment around the z-axis (N mm).
         """
-        Ew = self.weak['E']
-        nuw = self.weak['nu']
+        Ew = self.weak["E"]
+        nuw = self.weak["nu"]
         t = self.t
         Pi = np.pi
         b = self.b
         h = self.h
-        Mzz = self.A11 * np.longdouble(b**3)/12 * Z[11,:] 
+        Mzz = self.A11 * np.longdouble(b**3) / 12 * Z[11, :]
         if bed:
-            Mzz  = Mzz - np.longdouble(b**2*Ew*(-24*nuw*self.theta_wl(Z) + 3*b*Pi*nuw*self.psix(Z) + 2*t*(-1 + nuw)*(6*self.dtheta_ul_dx(Z) - b*Pi*self.dpsiz_dx(Z))))/(72*Pi*(-1 + nuw + 2*nuw**2))
+            Mzz = Mzz - np.longdouble(
+                b**2
+                * Ew
+                * (
+                    -24 * nuw * self.theta_wl(Z)
+                    + 3 * b * Pi * nuw * self.psix(Z)
+                    + 2
+                    * t
+                    * (-1 + nuw)
+                    * (6 * self.dtheta_ul_dx(Z) - b * Pi * self.dpsiz_dx(Z))
+                )
+            ) / (72 * Pi * (-1 + nuw + 2 * nuw**2))
         return Mzz
 
-
-    def Vyy(self, Z,bed = False):
+    def Vyy(self, Z, bed=False):
         """
         Calculate the shear force in y-direction.
 
@@ -864,18 +942,31 @@ class FieldQuantitiesMixin:
         float
             Out-of-plane shear force (N)).
         """
-        Ew = self.weak['E']
-        nuw = self.weak['nu']
+        Ew = self.weak["E"]
+        nuw = self.weak["nu"]
         t = self.t
         Pi = np.pi
         b = self.b
         h = self.h
-        Vyy = self.kA55 * b * (Z[3,:] - Z[10,:])- self.kB55 * b * Z[7,:] 
+        Vyy = self.kA55 * b * (Z[3, :] - Z[10, :]) - self.kB55 * b * Z[7, :]
         if bed:
-            Vyy = Vyy + np.longdouble(t*Ew*(12*self.theta_ul(Z) + b*(-2*Pi*self.psiz(Z) + 2*Pi*Z[3,:] + 6*self.dtheta_vc_dx(Z) - h*Pi*self.dpsix_dx(Z))))/(12*Pi*(1 + nuw))
+            Vyy = Vyy + np.longdouble(
+                t
+                * Ew
+                * (
+                    12 * self.theta_ul(Z)
+                    + b
+                    * (
+                        -2 * Pi * self.psiz(Z)
+                        + 2 * Pi * Z[3, :]
+                        + 6 * self.dtheta_vc_dx(Z)
+                        - h * Pi * self.dpsix_dx(Z)
+                    )
+                )
+            ) / (12 * Pi * (1 + nuw))
         return Vyy
-        
-    def Vzz(self, Z,bed = False):
+
+    def Vzz(self, Z, bed=False):
         """
         Calculate the shear force in the z-direction.
 
@@ -895,20 +986,27 @@ class FieldQuantitiesMixin:
         float
             Vertical shear force V (N) in the slab.
         """
-        Ew = self.weak['E']
-        nuw = self.weak['nu']
+        Ew = self.weak["E"]
+        nuw = self.weak["nu"]
         t = self.t
         Pi = np.pi
         b = self.b
         h = self.h
 
-        Vzz = self.kA55 * b * (Z[5,:] + Z[8,:])
+        Vzz = self.kA55 * b * (Z[5, :] + Z[8, :])
         if bed:
-            Vzz = Vzz + np.longdouble(b*Ew*(-6*Pi*Z[0,:] + 24*self.theta_uc(Z) - 3*h*Pi*self.psiy(Z) + 4*Pi*t*Z[5,:] + 12*t*self.dtheta_wc_dx(Z)))/(24*Pi*(1 + nuw))
+            Vzz = Vzz + np.longdouble(
+                b
+                * Ew
+                * (
+                    -6 * Pi * Z[0, :]
+                    + 24 * self.theta_uc(Z)
+                    - 3 * h * Pi * self.psiy(Z)
+                    + 4 * Pi * t * Z[5, :]
+                    + 12 * t * self.dtheta_wc_dx(Z)
+                )
+            ) / (24 * Pi * (1 + nuw))
         return Vzz
-        
-    
-        
 
     def NxxWL(self, Z):
         """
@@ -931,14 +1029,24 @@ class FieldQuantitiesMixin:
             Normal force in the weak layer in the x-direction (N).
         """
         # Unpack weak layer material properties
-        Ew = self.weak['E']
-        nuw = self.weak['nu']
+        Ew = self.weak["E"]
+        nuw = self.weak["nu"]
         t = self.t
         Pi = np.pi
         b = self.b
         h = self.h
 
-        return (Ew*(4*b*nuw*Z[4,:] - 2*Pi*t*nuw*self.theta_vl(Z) + b*t*(-1 + nuw)*(2*Z[1,:] + Pi*self.dtheta_uc_dx(Z) + h*self.dpsiy_dx(Z))))/(2*Pi*(1 + nuw)*(-1 + 2*nuw))
+        return (
+            Ew
+            * (
+                4 * b * nuw * Z[4, :]
+                - 2 * Pi * t * nuw * self.theta_vl(Z)
+                + b
+                * t
+                * (-1 + nuw)
+                * (2 * Z[1, :] + Pi * self.dtheta_uc_dx(Z) + h * self.dpsiy_dx(Z))
+            )
+        ) / (2 * Pi * (1 + nuw) * (-1 + 2 * nuw))
 
     def VyyWL(self, Z):
         """
@@ -961,14 +1069,27 @@ class FieldQuantitiesMixin:
             Shear force in the weak layer in the y-direction (N).
         """
         # Unpack weak layer material properties
-        Ew = self.weak['E']
-        nuw = self.weak['nu']
+        Ew = self.weak["E"]
+        nuw = self.weak["nu"]
         t = self.t
         Pi = np.pi
         b = self.b
         h = self.h
 
-        return (t*Ew*(2*Pi*self.theta_ul(Z) + b*(-2*self.psiz(Z) + 2*Z[3,:] + Pi*self.dtheta_vc_dx(Z) - h*self.dpsix_dx(Z))))/(4*Pi*(1 + nuw))
+        return (
+            t
+            * Ew
+            * (
+                2 * Pi * self.theta_ul(Z)
+                + b
+                * (
+                    -2 * self.psiz(Z)
+                    + 2 * Z[3, :]
+                    + Pi * self.dtheta_vc_dx(Z)
+                    - h * self.dpsix_dx(Z)
+                )
+            )
+        ) / (4 * Pi * (1 + nuw))
 
     def VzzWL(self, Z):
         """
@@ -991,14 +1112,23 @@ class FieldQuantitiesMixin:
             Shear force in the weak layer in the z-direction (N).
         """
         # Unpack weak layer material properties
-        Ew = self.weak['E']
-        nuw = self.weak['nu']
+        Ew = self.weak["E"]
+        nuw = self.weak["nu"]
         t = self.t
         Pi = np.pi
         b = self.b
         h = self.h
 
-        return (b*Ew*(-4*Z[0,:] - 2*h*self.psiy(Z) + 2*t*Z[5,:] + Pi*t*self.dtheta_wc_dx(Z)))/(4*Pi*(1 + nuw))
+        return (
+            b
+            * Ew
+            * (
+                -4 * Z[0, :]
+                - 2 * h * self.psiy(Z)
+                + 2 * t * Z[5, :]
+                + Pi * t * self.dtheta_wc_dx(Z)
+            )
+        ) / (4 * Pi * (1 + nuw))
 
     def MxxWL(self, Z):
         """
@@ -1021,14 +1151,22 @@ class FieldQuantitiesMixin:
             Associated force with theta_ul in the weak layer (N).
         """
         # Unpack weak layer material properties
-        Ew = self.weak['E']
-        nuw = self.weak['nu']
+        Ew = self.weak["E"]
+        nuw = self.weak["nu"]
         t = self.t
         Pi = np.pi
         b = self.b
         h = self.h
 
-        return (b*Ew*(2*b*self.psiz(Z) + Pi*t*self.dtheta_wl_dx(Z) + b*t*self.dpsix_dx(Z)))/(12*Pi*(1 + nuw))
+        return (
+            b
+            * Ew
+            * (
+                2 * b * self.psiz(Z)
+                + Pi * t * self.dtheta_wl_dx(Z)
+                + b * t * self.dpsix_dx(Z)
+            )
+        ) / (12 * Pi * (1 + nuw))
 
     def MyyWL(self, Z):
         """
@@ -1051,14 +1189,14 @@ class FieldQuantitiesMixin:
             Associated force with theta_vl in the weak layer (N).
         """
         # Unpack weak layer material properties
-        Ew = self.weak['E']
-        nuw = self.weak['nu']
+        Ew = self.weak["E"]
+        nuw = self.weak["nu"]
         t = self.t
         Pi = np.pi
         b = self.b
         h = self.h
 
-        return (b*t*Ew*self.dtheta_vl_dx(Z))/(12*(1 + nuw))
+        return (b * t * Ew * self.dtheta_vl_dx(Z)) / (12 * (1 + nuw))
 
     def MzzWL(self, Z):
         """
@@ -1081,16 +1219,23 @@ class FieldQuantitiesMixin:
             Associated force with theta_wl in the weak layer (N).
         """
         # Unpack weak layer material properties
-        Ew = self.weak['E']
-        nuw = self.weak['nu']
+        Ew = self.weak["E"]
+        nuw = self.weak["nu"]
         t = self.t
         Pi = np.pi
         b = self.b
         h = self.h
 
-        return (b*Ew*(2*b*nuw*self.psix(Z) + t*(-1 + nuw)*(Pi*self.dtheta_ul_dx(Z) - b*self.dpsiz_dx(Z))))/(6*Pi*(1 + nuw)*(-1 + 2*nuw))
+        return (
+            b
+            * Ew
+            * (
+                2 * b * nuw * self.psix(Z)
+                + t * (-1 + nuw) * (Pi * self.dtheta_ul_dx(Z) - b * self.dpsiz_dx(Z))
+            )
+        ) / (6 * Pi * (1 + nuw) * (-1 + 2 * nuw))
 
-    def sigzz(self, Z, z0 = 0, y0 = 0, unit='MPa' ):
+    def sigzz(self, Z, z0=0, y0=0, unit="MPa"):
         """
         Calculate the normal stress in the weak layer in the z-direction.
 
@@ -1118,25 +1263,60 @@ class FieldQuantitiesMixin:
         """
         # Convert coordinates from mm to cm and stresses from MPa to unit
         convert = {
-            'Pa': 1e6,    # pascals
-            'kPa': 1e3,   # kilopascals
-            'MPa': 1,     # megapascals
-            'GPa': 1e-3   # gigapascals
+            "Pa": 1e6,  # pascals
+            "kPa": 1e3,  # kilopascals
+            "MPa": 1,  # megapascals
+            "GPa": 1e-3,  # gigapascals
         }
         # Adjust z-coordinate for weak layer
-        z0 = z0 + self.h/2 + self.t/2
+        z0 = z0 + self.h / 2 + self.t / 2
         # Unpack weak layer material properties
-        Ew = self.weak['E']
-        nuw = self.weak['nu']
+        Ew = self.weak["E"]
+        nuw = self.weak["nu"]
         b = self.b
         h = self.h
         t = self.t
         Pi = np.pi
-        return convert[unit]*(2*Ew*nuw*np.cos((Pi*(-1/2*h - t/2 + z0))/t)*self.theta_vl(Z))/(b*(1 - 2*nuw)*(1 + nuw)) + (Ew*(1 - nuw)*(-((Pi*np.sin((Pi*(-1/2*h - t/2 + z0))/t)* \
-                                (self.theta_wc(Z) + (2*y0*self.theta_wl(Z))/b))/t) - (Z[4,:] + y0*self.psix(Z))/t))/((1 - 2*nuw)*(1 + nuw)) + (Ew*nuw*(np.cos((Pi*(-1/2*h - t/2 + z0))/t)*(self.dtheta_uc_dx(Z) + \
-                                (2*y0*self.dtheta_ul_dx(Z))/b) + (1 - (-1/2*h + z0)/t)*(Z[1,:] + (h*self.dpsiy_dx(Z))/2 - y0*self.dpsiz_dx(Z))))/((1 - 2*nuw)*(1 + nuw))
+        return (
+            convert[unit]
+            * (
+                2
+                * Ew
+                * nuw
+                * np.cos((Pi * (-1 / 2 * h - t / 2 + z0)) / t)
+                * self.theta_vl(Z)
+            )
+            / (b * (1 - 2 * nuw) * (1 + nuw))
+            + (
+                Ew
+                * (1 - nuw)
+                * (
+                    -(
+                        (
+                            Pi
+                            * np.sin((Pi * (-1 / 2 * h - t / 2 + z0)) / t)
+                            * (self.theta_wc(Z) + (2 * y0 * self.theta_wl(Z)) / b)
+                        )
+                        / t
+                    )
+                    - (Z[4, :] + y0 * self.psix(Z)) / t
+                )
+            )
+            / ((1 - 2 * nuw) * (1 + nuw))
+            + (
+                Ew
+                * nuw
+                * (
+                    np.cos((Pi * (-1 / 2 * h - t / 2 + z0)) / t)
+                    * (self.dtheta_uc_dx(Z) + (2 * y0 * self.dtheta_ul_dx(Z)) / b)
+                    + (1 - (-1 / 2 * h + z0) / t)
+                    * (Z[1, :] + (h * self.dpsiy_dx(Z)) / 2 - y0 * self.dpsiz_dx(Z))
+                )
+            )
+            / ((1 - 2 * nuw) * (1 + nuw))
+        )
 
-    def tauxz(self, Z,z0 = 0,y0 = 0, unit='MPa'):
+    def tauxz(self, Z, z0=0, y0=0, unit="MPa"):
         """
         Calculate the shear stress in the weak layer in the x-z plane.
 
@@ -1164,24 +1344,43 @@ class FieldQuantitiesMixin:
         """
         # Convert coordinates from mm to cm and stresses from MPa to unit
         convert = {
-            'Pa': 1e6,    # pascals
-            'kPa': 1e3,   # kilopascals
-            'MPa': 1,     # megapascals
-            'GPa': 1e-3   # gigapascals
+            "Pa": 1e6,  # pascals
+            "kPa": 1e3,  # kilopascals
+            "MPa": 1,  # megapascals
+            "GPa": 1e-3,  # gigapascals
         }
         # Adjust z-coordinate for weak layer
-        z0 = z0 + self.h/2 + self.t/2
+        z0 = z0 + self.h / 2 + self.t / 2
         # Unpack weak layer material properties
-        Ew = self.weak['E']
-        nuw = self.weak['nu']
+        Ew = self.weak["E"]
+        nuw = self.weak["nu"]
         b = self.b
         h = self.h
         t = self.t
         Pi = np.pi
-        return convert[unit]*(Ew*(-((Pi*np.sin((Pi*(-1/2*h - t/2 + z0))/t)*(self.theta_uc(Z) + (2*y0*self.theta_ul(Z))/b))/t) - (Z[0,:] + (h*self.psiy(Z))/2 - y0*self.psiz(Z))/t + np.cos((Pi*(-1/2*h - t/2 + z0))/t)* \
-                                  (self.dtheta_wc_dx(Z) + (2*y0*self.dtheta_wl_dx(Z))/b) + (1 - (-1/2*h + z0)/t)*(Z[5,:] + y0*self.dpsix_dx(Z))))/(2*(1 + nuw))
-    
-    def tauxy(self, Z, z0 = 0, y0 = 0, unit='MPa'):
+        return (
+            convert[unit]
+            * (
+                Ew
+                * (
+                    -(
+                        (
+                            Pi
+                            * np.sin((Pi * (-1 / 2 * h - t / 2 + z0)) / t)
+                            * (self.theta_uc(Z) + (2 * y0 * self.theta_ul(Z)) / b)
+                        )
+                        / t
+                    )
+                    - (Z[0, :] + (h * self.psiy(Z)) / 2 - y0 * self.psiz(Z)) / t
+                    + np.cos((Pi * (-1 / 2 * h - t / 2 + z0)) / t)
+                    * (self.dtheta_wc_dx(Z) + (2 * y0 * self.dtheta_wl_dx(Z)) / b)
+                    + (1 - (-1 / 2 * h + z0) / t) * (Z[5, :] + y0 * self.dpsix_dx(Z))
+                )
+            )
+            / (2 * (1 + nuw))
+        )
+
+    def tauxy(self, Z, z0=0, y0=0, unit="MPa"):
         """
         Calculate the shear stress in the weak layer in the x-y plane.
 
@@ -1209,24 +1408,38 @@ class FieldQuantitiesMixin:
         """
         # Convert coordinates from mm to cm and stresses from MPa to unit
         convert = {
-            'Pa': 1e6,    # pascals
-            'kPa': 1e3,   # kilopascals
-            'MPa': 1,     # megapascals
-            'GPa': 1e-3   # gigapascals
+            "Pa": 1e6,  # pascals
+            "kPa": 1e3,  # kilopascals
+            "MPa": 1,  # megapascals
+            "GPa": 1e-3,  # gigapascals
         }
         # Adjust z-coordinate for weak layer
-        z0 = z0 + self.h/2 + self.t/2
+        z0 = z0 + self.h / 2 + self.t / 2
         # Unpack weak layer material properties
-        Ew = self.weak['E']
-        nuw = self.weak['nu']
+        Ew = self.weak["E"]
+        nuw = self.weak["nu"]
         b = self.b
         h = self.h
         t = self.t
         Pi = np.pi
-        return convert[unit]*(Ew*((2*np.cos((Pi*(-1/2*h - t/2 + z0))/t)*self.theta_ul(Z))/b - (1 - (-1/2*h + z0)/t)*self.psiz(Z) + np.cos((Pi*(-1/2*h - t/2 + z0))/t)*(self.dtheta_vc_dx(Z) + \
-                            (2*y0*self.dtheta_vl_dx(Z))/b) + (1 - (-1/2*h + z0)/t)*(Z[3,:] - (h*self.dpsix_dx(Z))/2)))/(2*(1 + nuw))
-    
-    def tauyz(self, Z, z0 = 0, y0 = 0, unit='MPa'):
+        return (
+            convert[unit]
+            * (
+                Ew
+                * (
+                    (2 * np.cos((Pi * (-1 / 2 * h - t / 2 + z0)) / t) * self.theta_ul(Z))
+                    / b
+                    - (1 - (-1 / 2 * h + z0) / t) * self.psiz(Z)
+                    + np.cos((Pi * (-1 / 2 * h - t / 2 + z0)) / t)
+                    * (self.dtheta_vc_dx(Z) + (2 * y0 * self.dtheta_vl_dx(Z)) / b)
+                    + (1 - (-1 / 2 * h + z0) / t)
+                    * (Z[3, :] - (h * self.dpsix_dx(Z)) / 2)
+                )
+            )
+            / (2 * (1 + nuw))
+        )
+
+    def tauyz(self, Z, z0=0, y0=0, unit="MPa"):
         """
         Calculate the shear stress in the weak layer in the x-y plane.
 
@@ -1254,25 +1467,47 @@ class FieldQuantitiesMixin:
         """
         # Convert coordinates from mm to cm and stresses from MPa to unit
         convert = {
-            'Pa': 1e6,    # pascals
-            'kPa': 1e3,   # kilopascals
-            'MPa': 1,     # megapascals
-            'GPa': 1e-3   # gigapascals
+            "Pa": 1e6,  # pascals
+            "kPa": 1e3,  # kilopascals
+            "MPa": 1,  # megapascals
+            "GPa": 1e-3,  # gigapascals
         }
         # Adjust z-coordinate for weak layer
-        z0 = z0 + self.h/2 + self.t/2
+        z0 = z0 + self.h / 2 + self.t / 2
         # Unpack weak layer material properties
-        Ew = self.weak['E']
-        nuw = self.weak['nu']
+        Ew = self.weak["E"]
+        nuw = self.weak["nu"]
         b = self.b
         h = self.h
         t = self.t
         Pi = np.pi
-        return convert[unit]*(Ew*(-((Pi*np.sin((Pi*(-1/2*h - t/2 + z0))/t)*(self.theta_vc(Z) + (2*y0*self.theta_vl(Z))/b))/t) + \
-                   (2*np.cos((Pi*(-1/2*h - t/2 + z0))/t)*self.theta_wl(Z))/b + (1 - (-1/2*h + z0)/t)*self.psix(Z) - (Z[2,:] - (h*self.psix(Z))/2)/t))/(2*(1 + nuw))
+        return (
+            convert[unit]
+            * (
+                Ew
+                * (
+                    -(
+                        (
+                            Pi
+                            * np.sin((Pi * (-1 / 2 * h - t / 2 + z0)) / t)
+                            * (self.theta_vc(Z) + (2 * y0 * self.theta_vl(Z)) / b)
+                        )
+                        / t
+                    )
+                    + (
+                        2
+                        * np.cos((Pi * (-1 / 2 * h - t / 2 + z0)) / t)
+                        * self.theta_wl(Z)
+                    )
+                    / b
+                    + (1 - (-1 / 2 * h + z0) / t) * self.psix(Z)
+                    - (Z[2, :] - (h * self.psix(Z)) / 2) / t
+                )
+            )
+            / (2 * (1 + nuw))
+        )
 
-
-    def epszz(self, Z, z0 = 0, y0 = 0):
+    def epszz(self, Z, z0=0, y0=0):
         """
         Calculate the normal strain in the weak layer in the z-direction.
 
@@ -1302,11 +1537,21 @@ class FieldQuantitiesMixin:
         t = self.t
         Pi = np.pi
         # Adjust z-coordinate for weak layer
-        z0 = z0 + h/2 + t/2
+        z0 = z0 + h / 2 + t / 2
 
-        return -((Pi*np.sin((Pi*(-1/2*h - t/2 + z0))/t)*(self.theta_wc(Z) + (2*y0*self.theta_wl(Z))/b))/t) - (Z[4,:] + y0*self.psix(Z))/t
+        return (
+            -(
+                (
+                    Pi
+                    * np.sin((Pi * (-1 / 2 * h - t / 2 + z0)) / t)
+                    * (self.theta_wc(Z) + (2 * y0 * self.theta_wl(Z)) / b)
+                )
+                / t
+            )
+            - (Z[4, :] + y0 * self.psix(Z)) / t
+        )
 
-    def gammaxz(self, Z, z0 = 0, y0 = 0):
+    def gammaxz(self, Z, z0=0, y0=0):
         """
         Calculate the shear strain in the weak layer in the x-z plane.
 
@@ -1336,12 +1581,22 @@ class FieldQuantitiesMixin:
         t = self.t
         Pi = np.pi
 
+        return (
+            -(
+                (
+                    Pi
+                    * np.sin((Pi * (-1 / 2 * h - t / 2 + z0)) / t)
+                    * (self.theta_uc(Z) + (2 * y0 * self.theta_ul(Z)) / b)
+                )
+                / t
+            )
+            - (Z[0, :] + (h * self.psiy(Z)) / 2 - y0 * self.psiz(Z)) / t
+            + np.cos((Pi * (-1 / 2 * h - t / 2 + z0)) / t)
+            * (self.dtheta_wc_dx(Z) + (2 * y0 * self.dtheta_wl_dx(Z)) / b)
+            + (1 - (-1 / 2 * h + z0) / t) * (Z[5, :] + y0 * self.dpsix_dx(Z))
+        )
 
-        return -((Pi*np.sin((Pi*(-1/2*h - t/2 + z0))/t)*(self.theta_uc(Z) + (2*y0*self.theta_ul(Z))/b))/t) - (Z[0,:] + (h*self.psiy(Z))/2 - y0*self.psiz(Z))/t + np.cos((Pi*(-1/2*h - t/2 + z0))/t)* \
-            (self.dtheta_wc_dx(Z) + (2*y0*self.dtheta_wl_dx(Z))/b) + (1 - (-1/2*h + z0)/t)*(Z[5,:] + y0*self.dpsix_dx(Z))
-    
-
-    def gammaxy(self, Z, z0 = 0, y0 = 0):
+    def gammaxy(self, Z, z0=0, y0=0):
         """
         Calculate the shear strain in the weak layer in the x-y plane.
 
@@ -1371,11 +1626,15 @@ class FieldQuantitiesMixin:
         t = self.t
         Pi = np.pi
 
-        
-        return (2*np.cos((Pi*(-1/2*h - t/2 + z0))/t)*self.theta_ul(Z))/b - (1 - (-1/2*h + z0)/t)*self.psiz(Z) + np.cos((Pi*(-1/2*h - t/2 + z0))/t)*(self.dtheta_vc_dx(Z) + (2*y0*self.dtheta_vl_dx(Z))/b) + \
-            (1 - (-1/2*h + z0)/t)*(Z[3,:] - (h*self.dpsix_dx(Z))/2)
-    
-    def Gi(self, Ztip, Zback, unit='kJ/m^2'):
+        return (
+            (2 * np.cos((Pi * (-1 / 2 * h - t / 2 + z0)) / t) * self.theta_ul(Z)) / b
+            - (1 - (-1 / 2 * h + z0) / t) * self.psiz(Z)
+            + np.cos((Pi * (-1 / 2 * h - t / 2 + z0)) / t)
+            * (self.dtheta_vc_dx(Z) + (2 * y0 * self.dtheta_vl_dx(Z)) / b)
+            + (1 - (-1 / 2 * h + z0) / t) * (Z[3, :] - (h * self.dpsix_dx(Z)) / 2)
+        )
+
+    def Gi(self, Ztip, Zback, unit="kJ/m^2"):
         """
         Calculate the energy release rate (ERR) for mode I (opening mode) fracture.
 
@@ -1402,13 +1661,13 @@ class FieldQuantitiesMixin:
         """
         # Convert energy release rate from J/m^2 to specified unit
         convert = {
-            'J/m^2': 1,      # joules per square meter
-            'kJ/m^2': 1e-3   # kilojoules per square meter
+            "J/m^2": 1,  # joules per square meter
+            "kJ/m^2": 1e-3,  # kilojoules per square meter
         }
         # Unpack weak layer material properties
-        Ew = self.weak['E']
-        nuw = self.weak['nu']
-        rhow = self.weak['rho']
+        Ew = self.weak["E"]
+        nuw = self.weak["nu"]
+        rhow = self.weak["rho"]
         phi = self.phi
         theta = self.theta
         b = self.b
@@ -1418,21 +1677,78 @@ class FieldQuantitiesMixin:
         g = 9810
 
         convert = {
-            'J/m^2': 1e3,   # joule per square meter
-            'kJ/m^2': 1,    # kilojoule per square meter
-            'N/mm': 1       # newton per millimeter
+            "J/m^2": 1e3,  # joule per square meter
+            "kJ/m^2": 1,  # kilojoule per square meter
+            "N/mm": 1,  # newton per millimeter
         }
-        return convert[unit]*1/b*(
-                    -1/2*(b*g*rhow*t*np.cos(phi)*np.cos(theta)*(-Pi*Zback[4,:] + Pi*Ztip[4,:] - 4*self.theta_wc(Zback) + 4*self.theta_wc(Ztip)))/Pi + \
-                    (Ew*(24*b*Pi*(-1 + nuw)*Ztip[4,:]**2 + 6*t*nuw*Ztip[4,:]*(16*self.theta_vl(Ztip) + b*(2*Pi*Ztip[1,:] + 8*self.dtheta_uc_dx(Ztip) + \
-                    h*Pi*self.dpsiy_dx(Ztip))) + b*(12*Pi**3*(-1 + nuw)*self.theta_wc(Ztip)**2 + 4*Pi**3*(-1 + nuw)*self.theta_wl(Ztip)**2 - \
-                    24*t*nuw*self.theta_wc(Ztip)*(2*Ztip[1,:] + h*self.dpsiy_dx(Ztip)) + 8*b*t*nuw*self.theta_wl(Ztip)*self.dpsiz_dx(Ztip) + \
-                    b*self.psix(Ztip)*(2*b*Pi*(-1 + nuw)*self.psix(Ztip) + t*nuw*(8*self.dtheta_ul_dx(Ztip) - b*Pi*self.dpsiz_dx(Ztip))))))/(48*Pi*t*(1 + nuw)*(-1 + 2*nuw))
+        return (
+            convert[unit]
+            * 1
+            / b
+            * (
+                -1
+                / 2
+                * (
+                    b
+                    * g
+                    * rhow
+                    * t
+                    * np.cos(phi)
+                    * np.cos(theta)
+                    * (
+                        -Pi * Zback[4, :]
+                        + Pi * Ztip[4, :]
+                        - 4 * self.theta_wc(Zback)
+                        + 4 * self.theta_wc(Ztip)
                     )
+                )
+                / Pi
+                + (
+                    Ew
+                    * (
+                        24 * b * Pi * (-1 + nuw) * Ztip[4, :] ** 2
+                        + 6
+                        * t
+                        * nuw
+                        * Ztip[4, :]
+                        * (
+                            16 * self.theta_vl(Ztip)
+                            + b
+                            * (
+                                2 * Pi * Ztip[1, :]
+                                + 8 * self.dtheta_uc_dx(Ztip)
+                                + h * Pi * self.dpsiy_dx(Ztip)
+                            )
+                        )
+                        + b
+                        * (
+                            12 * Pi**3 * (-1 + nuw) * self.theta_wc(Ztip) ** 2
+                            + 4 * Pi**3 * (-1 + nuw) * self.theta_wl(Ztip) ** 2
+                            - 24
+                            * t
+                            * nuw
+                            * self.theta_wc(Ztip)
+                            * (2 * Ztip[1, :] + h * self.dpsiy_dx(Ztip))
+                            + 8 * b * t * nuw * self.theta_wl(Ztip) * self.dpsiz_dx(Ztip)
+                            + b
+                            * self.psix(Ztip)
+                            * (
+                                2 * b * Pi * (-1 + nuw) * self.psix(Ztip)
+                                + t
+                                * nuw
+                                * (
+                                    8 * self.dtheta_ul_dx(Ztip)
+                                    - b * Pi * self.dpsiz_dx(Ztip)
+                                )
+                            )
+                        )
+                    )
+                )
+                / (48 * Pi * t * (1 + nuw) * (-1 + 2 * nuw))
+            )
+        )
 
-
-
-    def Gii(self, Ztip, Zback, unit='kJ/m^2'):
+    def Gii(self, Ztip, Zback, unit="kJ/m^2"):
         """
         Calculate the energy release rate (ERR) for mode II (sliding mode) fracture.
 
@@ -1459,40 +1775,92 @@ class FieldQuantitiesMixin:
         """
         # Convert energy release rate from J/m^2 to specified unit
         convert = {
-            'J/m^2': 1,      # joules per square meter
-            'kJ/m^2': 1e-3   # kilojoules per square meter
+            "J/m^2": 1,  # joules per square meter
+            "kJ/m^2": 1e-3,  # kilojoules per square meter
         }
         # Unpack weak layer material properties
-        Ew = self.weak['E']
-        nuw = self.weak['nu']
-        rhow= self.weak['rho']
+        Ew = self.weak["E"]
+        nuw = self.weak["nu"]
+        rhow = self.weak["rho"]
         t = self.t
         Pi = np.pi
         h = self.h
-        b= self.b
+        b = self.b
         phi = self.phi
         g = 9810
         theta = self.theta
 
-
         convert = {
-            'J/m^2': 1e3,   # joule per square meter
-            'kJ/m^2': 1,    # kilojoule per square meter
-            'N/mm': 1       # newton per millimeter
+            "J/m^2": 1e3,  # joule per square meter
+            "kJ/m^2": 1,  # kilojoule per square meter
+            "N/mm": 1,  # newton per millimeter
         }
-        return convert[unit]*1/b*(
-                        (b*g*rhow*t*np.sin(phi)*(-2*Pi*Zback[0,:] + 2*Pi*Ztip[0,:] - 8*self.theta_uc(Zback) + 8*self.theta_uc(Ztip) - \
-                        h*Pi*self.psiy(Zback) + h*Pi*self.psiy(Ztip)))/(4*Pi) + \
-                        (\
-                            (b*Ew*(36*Pi*Ztip[0,:]**2 + 36*Ztip[0,:]*(h*Pi*self.psiy(Ztip) - t*(Pi*Ztip[5,:] + 4*self.dtheta_wc_dx(Ztip))) + 3*(6*Pi**3*self.theta_uc(Ztip)**2 + \
-                            2*Pi**3*self.theta_ul(Ztip)**2 + 3*h**2*Pi*self.psiy(Ztip)**2 + b**2*Pi*self.psiz(Ztip)**2 + 48*t*self.theta_uc(Ztip)*Ztip[5,:] - \
-                            6*h*Pi*t*self.psiy(Ztip)*Ztip[5,:] + 4*Pi*t**2*Ztip[5,:]**2 - 24*h*t*self.psiy(Ztip)*self.dtheta_wc_dx(Ztip) + 24*t**2*Ztip[5,:]*self.dtheta_wc_dx(Ztip) + \
-                            6*Pi*t**2*self.dtheta_wc_dx(Ztip)**2 + 8*b*t*self.psiz(Ztip)*self.dtheta_wl_dx(Ztip) + 2*Pi*t**2*self.dtheta_wl_dx(Ztip)**2) + 3*b*t*(8*self.theta_ul(Ztip) + \
-                            b*Pi*self.psiz(Ztip) + 4*t*self.dtheta_wl_dx(Ztip))*self.dpsix_dx(Ztip) + b**2*Pi*t**2*self.dpsix_dx(Ztip)**2))/(144*Pi*t*(1 + nuw))\
+        return (
+            convert[unit]
+            * 1
+            / b
+            * (
+                (
+                    b
+                    * g
+                    * rhow
+                    * t
+                    * np.sin(phi)
+                    * (
+                        -2 * Pi * Zback[0, :]
+                        + 2 * Pi * Ztip[0, :]
+                        - 8 * self.theta_uc(Zback)
+                        + 8 * self.theta_uc(Ztip)
+                        - h * Pi * self.psiy(Zback)
+                        + h * Pi * self.psiy(Ztip)
+                    )
+                )
+                / (4 * Pi)
+                + (
+                    (
+                        b
+                        * Ew
+                        * (
+                            36 * Pi * Ztip[0, :] ** 2
+                            + 36
+                            * Ztip[0, :]
+                            * (
+                                h * Pi * self.psiy(Ztip)
+                                - t * (Pi * Ztip[5, :] + 4 * self.dtheta_wc_dx(Ztip))
+                            )
+                            + 3
+                            * (
+                                6 * Pi**3 * self.theta_uc(Ztip) ** 2
+                                + 2 * Pi**3 * self.theta_ul(Ztip) ** 2
+                                + 3 * h**2 * Pi * self.psiy(Ztip) ** 2
+                                + b**2 * Pi * self.psiz(Ztip) ** 2
+                                + 48 * t * self.theta_uc(Ztip) * Ztip[5, :]
+                                - 6 * h * Pi * t * self.psiy(Ztip) * Ztip[5, :]
+                                + 4 * Pi * t**2 * Ztip[5, :] ** 2
+                                - 24 * h * t * self.psiy(Ztip) * self.dtheta_wc_dx(Ztip)
+                                + 24 * t**2 * Ztip[5, :] * self.dtheta_wc_dx(Ztip)
+                                + 6 * Pi * t**2 * self.dtheta_wc_dx(Ztip) ** 2
+                                + 8 * b * t * self.psiz(Ztip) * self.dtheta_wl_dx(Ztip)
+                                + 2 * Pi * t**2 * self.dtheta_wl_dx(Ztip) ** 2
+                            )
+                            + 3
+                            * b
+                            * t
+                            * (
+                                8 * self.theta_ul(Ztip)
+                                + b * Pi * self.psiz(Ztip)
+                                + 4 * t * self.dtheta_wl_dx(Ztip)
+                            )
+                            * self.dpsix_dx(Ztip)
+                            + b**2 * Pi * t**2 * self.dpsix_dx(Ztip) ** 2
                         )
-                        )
+                    )
+                    / (144 * Pi * t * (1 + nuw))
+                )
+            )
+        )
 
-    def Giii(self, Ztip, Zback, unit='kJ/m^2'):
+    def Giii(self, Ztip, Zback, unit="kJ/m^2"):
         """
         Calculate the energy release rate (ERR) for mode III (tearing mode) fracture.
 
@@ -1519,38 +1887,84 @@ class FieldQuantitiesMixin:
         """
         # Convert energy release rate from J/m^2 to specified unit
         convert = {
-            'J/m^2': 1,      # joules per square meter
-            'kJ/m^2': 1e-3   # kilojoules per square meter
+            "J/m^2": 1,  # joules per square meter
+            "kJ/m^2": 1e-3,  # kilojoules per square meter
         }
         # Unpack weak layer material properties
-        Ew = self.weak['E']
-        nuw = self.weak['nu']
-        rhow= self.weak['rho']
+        Ew = self.weak["E"]
+        nuw = self.weak["nu"]
+        rhow = self.weak["rho"]
         t = self.t
         Pi = np.pi
         h = self.h
-        b= self.b
+        b = self.b
         phi = self.phi
         g = 9810
         theta = self.theta
 
-
         convert = {
-            'J/m^2': 1e3,   # joule per square meter
-            'kJ/m^2': 1,    # kilojoule per square meter
-            'N/mm': 1       # newton per millimeter
+            "J/m^2": 1e3,  # joule per square meter
+            "kJ/m^2": 1,  # kilojoule per square meter
+            "N/mm": 1,  # newton per millimeter
         }
 
-        return convert[unit]*1/b*(
-            -1/4*(b*g*rhow*t*np.sin(theta)*(-2*Pi*Zback[2,:] + 2*Pi*Ztip[2,:] - 8*self.theta_vc(Zback) + 8*self.theta_vc(Ztip) + h*Pi*self.psix(Zback) - h*Pi*self.psix(Ztip)))/Pi + \
-            ( \
-                (Ew*(12*b**2*Pi*Ztip[2,:]**2 + 2*b**2*Pi**3*(3*self.theta_vc(Ztip)**2 + self.theta_vl(Ztip)**2) + 24*Pi*t**2*self.theta_wl(Ztip)**2 + 
-                     48*b*t*(b*self.theta_vc(Ztip) + (h + t)*self.theta_wl(Ztip))*self.psix(Ztip) + b**2*Pi*(3*h**2 + 6*h*t + 4*t**2)*self.psix(Ztip)**2\
-                    - 12*b*Ztip[2,:]*(8*t*self.theta_wl(Ztip) + b*Pi*(h + t)*self.psix(Ztip))))/(48*b*Pi*t*(1 + nuw))\
+        return (
+            convert[unit]
+            * 1
+            / b
+            * (
+                -1
+                / 4
+                * (
+                    b
+                    * g
+                    * rhow
+                    * t
+                    * np.sin(theta)
+                    * (
+                        -2 * Pi * Zback[2, :]
+                        + 2 * Pi * Ztip[2, :]
+                        - 8 * self.theta_vc(Zback)
+                        + 8 * self.theta_vc(Ztip)
+                        + h * Pi * self.psix(Zback)
+                        - h * Pi * self.psix(Ztip)
+                    )
+                )
+                / Pi
+                + (
+                    (
+                        Ew
+                        * (
+                            12 * b**2 * Pi * Ztip[2, :] ** 2
+                            + 2
+                            * b**2
+                            * Pi**3
+                            * (3 * self.theta_vc(Ztip) ** 2 + self.theta_vl(Ztip) ** 2)
+                            + 24 * Pi * t**2 * self.theta_wl(Ztip) ** 2
+                            + 48
+                            * b
+                            * t
+                            * (b * self.theta_vc(Ztip) + (h + t) * self.theta_wl(Ztip))
+                            * self.psix(Ztip)
+                            + b**2
+                            * Pi
+                            * (3 * h**2 + 6 * h * t + 4 * t**2)
+                            * self.psix(Ztip) ** 2
+                            - 12
+                            * b
+                            * Ztip[2, :]
+                            * (
+                                8 * t * self.theta_wl(Ztip)
+                                + b * Pi * (h + t) * self.psix(Ztip)
+                            )
+                        )
+                    )
+                    / (48 * b * Pi * t * (1 + nuw))
+                )
             )
         )
 
-    def G(self, Ztip, Zback, unit='kJ/m^2'):
+    def G(self, Ztip, Zback, unit="kJ/m^2"):
         """
         Calculate the total energy release rate (ERR) for mixed-mode fracture.
 
@@ -1607,7 +2021,7 @@ class FieldQuantitiesMixin:
             Integrand of the mode I crack opening integral at the specified points.
         """
         # Calculate the integrand by multiplying stress and displacement
-        return -self.sig(z0(x))*self.w(z1(x))
+        return -self.sig(z0(x)) * self.w(z1(x))
 
     def int2(self, x, z0, z1):
         """
@@ -1633,7 +2047,7 @@ class FieldQuantitiesMixin:
             Integrand of the mode II crack opening integral at the specified points.
         """
         # Calculate the integrand by multiplying shear stress, shear strain, and thickness
-        return -self.tauxz(z0(x)) * self.u(z1(x),z0=self.h/2) 
+        return -self.tauxz(z0(x)) * self.u(z1(x), z0=self.h / 2)
 
     def int3(self, x, z0, z1):
         """
@@ -1659,12 +2073,13 @@ class FieldQuantitiesMixin:
             Integrand of the mode III crack opening integral at the specified points.
         """
         # Calculate the integrand by multiplying shear stress, shear strain, and thickness
-        return -self.tauyz(z0(x)) * self.v(z1(x),z0=self.h/2)
+        return -self.tauyz(z0(x)) * self.v(z1(x), z0=self.h / 2)
+
 
 class SolutionMixin:
     """
     A mixin class that provides methods for solving the beam equations and handling boundary conditions.
-    
+
     This class contains methods for:
     - Calculating mode shapes and natural frequencies
     - Reducing system stiffness
@@ -1672,7 +2087,7 @@ class SolutionMixin:
     - Solving the system of equations
     - Assembling and solving the complete system
     """
-    
+
     def mode_td(self, l=0):
         """
         Calculate the mode shapes and natural frequencies for a given length.
@@ -1698,7 +2113,7 @@ class SolutionMixin:
         # Implementation details...
         pass
 
-    def reduce_stiffness(self, l=0, mode='A'):
+    def reduce_stiffness(self, l=0, mode="A"):
         """
         Reduce the system stiffness matrix for a given length and mode.
 
@@ -1721,7 +2136,7 @@ class SolutionMixin:
         # Implementation details...
         pass
 
-    def bc(self, z, l=0, k=False, pos='mid'):
+    def bc(self, z, l=0, k=False, pos="mid"):
         """
         Apply boundary conditions to the system.
 
@@ -1745,87 +2160,107 @@ class SolutionMixin:
             Vector of boundary conditions at position x.
         """
         # Check mode for free end
-        mode = 'A' #self.mode_td(l=l)
+        mode = "A"  # self.mode_td(l=l)
         # Get spring stiffness reduction factor
         kf = self.reduce_stiffness(l=l, mode=mode)
         # Get spring stiffness for collapsed weak-layer
         kR = self.calc_rot_spring(collapse=True)
 
         # Set boundary conditions for PST-systems
-        if self.system in ['pst-', '-pst', 'skier-finite']:
-            factor = -1 if pos in ['left', 'l'] else 1
+        if self.system in ["pst-", "-pst", "skier-finite"]:
+            factor = -1 if pos in ["left", "l"] else 1
             if not k:
-                if mode in ['A']:
+                if mode in ["A"]:
                     # Free end
                     # Factor for correct sign
-                    
-                    bc = factor*np.array([self.Nxx(z, bed = k),
-                                   self.Vyy(z, bed = k),
-                                   self.Vzz(z, bed = k),
-                                   self.Mxx(z, bed = k),
-                                   self.Myy(z, bed = k),
-                                   self.Mzz(z, bed = k)
-                                   ])
-                elif mode in ['B', 'C'] and pos in ['r', 'right']:
+
+                    bc = factor * np.array(
+                        [
+                            self.Nxx(z, bed=k),
+                            self.Vyy(z, bed=k),
+                            self.Vzz(z, bed=k),
+                            self.Mxx(z, bed=k),
+                            self.Myy(z, bed=k),
+                            self.Mzz(z, bed=k),
+                        ]
+                    )
+                elif mode in ["B", "C"] and pos in ["r", "right"]:
                     # Touchdown right
-                    bc = np.array([self.Nxx(z, bed = k),
-                                   self.Vyy(z, bed = k),
-                                   self.Vzz(z, bed = k),
-                                   self.Myy(z, bed = k) + kf*kR*self.psi(z),
-                                   self.w(z,z0 = 0, y0 = 0)
-                                   ])
-                elif mode in ['B', 'C'] and pos in ['l', 'left']:
+                    bc = np.array(
+                        [
+                            self.Nxx(z, bed=k),
+                            self.Vyy(z, bed=k),
+                            self.Vzz(z, bed=k),
+                            self.Myy(z, bed=k) + kf * kR * self.psi(z),
+                            self.w(z, z0=0, y0=0),
+                        ]
+                    )
+                elif mode in ["B", "C"] and pos in ["l", "left"]:
                     # Touchdown left
-                    bc = np.array([self.Nxx(z, bed = k),
-                                   self.Myy(z, bed = k) - kf*kR*self.psi(z),
-                                   self.w(z, z0 = 0, y0 = 0)
-                                   ])
+                    bc = np.array(
+                        [
+                            self.Nxx(z, bed=k),
+                            self.Myy(z, bed=k) - kf * kR * self.psi(z),
+                            self.w(z, z0=0, y0=0),
+                        ]
+                    )
             else:
                 # Free end
-                bc = factor*np.array([self.Nxx(z, bed = k),
-                               self.Vyy(z, bed = k),
-                               self.Vzz(z, bed = k),
-                               self.Mxx(z, bed = k),
-                               self.Myy(z, bed = k),
-                               self.Mzz(z, bed = k),
-                               self.NxxWL(z),
-                               self.VyyWL(z),
-                               self.VzzWL(z),
-                               self.MxxWL(z),
-                               self.MyyWL(z),
-                               self.MzzWL(z)])
+                bc = factor * np.array(
+                    [
+                        self.Nxx(z, bed=k),
+                        self.Vyy(z, bed=k),
+                        self.Vzz(z, bed=k),
+                        self.Mxx(z, bed=k),
+                        self.Myy(z, bed=k),
+                        self.Mzz(z, bed=k),
+                        self.NxxWL(z),
+                        self.VyyWL(z),
+                        self.VzzWL(z),
+                        self.MxxWL(z),
+                        self.MyyWL(z),
+                        self.MzzWL(z),
+                    ]
+                )
         # Set boundary conditions for SKIER-systems
-        elif self.system in [ 'skier','skiers']:
+        elif self.system in ["skier", "skiers"]:
             # Infinite end (vanishing complementary solution)
             if not k:
-                bc = np.array([self.u(z, z0 = 0,y0 = 0),
-                           self.w(z, y0 = 0),
-                           self.v(z, z0 = 0),
-                           self.psix(z),
-                           self.psiy(z),
-                           self.psiz(z)
-                           ])
-            else: 
-                bc = np.array([ self.u(z, z0 = 0, y0 = 0),
-                                self.v(z, z0 = 0),
-                                self.w(z, y0 = 0),
-                                self.psix(z),
-                                self.psiy(z),
-                                self.psiz(z),
-                                self.theta_uc(z),
-                                self.theta_ul(z),
-                                self.theta_vc(z),
-                                self.theta_vl(z),
-                                self.theta_wc(z),
-                                self.theta_wl(z)])
+                bc = np.array(
+                    [
+                        self.u(z, z0=0, y0=0),
+                        self.w(z, y0=0),
+                        self.v(z, z0=0),
+                        self.psix(z),
+                        self.psiy(z),
+                        self.psiz(z),
+                    ]
+                )
+            else:
+                bc = np.array(
+                    [
+                        self.u(z, z0=0, y0=0),
+                        self.v(z, z0=0),
+                        self.w(z, y0=0),
+                        self.psix(z),
+                        self.psiy(z),
+                        self.psiz(z),
+                        self.theta_uc(z),
+                        self.theta_ul(z),
+                        self.theta_vc(z),
+                        self.theta_vl(z),
+                        self.theta_wc(z),
+                        self.theta_wl(z),
+                    ]
+                )
         else:
             raise ValueError(
-                'Boundary conditions not defined for'
-                f'system of type {self.system}.')
+                f"Boundary conditions not defined forsystem of type {self.system}."
+            )
 
         return bc
 
-    def eqs(self, zl, zr, l=0, k=False, pos='mid'):
+    def eqs(self, zl, zr, l=0, k=False, pos="mid"):
         """
         Set up the system of equations for the beam.
 
@@ -1861,91 +2296,103 @@ class SolutionMixin:
         # Handle unsupported segments (k=False)
         if not k:
             # Left boundary segment
-            if pos in ('l', 'left'):
+            if pos in ("l", "left"):
                 # Set up equations for left boundary
                 # First 6 elements are boundary conditions from bc method
                 # Next 12 elements are transmission conditions at right end
-                eqsSlab = np.array([
-                    self.bc(zl, l, k, pos)[0],             # Left boundary condition
-                    self.bc(zl, l, k, pos)[1],             # Left boundary condition
-                    self.bc(zl, l, k, pos)[2],             # Left boundary condition
-                    self.bc(zl, l, k, pos)[3],
-                    self.bc(zl, l, k, pos)[4],
-                    self.bc(zl, l, k, pos)[5],
-                    self.u(zr, z0=0, y0=0),                # Displacement at right end
-                    self.v(zr, z0=0),                      # Vertical displacement
-                    self.w(zr, y0=0),                      # Lateral displacement
-                    self.psix(zr),                         # Rotation about x
-                    self.psiy(zr),                         # Rotation about y
-                    self.psiz(zr),                         # Rotation about z
-                    self.Nxx(zr, bed=k),                   # Normal force
-                    self.Vyy(zr, bed=k),                   # Shear force y
-                    self.Vzz(zr, bed=k),                   # Shear force z
-                    self.Mxx(zr, bed=k),                   # Bending moment x
-                    self.Myy(zr, bed=k),                   # Bending moment y
-                    self.Mzz(zr, bed=k)])                  # Bending moment z
+                eqsSlab = np.array(
+                    [
+                        self.bc(zl, l, k, pos)[0],  # Left boundary condition
+                        self.bc(zl, l, k, pos)[1],  # Left boundary condition
+                        self.bc(zl, l, k, pos)[2],  # Left boundary condition
+                        self.bc(zl, l, k, pos)[3],
+                        self.bc(zl, l, k, pos)[4],
+                        self.bc(zl, l, k, pos)[5],
+                        self.u(zr, z0=0, y0=0),  # Displacement at right end
+                        self.v(zr, z0=0),  # Vertical displacement
+                        self.w(zr, y0=0),  # Lateral displacement
+                        self.psix(zr),  # Rotation about x
+                        self.psiy(zr),  # Rotation about y
+                        self.psiz(zr),  # Rotation about z
+                        self.Nxx(zr, bed=k),  # Normal force
+                        self.Vyy(zr, bed=k),  # Shear force y
+                        self.Vzz(zr, bed=k),  # Shear force z
+                        self.Mxx(zr, bed=k),  # Bending moment x
+                        self.Myy(zr, bed=k),  # Bending moment y
+                        self.Mzz(zr, bed=k),
+                    ]
+                )  # Bending moment z
 
             # Middle segment
-            elif pos in ('m', 'mid'):
+            elif pos in ("m", "mid"):
                 # Set up equations for middle segment
                 # First 12 elements are transmission conditions at left end
                 # Next 12 elements are transmission conditions at right end
-                eqsSlab = np.array([
-                    -self.u(zl, z0=0, y0=0),               # Negative displacement at left end
-                    -self.v(zl, z0=0),                     # Negative vertical displacement
-                    -self.w(zl, y0=0),                     # Negative lateral displacement
-                    -self.psix(zl),                        # Negative rotation about x
-                    -self.psiy(zl),                        # Negative rotation about y
-                    -self.psiz(zl),                        # Negative rotation about z
-                    -self.Nxx(zl, bed=k),                  # Negative normal force
-                    -self.Vyy(zl, bed=k),                  # Negative shear force y
-                    -self.Vzz(zl, bed=k),                  # Negative shear force z
-                    -self.Mxx(zl, bed=k),                  # Negative bending moment x
-                    -self.Myy(zl, bed=k),                  # Negative bending moment y
-                    -self.Mzz(zl, bed=k),                  # Negative bending moment z
-                    self.u(zr, z0=0, y0=0),                # Displacement at right end
-                    self.v(zr, z0=0),                      # Vertical displacement
-                    self.w(zr, y0=0),                      # Lateral displacement
-                    self.psix(zr),                         # Rotation about x
-                    self.psiy(zr),                         # Rotation about y
-                    self.psiz(zr),                         # Rotation about z
-                    self.Nxx(zr, bed=k),                   # Normal force
-                    self.Vyy(zr, bed=k),                   # Shear force y
-                    self.Vzz(zr, bed=k),                   # Shear force z
-                    self.Mxx(zr, bed=k),                   # Bending moment x
-                    self.Myy(zr, bed=k),                   # Bending moment y
-                    self.Mzz(zr, bed=k)])                  # Bending moment z
+                eqsSlab = np.array(
+                    [
+                        -self.u(zl, z0=0, y0=0),  # Negative displacement at left end
+                        -self.v(zl, z0=0),  # Negative vertical displacement
+                        -self.w(zl, y0=0),  # Negative lateral displacement
+                        -self.psix(zl),  # Negative rotation about x
+                        -self.psiy(zl),  # Negative rotation about y
+                        -self.psiz(zl),  # Negative rotation about z
+                        -self.Nxx(zl, bed=k),  # Negative normal force
+                        -self.Vyy(zl, bed=k),  # Negative shear force y
+                        -self.Vzz(zl, bed=k),  # Negative shear force z
+                        -self.Mxx(zl, bed=k),  # Negative bending moment x
+                        -self.Myy(zl, bed=k),  # Negative bending moment y
+                        -self.Mzz(zl, bed=k),  # Negative bending moment z
+                        self.u(zr, z0=0, y0=0),  # Displacement at right end
+                        self.v(zr, z0=0),  # Vertical displacement
+                        self.w(zr, y0=0),  # Lateral displacement
+                        self.psix(zr),  # Rotation about x
+                        self.psiy(zr),  # Rotation about y
+                        self.psiz(zr),  # Rotation about z
+                        self.Nxx(zr, bed=k),  # Normal force
+                        self.Vyy(zr, bed=k),  # Shear force y
+                        self.Vzz(zr, bed=k),  # Shear force z
+                        self.Mxx(zr, bed=k),  # Bending moment x
+                        self.Myy(zr, bed=k),  # Bending moment y
+                        self.Mzz(zr, bed=k),
+                    ]
+                )  # Bending moment z
 
             # Right boundary segment
-            elif pos in ('r', 'right'):
+            elif pos in ("r", "right"):
                 # Set up equations for right boundary
                 # First 12 elements are transmission conditions at left end
                 # Last 6 elements are boundary conditions from bc method
-                eqsSlab = np.array([
-                    -self.u(zl, z0=0, y0=0),               # Negative displacement at left end
-                    -self.v(zl, z0=0),                     # Negative vertical displacement
-                    -self.w(zl, y0=0),                     # Negative lateral displacement
-                    -self.psix(zl),                        # Negative rotation about x
-                    -self.psiy(zl),                        # Negative rotation about y
-                    -self.psiz(zl),                        # Negative rotation about z
-                    -self.Nxx(zl, bed=k),                  # Negative normal force
-                    -self.Vyy(zl, bed=k),                  # Negative shear force y
-                    -self.Vzz(zl, bed=k),                  # Negative shear force z
-                    -self.Mxx(zl, bed=k),                  # Negative bending moment x
-                    -self.Myy(zl, bed=k),                  # Negative bending moment y
-                    -self.Mzz(zl, bed=k),                  # Negative bending moment z
-                    self.bc(zr, l, k, pos)[0],             # Right boundary condition
-                    self.bc(zr, l, k, pos)[1],             # Right boundary condition
-                    self.bc(zr, l, k, pos)[2],             # Right boundary condition
-                    self.bc(zr, l, k, pos)[3],             # Right boundary condition
-                    self.bc(zr, l, k, pos)[4],             # Right boundary condition
-                    self.bc(zr, l, k, pos)[5]])            # Right boundary condition
+                eqsSlab = np.array(
+                    [
+                        -self.u(zl, z0=0, y0=0),  # Negative displacement at left end
+                        -self.v(zl, z0=0),  # Negative vertical displacement
+                        -self.w(zl, y0=0),  # Negative lateral displacement
+                        -self.psix(zl),  # Negative rotation about x
+                        -self.psiy(zl),  # Negative rotation about y
+                        -self.psiz(zl),  # Negative rotation about z
+                        -self.Nxx(zl, bed=k),  # Negative normal force
+                        -self.Vyy(zl, bed=k),  # Negative shear force y
+                        -self.Vzz(zl, bed=k),  # Negative shear force z
+                        -self.Mxx(zl, bed=k),  # Negative bending moment x
+                        -self.Myy(zl, bed=k),  # Negative bending moment y
+                        -self.Mzz(zl, bed=k),  # Negative bending moment z
+                        self.bc(zr, l, k, pos)[0],  # Right boundary condition
+                        self.bc(zr, l, k, pos)[1],  # Right boundary condition
+                        self.bc(zr, l, k, pos)[2],  # Right boundary condition
+                        self.bc(zr, l, k, pos)[3],  # Right boundary condition
+                        self.bc(zr, l, k, pos)[4],  # Right boundary condition
+                        self.bc(zr, l, k, pos)[5],
+                    ]
+                )  # Right boundary condition
 
             else:
                 raise ValueError(
-                    (f'Invalid position argument {pos} given. '
-                     'Valid segment positions are l, m, and r, '
-                     'or left, mid and right.'))
+                    (
+                        f"Invalid position argument {pos} given. "
+                        "Valid segment positions are l, m, and r, "
+                        "or left, mid and right."
+                    )
+                )
 
             # For unsupported segments, weak layer equations are zero
             eqsWeak = np.zeros((12, eqsSlab.shape[1]))
@@ -1953,171 +2400,227 @@ class SolutionMixin:
         # Handle supported segments (k=True)
         else:
             # Left boundary segment
-            if pos in ('l', 'left'):
+            if pos in ("l", "left"):
                 # Set up equations for left boundary with support
                 # First 6 elements are boundary conditions from bc method
                 # Next 12 elements are transmission conditions at right end
-                eqsSlab = np.array([
-                    self.bc(zl, l, k, pos)[0],             # Left boundary condition
-                    self.bc(zl, l, k, pos)[1],             # Left boundary condition
-                    self.bc(zl, l, k, pos)[2],             # Left boundary condition
-                    self.bc(zl, l, k, pos)[3],             # Left boundary condition
-                    self.bc(zl, l, k, pos)[4],             # Left boundary condition
-                    self.bc(zl, l, k, pos)[5],             # Left boundary condition
-                    self.u(zr, z0=0, y0=0),                # Displacement at right end
-                    self.v(zr, z0=0),                      # Vertical displacement
-                    self.w(zr, y0=0),                      # Lateral displacement
-                    self.psix(zr),                         # Rotation about x
-                    self.psiy(zr),                         # Rotation about y
-                    self.psiz(zr),                         # Rotation about z
-                    self.Nxx(zr, bed=k),                   # Normal force
-                    self.Vyy(zr, bed=k),                   # Shear force y
-                    self.Vzz(zr, bed=k),                   # Shear force z
-                    self.Mxx(zr, bed=k),                   # Bending moment x
-                    self.Myy(zr, bed=k),                   # Bending moment y
-                    self.Mzz(zr, bed=k)])                  # Bending moment z
+                eqsSlab = np.array(
+                    [
+                        self.bc(zl, l, k, pos)[0],  # Left boundary condition
+                        self.bc(zl, l, k, pos)[1],  # Left boundary condition
+                        self.bc(zl, l, k, pos)[2],  # Left boundary condition
+                        self.bc(zl, l, k, pos)[3],  # Left boundary condition
+                        self.bc(zl, l, k, pos)[4],  # Left boundary condition
+                        self.bc(zl, l, k, pos)[5],  # Left boundary condition
+                        self.u(zr, z0=0, y0=0),  # Displacement at right end
+                        self.v(zr, z0=0),  # Vertical displacement
+                        self.w(zr, y0=0),  # Lateral displacement
+                        self.psix(zr),  # Rotation about x
+                        self.psiy(zr),  # Rotation about y
+                        self.psiz(zr),  # Rotation about z
+                        self.Nxx(zr, bed=k),  # Normal force
+                        self.Vyy(zr, bed=k),  # Shear force y
+                        self.Vzz(zr, bed=k),  # Shear force z
+                        self.Mxx(zr, bed=k),  # Bending moment x
+                        self.Myy(zr, bed=k),  # Bending moment y
+                        self.Mzz(zr, bed=k),
+                    ]
+                )  # Bending moment z
 
                 # Set up weak layer equations for left boundary
                 # First 6 elements are boundary conditions from bc method
                 # Next 12 elements are transmission conditions at right end
-                eqsWeak = np.array([
-                    self.bc(zl, l, k, pos)[6],             # Left boundary condition in weak layer
-                    self.bc(zl, l, k, pos)[7],             # Left boundary condition in weak layer
-                    self.bc(zl, l, k, pos)[8],             # Left boundary condition in weak layer
-                    self.bc(zl, l, k, pos)[9],             # Left boundary condition in weak layer
-                    self.bc(zl, l, k, pos)[10],            # Left boundary condition in weak layer
-                    self.bc(zl, l, k, pos)[11],            # Left boundary condition in weak layer
-                    self.theta_uc(zr),                     # Rotation in weak layer
-                    self.theta_ul(zr),                     # Rotation in weak layer
-                    self.theta_vc(zr),                     # Rotation in weak layer
-                    self.theta_vl(zr),                     # Rotation in weak layer
-                    self.theta_wc(zr),                     # Rotation in weak layer
-                    self.theta_wl(zr),                     # Rotation in weak layer
-                    self.NxxWL(zr),                        # Normal force in weak layer
-                    self.VyyWL(zr),                        # Shear force in weak layer
-                    self.VzzWL(zr),                        # Shear force in weak layer
-                    self.MxxWL(zr),                        # Bending moment in weak layer
-                    self.MyyWL(zr),                        # Bending moment in weak layer
-                    self.MzzWL(zr)])                       # Bending moment in weak layer
+                eqsWeak = np.array(
+                    [
+                        self.bc(zl, l, k, pos)[
+                            6
+                        ],  # Left boundary condition in weak layer
+                        self.bc(zl, l, k, pos)[
+                            7
+                        ],  # Left boundary condition in weak layer
+                        self.bc(zl, l, k, pos)[
+                            8
+                        ],  # Left boundary condition in weak layer
+                        self.bc(zl, l, k, pos)[
+                            9
+                        ],  # Left boundary condition in weak layer
+                        self.bc(zl, l, k, pos)[
+                            10
+                        ],  # Left boundary condition in weak layer
+                        self.bc(zl, l, k, pos)[
+                            11
+                        ],  # Left boundary condition in weak layer
+                        self.theta_uc(zr),  # Rotation in weak layer
+                        self.theta_ul(zr),  # Rotation in weak layer
+                        self.theta_vc(zr),  # Rotation in weak layer
+                        self.theta_vl(zr),  # Rotation in weak layer
+                        self.theta_wc(zr),  # Rotation in weak layer
+                        self.theta_wl(zr),  # Rotation in weak layer
+                        self.NxxWL(zr),  # Normal force in weak layer
+                        self.VyyWL(zr),  # Shear force in weak layer
+                        self.VzzWL(zr),  # Shear force in weak layer
+                        self.MxxWL(zr),  # Bending moment in weak layer
+                        self.MyyWL(zr),  # Bending moment in weak layer
+                        self.MzzWL(zr),
+                    ]
+                )  # Bending moment in weak layer
 
             # Middle segment
-            elif pos in ('m', 'mid'):
+            elif pos in ("m", "mid"):
                 # Set up equations for middle segment with support
                 # First 12 elements are transmission conditions at left end
                 # Next 12 elements are transmission conditions at right end
-                eqsSlab = np.array([
-                    -self.u(zl, z0=0, y0=0),               # Negative displacement at left end
-                    -self.v(zl, z0=0),                     # Negative vertical displacement
-                    -self.w(zl, y0=0),                     # Negative lateral displacement
-                    -self.psix(zl),                        # Negative rotation about x
-                    -self.psiy(zl),                        # Negative rotation about y
-                    -self.psiz(zl),                        # Negative rotation about z
-                    -self.Nxx(zl, bed=k),                  # Negative normal force
-                    -self.Vyy(zl, bed=k),                  # Negative shear force y
-                    -self.Vzz(zl, bed=k),                  # Negative shear force z
-                    -self.Mxx(zl, bed=k),                  # Negative bending moment x
-                    -self.Myy(zl, bed=k),                  # Negative bending moment y
-                    -self.Mzz(zl, bed=k),                  # Negative bending moment z
-                    self.u(zr, z0=0, y0=0),                # Displacement at right end
-                    self.v(zr, z0=0),                      # Vertical displacement
-                    self.w(zr, y0=0),                      # Lateral displacement
-                    self.psix(zr),                         # Rotation about x
-                    self.psiy(zr),                         # Rotation about y
-                    self.psiz(zr),                         # Rotation about z
-                    self.Nxx(zr, bed=k),                   # Normal force
-                    self.Vyy(zr, bed=k),                   # Shear force y
-                    self.Vzz(zr, bed=k),                   # Shear force z
-                    self.Mxx(zr, bed=k),                   # Bending moment x
-                    self.Myy(zr, bed=k),                   # Bending moment y
-                    self.Mzz(zr, bed=k)])                  # Bending moment z
+                eqsSlab = np.array(
+                    [
+                        -self.u(zl, z0=0, y0=0),  # Negative displacement at left end
+                        -self.v(zl, z0=0),  # Negative vertical displacement
+                        -self.w(zl, y0=0),  # Negative lateral displacement
+                        -self.psix(zl),  # Negative rotation about x
+                        -self.psiy(zl),  # Negative rotation about y
+                        -self.psiz(zl),  # Negative rotation about z
+                        -self.Nxx(zl, bed=k),  # Negative normal force
+                        -self.Vyy(zl, bed=k),  # Negative shear force y
+                        -self.Vzz(zl, bed=k),  # Negative shear force z
+                        -self.Mxx(zl, bed=k),  # Negative bending moment x
+                        -self.Myy(zl, bed=k),  # Negative bending moment y
+                        -self.Mzz(zl, bed=k),  # Negative bending moment z
+                        self.u(zr, z0=0, y0=0),  # Displacement at right end
+                        self.v(zr, z0=0),  # Vertical displacement
+                        self.w(zr, y0=0),  # Lateral displacement
+                        self.psix(zr),  # Rotation about x
+                        self.psiy(zr),  # Rotation about y
+                        self.psiz(zr),  # Rotation about z
+                        self.Nxx(zr, bed=k),  # Normal force
+                        self.Vyy(zr, bed=k),  # Shear force y
+                        self.Vzz(zr, bed=k),  # Shear force z
+                        self.Mxx(zr, bed=k),  # Bending moment x
+                        self.Myy(zr, bed=k),  # Bending moment y
+                        self.Mzz(zr, bed=k),
+                    ]
+                )  # Bending moment z
 
                 # Set up weak layer equations for middle segment
                 # First 12 elements are transmission conditions at left end
                 # Next 12 elements are transmission conditions at right end
-                eqsWeak = np.array([
-                    -self.theta_uc(zl),                    # Negative rotation in weak layer
-                    -self.theta_ul(zl),                    # Negative rotation in weak layer
-                    -self.theta_vc(zl),                    # Negative rotation in weak layer
-                    -self.theta_vl(zl),                    # Negative rotation in weak layer
-                    -self.theta_wc(zl),                    # Negative rotation in weak layer
-                    -self.theta_wl(zl),                    # Negative rotation in weak layer
-                    -self.NxxWL(zl),                       # Negative normal force in weak layer
-                    -self.VyyWL(zl),                       # Negative shear force in weak layer
-                    -self.VzzWL(zl),                       # Negative shear force in weak layer
-                    -self.MxxWL(zl),                       # Negative bending moment in weak layer
-                    -self.MyyWL(zl),                       # Negative bending moment in weak layer
-                    -self.MzzWL(zl),                       # Negative bending moment in weak layer
-                    self.theta_uc(zr),                     # Rotation in weak layer
-                    self.theta_ul(zr),                     # Rotation in weak layer
-                    self.theta_vc(zr),                     # Rotation in weak layer
-                    self.theta_vl(zr),                     # Rotation in weak layer
-                    self.theta_wc(zr),                     # Rotation in weak layer
-                    self.theta_wl(zr),                     # Rotation in weak layer
-                    self.NxxWL(zr),                        # Normal force in weak layer
-                    self.VyyWL(zr),                        # Shear force in weak layer
-                    self.VzzWL(zr),                        # Shear force in weak layer
-                    self.MxxWL(zr),                        # Bending moment in weak layer
-                    self.MyyWL(zr),                        # Bending moment in weak layer
-                    self.MzzWL(zr)])                       # Bending moment in weak layer
+                eqsWeak = np.array(
+                    [
+                        -self.theta_uc(zl),  # Negative rotation in weak layer
+                        -self.theta_ul(zl),  # Negative rotation in weak layer
+                        -self.theta_vc(zl),  # Negative rotation in weak layer
+                        -self.theta_vl(zl),  # Negative rotation in weak layer
+                        -self.theta_wc(zl),  # Negative rotation in weak layer
+                        -self.theta_wl(zl),  # Negative rotation in weak layer
+                        -self.NxxWL(zl),  # Negative normal force in weak layer
+                        -self.VyyWL(zl),  # Negative shear force in weak layer
+                        -self.VzzWL(zl),  # Negative shear force in weak layer
+                        -self.MxxWL(zl),  # Negative bending moment in weak layer
+                        -self.MyyWL(zl),  # Negative bending moment in weak layer
+                        -self.MzzWL(zl),  # Negative bending moment in weak layer
+                        self.theta_uc(zr),  # Rotation in weak layer
+                        self.theta_ul(zr),  # Rotation in weak layer
+                        self.theta_vc(zr),  # Rotation in weak layer
+                        self.theta_vl(zr),  # Rotation in weak layer
+                        self.theta_wc(zr),  # Rotation in weak layer
+                        self.theta_wl(zr),  # Rotation in weak layer
+                        self.NxxWL(zr),  # Normal force in weak layer
+                        self.VyyWL(zr),  # Shear force in weak layer
+                        self.VzzWL(zr),  # Shear force in weak layer
+                        self.MxxWL(zr),  # Bending moment in weak layer
+                        self.MyyWL(zr),  # Bending moment in weak layer
+                        self.MzzWL(zr),
+                    ]
+                )  # Bending moment in weak layer
 
             # Right boundary segment
-            elif pos in ('r', 'right'):
+            elif pos in ("r", "right"):
                 # Set up equations for right boundary with support
                 # First 12 elements are transmission conditions at left end
                 # Last 6 elements are boundary conditions from bc method
-                eqsSlab = np.array([
-                    -self.u(zl, z0=0, y0=0),               # Negative displacement at left end
-                    -self.v(zl, z0=0),                     # Negative vertical displacement
-                    -self.w(zl, y0=0),                     # Negative lateral displacement
-                    -self.psix(zl),                        # Negative rotation about x
-                    -self.psiy(zl),                        # Negative rotation about y
-                    -self.psiz(zl),                        # Negative rotation about z
-                    -self.Nxx(zl, bed=k),                  # Negative normal force
-                    -self.Vyy(zl, bed=k),                  # Negative shear force y
-                    -self.Vzz(zl, bed=k),                  # Negative shear force z
-                    -self.Mxx(zl, bed=k),                  # Negative bending moment x
-                    -self.Myy(zl, bed=k),                  # Negative bending moment y
-                    -self.Mzz(zl, bed=k),                  # Negative bending moment z
-                    self.bc(zr, l, k, pos)[0],             # Right boundary condition
-                    self.bc(zr, l, k, pos)[1],             # Right boundary condition
-                    self.bc(zr, l, k, pos)[2],             # Right boundary condition
-                    self.bc(zr, l, k, pos)[3],             # Right boundary condition
-                    self.bc(zr, l, k, pos)[4],             # Right boundary condition
-                    self.bc(zr, l, k, pos)[5]])            # Right boundary condition
+                eqsSlab = np.array(
+                    [
+                        -self.u(zl, z0=0, y0=0),  # Negative displacement at left end
+                        -self.v(zl, z0=0),  # Negative vertical displacement
+                        -self.w(zl, y0=0),  # Negative lateral displacement
+                        -self.psix(zl),  # Negative rotation about x
+                        -self.psiy(zl),  # Negative rotation about y
+                        -self.psiz(zl),  # Negative rotation about z
+                        -self.Nxx(zl, bed=k),  # Negative normal force
+                        -self.Vyy(zl, bed=k),  # Negative shear force y
+                        -self.Vzz(zl, bed=k),  # Negative shear force z
+                        -self.Mxx(zl, bed=k),  # Negative bending moment x
+                        -self.Myy(zl, bed=k),  # Negative bending moment y
+                        -self.Mzz(zl, bed=k),  # Negative bending moment z
+                        self.bc(zr, l, k, pos)[0],  # Right boundary condition
+                        self.bc(zr, l, k, pos)[1],  # Right boundary condition
+                        self.bc(zr, l, k, pos)[2],  # Right boundary condition
+                        self.bc(zr, l, k, pos)[3],  # Right boundary condition
+                        self.bc(zr, l, k, pos)[4],  # Right boundary condition
+                        self.bc(zr, l, k, pos)[5],
+                    ]
+                )  # Right boundary condition
 
                 # Set up weak layer equations for right boundary
                 # First 12 elements are transmission conditions at left end
                 # Last 6 elements are boundary conditions from bc method
-                eqsWeak = np.array([
-                    -self.theta_uc(zl),                    # Negative rotation in weak layer
-                    -self.theta_ul(zl),                    # Negative rotation in weak layer
-                    -self.theta_vc(zl),                    # Negative rotation in weak layer
-                    -self.theta_vl(zl),                    # Negative rotation in weak layer
-                    -self.theta_wc(zl),                    # Negative rotation in weak layer
-                    -self.theta_wl(zl),                    # Negative rotation in weak layer
-                    -self.NxxWL(zl),                       # Negative normal force in weak layer
-                    -self.VyyWL(zl),                       # Negative shear force in weak layer
-                    -self.VzzWL(zl),                       # Negative shear force in weak layer
-                    -self.MxxWL(zl),                       # Negative bending moment in weak layer
-                    -self.MyyWL(zl),                       # Negative bending moment in weak layer
-                    -self.MzzWL(zl),                       # Negative bending moment in weak layer
-                    self.bc(zr, l, k, pos)[6],             # Right boundary condition in weak layer
-                    self.bc(zr, l, k, pos)[7],             # Right boundary condition in weak layer
-                    self.bc(zr, l, k, pos)[8],             # Right boundary condition in weak layer
-                    self.bc(zr, l, k, pos)[9],             # Right boundary condition in weak layer
-                    self.bc(zr, l, k, pos)[10],            # Right boundary condition in weak layer
-                    self.bc(zr, l, k, pos)[11]])           # Right boundary condition in weak layer
+                eqsWeak = np.array(
+                    [
+                        -self.theta_uc(zl),  # Negative rotation in weak layer
+                        -self.theta_ul(zl),  # Negative rotation in weak layer
+                        -self.theta_vc(zl),  # Negative rotation in weak layer
+                        -self.theta_vl(zl),  # Negative rotation in weak layer
+                        -self.theta_wc(zl),  # Negative rotation in weak layer
+                        -self.theta_wl(zl),  # Negative rotation in weak layer
+                        -self.NxxWL(zl),  # Negative normal force in weak layer
+                        -self.VyyWL(zl),  # Negative shear force in weak layer
+                        -self.VzzWL(zl),  # Negative shear force in weak layer
+                        -self.MxxWL(zl),  # Negative bending moment in weak layer
+                        -self.MyyWL(zl),  # Negative bending moment in weak layer
+                        -self.MzzWL(zl),  # Negative bending moment in weak layer
+                        self.bc(zr, l, k, pos)[
+                            6
+                        ],  # Right boundary condition in weak layer
+                        self.bc(zr, l, k, pos)[
+                            7
+                        ],  # Right boundary condition in weak layer
+                        self.bc(zr, l, k, pos)[
+                            8
+                        ],  # Right boundary condition in weak layer
+                        self.bc(zr, l, k, pos)[
+                            9
+                        ],  # Right boundary condition in weak layer
+                        self.bc(zr, l, k, pos)[
+                            10
+                        ],  # Right boundary condition in weak layer
+                        self.bc(zr, l, k, pos)[11],
+                    ]
+                )  # Right boundary condition in weak layer
 
             else:
                 raise ValueError(
-                    (f'Invalid position argument {pos} given. '
-                     'Valid segment positions are l, m, and r, '
-                     'or left, mid and right.'))
+                    (
+                        f"Invalid position argument {pos} given. "
+                        "Valid segment positions are l, m, and r, "
+                        "or left, mid and right."
+                    )
+                )
 
         return eqsSlab, eqsWeak
 
-    def calc_segments(self, tdi=False, li=False,  ki=False, k0=False,wi = False, fi = False,
-                      L=1e4, a=0, m=0, phi = 0, theta = 0,  **kwargs):
+    def calc_segments(
+        self,
+        tdi=False,
+        li=False,
+        ki=False,
+        k0=False,
+        wi=False,
+        fi=False,
+        L=1e4,
+        a=0,
+        m=0,
+        phi=0,
+        theta=0,
+        **kwargs,
+    ):
         """
         Assemble lists defining the segments for different beam systems.
 
@@ -2180,14 +2683,14 @@ class SolutionMixin:
         _ = kwargs
 
         # Determine unbedded segment length based on touchdown mode
-        mode = 'A'  # Deactivate touchdown mode
-        if mode in ['A', 'B']:
+        mode = "A"  # Deactivate touchdown mode
+        if mode in ["A", "B"]:
             lU = a  # Unbedded length equals crack length
-        if mode in ['C']:
+        if mode in ["C"]:
             lU = self.lS  # Use stored segment length
 
         # Assemble segment definitions based on system type
-        if self.system == 'skiers':
+        if self.system == "skiers":
             # Convert input lists to numpy arrays for skiers system
             li = np.array(li)  # Segment lengths
             ki = np.array(ki)  # Foundation in cracked state
@@ -2195,41 +2698,57 @@ class SolutionMixin:
             wi = np.array(wi)  # Additional loads
             fi = np.array(fi)  # Loadvectors at segment boundaries
 
-        elif self.system == 'pst-':
+        elif self.system == "pst-":
             # PST with crack at left end
             li = np.array([L - a, lU])  # [supported length, unsupported length]
             ki = np.array([True, False])  # Foundation only in supported segment
             k0 = np.array([True, True])  # Foundation in both segments
             wi = np.array([False, False])  # Additional surface loads on both segments
-            fi = np.array([[0,0,0,0,0,0],[0,0,0,0,0,0],[0,0,0,0,0,0]]) # Loadvectors at segment boundaries 
+            fi = np.array(
+                [[0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0]]
+            )  # Loadvectors at segment boundaries
 
-        elif self.system == '-pst':
+        elif self.system == "-pst":
             # PST with crack at right end
             li = np.array([lU, L - a])  # [unsupported length, supported length]
             ki = np.array([False, True])  # Foundation only in supported segment
             k0 = np.array([True, True])  # Foundation in both segments
             wi = np.array([False, False])  # Additional surface load on both segments
-            fi = np.array([[0,0,0,0,0,0],[0,0,0,0,0,0],[0,0,0,0,0,0]]) # Loadvectors at segment boundaries 
+            fi = np.array(
+                [[0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0]]
+            )  # Loadvectors at segment boundaries
 
-        elif self.system in ['skier', 'skier-finite']:
+        elif self.system in ["skier", "skier-finite"]:
             # Single skier load in center
             Fx, Fy, Fz = self.get_skier_load(m, phi, theta)
-            lb = (L - a)/2  # Half supported length
-            lf = a/2  # Half free length
-            li = np.array([lb, lf, lf, lb])  # [left supported, left free, right free, right supported]
+            lb = (L - a) / 2  # Half supported length
+            lf = a / 2  # Half free length
+            li = np.array(
+                [lb, lf, lf, lb]
+            )  # [left supported, left free, right free, right supported]
             ki = np.array([True, False, False, True])  # Foundation in supported segments
             k0 = np.array([True, True, True, True])  # Foundation in all segments
-            wi = np.array([True, True, True, True])  # Additional surface loads on all segments
-            fi = np.array([[0,0,0,0,0,0],[0,0,0,0,0,0],[Fx, Fy, Fz, Fy * self.h/2, -Fx * self.h/2, 0],[0,0,0,0,0,0],[0,0,0,0,0,0]]) # Loadvectors at segment boundaries 
+            wi = np.array(
+                [True, True, True, True]
+            )  # Additional surface loads on all segments
+            fi = np.array(
+                [
+                    [0, 0, 0, 0, 0, 0],
+                    [0, 0, 0, 0, 0, 0],
+                    [Fx, Fy, Fz, Fy * self.h / 2, -Fx * self.h / 2, 0],
+                    [0, 0, 0, 0, 0, 0],
+                    [0, 0, 0, 0, 0, 0],
+                ]
+            )  # Loadvectors at segment boundaries
 
         else:
-            raise ValueError(f'System {self.system} is not implemented.')
+            raise ValueError(f"System {self.system} is not implemented.")
 
         # Create dictionary with segment definitions for different states
         segments = {
-            'nocrack': {'li': li, 'fi': fi, 'ki': k0, 'wi': wi},  # Uncracked state
-            'crack': {'li': li, 'fi': fi, 'ki': ki, 'wi': wi},    # Cracked state
-            'both': {'li': li, 'fi': fi, 'ki': ki, 'k0': k0, 'wi': wi}  # Both states
+            "nocrack": {"li": li, "fi": fi, "ki": k0, "wi": wi},  # Uncracked state
+            "crack": {"li": li, "fi": fi, "ki": ki, "wi": wi},  # Cracked state
+            "both": {"li": li, "fi": fi, "ki": ki, "k0": k0, "wi": wi},  # Both states
         }
         return segments
 
@@ -2252,7 +2771,7 @@ class SolutionMixin:
         [       ]   [   0     0     0   ... zhLwl zhMwl   0   ][   ]   [      ]   [       ]  mid
         [       ]   [   0     0     0   ...   0   zhMwl zhNwl ][   ]   [      ]   [       ]  mid
         [       ]   [   0     0     0   ...   0     0   zhNwl ][   ]   [      ]   [       ]  right
-        
+
 
         Where:
         - [zhi], [zhiwl]: Entries in the homogeneous solution matrices for the slab and the weak layer
@@ -2280,190 +2799,263 @@ class SolutionMixin:
             Matrix of shpae (24 x N)  for a system of N segements. For unsupported segments, the last 12 entries in the column are NaN.
         """
         # --- ERROR CHECKING ----------------------------------------------------
-        
+
         # Verify at least one segment has foundation
         if not any(ki):
-            raise ValueError('Provide at least one bedded segment.')
-        
+            raise ValueError("Provide at least one bedded segment.")
+
         # Verify consistent number of segments and transitions
         if len(li) != len(ki) or len(li) + 1 != len(fi):
-            raise ValueError('Make sure len(li)=N, len(ki)=N, and '
-                             'len(fi)=N+1 for a system of N segments.')
+            raise ValueError(
+                "Make sure len(li)=N, len(ki)=N, and "
+                "len(fi)=N+1 for a system of N segments."
+            )
 
         # Check boundary conditions for infinite systems
-        if self.system not in ['pst-', '-pst']:
+        if self.system not in ["pst-", "-pst"]:
             # Boundary segments must be on foundation for infinite BCs
             if not all([ki[0], ki[-1]]):
-                raise ValueError('Provide bedded boundary segments in '
-                                 'order to account for infinite extensions.')
+                raise ValueError(
+                    "Provide bedded boundary segments in "
+                    "order to account for infinite extensions."
+                )
             # Verify boundary segments are long enough
             if li[0] < 5e3 or li[-1] < 5e3:
-                print(('WARNING: Boundary segments are short. Make sure '
-                       'the complementary solution has decayed to the '
-                       'boundaries.'))
+                print(
+                    (
+                        "WARNING: Boundary segments are short. Make sure "
+                        "the complementary solution has decayed to the "
+                        "boundaries."
+                    )
+                )
 
         # --- SYSTEM SETUP ---------------------------------------------------
 
         # Calculate system dimensions
-        nSBedded = ki.sum()         # Number of bedded segments
+        nSBedded = ki.sum()  # Number of bedded segments
         nSFree = len(ki) - ki.sum()  # Number of free segments
-        nS = nSBedded + nSFree      # Total number of segments
-        nDOFfree = 12               # DOF per free segment
-        nDOFbedded = 24             # DOF per bedded segment
+        nS = nSBedded + nSFree  # Total number of segments
+        nDOFfree = 12  # DOF per free segment
+        nDOFbedded = 24  # DOF per bedded segment
 
         # Add dummy segment if only one segment provided
         if nS == 1:
             li.append(0)
             ki.append(True)
-            fi.append([0,0,0,0,0,0])
+            fi.append([0, 0, 0, 0, 0, 0])
             wi.append(True)
             nS = 2
 
         # Initialize position vector (l=left, m=middle, r=right)
-        pi = np.full(nS, 'm')
-        pi[0], pi[-1] = 'l', 'r'
+        pi = np.full(nS, "m")
+        pi[0], pi[-1] = "l", "r"
 
-        # Initialize matrices for the slab 
-        zh0Slab = np.zeros([nSBedded * nDOFfree + nSFree * nDOFfree, nSBedded * nDOFbedded + nSFree * nDOFfree],dtype = np.double)
-        zp0Slab = np.zeros([nSBedded * nDOFfree + nSFree * nDOFfree, 1],dtype = np.double)
-        rhsSlab = np.zeros([nSBedded * nDOFfree + nSFree * nDOFfree, 1] ,dtype = np.double)
+        # Initialize matrices for the slab
+        zh0Slab = np.zeros(
+            [
+                nSBedded * nDOFfree + nSFree * nDOFfree,
+                nSBedded * nDOFbedded + nSFree * nDOFfree,
+            ],
+            dtype=np.double,
+        )
+        zp0Slab = np.zeros([nSBedded * nDOFfree + nSFree * nDOFfree, 1], dtype=np.double)
+        rhsSlab = np.zeros([nSBedded * nDOFfree + nSFree * nDOFfree, 1], dtype=np.double)
 
-        # Initialize matrices for weak layer 
-        zh0Weak = np.zeros([nSBedded * (nDOFbedded-nDOFfree), 
-                           nSBedded * nDOFbedded + nSFree * nDOFfree], dtype=np.double)
-        zp0Weak = np.zeros([nSBedded * (nDOFbedded-nDOFfree), 1], dtype=np.double)
-        rhsWeak = np.zeros([nSBedded * (nDOFbedded-nDOFfree), 1], dtype=np.double)
+        # Initialize matrices for weak layer
+        zh0Weak = np.zeros(
+            [
+                nSBedded * (nDOFbedded - nDOFfree),
+                nSBedded * nDOFbedded + nSFree * nDOFfree,
+            ],
+            dtype=np.double,
+        )
+        zp0Weak = np.zeros([nSBedded * (nDOFbedded - nDOFfree), 1], dtype=np.double)
+        rhsWeak = np.zeros([nSBedded * (nDOFbedded - nDOFfree), 1], dtype=np.double)
 
         # --- ASSEMBLE EQUATIONS ---------------------------------------------
-        globalStartSlab = 0     # Global counter for slab matrix position
-        globalStartWeak = 0     # Global counter for weak layer matrix position
-        
+        globalStartSlab = 0  # Global counter for slab matrix position
+        globalStartWeak = 0  # Global counter for weak layer matrix position
+        kprev = False  # Initalize bedding storage
         # Loop through segments to assemble equations
         for i in range(nS):
             # Get segment properties
             l, k, pos, w = li[i], ki[i], pi[i], wi[i]
-            
+
             # Transmission conditions at left and right segment ends
-            zhiSlab,zhiWeak = self.eqs(
-                zl=np.around(self.zh(x=0, l=l, bed=k),16),
-                zr=np.around(self.zh(x=l, l=l, bed=k),16),
-                l=l, k=k, pos=pos)
-            zpiSlab,zpiWeak = self.eqs(
-                zl=np.around(self.zp(x=0, phi=phi,theta = theta, bed=k, load = w),16),
-                zr=np.around(self.zp(x=l, phi=phi,theta = theta, bed=k, load = w),16),
-                l=l, k=k, pos=pos)
+            zhiSlab, zhiWeak = self.eqs(
+                zl=np.around(self.zh(x=0, l=l, bed=k), 16),
+                zr=np.around(self.zh(x=l, l=l, bed=k), 16),
+                l=l,
+                k=k,
+                pos=pos,
+            )
+            zpiSlab, zpiWeak = self.eqs(
+                zl=np.around(self.zp(x=0, phi=phi, theta=theta, bed=k, load=w), 16),
+                zr=np.around(self.zp(x=l, phi=phi, theta=theta, bed=k, load=w), 16),
+                l=l,
+                k=k,
+                pos=pos,
+            )
 
             # Assemble slab equations
             nConst = 24 if k else 12  # Constants per segment
             startSlab = 0 if i == 0 else 6
-            stopSlab = 12 if i == nS-1 else 18
-            zh0Slab[(12 * i - startSlab):(12 * i + stopSlab), 
-                    globalStartSlab:globalStartSlab + nConst] = zhiSlab
-            zp0Slab[(12 * i - startSlab):(12 * i + stopSlab)] += zpiSlab
-        
+            stopSlab = 12 if i == nS - 1 else 18
+            zh0Slab[
+                (12 * i - startSlab) : (12 * i + stopSlab),
+                globalStartSlab : globalStartSlab + nConst,
+            ] = zhiSlab
+            zp0Slab[(12 * i - startSlab) : (12 * i + stopSlab)] += zpiSlab
+
             # Assemble weak layer equations based on segment position and foundation
-            if (pos == 'l' or pos == 'left') and k:
+            if (pos == "l" or pos == "left") and k:
                 # Left-most bedded segment
-                zh0Weak[0:6, globalStartSlab:globalStartSlab + nConst] = zhiWeak[0:6, :]
+                zh0Weak[0:6, globalStartSlab : globalStartSlab + nConst] = zhiWeak[
+                    0:6, :
+                ]
                 zp0Weak[0:6] += zpiWeak[0:6]
-                
-                if ki[i+1]:
+
+                if ki[i + 1]:
                     # Next segment is bedded
-                    zh0Weak[6:18, globalStartSlab:globalStartSlab + nConst] = zhiWeak[6:,:]
+                    zh0Weak[6:18, globalStartSlab : globalStartSlab + nConst] = zhiWeak[
+                        6:, :
+                    ]
                     zp0Weak[6:18] += zpiWeak[6:]
                 else:
                     # Next segment is free
-                    zh0Weak[6:12, globalStartSlab:globalStartSlab + nConst] = zhiWeak[12:,:]
+                    zh0Weak[6:12, globalStartSlab : globalStartSlab + nConst] = zhiWeak[
+                        12:, :
+                    ]
                     zp0Weak[6:12] += zpiWeak[12:]
-                    
-            elif (pos == 'm' or pos == 'mid') and k:
+
+            elif (pos == "m" or pos == "mid") and k:
                 # Middle bedded segment
-                if kprev and ki[i+1]:
+                if kprev and ki[i + 1]:
                     # Both adjacent segments are bedded
-                    zh0Weak[globalStartWeak-6:globalStartWeak+18, 
-                           globalStartSlab:globalStartSlab + nConst] = zhiWeak
-                    zp0Weak[globalStartWeak-6:globalStartWeak+18] += zpiWeak
-                elif kprev and not ki[i+1]:
+                    zh0Weak[
+                        globalStartWeak - 6 : globalStartWeak + 18,
+                        globalStartSlab : globalStartSlab + nConst,
+                    ] = zhiWeak
+                    zp0Weak[globalStartWeak - 6 : globalStartWeak + 18] += zpiWeak
+                elif kprev and not ki[i + 1]:
                     # Left bedded, right free
-                    zh0Weak[globalStartWeak-6:globalStartWeak+12, 
-                           globalStartSlab:globalStartSlab + nConst] = np.stack([zhiWeak[0:12,:], zhiWeak[18:,:]], axis=0)
-                    zp0Weak[globalStartWeak-6:globalStartWeak+12] += np.stack([zpiWeak[0:12], zpiWeak[18:]], axis=0)
-                elif not kprev and ki[i+1]:
+                    zh0Weak[
+                        globalStartWeak - 6 : globalStartWeak + 12,
+                        globalStartSlab : globalStartSlab + nConst,
+                    ] = np.stack([zhiWeak[0:12, :], zhiWeak[18:, :]], axis=0)
+                    zp0Weak[globalStartWeak - 6 : globalStartWeak + 12] += np.stack(
+                        [zpiWeak[0:12], zpiWeak[18:]], axis=0
+                    )
+                elif not kprev and ki[i + 1]:
                     # Left free, right bedded
-                    zh0Weak[globalStartWeak:globalStartWeak+18, 
-                           globalStartSlab:globalStartSlab + nConst] = zhiWeak[6:,:]
-                    zp0Weak[globalStartWeak:globalStartWeak+18] += zpiWeak[6:]
+                    zh0Weak[
+                        globalStartWeak : globalStartWeak + 18,
+                        globalStartSlab : globalStartSlab + nConst,
+                    ] = zhiWeak[6:, :]
+                    zp0Weak[globalStartWeak : globalStartWeak + 18] += zpiWeak[6:]
                 else:
                     # Both adjacent segments are free
-                    zh0Weak[globalStartWeak:globalStartWeak+12, 
-                           globalStartSlab:globalStartSlab + nConst] = np.stack([zhiWeak[6:12,:], zhiWeak[18:,:]], axis=0)
-                    zp0Weak[globalStartWeak:globalStartWeak+12] += np.stack([zpiWeak[6:12], zpiWeak[8:]], axis=0)
-                    
-            elif (pos == 'r' or pos == 'right') and k:
+                    zh0Weak[
+                        globalStartWeak : globalStartWeak + 12,
+                        globalStartSlab : globalStartSlab + nConst,
+                    ] = np.stack([zhiWeak[6:12, :], zhiWeak[18:, :]], axis=0)
+                    zp0Weak[globalStartWeak : globalStartWeak + 12] += np.stack(
+                        [zpiWeak[6:12], zpiWeak[8:]], axis=0
+                    )
+
+            elif (pos == "r" or pos == "right") and k:
                 # Right-most bedded segment
-                zh0Weak[-6:, globalStartSlab:globalStartSlab + nConst] = zhiWeak[-6:,:]
+                zh0Weak[-6:, globalStartSlab : globalStartSlab + nConst] = zhiWeak[
+                    -6:, :
+                ]
                 zp0Weak[-6:] += zpiWeak[-6:]
-                
+
                 if kprev:
                     # Previous segment is bedded
-                    zh0Weak[-18:-6, globalStartSlab:globalStartSlab + nConst] = zhiWeak[0:12,:]
+                    zh0Weak[-18:-6, globalStartSlab : globalStartSlab + nConst] = (
+                        zhiWeak[0:12, :]
+                    )
                     zp0Weak[-18:-6] += zpiWeak[0:12]
                 else:
                     # Previous segment is free
-                    zh0Weak[-12:-6, globalStartSlab:globalStartSlab + nConst] = zhiWeak[6:12,:]
+                    zh0Weak[-12:-6, globalStartSlab : globalStartSlab + nConst] = (
+                        zhiWeak[6:12, :]
+                    )
                     zp0Weak[-12:-6] += zpiWeak[6:12]
-            
+
             # Update global counters
             globalStartWeak += 12 if k else 0
             globalStartSlab += nConst
             kprev = k  # Store foundation state for next iteration
 
         # --- ASSEMBLE RIGHT-HAND SIDE --------------------------------------
-        
+
         # Add loads at boundary segments
         for i, f in enumerate(fi[1:-1], start=1):
-            rhsSlab[12*i:12*i + 6] = np.array(f).reshape(-1,1)
-        
-        if self.system not in ['skier']:
+            rhsSlab[12 * i : 12 * i + 6] = np.array(f).reshape(-1, 1)
+
+        if self.system not in ["skier"]:
             rhsSlab[0:6] = np.array(fi[0])  # Load at the left boundary of the strucutre
-            rhsSlab[-6:] = np.array(fi[-1]) # Load at the right boundary of the structure
+            rhsSlab[-6:] = np.array(
+                fi[-1]
+            )  # Load at the right boundary of the structure
         # Set boundary conditions for infinite systems
-        if self.system not in ['skier-finite', 'pst-', '-pst']:
+        if self.system not in ["skier-finite", "pst-", "-pst"]:
             # Left boundary
-            rhsSlab[:6] = self.bc(self.zp(x=0, phi=phi, theta=theta, bed=ki[0], load=wi[0]), 
-                                 l=li[0], k=ki[0], pos='l')[0:6]
+            rhsSlab[:6] = self.bc(
+                self.zp(x=0, phi=phi, theta=theta, bed=ki[0], load=wi[0]),
+                l=li[0],
+                k=ki[0],
+                pos="l",
+            )[0:6]
             if ki[0]:
-                rhsWeak[:6] = self.bc(self.zp(x=0, phi=phi, theta=theta, bed=ki[0], load=wi[0]), 
-                                     l=li[0], k=ki[0], pos='l')[6:]
-            
+                rhsWeak[:6] = self.bc(
+                    self.zp(x=0, phi=phi, theta=theta, bed=ki[0], load=wi[0]),
+                    l=li[0],
+                    k=ki[0],
+                    pos="l",
+                )[6:]
+
             # Right boundary
-            rhsSlab[-6:] = self.bc(self.zp(x=li[-1], phi=phi, theta=theta, bed=ki[-1], load=wi[-1]), 
-                                  l=li[-1], k=ki[-1], pos='r')[0:6]
-            if ki[nS-1]:
-                rhsWeak[-6:] = self.bc(self.zp(x=li[-1], phi=phi, theta=theta, bed=ki[-1], load=wi[-1]), 
-                                      l=li[-1], k=ki[-1], pos='r')[6:]
+            rhsSlab[-6:] = self.bc(
+                self.zp(x=li[-1], phi=phi, theta=theta, bed=ki[-1], load=wi[-1]),
+                l=li[-1],
+                k=ki[-1],
+                pos="r",
+            )[0:6]
+            if ki[nS - 1]:
+                rhsWeak[-6:] = self.bc(
+                    self.zp(x=li[-1], phi=phi, theta=theta, bed=ki[-1], load=wi[-1]),
+                    l=li[-1],
+                    k=ki[-1],
+                    pos="r",
+                )[6:]
 
         # --- SOLVE SYSTEM -------------------------------------------------
-        
+
         # Combine slab and weak layer equations
         zh0 = np.vstack([zh0Slab, zh0Weak])
         zp0 = np.vstack([zp0Slab, zp0Weak])
         rhs = np.vstack([rhsSlab, rhsWeak])
-        
+
         # Solve for constants: zh0*C = rhs - zp0
         C = np.linalg.solve(zh0, rhs - zp0)
-        
+
         # Reshape solution into matrix form
         CReturn = np.full((nS, nDOFbedded), np.nan, dtype=float)
         pos = 0
         for i in range(nS):
             if ki[i]:
-                CReturn[i,:] = np.reshape(C[pos:pos+nDOFbedded], C[pos:pos+nDOFbedded].shape[0])
+                CReturn[i, :] = np.reshape(
+                    C[pos : pos + nDOFbedded], C[pos : pos + nDOFbedded].shape[0]
+                )
                 pos += nDOFbedded
             else:
-                CReturn[i,:nDOFfree] = np.reshape(C[pos:pos+nDOFfree],C[pos:pos+nDOFfree].shape[0])
+                CReturn[i, :nDOFfree] = np.reshape(
+                    C[pos : pos + nDOFfree], C[pos : pos + nDOFfree].shape[0]
+                )
                 pos += nDOFfree
-            
+
         return CReturn.T
 
 
@@ -2475,7 +3067,7 @@ class AnalysisMixin:
     elastic foundations.
     """
 
-    def rasterize_solution(self, C, phi, theta, li, ki,wi, num=250, **kwargs):
+    def rasterize_solution(self, C, phi, theta, li, ki, wi, num=250, **kwargs):
         """
         Compute rasterized solution vector.
 
@@ -2514,7 +3106,7 @@ class AnalysisMixin:
         C, ki, li = C[:, isnonzero], ki[isnonzero], li[isnonzero]
 
         # Compute number of plot points per segment (+1 for last segment)
-        nq = np.ceil(li/li.sum()*num).astype('int')
+        nq = np.ceil(li / li.sum() * num).astype("int")
         nq[ki] += 1
 
         # Provide cumulated length and plot point lists
@@ -2533,17 +3125,17 @@ class AnalysisMixin:
             # Compute start and end coordinates of segment i
             x0 = lic[i]
             # Assemble global coordinate vector
-            xq[nqc[i]:nqc[i + 1]] = x0 + xi
+            xq[nqc[i] : nqc[i + 1]] = x0 + xi
             # Mask coordinates not on foundation (including endpoints)
             if not ki[i]:
-                isbedded[nqc[i]:nqc[i + 1]] = False
+                isbedded[nqc[i] : nqc[i + 1]] = False
             # Compute segment solution
             if ki[i]:
-                zi = self.z(xi, C[:, [i]], l, phi,theta, ki[i], wi[i])
-                zq[:, nqc[i]:nqc[i + 1]] = zi
+                zi = self.z(xi, C[:, [i]], l, phi, theta, ki[i], wi[i])
+                zq[:, nqc[i] : nqc[i + 1]] = zi
             else:
-                zi = self.z(xi, C[0:12, [i]], l, phi,theta, ki[i], wi[i])
-                zq[0:12, nqc[i]:nqc[i + 1]] = zi
+                zi = self.z(xi, C[0:12, [i]], l, phi, theta, ki[i], wi[i])
+                zq[0:12, nqc[i] : nqc[i + 1]] = zi
             # Assemble global solution matrix
 
         # Make sure cracktips are included
@@ -2557,7 +3149,7 @@ class AnalysisMixin:
 
         return xq, zq, xb
 
-    def ginc(self, C0, C1, phi,theta, li, ki, wi, k0, **kwargs):
+    def ginc(self, C0, C1, phi, theta, li, ki, wi, k0, **kwargs):
         """
         Compute incremental energy relase rate of of all cracks.
 
@@ -2599,24 +3191,25 @@ class AnalysisMixin:
 
         # Loop through segments with crack advance
         for j, l in enumerate(li):
-
             # Uncracked (0) and cracked (1) solutions at integration points
-            z0 = partial(self.z, C=C0[:, [j]], l=l, phi=phi,theta = theta, bed=True, load = wi[j])
-            z1 = partial(self.z, C=C1[:, [j]], l=l, phi=phi,theta = theta, bed=False, load = wi[j])
+            z0 = partial(
+                self.z, C=C0[:, [j]], l=l, phi=phi, theta=theta, bed=True, load=wi[j]
+            )
+            z1 = partial(
+                self.z, C=C1[:, [j]], l=l, phi=phi, theta=theta, bed=False, load=wi[j]
+            )
 
             # Mode I (1) and II (2) integrands at integration points
             int1 = partial(self.int1, z0=z0, z1=z1)
             int2 = partial(self.int2, z0=z0, z1=z1)
 
             # Segement contributions to total crack opening integral
-            Ginc1 += romberg(int1, 0, l, rtol=self.tol,
-                             vec_func=True)/(2*da)
-            Ginc2 += romberg(int2, 0, l, rtol=self.tol,
-                             vec_func=True)/(2*da)
+            Ginc1 += quad(int1, 0, l, epsabs=self.tol, epsrel=self.tol) / (2 * da)
+            Ginc2 += quad(int2, 0, l, epsabs=self.tol, epsrel=self.tol) / (2 * da)
 
         return np.array([Ginc1 + Ginc2, Ginc1, Ginc2]).flatten()
 
-    def gdif(self, C, phi, theta, li, ki, wi, unit='kJ/m^2', **kwargs):
+    def gdif(self, C, phi, theta, li, ki, wi, unit="kJ/m^2", **kwargs):
         """
         Compute differential energy release rate of all crack tips.
 
@@ -2647,35 +3240,64 @@ class AnalysisMixin:
         # Identify bedded-free and free-bedded transitions as crack tips
         # Differ between bedded->free and free->bedded !!!!
         iscracktip = [ki[j] != ki[j + 1] for j in range(ntr)]
-        
 
         # Transition indices of crack tips and total number of crack tips
         ict = itr[iscracktip]
         nct = len(ict)
         # Initialize energy release rate array
         Gdif = np.zeros([4, nct])
-        # 
+        #
         # Compute energy relase rate of all crack tips
         for j, idx in enumerate(ict):
             # Solution at crack tip
-            
+
             if ki[idx]:
-                ztip = self.z(li[idx], C[:, [idx]], li[idx], phi,theta, bed=ki[idx], load = wi[idx])
-                zback= self.z(0*li[idx], C[:, [idx]], li[idx], phi,theta,  bed=ki[idx], load = wi[idx])
+                ztip = self.z(
+                    li[idx], C[:, [idx]], li[idx], phi, theta, bed=ki[idx], load=wi[idx]
+                )
+                zback = self.z(
+                    0 * li[idx],
+                    C[:, [idx]],
+                    li[idx],
+                    phi,
+                    theta,
+                    bed=ki[idx],
+                    load=wi[idx],
+                )
             else:
-                ztip = self.z(0, C[:, [idx+1]], li[idx+1], phi,theta, bed=ki[idx+1], load = wi[idx+1])
-                zback= self.z(1*li[idx+1], C[:, [idx+1]], li[idx+1], phi,theta, bed=ki[idx+1], load = wi[idx+1])
+                ztip = self.z(
+                    0,
+                    C[:, [idx + 1]],
+                    li[idx + 1],
+                    phi,
+                    theta,
+                    bed=ki[idx + 1],
+                    load=wi[idx + 1],
+                )
+                zback = self.z(
+                    1 * li[idx + 1],
+                    C[:, [idx + 1]],
+                    li[idx + 1],
+                    phi,
+                    theta,
+                    bed=ki[idx + 1],
+                    load=wi[idx + 1],
+                )
             # Mode I and II differential energy release rates
-            Gdif[1:, j] = self.Gi(ztip,zback, unit=unit)[0], self.Gii(ztip,zback, unit=unit)[0], self.Giii(ztip,zback, unit = unit)[0]
+            Gdif[1:, j] = (
+                self.Gi(ztip, zback, unit=unit)[0],
+                self.Gii(ztip, zback, unit=unit)[0],
+                self.Giii(ztip, zback, unit=unit)[0],
+            )
 
         # Sum mode I and II contributions
         Gdif[0, :] = Gdif[1, :] + Gdif[2, :] + Gdif[3, :]
 
         # Adjust contributions for center cracks
         if nct > 1:
-            avgmask = np.full(nct, True)    # Initialize mask
+            avgmask = np.full(nct, True)  # Initialize mask
             avgmask[[0, -1]] = ki[[0, -1]]  # Do not weight edge cracks
-            Gdif[:, avgmask] *= 0.5         # Weigth with half crack length
+            Gdif[:, avgmask] *= 0.5  # Weigth with half crack length
 
         # Return total differential energy release rate of all crack tips
         return Gdif.sum(axis=1)
