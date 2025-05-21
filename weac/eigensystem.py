@@ -134,8 +134,6 @@ class Eigensystem:
         self.zs = False  # Z-coordinate of slab center of gravity (mm)
         self.zA = False  # Z-coordinate of weights center of gravity (mm)
         self.yA = False  # Y-coordinate of weights center of gravity (mm)
-        self.phi = False  # Slab inclination (°)
-        self.theta = False  # Slab rotation (°)
         self.A11 = False  # Slab extensional stiffness (N/mm)
         self.B11 = False  # Slab bending-extension coupling stiffness (N)
         self.D11 = False  # Slab bending stiffness (Nmm)

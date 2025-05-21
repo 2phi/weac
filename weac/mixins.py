@@ -1640,7 +1640,7 @@ class FieldQuantitiesMixin:
             + (1 - (-1 / 2 * h + z0) / t) * (Z[3, :] - (h * self.dpsix_dx(Z)) / 2)
         )
 
-    def Gi(self, Ztip, Zback, unit="kJ/m^2"):
+    def Gi(self, Ztip, Zback, phi, theta, unit="kJ/m^2"):
         """
         Calculate the energy release rate (ERR) for mode I (opening mode) fracture.
 
@@ -1674,13 +1674,13 @@ class FieldQuantitiesMixin:
         Ew = self.weak["E"]
         nuw = self.weak["nu"]
         rhow = self.weak["rho"]
-        phi = self.phi
-        theta = self.theta
         b = self.b
         t = self.t
         Pi = np.pi
         h = self.h
         g = 9810
+        phi = np.deg2rad(phi)
+        theta = np.deg2rad(theta)
 
         convert = {
             "J/m^2": 1e3,  # joule per square meter
@@ -1754,7 +1754,7 @@ class FieldQuantitiesMixin:
             )
         )
 
-    def Gii(self, Ztip, Zback, unit="kJ/m^2"):
+    def Gii(self, Ztip, Zback, phi, unit="kJ/m^2"):
         """
         Calculate the energy release rate (ERR) for mode II (sliding mode) fracture.
 
@@ -1794,7 +1794,7 @@ class FieldQuantitiesMixin:
         b = self.b
         phi = self.phi
         g = 9810
-        theta = self.theta
+        phi = np.deg2rad(phi)
 
         convert = {
             "J/m^2": 1e3,  # joule per square meter
@@ -1866,7 +1866,7 @@ class FieldQuantitiesMixin:
             )
         )
 
-    def Giii(self, Ztip, Zback, unit="kJ/m^2"):
+    def Giii(self, Ztip, Zback, theta, unit="kJ/m^2"):
         """
         Calculate the energy release rate (ERR) for mode III (tearing mode) fracture.
 
@@ -1904,9 +1904,8 @@ class FieldQuantitiesMixin:
         Pi = np.pi
         h = self.h
         b = self.b
-        phi = self.phi
         g = 9810
-        theta = self.theta
+        theta = np.deg2rad(theta)
 
         convert = {
             "J/m^2": 1e3,  # joule per square meter
@@ -1970,7 +1969,7 @@ class FieldQuantitiesMixin:
             )
         )
 
-    def G(self, Ztip, Zback, unit="kJ/m^2"):
+    def G(self, Ztip, Zback, phi, theta, unit="kJ/m^2"):
         """
         Calculate the total energy release rate (ERR) for mixed-mode fracture.
 
@@ -1996,9 +1995,9 @@ class FieldQuantitiesMixin:
             Total energy release rate (in specified unit).
         """
         # Calculate individual mode contributions
-        Gi = self.Gi(Ztip, Zback, unit)
-        Gii = self.Gii(Ztip, Zback, unit)
-        Giii = self.Giii(Ztip, Zback, unit)
+        Gi = self.Gi(Ztip, Zback, phi, theta, unit)
+        Gii = self.Gii(Ztip, Zback, phi, unit)
+        Giii = self.Giii(Ztip, Zback, theta, unit)
 
         # Sum all contributions
         return Gi + Gii + Giii
@@ -2126,7 +2125,8 @@ class SlabContactMixin:
         """
         # subtract displacement under constact load from collapsed wl height
         qn = self.calc_qn()
-        self.tc = cf * self.t - qn / self.kn
+        kn = self.weak["E"] / self.t
+        self.tc = cf * self.t - qn / kn
 
     def set_phi(self, phi):
         """
@@ -2160,7 +2160,7 @@ class SlabContactMixin:
         float
             Total surface normal load (N/mm).
         """
-        return self.get_weight_load(self.phi)[0] + self.get_surface_load(self.phi)[0]
+        return self.get_weight_load(self.phi)[2] + self.get_surface_load(self.phi)[2]
 
     def calc_qt(self):
         """
@@ -2171,7 +2171,7 @@ class SlabContactMixin:
         float
             Total surface normal load (N/mm).
         """
-        return self.get_weight_load(self.phi)[1] + self.get_surface_load(self.phi)[1]
+        return self.get_weight_load(self.phi)[0] + self.get_surface_load(self.phi)[0]
 
     def substitute_stiffness(self, L, support="rested", dof="rot"):
         """
@@ -2200,33 +2200,34 @@ class SlabContactMixin:
 
         # Change eigensystem for rested segment
         if support in ["rested"]:
-            tempkn = self.kn
-            tempkt = self.kt
-            self.kn = self.ratio * self.kn
-            self.kt = self.ratio * self.kt
+            tempEweak = self.weak["E"]
+
+            self.weak["E"] = self.ratio * self.weak["E"]
             self.calc_system_matrix()
             self.calc_eigensystem()
 
         # prepare list of segment characteristics
         segments = {
             "li": np.array([L, 0.0]),
-            "mi": np.array([0]),
+            "fi": np.array([[0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0]]),
             "ki": np.array([True, True]),
+            "qi": np.array([True, True]),
         }
         # solve system of equations
-        constants = self.assemble_and_solve(phi=0, **segments)
+        constants = self.assemble_and_solve(phi=0, theta=0, **segments)
         # calculate stiffness
-        _, z_pst, _ = self.rasterize_solution(C=constants, phi=0, num=1, **segments)
+        _, z_pst, _ = self.rasterize_solution(
+            C=constants, phi=0, theta=0, num=1, **segments
+        )
         if dof in ["rot"]:
-            k = abs(1 / self.psi(z_pst)[0])
+            k = abs(1 / self.psiy(z_pst)[0])
         if dof in ["trans"]:
             k = abs(1 / self.w(z_pst)[0])
 
         # Reset to previous system and eigensystem
         self.system = tempsys
         if support in ["rested"]:
-            self.kn = tempkn
-            self.kt = tempkt
+            self.weak["E"] = tempEweak
             self.calc_system_matrix()
             self.calc_eigensystem()
 
