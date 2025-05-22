@@ -47,6 +47,14 @@ class Layered(
             2D list of layer densities and thicknesses. Columns are
             density(kg/m ^ 3) and thickness(mm). One row corresponds
             to one layer. Default is [[240, 200], ].
+        phi : float
+            Inclination of snow slab. Default is 0.
+        theta : float
+            Rotation around the x-axis of the snow slab. Default is 0.
+        b : float
+            Out-of-plane (y) width of the snow pack. Default is 290.
+        touchdown : bool
+            Flag whether touchdown analysis is conducted. Default is False.
         """
         # Call parent __init__
         super().__init__(system=system)

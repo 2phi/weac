@@ -217,8 +217,6 @@ class Eigensystem:
     def set_beam_properties(
         self,
         layers,
-        phi,
-        theta=0,
         C0=6.5,
         C1=4.40,
         nu=0.25,
@@ -235,10 +233,6 @@ class Eigensystem:
             2D list of top-to-bottom layer densities and thicknesses.
             Columns are density (kg/m^3) and thickness (mm).
             If entered as str, last split must be available in database.
-        phi : float
-            Inclination of the slab (degrees).
-        theta : float, optional
-            Rotation of the slab (degrees). Default is 0.
         C0 : float, optional
             Multiplicative constant of Young's modulus parametrization
             according to Bergfeld et al. (2021). Default is 6.5.
