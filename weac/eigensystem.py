@@ -285,7 +285,7 @@ class Eigensystem:
         if update:
             self.calc_fundamental_system()
 
-    def set_surface_load(self, p, yA=0, zA=0, width=1.0):
+    def set_surface_load(self, p, yA=0, zA=0):
         """
         Set surface line load.
 
@@ -300,8 +300,6 @@ class Eigensystem:
             y-coordinate of the additional loads (mm)
         zA : float, optional
             z-coordinate of the additional loads (mm)
-        b  : float, optional
-            Width (mm) of an additional weight
 
         """
         self.p = p  # Total line load from the additional weigths
@@ -2113,10 +2111,12 @@ class Eigensystem:
 
         Returns
         -------
-        qn : float
+        qx : float
+            Line load (N/mm) at center of gravity in axial direction.
+        qy : float
+            Line load (N/mm) at center of gravity in out-of-plane direction.
+        qz : float
             Line load (N/mm) at center of gravity in normal direction.
-        qt : float
-            Line load (N/mm) at center of gravity in tangential direction.
         """
         # Convert units
         phi = np.deg2rad(phi)  # Convert inclination to rad
@@ -2142,10 +2142,12 @@ class Eigensystem:
 
         Returns
         -------
-        pn : float
+        px : float
+            Surface line load (N/mm) in axial direction.
+        py : float
+            Surface line load (N/mm) in out-of-plane direction.
+        pz : float
             Surface line load (N/mm) in normal direction.
-        pt : float
-            Surface line load (N/mm) in tangential direction.
         """
         # Convert units
         phi = np.deg2rad(phi)  # Convert inclination to rad

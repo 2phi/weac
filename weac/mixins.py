@@ -2527,7 +2527,7 @@ class SolutionMixin:
                             self.Nxx(z, bed=k),
                             self.Vyy(z, bed=k),
                             self.Vzz(z, bed=k),
-                            self.Myy(z, bed=k) + kf * kR * self.psi(z),
+                            self.Myy(z, bed=k) + kf * kR * self.psiy(z),
                             self.w(z, z0=0, y0=0),
                         ]
                     )
@@ -3176,10 +3176,10 @@ class SolutionMixin:
 
         # Add dummy segment if only one segment provided
         if nS == 1:
-            li.append(0)
-            ki.append(True)
-            fi.append([0, 0, 0, 0, 0, 0])
-            wi.append(True)
+            li = np.concatenate([li, [0]])
+            ki = np.concatenate([ki, [True]])
+            fi = np.vstack([fi, [[0, 0, 0, 0, 0, 0]]])
+            wi = np.concatenate([wi, [True]])
             nS = 2
 
         # Initialize position vector (l=left, m=middle, r=right)
