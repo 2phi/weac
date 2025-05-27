@@ -66,8 +66,6 @@ class Layered(
             else [
                 [240, 200],
             ],
-            phi=phi,
-            theta=theta,
             b=b,
         )
         self.set_foundation_properties()
