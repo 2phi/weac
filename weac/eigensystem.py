@@ -2102,6 +2102,8 @@ class Eigensystem:
         ---------
         phi : float
             Inclination (degrees). Counterclockwise positive.
+        theta : float
+            Rotation (degrees).
 
         Returns
         -------
@@ -2125,6 +2127,37 @@ class Eigensystem:
 
         return qx, qy, qz
 
+    def get_weak_layer_load(self, phi, theta=0):
+        """
+        Calculate surface line loads.
+
+        Arguments
+        ---------
+        phi : float
+            Inclination (degrees). Counterclockwise positive.
+        theta : float
+            Rotation (degrees).
+
+        Returns
+        -------
+        fx : float
+            Surface line load (N/mm³) in axial direction.
+        fy : float
+            Surface line load (N/mm³) in out-of-plane direction.
+        fz : float
+            Surface line load (N/mm³) in normal direction.
+        """
+        # Convert units
+        phi = np.deg2rad(phi)  # Convert inclination to rad
+        theta = np.deg2rad(theta)
+        f = self.weak["rho"] * self.g
+        # Split into components
+        fz = f * np.cos(phi) * np.cos(theta)  # Normal direction
+        fx = -f * np.sin(phi)  # Tangential direction
+        fy = f * np.sin(theta)  # Out-of-plane direction
+
+        return fx, fy, fz
+
     def get_surface_load(self, phi, theta=0):
         """
         Calculate surface line loads.
@@ -2133,6 +2166,8 @@ class Eigensystem:
         ---------
         phi : float
             Inclination (degrees). Counterclockwise positive.
+        theta : float
+            Rotation (degrees).
 
         Returns
         -------
@@ -2327,12 +2362,14 @@ class Eigensystem:
         Returns
         -------
         zp : ndarray
-            Particular integral vector (6x1) at position x.
+            Particular integral vector (24x1) at position x.
         """
         # Get weight and surface loads
         qx, qy, qz = self.get_weight_load(phi, theta)
 
         px, py, pz = self.get_surface_load(phi, theta)
+
+        fx, fy, fz = self.get_weak_layer_load(phi, theta)
         # Unpack laminate stiffnesses
         A11 = self.A11
         B11 = self.B11
@@ -2346,7 +2383,6 @@ class Eigensystem:
         # Unpack weak layer properties
         Ew = self.weak["E"]
         nuw = self.weak["nu"]
-        rhow = self.weak["rho"]
 
         # Unpack layering  information
 
@@ -2371,331 +2407,211 @@ class Eigensystem:
         # Assemble particular integral vectors in accordance with Mathematica scripts
 
         if bed:
+            zp01 = (
+                h * (2 * my + h * (px + qx)) * Ew
+                + 4 * kA55 * t * (2 * px + 2 * qx + b * fx * t) * (1 + nuw)
+            ) / (4 * b * kA55 * Ew)
+
+            zp02 = 0
+
+            zp03 = (
+                t
+                * (
+                    (
+                        -3
+                        * Pi**4
+                        * (h + t)
+                        * (4 * mx + b * fy * h * t)
+                        * (1 + nuw)
+                        * (-1 + 2 * nuw)
+                    )
+                    / b
+                    - 96 * fy * t**2 * (h + t) * (-1 + nuw + 2 * nuw**2)
+                    + (
+                        Pi**2
+                        * (2 * py + 2 * qy + b * fy * t)
+                        * (1 + nuw)
+                        * (
+                            2 * b**4 * Pi**6 * (-1 + nuw) ** 2
+                            + 6
+                            * (
+                                3 * h**2 * Pi**2 * (-8 + Pi**2)
+                                + 6 * h * Pi**2 * (-8 + Pi**2) * t
+                                + 4 * (-24 - 6 * Pi**2 + Pi**4) * t**2
+                            )
+                            * (t - 2 * t * nuw) ** 2
+                            + b**2
+                            * Pi**2
+                            * (
+                                3 * h**2 * Pi**4
+                                + 6 * h * Pi**4 * t
+                                + 4 * (-24 + 3 * Pi**2 + Pi**4) * t**2
+                            )
+                            * (1 - 3 * nuw + 2 * nuw**2)
+                        )
+                    )
+                    / (
+                        b**3 * Pi**4 * (-1 + nuw)
+                        + 6 * b * (-8 + Pi**2) * t**2 * (-1 + 2 * nuw)
+                    )
+                )
+            ) / (
+                Ew
+                * (2 * b**2 * Pi**4 * (-1 + nuw) + (-96 + Pi**4) * t**2 * (-1 + 2 * nuw))
+            )
+
+            zp04 = 0
+
+            zp05 = (
+                Pi**2
+                * t
+                * (2 * pz + 2 * qz + b * fz * t)
+                * (1 + nuw)
+                * (-1 + 2 * nuw)
+                * (24 * t**2 * (-1 + nuw) + b**2 * Pi**2 * (-1 + 2 * nuw))
+            ) / (
+                2
+                * b
+                * Ew
+                * (
+                    24 * t**2 * (Pi**2 * (-1 + nuw) ** 2 - 8 * nuw**2)
+                    + b**2 * Pi**4 * (1 - 3 * nuw + 2 * nuw**2)
+                )
+            )
+
+            zp06 = 0
+
+            zp07 = (
+                6
+                * t
+                * (
+                    -4 * mx * Pi**4
+                    + 2 * h * Pi**4 * (py + qy)
+                    + t * (-32 * b * fy * t + Pi**4 * (2 * py + 2 * qy + b * fy * t))
+                )
+                * (-1 + nuw + 2 * nuw**2)
+            ) / (
+                b
+                * Ew
+                * (2 * b**2 * Pi**4 * (-1 + nuw) + (-96 + Pi**4) * t**2 * (-1 + 2 * nuw))
+            )
+
+            zp08 = 0
+
+            zp09 = -1 / 2 * (2 * my + h * (px + qx)) / (b * kA55)
+
+            zp10 = 0
+
+            zp11 = (-24 * mz * Pi**2 * t * (b**2 * Pi**2 + 12 * t**2) * (1 + nuw)) / (
+                b**5 * Pi**4 * Ew
+                + 48 * b * t**3 * ((-6 + Pi**2) * t * Ew + 6 * kA55 * Pi**2 * (1 + nuw))
+                + 4
+                * b**3
+                * Pi**2
+                * t
+                * ((3 + Pi**2) * t * Ew + 6 * kA55 * Pi**2 * (1 + nuw))
+            )
+
+            zp12 = 0
+
+            zp13 = (8 * fx * t**2 * (1 + nuw)) / (Pi**3 * Ew)
+
+            zp14 = 0
+
+            zp15 = (-288 * mz * Pi * t**3 * (1 + nuw)) / (
+                b**4 * Pi**4 * Ew
+                + 48 * t**3 * ((-6 + Pi**2) * t * Ew + 6 * kA55 * Pi**2 * (1 + nuw))
+                + 4
+                * b**2
+                * Pi**2
+                * t
+                * ((3 + Pi**2) * t * Ew + 6 * kA55 * Pi**2 * (1 + nuw))
+            )
+
+            zp16 = 0
+
+            zp17 = (
+                16
+                * Pi
+                * t**2
+                * (1 + nuw)
+                * (
+                    b * fy * t**2 * (1 - 2 * nuw)
+                    + b**3 * fy * (-1 + nuw)
+                    + 3 * (2 * mx - (py + qy) * (h + t)) * (-1 + 2 * nuw)
+                )
+            ) / (
+                b
+                * Ew
+                * (2 * b**2 * Pi**4 * (-1 + nuw) + (-96 + Pi**4) * t**2 * (-1 + 2 * nuw))
+            )
+
+            zp18 = 0
+
+            zp19 = (
+                -24
+                * Pi
+                * t**2
+                * (2 * pz + 2 * qz + b * fz * t)
+                * nuw
+                * (1 + nuw)
+                * (-1 + 2 * nuw)
+            ) / (
+                Ew
+                * (
+                    24 * t**2 * (Pi**2 * (-1 + nuw) ** 2 - 8 * nuw**2)
+                    + b**2 * Pi**4 * (1 - 3 * nuw + 2 * nuw**2)
+                )
+            )
+
+            zp20 = 0
+
+            zp21 = (4 * fz * t**2 * (1 + nuw) * (-1 + 2 * nuw)) / (
+                Pi**3 * Ew * (-1 + nuw)
+            )
+
+            zp22 = 0
+
+            zp23 = (
+                12
+                * Pi
+                * t**2
+                * (2 * py + 2 * qy + b * fy * t)
+                * (1 + nuw)
+                * (-1 + 2 * nuw)
+            ) / (
+                Ew
+                * (b**2 * Pi**4 * (-1 + nuw) + 6 * (-8 + Pi**2) * t**2 * (-1 + 2 * nuw))
+            )
+
+            zp24 = 0
+
             zp = np.array(
                 [
-                    [
-                        (
-                            h * (h * (px + qx) - 2 * (px * zA + qx * zS)) * Ew
-                            + 8 * kA55 * (px + qx) * t * (1 + nuw)
-                            - 4
-                            * b
-                            * g
-                            * kA55
-                            * t**2
-                            * (1 + nuw)
-                            * rhow
-                            * np.sin(np.deg2rad(phi))
-                        )
-                        / (4 * b * kA55 * Ew)
-                    ],
-                    [0],
-                    [
-                        np.longdouble(
-                            (
-                                t
-                                * (1 + nuw)
-                                * (
-                                    2
-                                    * (
-                                        np.longdouble(2 * b**4 * Pi**8 * (py + qy))
-                                        * (-1 + nuw) ** 2
-                                        + 6
-                                        * Pi**2
-                                        * (
-                                            3 * h**2 * Pi**2 * (-8 + Pi**2) * (py + qy)
-                                            + 6
-                                            * h
-                                            * Pi**2
-                                            * (-8 + Pi**2)
-                                            * (pz * yA + py * (t - zA) + qy * (t - zS))
-                                            + 2
-                                            * t
-                                            * (
-                                                2 * (-24 - 6 * Pi**2 + Pi**4) * py * t
-                                                + 2 * (-24 - 6 * Pi**2 + Pi**4) * qy * t
-                                                + 3 * Pi**2 * (-8 + Pi**2) * pz * yA
-                                                - 3 * Pi**2 * (-8 + Pi**2) * py * zA
-                                                - 3 * Pi**2 * (-8 + Pi**2) * qy * zS
-                                            )
-                                        )
-                                        * (t - 2 * t * nuw) ** 2
-                                        + b**2
-                                        * Pi**4
-                                        * (
-                                            3 * h**2 * Pi**4 * (py + qy)
-                                            + 6
-                                            * h
-                                            * Pi**4
-                                            * (pz * yA + py * (t - zA) + qy * (t - zS))
-                                            + 2
-                                            * t
-                                            * (
-                                                2 * (-24 + 3 * Pi**2 + Pi**4) * py * t
-                                                + 2 * (-24 + 3 * Pi**2 + Pi**4) * qy * t
-                                                + 3 * Pi**4 * pz * yA
-                                                - 3 * Pi**4 * py * zA
-                                                - 3 * Pi**4 * qy * zS
-                                            )
-                                        )
-                                        * (1 - 3 * nuw + 2 * nuw**2)
-                                    )
-                                    + b
-                                    * g
-                                    * t
-                                    * (
-                                        6
-                                        * t**3
-                                        * (
-                                            3
-                                            * h
-                                            * (256 - 32 * Pi**2 - 8 * Pi**4 + Pi**6)
-                                            + 4
-                                            * (192 - 48 * Pi**2 - 6 * Pi**4 + Pi**6)
-                                            * t
-                                        )
-                                        * (1 - 2 * nuw) ** 2
-                                        + np.longdouble(
-                                            2 * b**4 * Pi**8 * (-1 + nuw) ** 2
-                                        )
-                                        + b**2
-                                        * Pi**4
-                                        * t
-                                        * (
-                                            3 * h * (-32 + Pi**4)
-                                            + 4 * (-48 + 3 * Pi**2 + Pi**4) * t
-                                        )
-                                        * (1 - 3 * nuw + 2 * nuw**2)
-                                    )
-                                    * rhow
-                                    * np.sin(np.deg2rad(theta))
-                                )
-                            )
-                            / (
-                                b
-                                * Ew
-                                * (
-                                    6
-                                    * (768 - 96 * Pi**2 - 8 * Pi**4 + Pi**6)
-                                    * t**4
-                                    * (1 - 2 * nuw) ** 2
-                                    + np.longdouble(2 * b**4 * Pi**8 * (-1 + nuw) ** 2)
-                                    + b**2
-                                    * Pi**4
-                                    * (-192 + 12 * Pi**2 + Pi**4)
-                                    * t**2
-                                    * (1 - 3 * nuw + 2 * nuw**2)
-                                )
-                            )
-                        )
-                    ],
-                    [0],
-                    [
-                        (
-                            Pi**2
-                            * t
-                            * (-1 + nuw + 2 * nuw**2)
-                            * (24 * t**2 * (-1 + nuw) + b**2 * Pi**2 * (-1 + 2 * nuw))
-                            * (
-                                2 * (pz + qz)
-                                + b
-                                * g
-                                * t
-                                * rhow
-                                * np.cos(np.deg2rad(theta))
-                                * np.cos(np.deg2rad(phi))
-                            )
-                        )
-                        / (
-                            2
-                            * b
-                            * Ew
-                            * (
-                                24 * t**2 * (Pi**2 * (-1 + nuw) ** 2 - 8 * nuw**2)
-                                + b**2 * Pi**4 * (1 - 3 * nuw + 2 * nuw**2)
-                            )
-                        )
-                    ],
-                    [0],
-                    [
-                        (
-                            6
-                            * t
-                            * (1 + nuw)
-                            * (-1 + 2 * nuw)
-                            * (
-                                2
-                                * Pi**4
-                                * (
-                                    h * (py + qy)
-                                    + py * t
-                                    + qy * t
-                                    + 2 * pz * yA
-                                    - 2 * py * zA
-                                    - 2 * qy * zS
-                                )
-                                + b
-                                * g
-                                * (-32 + Pi**4)
-                                * t**2
-                                * rhow
-                                * np.sin(np.deg2rad(theta))
-                            )
-                        )
-                        / (
-                            b
-                            * Ew
-                            * (
-                                2 * b**2 * Pi**4 * (-1 + nuw)
-                                + (-96 + Pi**4) * t**2 * (-1 + 2 * nuw)
-                            )
-                        )
-                    ],
-                    [0],
-                    [(-(h * (px + qx)) + 2 * (px * zA + qx * zS)) / (2 * b * kA55)],
-                    [0],
-                    [
-                        np.longdouble(
-                            (
-                                -24
-                                * Pi**2
-                                * px
-                                * t
-                                * (b**2 * Pi**2 + 12 * t**2)
-                                * yA
-                                * (1 + nuw)
-                            )
-                            / np.longdouble(
-                                b**5 * Pi**4 * Ew
-                                + 48
-                                * b
-                                * t**3
-                                * ((-6 + Pi**2) * t * Ew + 6 * kA55 * Pi**2 * (1 + nuw))
-                                + 4
-                                * b**3
-                                * Pi**2
-                                * t
-                                * ((3 + Pi**2) * t * Ew + 6 * kA55 * Pi**2 * (1 + nuw))
-                            )
-                        )
-                    ],
-                    [0],
-                    [
-                        (-8 * g * t**2 * (1 + nuw) * rhow * np.sin(np.deg2rad(phi)))
-                        / (Pi**3 * Ew)
-                    ],
-                    [0],
-                    [
-                        (-288 * Pi * px * t**3 * yA * (1 + nuw))
-                        / np.longdouble(
-                            (
-                                b**4 * Pi**4 * Ew
-                                + 48
-                                * t**3
-                                * ((-6 + Pi**2) * t * Ew + 6 * kA55 * Pi**2 * (1 + nuw))
-                                + 4
-                                * b**2
-                                * Pi**2
-                                * t
-                                * ((3 + Pi**2) * t * Ew + 6 * kA55 * Pi**2 * (1 + nuw))
-                            )
-                        )
-                    ],
-                    [0],
-                    [
-                        (
-                            16
-                            * Pi
-                            * t**2
-                            * (1 + nuw)
-                            * (
-                                -3
-                                * (
-                                    h * (py + qy)
-                                    + py * t
-                                    + qy * t
-                                    + 2 * pz * yA
-                                    - 2 * py * zA
-                                    - 2 * qy * zS
-                                )
-                                * (-1 + 2 * nuw)
-                                + b
-                                * g
-                                * (t**2 * (1 - 2 * nuw) + b**2 * (-1 + nuw))
-                                * rhow
-                                * np.sin(np.deg2rad(theta))
-                            )
-                        )
-                        / (
-                            b
-                            * Ew
-                            * (
-                                2 * b**2 * Pi**4 * (-1 + nuw)
-                                + (-96 + Pi**4) * t**2 * (-1 + 2 * nuw)
-                            )
-                        )
-                    ],
-                    [0],
-                    [
-                        (
-                            -24
-                            * Pi
-                            * t**2
-                            * nuw
-                            * (1 + nuw)
-                            * (-1 + 2 * nuw)
-                            * (
-                                2 * (pz + qz)
-                                + b
-                                * g
-                                * t
-                                * rhow
-                                * np.cos(np.deg2rad(theta))
-                                * np.cos(np.deg2rad(phi))
-                            )
-                        )
-                        / (
-                            Ew
-                            * (
-                                24 * t**2 * (Pi**2 * (-1 + nuw) ** 2 - 8 * nuw**2)
-                                + b**2 * Pi**4 * (1 - 3 * nuw + 2 * nuw**2)
-                            )
-                        )
-                    ],
-                    [0],
-                    [
-                        (
-                            4
-                            * g
-                            * t**2
-                            * (-1 + nuw + 2 * nuw**2)
-                            * rhow
-                            * np.cos(np.deg2rad(theta))
-                            * np.cos(np.deg2rad(phi))
-                        )
-                        / (Pi**3 * Ew * (-1 + nuw))
-                    ],
-                    [0],
-                    [
-                        (
-                            12
-                            * Pi
-                            * t**2
-                            * (1 + nuw)
-                            * (-1 + 2 * nuw)
-                            * (
-                                2 * (py + qy)
-                                + b * g * t * rhow * np.sin(np.deg2rad(theta))
-                            )
-                        )
-                        / (
-                            Ew
-                            * (
-                                b**2 * Pi**4 * (-1 + nuw)
-                                + 6 * (-8 + Pi**2) * t**2 * (-1 + 2 * nuw)
-                            )
-                        )
-                    ],
-                    [0],
+                    [zp01],
+                    [zp02],
+                    [zp03],
+                    [zp04],
+                    [zp05],
+                    [zp06],
+                    [zp07],
+                    [zp08],
+                    [zp09],
+                    [zp10],
+                    [zp11],
+                    [zp12],
+                    [zp13],
+                    [zp14],
+                    [zp15],
+                    [zp16],
+                    [zp17],
+                    [zp18],
+                    [zp19],
+                    [zp20],
+                    [zp21],
+                    [zp22],
+                    [zp23],
+                    [zp24],
                 ],
                 dtype=np.double,
             )
@@ -2844,3 +2760,368 @@ class Eigensystem:
             z = np.dot(self.zh(x, l, bed), C) + self.zp(x, phi, theta, bed, load)
 
         return z
+
+    def get_load_vector(self, phi, theta):
+        """
+        Compute vector d for the identification of z' = Kz + d
+
+        Arguments
+        ---------
+        phi : float
+            Inclination (degrees).
+        theta : float
+            Rotation (degrees)
+
+        Returns
+        -------
+        d : ndarray
+            Particular integral vector (24x1) at position x.
+        """
+        # Get weight and surface loads
+        qx, qy, qz = self.get_weight_load(phi, theta)
+
+        px, py, pz = self.get_surface_load(phi, theta)
+
+        fx, fy, fz = self.get_weak_layer_load(phi, theta)
+        # Unpack laminate stiffnesses
+        A11 = self.A11
+        B11 = self.B11
+        kA55 = self.kA55
+        D11 = self.D11
+        kB55 = self.kB55
+        kD55 = self.kD55
+        b = np.longdouble(self.b)
+        h = self.h
+        t = self.t
+        # Unpack weak layer properties
+        Ew = self.weak["E"]
+        nuw = self.weak["nu"]
+
+        # Unpack layering  information
+
+        # Unpack general variables
+        g = self.g
+        Pi = np.pi
+
+        # Unpack geometric properties
+        h = self.h
+        t = self.t
+        zS = self.zs
+        zA = self.zA
+        yA = self.yA
+
+        my = -qx * zS - px * zA
+        mz = -px * yA
+        mx = -qy * zS + pz * yA - py * zA
+
+        q01 = 0
+
+        q02 = (
+            h * (-6 + Pi**2) * (2 * my + h * (px + qx)) * t * Ew * (-1 + nuw)
+            + 3
+            * B11
+            * (4 * my * Pi**2 - b * fx * h * (-8 + Pi**2) * t)
+            * (-1 + nuw + 2 * nuw**2)
+            + 6
+            * D11
+            * (-8 * b * fx * t + Pi**2 * (2 * px + 2 * qx + b * fx * t))
+            * (-1 + nuw + 2 * nuw**2)
+        ) / (
+            b
+            * (
+                -4 * D11 * (-6 + Pi**2) * t * Ew * (-1 + nuw)
+                + 4 * B11 * h * (-6 + Pi**2) * t * Ew * (-1 + nuw)
+                - A11 * h**2 * (-6 + Pi**2) * t * Ew * (-1 + nuw)
+                + 12 * B11**2 * Pi**2 * (-1 + nuw + 2 * nuw**2)
+                - 12 * A11 * D11 * Pi**2 * (-1 + nuw + 2 * nuw**2)
+            )
+        )
+
+        q03 = 0
+
+        q04 = (
+            -3
+            * (1 + nuw)
+            * (
+                72 * b * fy * kD55 * Pi**2 * (-8 + Pi**2) * t * (1 + nuw)
+                - 36
+                * kB55
+                * Pi**2
+                * (4 * mx * Pi**2 + b * fy * h * (-8 + Pi**2) * t)
+                * (1 + nuw)
+                + 2
+                * b**2
+                * Pi**2
+                * (py + qy)
+                * ((-6 + Pi**2) * t * Ew + 6 * kA55 * Pi**2 * (1 + nuw))
+                + b**3
+                * fy
+                * (-8 + Pi**2)
+                * t
+                * ((-6 + Pi**2) * t * Ew + 6 * kA55 * Pi**2 * (1 + nuw))
+                + 6
+                * Pi**2
+                * (
+                    h * (-6 + Pi**2) * (-2 * mx + h * (py + qy)) * t * Ew
+                    + 24 * kD55 * Pi**2 * (py + qy) * (1 + nuw)
+                )
+            )
+        ) / (
+            b**3 * ((-6 + Pi**2) * t * Ew + 6 * kA55 * Pi**2 * (1 + nuw)) ** 2
+            - 18
+            * b
+            * Pi**2
+            * (1 + nuw)
+            * (
+                4 * h * kB55 * (-6 + Pi**2) * t * Ew
+                - 4 * kD55 * (-6 + Pi**2) * t * Ew
+                + 24 * kB55**2 * Pi**2 * (1 + nuw)
+                - kA55 * (h**2 * (-6 + Pi**2) * t * Ew + 24 * kD55 * Pi**2 * (1 + nuw))
+            )
+        )
+
+        q05 = 0
+
+        q06 = (
+            -3 * (-8 * b * fz * t + Pi**2 * (2 * pz + 2 * qz + b * fz * t)) * (1 + nuw)
+        ) / (b * ((-6 + Pi**2) * t * Ew + 6 * kA55 * Pi**2 * (1 + nuw)))
+
+        q07 = 0
+
+        q08 = (
+            36
+            * Pi**2
+            * (1 + nuw)
+            * (
+                (-6 + Pi**2) * (2 * mx - h * (py + qy)) * t * Ew
+                + 3 * kA55 * (4 * mx * Pi**2 + b * fy * h * (-8 + Pi**2) * t) * (1 + nuw)
+                - 6
+                * kB55
+                * (-8 * b * fy * t + Pi**2 * (2 * py + 2 * qy + b * fy * t))
+                * (1 + nuw)
+            )
+        ) / (
+            b**3 * ((-6 + Pi**2) * t * Ew + 6 * kA55 * Pi**2 * (1 + nuw)) ** 2
+            - 18
+            * b
+            * Pi**2
+            * (1 + nuw)
+            * (
+                4 * h * kB55 * (-6 + Pi**2) * t * Ew
+                - 4 * kD55 * (-6 + Pi**2) * t * Ew
+                + 24 * kB55**2 * Pi**2 * (1 + nuw)
+                - kA55 * (h**2 * (-6 + Pi**2) * t * Ew + 24 * kD55 * Pi**2 * (1 + nuw))
+            )
+        )
+
+        q09 = 0
+
+        q10 = (
+            -3
+            * A11
+            * (4 * my * Pi**2 - b * fx * h * (-8 + Pi**2) * t)
+            * (-1 + nuw + 2 * nuw**2)
+            - 2
+            * (
+                (-6 + Pi**2) * (2 * my + h * (px + qx)) * t * Ew * (-1 + nuw)
+                + 3
+                * B11
+                * (-8 * b * fx * t + Pi**2 * (2 * px + 2 * qx + b * fx * t))
+                * (-1 + nuw + 2 * nuw**2)
+            )
+        ) / (
+            b
+            * (
+                -4 * D11 * (-6 + Pi**2) * t * Ew * (-1 + nuw)
+                + 4 * B11 * h * (-6 + Pi**2) * t * Ew * (-1 + nuw)
+                - A11 * h**2 * (-6 + Pi**2) * t * Ew * (-1 + nuw)
+                + 12 * B11**2 * Pi**2 * (-1 + nuw + 2 * nuw**2)
+                - 12 * A11 * D11 * Pi**2 * (-1 + nuw + 2 * nuw**2)
+            )
+        )
+
+        q11 = 0
+
+        q12 = (36 * mz * Pi**2 * (1 + nuw) * (-1 + 2 * nuw)) / (
+            b**3
+            * (
+                (-6 + Pi**2) * t * Ew * (-1 + nuw)
+                + 3 * A11 * Pi**2 * (-1 + nuw + 2 * nuw**2)
+            )
+        )
+
+        q13 = 0
+
+        q14 = (
+            Pi
+            * (1 + nuw)
+            * (-1 + 2 * nuw)
+            * (
+                12
+                * (
+                    -2 * B11 * my
+                    + A11 * h * my
+                    - 2 * D11 * (px + qx)
+                    + B11 * h * (px + qx)
+                )
+                * Ew
+                * (-1 + nuw)
+                + b
+                * fx
+                * (
+                    4 * D11 * t * Ew * (-1 + nuw)
+                    - 4 * B11 * h * t * Ew * (-1 + nuw)
+                    + A11 * h**2 * t * Ew * (-1 + nuw)
+                    - 48 * B11**2 * (-1 + nuw + 2 * nuw**2)
+                    + 48 * A11 * D11 * (-1 + nuw + 2 * nuw**2)
+                )
+            )
+        ) / (
+            b
+            * Ew
+            * (-1 + nuw)
+            * (
+                -4 * D11 * (-6 + Pi**2) * t * Ew * (-1 + nuw)
+                + 4 * B11 * h * (-6 + Pi**2) * t * Ew * (-1 + nuw)
+                - A11 * h**2 * (-6 + Pi**2) * t * Ew * (-1 + nuw)
+                + 12 * B11**2 * Pi**2 * (-1 + nuw + 2 * nuw**2)
+                - 12 * A11 * D11 * Pi**2 * (-1 + nuw + 2 * nuw**2)
+            )
+        )
+
+        q15 = 0
+
+        q16 = (36 * mz * Pi * (1 + nuw) * (-1 + 2 * nuw)) / (
+            b**2
+            * (
+                (-6 + Pi**2) * t * Ew * (-1 + nuw)
+                + 3 * A11 * Pi**2 * (-1 + nuw + 2 * nuw**2)
+            )
+        )
+
+        q17 = 0
+
+        q18 = (
+            -2
+            * Pi
+            * (1 + nuw)
+            * (
+                216
+                * Pi**2
+                * (
+                    -(h * kA55 * mx)
+                    + 2 * kB55 * mx
+                    + h * kB55 * (py + qy)
+                    - 2 * kD55 * (py + qy)
+                )
+                * Ew
+                * (1 + nuw)
+                - 6
+                * b**2
+                * (py + qy)
+                * Ew
+                * ((-6 + Pi**2) * t * Ew + 6 * kA55 * Pi**2 * (1 + nuw))
+                + b**3
+                * fy
+                * (t * Ew + 24 * kA55 * (1 + nuw))
+                * ((-6 + Pi**2) * t * Ew + 6 * kA55 * Pi**2 * (1 + nuw))
+                - 18
+                * b
+                * fy
+                * Pi**2
+                * (1 + nuw)
+                * (
+                    4 * h * kB55 * t * Ew
+                    - 4 * kD55 * t * Ew
+                    + 96 * kB55**2 * (1 + nuw)
+                    - kA55 * (h**2 * t * Ew + 96 * kD55 * (1 + nuw))
+                )
+            )
+        ) / (
+            b
+            * Ew
+            * (
+                b**2 * ((-6 + Pi**2) * t * Ew + 6 * kA55 * Pi**2 * (1 + nuw)) ** 2
+                - 18
+                * Pi**2
+                * (1 + nuw)
+                * (
+                    4 * h * kB55 * (-6 + Pi**2) * t * Ew
+                    - 4 * kD55 * (-6 + Pi**2) * t * Ew
+                    + 24 * kB55**2 * Pi**2 * (1 + nuw)
+                    - kA55
+                    * (h**2 * (-6 + Pi**2) * t * Ew + 24 * kD55 * Pi**2 * (1 + nuw))
+                )
+            )
+        )
+
+        q19 = 0
+
+        q20 = 0
+
+        q21 = 0
+
+        q22 = (
+            -2
+            * Pi
+            * (1 + nuw)
+            * (-6 * (pz + qz) * Ew + b * fz * (t * Ew + 24 * kA55 * (1 + nuw)))
+        ) / (b * Ew * ((-6 + Pi**2) * t * Ew + 6 * kA55 * Pi**2 * (1 + nuw)))
+
+        q23 = 0
+
+        q24 = (
+            -36
+            * Pi
+            * (1 + nuw)
+            * (
+                (-6 + Pi**2) * (2 * mx - h * (py + qy)) * t * Ew
+                + 3 * kA55 * (4 * mx * Pi**2 + b * fy * h * (-8 + Pi**2) * t) * (1 + nuw)
+                - 6
+                * kB55
+                * (-8 * b * fy * t + Pi**2 * (2 * py + 2 * qy + b * fy * t))
+                * (1 + nuw)
+            )
+        ) / (
+            b**2 * ((-6 + Pi**2) * t * Ew + 6 * kA55 * Pi**2 * (1 + nuw)) ** 2
+            - 18
+            * Pi**2
+            * (1 + nuw)
+            * (
+                4 * h * kB55 * (-6 + Pi**2) * t * Ew
+                - 4 * kD55 * (-6 + Pi**2) * t * Ew
+                + 24 * kB55**2 * Pi**2 * (1 + nuw)
+                - kA55 * (h**2 * (-6 + Pi**2) * t * Ew + 24 * kD55 * Pi**2 * (1 + nuw))
+            )
+        )
+
+        q = np.array(
+            [
+                [q01],
+                [q02],
+                [q03],
+                [q04],
+                [q05],
+                [q06],
+                [q07],
+                [q08],
+                [q09],
+                [q10],
+                [q11],
+                [q12],
+                [q13],
+                [q14],
+                [q15],
+                [q16],
+                [q17],
+                [q18],
+                [q19],
+                [q20],
+                [q21],
+                [q22],
+                [q23],
+                [q24],
+            ],
+            dtype=np.double,
+        )
+        return q
