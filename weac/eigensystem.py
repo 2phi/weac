@@ -101,17 +101,9 @@ class Eigensystem:
 
     def __init__(self, system='pst-', touchdown = False):
         """
-        Initialize eigensystem with user input.
-
-        Parameters
-        ----------
-        system : {'pst-', '-pst', 'skier', 'skiers'}, optional
-            Type of system to analyze:
-            - 'pst-': PST cut from the right
-            - '-pst': PST cut from the left
-            - 'skier': One skier on infinite slab
-            - 'skiers': Multiple skiers on infinite slab
-            Default is 'pst-'.
+        Initializes an Eigensystem instance for layered snow slab analysis.
+        
+        Sets up default physical constants, system type, and initializes all attributes related to weak-layer properties, slab properties, eigenvalues, eigenvectors, system matrices, and touchdown analysis. The system type determines the loading and boundary conditions to be analyzed, such as PST cuts or skier loading scenarios.
         """
         # Assign global attributes
         self.g = 9810           # Gravitation (mm/s^2)
@@ -162,26 +154,17 @@ class Eigensystem:
 
     def set_foundation_properties(self, t=30,  E=0.25, nu=0.25, rhoweak=100, constitutive='plane strain', update=False):
         """
-        Set material properties and geometry of foundation (weak layer).
-
-        Parameters
-        ----------
-        t : float, optional
-            Weak-layer thickness (mm). Default is 30.
-        cf : float, optional
-            Fraction by which the weak-layer thickness is reduced due to collapse.
-            Default is 0.5.
-        E : float, optional
-            Weak-layer Young's modulus (MPa). Default is 0.25.
-        nu : float, optional
-            Weak-layer Poisson's ratio. Default is 0.25.
-        rhoweak : float, optional
-            Weak-layer density (kg/m^3). Default is 100.
-        constitutive: string, optional
-            Constitutive behavior of the weak layer in out-of-plane direction. Possible values are 'plane strain', 'plane stress' and 'uniaxial'
-        update : bool, optional
-            If True, recalculate the fundamental system after foundation properties
-            have changed. Default is False.
+        Sets the material properties and geometry of the weak-layer foundation.
+        
+        Configures weak-layer thickness, Young's modulus, Poisson's ratio, and density, adjusting for the specified constitutive behavior ('plane strain', 'plane stress', or 'uniaxial'). Optionally updates the fundamental system if properties are changed and `update` is True.
+        
+        Args:
+            t: Weak-layer thickness in mm.
+            E: Weak-layer Young's modulus in MPa.
+            nu: Weak-layer Poisson's ratio.
+            rhoweak: Weak-layer density in kg/m³.
+            constitutive: Constitutive behavior for out-of-plane direction ('plane strain', 'plane stress', or 'uniaxial').
+            update: If True, recalculates the fundamental system after updating properties.
         """
         # Geometry
         self.t = t              # Weak-layer thickness (mm)
@@ -209,34 +192,21 @@ class Eigensystem:
     def set_beam_properties(self, layers, phi, theta=0, C0=6.5, C1=4.40,
                            nu=0.25, b=290, k=5/6, update=False):
         """
-        Set material and geometry properties of beam (slab).
-
-        Parameters
-        ----------
-        layers : list or str
-            2D list of top-to-bottom layer densities and thicknesses.
-            Columns are density (kg/m^3) and thickness (mm).
-            If entered as str, last split must be available in database.
-        phi : float
-            Inclination of the slab (degrees).
-        theta : float, optional
-            Rotation of the slab (degrees). Default is 0.
-        C0 : float, optional
-            Multiplicative constant of Young's modulus parametrization
-            according to Bergfeld et al. (2021). Default is 6.5.
-        C1 : float, optional
-            Exponent of Young's modulus parameterization according to
-            Bergfeld et al. (2021). Default is 4.40.
-        nu : float, optional
-            Poisson's ratio. Default is 0.25.
-        b : float, optional
-            Total snowpack thickness (mm). Default is 290.
-        k: float, optional
-            Shear correction factor. Default is 5/6.
-        update : bool, optional
-            If True, recalculate the fundamental system after
-            beam properties have changed. Default is False.
-        """
+                           Sets the material and geometric properties of the slab (beam), including layering, elastic moduli, inclination, and rotation.
+                           
+                           Args:
+                               layers: 2D list or string specifying slab layering. If a list, each row contains density (kg/m³) and thickness (mm) for a layer. If a string, loads a predefined profile from the database.
+                               phi: Inclination angle of the slab in degrees.
+                               theta: Rotation angle of the slab in degrees (default 0).
+                               C0: Multiplicative constant for Young's modulus parameterization (default 6.5).
+                               C1: Exponent for Young's modulus parameterization (default 4.40).
+                               nu: Poisson's ratio for all layers (default 0.25).
+                               b: Total snowpack thickness in mm (default 290).
+                               k: Shear correction factor (default 5/6).
+                               update: If True, recalculates the fundamental system after updating properties.
+                           
+                           If `layers` is a string, loads density, thickness, and Young's modulus from a database profile. Otherwise, computes Young's modulus for each layer using the Bergfeld parameterization. Updates slab attributes including thickness, center of gravity, and elastic properties. Optionally updates the system matrices if `update` is True.
+                           """
         if isinstance(layers, str):
             # Read layering and Young's modulus from database
             layers, E = load_dummy_profile(layers.split()[-1])
@@ -270,22 +240,15 @@ class Eigensystem:
 
     def set_surface_load(self, p, yA = 0, zA = 0, width = 1.):
         """
-        Set surface line load.
-
-        Define a distributed surface load p (N/mm) that acts
-        in vertical (gravity) direction and the center of attack for optional additional weights.
-
-        Arguments
-        ---------
-        p  : float
-            Total weight (kg) of the additional loads
-        yA : float, optional
-            y-coordinate of the additional loads (mm)
-        zA : float, optional
-            z-coordinate of the additional loads (mm)
-        b  : float, optional
-            Width (mm) of an additional weight
+        Sets a distributed surface line load acting in the vertical direction.
         
+        Defines the magnitude and location of an external surface load applied to the slab, including optional out-of-plane and lateral coordinates and load width.
+        
+        Args:
+            p: Magnitude of the distributed surface load (N/mm).
+            yA: y-coordinate of the load application point (mm), optional.
+            zA: z-coordinate of the load application point (mm), optional.
+            width: Width over which the load is distributed (mm), optional.
         """
         self.p = p        # Total line load from the additional weigths
         self.zA = zA                            # z-coordiante of the additional weights 
@@ -294,9 +257,9 @@ class Eigensystem:
 
     def calc_laminate_stiffness_matrix(self):
         """
-        Provide ABD matrix.
-
-        Return plane-strain laminate stiffness matrix (ABD matrix).
+        Calculates the plane-strain laminate stiffness matrix (ABD matrix) for the layered slab.
+        
+        Computes extensional (A11), bending-extension coupling (B11), bending (D11), and shear (kA55, kB55, kD55) stiffness components by summing contributions from each layer based on their elastic properties and thicknesses. Updates the corresponding class attributes.
         """
         # Number of plies and ply thicknesses (top to bottom)
         n = self.slab.shape[0]
@@ -331,11 +294,9 @@ class Eigensystem:
 
     def calc_system_matrix(self):
         """
-        Assemble first-order ODE system matrix.
-
-        Using the solution vector z = [u, u', w, w', psi, psi',phiU, phiU', phiW, phiW']
-        the ODE system is written in the form Az' + Bz = d
-        and rearranged to z' = -(A ^ -1) B z + (A ^ -1) d = E z + F
+        Assembles the 24x24 first-order ODE system matrix for the layered beam on an elastic foundation.
+        
+        The matrix incorporates slab and weak-layer stiffness, geometric, and material properties, and is used to represent the coupled equations of motion for the layered snow slab system. The resulting matrix is stored in `self.sysmat` and is fundamental for subsequent eigenvalue and solution computations.
         """
         Ew = self.weak['E']
         nuw = self.weak['nu']
@@ -624,7 +585,11 @@ class Eigensystem:
         self.sysmat = np.array(SystemMatrixC)
 
     def calc_eigensystem(self):
-        """Calculate eigenvalues and eigenvectors of the system matrix."""
+        """
+        Computes and classifies the eigenvalues and eigenvectors of the system matrix.
+        
+        Separates real and complex eigenvalues and their corresponding eigenvectors, storing them for later use. Sets numerical stability shifts for positive eigenvalues to enhance robustness.
+        """
         # Calculate eigenvalues (ew) and eigenvectors (ev)
         ew, ev = np.linalg.eig(self.sysmat)
         # Classify real and complex eigenvalues
@@ -641,26 +606,29 @@ class Eigensystem:
         self.sR[self.ewR > 0], self.sC[self.ewC > 0] = -1, -1
 
     def calc_fundamental_system(self):
-        """Calculate the fundamental system of the problem."""
+        """
+        Updates the fundamental system by recalculating stiffness matrices, the system matrix, and the eigensystem.
+        
+        This method should be called after any change to slab or foundation properties to ensure all system matrices and eigenvalues are consistent with the current configuration.
+        """
         self.calc_laminate_stiffness_matrix()
         self.calc_system_matrix()
         self.calc_eigensystem()
 
     def get_weight_load(self, phi, theta = 0):
         """
-        Calculate line loads from slab mass.
-
-        Arguments
-        ---------
-        phi : float
-            Inclination (degrees). Counterclockwise positive.
-
-        Returns
-        -------
-        qn : float
-            Line load (N/mm) at center of gravity in normal direction.
-        qt : float
-            Line load (N/mm) at center of gravity in tangential direction.
+        Calculates the line load components from the slab's own weight, accounting for inclination and rotation.
+        
+        Args:
+            phi: Slab inclination angle in degrees (counterclockwise positive).
+            theta: Slab rotation angle in degrees (default is 0).
+        
+        Returns:
+            qx: Axial component of the line load (N/mm).
+            qy: Out-of-plane component of the line load (N/mm).
+            qz: Normal component of the line load (N/mm).
+        
+        The load is decomposed into axial, out-of-plane, and normal directions at the slab's center of gravity.
         """
         # Convert units
         phi = np.deg2rad(phi)                   # Convert inclination to rad
@@ -679,19 +647,14 @@ class Eigensystem:
 
     def get_surface_load(self, phi, theta = 0):
         """
-        Calculate surface line loads.
-
-        Arguments
-        ---------
-        phi : float
-            Inclination (degrees). Counterclockwise positive.
-
-        Returns
-        -------
-        pn : float
-            Surface line load (N/mm) in normal direction.
-        pt : float
-            Surface line load (N/mm) in tangential direction.
+        Calculates the components of the applied surface line load in tangential, out-of-plane, and normal directions based on slab inclination and rotation.
+        
+        Args:
+            phi: Slab inclination angle in degrees (counterclockwise positive).
+            theta: Slab rotation angle in degrees (default is 0).
+        
+        Returns:
+            Tuple of floats (pt, po, pn) representing the surface line load (N/mm) in the tangential, out-of-plane, and normal directions, respectively.
         """
         # Convert units
         phi = np.deg2rad(phi)                   # Convert inclination to rad
@@ -705,21 +668,17 @@ class Eigensystem:
 
     def get_skier_load(self, m, phi,theta = 0):
         """
-        Calculate skier point load.
-
-        Arguments
-        ---------
-        m : float
-            Skier weight (kg).
-        phi : float
-            Inclination (degrees). Counterclockwise positive.
-
-        Returns
-        -------
-        Fn : float
-            Skier load (N) in normal direction.
-        Ft : float
-            Skier load (N) in tangential direction.
+        Calculates the components of a skier's point load on the slab, accounting for inclination and rotation.
+        
+        Args:
+            m: Skier mass in kilograms.
+            phi: Slab inclination angle in degrees (counterclockwise positive).
+            theta: Slab rotation angle in degrees (default is 0).
+        
+        Returns:
+            Fx: Tangential component of the skier load (N).
+            Fy: Out-of-plane component of the skier load (N).
+            Fz: Normal component of the skier load (N).
         """
         phi = np.deg2rad(phi)                   # Convert inclination to rad
         theta = np.deg2rad(theta)               # Convert rotation to rad
@@ -733,22 +692,17 @@ class Eigensystem:
 
     def zh(self, x, l=0, bed=True):
         """
-        Compute bedded or free complementary solution at position x.
-
-        Arguments
-        ---------
-        x : float
-            Horizontal coordinate (mm).
-        l : float, optional
-            Segment length (mm). Default is 0.
-        bed : bool
-            Indicates whether segment has foundation or not. Default
-            is True.
-
-        Returns
-        -------
-        zh : ndarray
-            Complementary solution matrix (6x6) at position x.
+        Computes the complementary solution matrix at position x for either a bedded (with foundation) or free (unbedded) segment.
+        
+        For bedded segments, constructs the solution using eigenvalues and eigenvectors of the system matrix, combining real and complex parts. For free segments, returns a predefined matrix of polynomial and stiffness-based terms representing the complementary solution.
+        
+        Args:
+            x: Horizontal coordinate (mm).
+            l: Segment length (mm), used for phase shifting in bedded segments.
+            bed: If True, computes the solution for a bedded segment; if False, for a free segment.
+        
+        Returns:
+            The complementary solution matrix at position x. For bedded segments, the shape matches the system size (typically 24x24); for free segments, returns a 12x12 matrix.
         """
 
         A11 = self.A11
@@ -844,22 +798,19 @@ class Eigensystem:
 
     def zp(self, x, phi,theta = 0, bed=True, load = False):
         """
-        Compute bedded or free particular integrals at position x.
-
-        Arguments
-        ---------
-        x : float
-            Horizontal coordinate (mm).
-        phi : float
-            Inclination (degrees).
-        bed : bool
-            Indicates whether segment has foundation (True) or not
-            (False). Default is True.
-
-        Returns
-        -------
-        zp : ndarray
-            Particular integral vector (6x1) at position x.
+        Computes the particular integral vector at position x for a layered beam system, accounting for slab inclination, rotation, and loading.
+        
+        Depending on the `bed` flag, returns the particular solution for either a bedded segment (with elastic foundation) or a free segment (without foundation). The vector incorporates the effects of slab self-weight, surface loads, geometric properties, and material parameters. If `load` is False, external loads are omitted from the calculation.
+        
+        Args:
+            x: Horizontal coordinate (mm).
+            phi: Slab inclination angle in degrees.
+            theta: Slab rotation angle in degrees (default is 0).
+            bed: If True, computes for a bedded segment; if False, for a free segment.
+            load: If False, ignores external loads in the calculation.
+        
+        Returns:
+            ndarray: Particular integral vector at position x (24x1 for bedded, 12x1 for free segments).
         """
         # Get weight and surface loads
         qx, qy, qz = self.get_weight_load(phi,theta)
@@ -974,26 +925,19 @@ class Eigensystem:
 
     def z(self, x, C, l, phi, theta = 0, bed=True, load = True):
         """
-        Assemble solution vector at positions x.
-
-        Arguments
-        ---------
-        x : float or squence
-            Horizontal coordinate (mm). Can be sequence of length N.
-        C : ndarray
-            Vector of constants (6xN) at positions x.
-        l : float
-            Segment length (mm).
-        phi : float
-            Inclination (degrees).
-        bed : bool
-            Indicates whether segment has foundation (True) or not
-            (False). Default is True.
-
-        Returns
-        -------
-        z : ndarray
-            Solution vector (6xN) or (10xN) at position x.
+        Computes the total solution vector at specified positions by combining the complementary and particular solutions.
+        
+        Args:
+            x: Scalar or sequence of horizontal positions (mm) where the solution is evaluated.
+            C: Array of constants for the complementary solution.
+            l: Segment length (mm).
+            phi: Slab inclination angle in degrees.
+            theta: Slab rotation angle in degrees (default is 0).
+            bed: If True, computes for a segment with foundation; if False, for a free segment.
+            load: If True, includes external loads in the particular solution.
+        
+        Returns:
+            The solution vector(s) at the specified position(s), with shape depending on the system (bedded or free segment).
         """
         if isinstance(x, (list, tuple, np.ndarray)):
             z = np.concatenate([
