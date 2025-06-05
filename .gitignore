@@ -18,8 +18,13 @@ dist/
 # IDE setup
 .vscode/
 
+# Secrets
+.env
+
 # misc
 *.stats
 plots/
 test/
 scratch/
+.cursorignore
+misc/

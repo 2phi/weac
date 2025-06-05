@@ -12,6 +12,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 # Local application imports
+import weac
 from weac.tools import isnotebook
 
 # === SET PLOT STYLES =========================================================
@@ -188,7 +189,7 @@ def slab_profile(instance):
 # === DEFORMATION CONTOUR PLOT ================================================
 
 
-def deformed(instance, xsl, xwl, z, phi, dz=2, scale=100,
+def deformed(instance: weac.Layered, xsl, xwl, z, phi, dz=2, scale=100,
              window=np.inf, pad=2, levels=300, aspect=2,
              field='principal', normalize=True, dark=False,
              filename='cont'):
@@ -528,7 +529,7 @@ def section_forces(instance, x, z, i='', **segments):
               name='forc' + str(i), **segments)
 
 
-def stresses(instance, x, z, i='', **segments):
+def stresses(instance: weac.Layered, x, z, i='', **segments):
     """Wrap stress plot."""
     data = [
         [x/10, instance.tau(z, unit='kPa'), r'$\tau$'],
@@ -538,7 +539,7 @@ def stresses(instance, x, z, i='', **segments):
               name='stress' + str(i), **segments)
 
 
-def stress_criteria(x, stress, **segments):
+def stress_criteria(instance: weac.Layered, x, stress, **segments):
     """Wrap plot of stress and energy criteria."""
     data = [
         [x/10, stress, r'$\sigma/\sigma_\mathrm{c}$']
@@ -547,7 +548,7 @@ def stress_criteria(x, stress, **segments):
               name='crit', **segments)
 
 
-def err_comp(da, Gdif, Ginc, mode=0):
+def err_comp(instance: weac.Layered, da, Gdif, Ginc, mode=0):
     """Wrap energy release rate plot."""
     data = [
         [da/10, 1e3*Gdif[mode, :], r'$\mathcal{G}$'],
@@ -559,7 +560,7 @@ def err_comp(da, Gdif, Ginc, mode=0):
         ax1data=data, name='err', vlines=False)
 
 
-def err_modes(da, G, kind='inc'):
+def err_modes(instance: weac.Layered, da, G, kind='inc'):
     """Wrap energy release rate plot."""
     label = r'$\bar{\mathcal{G}}$' if kind == 'inc' else r'$\mathcal{G}$'
     data = [
@@ -573,7 +574,7 @@ def err_modes(da, G, kind='inc'):
         ax1data=data, name='modes', vlines=False)
 
 
-def fea_disp(instance, x, z, fea):
+def fea_disp(instance: weac.Layered, x, z, fea):
     """Wrap dispalcements plot."""
     data = [
         [fea[:, 0]/10, -np.flipud(fea[:, 1]), r'FEA $u_0$'],
@@ -591,7 +592,7 @@ def fea_disp(instance, x, z, fea):
         labelpos=-50)
 
 
-def fea_stress(instance, xb, zb, fea):
+def fea_stress(instance: weac.Layered, xb, zb, fea):
     """Wrap stress plot."""
     data = [
         [fea[:, 0]/10, 1e3*np.flipud(fea[:, 2]), r'FEA $\sigma_2$'],
@@ -602,10 +603,59 @@ def fea_stress(instance, xb, zb, fea):
     plot_data(ax1label=r'Stress (kPa)', ax1data=data, name='fea_stress',
               labelpos=-50)
 
+def stress_envelope(instance: weac.Layered, x, z, **segments):
+    """Wrap plot of stress and energy criteria."""
+    sigma_c = 6.16
+    tau_c = 5.09
+    fn = 2
+    fm = 2
+    
+    tau = instance.get_weaklayer_shearstress(x=x, z=z, unit='kPa', removeNaNs=True)[1]
+    sig = instance.get_weaklayer_normalstress(x=x, z=z, unit='kPa', removeNaNs=True)[1]
+    
+    max_sig = max(sigma_c, np.max(np.abs(sig)))
+    sig_range = np.linspace(0, max_sig, 100)
+    tau_boundary = tau_c * (1 - (sig_range / sigma_c) ** fn) ** (1 / fm)
+
+    # Plot Setup
+    plt.rcdefaults()
+    plt.rc('font', family='serif', size=10)
+    plt.rc('mathtext', fontset='cm')
+
+    # Plot data
+    plt.plot(sig_range, tau_boundary, 'r', linewidth=1)
+    plt.plot(np.abs(sig), np.abs(tau), 'b', linewidth=1)
+    
+    plt.xlabel(r'Normal stress $\sigma$ (kPa)')
+    plt.ylabel(r'Shear stress $\tau$ (kPa)')
+    
+    plt.title(r'Stress envelope')
+
+    # Save figure
+    save_plot(name='stress_envelope')
+    
+# def energy_release_ratecriterion_boundary(instance: weac.Layered, x, z, **segments):
+#     """Wrap plot of stress and energy criteria."""
+#     G1c = 0.56
+#     G2c = 0.79
+#     gn = 5.0
+#     gm = 2.2
+#     G1 = instance.G1(z, unit='kJ/m^2')
+#     G2 = instance.G2(z, unit='kJ/m^2')
+#     G = instance.G(z, unit='kJ/m^2')
+    
+#     data = [
+#         [x/10, G1c, r'$\mathcal{G}_1$'],
+#         [x/10, G2c, r'$\mathcal{G}_2$'],
+#         [x/10, Gc, r'$\mathcal{G}$']
+#     ]
+#     plot_data(ax1label=r'Energy release rate (kJ/m$^2$)', ax1data=data,
+#               name='energy_crit', **segments)
+
 
 # === SAVE FUNCTION ===========================================================
 
-def save_plot(name):
+def save_plot(name: str):
     """
     Show or save plot depending on interpreter
 

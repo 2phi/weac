@@ -78,7 +78,6 @@ def load_dummy_profile(profile_id):
 
     return layers, E
 
-
 def calc_center_of_gravity(layers):
     """
     Calculate z-coordinate of the center of gravity.
@@ -103,7 +102,8 @@ def calc_center_of_gravity(layers):
     h = np.flipud(layers[:, 1])  # Layer thicknesses
     H = sum(h)  # Total slab thickness
     # Layer center coordinates (bottom to top)
-    zi = [H / 2 - sum(h[0:j]) - h[j] / 2 for j in range(n)]
+    zi = [float(H / 2 - sum(h[0:j]) - h[j] / 2) for j in range(n)]
+    print("Layer center coordinates bottom to top", zi)
     # Z-coordinate of the center of gravity
     zs = sum(zi * h * rho) / sum(h * rho)
     # Return slab thickness and center of gravity
