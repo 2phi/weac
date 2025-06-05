@@ -57,7 +57,7 @@ class Layered(
             Flag whether touchdown analysis is conducted. Default is False.
         """
         # Call parent __init__
-        super().__init__(system=system)
+        super().__init__(system=system, touchdown=touchdown)
 
         # Set material properties and set up model
         self.set_beam_properties(

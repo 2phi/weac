@@ -3336,7 +3336,7 @@ class SolutionMixin:
                 fi[-1]
             )  # Load at the right boundary of the structure
         # Set boundary conditions for infinite systems
-        if self.system not in ["skier-finite", "pst-", "-pst"]:
+        if self.system not in ["skier-finite", "pst-", "-pst", "rested"]:
             # Left boundary
             rhsSlab[:6] = self.bc(
                 self.zp(x=0, phi=phi, theta=theta, bed=ki[0], load=wi[0]),
@@ -3376,7 +3376,7 @@ class SolutionMixin:
                 xs, zs, m = calc_vertical_bc_center_of_gravity(self.slab, phi)
                 # Convert slope angle to radians
                 phi = np.deg2rad(phi)
-                # Translate inbto section forces and moments
+                # Translate into section forces and moments
                 Nx = -self.g * m * np.sin(phi)
                 My = -self.g * m * (xs * np.cos(phi) + zs * np.sin(phi))
                 Vz = self.g * m * np.cos(phi)
