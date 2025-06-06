@@ -304,6 +304,60 @@ class Eigensystem:
         self.kA55 = kA55
         self.K0 = B11**2 - A11*D11
 
+    def get_load_vector(self, phi):
+        """
+        Compute sytem load vector q.
+
+        Using the solution vector z = [u, u', w, w', psi, psi']
+        the ODE system is written in the form Az' + Bz = d
+        and rearranged to z' = -(A ^ -1)Bz + (A ^ -1)d = Kz + q
+
+        Arguments
+        ---------
+        phi : float
+            Inclination (degrees). Counterclockwise positive.
+
+        Returns
+        -------
+        ndarray
+            System load vector q (6x1).
+        """
+        qn, qt = self.get_weight_load(phi)
+        pn, pt = self.get_surface_load(phi)
+        return np.array([
+            [0],
+            [(self.B11*(self.h*pt - 2*qt*self.zs)
+              + 2*self.D11*(qt + pt))/(2*self.K0)],
+            [0],
+            [-(qn + pn)/self.kA55],
+            [0],
+            [-(self.A11*(self.h*pt - 2*qt*self.zs)
+               + 2*self.B11*(qt + pt))/(2*self.K0)]
+        ])
+
+    def calc_fundamental_system(self):
+        """Calculate the fundamental system of the problem."""
+        self.calc_foundation_stiffness()
+        self.calc_laminate_stiffness_matrix()
+        self.calc_eigensystem()
+
+    def calc_eigensystem(self):
+        """Calculate eigenvalues and eigenvectors of the system matrix."""
+        # Calculate eigenvalues (ew) and eigenvectors (ev)
+        ew, ev = np.linalg.eig(self.calc_system_matrix())
+        # Classify real and complex eigenvalues
+        real = (ew.imag == 0) & (ew.real != 0)  # real eigenvalues
+        cmplx = ew.imag > 0                   # positive complex conjugates
+        # Eigenvalues
+        self.ewC = ew[cmplx]
+        self.ewR = ew[real].real
+        # Eigenvectors
+        self.evC = ev[:, cmplx]
+        self.evR = ev[:, real].real
+        # Prepare positive eigenvalue shifts for numerical robustness
+        self.sR, self.sC = np.zeros(self.ewR.shape), np.zeros(self.ewC.shape)
+        self.sR[self.ewR > 0], self.sC[self.ewC > 0] = -1, -1
+
     def calc_system_matrix(self):
         """
         Assemble first-order ODE system matrix K.
@@ -346,60 +400,6 @@ class Eigensystem:
              [K61,  0,    0,  K64,  K65,    0]]
 
         return np.array(K)
-
-    def get_load_vector(self, phi):
-        """
-        Compute sytem load vector q.
-
-        Using the solution vector z = [u, u', w, w', psi, psi']
-        the ODE system is written in the form Az' + Bz = d
-        and rearranged to z' = -(A ^ -1)Bz + (A ^ -1)d = Kz + q
-
-        Arguments
-        ---------
-        phi : float
-            Inclination (degrees). Counterclockwise positive.
-
-        Returns
-        -------
-        ndarray
-            System load vector q (6x1).
-        """
-        qn, qt = self.get_weight_load(phi)
-        pn, pt = self.get_surface_load(phi)
-        return np.array([
-            [0],
-            [(self.B11*(self.h*pt - 2*qt*self.zs)
-              + 2*self.D11*(qt + pt))/(2*self.K0)],
-            [0],
-            [-(qn + pn)/self.kA55],
-            [0],
-            [-(self.A11*(self.h*pt - 2*qt*self.zs)
-               + 2*self.B11*(qt + pt))/(2*self.K0)]
-        ])
-
-    def calc_eigensystem(self):
-        """Calculate eigenvalues and eigenvectors of the system matrix."""
-        # Calculate eigenvalues (ew) and eigenvectors (ev)
-        ew, ev = np.linalg.eig(self.calc_system_matrix())
-        # Classify real and complex eigenvalues
-        real = (ew.imag == 0) & (ew.real != 0)  # real eigenvalues
-        cmplx = ew.imag > 0                   # positive complex conjugates
-        # Eigenvalues
-        self.ewC = ew[cmplx]
-        self.ewR = ew[real].real
-        # Eigenvectors
-        self.evC = ev[:, cmplx]
-        self.evR = ev[:, real].real
-        # Prepare positive eigenvalue shifts for numerical robustness
-        self.sR, self.sC = np.zeros(self.ewR.shape), np.zeros(self.ewC.shape)
-        self.sR[self.ewR > 0], self.sC[self.ewC > 0] = -1, -1
-
-    def calc_fundamental_system(self):
-        """Calculate the fundamental system of the problem."""
-        self.calc_foundation_stiffness()
-        self.calc_laminate_stiffness_matrix()
-        self.calc_eigensystem()
 
     def get_weight_load(self, phi):
         """

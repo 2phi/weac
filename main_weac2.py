@@ -2,14 +2,14 @@
 This script demonstrates the basic usage of the WEAC package to run a simulation.
 '''
 from weac_2.logging_config import setup_logging
-from weac_2.components import ModelInput, Layer, Segment, CriteriaOverrides, WeakLayer, Scenario
+from weac_2.components import ModelInput, Layer, Segment, CriteriaOverrides, WeakLayer, ScenarioConfig
 from weac_2.components.config import Config
 from weac_2.core.system_model import SystemModel
 
 setup_logging()
 
 config = Config(density_method='adam_unpublished', stress_failure_envelope_method='adam_unpublished')
-scenario = Scenario(phi=38, touchdown=True, system='skiers')
+scenario_config = ScenarioConfig(phi=38, touchdown=True, system='skiers')
 weak_layer = WeakLayer(rho=10, h=1000, E=0.25, G_Ic=1)
 layers = [
     Layer(rho=170, h=100), # (1) Top Layer
@@ -28,6 +28,6 @@ segments = [
 ]
 criteria_overrides = CriteriaOverrides(fn=1, fm=1, gn=1, gm=1)
 
-model_input = ModelInput(scenario=scenario, weak_layer=weak_layer, layers=layers, segments=segments, criteria_overrides=criteria_overrides)
+model_input = ModelInput(scenario_config=scenario_config, weak_layer=weak_layer, layers=layers, segments=segments, criteria_overrides=criteria_overrides)
 
 system = SystemModel(config=config, model_input=model_input)

@@ -15,42 +15,11 @@ import json
 from typing import List, Literal
 from pydantic import BaseModel, Field
 
-from weac_2.components.layers import WeakLayer, Layer
+from weac_2.components.scenario_config import ScenarioConfig
+from weac_2.components.layer import WeakLayer, Layer
+from weac_2.components.segment import Segment
 
 logger = logging.getLogger(__name__)
-
-
-class Scenario(BaseModel):
-    """
-    Configuration for the overall scenario, such as slope angle.
-
-    Args:
-        phi (float): Slope angle in degrees.
-        left_boundary (str): Boundary one of 'inf' or 'free'.
-        right_boundary (str): Boundary one of 'inf' or 'free'.
-    """
-    phi: float = Field(0, description="Slope angle in degrees, counterclockwise positive")
-    touchdown: bool = Field(False, description="Whether to calculate the touchdown")
-    # TODO: add more descriptive/human-readable system names
-    system: Literal['skier', 'skiers', 'pst-', 'pst+'] = Field('skiers', description="Type of system, '-pst', '+pst', ....")
-    # left_boundary: str = Field('inf', description="Boundary one of 'inf' or 'free'")
-    # right_boundary: str = Field('inf', description="Boundary one of 'inf' or 'free'")
-
-
-class Segment(BaseModel):
-    """
-    Defines a segment of the snow slab, its length, foundation support, and applied loads.
-
-    Args:
-        length (float): Segment length in mm.
-        fractured (bool): Boolean indicating whether the segment is fractured or not.
-        skier_weight (float): Skier weight at segments right edge in kg. Defaults to 0.
-        surface_load (float): Surface load in kPa. Defaults to 0.
-    """
-    length: float = Field(..., gt=0, description="Segment length in mm")
-    fractured: bool = Field(..., description="Boolean indicating whether the segment is fractured or not")
-    skier_weight: float = Field(0, ge=0, description="Skier weight at segment right edge in kg")
-    surface_load: float = Field(0, ge=0, description="Surface load in kPa")
 
 class CriteriaOverrides(BaseModel):
     """
@@ -78,7 +47,7 @@ class ModelInput(BaseModel):
         segments (List[Segment]): List of segments defining the slab geometry and loading.
         criteria_overrides (CriteriaOverrides): Criteria overrides.
     """
-    scenario: Scenario = Field(..., description="Scenario configuration")
+    scenario_config: ScenarioConfig = Field(..., description="Scenario configuration")
     weak_layer: WeakLayer = Field(..., description="Weak layer")
     layers: List[Layer] = Field(..., description="List of layers")
     segments: List[Segment] = Field(..., description="Segments")
@@ -86,7 +55,7 @@ class ModelInput(BaseModel):
 
 if __name__ == "__main__":
     # Example usage requiring all mandatory fields for proper instantiation
-    example_scenario = Scenario(phi=30, touchdown=False, system='skiers')
+    example_scenario_config = ScenarioConfig(phi=30, touchdown=False, system='skiers')
     example_weak_layer = WeakLayer(density=200, thickness=10) # grain_size, temp, E, G_I have defaults
     example_layers = [
         Layer(rho=250, t=100), # grain_size, temp have defaults
@@ -99,7 +68,7 @@ if __name__ == "__main__":
     example_criteria_overrides = CriteriaOverrides() # All fields have defaults
 
     model_input = ModelInput(
-        scenario=example_scenario,
+        scenario_config=example_scenario_config,
         weak_layer=example_weak_layer,
         layers=example_layers,
         segments=example_segments,

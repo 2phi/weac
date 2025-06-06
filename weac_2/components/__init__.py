@@ -1,3 +1,3 @@
 from .config import Config
-from .model_input import ModelInput, Segment, CriteriaOverrides, Scenario
-from .layers import WeakLayer, Layer
+from .model_input import ModelInput, Segment, CriteriaOverrides, ScenarioConfig
+from .layer import WeakLayer, Layer

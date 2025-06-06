@@ -1,13 +1,8 @@
 """Class for the elastic analysis of layered snow slabs."""
 
 # Project imports
-from weac.mixins import FieldQuantitiesMixin
-from weac.mixins import SlabContactMixin
-from weac.mixins import SolutionMixin
-from weac.mixins import AnalysisMixin
-from weac.mixins import OutputMixin
+from weac.mixins import FieldQuantitiesMixin, SlabContactMixin, SolutionMixin, AnalysisMixin, OutputMixin
 from weac.eigensystem import Eigensystem
-
 
 class Layered(FieldQuantitiesMixin, SlabContactMixin, SolutionMixin,
               AnalysisMixin, OutputMixin, Eigensystem):
