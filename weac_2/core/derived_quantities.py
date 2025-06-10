@@ -18,7 +18,6 @@ class DerivedQuantities():
     """
     unknown_constants: np.ndarray
     field_quantities: FieldQuantities
-    system_properties: SystemProperties
     
     # Derived Quantities
     tau: np.ndarray
@@ -31,10 +30,9 @@ class DerivedQuantities():
     Sxx: np.ndarray
     # etc...
     
-    def __init__(self, unknown_constants: np.ndarray, field_quantities: FieldQuantities, system_properties: SystemProperties):
+    def __init__(self, unknown_constants: np.ndarray, field_quantities: FieldQuantities):
         self.unknown_constants = unknown_constants
         self.field_quantities = field_quantities
-        self.system_properties = system_properties
         
     def compute_all_derived_quantities(self):
         pass

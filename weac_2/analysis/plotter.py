@@ -4,18 +4,16 @@ from functools import partial
 import numpy as np
 from scipy.integrate import cumulative_trapezoid, quad
 from scipy.optimize import brentq
+# Module imports
 
 from weac_2.core.system_model import SystemModel
-from weac_2.components.criteria_config import CriteriaConfig
 
-class CriteriaEvaluator:
+class Plotter:
     """
     Provides methods for the analysis of layered slabs on compliant
     elastic foundations.
     """
     system: SystemModel
-    criteria_config: CriteriaConfig
     
-    def __init__(self, system: SystemModel, criteria_config: CriteriaConfig):
+    def __init__(self, system: SystemModel):
         self.system = system
-        self.criteria_config = criteria_config

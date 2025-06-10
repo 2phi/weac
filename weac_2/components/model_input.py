@@ -18,61 +18,55 @@ from pydantic import BaseModel, Field
 from weac_2.components.scenario_config import ScenarioConfig
 from weac_2.components.layer import WeakLayer, Layer
 from weac_2.components.segment import Segment
+from weac_2.components.criteria_config import CriteriaConfig
 
 logger = logging.getLogger(__name__)
-
-class CriteriaOverrides(BaseModel):
-    """
-    Parameters defining the interaction between different failure modes.
-
-    Args:
-        fn (float): Failure mode interaction exponent for normal stress. Defaults to 1.
-        fm (float): Failure mode interaction exponent for normal strain. Defaults to 1.
-        gn (float): Failure mode interaction exponent for closing energy release rate. Defaults to 1.
-        gm (float): Failure mode interaction exponent for shearing energy release rate. Defaults to 1.
-    """
-    fn: float = Field(1, gt=0, description="Failure mode interaction exponent for normal stress")
-    fm: float = Field(1, gt=0, description="Failure mode interaction exponent for normal strain")
-    gn: float = Field(1, gt=0, description="Failure mode interaction exponent for closing energy release rate")
-    gm: float = Field(1, gt=0, description="Failure mode interaction exponent for shearing energy release rate")
 
 class ModelInput(BaseModel):
     """
     Comprehensive input data model for a WEAC simulation.
 
     Args:
-        scenario_config (ScenarioConfig): Scenario configuration.
-        weak_layer (WeakLayer): Weak layer properties.
-        layers (List[Layer]): List of snow slab layers.
-        segments (List[Segment]): List of segments defining the slab geometry and loading.
-        criteria_overrides (CriteriaOverrides): Criteria overrides.
+    -----
+        scenario_config : ScenarioConfig
+            Scenario configuration.
+        weak_layer : WeakLayer
+            Weak layer properties.
+        layers : List[Layer]
+            List of snow slab layers.
+        segments : List[Segment]
+            List of segments defining the slab geometry and loading.
+        criteria_config : CriteriaConfig, optional
+            Criteria overrides.
     """
     scenario_config: ScenarioConfig = Field(..., description="Scenario configuration")
     weak_layer: WeakLayer = Field(..., description="Weak layer")
     layers: List[Layer] = Field(..., description="List of layers")
     segments: List[Segment] = Field(..., description="Segments")
-    criteria_overrides: CriteriaOverrides = Field(CriteriaOverrides(), description="Criteria overrides")
+    
+    criteria_config: CriteriaConfig = Field(default=CriteriaConfig(), description="Criteria overrides")
 
 if __name__ == "__main__":
     # Example usage requiring all mandatory fields for proper instantiation
     example_scenario_config = ScenarioConfig(phi=30, touchdown=False, system='skiers')
-    example_weak_layer = WeakLayer(density=200, thickness=10) # grain_size, temp, E, G_I have defaults
+    example_weak_layer = WeakLayer(rho=200, h=10) # grain_size, temp, E, G_I have defaults
+    
     example_layers = [
-        Layer(rho=250, t=100), # grain_size, temp have defaults
-        Layer(rho=280, t=150)
+        Layer(rho=250, h=100), # grain_size, temp have defaults
+        Layer(rho=280, h=150)
     ]
     example_segments = [
-        Segment(length=5000, fractured=True, skier_weight=80, surface_load=0), # pi has default
-        Segment(length=3000, fractured=False, skier_weight=0, surface_load=0)
+        Segment(l=5000, k=True, m=80),
+        Segment(l=3000, k=False, m=0)
     ]
-    example_criteria_overrides = CriteriaOverrides() # All fields have defaults
+    example_criteria_overrides = CriteriaConfig() # All fields have defaults
 
     model_input = ModelInput(
         scenario_config=example_scenario_config,
         weak_layer=example_weak_layer,
         layers=example_layers,
         segments=example_segments,
-        criteria_overrides=example_criteria_overrides
+        criteria_config=example_criteria_overrides
     )
     print(model_input.model_dump_json(indent=2))
     print("\n\n")

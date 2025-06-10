@@ -9,15 +9,50 @@ import logging
 from typing import Literal
 
 from pydantic import BaseModel, Field, ConfigDict
-from weac_2.constants import C0, C1, K_SHEAR, NU, RHO0
+from weac_2.constants import CB0, CB1, CG0, CG1, K_SHEAR, NU, RHO0
 
 logger = logging.getLogger(__name__)
 
 
-def bergfeld(rho: float) -> float:
-    """Young’s modulus from Bergfeld et al. (2023)  –  returns MPa."""
-    return C0 * 1e3 * (rho / RHO0) ** C1
+def bergfeld(rho: float, C_0: float = CB0, C_1: float = CB1) -> float:
+    """Young's modulus from Bergfeld et al. (2023) - returns MPa.
+    
+    Arguments
+    ---------
+    rho : float or ndarray
+        Density (kg/m^3).
+    C0 : float, optional
+        Multiplicative constant of Young modulus parametrization
+        according to Bergfeld et al. (2023). Default is 6.5.
+    C1 : float, optional
+        Exponent of Young modulus parameterization according to
+        Bergfeld et al. (2023). Default is 4.4.
+    """
+    return C_0 * 1e3 * (rho / RHO0) ** C_1
 
+def scapozza(rho: float) -> float:
+    """Young's modulus from Scapazzo - return MPa
+        `rho` in [kg/m^3]"""
+    rho = rho * 1e-12               # Convert to [t/mm^3]
+    rho_0 = RHO0 * 1e-12            # Desity of ice in [t/mm^3]
+    return 5.07e3 * (rho / rho_0) ** 5.13
+
+
+def gerling(rho: float, C_0: float = CG0, C_1: float = CG1) -> float:
+    """Young's modulus according to Gerling et al. 2017.
+
+    Arguments
+    ---------
+    rho : float or ndarray
+        Density (kg/m^3).
+    C0 : float, optional
+        Multiplicative constant of Young modulus parametrization
+        according to Gerling et al. (2017). Default is 6.0.
+    C1 : float, optional
+        Exponent of Young modulus parameterization according to
+        Gerling et al. (2017). Default is 4.6.
+    """
+    return C_0 * 1e-10 * rho**C_1
 
 class _BaseLayer(BaseModel):
     """
@@ -37,18 +72,18 @@ class _BaseLayer(BaseModel):
     G : float, optional
         Shear modulus G [MPa].  If omitted it is derived from ``E`` and ``nu``.
     k : float, optional
-        Mindlin shear-correction factor k [–].  Defaults to
+        Mindlin shear-correction factor k [-].  Defaults to
         ``weac_2.constants.K_SHEAR``.
     """
     # has to be provided
     rho: float = Field(..., gt=0, description="Density of the Slab  [kg m⁻³]")
     h: float = Field(..., gt=0, description="Height/Thickness of the slab  [mm]")
-    nu: float = Field(NU, ge=0, lt=0.5, description="Poisson's ratio [–]")
+    nu: float = Field(default=NU, ge=0, lt=0.5, description="Poisson's ratio [-]")
 
     # derived if not provided
-    E: float | None = Field(None, gt=0, description="Young’s modulus [MPa]")
-    G: float | None = Field(None, gt=0, description="Shear modulus [MPa]")
-    k: float | None = Field(None, description="Mindlin k  [–]")
+    E: float | None = Field(default=None, gt=0, description="Young's modulus [MPa]")
+    G: float | None = Field(default=None, gt=0, description="Shear modulus [MPa]")
+    k: float | None = Field(default=None, description="Mindlin k  [-]")
 
     model_config = ConfigDict(frozen=True, extra='forbid',)
 
@@ -80,7 +115,7 @@ class WeakLayer(_BaseLayer):
     kn : float, optional
         Normal (compression) spring stiffness kₙ [N mm⁻³].  If omitted it is
         computed as ``E_plane / t`` where
-        ``E_plane = E / (1 − nu²)``.
+        ``E_plane = E / (1 - nu²)``.
     kt : float, optional
         Shear spring stiffness kₜ [N mm⁻³].  If omitted it is ``G / t``.
     G_c : float
@@ -91,13 +126,13 @@ class WeakLayer(_BaseLayer):
         Mode-II fracture toughness GIIc [MPa m½].  Default 1 MPa m½.
     """
     # Winkler springs (can be overridden by caller)
-    kn: float | None = Field(None, description="Normal stiffness  [N mm⁻³]")
-    kt: float | None = Field(None, description="Shear  stiffness  [N mm⁻³]")
+    kn: float | None = Field(default=None, description="Normal stiffness  [N mm⁻³]")
+    kt: float | None = Field(default=None, description="Shear  stiffness  [N mm⁻³]")
 
     # fracture-mechanics parameters
-    G_c: float = Field(1.0, gt=0, description="Gc  [MPa m½]")
-    G_Ic: float = Field(1.0, gt=0, description="GIc [MPa m½]")
-    G_IIc:float = Field(1.0, gt=0, description="GIIc[MPa m½]")
+    G_c: float = Field(default=1.0, gt=0, description="Gc  [MPa m½]")
+    G_Ic: float = Field(default=1.0, gt=0, description="GIc [MPa m½]")
+    G_IIc:float = Field(default=1.0, gt=0, description="GIIc[MPa m½]")
 
     def model_post_init(self, _ctx):
         super().model_post_init(_ctx)      # fills E, G, k
