@@ -18,6 +18,7 @@ from weac_2.components import Config, WeakLayer, Segment, ScenarioConfig, Criter
 from weac_2.core.slab import Slab
 from weac_2.core.eigensystem import Eigensystem
 from weac_2.core.scenario import Scenario
+from weac_2.core.slab_touchdown import SlabTouchdown
 from weac_2.core.field_quantities import FieldQuantities
 
 logger = logging.getLogger(__name__)
@@ -33,7 +34,7 @@ class SystemModel():
     eigensystem: Eigensystem
     
     scenario: Scenario
-    C_constants: np.ndarray
+    unknown_constants: np.ndarray
     
     def __init__(self, model_input: ModelInput, config: Config):
         self.config = config
@@ -46,28 +47,39 @@ class SystemModel():
 
         # Solve for a specific Scenario
         self.scenario = Scenario(scenario_config=model_input.scenario_config, segments=model_input.segments, weak_layer=self.weak_layer, slab=self.slab)
-        # self.C_constants = self._solve_for_unknown_constants()
+        self._slab_touchdown = None
+        # self.unknown_constants = self._solve_for_unknown_constants()
         
         self.__dict__['_eigensystem_cache'] = None
-        self.__dict__['_C_constants_cache']   = None
+        self.__dict__['_unknown_constants_cache'] = None
+        self.__dict__['_slab_touchdown_cache_'] = None
+    
+    @cached_property
+    def slab_touchdown(self):
+        if self.touchdown:
+            if self._slab_touchdown is None:
+                self._slab_touchdown = SlabTouchdown()
+                # TODO: Optionally, pass required state/parameters here
+            return self._slab_touchdown
+        return None
     
     @cached_property
     def eigensystem(self) -> Eigensystem:                 # heavy
         return Eigensystem(weak_layer=self.weak_layer, slab=self.slab)
 
     @cached_property
-    def C_constants(self) -> np.ndarray:                  # medium
+    def unknown_constants(self) -> np.ndarray:                  # medium
         return self._solve_for_unknown_constants()
-
-    # Changes that affect the *slab*  -> rebuild everything
-    def update_slab_layers(self, new_layers: List[Layer]):
-        self.slab.layers = new_layers
-        self._invalidate_eigensystem()
 
     # Changes that affect the *weak layer*  -> rebuild everything
     def update_weak_layer(self, **kwargs):
         for k, v in kwargs.items():
             setattr(self.weak_layer, k, v)
+        self._invalidate_eigensystem()
+
+    # Changes that affect the *slab*  -> rebuild everything
+    def update_slab_layers(self, new_layers: List[Layer]):
+        self.slab.layers = new_layers
         self._invalidate_eigensystem()
 
     # Changes that affect the *scenario*  -> only rebuild C constants
@@ -93,10 +105,13 @@ class SystemModel():
 
     def _invalidate_eigensystem(self):
         self.__dict__.pop('eigensystem', None)
-        self.__dict__.pop('C_constants', None)
+        self.__dict__.pop('unknown_constants', None)
+
+    def _invalidate_slab_touchdown(self):
+        self.__dict__.pop('slab_touchdown', None)
 
     def _invalidate_constants(self):
-        self.__dict__.pop('C_constants', None)
+        self.__dict__.pop('unknown_constants', None)
 
     def z(self, x: Union[float, Sequence[float], np.ndarray], C: np.ndarray, l: float, phi: float, k: bool = True, qs: float = 0) -> np.ndarray:
         """
@@ -415,3 +430,29 @@ class SystemModel():
             )
 
         return bc
+
+    def _setup_RHS(self, z, k: bool, pos: Literal['l','r','m','left','right','mid'], system: Literal['skier', 'skiers', 'pst-', 'pst+', 'rot', 'trans']):
+        """
+        Setup RHS depending on System Properties.
+
+        Arguments
+        ---------
+        z : ndarray
+            Solution vector (6x1) at a certain position x.
+        l : float, optional
+            Length of the segment in consideration. Default is zero.
+        k : boolean
+            Indicates whether segment has foundation(True) or not (False).
+            Default is False.
+        pos : {'left', 'mid', 'right', 'l', 'm', 'r'}, optional
+            Determines whether the segement under consideration
+            is a left boundary segement (left, l), one of the
+            center segement (mid, m), or a right boundary
+            segement (right, r). Default is 'mid'.
+
+        Returns
+        -------
+        rhs : ndarray
+            RHS vector (length ?) at position x.
+        """
+        pass

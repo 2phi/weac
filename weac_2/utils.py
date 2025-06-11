@@ -19,16 +19,16 @@ def decompose_to_normal_tangential(f: float, phi: float) -> Tuple[float, float]:
 
         Returns
         -------
-        f_tan, f_norm : float
+        f_norm, f_tan : float
             Magnitudes of the tangential ( + downslope ) and normal
             ( + into-slope ) components, respectively.
         """
         # Convert units
         phi = np.deg2rad(phi)                   # Convert inclination to rad
         # Split into components
-        f_tan = -f*np.sin(phi)                # Tangential direction
         f_norm = f*np.cos(phi)                 # Normal direction
-        return f_tan, f_norm
+        f_tan = -f*np.sin(phi)                # Tangential direction
+        return f_norm, f_tan
     
 def get_skier_point_load(m: float):
         """

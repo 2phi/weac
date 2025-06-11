@@ -9,7 +9,7 @@ import numpy as np
 from numpy.typing import NDArray
 
 from weac_2.utils import decompose_to_normal_tangential
-from weac_2.constants import K_SHEAR
+from weac_2.constants import SHEAR_CORRECTION_FACTOR
 from weac_2.components import WeakLayer
 from weac_2.core.slab import Slab
 
@@ -94,7 +94,7 @@ class Eigensystem():
             A11 += E/(1 - nu**2)*(zis[i+1] - zis[i])
             B11 += 1/2*E/(1 - nu**2)*(zis[i+1]**2 - zis[i]**2)
             D11 += 1/3*E/(1 - nu**2)*(zis[i+1]**3 - zis[i]**3)
-            kA55 += K_SHEAR*G*(zis[i+1] - zis[i])
+            kA55 += SHEAR_CORRECTION_FACTOR*G*(zis[i+1] - zis[i])
 
         self.A11 = A11
         self.B11 = B11

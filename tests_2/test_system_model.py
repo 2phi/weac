@@ -55,12 +55,12 @@ class TestSystemModelCaching(unittest.TestCase):
     def test_caching(self):
         # first access builds both heavy objects
         eig1 = self.system.eigensystem
-        C1   = self.system.C_constants
+        C1   = self.system.unknown_constants
         self.assertEqual(DummyEigensystem.calls, 1)
 
         # second access without changes must reuse the cache
         eig1_again = self.system.eigensystem
-        C1_again   = self.system.C_constants
+        C1_again   = self.system.unknown_constants
         self.assertIs(eig1_again, eig1)
         self.assertIs(C1_again, C1)
         self.assertEqual(DummyEigensystem.calls, 1)
@@ -68,12 +68,12 @@ class TestSystemModelCaching(unittest.TestCase):
     # ----------------------------------------------------------------
     def test_scenario_update_only_rebuilds_constants(self):
         _ = self.system.eigensystem      # build once
-        C_before = self.system.C_constants.copy()
+        C_before = self.system.unknown_constants.copy()
         print(C_before)
 
         # Change a value that the solver actually uses (phi in degrees)
         self.system.update_scenario(phi=15)
-        C_after = self.system.C_constants
+        C_after = self.system.unknown_constants
         print(C_after)
         # eigensystem must still be cached
         self.assertEqual(DummyEigensystem.calls, 1)
@@ -82,7 +82,7 @@ class TestSystemModelCaching(unittest.TestCase):
     # ------------------------------------------------------------------
     def test_slab_update_rebuilds_both(self):
         eig_before = self.system.eigensystem
-        C_before   = self.system.C_constants.copy()
+        C_before   = self.system.unknown_constants.copy()
 
         self.system.update_slab_layers([
             Layer(rho=200, h=50),
@@ -90,7 +90,7 @@ class TestSystemModelCaching(unittest.TestCase):
         ])
 
         eig_after = self.system.eigensystem
-        C_after   = self.system.C_constants
+        C_after   = self.system.unknown_constants
 
         self.assertEqual(DummyEigensystem.calls, 2)
         self.assertIsNot(eig_after, eig_before)

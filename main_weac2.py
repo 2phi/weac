@@ -47,13 +47,13 @@ criteria_config = CriteriaConfig(fn=1, fm=1, gn=1, gm=1)
 model_input = ModelInput(scenario_config=scenario_config, weak_layer=weak_layer, layers=layers, segments=segments, criteria_config=criteria_config)
 
 system = SystemModel(config=config, model_input=model_input)
-C_constants = system.C_constants
-print(C_constants)
+unknown_constants = system.unknown_constants
+print(unknown_constants)
 
 system.update_scenario(phi=20.0)
-C_constants = system.C_constants
-print(C_constants)
+unknown_constants = system.unknown_constants
+print(unknown_constants)
 
 Analyzer(system=system)
-Plotter(system=system)
+plotter = Plotter(system=system)
 CriteriaEvaluator(system=system, criteria_config=criteria_config)

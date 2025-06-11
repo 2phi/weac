@@ -57,15 +57,15 @@ segments_data = skier_model.calc_segments(
 # 4. Assemble the system of linear equations and solve
 # Input: inclination phi (degrees, counterclockwise positive)
 inclination_angle = 38  # degrees
-C_constants = skier_model.assemble_and_solve(phi=inclination_angle, **segments_data)
+unknown_constants = skier_model.assemble_and_solve(phi=inclination_angle, **segments_data)
 
 # 5. Prepare the output by rasterizing the solution
 # Input: Solution constants C, inclination phi, and segments data
 xsl_slab, z_solution, xwl_weak_layer = skier_model.rasterize_solution(
-    C=C_constants, phi=inclination_angle, **segments_data
+    C=unknown_constants, phi=inclination_angle, **segments_data
 )
 
-print("Simulation completed. Solution constants C:", C_constants)
+print("Simulation completed. Solution constants C:", unknown_constants)
 print("Slab x-coordinates (xsl_slab):", xsl_slab)
 print("Solution vector (z_solution):", z_solution)
 print("Weak layer x-coordinates (xwl_weak_layer):", xwl_weak_layer)

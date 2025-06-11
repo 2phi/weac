@@ -12,7 +12,7 @@ class Scenario:
     """
     Sets up the scenario on which the eigensystem is solved.
     
-    Arguments
+    Parameters
     ---------
     scenario_config: ScenarioConfig
     segments: List[Segment]
@@ -53,7 +53,8 @@ class Scenario:
     qs: float                    # Line-Load [N/mm]
     L: float                     # Length of the model [mm]
     crack_h: float               # Height of the crack [mm]
-    
+    crack_l: float               # Length of the crack [mm]
+
     def __init__(self, scenario_config: ScenarioConfig, segments: List[Segment], weak_layer: WeakLayer, slab: Slab):
         self.scenario_config = scenario_config
         self.segments = segments
@@ -61,12 +62,15 @@ class Scenario:
         self.slab = slab
         
         self.system = scenario_config.system
+        self.touchdown = scenario_config.touchdown
         self.phi = scenario_config.phi
         self.qs = scenario_config.qs
         
         self._setup_scenario()
         self._calc_crack_height()
-    
+        # TODO:
+        self._calc_crack_length(crack_length=1.0)
+
     def refresh_from_config(self):
         """Pull changed values out of scenario_config
            and recompute derived attributes."""
@@ -76,6 +80,46 @@ class Scenario:
 
         self._setup_scenario()
         self._calc_crack_height()
+
+    def calc_tangential_load(self):
+        """
+        Total Tangential Load (Surface Load + Weight Load)
+        
+        Returns:
+        --------
+        qt : float
+            Tangential Component of Load [N/mm]
+        """
+        # Surface Load & Weight Load
+        qw = self.slab.qw
+        qs = self.qs
+        
+        # Normal components of forces
+        phi = self.phi
+        _, qwt = decompose_to_normal_tangential(qw, phi)
+        _, qst = decompose_to_normal_tangential(qs, phi)
+        qt = qwt + qst
+        return qt
+    
+    def calc_normal_load(self):
+        """
+        Total Normal Load (Surface Load + Weight Load)
+        
+        Returns:
+        --------
+        qn : float
+            Normal Component of Load [N/mm]
+        """
+        # Surface Load & Weight Load
+        qw = self.slab.qw
+        qs = self.qs
+        
+        # Normal components of forces
+        phi = self.phi
+        qwn, _ = decompose_to_normal_tangential(qw, phi)
+        qsn, _ = decompose_to_normal_tangential(qs, phi)
+        qn = qwn + qsn
+        return qn
 
     def _setup_scenario(self):
         self.li = np.array([seg.l for seg in self.segments])
@@ -102,26 +146,9 @@ class Scenario:
         cf = self.scenario_config.collapse_factor
         self.crack_h = cf * self.weak_layer.h - qn / self.weak_layer.kn
     
-    def calc_tangential_load(self):
-        # Surface Load & Weight Load
-        qw = self.slab.qw
-        qs = self.qs
-        
-        # Normal components of forces
-        phi = self.phi
-        qwn, _ = decompose_to_normal_tangential(qw, phi)
-        qsn, _ = decompose_to_normal_tangential(qs, phi)
-        qn = qwn + qsn
-        return qn
-    
-    def calc_normal_load(self):
-        # Surface Load & Weight Load
-        qw = self.slab.qw
-        qs = self.qs
-        
-        # Normal components of forces
-        phi = self.phi
-        _, qwt = decompose_to_normal_tangential(qw, phi)
-        _, qst = decompose_to_normal_tangential(qs, phi)
-        qt = qwt + qst
-        return qt
+    def _calc_crack_length(self, crack_length: float):
+        """
+        TODO:
+        """
+        self.crack_l = crack_length
+
