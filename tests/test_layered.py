@@ -193,6 +193,7 @@ class TestLayered(unittest.TestCase):
 
         # Check that energy release rate is non-negative
         self.assertIsNotNone(G)
+
         self.assertEqual(
             len(G), 4
         )  # Three components: mode I, mode II, mode III, and total

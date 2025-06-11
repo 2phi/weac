@@ -300,24 +300,34 @@ class Eigensystem:
         self.zA = zA  # z-coordiante of the additional weights
         self.yA = yA  # y-coordinate of the additional weigths
 
+    def get_ply_coordinates(self):
+        """
+        Calculate ply (layer) z-coordinates.
+
+        Returns
+        -------
+        ndarray
+            Ply (layer) z-coordinates (top to bottom) in coordinate system with
+            downward pointing z-axis (z-list will be negative to positive).
+
+        """
+        # Get list of ply (layer) thicknesses and prepend 0
+        t = np.concatenate(([0], self.slab[:, 1]))
+        # Calculate and return ply z-coordiantes
+        return np.cumsum(t) - self.h / 2
+
     def calc_laminate_stiffness_matrix(self):
         """
         Provide ABD matrix.
 
         Return plane-strain laminate stiffness matrix (ABD matrix).
         """
-        # Number of plies and ply thicknesses (top to bottom)
-        n = self.slab.shape[0]
-        t = self.slab[:, 1]
-        # Calculate ply coordinates (top to bottom) in coordinate system
-        # with downward pointing z-axis (z-list will be negative to positive)
-        z = np.zeros(n + 1)
-        for j in range(n + 1):
-            z[j] = -self.h / 2 + sum(t[0:j])
+        # Get ply coordinates (z-list is top to bottom, negative to positive)
+        z = self.get_ply_coordinates()
         # Initialize stiffness components
         A11, B11, D11, kA55, kB55, kD55 = 0, 0, 0, 0, 0, 0
         # Add layerwise contributions
-        for i in range(n):
+        for i in range(len(z) - 1):
             E, G, nu = self.slab[i, 2:5]
             A11 = A11 + E / (1 - nu**2) * (z[i + 1] - z[i])
             B11 = B11 + 1 / 2 * E / (1 - nu**2) * (z[i + 1] ** 2 - z[i] ** 2)
@@ -2070,6 +2080,7 @@ class Eigensystem:
         ]
 
         self.sysmat = np.array(SystemMatrixC)
+        return SystemMatrixC
 
     def calc_eigensystem(self):
         """Calculate eigenvalues and eigenvectors of the system matrix."""
@@ -2731,7 +2742,7 @@ class Eigensystem:
 
         Arguments
         ---------
-        x : float or squence
+        x : float or sequence
             Horizontal coordinate (mm). Can be sequence of length N.
         C : ndarray
             Vector of constants (6xN) at positions x.

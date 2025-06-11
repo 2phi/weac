@@ -1792,7 +1792,6 @@ class FieldQuantitiesMixin:
         Pi = np.pi
         h = self.h
         b = self.b
-        phi = self.phi
         g = 9810
         phi = np.deg2rad(phi)
 
@@ -2026,7 +2025,7 @@ class FieldQuantitiesMixin:
             Integrand of the mode I crack opening integral at the specified points.
         """
         # Calculate the integrand by multiplying stress and displacement
-        return -self.sig(z0(x)) * self.w(z1(x))
+        return -self.sigzz(z0(x)) * self.w(z1(x))
 
     def int2(self, x, z0, z1):
         """
@@ -2497,16 +2496,11 @@ class SolutionMixin:
         """
         # Check mode for free end
         mode = "A"  # self.mode_td(l=l)
-        # Get spring stiffness reduction factor
-        kf = self.reduce_stiffness(l=l, mode=mode)
-        # Get spring stiffness for collapsed weak-layer
-        kR = self.calc_rot_spring(collapse=True)
-
         # Set boundary conditions for PST-systems
         if self.system in ["pst-", "-pst", "skier-finite"]:
             factor = -1 if pos in ["left", "l"] else 1
             if not k:
-                if mode in ["A"]:
+                if (mode in ["A"]) or (self.system in ["skier-finite"]):
                     # Free end
                     # Factor for correct sign
 
@@ -2520,24 +2514,56 @@ class SolutionMixin:
                             self.Mzz(z, bed=k),
                         ]
                     )
-                elif mode in ["B", "C"] and pos in ["r", "right"]:
+                elif self.mode in ["B"] and pos in ["r", "right"]:
                     # Touchdown right
                     bc = np.array(
                         [
-                            self.Nxx(z, bed=k),
-                            self.Vyy(z, bed=k),
-                            self.Vzz(z, bed=k),
-                            self.Myy(z, bed=k) + kf * kR * self.psiy(z),
-                            self.w(z, z0=0, y0=0),
+                            self.Nxx(z),
+                            self.Vyy(z),
+                            self.w(z),
+                            self.Mxx(z),
+                            self.Myy(z),
+                            self.Mzz(z),
                         ]
                     )
-                elif mode in ["B", "C"] and pos in ["l", "left"]:
+                elif self.mode in ["B"] and pos in ["l", "left"]:  # Kann dieser Block
+                    # Touchdown left                                # verschwinden? Analog zu 'A'
+                    bc = np.array(
+                        [
+                            self.Nxx(z),
+                            self.Vyy(z),
+                            self.w(z),
+                            self.Mxx(z),
+                            self.Myy(z),
+                            self.Mzz(z),
+                        ]
+                    )
+                elif self.mode in ["C"] and pos in ["r", "right"]:
+                    # Spring stiffness
+                    kR = self.substitute_stiffness(self.a - self.td, "rested", "rot")
+                    # Touchdown right
+                    bc = np.array(
+                        [
+                            self.Nxx(z),
+                            self.Vyy(z),
+                            self.w(z),
+                            self.Mxx(z),
+                            self.Myy(z) + kR * self.psiy(z),
+                            self.Mzz(z),
+                        ]
+                    )
+                elif self.mode in ["C"] and pos in ["l", "left"]:
+                    # Spring stiffness
+                    kR = self.substitute_stiffness(self.a - self.td, "rested", "rot")
                     # Touchdown left
                     bc = np.array(
                         [
-                            self.Nxx(z, bed=k),
-                            self.Myy(z, bed=k) - kf * kR * self.psi(z),
-                            self.w(z, z0=0, y0=0),
+                            self.Nxx(z),
+                            self.Vyy(z),
+                            self.w(z),
+                            self.Mxx(z),
+                            self.Myy(z) - kR * self.psiy(z),
+                            self.Mzz(z),
                         ]
                     )
             else:
@@ -3331,9 +3357,11 @@ class SolutionMixin:
             rhsSlab[12 * i : 12 * i + 6] = np.array(f).reshape(-1, 1)
 
         if self.system not in ["skier"]:
-            rhsSlab[0:6] = np.array(fi[0])  # Load at the left boundary of the strucutre
-            rhsSlab[-6:] = np.array(
-                fi[-1]
+            rhsSlab[0:6] = np.array(fi[0]).reshape(
+                (-1, 1)
+            )  # Load at the left boundary of the strucutre
+            rhsSlab[-6:] = np.array(fi[-1]).reshape(
+                (-1, 1)
             )  # Load at the right boundary of the structure
         # Set boundary conditions for infinite systems
         if self.system not in ["skier-finite", "pst-", "-pst", "rested"]:
@@ -3539,7 +3567,7 @@ class AnalysisMixin:
 
         # Compute total crack lenght and initialize outputs
         da = li.sum() if li.sum() > 0 else np.nan
-        Ginc1, Ginc2 = 0, 0
+        Ginc1, Ginc2, Ginc3 = 0, 0, 0
 
         # Loop through segments with crack advance
         for j, l in enumerate(li):
@@ -3548,18 +3576,20 @@ class AnalysisMixin:
                 self.z, C=C0[:, [j]], l=l, phi=phi, theta=theta, bed=True, load=wi[j]
             )
             z1 = partial(
-                self.z, C=C1[:, [j]], l=l, phi=phi, theta=theta, bed=False, load=wi[j]
+                self.z, C=C1[0:12, [j]], l=l, phi=phi, theta=theta, bed=False, load=wi[j]
             )
 
             # Mode I (1) and II (2) integrands at integration points
             int1 = partial(self.int1, z0=z0, z1=z1)
             int2 = partial(self.int2, z0=z0, z1=z1)
-
+            int3 = partial(self.int3, z0=z0, z1=z1)
             # Segement contributions to total crack opening integral
-            Ginc1 += quad(int1, 0, l, epsabs=self.tol, epsrel=self.tol) / (2 * da)
-            Ginc2 += quad(int2, 0, l, epsabs=self.tol, epsrel=self.tol) / (2 * da)
 
-        return np.array([Ginc1 + Ginc2, Ginc1, Ginc2]).flatten()
+            Ginc1 += quad(int1, 0, l, epsabs=self.tol, epsrel=self.tol)[0] / (2 * da)
+            Ginc2 += quad(int2, 0, l, epsabs=self.tol, epsrel=self.tol)[0] / (2 * da)
+            Ginc3 += quad(int3, 0, l, epsabs=self.tol, epsrel=self.tol)[0] / (2 * da)
+
+        return np.array([Ginc1 + Ginc2 + Ginc3, Ginc1, Ginc2, Ginc3]).flatten()
 
     def gdif(self, C, phi, theta, li, ki, wi, unit="kJ/m^2", **kwargs):
         """
@@ -3637,9 +3667,9 @@ class AnalysisMixin:
                 )
             # Mode I and II differential energy release rates
             Gdif[1:, j] = (
-                self.Gi(ztip, zback, unit=unit)[0],
-                self.Gii(ztip, zback, unit=unit)[0],
-                self.Giii(ztip, zback, unit=unit)[0],
+                self.Gi(ztip, zback, phi=phi, theta=theta, unit=unit)[0],
+                self.Gii(ztip, zback, phi=phi, unit=unit)[0],
+                self.Giii(ztip, zback, theta=theta, unit=unit)[0],
             )
 
         # Sum mode I and II contributions
@@ -3653,6 +3683,126 @@ class AnalysisMixin:
 
         # Return total differential energy release rate of all crack tips
         return Gdif.sum(axis=1)
+
+    def dz_dx(self, z, phi, theta):
+        """
+        Get first derivative z'(x) = K*z(x) + q of the solution vector.
+
+        z'(x) = [u'(x) u''(x) w'(x) w''(x) psi'(x), psi''(x)]^T
+
+        Parameters
+        ----------
+        z : ndarray
+            Solution vector [u(x) u'(x) w(x) w'(x) psi(x), psi'(x)]^T
+        phi : float
+            Inclination (degrees). Counterclockwise positive.
+
+        Returns
+        -------
+        ndarray, float
+            First derivative z'(x) for the solution vector (6x1).
+        """
+        K = self.calc_system_matrix()
+        q = self.get_load_vector(phi, theta)
+        return np.dot(K, z) + q
+
+    def dz_dxdx(self, z, phi, theta):
+        """
+        Get second derivative z''(x) = K*z'(x) of the solution vector.
+
+        z''(x) = [u''(x) u'''(x) w''(x) w'''(x) psi''(x), psi'''(x)]^T
+
+        Parameters
+        ----------
+        z : ndarray
+            Solution vector [u(x) u'(x) w(x) w'(x) psi(x), psi'(x)]^T
+        phi : float
+            Inclination (degrees). Counterclockwise positive.
+
+        Returns
+        -------
+        ndarray, float
+            Second derivative z''(x) = (K*z(x) + q)' = K*z'(x) = K*(K*z(x) + q)
+            of the solution vector (6x1).
+        """
+        K = self.calc_system_matrix()
+        q = self.get_load_vector(phi, theta)
+        dz_dx = np.dot(K, z) + q
+        return np.dot(K, dz_dx)
+
+    def du0_dxdx(self, z, phi, theta):
+        """
+        Get second derivative of the horiz. centerline displacement u0''(x).
+
+        Parameters
+        ----------
+        z : ndarray
+            Solution vector [u(x) u'(x) w(x) w'(x) psi(x) psi'(x)]^T.
+        phi : float
+            Inclination (degrees). Counterclockwise positive.
+
+        Returns
+        -------
+        ndarray, float
+            Second derivative of the horizontal centerline displacement
+            u0''(x) (1/mm).
+        """
+        return self.dz_dx(z, phi, theta)[1, :]
+
+    def dpsiy_dxdx(self, z, phi, theta):
+        """
+        Get second derivative of the cross-section rotation psi''(x).
+
+        Parameters
+        ----------
+        z : ndarray
+            Solution vector [u(x) u'(x) w(x) w'(x) psi(x) psi'(x)]^T.
+        phi : float
+            Inclination (degrees). Counterclockwise positive.
+
+        Returns
+        -------
+        ndarray, float
+            Second derivative of the cross-section rotation psi''(x) (1/mm^2).
+        """
+        return self.dz_dx(z, phi, theta)[9, :]
+
+    def du0_dxdxdx(self, z, phi, theta):
+        """
+        Get third derivative of the horiz. centerline displacement u0'''(x).
+
+        Parameters
+        ----------
+        z : ndarray
+            Solution vector [u(x) u'(x) w(x) w'(x) psi(x) psi'(x)]^T.
+        phi : float
+            Inclination (degrees). Counterclockwise positive.
+
+        Returns
+        -------
+        ndarray, float
+            Third derivative of the horizontal centerline displacement
+            u0'''(x) (1/mm^2).
+        """
+        return self.dz_dxdx(z, phi, theta)[1, :]
+
+    def dpsiy_dxdxdx(self, z, phi, theta):
+        """
+        Get third derivative of the cross-section rotation psi'''(x).
+
+        Parameters
+        ----------
+        z : ndarray
+            Solution vector [u(x) u'(x) w(x) w'(x) psi(x) psi'(x)]^T.
+        phi : float
+            Inclination (degrees). Counterclockwise positive.
+
+        Returns
+        -------
+        ndarray, float
+            Third derivative of the cross-section rotation psi'''(x) (1/mm^3).
+        """
+        return self.dz_dxdx(z, phi, theta)[9, :]
 
     def get_zmesh(self, dz=2):
         """
@@ -3685,7 +3835,7 @@ class AnalysisMixin:
         # Assemble mesh with columns (z, E, G, nu)
         return np.column_stack([zi, si])
 
-    def Sxx(self, Z, phi, dz=2, unit="kPa"):
+    def Sxx(self, Z, phi, theta, dz=2, unit="kPa"):
         """
         Compute axial normal stress in slab layers.
 
@@ -3733,7 +3883,7 @@ class AnalysisMixin:
         # Return axial normal stress in specified unit
         return convert[unit] * Sxx
 
-    def Txz(self, Z, phi, dz=2, unit="kPa"):
+    def Txz(self, Z, phi, theta, dz=2, unit="kPa"):
         """
         Compute shear stress in slab layers.
 
@@ -3766,15 +3916,15 @@ class AnalysisMixin:
 
         # Get second derivatives of centerline displacement u0 and
         # cross-section rotaiton psi of all grid points along the x-axis
-        du0_dxdx = self.du0_dxdx(Z, phi)
-        dpsi_dxdx = self.dpsi_dxdx(Z, phi)
+        du0_dxdx = self.du0_dxdx(Z, phi, theta)
+        dpsiy_dxdx = self.dpsiy_dxdx(Z, phi, theta)
 
         # Initialize first derivative of axial normal stress sxx w.r.t. x
         dsxx_dx = np.zeros(shape=[n, m])
 
         # Calculate first derivative of sxx at z-grid points
         for i, (z, E, nu, _) in enumerate(zmesh):
-            dsxx_dx[i, :] = E / (1 - nu**2) * (du0_dxdx + z * dpsi_dxdx)
+            dsxx_dx[i, :] = E / (1 - nu**2) * (du0_dxdx + z * dpsiy_dxdx)
 
         # Calculate weight load at grid points
         qt = -rho * self.g * np.sin(np.deg2rad(phi))
@@ -3787,7 +3937,7 @@ class AnalysisMixin:
         # Return shear stress Txz in specified unit
         return convert[unit] * Txz
 
-    def Szz(self, Z, phi, dz=2, unit="kPa"):
+    def Szz(self, Z, phi, theta, dz=2, unit="kPa"):
         """
         Compute transverse normal stress in slab layers.
 
@@ -3822,15 +3972,15 @@ class AnalysisMixin:
 
         # Get third derivatives of centerline displacement u0 and
         # cross-section rotaiton psi of all grid points along the x-axis
-        du0_dxdxdx = self.du0_dxdxdx(Z, phi)
-        dpsi_dxdxdx = self.dpsi_dxdxdx(Z, phi)
+        du0_dxdxdx = self.du0_dxdxdx(Z, phi, theta)
+        dpsiy_dxdxdx = self.dpsiy_dxdxdx(Z, phi, theta)
 
         # Initialize second derivative of axial normal stress sxx w.r.t. x
         dsxx_dxdx = np.zeros(shape=[n, m])
 
         # Calculate second derivative of sxx at z-grid points
         for i, (z, E, nu, _) in enumerate(zmesh):
-            dsxx_dxdx[i, :] = E / (1 - nu**2) * (du0_dxdxdx + z * dpsi_dxdxdx)
+            dsxx_dxdx[i, :] = E / (1 - nu**2) * (du0_dxdxdx + z * dpsiy_dxdxdx)
 
         # Calculate weight load at grid points
         qn = rho * self.g * np.cos(np.deg2rad(phi))
@@ -3845,7 +3995,7 @@ class AnalysisMixin:
         return convert[unit] * Szz
 
     def principal_stress_slab(
-        self, Z, phi, dz=2, unit="kPa", val="max", normalize=False
+        self, Z, phi, theta, dz=2, unit="kPa", val="max", normalize=False
     ):
         """
         Compute maxium or minimum principal stress in slab layers.
@@ -3885,9 +4035,9 @@ class AnalysisMixin:
         m = {"max": 1, "min": -1}
 
         # Get axial normal stresses, shear stresses, transverse normal stresses
-        Sxx = self.Sxx(Z=Z, phi=phi, dz=dz, unit=unit)
-        Txz = self.Txz(Z=Z, phi=phi, dz=dz, unit=unit)
-        Szz = self.Szz(Z=Z, phi=phi, dz=dz, unit=unit)
+        Sxx = self.Sxx(Z=Z, phi=phi, theta=theta, dz=dz, unit=unit)
+        Txz = self.Txz(Z=Z, phi=phi, theta=theta, dz=dz, unit=unit)
+        Szz = self.Szz(Z=Z, phi=phi, theta=theta, dz=dz, unit=unit)
 
         # Calculate principal stress
         Ps = (Sxx + Szz) / 2 + m[val] * np.sqrt((Sxx - Szz) ** 2 + 4 * Txz**2) / 2
@@ -3945,8 +4095,8 @@ class AnalysisMixin:
         m = {"max": 1, "min": -1}
 
         # Get weak-layer normal and shear stresses
-        sig = self.sig(Z, unit=unit)
-        tau = self.tau(Z, unit=unit)
+        sig = self.sigzz(Z, unit=unit)
+        tau = self.tauxz(Z, unit=unit)
 
         # Calculate principal stress
         ps = sig / 2 + m[val] * np.sqrt(sig**2 + 4 * tau**2) / 2
@@ -4138,7 +4288,7 @@ class OutputMixin:
         """
         # Convert coordinates from mm to cm and stresses from MPa to unit
         x = x / 10
-        tau = self.tau(z, unit=unit)
+        tau = self.tauxz(z, unit=unit)
         # Filter stresses in unspupported segments
         if removeNaNs:
             # Remove coordinate-stress pairs where no weak layer is present
@@ -4175,7 +4325,7 @@ class OutputMixin:
         """
         # Convert coordinates from mm to cm and stresses from MPa to unit
         x = x / 10
-        sig = self.sig(z, unit=unit)
+        sig = self.sigzz(z, unit=unit)
         # Filter stresses in unspupported segments
         if removeNaNs:
             # Remove coordinate-stress pairs where no weak layer is present
@@ -4274,6 +4424,6 @@ class OutputMixin:
         # Coordinates (cm)
         x = x / 10
         # Cross-section rotation angle (unit)
-        psi = self.psi(z, unit=unit)
+        psi = self.psiy(z, unit=unit)
         # Output array
         return x, psi

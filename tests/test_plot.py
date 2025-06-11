@@ -29,11 +29,13 @@ class TestPlot(unittest.TestCase):
         self.segments = self.layered.calc_segments(L=1000, a=300)
 
         # Assemble and solve the system
-        self.C = self.layered.assemble_and_solve(phi=0, **self.segments["crack"])
+        self.C = self.layered.assemble_and_solve(
+            phi=0, theta=0, **self.segments["crack"]
+        )
 
         # Rasterize the solution
         self.xsl, self.z, self.xwl = self.layered.rasterize_solution(
-            C=self.C, phi=0, **self.segments["crack"]
+            C=self.C, phi=0, theta=0, **self.segments["crack"]
         )
 
         # Create plots directory if it doesn't exist
@@ -69,7 +71,14 @@ class TestPlot(unittest.TestCase):
     def test_deformed(self):
         """Test plotting of deformed slab."""
         # Test with default parameters
-        weac.plot.deformed(self.layered, xsl=self.xsl, xwl=self.xwl, z=self.z, phi=0)
+        weac.plot.deformed(
+            self.layered,
+            xsl=self.xsl,
+            xwl=self.xwl,
+            z=self.z,
+            phi=0,
+            theta=0,
+        )
 
         # Check that the plot file was created
         self.assertTrue(os.path.exists("plots/cont.png"))
@@ -81,6 +90,7 @@ class TestPlot(unittest.TestCase):
             xwl=self.xwl,
             z=self.z,
             phi=0,
+            theta=0,
             scale=2.0,
             field="w",
             normalize=False,
@@ -98,7 +108,7 @@ class TestPlot(unittest.TestCase):
             z=self.z,
             li=self.segments["crack"]["li"],
             ki=self.segments["crack"]["ki"],
-            mi=self.segments["crack"]["mi"],  # Add mi parameter
+            fi=self.segments["crack"]["fi"],  # Add mi parameter
         )
 
         # Check that the plot file was created
@@ -113,7 +123,7 @@ class TestPlot(unittest.TestCase):
             z=self.z,
             li=self.segments["crack"]["li"],
             ki=self.segments["crack"]["ki"],
-            mi=self.segments["crack"]["mi"],  # Add mi parameter
+            fi=self.segments["crack"]["fi"],  # Add mi parameter
         )
 
         # Check that the plot file was created
