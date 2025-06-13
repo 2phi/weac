@@ -88,7 +88,7 @@ class Slab():
     
     def calc_vertical_center_of_gravity(self, phi: float):
         """
-        TODO: No idea what this does.
+        Vertical PSTs use triangular slabs (with horizontal cuts on the slab ends)
         Calculate center of gravity of triangular slab segments for vertical PSTs.
 
         Parameters

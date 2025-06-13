@@ -3,8 +3,7 @@ from typing import Literal
 
 from weac_2.core.eigensystem import Eigensystem
 
-Unit = Literal["m", "cm", "mm", "um", "deg", "degree", "degrees", "rad",
-               "radian", "radians"]
+Unit = Literal["m", "cm", "mm", "um", "deg", "degree", "degrees", "rad", "radian", "radians"]
 
 _UNIT_FACTOR: dict[str, float] = {
     "m": 1e-3,  "cm": 1e-1, "mm": 1,    "um": 1e3,
@@ -42,7 +41,7 @@ class FieldQuantities:
         )
 
     def du_dx(self, Z: np.ndarray, h0: float) -> float | np.ndarray:
-        """Derivative u′ = u₀′ + h₀ ψ′."""
+        """Derivative u' = u₀' + h₀ ψ'."""
         return Z[1,:] + h0 * self.dpsi_dx(Z)
 
     def w(self, Z: np.ndarray, unit: Literal["m", "cm", "mm", "um"] = "mm") -> float | np.ndarray:
@@ -50,7 +49,7 @@ class FieldQuantities:
         return self._unit_factor(unit) * Z[2,:]
 
     def dw_dx(self, Z: np.ndarray) -> float | np.ndarray:
-        """First derivative w′."""
+        """First derivative w'."""
         return Z[3, :]
 
     def psi(

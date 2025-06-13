@@ -48,7 +48,7 @@ class ModelInput(BaseModel):
 
 if __name__ == "__main__":
     # Example usage requiring all mandatory fields for proper instantiation
-    example_scenario_config = ScenarioConfig(phi=30, touchdown=False, system='skiers')
+    example_scenario_config = ScenarioConfig(phi=30, system='skiers')
     example_weak_layer = WeakLayer(rho=200, h=10) # grain_size, temp, E, G_I have defaults
     
     example_layers = [

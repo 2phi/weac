@@ -18,7 +18,7 @@ my_profile = [
 
 # 2. Create a model instance
 # System can be 'skier', 'pst-' (Propagation Saw Test from left), etc.
-skier_model = weac.Layered(system='skiers', layers=my_profile, touchdown=True)
+skier_model = weac.Layered(system='skiers', layers=my_profile, touchdown=False)
 
 # Optional: Set foundation properties if different from default
 # skier_model.set_foundation_properties(E=0.25, t=30) # E in MPa, t in mm

@@ -172,8 +172,8 @@ class SlabContactMixin:
         # Create polynomial function
         def polynomial(x):
             # Spring stiffness supported segment
-            kRl = self.substitute_stiffness(L - x, "supported", "rot")
-            kNl = self.substitute_stiffness(L - x, "supported", "trans")
+            kRl = self.substitute_stiffness(L - x, "supported", "rot")    # rotational spring stiffness
+            kNl = self.substitute_stiffness(L - x, "supported", "trans")  # linear spring stiffness
             c1 = ss**2 * kRl * kNl * qn
             c2 = 6 * ss**2 * bs * kNl * qn
             c3 = 30 * bs * ss * kRl * kNl * qn

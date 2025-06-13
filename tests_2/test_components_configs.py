@@ -1,0 +1,344 @@
+"""
+Unit tests for configuration components.
+
+Tests Config, ScenarioConfig, CriteriaConfig, Segment, and ModelInput validation.
+"""
+import unittest
+import json
+from pydantic import ValidationError
+
+from weac_2.components import (
+    Config, ScenarioConfig, CriteriaConfig, Segment, ModelInput,
+    Layer, WeakLayer
+)
+
+
+class TestConfig(unittest.TestCase):
+    """Test the Config class for runtime configuration."""
+    
+    def test_config_default_creation(self):
+        """Test creating Config with default values."""
+        config = Config()
+        
+        # Check default values
+        self.assertEqual(config.youngs_modulus_method, 'adam_unpublished')
+        self.assertEqual(config.stress_failure_envelope_method, 'bergfeld')
+        
+    def test_config_custom_values(self):
+        """Test creating Config with custom values."""
+        config = Config(
+            youngs_modulus_method='bergfeld',
+            stress_failure_envelope_method='adam_published'
+        )
+        
+        self.assertEqual(config.youngs_modulus_method, 'bergfeld')
+        self.assertEqual(config.stress_failure_envelope_method, 'adam_published')
+        
+    def test_config_invalid_values(self):
+        """Test that invalid enum values raise ValidationError."""
+        with self.assertRaises(ValidationError):
+            Config(youngs_modulus_method='invalid_method')
+            
+        with self.assertRaises(ValidationError):
+            Config(stress_failure_envelope_method='invalid_envelope')
+
+
+class TestScenarioConfig(unittest.TestCase):
+    """Test the ScenarioConfig class."""
+    
+    def test_scenario_config_defaults(self):
+        """Test ScenarioConfig with default values."""
+        scenario = ScenarioConfig()
+        
+        self.assertEqual(scenario.phi, 0)
+        self.assertEqual(scenario.system, 'skiers')
+        self.assertIsNone(scenario.crack_length)
+        self.assertEqual(scenario.collapse_factor, 0.5)
+        self.assertEqual(scenario.stiffness_ratio, 1000)
+        self.assertEqual(scenario.qs, 0.0)
+        
+    def test_scenario_config_custom_values(self):
+        """Test ScenarioConfig with custom values."""
+        scenario = ScenarioConfig(
+            phi=30.0,
+            system='skier',
+            crack_length=150.0,
+            collapse_factor=0.3,
+            stiffness_ratio=500.0,
+            qs=10.0
+        )
+        
+        self.assertEqual(scenario.phi, 30.0)
+        self.assertEqual(scenario.system, 'skier')
+        self.assertEqual(scenario.crack_length, 150.0)
+        self.assertEqual(scenario.collapse_factor, 0.3)
+        self.assertEqual(scenario.stiffness_ratio, 500.0)
+        self.assertEqual(scenario.qs, 10.0)
+        
+    def test_scenario_config_validation(self):
+        """Test ScenarioConfig validation."""
+        # Negative crack length
+        with self.assertRaises(ValidationError):
+            ScenarioConfig(crack_length=-10.0)
+            
+        # Invalid collapse factor (>= 1)
+        with self.assertRaises(ValidationError):
+            ScenarioConfig(collapse_factor=1.0)
+            
+        # Invalid collapse factor (< 0)
+        with self.assertRaises(ValidationError):
+            ScenarioConfig(collapse_factor=-0.1)
+            
+        # Invalid stiffness ratio (<= 0)
+        with self.assertRaises(ValidationError):
+            ScenarioConfig(stiffness_ratio=0.0)
+            
+        # Negative surface load
+        with self.assertRaises(ValidationError):
+            ScenarioConfig(qs=-5.0)
+            
+        # Invalid system type
+        with self.assertRaises(ValidationError):
+            ScenarioConfig(system='invalid_system')
+
+
+class TestCriteriaConfig(unittest.TestCase):
+    """Test the CriteriaConfig class."""
+    
+    def test_criteria_config_defaults(self):
+        """Test CriteriaConfig with default values."""
+        criteria = CriteriaConfig()
+        
+        self.assertEqual(criteria.fn, 1)
+        self.assertEqual(criteria.fm, 1)
+        self.assertEqual(criteria.gn, 1)
+        self.assertEqual(criteria.gm, 1)
+        
+    def test_criteria_config_custom_values(self):
+        """Test CriteriaConfig with custom values."""
+        criteria = CriteriaConfig(fn=1.5, fm=2.0, gn=0.8, gm=1.2)
+        
+        self.assertEqual(criteria.fn, 1.5)
+        self.assertEqual(criteria.fm, 2.0)
+        self.assertEqual(criteria.gn, 0.8)
+        self.assertEqual(criteria.gm, 1.2)
+        
+    def test_criteria_config_validation(self):
+        """Test CriteriaConfig validation."""
+        # All parameters must be positive
+        with self.assertRaises(ValidationError):
+            CriteriaConfig(fn=0.0)
+            
+        with self.assertRaises(ValidationError):
+            CriteriaConfig(fm=-0.5)
+            
+        with self.assertRaises(ValidationError):
+            CriteriaConfig(gn=-1.0)
+            
+        with self.assertRaises(ValidationError):
+            CriteriaConfig(gm=0.0)
+
+
+class TestSegment(unittest.TestCase):
+    """Test the Segment class."""
+    
+    def test_segment_creation(self):
+        """Test creating segments with various parameters."""
+        # Basic segment
+        seg1 = Segment(l=1000.0, k=True, m=0.0)
+        self.assertEqual(seg1.l, 1000.0)
+        self.assertEqual(seg1.k, True)
+        self.assertEqual(seg1.m, 0.0)
+        
+        # Segment with skier load
+        seg2 = Segment(l=2000.0, k=False, m=75.0)
+        self.assertEqual(seg2.l, 2000.0)
+        self.assertEqual(seg2.k, False)
+        self.assertEqual(seg2.m, 75.0)
+        
+    def test_segment_default_mass(self):
+        """Test that segment mass defaults to 0."""
+        seg = Segment(l=1500.0, k=True)
+        self.assertEqual(seg.m, 0.0)
+        
+    def test_segment_validation(self):
+        """Test segment validation."""
+        # Zero or negative length
+        with self.assertRaises(ValidationError):
+            Segment(l=0.0, k=True)
+            
+        with self.assertRaises(ValidationError):
+            Segment(l=-100.0, k=True)
+            
+        # Negative mass
+        with self.assertRaises(ValidationError):
+            Segment(l=1000.0, k=True, m=-10.0)
+
+
+class TestModelInput(unittest.TestCase):
+    """Test the ModelInput class for complete model validation."""
+    
+    def setUp(self):
+        """Set up common test data."""
+        self.scenario_config = ScenarioConfig(phi=25, system='skier')
+        self.weak_layer = WeakLayer(rho=50, h=30, E=0.25, G_Ic=1)
+        self.layers = [
+            Layer(rho=200, h=100),
+            Layer(rho=300, h=150)
+        ]
+        self.segments = [
+            Segment(l=3000, k=True, m=70),
+            Segment(l=4000, k=True, m=0)
+        ]
+        self.criteria_config = CriteriaConfig(fn=1, fm=1, gn=1, gm=1)
+        
+    def test_model_input_complete(self):
+        """Test creating complete ModelInput."""
+        model = ModelInput(
+            scenario_config=self.scenario_config,
+            weak_layer=self.weak_layer,
+            layers=self.layers,
+            segments=self.segments,
+            criteria_config=self.criteria_config
+        )
+        
+        self.assertEqual(model.scenario_config, self.scenario_config)
+        self.assertEqual(model.weak_layer, self.weak_layer)
+        self.assertEqual(model.layers, self.layers)
+        self.assertEqual(model.segments, self.segments)
+        self.assertEqual(model.criteria_config, self.criteria_config)
+        
+    def test_model_input_default_criteria(self):
+        """Test ModelInput with default criteria config."""
+        model = ModelInput(
+            scenario_config=self.scenario_config,
+            weak_layer=self.weak_layer,
+            layers=self.layers,
+            segments=self.segments
+        )
+        
+        # Should have default criteria config
+        self.assertIsInstance(model.criteria_config, CriteriaConfig)
+        self.assertEqual(model.criteria_config.fn, 1)
+        
+    def test_model_input_missing_required_fields(self):
+        """Test that missing required fields raise ValidationError."""
+        # Missing scenario_config
+        with self.assertRaises(ValidationError):
+            ModelInput(
+                weak_layer=self.weak_layer,
+                layers=self.layers,
+                segments=self.segments
+            )
+            
+        # Missing weak_layer
+        with self.assertRaises(ValidationError):
+            ModelInput(
+                scenario_config=self.scenario_config,
+                layers=self.layers,
+                segments=self.segments
+            )
+            
+        # Missing layers
+        with self.assertRaises(ValidationError):
+            ModelInput(
+                scenario_config=self.scenario_config,
+                weak_layer=self.weak_layer,
+                segments=self.segments
+            )
+            
+        # Missing segments
+        with self.assertRaises(ValidationError):
+            ModelInput(
+                scenario_config=self.scenario_config,
+                weak_layer=self.weak_layer,
+                layers=self.layers
+            )
+            
+    def test_model_input_empty_collections(self):
+        """Test validation with empty layers or segments."""
+        # Empty layers list
+        with self.assertRaises(ValidationError):
+            ModelInput(
+                scenario_config=self.scenario_config,
+                weak_layer=self.weak_layer,
+                layers=[],
+                segments=self.segments
+            )
+            
+        # Empty segments list
+        with self.assertRaises(ValidationError):
+            ModelInput(
+                scenario_config=self.scenario_config,
+                weak_layer=self.weak_layer,
+                layers=self.layers,
+                segments=[]
+            )
+            
+    def test_model_input_json_serialization(self):
+        """Test JSON serialization and schema generation."""
+        model = ModelInput(
+            scenario_config=self.scenario_config,
+            weak_layer=self.weak_layer,
+            layers=self.layers,
+            segments=self.segments,
+            criteria_config=self.criteria_config
+        )
+        
+        # Test JSON serialization
+        json_str = model.model_dump_json()
+        self.assertIsInstance(json_str, str)
+        
+        # Test that it can be parsed back
+        parsed_data = json.loads(json_str)
+        self.assertIsInstance(parsed_data, dict)
+        
+        # Test schema generation
+        schema = ModelInput.model_json_schema()
+        self.assertIsInstance(schema, dict)
+        self.assertIn('properties', schema)
+        self.assertIn('scenario_config', schema['properties'])
+        self.assertIn('weak_layer', schema['properties'])
+        self.assertIn('layers', schema['properties'])
+        self.assertIn('segments', schema['properties'])
+
+
+class TestModelInputPhysicalConsistency(unittest.TestCase):
+    """Test physical consistency checks for ModelInput."""
+    
+    def test_layer_ordering_makes_sense(self):
+        """Test that layer ordering is physically reasonable."""
+        # This is more of a documentation test - the model doesn't enforce
+        # physical layer ordering, but we can test that our test data makes sense
+        layers = [
+            Layer(rho=150, h=50),   # Light surface layer
+            Layer(rho=200, h=100),  # Medium density
+            Layer(rho=350, h=75)    # Denser bottom layer
+        ]
+        
+        weak_layer = WeakLayer(rho=80, h=20)  # Weak layer should be less dense
+        
+        # Check that weak layer is less dense than slab layers
+        for layer in layers:
+            self.assertLess(weak_layer.rho, layer.rho,
+                           "Weak layer should typically be less dense than slab layers")
+            
+    def test_segment_length_consistency(self):
+        """Test that segment lengths are reasonable."""
+        segments = [
+            Segment(l=1000, k=True, m=0),    # 1m segment
+            Segment(l=2000, k=False, m=75),  # 2m free segment with skier
+            Segment(l=1500, k=True, m=0)     # 1.5m segment
+        ]
+        
+        total_length = sum(seg.l for seg in segments)
+        self.assertGreater(total_length, 0, "Total length should be positive")
+        self.assertLess(total_length, 100000, "Total length should be reasonable (< 100m)")
+        
+        # Check that at least one segment is supported
+        has_support = any(seg.k for seg in segments)
+        self.assertTrue(has_support, "At least one segment should have foundation support")
+
+
+if __name__ == "__main__":
+    unittest.main(verbosity=2) 

@@ -46,3 +46,28 @@ def get_skier_point_load(m: float):
         """
         F = 1e-3*np.array(m)*G_MM_S2/LSKI_MM   # Total skier
         return F
+
+def isnotebook() -> bool:
+    """
+    Check if code is running in a Jupyter notebook environment.
+    
+    Returns
+    -------
+    bool
+        True if running in Jupyter notebook, False otherwise.
+    """
+    try:
+        # Check if we're in IPython
+        from IPython import get_ipython
+        if get_ipython() is None:
+            return False
+        
+        # Check if we're specifically in a notebook (not just IPython terminal)
+        if get_ipython().__class__.__name__ == 'ZMQInteractiveShell':
+            return True  # Jupyter notebook
+        elif get_ipython().__class__.__name__ == 'TerminalInteractiveShell':
+            return False  # IPython terminal
+        else:
+            return False  # Other IPython environments
+    except ImportError:
+        return False  # IPython not available

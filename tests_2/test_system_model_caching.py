@@ -1,4 +1,3 @@
-# tests/test_system_model.py
 import unittest
 import numpy as np
 from functools import cached_property
@@ -40,7 +39,7 @@ class TestSystemModelCaching(unittest.TestCase):
         DummyEigensystem.calls = 0
 
         model_input = ModelInput(
-            scenario_config=ScenarioConfig(phi=5, touchdown=True, system='skier'),
+            scenario_config=ScenarioConfig(phi=5, system='skier'),
             weak_layer=WeakLayer(rho=10, h=30, E=0.25, G_Ic=1),
             layers=[Layer(rho=170, h=100), Layer(rho=280, h=100)],
             segments=[Segment(l=3000, k=True, m=70), Segment(l=4000, k=True, m=0)],
@@ -95,8 +94,3 @@ class TestSystemModelCaching(unittest.TestCase):
         self.assertEqual(DummyEigensystem.calls, 2)
         self.assertIsNot(eig_after, eig_before)
         self.assertFalse(np.array_equal(C_after, C_before))
-
-
-# Run the tests when the file is executed directly
-if __name__ == "__main__":
-    unittest.main(verbosity=2)

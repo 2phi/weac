@@ -1,5 +1,3 @@
-
-
 from typing import List, Literal
 import numpy as np
 
@@ -28,7 +26,7 @@ class Scenario:
     mi : List[float]
         skier masses (kg) on boundary of segment i and i+1 [kg]
     
-    system : Literal[
+    system_type : Literal['skier', 'skiers', 'pst-', 'pst+', 'rot', 'trans']
     phi : float
         Angle of slab in positive in counter-clockwise direction [deg]
     L : float
@@ -47,8 +45,7 @@ class Scenario:
     ki: np.ndarray               # booleans indicating foundation support for segment i
     mi: np.ndarray               # skier masses (kg) on boundary of segment i and i+1 [kg]
     
-    system: Literal['skier', 'skiers', 'pst-', 'pst+', 'rot', 'trans']
-    touchdown: bool              # Considering Touchdown or not
+    system_type: Literal['skier', 'skiers', 'pst-', '-pst', 'vpst-', '-vpst', 'rot', 'trans']
     phi: float                   # Angle in [deg]
     qs: float                    # Line-Load [N/mm]
     L: float                     # Length of the model [mm]
@@ -61,20 +58,18 @@ class Scenario:
         self.weak_layer = weak_layer
         self.slab = slab
         
-        self.system = scenario_config.system
-        self.touchdown = scenario_config.touchdown
+        self.system_type = scenario_config.system_type
         self.phi = scenario_config.phi
         self.qs = scenario_config.qs
         
         self._setup_scenario()
         self._calc_crack_height()
-        # TODO:
-        self._calc_crack_length(crack_length=1.0)
+        self.crack_l = scenario_config.crack_length
 
     def refresh_from_config(self):
         """Pull changed values out of scenario_config
            and recompute derived attributes."""
-        self.system = self.scenario_config.system
+        self.system_type = self.scenario_config.system_type
         self.phi    = self.scenario_config.phi
         self.qs     = self.scenario_config.qs
 
@@ -129,9 +124,9 @@ class Scenario:
         
         # Add dummy segment if only one segment provided
         if len(self.li) == 1:
-            self.li.append(0)
-            self.ki.append(True)
-            self.mi.append(0)
+            self.li = np.append(self.li, 0)
+            self.ki = np.append(self.ki, True)
+            self.mi = np.append(self.mi, 0)
         
         # Calculate the total slab length
         self.L = np.sum(self.li)
@@ -145,10 +140,3 @@ class Scenario:
         
         cf = self.scenario_config.collapse_factor
         self.crack_h = cf * self.weak_layer.h - qn / self.weak_layer.kn
-    
-    def _calc_crack_length(self, crack_length: float):
-        """
-        TODO:
-        """
-        self.crack_l = crack_length
-

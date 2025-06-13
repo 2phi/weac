@@ -78,7 +78,7 @@ def load_dummy_profile(profile_id):
 
     return layers, E
 
-def calc_center_of_gravity(layers):
+def calc_center_of_gravity(layers: np.ndarray) -> tuple[float, float]:
     """
     Calculate z-coordinate of the center of gravity.
 

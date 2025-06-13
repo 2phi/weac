@@ -4,7 +4,7 @@ The system properties are used to define the system of the WEAC simulation.
 The Eigenvalue problem is solved for the system properties and the mechanical properties are calculated.
 """
 import logging
-from typing import Literal
+from typing import Literal, Optional
 import numpy as np
 from numpy.typing import NDArray
 
@@ -72,8 +72,8 @@ class Eigensystem():
     def calc_eigensystem(self):
         """Calculate the fundamental system of the problem."""
         self._calc_laminate_stiffness_parameters()
-        self.K = self._assemble_system_matrix()
-        self._calc_eigenvalues_and_eigenvectors(self.K)
+        self.K = self.assemble_system_matrix(kn=None, kt=None)
+        self.ewC, self.ewR, self.evC, self.evR, self.sR, self.sC = self.calc_eigenvalues_and_eigenvectors(self.K)
         
     def _calc_laminate_stiffness_parameters(self):
         """
@@ -102,7 +102,7 @@ class Eigensystem():
         self.kA55 = kA55
         self.K0 = B11**2 - A11*D11
     
-    def _assemble_system_matrix(self) -> NDArray[np.float64]:
+    def assemble_system_matrix(self, kn: Optional[float], kt: Optional[float]) -> NDArray[np.float64]:
         """
         Assemble first-order ODE system matrix K.
 
@@ -115,8 +115,8 @@ class Eigensystem():
         NDArray[np.float64]
             System matrix K (6x6).
         """
-        kn = self.weak_layer.kn
-        kt = self.weak_layer.kt
+        kn = kn or self.weak_layer.kn
+        kt = kt or self.weak_layer.kt
         H = self.slab.H          # total slab thickness
         h = self.weak_layer.h    # weak layer thickness
 
@@ -147,9 +147,22 @@ class Eigensystem():
 
         return np.array(K, dtype=np.float64)
 
-    def _calc_eigenvalues_and_eigenvectors(self, system_matrix: NDArray[np.float64]):
+    def calc_eigenvalues_and_eigenvectors(self, system_matrix: NDArray[np.float64]) -> tuple[NDArray[np.complex128], NDArray[np.float64], NDArray[np.complex128], NDArray[np.float64], NDArray[np.float64], NDArray[np.float64]] :
         """
         Calculate eigenvalues and eigenvectors of the system matrix.
+        
+        Parameters:
+        -----------
+        system_matrix: NDArray          # system_matrix size (6x6) of the eigenvalue problem
+        
+        Return:
+        -------
+        ewC: NDArray[np.complex128]     # shape (k): Complex Eigenvalues
+        ewR: NDArray[np.float64]        # shape (g): Real Eigenvalues
+        evC: NDArray[np.complex128]     # shape (6, k): Complex Eigenvectors
+        evR: NDArray[np.float64]        # shape (6, g): Real Eigenvectors
+        sR: NDArray[np.float64]         # shape (k): Real positive eigenvalue shifts (for numerical robustness)
+        sC: NDArray[np.float64]         # shape (g): Complex positive eigenvalue shifts (for numerical robustness)
         """
         # Calculate eigenvalues (ew) and eigenvectors (ev)
         ew, ev = np.linalg.eig(system_matrix)
@@ -157,15 +170,16 @@ class Eigensystem():
         real = (ew.imag == 0) & (ew.real != 0)  # real eigenvalues
         cmplx = ew.imag > 0                   # positive complex conjugates
         # Eigenvalues
-        self.ewC = ew[cmplx]
-        self.ewR = ew[real].real
+        ewC = ew[cmplx]
+        ewR = ew[real].real
         # Eigenvectors
-        self.evC = ev[:, cmplx]
-        self.evR = ev[:, real].real
+        evC = ev[:, cmplx]
+        evR = ev[:, real].real
         # Prepare positive eigenvalue shifts for numerical robustness
         # 1. Keep small-positive eigenvalues away from zero, to not have a near-singular matrix
-        self.sR, self.sC = np.zeros(self.ewR.shape), np.zeros(self.ewC.shape)
-        self.sR[self.ewR > 0], self.sC[self.ewC > 0] = -1, -1
+        sR, sC = np.zeros(ewR.shape), np.zeros(ewC.shape)
+        sR[ewR > 0], sC[ewC > 0] = -1, -1
+        return ewC, ewR, evC, evR, sR, sC
 
     def zh(self, x: float, l: float = 0, k: bool = True) -> NDArray:
         """
