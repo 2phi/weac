@@ -66,8 +66,7 @@ class Slab():
         nui = np.array([ly.nu for ly in self.layers])
         
         H = hi.sum()
-        
-        zi_mid = [H / 2 - sum(hi[0:j]) - hi[j] / 2 for j in range(n)]
+        zi_mid = [float(H / 2 - sum(hi[j:n]) + hi[j] / 2) for j in range(n)]
         zi_bottom = np.cumsum(hi) - H/2
         z_cog = sum(zi_mid * hi * rhoi) / sum(hi * rhoi)
         

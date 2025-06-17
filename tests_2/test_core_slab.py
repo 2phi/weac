@@ -50,12 +50,12 @@ class TestSlabBasicOperations(unittest.TestCase):
         np.testing.assert_array_equal(slab.rhoi, expected_rho)
         
         # Check coordinate system
-        # Layer midpoints from top to bottom
-        expected_zi_mid = [
-            100 - 25,   # Top layer: H/2 - h1/2 = 100 - 25 = 75
-            100 - 50 - 40,  # Middle: H/2 - h1 - h2/2 = 100 - 50 - 40 = 10
-            100 - 50 - 80 - 35,  # Bottom: H/2 - h1 - h2 - h3/2 = 100 - 50 - 80 - 35 = -65
-        ]
+        # Layer midpoints calculated as: H/2 - sum(hi[j:n]) + hi[j]/2
+        # For H=200, hi=[50,80,70]:
+        # j=0: 100 - (50+80+70) + 50/2 = 100 - 200 + 25 = -75
+        # j=1: 100 - (80+70) + 80/2 = 100 - 150 + 40 = -10  
+        # j=2: 100 - (70) + 70/2 = 100 - 70 + 35 = 65
+        expected_zi_mid = [-75, -10, 65]
         np.testing.assert_array_almost_equal(slab.zi_mid, expected_zi_mid)
         
         # Layer bottom coordinates

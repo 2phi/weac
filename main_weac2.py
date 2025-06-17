@@ -20,16 +20,17 @@ logging.getLogger('matplotlib.font_manager').setLevel(logging.WARNING)
 # === SYSTEM 1: Basic Configuration ===
 config1 = Config(touchdown=True, youngs_modulus_method='bergfeld', stress_failure_envelope_method='adam_unpublished')
 scenario_config1 = ScenarioConfig(phi=5, system_type='skier')  # Steeper slope
+criteria_config1 = CriteriaConfig(fn=1, fm=1, gn=1, gm=1)
+
 weak_layer1 = WeakLayer(rho=10, h=25, E=0.25, G_Ic=1)
 layers1 = [
     Layer(rho=170, h=100), # Top Layer
     Layer(rho=280, h=100), # Bottom Layer
 ]
 segments1 = [
-    Segment(l=3000, k=True, m=70),
-    Segment(l=4000, k=True, m=0)
+    Segment(l=3000, has_foundation=True, m=70),
+    Segment(l=4000, has_foundation=True, m=0)
 ]
-criteria_config1 = CriteriaConfig(fn=1, fm=1, gn=1, gm=1)
 
 model_input1 = ModelInput(
     scenario_config=scenario_config1, 
@@ -50,8 +51,8 @@ layers2 = [
     Layer(rho=280, h=100), # Bottom Layer
 ]
 segments2 = [
-    Segment(l=3000, k=True, m=70),
-    Segment(l=4000, k=True, m=0)
+    Segment(l=3000, has_foundation=True, m=70),
+    Segment(l=4000, has_foundation=True, m=0)
 ]
 criteria_config2 = CriteriaConfig(fn=1, fm=1, gn=1, gm=1)
 
@@ -75,8 +76,8 @@ layers3 = [
     Layer(rho=320, h=120), # Heavier bottom layer
 ]
 segments3 = [
-    Segment(l=3500, k=True, m=60),  # Different skier mass
-    Segment(l=3500, k=True, m=0)
+    Segment(l=3500, has_foundation=True, m=60),  # Different skier mass
+    Segment(l=3500, has_foundation=True, m=0)
 ]
 criteria_config3 = CriteriaConfig(fn=1, fm=1, gn=1, gm=1)
 
@@ -104,11 +105,11 @@ layers4 = [
     Layer(rho=280, h=100), # (N) Bottom Layer
 ]
 segments4 = [
-    Segment(l=5000, k=True, m=80),
-    Segment(l=3000, k=True, m=0),
-    Segment(l=3000, k=False, m=0),
-    Segment(l=4000, k=True, m=70),
-    Segment(l=3000, k=True, m=0)
+    Segment(l=5000, has_foundation=True, m=80),
+    Segment(l=3000, has_foundation=True, m=0),
+    Segment(l=3000, has_foundation=False, m=0),
+    Segment(l=4000, has_foundation=True, m=70),
+    Segment(l=3000, has_foundation=True, m=0)
 ]
 criteria_config4 = CriteriaConfig(fn=1, fm=1, gn=1, gm=1)
 model_input4 = ModelInput(

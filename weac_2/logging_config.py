@@ -11,7 +11,6 @@ def setup_logging() -> None:
     The level is taken from the env var WEAC_LOG_LEVEL (default WARNING).
     """
     level = os.getenv("WEAC_LOG_LEVEL", "WARNING").upper()
-    print(f"Setting logging level to {level}")
 
     dictConfig({
         "version": 1,

@@ -536,7 +536,7 @@ class Analyzer:
     
     def z(self, x, C, l, phi, bed=True, qs=0):
         """Delegate to system model."""
-        return self.sm.z(x, C, l, phi, k=bed, qs=qs)
+        return self.sm.z(x, C, l, phi, has_foundation=bed, qs=qs)
     
     def du0_dxdx(self, Z, phi):
         """Calculate second derivative of centerline displacement."""

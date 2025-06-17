@@ -21,18 +21,18 @@ class TestConfig(unittest.TestCase):
         config = Config()
         
         # Check default values
-        self.assertEqual(config.youngs_modulus_method, 'adam_unpublished')
-        self.assertEqual(config.stress_failure_envelope_method, 'bergfeld')
+        self.assertEqual(config.youngs_modulus_method, 'bergfeld')
+        self.assertEqual(config.stress_failure_envelope_method, 'adam_unpublished')
         
     def test_config_custom_values(self):
         """Test creating Config with custom values."""
         config = Config(
-            youngs_modulus_method='bergfeld',
-            stress_failure_envelope_method='adam_published'
+            youngs_modulus_method='scapazzo',
+            stress_failure_envelope_method='adam_unpublished'
         )
         
-        self.assertEqual(config.youngs_modulus_method, 'bergfeld')
-        self.assertEqual(config.stress_failure_envelope_method, 'adam_published')
+        self.assertEqual(config.youngs_modulus_method, 'scapazzo')
+        self.assertEqual(config.stress_failure_envelope_method, 'adam_unpublished')
         
     def test_config_invalid_values(self):
         """Test that invalid enum values raise ValidationError."""
@@ -51,8 +51,8 @@ class TestScenarioConfig(unittest.TestCase):
         scenario = ScenarioConfig()
         
         self.assertEqual(scenario.phi, 0)
-        self.assertEqual(scenario.system, 'skiers')
-        self.assertIsNone(scenario.crack_length)
+        self.assertEqual(scenario.system_type, 'skiers')
+        self.assertEqual(scenario.crack_length, 0.0)
         self.assertEqual(scenario.collapse_factor, 0.5)
         self.assertEqual(scenario.stiffness_ratio, 1000)
         self.assertEqual(scenario.qs, 0.0)
@@ -61,7 +61,7 @@ class TestScenarioConfig(unittest.TestCase):
         """Test ScenarioConfig with custom values."""
         scenario = ScenarioConfig(
             phi=30.0,
-            system='skier',
+            system_type='skier',
             crack_length=150.0,
             collapse_factor=0.3,
             stiffness_ratio=500.0,
@@ -69,7 +69,7 @@ class TestScenarioConfig(unittest.TestCase):
         )
         
         self.assertEqual(scenario.phi, 30.0)
-        self.assertEqual(scenario.system, 'skier')
+        self.assertEqual(scenario.system_type, 'skier')
         self.assertEqual(scenario.crack_length, 150.0)
         self.assertEqual(scenario.collapse_factor, 0.3)
         self.assertEqual(scenario.stiffness_ratio, 500.0)
@@ -99,7 +99,7 @@ class TestScenarioConfig(unittest.TestCase):
             
         # Invalid system type
         with self.assertRaises(ValidationError):
-            ScenarioConfig(system='invalid_system')
+            ScenarioConfig(system_type='invalid_system')
 
 
 class TestCriteriaConfig(unittest.TestCase):
@@ -145,34 +145,31 @@ class TestSegment(unittest.TestCase):
     def test_segment_creation(self):
         """Test creating segments with various parameters."""
         # Basic segment
-        seg1 = Segment(l=1000.0, k=True, m=0.0)
+        seg1 = Segment(l=1000.0, has_foundation=True, m=0.0)
         self.assertEqual(seg1.l, 1000.0)
-        self.assertEqual(seg1.k, True)
+        self.assertEqual(seg1.has_foundation, True)
         self.assertEqual(seg1.m, 0.0)
         
         # Segment with skier load
-        seg2 = Segment(l=2000.0, k=False, m=75.0)
+        seg2 = Segment(l=2000.0, has_foundation=False, m=75.0)
         self.assertEqual(seg2.l, 2000.0)
-        self.assertEqual(seg2.k, False)
+        self.assertEqual(seg2.has_foundation, False)
         self.assertEqual(seg2.m, 75.0)
         
     def test_segment_default_mass(self):
         """Test that segment mass defaults to 0."""
-        seg = Segment(l=1500.0, k=True)
+        seg = Segment(l=1500.0, has_foundation=True)
         self.assertEqual(seg.m, 0.0)
         
     def test_segment_validation(self):
         """Test segment validation."""
-        # Zero or negative length
+        # Negative length
         with self.assertRaises(ValidationError):
-            Segment(l=0.0, k=True)
-            
-        with self.assertRaises(ValidationError):
-            Segment(l=-100.0, k=True)
+            Segment(l=-100.0, has_foundation=True)
             
         # Negative mass
         with self.assertRaises(ValidationError):
-            Segment(l=1000.0, k=True, m=-10.0)
+            Segment(l=1000.0, has_foundation=True, m=-10.0)
 
 
 class TestModelInput(unittest.TestCase):
@@ -187,8 +184,8 @@ class TestModelInput(unittest.TestCase):
             Layer(rho=300, h=150)
         ]
         self.segments = [
-            Segment(l=3000, k=True, m=70),
-            Segment(l=4000, k=True, m=0)
+            Segment(l=3000, has_foundation=True, m=70),
+            Segment(l=4000, has_foundation=True, m=0)
         ]
         self.criteria_config = CriteriaConfig(fn=1, fm=1, gn=1, gm=1)
         
@@ -326,9 +323,9 @@ class TestModelInputPhysicalConsistency(unittest.TestCase):
     def test_segment_length_consistency(self):
         """Test that segment lengths are reasonable."""
         segments = [
-            Segment(l=1000, k=True, m=0),    # 1m segment
-            Segment(l=2000, k=False, m=75),  # 2m free segment with skier
-            Segment(l=1500, k=True, m=0)     # 1.5m segment
+            Segment(l=1000, has_foundation=True, m=0),    # 1m segment
+            Segment(l=2000, has_foundation=False, m=75),  # 2m free segment with skier
+            Segment(l=1500, has_foundation=True, m=0)     # 1.5m segment
         ]
         
         total_length = sum(seg.l for seg in segments)
@@ -336,7 +333,7 @@ class TestModelInputPhysicalConsistency(unittest.TestCase):
         self.assertLess(total_length, 100000, "Total length should be reasonable (< 100m)")
         
         # Check that at least one segment is supported
-        has_support = any(seg.k for seg in segments)
+        has_support = any(seg.has_foundation for seg in segments)
         self.assertTrue(has_support, "At least one segment should have foundation support")
 
 

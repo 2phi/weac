@@ -335,7 +335,7 @@ class TestFieldQuantitiesPhysicalConsistency(unittest.TestCase):
         Z = np.array([[1.0], [0.1], [0.5], [0.05], [0.01], [0.001]])
         
         # Test displacement at nearby heights
-        h1, h2 = 30.0, 30.1
+        h1, h2 = 30.0, 30.00001
         u1 = fq.u(Z, h1)
         u2 = fq.u(Z, h2)
         

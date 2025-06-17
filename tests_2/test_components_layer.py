@@ -4,7 +4,6 @@ Unit tests for Layer and WeakLayer components.
 Tests validation, automatic property calculations, and edge cases.
 """
 import unittest
-import pytest
 from pydantic import ValidationError
 
 from weac_2.components.layer import Layer, WeakLayer, bergfeld, scapozza, gerling

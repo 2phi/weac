@@ -13,11 +13,13 @@ import logging
 
 setup_logging()
 
+logger = logging.getLogger(__name__)
+
 # Suppress matplotlib debug logging
 logging.getLogger('matplotlib').setLevel(logging.WARNING)
 logging.getLogger('matplotlib.font_manager').setLevel(logging.WARNING)
 
-# === SYSTEM 1: Basic Configuration ===
+
 config1 = Config(touchdown=True, youngs_modulus_method='bergfeld', stress_failure_envelope_method='adam_unpublished')
 scenario_config1 = ScenarioConfig(phi=5, system_type='pst-', crack_length=1000)  # Steeper slope
 weak_layer1 = WeakLayer(rho=10, h=25, E=0.25, G_Ic=1)
@@ -26,20 +28,61 @@ layers1 = [
     Layer(rho=280, h=100), # Bottom Layer
 ]
 segments1 = [
-    Segment(l=3000, k=True, m=0),
-    Segment(l=4000, k=True, m=0)
+    Segment(l=3000, has_foundation=True, m=0),
+    Segment(l=4000, has_foundation=True, m=0)
 ]
 criteria_config1 = CriteriaConfig(fn=1, fm=1, gn=1, gm=1)
+logger.info("Validated model input 1")
 
 model_input1 = ModelInput(
-    scenario_config=scenario_config1, 
-    weak_layer=weak_layer1, 
-    layers=layers1, 
-    segments=segments1, 
+    scenario_config=scenario_config1,
+    weak_layer=weak_layer1,
+    layers=layers1,
+    segments=segments1,
     criteria_config=criteria_config1
 )
 
-system1 = SystemModel(config=config1, model_input=model_input1)
+system1 = SystemModel(model_input=model_input1, config=config1)
+logger.info("System 1 setup")
+unknown_constants = system1.get_unknown_constants()
+logger.info("Unknown constants: %s", unknown_constants)
+print(system1.scenario.phi)
+print(system1.scenario.crack_h)
+breakpoint()
+
+
+# Equivalent setup in new system
+layers = [
+    Layer(rho=200, h=150),
+    Layer(rho=300, h=100),
+]
+
+# For touchdown=True, the segmentation will be different
+# Need to match the segments that would be created by calc_segments with touchdown=True
+segments = [
+    Segment(l=6000, has_foundation=True, m=0),
+    Segment(l=1000, has_foundation=False, m=75),
+    Segment(l=1000, has_foundation=False, m=0),
+    Segment(l=6000, has_foundation=True, m=0)
+]
+
+scenario_config = ScenarioConfig(phi=30.0, system_type='skier', crack_length=2000)
+weak_layer = WeakLayer(rho=10, h=30, E=0.25, G_Ic=1)  # Default weak layer properties
+criteria_config = CriteriaConfig(fn=1, fm=1, gn=1, gm=1)
+config = Config()  # Use default configuration
+
+model_input = ModelInput(
+    scenario_config=scenario_config,
+    weak_layer=weak_layer,
+    layers=layers,
+    segments=segments,
+    criteria_config=criteria_config
+)
+
+new_system = SystemModel(config=config, model_input=model_input)
+new_constants = new_system.unknown_constants
+print(new_system.scenario.crack_h)
+print(new_system.scenario.phi)
 
 # === DEMO 1: Single System Analysis ===
 

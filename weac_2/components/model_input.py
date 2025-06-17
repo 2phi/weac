@@ -13,7 +13,7 @@ field_name: type = Field(..., gt=0, description="Description")
 import logging
 import json
 from typing import List, Literal
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, ValidationError
 
 from weac_2.components.scenario_config import ScenarioConfig
 from weac_2.components.layer import WeakLayer, Layer
@@ -45,6 +45,15 @@ class ModelInput(BaseModel):
     segments: List[Segment] = Field(..., description="Segments")
     
     criteria_config: CriteriaConfig = Field(default=CriteriaConfig(), description="Criteria overrides")
+    
+    def model_post_init(self, _ctx):
+        # Check that the last segment does not have a mass
+        if len(self.segments) == 0:
+            raise ValueError("At least one segment is required")
+        if len(self.layers) == 0:
+            raise ValueError("At least one layer is required")
+        if self.segments[-1].m != 0:
+            raise ValueError("The last segment must have a mass of 0")
 
 if __name__ == "__main__":
     # Example usage requiring all mandatory fields for proper instantiation
@@ -56,8 +65,8 @@ if __name__ == "__main__":
         Layer(rho=280, h=150)
     ]
     example_segments = [
-        Segment(l=5000, k=True, m=80),
-        Segment(l=3000, k=False, m=0)
+        Segment(l=5000, has_foundation=True, m=80),
+        Segment(l=3000, has_foundation=False, m=0)
     ]
     example_criteria_overrides = CriteriaConfig() # All fields have defaults
 

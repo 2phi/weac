@@ -181,7 +181,7 @@ class Eigensystem():
         sR[ewR > 0], sC[ewC > 0] = -1, -1
         return ewC, ewR, evC, evR, sR, sC
 
-    def zh(self, x: float, l: float = 0, k: bool = True) -> NDArray:
+    def zh(self, x: float, l: float = 0, has_foundation: bool = True) -> NDArray:
         """
         Compute bedded or free complementary solution at position x.
 
@@ -191,7 +191,7 @@ class Eigensystem():
             Horizontal coordinate (mm).
         l : float, optional
             Segment length (mm). Default is 0.
-        k : bool
+        has_foundation : bool
             Indicates whether segment has foundation or not. Default
             is True.
 
@@ -200,7 +200,7 @@ class Eigensystem():
         zh : ndarray
             Complementary solution matrix (6x6) at position x.
         """
-        if k:
+        if has_foundation:
             zh = np.concatenate([
                 # Real
                 self.evR*np.exp(self.ewR*(x + l*self.sR)),
@@ -228,7 +228,7 @@ class Eigensystem():
 
         return zh
 
-    def zp(self, x: float, phi: float = 0, k=True, qs: float = 0) -> NDArray:
+    def zp(self, x: float, phi: float = 0, has_foundation=True, qs: float = 0) -> NDArray:
         """
         Compute bedded or free particular integrals at position x.
 
@@ -238,7 +238,7 @@ class Eigensystem():
             Horizontal coordinate (mm).
         phi : float
             Inclination (degrees).
-        k : bool
+        has_foundation : bool
             Indicates whether segment has foundation (True) or not
             (False). Default is True.
         qs : float
@@ -269,7 +269,7 @@ class Eigensystem():
         K0 = self.K0
 
         # Assemble particular integral vectors
-        if k:
+        if has_foundation:
             zp = np.array([
                 [(qw_t + qs_t)/kt + H*qw_t*(H + h - 2*z_cog)/(4*kA55)
                     + H*qs_t*(2*H + h)/(4*kA55)],
@@ -316,11 +316,11 @@ class Eigensystem():
 
         return np.array([
             [0],
-            [(self.B11*(self.h*qs_t - 2*qw_t*self.slab.z_cog)
+            [(self.B11*(self.slab.H*qs_t - 2*qw_t*self.slab.z_cog)
             + 2*self.D11*(qw_t + qs_t))/(2*self.K0)],
             [0],
             [-(qw_n + qs_n)/self.kA55],
             [0],
-            [-(self.A11*(self.h*qs_t - 2*qw_t*self.slab.z_cog)
+            [-(self.A11*(self.slab.H*qs_t - 2*qw_t*self.slab.z_cog)
             + 2*self.B11*(qw_t + qs_t))/(2*self.K0)]
         ])

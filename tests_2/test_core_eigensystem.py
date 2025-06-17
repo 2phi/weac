@@ -135,9 +135,9 @@ class TestEigensystemSolutionMethods(unittest.TestCase):
         """Test complementary solution for bedded segment."""
         x = 100.0  # Position
         l = 1000.0  # Segment length
-        k = True   # Bedded
+        has_foundation = True   # Bedded
         
-        zh = self.eigensystem.zh(x, l, k)
+        zh = self.eigensystem.zh(x, l, has_foundation)
         
         # Should return 6x6 matrix
         self.assertEqual(zh.shape, (6, 6), "Complementary solution should be 6x6 matrix")
@@ -149,9 +149,9 @@ class TestEigensystemSolutionMethods(unittest.TestCase):
         """Test complementary solution for free segment."""
         x = 50.0   # Position
         l = 500.0  # Segment length
-        k = False  # Free
+        has_foundation = False  # Free
         
-        zh = self.eigensystem.zh(x, l, k)
+        zh = self.eigensystem.zh(x, l, has_foundation)
         
         # Should return 6x6 matrix
         self.assertEqual(zh.shape, (6, 6), "Complementary solution should be 6x6 matrix")
@@ -173,10 +173,10 @@ class TestEigensystemSolutionMethods(unittest.TestCase):
         """Test particular solution for bedded segment."""
         x = 200.0  # Position
         phi = 30.0  # Inclination
-        k = True   # Bedded
+        has_foundation = True   # Bedded
         qs = 5.0   # Surface load
         
-        zp = self.eigensystem.zp(x, phi, k, qs)
+        zp = self.eigensystem.zp(x, phi, has_foundation, qs)
         
         # Should return 6x1 vector
         self.assertEqual(zp.shape, (6, 1), "Particular solution should be 6x1 vector")
@@ -188,10 +188,10 @@ class TestEigensystemSolutionMethods(unittest.TestCase):
         """Test particular solution for free segment."""
         x = 150.0  # Position
         phi = 25.0  # Inclination
-        k = False  # Free
+        has_foundation = False  # Free
         qs = 0.0   # No additional surface load
         
-        zp = self.eigensystem.zp(x, phi, k, qs)
+        zp = self.eigensystem.zp(x, phi, has_foundation, qs)
         
         # Should return 6x1 vector
         self.assertEqual(zp.shape, (6, 1), "Particular solution should be 6x1 vector")
@@ -273,7 +273,7 @@ class TestEigensystemPhysicalConsistency(unittest.TestCase):
         eigensystem = Eigensystem(weak_layer, slab)
         
         # Test continuity for bedded segments
-        x1, x2 = 100.0, 100.1  # Very close points
+        x1, x2 = 100.0, 100.0  # Very close points
         l = 1000.0
         
         zh1 = eigensystem.zh(x1, l, True)

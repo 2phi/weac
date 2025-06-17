@@ -27,12 +27,12 @@ class Config(BaseModel):
         Consider Touchdown of the Slab on Twisting (?)
     youngs_modulus_method : Literal['bergfeld', 'scapazzo', 'gerling']
         Method to calculate the density of the snowpack
-    stress_failure_envelope_method : Literal['adam_unpublished', 'adam_published']
+    stress_failure_envelope_method : Literal['adam_unpublished', 'adam_unpublished']
         Method to calculate the stress failure envelope
     """
-    touchdown: bool = Field(default=True, description="Whether to calculate the touchdown of the slab")
-    youngs_modulus_method: Literal['bergfeld', 'scapazzo', 'gerling'] = Field(default='adam_unpublished', description="Method to calculate the density of the snowpack")
-    stress_failure_envelope_method: Literal['adam_unpublished', 'adam_published'] = Field(default='bergfeld', description="Method to calculate the stress failure envelope")
+    touchdown: bool = Field(default=False, description="Whether to calculate the touchdown of the slab")
+    youngs_modulus_method: Literal['bergfeld', 'scapazzo', 'gerling'] = Field(default='bergfeld', description="Method to calculate the density of the snowpack")
+    stress_failure_envelope_method: Literal['adam_unpublished'] = Field(default='adam_unpublished', description="Method to calculate the stress failure envelope")
 
 if __name__ == "__main__":
     config = Config()

@@ -291,7 +291,7 @@ class SolutionMixin:
             rhs[2] = 1
 
         # --- SOLVE -----------------------------------------------------------
-
+        
         # Solve z0 = zh0*C + zp0 = rhs for constants, i.e. zh0*C = rhs - zp0
         C = np.linalg.solve(zh0, rhs - zp0)
         # Sort (nDOF = 6) constants for each segment into columns of a matrix

@@ -31,8 +31,8 @@ class SlabContactMixin:
         """Set class attributes for touchdown consideration"""
         self.set_columnlength(L)
         self.set_cracklength(a)
-        self.set_tc(cf)
         self.set_phi(phi)
+        self.set_tc(cf)
         self.set_stiffness_ratio(ratio)
 
     def calc_touchdown_mode(self):
@@ -41,6 +41,8 @@ class SlabContactMixin:
             # Calculate stage transitions
             a1 = self.calc_a1()
             a2 = self.calc_a2()
+            self.a1 = a1
+            self.a2 = a2
             # Assign stage
             if self.a <= a1:
                 mode = "A"
@@ -83,6 +85,18 @@ class SlabContactMixin:
         """
         self.a = a
 
+
+    def set_phi(self, phi):
+        """
+        Set inclination of the slab.
+
+        Arguments
+        ---------
+        phi : float
+            Inclination of the slab (°).
+        """
+        self.phi = phi
+
     def set_tc(self, cf):
         """
         Set height of the crack.
@@ -96,17 +110,6 @@ class SlabContactMixin:
         # subtract displacement under constact load from collapsed wl height
         qn = self.calc_qn()
         self.tc = cf * self.t - qn / self.kn
-
-    def set_phi(self, phi):
-        """
-        Set inclination of the slab.
-
-        Arguments
-        ---------
-        phi : float
-            Inclination of the slab (°).
-        """
-        self.phi = phi
 
     def set_stiffness_ratio(self, ratio=1000):
         """
@@ -217,11 +220,13 @@ class SlabContactMixin:
         a = self.a
         tc = self.tc
         qn = self.calc_qn()
+        
+        # Spring stiffness supported segment
+        kRl = self.substitute_stiffness(L - a, "supported", "rot")
+        kNl = self.substitute_stiffness(L - a, "supported", "trans")
 
         def polynomial(x):
-            # Spring stiffness supported segment
-            kRl = self.substitute_stiffness(L - a, "supported", "rot")
-            kNl = self.substitute_stiffness(L - a, "supported", "trans")
+            
             # Spring stiffness rested segment
             kRr = self.substitute_stiffness(a - x, "rested", "rot")
             # define constants
