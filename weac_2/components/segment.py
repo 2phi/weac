@@ -7,9 +7,9 @@ class Segment(BaseModel):
     Args:
         length : float
             Segment length [mm]
-        fractured: bool
+        has_foundation: bool
             Indicating whether the segment is supported or free hanging.
-        skier_weight : float
+        m : float
             Skier weight at segments right edge in kg
     """
     length: float = Field(..., ge=0, description="Segment length in mm")
