@@ -145,31 +145,31 @@ class TestSegment(unittest.TestCase):
     def test_segment_creation(self):
         """Test creating segments with various parameters."""
         # Basic segment
-        seg1 = Segment(l=1000.0, has_foundation=True, m=0.0)
-        self.assertEqual(seg1.l, 1000.0)
+        seg1 = Segment(length=1000.0, has_foundation=True, m=0.0)
+        self.assertEqual(seg1.length, 1000.0)
         self.assertEqual(seg1.has_foundation, True)
         self.assertEqual(seg1.m, 0.0)
         
         # Segment with skier load
-        seg2 = Segment(l=2000.0, has_foundation=False, m=75.0)
-        self.assertEqual(seg2.l, 2000.0)
+        seg2 = Segment(length=2000.0, has_foundation=False, m=75.0)
+        self.assertEqual(seg2.length, 2000.0)
         self.assertEqual(seg2.has_foundation, False)
         self.assertEqual(seg2.m, 75.0)
         
     def test_segment_default_mass(self):
         """Test that segment mass defaults to 0."""
-        seg = Segment(l=1500.0, has_foundation=True)
+        seg = Segment(length=1500.0, has_foundation=True)
         self.assertEqual(seg.m, 0.0)
         
     def test_segment_validation(self):
         """Test segment validation."""
         # Negative length
         with self.assertRaises(ValidationError):
-            Segment(l=-100.0, has_foundation=True)
+            Segment(length=-100.0, has_foundation=True)
             
         # Negative mass
         with self.assertRaises(ValidationError):
-            Segment(l=1000.0, has_foundation=True, m=-10.0)
+            Segment(length=1000.0, has_foundation=True, m=-10.0)
 
 
 class TestModelInput(unittest.TestCase):
@@ -184,8 +184,8 @@ class TestModelInput(unittest.TestCase):
             Layer(rho=300, h=150)
         ]
         self.segments = [
-            Segment(l=3000, has_foundation=True, m=70),
-            Segment(l=4000, has_foundation=True, m=0)
+            Segment(length=3000, has_foundation=True, m=70),
+            Segment(length=4000, has_foundation=True, m=0)
         ]
         self.criteria_config = CriteriaConfig(fn=1, fm=1, gn=1, gm=1)
         
@@ -323,12 +323,12 @@ class TestModelInputPhysicalConsistency(unittest.TestCase):
     def test_segment_length_consistency(self):
         """Test that segment lengths are reasonable."""
         segments = [
-            Segment(l=1000, has_foundation=True, m=0),    # 1m segment
-            Segment(l=2000, has_foundation=False, m=75),  # 2m free segment with skier
-            Segment(l=1500, has_foundation=True, m=0)     # 1.5m segment
+            Segment(length=1000, has_foundation=True, m=0),    # 1m segment
+            Segment(length=2000, has_foundation=False, m=75),  # 2m free segment with skier
+            Segment(length=1500, has_foundation=True, m=0)     # 1.5m segment
         ]
         
-        total_length = sum(seg.l for seg in segments)
+        total_length = sum(seg.length for seg in segments)
         self.assertGreater(total_length, 0, "Total length should be positive")
         self.assertLess(total_length, 100000, "Total length should be reasonable (< 100m)")
         

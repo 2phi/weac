@@ -53,10 +53,10 @@ class DetailedProfiler:
         ]
         
         segments = [
-            Segment(l=6000, has_foundation=True, m=0),
-            Segment(l=1000, has_foundation=False, m=75),
-            Segment(l=1000, has_foundation=False, m=0),
-            Segment(l=6000, has_foundation=True, m=0)
+            Segment(length=6000, has_foundation=True, m=0),
+            Segment(length=1000, has_foundation=False, m=75),
+            Segment(length=1000, has_foundation=False, m=0),
+            Segment(length=6000, has_foundation=True, m=0)
         ]
         
         inclination = 30.0
@@ -175,10 +175,10 @@ class DetailedProfiler:
         
         layers = [Layer(rho=200, h=150), Layer(rho=300, h=100)]
         segments = [
-            Segment(l=6000, has_foundation=True, m=0),
-            Segment(l=1000, has_foundation=False, m=75),
-            Segment(l=1000, has_foundation=False, m=0),
-            Segment(l=6000, has_foundation=True, m=0)
+            Segment(length=6000, has_foundation=True, m=0),
+            Segment(length=1000, has_foundation=False, m=75),
+            Segment(length=1000, has_foundation=False, m=0),
+            Segment(length=6000, has_foundation=True, m=0)
         ]
         
         scenario_config = ScenarioConfig(phi=30.0, system_type='skier', crack_length=2000)

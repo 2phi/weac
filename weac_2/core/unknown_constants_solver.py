@@ -64,7 +64,7 @@ class UnknownConstantsSolver:
         
         # Assemble position vector
         pi = np.full(nS, "m")
-        pi[0], pi[-1] = "l", "r"
+        pi[0], pi[-1] = "length", "r"
 
         # Initialize matrices
         Zh0 = np.zeros([nS * 6, nS * nDOF])
@@ -75,13 +75,13 @@ class UnknownConstantsSolver:
         # LHS: Transmission & Boundary Conditions between segments
         for i in range(nS):
             # Length, foundation and position of segment i
-            l, has_foundation, pos = li[i], ki[i], pi[i]
+            length, has_foundation, pos = li[i], ki[i], pi[i]
             
-            logger.debug(f"Assembling segment {i}: l={l}, has_foundation={has_foundation}, pos={pos}")
+            logger.debug(f"Assembling segment {i}: length={length}, has_foundation={has_foundation}, pos={pos}")
             # Matrix of Size one of: (l: [9,6], m: [12,6], r: [9,6])
             Zhi = cls._setup_conditions(
-                zl=eigensystem.zh(x=0, l=l, has_foundation=has_foundation),
-                zr=eigensystem.zh(x=l, l=l, has_foundation=has_foundation),
+                zl=eigensystem.zh(x=0, length=length, has_foundation=has_foundation),
+                zr=eigensystem.zh(x=length, length=length, has_foundation=has_foundation),
                 eigensystem=eigensystem,
                 has_foundation=has_foundation,
                 pos=pos,
@@ -92,7 +92,7 @@ class UnknownConstantsSolver:
             # Vector of Size one of: (l: [9,1], m: [12,1], r: [9,1])
             zpi = cls._setup_conditions(
                 zl=eigensystem.zp(x=0, phi=phi, has_foundation=has_foundation, qs=qs),
-                zr=eigensystem.zp(x=l, phi=phi, has_foundation=has_foundation, qs=qs),
+                zr=eigensystem.zp(x=length, phi=phi, has_foundation=has_foundation, qs=qs),
                 eigensystem=eigensystem,
                 has_foundation=has_foundation,
                 pos=pos,
@@ -146,7 +146,7 @@ class UnknownConstantsSolver:
         # Loop through segments to set touchdown conditions at rhs
         for i in range(nS):
             # Length, foundation and position of segment i
-            l, has_foundation, pos = li[i], ki[i], pi[i]
+            length, has_foundation, pos = li[i], ki[i], pi[i]
             # Set displacement BC in stage B
             if not has_foundation and bool(touchdown_mode in ["B_point_contact"]):
                 if i == 0:
@@ -324,29 +324,3 @@ class UnknownConstantsSolver:
             )
 
         return bc
-
-    def _setup_RHS(self, z, has_foundation: bool, pos: Literal['l','r','m','left','right','mid'], system_type: Literal['skier', 'skiers', 'pst-', 'pst+', 'rot', 'trans']):
-        """
-        Setup RHS depending on System Properties.
-
-        Arguments
-        ---------
-        z : ndarray
-            Solution vector (6x1) at a certain position x.
-        l : float, optional
-            Length of the segment in consideration. Default is zero.
-        has_foundation : boolean
-            Indicates whether segment has foundation(True) or not (False).
-            Default is False.
-        pos : {'left', 'mid', 'right', 'l', 'm', 'r'}, optional
-            Determines whether the segement under consideration
-            is a left boundary segement (left, l), one of the
-            center segement (mid, m), or a right boundary
-            segement (right, r). Default is 'mid'.
-
-        Returns
-        -------
-        rhs : ndarray
-            RHS vector (length ?) at position x.
-        """
-        pass

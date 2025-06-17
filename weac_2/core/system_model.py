@@ -80,7 +80,7 @@ class SystemModel:
     
     # Define system components
     layers = [Layer(rho=200, h=150), Layer(rho=300, h=100)]
-    segments = [Segment(l=10000, has_foundation=True, m=0), Segment(l=4000, has_foundation=False, m=0)]
+    segments = [Segment(length=10000, has_foundation=True, m=0), Segment(length=4000, has_foundation=False, m=0)]
     
     # Create and solve system
     system = SystemModel(model_input=model_input, config=Config(touchdown=True))
@@ -137,10 +137,10 @@ class SystemModel:
             
             if self.scenario.system_type == "pst-":
                 new_segments = copy.deepcopy(self.scenario.segments)
-                new_segments[-1].l = slab_touchdown.touchdown_l
+                new_segments[-1].length = slab_touchdown.touchdown_l
             elif self.scenario.system_type == "-pst":
                 new_segments = copy.deepcopy(self.scenario.segments)
-                new_segments[0].l = slab_touchdown.touchdown_l
+                new_segments[0].length = slab_touchdown.touchdown_l
             else:
                 # For other systems, keep original segments
                 new_segments = self.scenario.segments
@@ -153,7 +153,7 @@ class SystemModel:
                 weak_layer=self.weak_layer, 
                 slab=self.slab
             )
-            logger.info(f"Updated scenario with new segment lengths: {[seg.l for seg in new_segments]}")
+            logger.info(f"Updated scenario with new segment lengths: {[seg.length for seg in new_segments]}")
             
             return slab_touchdown
         return None
@@ -264,7 +264,7 @@ class SystemModel:
     def _invalidate_constants(self):
         self.__dict__.pop('unknown_constants', None)
 
-    def z(self, x: Union[float, Sequence[float], np.ndarray], C: np.ndarray, l: float, phi: float, has_foundation: bool = True, qs: float = 0) -> np.ndarray:
+    def z(self, x: Union[float, Sequence[float], np.ndarray], C: np.ndarray, length: float, phi: float, has_foundation: bool = True, qs: float = 0) -> np.ndarray:
         """
         Assemble solution vector at positions x.
 
@@ -274,7 +274,7 @@ class SystemModel:
             Horizontal coordinate (mm). Can be sequence of length N.
         C : ndarray
             Vector of constants (6xN) at positions x.
-        l : float
+        length : float
             Segment length (mm).
         phi : float
             Inclination (degrees).
@@ -291,9 +291,9 @@ class SystemModel:
         """
         if isinstance(x, (list, tuple, np.ndarray)):
             z = np.concatenate([
-                np.dot(self.eigensystem.zh(xi, l, has_foundation), C)
+                np.dot(self.eigensystem.zh(xi, length, has_foundation), C)
                 + self.eigensystem.zp(xi, phi, has_foundation, qs) for xi in x], axis=1)
         else:
-            z = np.dot(self.eigensystem.zh(x, l, has_foundation), C) + self.eigensystem.zp(x, phi, has_foundation, qs)
+            z = np.dot(self.eigensystem.zh(x, length, has_foundation), C) + self.eigensystem.zp(x, phi, has_foundation, qs)
 
         return z

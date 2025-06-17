@@ -19,7 +19,7 @@ class TestSystemModelCaching(unittest.TestCase):
             scenario_config=ScenarioConfig(phi=5, system='skier'),
             weak_layer=WeakLayer(rho=10, h=30, E=0.25, G_Ic=1),
             layers=[Layer(rho=170, h=100), Layer(rho=280, h=100)],
-            segments=[Segment(l=3000, has_foundation=True, m=70), Segment(l=4000, has_foundation=True, m=0)],
+            segments=[Segment(length=3000, has_foundation=True, m=70), Segment(length=4000, has_foundation=True, m=0)],
             criteria_config=CriteriaConfig(fn=1, fm=1, gn=1, gm=1),
         )
         cfg = Config(youngs_modulus_method='bergfeld',

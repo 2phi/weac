@@ -65,8 +65,8 @@ if __name__ == "__main__":
         Layer(rho=280, h=150)
     ]
     example_segments = [
-        Segment(l=5000, has_foundation=True, m=80),
-        Segment(l=3000, has_foundation=False, m=0)
+        Segment(length=5000, has_foundation=True, m=80),
+        Segment(length=3000, has_foundation=False, m=0)
     ]
     example_criteria_overrides = CriteriaConfig() # All fields have defaults
 

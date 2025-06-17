@@ -12,6 +12,6 @@ class Segment(BaseModel):
         skier_weight : float
             Skier weight at segments right edge in kg
     """
-    l: float = Field(..., ge=0, description="Segment length in mm")
+    length: float = Field(..., ge=0, description="Segment length in mm")
     has_foundation: bool = Field(default=True, description="Boolean indicating whether the segment is fractured or not")
     m: float = Field(default=0, ge=0, description="Skier weight at segment right edge in kg")

@@ -273,7 +273,7 @@ class SlabTouchdown:
         return kR
     
     def _generate_straight_scenario(self, L: float) -> Scenario:
-        segments = [Segment(l=L, has_foundation=True, m=0)]
+        segments = [Segment(length=L, has_foundation=True, m=0)]
         
         logger.info("Generating straight scenario with length %s", L)
         straight_scenario = Scenario(
@@ -301,7 +301,7 @@ class SlabTouchdown:
         unknown_constants = UnknownConstantsSolver.solve_for_unknown_constants(scenario=scenario, eigensystem=eigensystem, system_type=dof)
 
         # Calculate field quantities at x=0 (left end)
-        Zh0 = eigensystem.zh(x=0, l=scenario.L, has_foundation=True)
+        Zh0 = eigensystem.zh(x=0, length=scenario.L, has_foundation=True)
         zp0 = eigensystem.zp(x=0, phi=0, has_foundation=True, qs=0)
         C_at_x0 = unknown_constants[:, 0].reshape(-1, 1)  # Ensure column vector
         z_at_x0 = Zh0 @ C_at_x0 + zp0

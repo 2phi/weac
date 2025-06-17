@@ -125,7 +125,7 @@ class Scenario:
         self.qn = qn
 
     def _setup_scenario(self):
-        self.li = np.array([seg.l for seg in self.segments])
+        self.li = np.array([seg.length for seg in self.segments])
         self.ki = np.array([seg.has_foundation for seg in self.segments])
         # masses that act *between* segments: take all but the last one
         self.mi = np.array([seg.m for seg in self.segments[:-1]])

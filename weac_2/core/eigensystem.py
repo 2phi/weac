@@ -181,7 +181,7 @@ class Eigensystem():
         sR[ewR > 0], sC[ewC > 0] = -1, -1
         return ewC, ewR, evC, evR, sR, sC
 
-    def zh(self, x: float, l: float = 0, has_foundation: bool = True) -> NDArray:
+    def zh(self, x: float, length: float = 0, has_foundation: bool = True) -> NDArray:
         """
         Compute bedded or free complementary solution at position x.
 
@@ -189,7 +189,7 @@ class Eigensystem():
         ---------
         x : float
             Horizontal coordinate (mm).
-        l : float, optional
+        length : float, optional
             Segment length (mm). Default is 0.
         has_foundation : bool
             Indicates whether segment has foundation or not. Default
@@ -203,13 +203,13 @@ class Eigensystem():
         if has_foundation:
             zh = np.concatenate([
                 # Real
-                self.evR*np.exp(self.ewR*(x + l*self.sR)),
+                self.evR*np.exp(self.ewR*(x + length*self.sR)),
                 # Complex
-                np.exp(self.ewC.real*(x + l*self.sC))*(
+                np.exp(self.ewC.real*(x + length*self.sC))*(
                        self.evC.real*np.cos(self.ewC.imag*x)
                        - self.evC.imag*np.sin(self.ewC.imag*x)),
                 # Complex
-                np.exp(self.ewC.real*(x + l*self.sC))*(
+                np.exp(self.ewC.real*(x + length*self.sC))*(
                        self.evC.imag*np.cos(self.ewC.imag*x)
                        + self.evC.real*np.sin(self.ewC.imag*x))], axis=1)
         else:

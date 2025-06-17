@@ -63,8 +63,8 @@ class TestIntegrationOldVsNew(unittest.TestCase):
         ]
         
         segments = [
-            Segment(l=10000, has_foundation=True, m=0),
-            Segment(l=4000, has_foundation=False, m=0)
+            Segment(length=10000, has_foundation=True, m=0),
+            Segment(length=4000, has_foundation=False, m=0)
         ]
         
         scenario_config = ScenarioConfig(phi=inclination, system_type='pst-', crack_length=4000)
@@ -173,8 +173,8 @@ class TestIntegrationOldVsNew(unittest.TestCase):
         # For touchdown=True, the segmentation will be different
         # Need to match the segments that would be created by calc_segments with touchdown=True
         segments = [
-            Segment(l=10000, has_foundation=True, m=0),
-            Segment(l=4000, has_foundation=False, m=0)
+            Segment(lengthength=10000, has_foundation=True, m=0),
+            Segment(length=4000, has_foundation=False, m=0)
         ]
         
         scenario_config = ScenarioConfig(phi=inclination, system_type='pst-', crack_length=4000)

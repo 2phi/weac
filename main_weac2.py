@@ -28,8 +28,8 @@ layers1 = [
     Layer(rho=280, h=100), # Bottom Layer
 ]
 segments1 = [
-    Segment(l=3000, has_foundation=True, m=70),
-    Segment(l=4000, has_foundation=True, m=0)
+    Segment(length=3000, has_foundation=True, m=70),
+    Segment(length=4000, has_foundation=True, m=0)
 ]
 
 model_input1 = ModelInput(
@@ -51,8 +51,8 @@ layers2 = [
     Layer(rho=280, h=100), # Bottom Layer
 ]
 segments2 = [
-    Segment(l=3000, has_foundation=True, m=70),
-    Segment(l=4000, has_foundation=True, m=0)
+    Segment(length=3000, has_foundation=True, m=70),
+    Segment(length=4000, has_foundation=True, m=0)
 ]
 criteria_config2 = CriteriaConfig(fn=1, fm=1, gn=1, gm=1)
 
@@ -76,8 +76,8 @@ layers3 = [
     Layer(rho=320, h=120), # Heavier bottom layer
 ]
 segments3 = [
-    Segment(l=3500, has_foundation=True, m=60),  # Different skier mass
-    Segment(l=3500, has_foundation=True, m=0)
+    Segment(length=3500, has_foundation=True, m=60),  # Different skier mass
+    Segment(length=3500, has_foundation=True, m=0)
 ]
 criteria_config3 = CriteriaConfig(fn=1, fm=1, gn=1, gm=1)
 
@@ -105,11 +105,11 @@ layers4 = [
     Layer(rho=280, h=100), # (N) Bottom Layer
 ]
 segments4 = [
-    Segment(l=5000, has_foundation=True, m=80),
-    Segment(l=3000, has_foundation=True, m=0),
-    Segment(l=3000, has_foundation=False, m=0),
-    Segment(l=4000, has_foundation=True, m=70),
-    Segment(l=3000, has_foundation=True, m=0)
+    Segment(length=5000, has_foundation=True, m=80),
+    Segment(lengthengthength=3000, has_foundation=True, m=0),
+    Segment(length=3000, has_foundation=False, m=0),
+    Segment(length=4000, has_foundation=True, m=70),
+    Segment(length=3000, has_foundation=True, m=0)
 ]
 criteria_config4 = CriteriaConfig(fn=1, fm=1, gn=1, gm=1)
 model_input4 = ModelInput(

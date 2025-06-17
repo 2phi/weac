@@ -134,10 +134,10 @@ class TestEigensystemSolutionMethods(unittest.TestCase):
     def test_complementary_solution_bedded(self):
         """Test complementary solution for bedded segment."""
         x = 100.0  # Position
-        l = 1000.0  # Segment length
+        length = 1000.0  # Segment length
         has_foundation = True   # Bedded
         
-        zh = self.eigensystem.zh(x, l, has_foundation)
+        zh = self.eigensystem.zh(x, length, has_foundation)
         
         # Should return 6x6 matrix
         self.assertEqual(zh.shape, (6, 6), "Complementary solution should be 6x6 matrix")
@@ -148,10 +148,10 @@ class TestEigensystemSolutionMethods(unittest.TestCase):
     def test_complementary_solution_free(self):
         """Test complementary solution for free segment."""
         x = 50.0   # Position
-        l = 500.0  # Segment length
+        length = 500.0  # Segment length
         has_foundation = False  # Free
         
-        zh = self.eigensystem.zh(x, l, has_foundation)
+        zh = self.eigensystem.zh(x, length, has_foundation)
         
         # Should return 6x6 matrix
         self.assertEqual(zh.shape, (6, 6), "Complementary solution should be 6x6 matrix")
@@ -274,10 +274,10 @@ class TestEigensystemPhysicalConsistency(unittest.TestCase):
         
         # Test continuity for bedded segments
         x1, x2 = 100.0, 100.0  # Very close points
-        l = 1000.0
+        length = 1000.0
         
-        zh1 = eigensystem.zh(x1, l, True)
-        zh2 = eigensystem.zh(x2, l, True)
+        zh1 = eigensystem.zh(x1, length, True)
+        zh2 = eigensystem.zh(x2, length, True)
         
         # Solutions should be very close for nearby points
         self.assertTrue(np.allclose(zh1, zh2, atol=1e-6),

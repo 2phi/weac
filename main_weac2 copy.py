@@ -26,8 +26,8 @@ layers1 = [
     Layer(rho=280, h=100), # Bottom Layer
 ]
 segments1 = [
-    Segment(l=3000, has_foundation=True, m=0),
-    Segment(l=4000, has_foundation=True, m=0)
+    Segment(length=3000, has_foundation=True, m=0),
+    Segment(length=4000, has_foundation=True, m=0)
 ]
 criteria_config1 = CriteriaConfig(fn=1, fm=1, gn=1, gm=1)
 

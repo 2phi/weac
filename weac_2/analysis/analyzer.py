@@ -66,9 +66,9 @@ class Analyzer:
         zs = np.full([6, xs.size], np.nan)
 
         # Loop through segments
-        for i, l in enumerate(li):
+        for i, length in enumerate(li):
             # Get local x-coordinates of segment i
-            xi = np.linspace(0, l, num=ni[i], endpoint=(i == li.size - 1))
+            xi = np.linspace(0, length, num=ni[i], endpoint=(i == li.size - 1))
             # Compute start and end coordinates of segment i
             x0 = lic[i]
             # Assemble global coordinate vector
@@ -77,7 +77,7 @@ class Analyzer:
             if not ki[i]:
                 issupported[nic[i] : nic[i + 1]] = False
             # Compute segment solution
-            zi = self.sm.z(xi, C[:, [i]], l, phi, ki[i], qs=qs)
+            zi = self.sm.z(xi, C[:, [i]], length, phi, ki[i], qs=qs)
             # Assemble global solution matrix
             zs[:, nic[i] : nic[i + 1]] = zi
 
@@ -130,18 +130,18 @@ class Analyzer:
         Ginc1, Ginc2 = 0, 0
 
         # Loop through segments with crack advance
-        for j, l in enumerate(li):
+        for j, length in enumerate(li):
             # Uncracked (0) and cracked (1) solutions at integration points
-            z0 = partial(self.z, C=C0[:, [j]], l=l, phi=phi, bed=True)
-            z1 = partial(self.z, C=C1[:, [j]], l=l, phi=phi, bed=False)
+            z0 = partial(self.z, C=C0[:, [j]], length=length, phi=phi, bed=True)
+            z1 = partial(self.z, C=C1[:, [j]], length=length, phi=phi, bed=False)
 
             # Mode I (1) and II (2) integrands at integration points
             int1 = partial(self.int1, z0=z0, z1=z1)
             int2 = partial(self.int2, z0=z0, z1=z1)
 
             # Segement contributions to total crack opening integral
-            Ginc1 += quad(int1, 0, l, epsabs=self.tol, epsrel=self.tol)[0] / (2 * da)
-            Ginc2 += quad(int2, 0, l, epsabs=self.tol, epsrel=self.tol)[0] / (2 * da)
+            Ginc1 += quad(int1, 0, length, epsabs=self.tol, epsrel=self.tol)[0] / (2 * da)
+            Ginc2 += quad(int2, 0, length, epsabs=self.tol, epsrel=self.tol)[0] / (2 * da)
 
         return np.array([Ginc1 + Ginc2, Ginc1, Ginc2]).flatten()
 
@@ -534,9 +534,9 @@ class Analyzer:
         """Delegate to system field quantities."""
         return self.sm.fq.Gii(Z, unit=unit)
     
-    def z(self, x, C, l, phi, bed=True, qs=0):
+    def z(self, x, C, length, phi, bed=True, qs=0):
         """Delegate to system model."""
-        return self.sm.z(x, C, l, phi, has_foundation=bed, qs=qs)
+        return self.sm.z(x, C, length, phi, has_foundation=bed, qs=qs)
     
     def du0_dxdx(self, Z, phi):
         """Calculate second derivative of centerline displacement."""

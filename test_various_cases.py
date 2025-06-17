@@ -28,8 +28,8 @@ layers1 = [
     Layer(rho=280, h=100), # Bottom Layer
 ]
 segments1 = [
-    Segment(l=3000, has_foundation=True, m=0),
-    Segment(l=4000, has_foundation=True, m=0)
+    Segment(length=3000, has_foundation=True, m=0),
+    Segment(length=4000, has_foundation=True, m=0)
 ]
 criteria_config1 = CriteriaConfig(fn=1, fm=1, gn=1, gm=1)
 logger.info("Validated model input 1")
@@ -60,10 +60,10 @@ layers = [
 # For touchdown=True, the segmentation will be different
 # Need to match the segments that would be created by calc_segments with touchdown=True
 segments = [
-    Segment(l=6000, has_foundation=True, m=0),
-    Segment(l=1000, has_foundation=False, m=75),
-    Segment(l=1000, has_foundation=False, m=0),
-    Segment(l=6000, has_foundation=True, m=0)
+    Segment(length=6000, has_foundation=True, m=0),
+    Segment(length=1000, has_foundation=False, m=75),
+    Segment(length=1000, has_foundation=False, m=0),
+    Segment(length=6000, has_foundation=True, m=0)
 ]
 
 scenario_config = ScenarioConfig(phi=30.0, system_type='skier', crack_length=2000)
