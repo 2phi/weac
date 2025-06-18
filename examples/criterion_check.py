@@ -1972,6 +1972,7 @@ def find_minimum_force_dampened(
     )
 
 
+# not used
 def find_min_crack_length_self_propagation(
     snow_profile, phi, E, t, initial_interval=(1, 3000)
 ):
@@ -2023,6 +2024,7 @@ def find_min_crack_length_self_propagation(
         return None
 
 
+# not used
 def g_delta_diff_objective(crack_length, snow_profile, phi, E, t, target=1):
     """
     Objective function to evaluate the fracture toughness function.
@@ -2077,6 +2079,7 @@ def g_delta_diff_objective(crack_length, snow_profile, phi, E, t, target=1):
     return g_delta_diff - target
 
 
+# not used
 def failure_envelope_mede(sigma, sample_type="s-RG1"):
     """
     Compute the shear stress (τ) for a given compression strength (σ) based on the
@@ -2154,6 +2157,7 @@ def failure_envelope_mede(sigma, sample_type="s-RG1"):
     return tau
 
 
+# not used
 def failure_envelope_adam_unpublished(x, scaling_factor=1, order_of_magnitude=1):
     """
     Compute the shear stress (τ) for a given normal stress (σ) based on the
@@ -2191,6 +2195,7 @@ def failure_envelope_adam_unpublished(x, scaling_factor=1, order_of_magnitude=1)
     )
 
 
+# not used
 def failure_envelope_schottner(x, order_of_magnitude=1, density=250):
     """
     Compute the shear stress (τ) for a given normal stress (σ) based on
@@ -2238,6 +2243,7 @@ def failure_envelope_schottner(x, order_of_magnitude=1, density=250):
     )
 
 
+# not used
 def failure_envelope_chandel(sigma, sample_type="FCsf"):
     """
     Compute the shear stress (τ) for a given normal stress (σ) based on the
@@ -2304,6 +2310,7 @@ def failure_envelope_chandel(sigma, sample_type="FCsf"):
     return tau
 
 
+# not used
 def fracture_toughness_envelope(G_I):
     """
     Compute the Mode II energy release rate (G_II) as a function of the Mode I

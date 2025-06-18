@@ -5,31 +5,40 @@ The system model initializes and calculates all the parameterizations and passes
 
 We utilize the pydantic library to define the system model.
 """
+
 import logging
-import copy
-from functools import cached_property
-from collections.abc import Sequence
+from typing import Literal, Optional
+
 import numpy as np
-from typing import List, Optional, Union, Iterable, Tuple, Literal
+
+from weac_2.constants import G_MM_S2
+from weac_2.core.eigensystem import Eigensystem
+from weac_2.core.field_quantities import FieldQuantities
+from weac_2.core.scenario import Scenario
 
 # from weac_2.constants import G_MM_S2, LSKI_MM
 from weac_2.utils import decompose_to_normal_tangential, get_skier_point_load
-from weac_2.constants import G_MM_S2, STIFFNESS_COLLAPSE_FACTOR
-from weac_2.components import Config, WeakLayer, Segment, ScenarioConfig, CriteriaConfig, ModelInput, Layer
-from weac_2.core.slab import Slab
-from weac_2.core.eigensystem import Eigensystem
-from weac_2.core.scenario import Scenario
-from weac_2.core.field_quantities import FieldQuantities
 
 logger = logging.getLogger(__name__)
+
 
 class UnknownConstantsSolver:
     """
     This class solves the unknown constants for the WEAC simulation.
     """
-    
+
     @classmethod
-    def solve_for_unknown_constants(cls, scenario: Scenario, eigensystem: Eigensystem, system_type: Literal['skier', 'skiers', 'pst-', 'pst+', 'rot', 'trans'], touchdown_l: Optional[float] = None, touchdown_mode: Optional[Literal['A_free_hanging', 'B_point_contact', 'C_in_contact']] = None, collapsed_weak_layer_kR: Optional[float] = None) -> np.ndarray:
+    def solve_for_unknown_constants(
+        cls,
+        scenario: Scenario,
+        eigensystem: Eigensystem,
+        system_type: Literal["skier", "skiers", "pst-", "pst+", "rot", "trans"],
+        touchdown_distance: Optional[float] = None,
+        touchdown_mode: Optional[
+            Literal["A_free_hanging", "B_point_contact", "C_in_contact"]
+        ] = None,
+        collapsed_weak_layer_kR: Optional[float] = None,
+    ) -> np.ndarray:
         """
         Compute free constants *C* for system. \\
         Assemble LHS from supported and unsupported segments in the form::
@@ -56,12 +65,12 @@ class UnknownConstantsSolver:
         li = scenario.li
         ki = scenario.ki
         mi = scenario.mi
-        
+
         # Determine size of linear system of equations
         nS = len(li)  # Number of beam segments
         nDOF = 6  # Number of free constants per segment
         logger.debug(f"Number of segments: {nS}, DOF per segment: {nDOF}")
-        
+
         # Assemble position vector
         pi = np.full(nS, "m")
         pi[0], pi[-1] = "length", "r"
@@ -70,18 +79,24 @@ class UnknownConstantsSolver:
         Zh0 = np.zeros([nS * 6, nS * nDOF])
         Zp0 = np.zeros([nS * 6, 1])
         rhs = np.zeros([nS * 6, 1])
-        logger.debug(f"Initialized Zh0 shape: {Zh0.shape}, Zp0 shape: {Zp0.shape}, rhs shape: {rhs.shape}")
-        
+        logger.debug(
+            f"Initialized Zh0 shape: {Zh0.shape}, Zp0 shape: {Zp0.shape}, rhs shape: {rhs.shape}"
+        )
+
         # LHS: Transmission & Boundary Conditions between segments
         for i in range(nS):
             # Length, foundation and position of segment i
             length, has_foundation, pos = li[i], ki[i], pi[i]
-            
-            logger.debug(f"Assembling segment {i}: length={length}, has_foundation={has_foundation}, pos={pos}")
+
+            logger.debug(
+                f"Assembling segment {i}: length={length}, has_foundation={has_foundation}, pos={pos}"
+            )
             # Matrix of Size one of: (l: [9,6], m: [12,6], r: [9,6])
             Zhi = cls._setup_conditions(
                 zl=eigensystem.zh(x=0, length=length, has_foundation=has_foundation),
-                zr=eigensystem.zh(x=length, length=length, has_foundation=has_foundation),
+                zr=eigensystem.zh(
+                    x=length, length=length, has_foundation=has_foundation
+                ),
                 eigensystem=eigensystem,
                 has_foundation=has_foundation,
                 pos=pos,
@@ -92,7 +107,9 @@ class UnknownConstantsSolver:
             # Vector of Size one of: (l: [9,1], m: [12,1], r: [9,1])
             zpi = cls._setup_conditions(
                 zl=eigensystem.zp(x=0, phi=phi, has_foundation=has_foundation, qs=qs),
-                zr=eigensystem.zp(x=length, phi=phi, has_foundation=has_foundation, qs=qs),
+                zr=eigensystem.zp(
+                    x=length, phi=phi, has_foundation=has_foundation, qs=qs
+                ),
                 eigensystem=eigensystem,
                 has_foundation=has_foundation,
                 pos=pos,
@@ -100,7 +117,7 @@ class UnknownConstantsSolver:
                 system_type=system_type,
                 collapsed_weak_layer_kR=collapsed_weak_layer_kR,
             )
-            
+
             # Rows for left-hand side assembly
             start = 0 if i == 0 else 3
             stop = 6 if i == nS - 1 else 9
@@ -121,25 +138,43 @@ class UnknownConstantsSolver:
         # Set RHS so that Complementary Integral vanishes at boundaries
         if system_type not in ["pst-", "-pst", "rested"]:
             logger.debug(f"Pre RHS {rhs[:3]}")
-            rhs[:3] = cls._boundary_conditions(eigensystem.zp(x=0, phi=phi, has_foundation=ki[0], qs=qs), eigensystem, False, "mid", system_type, touchdown_mode, collapsed_weak_layer_kR)
+            rhs[:3] = cls._boundary_conditions(
+                eigensystem.zp(x=0, phi=phi, has_foundation=ki[0], qs=qs),
+                eigensystem,
+                False,
+                "mid",
+                system_type,
+                touchdown_mode,
+                collapsed_weak_layer_kR,
+            )
             logger.debug(f"Post RHS {rhs[:3]}")
-            rhs[-3:] = cls._boundary_conditions(eigensystem.zp(x=li[-1], phi=phi, has_foundation=ki[-1], qs=qs), eigensystem, False, "mid", system_type, touchdown_mode, collapsed_weak_layer_kR)
+            rhs[-3:] = cls._boundary_conditions(
+                eigensystem.zp(x=li[-1], phi=phi, has_foundation=ki[-1], qs=qs),
+                eigensystem,
+                False,
+                "mid",
+                system_type,
+                touchdown_mode,
+                collapsed_weak_layer_kR,
+            )
             logger.debug(f"Post RHS {rhs[-3:]}")
             logger.debug("Set complementary integral vanishing at boundaries.")
-        
+
         # Set rhs for vertical faces
         if system_type in ["vpst-", "-vpst"]:
             # Calculate center of gravity and mass of added or cut off slab segement
             x_cog, z_cog, m = scenario.slab.calc_vertical_center_of_gravity(phi)
-            logger.debug(f"Vertical center of gravity: x_cog={x_cog}, z_cog={z_cog}, m={m}")
+            logger.debug(
+                f"Vertical center of gravity: x_cog={x_cog}, z_cog={z_cog}, m={m}"
+            )
             # Convert slope angle to radians
             phi = np.deg2rad(phi)
             # Translate into section forces and moments
-            N = - G_MM_S2 * m * np.sin(phi)
-            M = - G_MM_S2 * m * (x_cog * np.cos(phi) + z_cog * np.sin(phi))
+            N = -G_MM_S2 * m * np.sin(phi)
+            M = -G_MM_S2 * m * (x_cog * np.cos(phi) + z_cog * np.sin(phi))
             V = G_MM_S2 * m * np.cos(phi)
             # Add to right-hand side
-            rhs[:3] = np.vstack([N, M, V])   # left end
+            rhs[:3] = np.vstack([N, M, V])  # left end
             rhs[-3:] = np.vstack([N, M, V])  # right end
             logger.debug(f"Vertical faces: N={N}, M={M}, V={V}")
 
@@ -155,7 +190,7 @@ class UnknownConstantsSolver:
                     rhs[-3:] = np.vstack([0, 0, scenario.crack_h])
             # Set normal force and displacement BC for stage C
             if not has_foundation and bool(touchdown_mode in ["C_in_contact"]):
-                N = scenario.qt * (scenario.crack_l - touchdown_l)
+                N = scenario.qt * (scenario.crack_l - touchdown_distance)
                 if i == 0:
                     rhs[:3] = np.vstack([-N, 0, scenario.crack_h])
                 if i == (nS - 1):
@@ -177,7 +212,19 @@ class UnknownConstantsSolver:
         return C.reshape([-1, nDOF]).T
 
     @classmethod
-    def _setup_conditions(cls, zl: np.ndarray, zr: np.ndarray, eigensystem: Eigensystem, has_foundation: bool, pos: Literal['l','r','m','left','right','mid'] , system_type: Literal['skier', 'skiers', 'pst-', 'pst+', 'rot', 'trans'], touchdown_mode: Optional[Literal['A_free_hanging', 'B_point_contact', 'C_in_contact']] = None, collapsed_weak_layer_kR: Optional[float] = None) -> np.ndarray:
+    def _setup_conditions(
+        cls,
+        zl: np.ndarray,
+        zr: np.ndarray,
+        eigensystem: Eigensystem,
+        has_foundation: bool,
+        pos: Literal["l", "r", "m", "left", "right", "mid"],
+        system_type: Literal["skier", "skiers", "pst-", "pst+", "rot", "trans"],
+        touchdown_mode: Optional[
+            Literal["A_free_hanging", "B_point_contact", "C_in_contact"]
+        ] = None,
+        collapsed_weak_layer_kR: Optional[float] = None,
+    ) -> np.ndarray:
         """
         Provide boundary or transmission conditions for beam segments.
 
@@ -200,23 +247,31 @@ class UnknownConstantsSolver:
         -------
         conditions : ndarray
             `zh`: Matrix of Size one of: (`l: [9,6], m: [12,6], r: [9,6]`)
-            
+
             `zp`: Vector of Size one of: (`l: [9,1], m: [12,1], r: [9,1]`)
         """
         fq = FieldQuantities(eigensystem=eigensystem)
         if pos in ("l", "left"):
-            bcs = cls._boundary_conditions(zl, eigensystem, has_foundation, pos, system_type, touchdown_mode, collapsed_weak_layer_kR)  # Left boundary condition
+            bcs = cls._boundary_conditions(
+                zl,
+                eigensystem,
+                has_foundation,
+                pos,
+                system_type,
+                touchdown_mode,
+                collapsed_weak_layer_kR,
+            )  # Left boundary condition
             conditions = np.array(
                 [
-                    bcs[0],  
+                    bcs[0],
                     bcs[1],
                     bcs[2],
-                    fq.u(zr, h0=0),             # ui(xi = li)
-                    fq.w(zr),                   # wi(xi = li)
-                    fq.psi(zr),                 # psii(xi = li)
-                    fq.N(zr),                   # Ni(xi = li)
-                    fq.M(zr),                   # Mi(xi = li)
-                    fq.V(zr),                   # Vi(xi = li)
+                    fq.u(zr, h0=0),  # ui(xi = li)
+                    fq.w(zr),  # wi(xi = li)
+                    fq.psi(zr),  # psii(xi = li)
+                    fq.N(zr),  # Ni(xi = li)
+                    fq.M(zr),  # Mi(xi = li)
+                    fq.V(zr),  # Vi(xi = li)
                 ]
             )
         elif pos in ("m", "mid"):
@@ -237,7 +292,15 @@ class UnknownConstantsSolver:
                 ]
             )
         elif pos in ("r", "right"):
-            bcs = cls._boundary_conditions(zr, eigensystem, has_foundation, pos, system_type, touchdown_mode, collapsed_weak_layer_kR) # Right boundary condition
+            bcs = cls._boundary_conditions(
+                zr,
+                eigensystem,
+                has_foundation,
+                pos,
+                system_type,
+                touchdown_mode,
+                collapsed_weak_layer_kR,
+            )  # Right boundary condition
             conditions = np.array(
                 [
                     -fq.u(zl, h0=0),  # -ui(xi = 0)
@@ -250,12 +313,23 @@ class UnknownConstantsSolver:
                     bcs[1],
                     bcs[2],
                 ]
-            )  
+            )
         logger.debug(f"Boundary Conditions at pos {pos}: {conditions.shape}")
         return conditions
 
     @classmethod
-    def _boundary_conditions(cls, z, eigensystem: Eigensystem, has_foundation: bool, pos: Literal['l','r','m','left','right','mid'], system_type: Literal['skier', 'skiers', 'pst-', 'pst+', 'rot', 'trans'], touchdown_mode: Optional[Literal['A_free_hanging', 'B_point_contact', 'C_in_contact']] = None, collapsed_weak_layer_kR: Optional[float] = None):
+    def _boundary_conditions(
+        cls,
+        z,
+        eigensystem: Eigensystem,
+        has_foundation: bool,
+        pos: Literal["l", "r", "m", "left", "right", "mid"],
+        system_type: Literal["skier", "skiers", "pst-", "pst+", "rot", "trans"],
+        touchdown_mode: Optional[
+            Literal["A_free_hanging", "B_point_contact", "C_in_contact"]
+        ] = None,
+        collapsed_weak_layer_kR: Optional[float] = None,
+    ):
         """
         Provide equations for free (pst) or infinite (skiers) ends.
 
@@ -320,7 +394,7 @@ class UnknownConstantsSolver:
             bc = np.array([fq.N(z), fq.M(z), fq.V(z)])
         else:
             raise ValueError(
-                "Boundary conditions not defined for" f"system of type {system_type}."
+                f"Boundary conditions not defined forsystem of type {system_type}."
             )
 
         return bc

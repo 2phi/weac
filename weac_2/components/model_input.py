@@ -10,17 +10,20 @@ Pydantic syntax is for a field:
 field_name: type = Field(..., gt=0, description="Description")
 - typing, default value, conditions, description
 """
-import logging
-import json
-from typing import List, Literal
-from pydantic import BaseModel, Field, ValidationError
 
-from weac_2.components.scenario_config import ScenarioConfig
-from weac_2.components.layer import WeakLayer, Layer
-from weac_2.components.segment import Segment
+import json
+import logging
+from typing import List
+
+from pydantic import BaseModel, Field
+
 from weac_2.components.criteria_config import CriteriaConfig
+from weac_2.components.layer import Layer, WeakLayer
+from weac_2.components.scenario_config import ScenarioConfig
+from weac_2.components.segment import Segment
 
 logger = logging.getLogger(__name__)
+
 
 class ModelInput(BaseModel):
     """
@@ -39,13 +42,23 @@ class ModelInput(BaseModel):
         criteria_config : CriteriaConfig, optional
             Criteria overrides.
     """
-    scenario_config: ScenarioConfig = Field(..., description="Scenario configuration")
-    weak_layer: WeakLayer = Field(..., description="Weak layer")
-    layers: List[Layer] = Field(..., description="List of layers")
-    segments: List[Segment] = Field(..., description="Segments")
-    
-    criteria_config: CriteriaConfig = Field(default=CriteriaConfig(), description="Criteria overrides")
-    
+
+    scenario_config: ScenarioConfig = Field(
+        ScenarioConfig(phi=0, system="skier"), description="Scenario configuration"
+    )
+    weak_layer: WeakLayer = Field(WeakLayer(rho=200, h=10), description="Weak layer")
+    layers: List[Layer] = Field(
+        default_factory=lambda: [Layer(rho=250, h=100)], description="List of layers"
+    )
+    segments: List[Segment] = Field(
+        default_factory=lambda: [Segment(length=5000, has_foundation=True, m=0)],
+        description="Segments",
+    )
+
+    criteria_config: CriteriaConfig = Field(
+        default=CriteriaConfig(), description="Criteria overrides"
+    )
+
     def model_post_init(self, _ctx):
         # Check that the last segment does not have a mass
         if len(self.segments) == 0:
@@ -55,27 +68,30 @@ class ModelInput(BaseModel):
         if self.segments[-1].m != 0:
             raise ValueError("The last segment must have a mass of 0")
 
+
 if __name__ == "__main__":
     # Example usage requiring all mandatory fields for proper instantiation
-    example_scenario_config = ScenarioConfig(phi=30, system='skiers')
-    example_weak_layer = WeakLayer(rho=200, h=10) # grain_size, temp, E, G_I have defaults
-    
+    example_scenario_config = ScenarioConfig(phi=30, system="skiers")
+    # example_weak_layer = WeakLayer(
+    #     rho=200, h=10
+    # )  # grain_size, temp, E, G_I have defaults
+
     example_layers = [
-        Layer(rho=250, h=100), # grain_size, temp have defaults
-        Layer(rho=280, h=150)
+        Layer(rho=250, h=100),  # grain_size, temp have defaults
+        Layer(rho=280, h=150),
     ]
     example_segments = [
         Segment(length=5000, has_foundation=True, m=80),
-        Segment(length=3000, has_foundation=False, m=0)
+        Segment(length=3000, has_foundation=False, m=0),
     ]
-    example_criteria_overrides = CriteriaConfig() # All fields have defaults
+    example_criteria_overrides = CriteriaConfig()  # All fields have defaults
 
     model_input = ModelInput(
         scenario_config=example_scenario_config,
-        weak_layer=example_weak_layer,
+        # weak_layer=example_weak_layer,
         layers=example_layers,
         segments=example_segments,
-        criteria_config=example_criteria_overrides
+        criteria_config=example_criteria_overrides,
     )
     print(model_input.model_dump_json(indent=2))
     print("\n\n")

@@ -25,7 +25,7 @@ class SlabContactMixin:
         """Calculate touchdown"""
         self.set_touchdown_attributes(L, a, cf, phi, ratio)
         self.calc_touchdown_mode()
-        self.calc_touchdown_length()
+        self.calc_touchdown_distance()
 
     def set_touchdown_attributes(self, L, a, cf, phi, ratio):
         """Set class attributes for touchdown consideration"""
@@ -54,8 +54,8 @@ class SlabContactMixin:
         else:
             self.mode = "A"
 
-    def calc_touchdown_length(self):
-        """Calculate touchdown length"""
+    def calc_touchdown_distance(self):
+        """Calculate touchdown distance"""
         if self.mode in ["A"]:
             self.td = self.calc_lA()
         elif self.mode in ["B"]:

@@ -1,22 +1,28 @@
 # Standard library imports
 from functools import partial
+
 # Third party imports
 import numpy as np
 from scipy.integrate import cumulative_trapezoid, quad
-from scipy.optimize import brentq
-# Module imports
 
+# Module imports
 from weac_2.core.system_model import SystemModel
+from weac_2.constants import G_MM_S2
+
 
 class Analyzer:
     """
     Provides methods for the analysis of layered slabs on compliant
     elastic foundations.
     """
+
+    g_m_s2: float
+    tol: float = 1e-6
     sm: SystemModel
-    
+
     def __init__(self, system_model: SystemModel):
         self.sm = system_model
+        self.g_m_s2 = G_MM_S2 / 1000
 
     def rasterize_solution(
         self,
@@ -46,7 +52,7 @@ class Analyzer:
         ki = self.sm.scenario.ki
         qs = self.sm.scenario.qs
         C = self.sm.unknown_constants
-        
+
         # Drop zero-length segments
         li = abs(li)
         isnonzero = li > 0
@@ -140,8 +146,12 @@ class Analyzer:
             int2 = partial(self.int2, z0=z0, z1=z1)
 
             # Segement contributions to total crack opening integral
-            Ginc1 += quad(int1, 0, length, epsabs=self.tol, epsrel=self.tol)[0] / (2 * da)
-            Ginc2 += quad(int2, 0, length, epsabs=self.tol, epsrel=self.tol)[0] / (2 * da)
+            Ginc1 += quad(int1, 0, length, epsabs=self.tol, epsrel=self.tol)[0] / (
+                2 * da
+            )
+            Ginc2 += quad(int2, 0, length, epsabs=self.tol, epsrel=self.tol)[0] / (
+                2 * da
+            )
 
         return np.array([Ginc1 + Ginc2, Ginc1, Ginc2]).flatten()
 
@@ -278,7 +288,7 @@ class Analyzer:
             Sxx[i, :] = E / (1 - nu**2) * self.du_dx(Z, z)
 
         # Calculate weight load at grid points and superimpose on stress field
-        qt = -rho * self.g * np.sin(np.deg2rad(phi))
+        qt = -rho * self.g_m_s2 * np.sin(np.deg2rad(phi))
         for i, qi in enumerate(qt[:-1]):
             Sxx[i, :] += qi * (zi[i + 1] - zi[i])
         Sxx[-1, :] += qt[-1] * (zi[-1] - zi[-2])
@@ -330,7 +340,7 @@ class Analyzer:
             dsxx_dx[i, :] = E / (1 - nu**2) * (du0_dxdx + z * dpsi_dxdx)
 
         # Calculate weight load at grid points
-        qt = -rho * self.g * np.sin(np.deg2rad(phi))
+        qt = -rho * self.g_m_s2 * np.sin(np.deg2rad(phi))
 
         # Integrate -dsxx_dx along z and add cumulative weight load
         # to obtain shear stress Txz in MPa
@@ -386,7 +396,7 @@ class Analyzer:
             dsxx_dxdx[i, :] = E / (1 - nu**2) * (du0_dxdxdx + z * dpsi_dxdxdx)
 
         # Calculate weight load at grid points
-        qn = rho * self.g * np.cos(np.deg2rad(phi))
+        qn = rho * self.g_m_s2 * np.cos(np.deg2rad(phi))
 
         # Integrate dsxx_dxdx twice along z to obtain transverse
         # normal stress Szz in MPa
@@ -456,7 +466,9 @@ class Analyzer:
             # TODO: Implement tensile_strength_slab function
             # Normlize maximum principal stress to layers' tensile strength
             # return Ps / tensile_strength_slab(rho, unit=unit)[:, None]
-            raise NotImplementedError("Tensile strength normalization not yet implemented")
+            raise NotImplementedError(
+                "Tensile strength normalization not yet implemented"
+            )
 
         # Return absolute principal stresses
         return Ps
@@ -521,54 +533,80 @@ class Analyzer:
     def sig(self, Z, unit="kPa"):
         """Delegate to system field quantities."""
         return self.sm.fq.sig(Z, unit=unit)
-    
+
     def tau(self, Z, unit="kPa"):
         """Delegate to system field quantities."""
         return self.sm.fq.tau(Z, unit=unit)
-    
+
     def Gi(self, Z, unit="kJ/m^2"):
         """Delegate to system field quantities."""
         return self.sm.fq.Gi(Z, unit=unit)
-    
+
     def Gii(self, Z, unit="kJ/m^2"):
         """Delegate to system field quantities."""
         return self.sm.fq.Gii(Z, unit=unit)
-    
+
     def z(self, x, C, length, phi, bed=True, qs=0):
         """Delegate to system model."""
         return self.sm.z(x, C, length, phi, has_foundation=bed, qs=qs)
-    
+
     def du0_dxdx(self, Z, phi):
         """Calculate second derivative of centerline displacement."""
         # This is a simplified implementation - in the full version this would
         # involve more complex calculations based on the solution vector
         return np.zeros_like(Z[0, :])
-    
+
     def dpsi_dxdx(self, Z, phi):
         """Calculate second derivative of rotation."""
         # This is a simplified implementation
         return np.zeros_like(Z[0, :])
-    
+
     def du0_dxdxdx(self, Z, phi):
         """Calculate third derivative of centerline displacement."""
         # This is a simplified implementation
         return np.zeros_like(Z[0, :])
-    
+
     def dpsi_dxdxdx(self, Z, phi):
         """Calculate third derivative of rotation."""
         # This is a simplified implementation
         return np.zeros_like(Z[0, :])
-    
+
     def int1(self, x, z0, z1):
-        """Mode I integrand for energy release rate calculation."""
-        # This is a simplified implementation
-        return 0.0
-    
+        """
+        Mode I integrand for energy release rate calculation.
+        Computes sig_zz(z1) * (w(z1) - w(z0)).
+        """
+        z0_vec = z0(x)
+        z1_vec = z1(x)
+
+        # Ensure vectors are 2D arrays for fq methods
+        if z0_vec.ndim == 1:
+            z0_vec = z0_vec[:, np.newaxis]
+        if z1_vec.ndim == 1:
+            z1_vec = z1_vec[:, np.newaxis]
+
+        sig1 = self.sm.fq.sig(z1_vec)
+        w0 = self.sm.fq.w(z0_vec)
+        w1 = self.sm.fq.w(z1_vec)
+
+        return sig1[0] * (w1[0] - w0[0])
+
     def int2(self, x, z0, z1):
-        """Mode II integrand for energy release rate calculation."""
-        # This is a simplified implementation
-        return 0.0
-    
-    # Constants
-    g = 9.81  # gravitational acceleration
-    tol = 1e-6  # tolerance for numerical integration
+        """
+        Mode II integrand for energy release rate calculation.
+        Computes tau_xz(z1) * (u(z1) - u(z0)).
+        """
+        z0_vec = z0(x)
+        z1_vec = z1(x)
+
+        # Ensure vectors are 2D arrays for fq methods
+        if z0_vec.ndim == 1:
+            z0_vec = z0_vec[:, np.newaxis]
+        if z1_vec.ndim == 1:
+            z1_vec = z1_vec[:, np.newaxis]
+
+        tau1 = self.sm.fq.tau(z1_vec)
+        u0 = self.sm.fq.u(z0_vec, h0=0)  # u at centerline
+        u1 = self.sm.fq.u(z1_vec, h0=0)
+
+        return tau1[0] * (u1[0] - u0[0])

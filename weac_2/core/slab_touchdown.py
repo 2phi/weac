@@ -1,47 +1,47 @@
 import logging
-import copy
-import numpy as np
 from typing import Literal, Optional
+
 from scipy.optimize import brentq
 
-from weac_2.constants import STIFFNESS_COLLAPSE_FACTOR
 from weac_2.components.layer import WeakLayer
-from weac_2.components.segment import Segment
 from weac_2.components.scenario_config import ScenarioConfig
+from weac_2.components.segment import Segment
+from weac_2.constants import STIFFNESS_COLLAPSE_FACTOR
 from weac_2.core.eigensystem import Eigensystem
+from weac_2.core.field_quantities import FieldQuantities
 from weac_2.core.scenario import Scenario
 from weac_2.core.unknown_constants_solver import UnknownConstantsSolver
-from weac_2.core.field_quantities import FieldQuantities
 
 logger = logging.getLogger(__name__)
+
 
 class SlabTouchdown:
     """
     Handling the touchdown situation in a PST.
     Calculations follow paper Rosendahl et al. (2024)
         `The effect of slab touchdown on anticrack arrest in propagation saw tests`
-    
+
     Types of Touchdown:
         `A_free_hanging` : Slab is free hanging (not in contact with the collapsed weak layer)
-            touchdown_l `=` crack_l -> the unsupported segment (touchdown_l) equals the crack length
+            touchdown_distance `=` crack_l -> the unsupported segment (touchdown_distance) equals the crack length
         `B_point_contact` : End of slab is in contact with the collapsed weak layer
-            touchdown_l `=` crack_l -> the unsupported segment (touchdown_l) equals the crack length
+            touchdown_distance `=` crack_l -> the unsupported segment (touchdown_distance) equals the crack length
         `C_in_contact` : more of the slab is in contact with the collapsed weak layer
-            touchdown_l `<` crack_l -> the unsupported segment (touchdown_l) i striclty smaller than the crack length
-    
+            touchdown_distance `<` crack_l -> the unsupported segment (touchdown_distance) i striclty smaller than the crack length
+
     The Module does:
     1. Calculation of Zones of modes `[A_free_hanging, B_point_contact, C_in_contact]`::
-    
+
         |+++++++++++++++++++|-------A-------|-------B-------|--------C-------- [...]
         | supported segment | free-hanging  | point contact |  in contact
                             0            `l_AB`           `l_BC`
-        through calculation of boundary touchdown_l `l_AB` and `l_BC`
-    
+        through calculation of boundary touchdown_distance `l_AB` and `l_BC`
+
     Parameters:
     -----------
     scenario: `Scenario`
     eigensystem: `Eigensystem`
-    
+
     Attributes:
     -----------
     l_AB : float
@@ -50,11 +50,12 @@ class SlabTouchdown:
         Length of the crack for transition of stage B to stage C [mm]
     touchdown_mode : Literal["A_free_hanging", "B_point_contact", "C_in_contact"]
         Type of touchdown mode
-    touchdown_l : float
+    touchdown_distance : float
         Length of the touchdown segment [mm]
     collapsed_weak_layer_kR : Optional[float]
         Rotational spring stiffness of the collapsed weak layer segment
     """
+
     # Inputs
     scenario: Scenario
     eigensystem: Eigensystem
@@ -65,50 +66,32 @@ class SlabTouchdown:
     straight_scenario: Scenario
     l_AB: float
     l_BC: float
-    touchdown_mode: Literal["A_free_hanging", "B_point_contact", "C_in_contact"]  # Three types of contact with collapsed weak layer
-    touchdown_l: float
+    touchdown_mode: Literal[
+        "A_free_hanging", "B_point_contact", "C_in_contact"
+    ]  # Three types of contact with collapsed weak layer
+    touchdown_distance: float
     collapsed_weak_layer_kR: Optional[float] = None
 
     def __init__(self, scenario: Scenario, eigensystem: Eigensystem):
         self.scenario = scenario
         self.eigensystem = eigensystem
-        
+
         # Create a new scenario config with phi=0 (flat slab) while preserving other settings
-        self.straight_config = ScenarioConfig(
+        self.flat_config = ScenarioConfig(
             phi=0.0,  # Flat slab for collapsed scenario
             system_type=self.scenario.scenario_config.system_type,
             crack_length=self.scenario.scenario_config.crack_length,
             collapse_factor=self.scenario.scenario_config.collapse_factor,
             stiffness_ratio=self.scenario.scenario_config.stiffness_ratio,
-            qs=self.scenario.scenario_config.qs
+            qs=self.scenario.scenario_config.qs,
         )
-        
-        self._setup_touchdown_system()
-        
 
-    def _create_collapsed_system(self):
-        """
-        Create the collapsed weak layer and eigensystem with modified stiffness values.
-        This centralizes all collapsed-related logic within the SlabTouchdown class.
-        """
-        # Create collapsed weak layer with increased stiffness
-        self.collapsed_weak_layer = self.scenario.weak_layer.model_copy(
-            update={
-                "kn": self.scenario.weak_layer.kn * STIFFNESS_COLLAPSE_FACTOR,
-                "kt": self.scenario.weak_layer.kt * STIFFNESS_COLLAPSE_FACTOR,
-            }
-        )
-        
-        # Create eigensystem for the collapsed weak layer
-        self.collapsed_eigensystem = Eigensystem(
-            weak_layer=self.collapsed_weak_layer, 
-            slab=self.scenario.slab
-        )
+        self._setup_touchdown_system()
 
     def _setup_touchdown_system(self):
         """Calculate touchdown"""
         self._calc_touchdown_mode()
-        self._calc_touchdown_length()
+        self._calc_touchdown_distance()
 
     def _calc_touchdown_mode(self):
         """Calculate touchdown-mode from thresholds"""
@@ -124,16 +107,16 @@ class SlabTouchdown:
             touchdown_mode = "C_in_contact"
         self.touchdown_mode = touchdown_mode
 
-    def _calc_touchdown_length(self):
-        """Calculate touchdown length"""
+    def _calc_touchdown_distance(self):
+        """Calculate touchdown distance"""
         if self.touchdown_mode in ["A_free_hanging"]:
-            self.touchdown_l = self.scenario.crack_l
+            self.touchdown_distance = self.scenario.crack_l
         elif self.touchdown_mode in ["B_point_contact"]:
-            self.touchdown_l = self.scenario.crack_l
+            self.touchdown_distance = self.scenario.crack_l
         elif self.touchdown_mode in ["C_in_contact"]:
             # Create collapsed weak layer and eigensystem internally
             self._create_collapsed_system()
-            self.touchdown_l = self._calc_touchdown_l_in_mode_C()
+            self.touchdown_distance = self._calc_touchdown_distance_in_mode_C()
             self.collapsed_weak_layer_kR = self._calc_collapsed_weak_layer_kR()
 
     def _calc_l_AB(self):
@@ -156,8 +139,12 @@ class SlabTouchdown:
         def polynomial(x):
             # Spring stiffness of uncollapsed eigensystem of length L - x
             straight_scenario = self._generate_straight_scenario(L - x)
-            kRl = self._substitute_stiffness(straight_scenario, self.eigensystem, "rot")
-            kNl = self._substitute_stiffness(straight_scenario, self.eigensystem, "trans")
+            kRl = self._substitute_stiffness(
+                straight_scenario, self.eigensystem, "rot"
+            )  # rotational stiffness
+            kNl = self._substitute_stiffness(
+                straight_scenario, self.eigensystem, "trans"
+            )  # pulling stiffness
             c1 = 1 / (8 * bs)
             c2 = 1 / (2 * kRl)
             c3 = 1 / (2 * ss)
@@ -191,7 +178,9 @@ class SlabTouchdown:
             # Spring stiffness of uncollapsed eigensystem of length L - x
             straight_scenario = self._generate_straight_scenario(L - x)
             kRl = self._substitute_stiffness(straight_scenario, self.eigensystem, "rot")
-            kNl = self._substitute_stiffness(straight_scenario, self.eigensystem, "trans")
+            kNl = self._substitute_stiffness(
+                straight_scenario, self.eigensystem, "trans"
+            )
             c1 = ss**2 * kRl * kNl * qn
             c2 = 6 * ss**2 * bs * kNl * qn
             c3 = 30 * bs * ss * kRl * kNl * qn
@@ -208,7 +197,25 @@ class SlabTouchdown:
 
         return l_BC
 
-    def _calc_touchdown_l_in_mode_C(self):
+    def _create_collapsed_system(self):
+        """
+        Create the collapsed weak layer and eigensystem with modified stiffness values.
+        This centralizes all collapsed-related logic within the SlabTouchdown class.
+        """
+        # Create collapsed weak layer with increased stiffness
+        self.collapsed_weak_layer = self.scenario.weak_layer.model_copy(
+            update={
+                "kn": self.scenario.weak_layer.kn * STIFFNESS_COLLAPSE_FACTOR,
+                "kt": self.scenario.weak_layer.kt * STIFFNESS_COLLAPSE_FACTOR,
+            }
+        )
+
+        # Create eigensystem for the collapsed weak layer
+        self.collapsed_eigensystem = Eigensystem(
+            weak_layer=self.collapsed_weak_layer, slab=self.scenario.slab
+        )
+
+    def _calc_touchdown_distance_in_mode_C(self):
         """
         Calculate the length of the touchdown element in mode C
         when the slab is in contact.
@@ -220,16 +227,18 @@ class SlabTouchdown:
         crack_l = self.scenario.crack_l
         crack_h = self.scenario.crack_h
         qn = self.scenario.qn
-        
+
         # Spring stiffness of uncollapsed eigensystem of length L - crack_l
         straight_scenario = self._generate_straight_scenario(L - crack_l)
         kRl = self._substitute_stiffness(straight_scenario, self.eigensystem, "rot")
         kNl = self._substitute_stiffness(straight_scenario, self.eigensystem, "trans")
-        
+
         def polynomial(x):
             # Spring stiffness of collapsed eigensystem of length crack_l - x
             straight_scenario = self._generate_straight_scenario(crack_l - x)
-            kRr = self._substitute_stiffness(straight_scenario, self.collapsed_eigensystem, "rot")
+            kRr = self._substitute_stiffness(
+                straight_scenario, self.collapsed_eigensystem, "rot"
+            )
             # define constants
             c1 = ss**2 * kRl * kNl * qn
             c2 = 6 * ss * kNl * qn * (bs * ss + kRl * kRr)
@@ -260,31 +269,40 @@ class SlabTouchdown:
             )
 
         # Find root
-        touchdown_l = brentq(polynomial, crack_l / 1000, 999 / 1000 * crack_l)
+        touchdown_distance = brentq(polynomial, crack_l / 1000, 999 / 1000 * crack_l)
 
-        return touchdown_l
+        return touchdown_distance
 
     def _calc_collapsed_weak_layer_kR(self):
         """
         Calculate the rotational stiffness of the collapsed weak layer
         """
-        straight_scenario = self._generate_straight_scenario(self.scenario.crack_l - self.touchdown_l)
-        kR = self._substitute_stiffness(straight_scenario, self.collapsed_eigensystem, "rot")
+        straight_scenario = self._generate_straight_scenario(
+            self.scenario.crack_l - self.touchdown_distance
+        )
+        kR = self._substitute_stiffness(
+            straight_scenario, self.collapsed_eigensystem, "rot"
+        )
         return kR
-    
+
     def _generate_straight_scenario(self, L: float) -> Scenario:
         segments = [Segment(length=L, has_foundation=True, m=0)]
-        
+
         logger.info("Generating straight scenario with length %s", L)
         straight_scenario = Scenario(
-            scenario_config=self.straight_config,
+            scenario_config=self.flat_config,
             segments=segments,
             weak_layer=self.scenario.weak_layer,
-            slab=self.scenario.slab
+            slab=self.scenario.slab,
         )
         return straight_scenario
 
-    def _substitute_stiffness(self, scenario: Scenario, eigensystem: Eigensystem, dof: Literal["rot", "trans"] = "rot"):
+    def _substitute_stiffness(
+        self,
+        scenario: Scenario,
+        eigensystem: Eigensystem,
+        dof: Literal["rot", "trans"] = "rot",
+    ):
         """
         Calc substitute stiffness for beam on elastic foundation.
 
@@ -298,14 +316,16 @@ class SlabTouchdown:
         has_foundation : stiffness of substitute spring.
         """
 
-        unknown_constants = UnknownConstantsSolver.solve_for_unknown_constants(scenario=scenario, eigensystem=eigensystem, system_type=dof)
+        unknown_constants = UnknownConstantsSolver.solve_for_unknown_constants(
+            scenario=scenario, eigensystem=eigensystem, system_type=dof
+        )
 
         # Calculate field quantities at x=0 (left end)
         Zh0 = eigensystem.zh(x=0, length=scenario.L, has_foundation=True)
         zp0 = eigensystem.zp(x=0, phi=0, has_foundation=True, qs=0)
         C_at_x0 = unknown_constants[:, 0].reshape(-1, 1)  # Ensure column vector
         z_at_x0 = Zh0 @ C_at_x0 + zp0
-        
+
         # Calculate stiffness based on field quantities
         fq = FieldQuantities(eigensystem=eigensystem)
 
