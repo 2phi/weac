@@ -206,6 +206,7 @@ def deformed(
     xwl,
     z,
     phi,
+    theta,
     dz=2,
     scale=100,
     window=np.inf,
@@ -321,23 +322,23 @@ def deformed(
             label = r"$w$ ($\mu$m)"
         # Axial normal stresses (kPa)
         case "Sxx":
-            slab = instance.Sxx(z, phi, dz=dz, unit="kPa")
+            slab = instance.Sxx(z, phi, theta, dz=dz, unit="kPa")
             weak = np.zeros(xwl.shape[0])
             label = r"$\sigma_{xx}$ (kPa)"
         # Shear stresses (kPa)
         case "Txz":
-            slab = instance.Txz(z, phi, dz=dz, unit="kPa")
+            slab = instance.Txz(z, phi, theta, dz=dz, unit="kPa")
             weak = instance.get_weaklayer_shearstress(x=xwl, z=z, unit="kPa")[1]
             label = r"$\tau_{xz}$ (kPa)"
         # Transverse normal stresses (kPa)
         case "Szz":
-            slab = instance.Szz(z, phi, dz=dz, unit="kPa")
+            slab = instance.Szz(z, phi, theta, dz=dz, unit="kPa")
             weak = instance.get_weaklayer_normalstress(x=xwl, z=z, unit="kPa")[1]
             label = r"$\sigma_{zz}$ (kPa)"
         # Principal stresses
         case "principal":
             slab = instance.principal_stress_slab(
-                z, phi, dz=dz, val="max", unit="kPa", normalize=normalize
+                z, phi, theta, dz=dz, val="max", unit="kPa", normalize=normalize
             )
             weak = instance.principal_stress_weaklayer(
                 z, val="min", unit="kPa", normalize=normalize
@@ -365,9 +366,9 @@ def deformed(
     weak = np.row_stack([weak, weak])
 
     # Normalize colormap
-    absmax = np.nanmax(np.abs([slab.min(), slab.max(), weak.min(), weak.max()]))
-    clim = np.round(absmax, significant_digits(absmax))
-    levels = np.linspace(-clim, clim, num=levels + 1, endpoint=True)
+    # absmax = np.nanmax(np.abs([slab.min(), slab.max(), weak.min(), weak.max()]))
+    # clim = np.round(absmax, significant_digits(absmax))
+    # levels = np.linspace(-clim, clim, num=levels + 1, endpoint=True)
     # nanmax = np.nanmax([slab.max(), weak.max()])
     # nanmin = np.nanmin([slab.min(), weak.min()])
     # norm = MidpointNormalize(vmin=nanmin, vmax=nanmax)
@@ -399,7 +400,7 @@ def deformed(
         Xsl + scale * Usl,
         Zsl + scale * Wsl,
         slab,
-        levels=levels,  # norm=norm,
+        # levels=levels,  # norm=norm,
         cmap=cmap,
         extend="both",
     )
@@ -407,7 +408,7 @@ def deformed(
         Xwl + scale * Uwl,
         Zwl + scale * Wwl,
         weak,
-        levels=levels,  # norm=norm,
+        # levels=levels,  # norm=norm,
         cmap=cmap,
         extend="both",
     )
@@ -426,8 +427,8 @@ def deformed(
     plt.title(rf"${scale}\!\times\!$ scaled deformations (cm)", size=10)
 
     # Show colorbar
-    ticks = np.linspace(levels[0], levels[-1], num=11, endpoint=True)
-    plt.colorbar(orientation="horizontal", ticks=ticks, label=label, aspect=35)
+    # ticks = np.linspace(levels[0], levels[-1], num=11, endpoint=True)
+    plt.colorbar(orientation="horizontal", label=label, aspect=35)
 
     # Save figure
     save_plot(name=filename)
@@ -451,7 +452,7 @@ def plot_data(
     labelpos=None,
     vlines=True,
     li=False,
-    mi=False,
+    fi=False,
     ki=False,
     xlabel=r"Horizontal position $x$ (cm)",
 ):
@@ -490,8 +491,8 @@ def plot_data(
                     alpha=0.05,
                     zorder=100,
                 )
-        for i, m in enumerate(mi, start=1):
-            if m > 0:
+        for i, m in enumerate(fi, start=1):
+            if m.any() > 0:
                 ax1.axvline(sum(li[:i]) / 10, linewidth=0.5, color="gray")
     else:
         ax1.autoscale(axis="y", tight=True)
@@ -560,7 +561,7 @@ def displacements(instance, x, z, i="", **segments):
     data = [
         [x / 10, instance.u(z, z0=0, unit="mm"), r"$u_0\ (\mathrm{mm})$"],
         [x / 10, -instance.w(z, unit="mm"), r"$-w\ (\mathrm{mm})$"],
-        [x / 10, instance.psi(z, unit="degrees"), r"$\psi\ (^\circ)$ "],
+        [x / 10, instance.psiy(z, unit="degrees"), r"$\psi\ (^\circ)$ "],
     ]
     plot_data(ax1label=r"Displacements", ax1data=data, name="disp" + str(i), **segments)
 
@@ -568,9 +569,9 @@ def displacements(instance, x, z, i="", **segments):
 def section_forces(instance, x, z, i="", **segments):
     """Wrap section forces plot."""
     data = [
-        [x / 10, instance.N(z), r"$N$"],
-        [x / 10, instance.M(z), r"$M$"],
-        [x / 10, instance.V(z), r"$V$"],
+        [x / 10, instance.Nxx(z), r"$N$"],
+        [x / 10, instance.Myy(z), r"$M$"],
+        [x / 10, instance.Vzz(z), r"$V$"],
     ]
     plot_data(ax1label=r"Section forces", ax1data=data, name="forc" + str(i), **segments)
 
@@ -578,8 +579,8 @@ def section_forces(instance, x, z, i="", **segments):
 def stresses(instance, x, z, i="", **segments):
     """Wrap stress plot."""
     data = [
-        [x / 10, instance.tau(z, unit="kPa"), r"$\tau$"],
-        [x / 10, instance.sig(z, unit="kPa"), r"$\sigma$"],
+        [x / 10, instance.tauxz(z, unit="kPa"), r"$\tau$"],
+        [x / 10, instance.sigzz(z, unit="kPa"), r"$\sigma$"],
     ]
     plot_data(ax1label=r"Stress (kPa)", ax1data=data, name="stress" + str(i), **segments)
 

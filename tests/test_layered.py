@@ -73,7 +73,15 @@ class TestLayered(unittest.TestCase):
         segments = self.layered.calc_segments(
             li=[500, 100, 250, 30, 30, 500],
             ki=[True, True, True, False, False, True],
-            mi=[80, 80, 0, 0, 0],
+            fi=[
+                [0, 0, 0, 0, 0, 0],
+                [0, 0, 80, 0, 0, 0],
+                [0, 0, 80, 0, 0, 0],
+                [0, 0, 0, 0, 0, 0],
+                [0, 0, 0, 0, 0, 0],
+                [0, 0, 0, 0, 0, 0],
+                [0, 0, 0, 0, 0, 0],
+            ],
         )
 
         # Check that segments dictionary contains expected keys
@@ -101,16 +109,16 @@ class TestLayered(unittest.TestCase):
         segments = self.layered.calc_segments(L=1000, a=300)
 
         # Assemble and solve the system
-        C = self.layered.assemble_and_solve(phi=0, **segments["crack"])
+        C = self.layered.assemble_and_solve(phi=0, theta=0, **segments["crack"])
 
         # Check that solution vector has correct shape
         self.assertIsNotNone(C)
-        self.assertEqual(C.shape, (6, 2))  # 6 state variables, 2 segments
+        self.assertEqual(C.shape, (24, 2))  # 6 state variables, 2 segments
 
         # Test with non-zero slope angle
-        C_slope = self.layered.assemble_and_solve(phi=30, **segments["crack"])
+        C_slope = self.layered.assemble_and_solve(phi=30, theta=20, **segments["crack"])
         self.assertIsNotNone(C_slope)
-        self.assertEqual(C_slope.shape, (6, 2))
+        self.assertEqual(C_slope.shape, (24, 2))
 
     def test_rasterize_solution(self):
         """Test rasterization of the solution."""
@@ -123,16 +131,18 @@ class TestLayered(unittest.TestCase):
         segments = self.layered.calc_segments(L=1000, a=300)
 
         # Assemble and solve the system
-        C = self.layered.assemble_and_solve(phi=0, **segments["crack"])
+        C = self.layered.assemble_and_solve(phi=0, theta=0, **segments["crack"])
 
         # Rasterize the solution
-        xsl, z, xwl = self.layered.rasterize_solution(C=C, phi=0, **segments["crack"])
+        xsl, z, xwl = self.layered.rasterize_solution(
+            C=C, phi=0, theta=0, **segments["crack"]
+        )
 
         # Check that output arrays have correct shapes
         self.assertIsNotNone(xsl)
         self.assertIsNotNone(z)
         self.assertIsNotNone(xwl)
-        self.assertEqual(z.shape[0], 6)  # 6 state variables
+        self.assertEqual(z.shape[0], 24)  # 6 state variables
         self.assertEqual(xsl.shape, z.shape[1:])  # Same length as state variables
 
         # Check that x coordinates are within expected range
@@ -150,14 +160,16 @@ class TestLayered(unittest.TestCase):
         segments = self.layered.calc_segments(L=1000, a=300)
 
         # Assemble and solve the system
-        C = self.layered.assemble_and_solve(phi=0, **segments["crack"])
+        C = self.layered.assemble_and_solve(phi=0, theta=0, **segments["crack"])
 
         # Calculate differential energy release rate
-        G = self.layered.gdif(C, phi=0, **segments["crack"])
+        G = self.layered.gdif(C, phi=0, theta=0, **segments["crack"])
 
         # Check that energy release rate is non-negative
         self.assertIsNotNone(G)
-        self.assertEqual(len(G), 3)  # Three components: mode I, mode II, and total
+        self.assertEqual(
+            len(G), 4
+        )  # Three components: mode I, mode II, mode III, and total
         self.assertGreaterEqual(
             G[2], 0
         )  # Total energy release rate should be non-negative
@@ -173,17 +185,20 @@ class TestLayered(unittest.TestCase):
         segments = self.layered.calc_segments(L=1000, a=300)
 
         # Assemble and solve the system for both configurations
-        C0 = self.layered.assemble_and_solve(phi=0, **segments["nocrack"])
-        C1 = self.layered.assemble_and_solve(phi=0, **segments["crack"])
+        C0 = self.layered.assemble_and_solve(phi=0, theta=0, **segments["nocrack"])
+        C1 = self.layered.assemble_and_solve(phi=0, theta=0, **segments["crack"])
 
         # Calculate incremental energy release rate
-        G = self.layered.ginc(C0, C1, phi=0, **segments["both"])
+        G = self.layered.ginc(C0, C1, phi=0, theta=0, **segments["both"])
 
         # Check that energy release rate is non-negative
         self.assertIsNotNone(G)
-        self.assertEqual(len(G), 3)  # Three components: mode I, mode II, and total
+
+        self.assertEqual(
+            len(G), 4
+        )  # Three components: mode I, mode II, mode III, and total
         self.assertGreaterEqual(
-            G[2], 0
+            G[3], 0
         )  # Total energy release rate should be non-negative
 
 

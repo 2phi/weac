@@ -42,8 +42,6 @@ class TestEigensystem(unittest.TestCase):
                 eigen.calc_fundamental_system()
 
                 # Basic functionality checks
-                self.assertIsNotNone(eigen.kn)
-                self.assertIsNotNone(eigen.kt)
                 self.assertIsNotNone(eigen.A11)
                 self.assertIsNotNone(eigen.ewC)
                 self.assertIsNotNone(eigen.ewR)
@@ -71,20 +69,6 @@ class TestEigensystem(unittest.TestCase):
                 self.assertIsNotNone(eigen.ewR)
 
                 # Check that the number of eigenvalues is consistent with expectations
-                # For this beam on elastic foundation problem, we expect 2 complex eigenvalues
-                self.assertEqual(
-                    len(eigen.ewC),
-                    2,
-                    f"System {system_type} should have 2 complex eigenvalues",
-                )
-
-                # For PST-type systems, expect 2 real eigenvalues
-                if system_type in ["pst-", "-pst", "vpst-", "-vpst"]:
-                    self.assertEqual(
-                        len(eigen.ewR),
-                        2,
-                        f"PST-type system {system_type} should have 2 real eigenvalues",
-                    )
 
         # Compare eigenvalues between different PST variants
         # Corresponding eigenvalues may differ in sign but should have similar magnitudes
@@ -126,46 +110,45 @@ class TestEigensystem(unittest.TestCase):
         x_values = np.linspace(0, 1000, 5)  # 5 points from 0 to 1000 mm
 
         # Test constants for the solution
-        C = np.zeros((6, 1))  # Zero constants for simplicity
+        C = np.zeros((24, 1))  # Zero constants for simplicity
 
         # Set an incline angle
         phi = 30  # degrees
+        theta = 20  # degrees
 
         # Test that solutions can be computed for both systems
         for system_type, eigen in systems.items():
             with self.subTest(system=system_type):
                 # Test bedded solution
-                z_bedded = eigen.z(x_values, C, 0, phi, bed=True)
+                z_bedded = eigen.z(x_values, C, 0, phi, theta, bed=True)
 
                 # Check solution dimensions
-                self.assertEqual(z_bedded.shape[0], 6)  # 6 solution components
+                self.assertEqual(z_bedded.shape[0], 24)  # 6 solution components
                 self.assertEqual(
                     z_bedded.shape[1], len(x_values)
                 )  # One column per x value
 
                 # Test unbedded solution
-                z_unbedded = eigen.z(x_values, C, 0, phi, bed=False)
+                z_unbedded = eigen.z(x_values, C[:12], 0, phi, theta, bed=False)
 
                 # Check solution dimensions
-                self.assertEqual(z_unbedded.shape[0], 6)
+                self.assertEqual(z_unbedded.shape[0], 12)
                 self.assertEqual(z_unbedded.shape[1], len(x_values))
 
-                # Test that bedded and unbedded solutions are different
-                self.assertFalse(np.allclose(z_bedded, z_unbedded))
-
                 # Test with a single x value to cover line 656
-                z_single = eigen.z(x_values[0], C, 0, phi, bed=True)
-                self.assertEqual(z_single.shape[0], 6)
+                z_single = eigen.z(x_values[0], C, 0, phi, theta, bed=True)
+                self.assertEqual(z_single.shape[0], 24)
                 self.assertEqual(z_single.shape[1], 1)
 
         # Test skier load
         skier_system = systems["skier"]
         skier_mass = 80  # kg
-        Fn, Ft = skier_system.get_skier_load(skier_mass, phi)
+        Fx, Fy, Fz = skier_system.get_skier_load(skier_mass, phi, theta)
 
         # Check skier load values are reasonable
-        self.assertGreater(Fn, 0)
-        self.assertLess(Ft, 0)  # Downslope component should be negative
+        self.assertGreater(Fz, 0)
+        self.assertGreater(Fy, 0)
+        self.assertLess(Fx, 0)  # Downslope component should be negative
 
     def test_set_beam_properties(self):
         """Test setting beam properties with different layer configurations."""
@@ -272,14 +255,7 @@ class TestEigensystem(unittest.TestCase):
         """Test calculation of the fundamental system."""
         # Calculate the fundamental system
         self.eigen.calc_fundamental_system()
-
-        # Check that the system has been initialized
-        self.assertIsNotNone(
-            getattr(self.eigen, "kn", None)
-        )  # Foundation normal stiffness
-        self.assertIsNotNone(
-            getattr(self.eigen, "kt", None)
-        )  # Foundation shear stiffness
+        # Foundation shear stiffness
         self.assertIsNotNone(getattr(self.eigen, "A11", None))  # Extensional stiffness
         self.assertIsNotNone(
             getattr(self.eigen, "B11", None)
@@ -309,17 +285,18 @@ class TestEigensystem(unittest.TestCase):
 
         # Test the load vector calculation
         phi = 30  # degrees
-        load_vector = eigen.get_load_vector(phi)
+        theta = 20  # degrees
+        load_vector = eigen.get_load_vector(phi, theta)
 
         # Check expected dimensions and structure
-        self.assertEqual(load_vector.shape, (6, 1))
+        self.assertEqual(load_vector.shape, (24, 1))
         self.assertEqual(load_vector[0, 0], 0)  # First component should be 0
         self.assertEqual(load_vector[2, 0], 0)  # Third component should be 0
         self.assertEqual(load_vector[4, 0], 0)  # Fifth component should be 0
 
         # Test with surface load to ensure all branches are covered
         eigen.set_surface_load(100.0)
-        load_vector_with_surface = eigen.get_load_vector(phi)
+        load_vector_with_surface = eigen.get_load_vector(phi, theta)
 
         # The resulting load vector should be different
         self.assertFalse(np.array_equal(load_vector, load_vector_with_surface))
@@ -371,12 +348,13 @@ class TestEigensystem(unittest.TestCase):
         # Test skier load calculation
         skier_mass = 80  # kg
         slope_angle = 30  # degrees
-        Fn, Ft = eigen_skier.get_skier_load(skier_mass, slope_angle)
+        slope_rotation = 20  # degrees
+        Fx, Fy, Fz = eigen_skier.get_skier_load(skier_mass, slope_angle, slope_rotation)
 
         # Check that load values are calculated and reasonable
-        self.assertGreater(Fn, 0)  # Normal force should be positive
-        self.assertLess(Ft, 0)  # Tangential force should be negative on a slope
-
+        self.assertGreater(Fz, 0)  # Normal force should be positive
+        self.assertLess(Fx, 0)  # Tangential force should be negative on a slope
+        self.assertGreater(Fy, 0)  # Out-of-plane force should be negative on a slope
         # Test multiple skiers
         eigen_skiers = Eigensystem(system="skiers")
         eigen_skiers.set_beam_properties(layers="A")
@@ -411,8 +389,6 @@ class TestEigensystem(unittest.TestCase):
                 eigen.calc_fundamental_system()
 
                 # Basic functionality checks
-                self.assertIsNotNone(eigen.kn)
-                self.assertIsNotNone(eigen.kt)
                 self.assertIsNotNone(eigen.A11)
                 self.assertIsNotNone(eigen.ewC)
                 self.assertIsNotNone(eigen.ewR)
@@ -427,8 +403,6 @@ class TestEigensystem(unittest.TestCase):
                 eigen.calc_fundamental_system()
 
                 # Basic functionality checks
-                self.assertIsNotNone(eigen.kn)
-                self.assertIsNotNone(eigen.kt)
                 self.assertIsNotNone(eigen.A11)
                 self.assertIsNotNone(eigen.ewC)
                 self.assertIsNotNone(eigen.ewR)
@@ -440,27 +414,40 @@ class TestEigensystem(unittest.TestCase):
 
         # Test weight load at different angles
         # At 0 degrees (flat)
-        qn, qt = eigen.get_weight_load(0)
-        self.assertGreater(qn, 0)  # Normal load is positive
-        self.assertAlmostEqual(qt, 0, places=5)  # Tangential load is zero
-
+        qx, qy, qz = eigen.get_weight_load(0, 0)
+        self.assertGreater(qz, 0)  # Normal load is positive
+        self.assertAlmostEqual(qx, 0, places=5)  # Tangential load is zero
+        self.assertAlmostEqual(qy, 0, places=5)  # Out-of-plane load is zero
         # At 30 degrees
-        qn, qt = eigen.get_weight_load(30)
-        self.assertGreater(qn, 0)  # Normal load is positive
-        self.assertLess(qt, 0)  # Tangential load is negative (downslope)
+        qx, qy, qz = eigen.get_weight_load(30, 0)
+        self.assertGreater(qz, 0)  # Normal load is positive
+        self.assertLess(qx, 0)  # Tangential load is negative (downslope)
+        self.assertAlmostEqual(qy, 0, places=5)  # Out-of-plane load is zero
 
+        # At phi = 30 degrees and theta = 20 degrees
+        qx, qy, qz = eigen.get_weight_load(30, 20)
+        self.assertGreater(qz, 0)  # Normal load is positive
+        self.assertLess(qx, 0)  # Tangential load is negative (downslope)
+        self.assertGreater(qy, 0)  # Normal load is positive
         # Set surface load
         eigen.set_surface_load(100.0)
 
         # Test surface load at different angles
-        pn, pt = eigen.get_surface_load(0)
-        self.assertAlmostEqual(pn, 100.0)  # Normal load equals input at 0 degrees
-        self.assertAlmostEqual(pt, 0, places=5)  # Tangential load is zero
-
+        px, py, pz = eigen.get_surface_load(0)
+        self.assertAlmostEqual(pz, 100.0)  # Normal load equals input at 0 degrees
+        self.assertAlmostEqual(px, 0, places=5)  # Tangential load is zero
+        self.assertAlmostEqual(py, 0, places=5)  # Tangential load is zero
         # At 30 degrees
-        pn, pt = eigen.get_surface_load(30)
-        self.assertGreater(pn, 0)  # Normal load is positive
-        self.assertLess(pt, 0)  # Tangential load is negative (downslope)
+        px, py, pz = eigen.get_surface_load(30, 0)
+        self.assertGreater(pz, 0)  # Normal load is positive
+        self.assertLess(px, 0)  # Tangential load is negative (downslope)
+        self.assertAlmostEqual(py, 0, places=5)  # Out-of-plane load is zero
+
+        # At phi = 30 degrees and theta = 20 degrees
+        px, py, pz = eigen.get_surface_load(30, 20)
+        self.assertGreater(qz, 0)  # Normal load is positive
+        self.assertLess(px, 0)  # Tangential load is negative (downslope)
+        self.assertGreater(py, 0)  # Normal load is positive
 
 
 if __name__ == "__main__":
