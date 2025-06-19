@@ -116,6 +116,7 @@ class SystemModel:
     scenario: Scenario
     slab_touchdown: Optional[SlabTouchdown]
     unknown_constants: np.ndarray
+    uncracked_scenario: Scenario
     uncracked_unknown_constants: np.ndarray
 
     def __init__(self, model_input: ModelInput, config: Config = Config()):
@@ -248,11 +249,20 @@ class SystemModel:
 
     @cached_property
     def uncracked_unknown_constants(self) -> np.ndarray:
-        # TODO: Implement this
+        new_segments = copy.deepcopy(self.scenario.segments)
+        for i, seg in enumerate(new_segments):
+            seg.has_foundation = True
+        self.uncracked_scenario = Scenario(
+            scenario_config=self.scenario.scenario_config,
+            segments=new_segments,
+            weak_layer=self.weak_layer,
+            slab=self.slab,
+        )
+
         logger.info("Solving for Uncracked Unknown Constants")
         if self.slab_touchdown is not None:
             return UnknownConstantsSolver.solve_for_unknown_constants(
-                scenario=self.scenario,
+                scenario=self.uncracked_scenario,
                 eigensystem=self.eigensystem,
                 system_type=self.scenario.system_type,
                 touchdown_distance=self.slab_touchdown.touchdown_distance,
@@ -262,7 +272,7 @@ class SystemModel:
         else:
             logger.info("Solving for Uncracked Unknown Constants")
             return UnknownConstantsSolver.solve_for_unknown_constants(
-                scenario=self.scenario,
+                scenario=self.uncracked_scenario,
                 eigensystem=self.eigensystem,
                 system_type=self.scenario.system_type,
                 touchdown_distance=None,
@@ -290,13 +300,13 @@ class SystemModel:
         Scenario object itself, then refresh and invalidate constants.
         """
         logger.debug("Updating Scenario...")
-        for has_foundation, v in kwargs.items():
-            if hasattr(self.scenario.scenario_config, has_foundation):
-                setattr(self.scenario.scenario_config, has_foundation, v)
-            elif hasattr(self.scenario, has_foundation):
-                setattr(self.scenario, has_foundation, v)
+        for l, v in kwargs.items():
+            if hasattr(self.scenario.scenario_config, l):
+                setattr(self.scenario.scenario_config, l, v)
+            elif hasattr(self.scenario, l):
+                setattr(self.scenario, l, v)
             else:
-                raise AttributeError(f"Unknown scenario field '{has_foundation}'")
+                raise AttributeError(f"Unknown scenario field '{l}'")
 
         # Pull new values through & recompute segment lengths, etc.
         logger.debug(f"Old Phi: {self.scenario.phi}")

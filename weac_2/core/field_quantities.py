@@ -3,50 +3,58 @@ from typing import Literal
 
 from weac_2.core.eigensystem import Eigensystem
 
-Unit = Literal["m", "cm", "mm", "um", "deg", "degree", "degrees", "rad", "radian", "radians"]
+Unit = Literal[
+    "m", "cm", "mm", "um", "deg", "degree", "degrees", "rad", "radian", "radians"
+]
 
 _UNIT_FACTOR: dict[str, float] = {
-    "m": 1e-3,  "cm": 1e-1, "mm": 1,    "um": 1e3,
-    "rad": 1, "deg": 180 / np.pi
-    }
+    "m": 1e-3,
+    "cm": 1e-1,
+    "mm": 1,
+    "um": 1e3,
+    "rad": 1,
+    "deg": 180 / np.pi,
+}
 
 
 class FieldQuantities:
     """
-    Convenience accessors for a 6×N solution matrix Z =
+    Convenience accessors for a 6xN solution matrix Z =
     [u, u', w, w', ψ, ψ']ᵀ.  All functions are *vectorized* along the second
     axis (x-coordinate), so they return an `ndarray` of length N.
     """
 
     def __init__(self, eigensystem: Eigensystem):
         self.es = eigensystem
-    
+
     @staticmethod
     def _unit_factor(unit: Unit, /) -> float:
         """Return multiplicative factor associated with *unit*."""
         try:
             return _UNIT_FACTOR[unit]
         except KeyError as exc:
-            raise ValueError(f"Unsupported unit: {unit!r}, supported units are {_UNIT_FACTOR}") from exc
+            raise ValueError(
+                f"Unsupported unit: {unit!r}, supported units are {_UNIT_FACTOR}"
+            ) from exc
 
     def u(
         self,
         Z: np.ndarray,
-        h0: float,
+        h0: float = 0,
         unit: Literal["m", "cm", "mm", "um"] = "mm",
     ) -> float | np.ndarray:
         """Horizontal displacement *u = u₀ + h₀ ψ* at depth h₀."""
-        return self._unit_factor(unit) * (
-            Z[0,:] + h0 * self.psi(Z)
-        )
+        return self._unit_factor(unit) * (Z[0, :] + h0 * self.psi(Z))
 
     def du_dx(self, Z: np.ndarray, h0: float) -> float | np.ndarray:
         """Derivative u' = u₀' + h₀ ψ'."""
-        return Z[1,:] + h0 * self.dpsi_dx(Z)
+        return Z[1, :] + h0 * self.dpsi_dx(Z)
 
-    def w(self, Z: np.ndarray, unit: Literal["m", "cm", "mm", "um"] = "mm") -> float | np.ndarray:
+    def w(
+        self, Z: np.ndarray, unit: Literal["m", "cm", "mm", "um"] = "mm"
+    ) -> float | np.ndarray:
         """Center-line deflection *w*."""
-        return self._unit_factor(unit) * Z[2,:]
+        return self._unit_factor(unit) * Z[2, :]
 
     def dw_dx(self, Z: np.ndarray) -> float | np.ndarray:
         """First derivative w'."""
@@ -64,8 +72,7 @@ class FieldQuantities:
     def dpsi_dx(self, Z: np.ndarray) -> float | np.ndarray:
         """First derivative ψ′."""
         return Z[5, :]
-    
-    
+
     def N(self, Z: np.ndarray) -> float | np.ndarray:
         """Axial normal force N = A11 u' + B11 psi' in the slab [N]"""
         return self.es.A11 * Z[1, :] + self.es.B11 * Z[5, :]
@@ -78,18 +85,25 @@ class FieldQuantities:
         """Vertical shear force V = kA55(w' + psi) [N]"""
         return self.es.kA55 * (Z[3, :] + Z[4, :])
 
-    def sig(self, Z: np.ndarray, unit: Literal["kPa", "MPa"] = "MPa") -> float | np.ndarray:
+    def sig(
+        self, Z: np.ndarray, unit: Literal["kPa", "MPa"] = "MPa"
+    ) -> float | np.ndarray:
         """Weak-layer normal stress"""
         convert = {"kPa": 1e3, "MPa": 1}
         return -convert[unit] * self.es.weak_layer.kn * self.w(Z)
 
-    def tau(self, Z: np.ndarray, unit: Literal["kPa", "MPa"] = "MPa") -> float | np.ndarray:
+    def tau(
+        self, Z: np.ndarray, unit: Literal["kPa", "MPa"] = "MPa"
+    ) -> float | np.ndarray:
         """Weak-layer shear stress"""
         convert = {"kPa": 1e3, "MPa": 1}
         return (
             -convert[unit]
             * self.es.weak_layer.kt
-            * (self.dw_dx(Z) * self.es.weak_layer.h / 2 - self.u(Z, h0=self.es.slab.H / 2))
+            * (
+                self.dw_dx(Z) * self.es.weak_layer.h / 2
+                - self.u(Z, h0=self.es.slab.H / 2)
+            )
         )
 
     def eps(self, Z: np.ndarray) -> float | np.ndarray:
@@ -98,9 +112,13 @@ class FieldQuantities:
 
     def gamma(self, Z: np.ndarray) -> float | np.ndarray:
         """Weak-layer shear strain."""
-        return self.dw_dx(Z) / 2 - self.u(Z, h0=self.es.slab.H / 2) / self.es.weak_layer.h
+        return (
+            self.dw_dx(Z) / 2 - self.u(Z, h0=self.es.slab.H / 2) / self.es.weak_layer.h
+        )
 
-    def Gi(self, Ztip: np.ndarray, unit: Literal["J/m^2", "kJ/m^2", "N/mm"] = "kJ/m^2") -> float | np.ndarray:
+    def Gi(
+        self, Ztip: np.ndarray, unit: Literal["J/m^2", "kJ/m^2", "N/mm"] = "kJ/m^2"
+    ) -> float | np.ndarray:
         """Mode I differential energy release rate at crack tip.
 
         Arguments
@@ -118,7 +136,9 @@ class FieldQuantities:
         }
         return convert[unit] * self.sig(Ztip) ** 2 / (2 * self.es.weak_layer.kn)
 
-    def Gii(self, Ztip: np.ndarray, unit: Literal["J/m^2", "kJ/m^2", "N/mm"] = "kJ/m^2") -> float | np.ndarray:
+    def Gii(
+        self, Ztip: np.ndarray, unit: Literal["J/m^2", "kJ/m^2", "N/mm"] = "kJ/m^2"
+    ) -> float | np.ndarray:
         """Mode II differential energy release rate at crack tip.
 
         Arguments
@@ -254,4 +274,3 @@ class FieldQuantities:
             Third derivative of the cross-section rotation psi'''(x) (1/mm^3).
         """
         return self.dz_dxdx(z, phi, qs)[5, :]
-

@@ -14,7 +14,7 @@ from weac_2.constants import CB0, CB1, CG0, CG1, NU, RHO0
 logger = logging.getLogger(__name__)
 
 
-def bergfeld(rho: float, C_0: float = CB0, C_1: float = CB1) -> float:
+def _bergfeld_youngs_modulus(rho: float, C_0: float = CB0, C_1: float = CB1) -> float:
     """Young's modulus from Bergfeld et al. (2023) - returns MPa.
 
     Arguments
@@ -31,7 +31,7 @@ def bergfeld(rho: float, C_0: float = CB0, C_1: float = CB1) -> float:
     return C_0 * 1e3 * (rho / RHO0) ** C_1
 
 
-def scapozza(rho: float) -> float:
+def _scapozza_youngs_modulus(rho: float) -> float:
     """Young's modulus from Scapazzo - return MPa
     `rho` in [kg/m^3]"""
     rho = rho * 1e-12  # Convert to [t/mm^3]
@@ -39,7 +39,7 @@ def scapozza(rho: float) -> float:
     return 5.07e3 * (rho / rho_0) ** 5.13
 
 
-def gerling(rho: float, C_0: float = CG0, C_1: float = CG1) -> float:
+def _gerling_youngs_modulus(rho: float, C_0: float = CG0, C_1: float = CG1) -> float:
     """Young's modulus according to Gerling et al. 2017.
 
     Arguments
@@ -54,6 +54,30 @@ def gerling(rho: float, C_0: float = CG0, C_1: float = CG1) -> float:
         Gerling et al. (2017). Default is 4.6.
     """
     return C_0 * 1e-10 * rho**C_1
+
+
+def _sigrist_tensile_strength(rho, unit="kPa"):
+    """
+    Estimate the tensile strenght of a slab layer from its density.
+
+    Uses the density parametrization of Sigrist (2006).
+
+    Arguments
+    ---------
+    rho : ndarray, float
+        Layer density (kg/m^3).
+    unit : str, optional
+        Desired output unit of the layer strength. Default is 'kPa'.
+
+    Returns
+    -------
+    ndarray
+        Tensile strenght in specified unit.
+    """
+    convert = {"kPa": 1, "MPa": 1e-3}
+    rho_ice = 917
+    # Sigrist's equation is given in kPa
+    return convert[unit] * 240 * (rho / rho_ice) ** 2.44
 
 
 class Layer(BaseModel):
@@ -82,6 +106,9 @@ class Layer(BaseModel):
     # derived if not provided
     E: float | None = Field(default=None, gt=0, description="Young's modulus [MPa]")
     G: float | None = Field(default=None, gt=0, description="Shear modulus [MPa]")
+    tensile_strength: float | None = Field(
+        default=None, gt=0, description="Tensile strength [kPa]"
+    )
 
     model_config = ConfigDict(
         frozen=True,
@@ -89,8 +116,13 @@ class Layer(BaseModel):
     )
 
     def model_post_init(self, _ctx):
-        object.__setattr__(self, "E", self.E or bergfeld(self.rho))
+        object.__setattr__(self, "E", self.E or _bergfeld_youngs_modulus(self.rho))
         object.__setattr__(self, "G", self.G or self.E / (2 * (1 + self.nu)))
+        object.__setattr__(
+            self,
+            "tensile_strength",
+            self.tensile_strength or _sigrist_tensile_strength(self.rho, unit="kPa"),
+        )
 
 
 class WeakLayer(BaseModel):
@@ -148,7 +180,7 @@ class WeakLayer(BaseModel):
     )
 
     def model_post_init(self, _ctx):
-        object.__setattr__(self, "E", self.E or bergfeld(self.rho))
+        object.__setattr__(self, "E", self.E or _bergfeld_youngs_modulus(self.rho))
         object.__setattr__(self, "G", self.G or self.E / (2 * (1 + self.nu)))
         E_plane = self.E / (1 - self.nu**2)  # plane-strain Young
         object.__setattr__(self, "kn", self.kn or E_plane / self.h)

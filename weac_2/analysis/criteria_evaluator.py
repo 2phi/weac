@@ -403,7 +403,7 @@ class CriteriaEvaluator:
         # Get differential energy release rates at the crack tips
         # Note: gdif returns [total, modeI, modeII] in kJ/m^2 by default
         # We need J/m^2 for the fracture toughness criterion.
-        diff_energy = analyzer.gdif(
+        diff_energy = analyzer.differential_ERR(
             C=system.unknown_constants,
             phi=system.scenario.phi,
             li=system.scenario.li,
@@ -614,7 +614,7 @@ class CriteriaEvaluator:
                 layers, weak_layer, segments, scenario_config_c
             )
 
-            # Calculate incremental energy release rate (ginc)
+            # Calculate incremental energy release rate
             analyzer = Analyzer(cracked_system)
             k0_bools = [s.has_foundation for s in uncracked_segments]
 
@@ -647,7 +647,7 @@ class CriteriaEvaluator:
                 layers, weak_layer, uncracked_segments_ginc, scenario_config_uc
             )
 
-            incr_energy = analyzer.ginc(
+            incr_energy = analyzer.incremental_ERR(
                 C0=uncracked_system_ginc.unknown_constants,
                 C1=cracked_system.unknown_constants,
                 phi=phi,

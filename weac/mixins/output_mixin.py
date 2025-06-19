@@ -3,12 +3,15 @@ from __future__ import annotations
 """Mixin for Output."""
 # Standard library imports
 from functools import partial
+
 # Third party imports
 import numpy as np
 from scipy.integrate import cumulative_trapezoid, quad
 from scipy.optimize import brentq
+
 # Module imports
 from weac.tools import calc_vertical_bc_center_of_gravity, tensile_strength_slab
+
 
 class OutputMixin:
     """

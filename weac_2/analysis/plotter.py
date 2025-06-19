@@ -11,8 +11,95 @@ import numpy as np
 from weac_2.analysis.analyzer import Analyzer
 
 # Module imports
+from weac_2.core.scenario import Scenario
 from weac_2.core.system_model import SystemModel
 from weac_2.utils import isnotebook
+
+LABELSTYLE = {
+    "backgroundcolor": "w",
+    "horizontalalignment": "center",
+    "verticalalignment": "center",
+}
+
+COLORS = np.array(
+    [  # TUD color palette
+        ["#DCDCDC", "#B5B5B5", "#898989", "#535353"],  # gray
+        ["#5D85C3", "#005AA9", "#004E8A", "#243572"],  # blue
+        ["#009CDA", "#0083CC", "#00689D", "#004E73"],  # ocean
+        ["#50B695", "#009D81", "#008877", "#00715E"],  # teal
+        ["#AFCC50", "#99C000", "#7FAB16", "#6A8B22"],  # green
+        ["#DDDF48", "#C9D400", "#B1BD00", "#99A604"],  # lime
+        ["#FFE05C", "#FDCA00", "#D7AC00", "#AE8E00"],  # yellow
+        ["#F8BA3C", "#F5A300", "#D28700", "#BE6F00"],  # sand
+        ["#EE7A34", "#EC6500", "#CC4C03", "#A94913"],  # orange
+        ["#E9503E", "#E6001A", "#B90F22", "#961C26"],  # red
+        ["#C9308E", "#A60084", "#951169", "#732054"],  # magenta
+        ["#804597", "#721085", "#611C73", "#4C226A"],  # purple
+    ]
+)
+
+
+def _outline(grid):
+    """Extract _outline values of a 2D array (matrix, grid)."""
+    top = grid[0, :-1]
+    right = grid[:-1, -1]
+    bot = grid[-1, :0:-1]
+    left = grid[::-1, 0]
+
+    return np.hstack([top, right, bot, left])
+
+
+def _significant_digits(decimal):
+    """Return the number of significant digits for a given decimal."""
+    return -int(np.floor(np.log10(decimal)))
+
+
+def _tight_central_distribution(limit, samples=100, tightness=1.5):
+    """
+    Provide values within a given interval distributed tightly around 0.
+
+    Parameters
+    ----------
+    limit : float
+        Maximum and minimum of value range.
+    samples : int, optional
+        Number of values. Default is 100.
+    tightness : int, optional
+        Degree of value densification at center. 1.0 corresponds
+        to equal spacing. Default is 1.5.
+
+    Returns
+    -------
+    ndarray
+        Array of values more tightly spaced around 0.
+    """
+    stop = limit ** (1 / tightness)
+    levels = np.linspace(0, stop, num=int(samples / 2), endpoint=True) ** tightness
+    return np.unique(np.hstack([-levels[::-1], levels]))
+
+
+def _adjust_lightness(color, amount=0.5):
+    """
+    Adjust color lightness.
+
+    Arguments
+    ----------
+    color : str or tuple
+        Matplotlib colorname, hex string, or RGB value tuple.
+    amount : float, optional
+        Amount of lightening: >1 lightens, <1 darkens. Default is 0.5.
+
+    Returns
+    -------
+    tuple
+        RGB color tuple.
+    """
+    try:
+        c = mc.cnames[color]
+    except KeyError:
+        c = color
+    c = colorsys.rgb_to_hls(*mc.to_rgb(c))
+    return colorsys.hls_to_rgb(c[0], max(0, min(1, amount * c[1])), c[2])
 
 
 class MidpointNormalize(mc.Normalize):
@@ -91,16 +178,7 @@ class Plotter:
                 )
             self.labels = labels
 
-        # Set up colors
-        if colors is None:
-            # Generate distinct colors using HSV color space
-            self.colors = self._generate_colors(self.n_systems)
-        else:
-            if len(colors) != self.n_systems:
-                raise ValueError(
-                    f"Number of colors ({len(colors)}) must match number of systems ({self.n_systems})"
-                )
-            self.colors = colors
+        self.colors = COLORS
 
         # Set up plot directory
         self.plot_dir = plot_dir
@@ -111,19 +189,6 @@ class Plotter:
 
         # Cache analyzers for performance
         self._analyzers = {}
-
-    def _generate_colors(self, n: int) -> List[str]:
-        """Generate n distinct colors using HSV color space."""
-        colors = []
-        for i in range(n):
-            hue = i / n
-            saturation = 0.7 + 0.3 * (i % 2)  # Alternate between 0.7 and 1.0
-            value = 0.8 + 0.2 * ((i + 1) % 2)  # Alternate between 0.8 and 1.0
-            rgb = colorsys.hsv_to_rgb(hue, saturation, value)
-            colors.append(
-                f"#{int(rgb[0] * 255):02x}{int(rgb[1] * 255):02x}{int(rgb[2] * 255):02x}"
-            )
-        return colors
 
     def _setup_matplotlib_style(self):
         """Set up modern matplotlib styling."""
@@ -171,28 +236,6 @@ class Plotter:
         else:
             return self.systems
 
-    def _get_labels_and_colors(
-        self, systems_to_plot: List[SystemModel]
-    ) -> tuple[List[str], List[str]]:
-        """Get corresponding labels and colors for systems to plot."""
-        if systems_to_plot == self.systems:
-            return self.labels, self.colors
-
-        # Find indices of systems to plot
-        labels = []
-        colors = []
-        for system in systems_to_plot:
-            try:
-                idx = self.systems.index(system)
-                labels.append(self.labels[idx])
-                colors.append(self.colors[idx])
-            except ValueError:
-                # System not in original list, use defaults
-                labels.append(f"System {len(labels) + 1}")
-                colors.append(self._generate_colors(1)[0])
-
-        return labels, colors
-
     def _save_figure(self, filename: str, fig: Optional[plt.Figure] = None):
         """Save figure with proper formatting."""
         if fig is None:
@@ -228,7 +271,12 @@ class Plotter:
             The generated plot axes.
         """
         systems_to_plot = self._get_systems_to_plot(system_model, system_models)
-        labels, colors = self._get_labels_and_colors(systems_to_plot)
+        labels, colors = self.labels, self.colors
+
+        # Plot Setup
+        plt.rcdefaults()
+        plt.rc("font", family="serif", size=10)
+        plt.rc("mathtext", fontset="cm")
 
         fig = plt.figure(figsize=(4, 7))
         ax1 = fig.gca()
@@ -286,74 +334,8 @@ class Plotter:
         if filename:
             self._save_figure(filename, fig)
 
-        return ax1
-
-    def plot_displacements(
-        self,
-        system_model: Optional[SystemModel] = None,
-        system_models: Optional[List[SystemModel]] = None,
-        filename: Optional[str] = None,
-    ):
-        """
-        Plot displacement fields (u, w, ψ) for comparison.
-
-        Parameters
-        ----------
-        system_model : SystemModel, optional
-            Single system to plot (overrides default)
-        system_models : List[SystemModel], optional
-            Multiple systems to plot (overrides default)
-        filename : str, optional
-            Filename for saving plot
-        """
-        systems_to_plot = self._get_systems_to_plot(system_model, system_models)
-        labels, colors = self._get_labels_and_colors(systems_to_plot)
-
-        fig, axes = plt.subplots(3, 1, figsize=(14, 12))
-
-        for system, label, color in zip(systems_to_plot, labels, colors):
-            analyzer = self._get_analyzer(system)
-            x, z, _ = analyzer.rasterize_solution()
-            fq = system.fq
-
-            # Convert x to meters for plotting
-            x_m = x / 1000
-
-            # Plot horizontal displacement u at mid-height
-            u = fq.u(z, h0=0, unit="mm")
-            axes[0].plot(x_m, u, color=color, label=label, linewidth=2)
-
-            # Plot vertical displacement w
-            w = fq.w(z, unit="mm")
-            axes[1].plot(x_m, w, color=color, label=label, linewidth=2)
-
-            # Plot rotation ψ
-            psi = fq.psi(z, unit="deg")
-            axes[2].plot(x_m, psi, color=color, label=label, linewidth=2)
-
-        # Formatting
-        axes[0].set_ylabel("u (mm)")
-        axes[0].set_title("Horizontal Displacement")
-        axes[0].legend()
-        axes[0].grid(True, alpha=0.3)
-
-        axes[1].set_ylabel("w (mm)")
-        axes[1].set_title("Vertical Displacement")
-        axes[1].legend()
-        axes[1].grid(True, alpha=0.3)
-
-        axes[2].set_xlabel("Distance (m)")
-        axes[2].set_ylabel("ψ (°)")
-        axes[2].set_title("Cross-section Rotation")
-        axes[2].legend()
-        axes[2].grid(True, alpha=0.3)
-
-        plt.tight_layout()
-
-        if filename:
-            self._save_figure(filename, fig)
-
-        return fig
+        # Reset plot styles
+        plt.rcdefaults()
 
     def plot_section_forces(
         self,
@@ -374,7 +356,7 @@ class Plotter:
             Filename for saving plot
         """
         systems_to_plot = self._get_systems_to_plot(system_model, system_models)
-        labels, colors = self._get_labels_and_colors(systems_to_plot)
+        labels, colors = self.labels, self.colors
 
         fig, axes = plt.subplots(3, 1, figsize=(14, 12))
 
@@ -422,64 +404,6 @@ class Plotter:
 
         return fig
 
-    def plot_stresses(
-        self,
-        system_model: Optional[SystemModel] = None,
-        system_models: Optional[List[SystemModel]] = None,
-        filename: Optional[str] = None,
-    ):
-        """
-        Plot weak layer stresses (σ, τ) for comparison.
-
-        Parameters
-        ----------
-        system_model : SystemModel, optional
-            Single system to plot (overrides default)
-        system_models : List[SystemModel], optional
-            Multiple systems to plot (overrides default)
-        filename : str, optional
-            Filename for saving plot
-        """
-        systems_to_plot = self._get_systems_to_plot(system_model, system_models)
-        labels, colors = self._get_labels_and_colors(systems_to_plot)
-
-        fig, axes = plt.subplots(2, 1, figsize=(14, 10))
-
-        for system, label, color in zip(systems_to_plot, labels, colors):
-            analyzer = self._get_analyzer(system)
-            x, z, _ = analyzer.rasterize_solution()
-            fq = system.fq
-
-            # Convert x to meters for plotting
-            x_m = x / 1000
-
-            # Plot normal stress σ
-            sigma = fq.sig(z, unit="kPa")
-            axes[0].plot(x_m, sigma, color=color, label=label, linewidth=2)
-
-            # Plot shear stress τ
-            tau = fq.tau(z, unit="kPa")
-            axes[1].plot(x_m, tau, color=color, label=label, linewidth=2)
-
-        # Formatting
-        axes[0].set_ylabel("σ (kPa)")
-        axes[0].set_title("Weak Layer Normal Stress")
-        axes[0].legend()
-        axes[0].grid(True, alpha=0.3)
-
-        axes[1].set_xlabel("Distance (m)")
-        axes[1].set_ylabel("τ (kPa)")
-        axes[1].set_title("Weak Layer Shear Stress")
-        axes[1].legend()
-        axes[1].grid(True, alpha=0.3)
-
-        plt.tight_layout()
-
-        if filename:
-            self._save_figure(filename, fig)
-
-        return fig
-
     def plot_energy_release_rates(
         self,
         system_model: Optional[SystemModel] = None,
@@ -499,7 +423,7 @@ class Plotter:
             Filename for saving plot
         """
         systems_to_plot = self._get_systems_to_plot(system_model, system_models)
-        labels, colors = self._get_labels_and_colors(systems_to_plot)
+        labels, colors = self.labels, self.colors
 
         fig, axes = plt.subplots(2, 1, figsize=(14, 10))
 
@@ -540,10 +464,19 @@ class Plotter:
 
     def plot_deformed(
         self,
-        field: Literal["w", "u", "principal", "sigma", "tau"] = "w",
-        system_model: Optional[SystemModel] = None,
+        xsl: np.ndarray,
+        xwl: np.ndarray,
+        z: np.ndarray,
+        analyzer: Analyzer,
+        dz: int = 2,
+        scale: int = 100,
+        window: int = np.inf,
+        pad: int = 2,
+        levels: int = 300,
+        aspect: int = 2,
+        field: Literal["w", "u", "principal", "Sxx", "Txz", "Szz"] = "w",
+        normalize: bool = True,
         filename: Optional[str] = None,
-        contour_levels: int = 20,
     ):
         """
         Plot deformed slab with field contours.
@@ -556,99 +489,183 @@ class Plotter:
             System to plot (uses first system if not specified)
         filename : str, optional
             Filename for saving plot
-        contour_levels : int, default 20
-            Number of contour levels
         """
-        if system_model is None:
-            system_model = self.systems[0]
+        # Plot Setup
+        plt.rcdefaults()
+        plt.rc("font", family="serif", size=10)
+        plt.rc("mathtext", fontset="cm")
 
-        analyzer = self._get_analyzer(system_model)
-        x, z, _ = analyzer.rasterize_solution()
-        fq = system_model.fq
+        zi = analyzer.get_zmesh(dz=dz)["z"]
+        H = analyzer.sm.slab.H
+        phi = analyzer.sm.scenario.phi
+        system_type = analyzer.sm.scenario.system_type
+        fq = analyzer.sm.fq
 
-        # Convert coordinates
-        x_m = x / 1000
+        # Compute slab displacements on grid (cm)
+        Usl = np.vstack([fq.u(z, h0=h0, unit="cm") for h0 in zi])
+        Wsl = np.vstack([fq.w(z, unit="cm") for _ in zi])
 
-        # Create mesh for contour plotting
-        slab_height = system_model.slab.H / 1000  # Convert to meters
-        y = np.linspace(0, slab_height, 50)
-        X, Y = np.meshgrid(x_m, y)
+        # Put coordinate origin at horizontal center
+        if system_type in ["skier", "skiers"]:
+            xsl = xsl - max(xsl) / 2
+            xwl = xwl - max(xwl) / 2
 
-        # Calculate field values
-        if field == "w":
-            field_values = fq.w(z, unit="mm")
-            field_label = "Vertical Displacement w (mm)"
-            cmap = "RdBu_r"
-        elif field == "u":
-            field_values = fq.u(z, h0=slab_height * 500, unit="mm")  # At mid-height
-            field_label = "Horizontal Displacement u (mm)"
-            cmap = "RdBu_r"
-        elif field == "principal":
-            # Calculate principal stress (simplified)
-            sigma = fq.sig(z, unit="kPa")
-            tau = fq.tau(z, unit="kPa")
-            field_values = np.sqrt(sigma**2 + 4 * tau**2)
-            field_label = "Principal Stress (kPa)"
-            cmap = "plasma"
-        elif field == "sigma":
-            field_values = fq.sig(z, unit="kPa")
-            field_label = "Normal Stress σ (kPa)"
-            cmap = "RdBu_r"
-        elif field == "tau":
-            field_values = fq.tau(z, unit="kPa")
-            field_label = "Shear Stress τ (kPa)"
-            cmap = "RdBu_r"
+        # Compute slab grid coordinates with vertical origin at top surface (cm)
+        Xsl, Zsl = np.meshgrid(1e-1 * (xsl), 1e-1 * (zi + H / 2))
 
-        # Create field mesh (simplified - constant across height)
-        Z = np.tile(field_values, (len(y), 1))
+        # Get x-coordinate of maximum deflection w (cm) and derive plot limits
+        xfocus = xsl[np.max(np.argmax(Wsl, axis=1))] / 10
+        xmax = np.min([np.max([Xsl, Xsl + scale * Usl]) + pad, xfocus + window / 2])
+        xmin = np.max([np.min([Xsl, Xsl + scale * Usl]) - pad, xfocus - window / 2])
 
-        fig, ax = plt.subplots(figsize=(16, 8))
-
-        # Plot contours
-        if field in ["sigma", "tau", "u", "w"]:
-            # Use symmetric colormap for stress/displacement
-            vmax = np.max(np.abs(field_values))
-            norm = MidpointNormalize(vmin=-vmax, vmax=vmax, midpoint=0)
-            contour = ax.contourf(X, Y, Z, levels=contour_levels, cmap=cmap, norm=norm)
+        # Scale shown weak-layer thickness with to max deflection and add padding
+        if analyzer.sm.config.touchdown:
+            zmax = (
+                np.max(Zsl)
+                + (analyzer.sm.weak_layer.h * 1e-1 * scale)
+                - (analyzer.sm.scenario.crack_h * 1e-1 * scale)
+            )
+            zmax = min(zmax, np.max(Zsl + scale * Wsl))
         else:
-            contour = ax.contourf(X, Y, Z, levels=contour_levels, cmap=cmap)
+            zmax = np.max(Zsl + scale * Wsl)
+        zmin = np.min(Zsl) - pad
 
-        # Add colorbar
-        cbar = plt.colorbar(contour, ax=ax)
-        cbar.set_label(field_label)
+        # Compute weak-layer grid coordinates (cm)
+        Xwl, Zwl = np.meshgrid(1e-1 * xwl, [1e-1 * (zi[-1] + H / 2), zmax])
 
-        # Plot deformed shape (exaggerated)
-        if field in ["w", "u"]:
-            scale_factor = 0.1  # Exaggeration factor
-            if field == "w":
-                deformation = fq.w(z, unit="mm") * scale_factor / 1000
-            else:
-                deformation = (
-                    fq.u(z, h0=slab_height * 500, unit="mm") * scale_factor / 1000
+        # Assemble weak-layer displacement field (top and bottom)
+        Uwl = np.vstack([Usl[-1, :], np.zeros(xwl.shape[0])])
+        Wwl = np.vstack([Wsl[-1, :], np.zeros(xwl.shape[0])])
+
+        # Compute stress or displacement fields
+        match field:
+            # Horizontal displacements (um)
+            case "u":
+                slab = 1e4 * Usl
+                weak = 1e4 * Usl[-1, :]
+                label = r"$u$ ($\mu$m)"
+            # Vertical deflection (um)
+            case "w":
+                slab = 1e4 * Wsl
+                weak = 1e4 * Wsl[-1, :]
+                label = r"$w$ ($\mu$m)"
+            # Axial normal stresses (kPa)
+            case "Sxx":
+                slab = analyzer.Sxx(z, phi, dz=dz, unit="kPa")
+                weak = np.zeros(xwl.shape[0])
+                label = r"$\sigma_{xx}$ (kPa)"
+            # Shear stresses (kPa)
+            case "Txz":
+                slab = analyzer.Txz(z, phi, dz=dz, unit="kPa")
+                weak = analyzer.weaklayer_shearstress(x=xwl, z=z, unit="kPa")[1]
+                label = r"$\tau_{xz}$ (kPa)"
+            # Transverse normal stresses (kPa)
+            case "Szz":
+                slab = analyzer.Szz(z, phi, dz=dz, unit="kPa")
+                weak = analyzer.weaklayer_normalstress(x=xwl, z=z, unit="kPa")[1]
+                label = r"$\sigma_{zz}$ (kPa)"
+            # Principal stresses
+            case "principal":
+                slab = analyzer.principal_stress_slab(
+                    z, phi, dz=dz, val="max", unit="kPa", normalize=normalize
+                )
+                weak = analyzer.principal_stress_weaklayer(
+                    z, val="min", unit="kPa", normalize=normalize
+                )
+                if normalize:
+                    label = (
+                        r"$\sigma_\mathrm{I}/\sigma_+$ (slab),  "
+                        r"$\sigma_\mathrm{I\!I\!I}/\sigma_-$ (weak layer)"
+                    )
+                else:
+                    label = (
+                        r"$\sigma_\mathrm{I}$ (kPa, slab),  "
+                        r"$\sigma_\mathrm{I\!I\!I}$ (kPa, weak layer)"
+                    )
+            case _:
+                raise ValueError(
+                    f"Invalid input '{field}' for field. Valid options are "
+                    "'u', 'w', 'Sxx', 'Txz', 'Szz', or 'principal'"
                 )
 
-            # Plot original and deformed profiles
-            ax.plot(
-                x_m, np.zeros_like(x_m), "k--", linewidth=1, alpha=0.5, label="Original"
+        # Complement label
+        label += r"  $\longrightarrow$"
+
+        # Assemble weak-layer output on grid
+        weak = np.vstack([weak, weak])
+
+        # Normalize colormap
+        absmax = np.nanmax(np.abs([slab.min(), slab.max(), weak.min(), weak.max()]))
+        clim = np.round(absmax, _significant_digits(absmax))
+        levels = np.linspace(-clim, clim, num=levels + 1, endpoint=True)
+        # nanmax = np.nanmax([slab.max(), weak.max()])
+        # nanmin = np.nanmin([slab.min(), weak.min()])
+        # norm = MidpointNormalize(vmin=nanmin, vmax=nanmax)
+
+        # Plot baseline
+        plt.axhline(zmax, color="k", linewidth=1)
+
+        # Plot outlines of the undeformed and deformed slab
+        plt.plot(_outline(Xsl), _outline(Zsl), "k--", alpha=0.3, linewidth=1)
+        plt.plot(
+            _outline(Xsl + scale * Usl), _outline(Zsl + scale * Wsl), "k", linewidth=1
+        )
+
+        # Plot deformed weak-layer _outline
+        if system_type in ["-pst", "pst-", "-vpst", "vpst-"]:
+            nanmask = np.isfinite(xwl)
+            plt.plot(
+                _outline(Xwl[:, nanmask] + scale * Uwl[:, nanmask]),
+                _outline(Zwl[:, nanmask] + scale * Wwl[:, nanmask]),
+                "k",
+                linewidth=1,
             )
-            ax.plot(
-                x_m, deformation, "k-", linewidth=2, label=f"Deformed ({scale_factor}x)"
-            )
-            ax.legend()
 
-        # Formatting
-        ax.set_xlabel("Distance (m)")
-        ax.set_ylabel("Height (m)")
-        ax.set_title(f"Deformed Slab - {field_label}")
-        ax.set_aspect("equal")
-        ax.grid(True, alpha=0.3)
+        # Colormap
+        cmap = plt.cm.RdBu_r
+        cmap.set_over(_adjust_lightness(cmap(1.0), 0.9))
+        cmap.set_under(_adjust_lightness(cmap(0.0), 0.9))
 
-        plt.tight_layout()
+        # Plot fields
+        plt.contourf(
+            Xsl + scale * Usl,
+            Zsl + scale * Wsl,
+            slab,
+            levels=levels,  # norm=norm,
+            cmap=cmap,
+            extend="both",
+        )
+        plt.contourf(
+            Xwl + scale * Uwl,
+            Zwl + scale * Wwl,
+            weak,
+            levels=levels,  # norm=norm,
+            cmap=cmap,
+            extend="both",
+        )
 
-        if filename:
-            self._save_figure(filename, fig)
+        # Plot setup
+        plt.axis("scaled")
+        plt.xlim([xmin, xmax])
+        plt.ylim([zmin, zmax])
+        plt.gca().set_aspect(aspect)
+        plt.gca().invert_yaxis()
+        plt.gca().use_sticky_edges = False
 
-        return fig
+        # Plot labels
+        plt.gca().set_xlabel(r"lateral position $x$ (cm) $\longrightarrow$")
+        plt.gca().set_ylabel("depth below surface\n" + r"$\longleftarrow $ $d$ (cm)")
+        plt.title(rf"${scale}\!\times\!$ scaled deformations (cm)", size=10)
+
+        # Show colorbar
+        ticks = np.linspace(levels[0], levels[-1], num=11, endpoint=True)
+        plt.colorbar(orientation="horizontal", ticks=ticks, label=label, aspect=35)
+
+        # Save figure
+        self._save_figure(filename)
+
+        # Reset plot styles
+        plt.rcdefaults()
 
     def plot_stress_envelope(
         self, system_model: Optional[SystemModel] = None, filename: Optional[str] = None
@@ -731,7 +748,7 @@ class Plotter:
         if system_models is None:
             system_models = self.systems
 
-        labels, colors = self._get_labels_and_colors(system_models)
+        labels, colors = self.labels, self.colors
 
         fig = plt.figure(figsize=(20, 16))
 
@@ -891,3 +908,237 @@ class Plotter:
             self._save_figure(filename, fig)
 
         return fig
+
+    # === PLOT WRAPPERS ===========================================================
+
+    def plot_displacements(
+        self, analyzer: Analyzer, x: np.ndarray, z: np.ndarray, i: int = 0
+    ):
+        """Wrap for displacements plot."""
+        data = [
+            [x / 10, analyzer.sm.fq.u(z, unit="mm"), r"$u_0\ (\mathrm{mm})$"],
+            [x / 10, -analyzer.sm.fq.w(z, unit="mm"), r"$-w\ (\mathrm{mm})$"],
+            [x / 10, analyzer.sm.fq.psi(z, unit="deg"), r"$\psi\ (^\circ)$ "],
+        ]
+        self._plot_data(
+            scenario=analyzer.sm.scenario,
+            ax1label=r"Displacements",
+            ax1data=data,
+            name="disp" + str(i),
+        )
+
+    def plot_stresses(
+        self, analyzer: Analyzer, x: np.ndarray, z: np.ndarray, i: int = 0
+    ):
+        """Wrap stress plot."""
+        data = [
+            [x / 10, analyzer.sm.fq.tau(z, unit="kPa"), r"$\tau$"],
+            [x / 10, analyzer.sm.fq.sig(z, unit="kPa"), r"$\sigma$"],
+        ]
+        self._plot_data(
+            scenario=analyzer.sm.scenario,
+            ax1label=r"Stress (kPa)",
+            ax1data=data,
+            name="stress" + str(i),
+        )
+
+    def plot_stress_criteria(
+        self, analyzer: Analyzer, x: np.ndarray, stress: np.ndarray
+    ):
+        """Wrap plot of stress and energy criteria."""
+        data = [[x / 10, stress, r"$\sigma/\sigma_\mathrm{c}$"]]
+        self._plot_data(
+            scenario=analyzer.sm.scenario,
+            ax1label=r"Criteria",
+            ax1data=data,
+            name="crit",
+        )
+
+    def plot_ERR_comp(
+        self,
+        analyzer: Analyzer,
+        da: np.ndarray,
+        Gdif: np.ndarray,
+        Ginc: np.ndarray,
+        mode: int = 0,
+    ):
+        """Wrap energy release rate plot."""
+        data = [
+            [da / 10, 1e3 * Gdif[mode, :], r"$\mathcal{G}$"],
+            [da / 10, 1e3 * Ginc[mode, :], r"$\bar{\mathcal{G}}$"],
+        ]
+        self._plot_data(
+            scenario=analyzer.sm.scenario,
+            xlabel=r"Crack length $\Delta a$ (cm)",
+            ax1label=r"Energy release rate (J/m$^2$)",
+            ax1data=data,
+            name="err",
+            vlines=False,
+        )
+
+    def plot_ERR_modes(
+        self, analyzer: Analyzer, da: np.ndarray, G: np.ndarray, kind: str = "inc"
+    ):
+        """Wrap energy release rate plot."""
+        label = r"$\bar{\mathcal{G}}$" if kind == "inc" else r"$\mathcal{G}$"
+        data = [
+            [da / 10, 1e3 * G[2, :], label + r"$_\mathrm{I\!I}$"],
+            [da / 10, 1e3 * G[1, :], label + r"$_\mathrm{I}$"],
+            [da / 10, 1e3 * G[0, :], label + r"$_\mathrm{I+I\!I}$"],
+        ]
+        self._plot_data(
+            scenario=analyzer.sm.scenario,
+            xlabel=r"Crack length $a$ (cm)",
+            ax1label=r"Energy release rate (J/m$^2$)",
+            ax1data=data,
+            name="modes",
+            vlines=False,
+        )
+
+    def plot_fea_disp(
+        self, analyzer: Analyzer, x: np.ndarray, z: np.ndarray, fea: np.ndarray
+    ):
+        """Wrap displacements plot."""
+        data = [
+            [fea[:, 0] / 10, -np.flipud(fea[:, 1]), r"FEA $u_0$"],
+            [fea[:, 0] / 10, np.flipud(fea[:, 2]), r"FEA $w_0$"],
+            # [fea[:, 0]/10, -np.flipud(fea[:, 3]), r'FEA $u(z=-h/2)$'],
+            # [fea[:, 0]/10, np.flipud(fea[:, 4]), r'FEA $w(z=-h/2)$'],
+            [fea[:, 0] / 10, np.flipud(np.rad2deg(fea[:, 5])), r"FEA $\psi$"],
+            [x / 10, analyzer.sm.fq.u(z, z0=0), r"$u_0$"],
+            [x / 10, -analyzer.sm.fq.w(z), r"$-w$"],
+            [x / 10, np.rad2deg(analyzer.sm.fq.psi(z)), r"$\psi$"],
+        ]
+        self._plot_data(
+            scenario=analyzer.sm.scenario,
+            ax1label=r"Displacements (mm)",
+            ax1data=data,
+            name="fea_disp",
+            labelpos=-50,
+        )
+
+    def plot_fea_stress(
+        self, analyzer: Analyzer, xb: np.ndarray, zb: np.ndarray, fea: np.ndarray
+    ):
+        """Wrap stress plot."""
+        data = [
+            [fea[:, 0] / 10, 1e3 * np.flipud(fea[:, 2]), r"FEA $\sigma_2$"],
+            [fea[:, 0] / 10, 1e3 * np.flipud(fea[:, 3]), r"FEA $\tau_{12}$"],
+            [xb / 10, analyzer.sm.fq.tau(zb, unit="kPa"), r"$\tau$"],
+            [xb / 10, analyzer.sm.fq.sig(zb, unit="kPa"), r"$\sigma$"],
+        ]
+        self._plot_data(
+            scenario=analyzer.sm.scenario,
+            ax1label=r"Stress (kPa)",
+            ax1data=data,
+            name="fea_stress",
+            labelpos=-50,
+        )
+
+    # === BASE PLOT FUNCTION ======================================================
+
+    def _plot_data(
+        self,
+        scenario: Scenario,
+        name,
+        ax1data,
+        ax1label,
+        ax2data=None,
+        ax2label=None,
+        labelpos=None,
+        vlines=True,
+        xlabel=r"Horizontal position $x$ (cm)",
+    ):
+        """Plot data. Base function."""
+        # Figure setup
+        plt.rcdefaults()
+        plt.rc("font", family="serif", size=10)
+        plt.rc("mathtext", fontset="cm")
+
+        # Create figure
+        fig = plt.figure(figsize=(4, 8 / 3))
+        ax1 = fig.gca()
+
+        # Axis limits
+        ax1.autoscale(axis="x", tight=True)
+
+        # Set axis labels
+        ax1.set_xlabel(xlabel + r" $\longrightarrow$")
+        ax1.set_ylabel(ax1label + r" $\longrightarrow$")
+
+        # Plot x-axis
+        ax1.axhline(0, linewidth=0.5, color="gray")
+
+        ki = scenario.ki
+        li = scenario.li
+        mi = scenario.mi
+
+        # Plot vertical separators
+        if vlines:
+            ax1.axvline(0, linewidth=0.5, color="gray")
+            for i, f in enumerate(ki):
+                if not f:
+                    ax1.axvspan(
+                        sum(li[:i]) / 10,
+                        sum(li[: i + 1]) / 10,
+                        facecolor="gray",
+                        alpha=0.05,
+                        zorder=100,
+                    )
+            for i, m in enumerate(mi, start=1):
+                if m > 0:
+                    ax1.axvline(sum(li[:i]) / 10, linewidth=0.5, color="gray")
+        else:
+            ax1.autoscale(axis="y", tight=True)
+
+        # Calculate labelposition
+        if not labelpos:
+            x = ax1data[0][0]
+            labelpos = int(0.95 * len(x[~np.isnan(x)]))
+
+        # Fill left y-axis
+        i = 0
+        for x, y, label in ax1data:
+            i += 1
+            if label == "" or "FEA" in label:
+                # line, = ax1.plot(x, y, 'k:', linewidth=1)
+                ax1.plot(x, y, linewidth=3, color="white")
+                (line,) = ax1.plot(x, y, ":", linewidth=1)  # , color='black'
+                thislabelpos = -2
+                x, y = x[~np.isnan(x)], y[~np.isnan(x)]
+                xtx = (x[thislabelpos - 1] + x[thislabelpos]) / 2
+                ytx = (y[thislabelpos - 1] + y[thislabelpos]) / 2
+                ax1.text(xtx, ytx, label, color=line.get_color(), **LABELSTYLE)
+            else:
+                # Plot line
+                ax1.plot(x, y, linewidth=3, color="white")
+                (line,) = ax1.plot(x, y, linewidth=1)
+                # Line label
+                x, y = x[~np.isnan(x)], y[~np.isnan(x)]
+                if len(x) > 0:
+                    xtx = (x[labelpos - 10 * i - 1] + x[labelpos - 10 * i]) / 2
+                    ytx = (y[labelpos - 10 * i - 1] + y[labelpos - 10 * i]) / 2
+                    ax1.text(xtx, ytx, label, color=line.get_color(), **LABELSTYLE)
+
+        # Fill right y-axis
+        if ax2data:
+            # Create right y-axis
+            ax2 = ax1.twinx()
+            # Set axis label
+            ax2.set_ylabel(ax2label + r" $\longrightarrow$")
+            # Fill
+            for x, y, label in ax2data:
+                # Plot line
+                ax2.plot(x, y, linewidth=3, color="white")
+                (line,) = ax2.plot(x, y, linewidth=1, color=COLORS[8, 0])
+                # Line label
+                x, y = x[~np.isnan(x)], y[~np.isnan(x)]
+                xtx = (x[labelpos - 1] + x[labelpos]) / 2
+                ytx = (y[labelpos - 1] + y[labelpos]) / 2
+                ax2.text(xtx, ytx, label, color=line.get_color(), **LABELSTYLE)
+
+        # Save figure
+        self._save_figure(name, fig)
+
+        # Reset plot styles
+        plt.rcdefaults()

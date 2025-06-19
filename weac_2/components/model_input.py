@@ -46,7 +46,9 @@ class ModelInput(BaseModel):
     scenario_config: ScenarioConfig = Field(
         ScenarioConfig(phi=0, system="skier"), description="Scenario configuration"
     )
-    weak_layer: WeakLayer = Field(WeakLayer(rho=200, h=10), description="Weak layer")
+    weak_layer: WeakLayer = Field(
+        WeakLayer(rho=10, h=30, E=0.25), description="Weak layer"
+    )
     layers: List[Layer] = Field(
         default_factory=lambda: [Layer(rho=250, h=100)], description="List of layers"
     )
