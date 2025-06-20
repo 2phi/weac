@@ -527,7 +527,7 @@ class Plotter:
             )
             zmax = min(zmax, np.max(Zsl + scale * Wsl))
         else:
-            zmax = np.max(Zsl + scale * Wsl)
+            zmax = np.max(Zsl + scale * Wsl) + pad
         zmin = np.min(Zsl) - pad
 
         # Compute weak-layer grid coordinates (cm)

@@ -3,10 +3,12 @@ from __future__ import annotations
 """Mixin for solution."""
 # Standard library imports
 from functools import partial
+
 # Third party imports
 import numpy as np
 from scipy.integrate import cumulative_trapezoid, quad
 from scipy.optimize import brentq
+
 # Module imports
 from weac.tools import calc_vertical_bc_center_of_gravity, tensile_strength_slab
 
@@ -291,7 +293,6 @@ class SolutionMixin:
             rhs[2] = 1
 
         # --- SOLVE -----------------------------------------------------------
-        
         # Solve z0 = zh0*C + zp0 = rhs for constants, i.e. zh0*C = rhs - zp0
         C = np.linalg.solve(zh0, rhs - zp0)
         # Sort (nDOF = 6) constants for each segment into columns of a matrix
@@ -359,7 +360,7 @@ class SolutionMixin:
             bc = np.array([self.N(z), self.M(z), self.V(z)])
         else:
             raise ValueError(
-                "Boundary conditions not defined for" f"system of type {self.system}."
+                f"Boundary conditions not defined forsystem of type {self.system}."
             )
 
         return bc

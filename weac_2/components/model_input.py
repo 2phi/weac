@@ -29,8 +29,8 @@ class ModelInput(BaseModel):
     """
     Comprehensive input data model for a WEAC simulation.
 
-    Args:
-    -----
+    Parameters:
+    ----------
         scenario_config : ScenarioConfig
             Scenario configuration.
         weak_layer : WeakLayer

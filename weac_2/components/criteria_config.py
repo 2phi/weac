@@ -4,6 +4,7 @@ TODO: blabla
 
 import logging
 
+from typing import Literal
 from pydantic import BaseModel, Field
 
 logger = logging.getLogger(__name__)
@@ -44,4 +45,20 @@ class CriteriaConfig(BaseModel):
         default=2.22,
         gt=0,
         description="Failure mode interaction exponent for shearing energy release rate (G_II)",
+    )
+    stress_envelope_method: Literal[
+        "adam_unpublished", "schottner", "mede_s-RG1", "mede_s-RG2", "mede_s-FCDH"
+    ] = Field(
+        default="adam_unpublished",
+        description="Method to calculate the stress failure envelope",
+    )
+    scaling_factor: float = Field(
+        default=1,
+        gt=0,
+        description="Scaling factor for stress envelope",
+    )
+    order_of_magnitude: float = Field(
+        default=1,
+        gt=0,
+        description="Order of magnitude for stress envelope",
     )

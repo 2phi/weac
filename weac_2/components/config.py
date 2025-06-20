@@ -42,12 +42,6 @@ class Config(BaseModel):
         default="bergfeld",
         description="Method to calculate the density of the snowpack",
     )
-    stress_envelope_method: Literal[
-        "adam_unpublished", "schottner", "mede_s-RG1", "mede_s-RG2", "mede_s-FCDH"
-    ] = Field(
-        default="adam_unpublished",
-        description="Method to calculate the stress failure envelope",
-    )
 
 
 if __name__ == "__main__":

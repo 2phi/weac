@@ -26,8 +26,6 @@ logging.getLogger("matplotlib.font_manager").setLevel(logging.WARNING)
 # === SYSTEM 1: Basic Configuration ===
 config1 = Config(
     touchdown=False,
-    youngs_modulus_method="bergfeld",
-    stress_envelope_method="adam_unpublished",
 )
 scenario_config1 = ScenarioConfig(phi=5, system_type="skier")  # Steeper slope
 weak_layer1 = WeakLayer(rho=10, h=25, E=0.25, G_Ic=1)

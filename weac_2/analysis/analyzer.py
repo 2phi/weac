@@ -1,5 +1,6 @@
 # Standard library imports
 from functools import partial
+from typing import Callable
 
 # Third party imports
 import numpy as np
@@ -144,119 +145,6 @@ class Analyzer:
             si[prop] = np.repeat(values, nlayer)
 
         return si
-
-    def incremental_ERR(self):
-        """
-        Compute incremental energy release rate (ERR) of all cracks.
-
-        Returns
-        -------
-        ndarray
-            List of total, mode I, and mode II energy release rates.
-        """
-        li = self.sm.scenario.li
-        ki = self.sm.scenario.ki
-        k0 = np.ones_like(ki, dtype=bool)
-        C0 = self.sm.unknown_constants
-        C1 = self.sm.unknown_constants
-        phi = self.sm.scenario.phi
-        qs = self.sm.scenario.qs
-
-        # Reduce inputs to segments with crack advance
-        iscrack = k0 & ~ki
-        C0, C1, li = C0[:, iscrack], C1[:, iscrack], li[iscrack]
-        print("cracked: ", C0, C1, li)
-
-        # Compute total crack lenght and initialize outputs
-        da = li.sum() if li.sum() > 0 else np.nan
-        Ginc1, Ginc2 = 0, 0
-
-        # Loop through segments with crack advance
-        for j, length in enumerate(li):
-            # Uncracked (0) and cracked (1) solutions at integration points
-            z0 = partial(
-                self.sm.z,
-                C=C0[:, [j]],
-                length=length,
-                phi=phi,
-                has_foundation=True,
-                qs=qs,
-            )
-            z1 = partial(
-                self.sm.z,
-                C=C1[:, [j]],
-                length=length,
-                phi=phi,
-                has_foundation=False,
-                qs=qs,
-            )
-
-            # Mode I (1) and II (2) integrands at integration points
-            int1 = partial(self.int1, z0=z0, z1=z1)
-            int2 = partial(self.int2, z0=z0, z1=z1)
-
-            # Segement contributions to total crack opening integral
-            Ginc1 += quad(int1, 0, length, epsabs=self.tol, epsrel=self.tol)[0] / (
-                2 * da
-            )
-            Ginc2 += quad(int2, 0, length, epsabs=self.tol, epsrel=self.tol)[0] / (
-                2 * da
-            )
-
-        return np.array([Ginc1 + Ginc2, Ginc1, Ginc2]).flatten()
-
-    def differential_ERR(self, unit: str = "kJ/m^2"):
-        """
-        Compute differential energy release rate of all crack tips.
-
-        Returns
-        -------
-        ndarray
-            List of total, mode I, and mode II energy release rates.
-        """
-        li = self.sm.scenario.li
-        ki = self.sm.scenario.ki
-        C = self.sm.unknown_constants
-        phi = self.sm.scenario.phi
-        qs = self.sm.scenario.qs
-
-        # Get number and indices of segment transitions
-        ntr = len(li) - 1
-        itr = np.arange(ntr)
-
-        # Identify supported-free and free-supported transitions as crack tips
-        iscracktip = [ki[j] != ki[j + 1] for j in range(ntr)]
-
-        # Transition indices of crack tips and total number of crack tips
-        ict = itr[iscracktip]
-        nct = len(ict)
-
-        # Initialize energy release rate array
-        Gdif = np.zeros([3, nct])
-
-        # Compute energy relase rate of all crack tips
-        for j, idx in enumerate(ict):
-            # Solution at crack tip
-            z = self.sm.z(
-                li[idx], C[:, [idx]], li[idx], phi, has_foundation=ki[idx], qs=qs
-            )
-            print("z", z)
-            # Mode I and II differential energy release rates
-            Gdif[1:, j] = np.concatenate(
-                (self.Gi(z, unit=unit), self.Gii(z, unit=unit))
-            )
-
-        # Sum mode I and II contributions
-        Gdif[0, :] = Gdif[1, :] + Gdif[2, :]
-
-        # Adjust contributions for center cracks
-        if nct > 1:
-            avgmask = np.full(nct, True)  # Initialize mask
-            avgmask[[0, -1]] = ki[[0, -1]]  # Do not weight edge cracks
-            Gdif[:, avgmask] *= 0.5  # Weigth with half crack length
-
-        # Return total differential energy release rate of all crack tips
-        return Gdif.sum(axis=1)
 
     def Sxx(self, Z, phi, dz=2, unit="kPa"):
         """
@@ -543,62 +431,144 @@ class Analyzer:
         # Return absolute principal stresses
         return ps
 
-    # Delegate methods to system components
-    def sig(self, Z, unit="kPa"):
-        """Delegate to system field quantities."""
-        return self.sm.fq.sig(Z, unit=unit)
+    def incremental_ERR(self):
+        """
+        Compute incremental energy release rate (ERR) of all cracks.
 
-    def tau(self, Z, unit="kPa"):
-        """Delegate to system field quantities."""
-        return self.sm.fq.tau(Z, unit=unit)
+        Returns
+        -------
+        ndarray
+            List of total, mode I, and mode II energy release rates.
+        """
+        li = self.sm.scenario.li
+        ki = self.sm.scenario.ki
+        k0 = np.ones_like(ki, dtype=bool)
+        C_uncracked = self.sm.unknown_constants
+        C_cracked = self.sm.uncracked_unknown_constants
+        phi = self.sm.scenario.phi
+        qs = self.sm.scenario.qs
 
-    def Gi(self, Z, unit="kJ/m^2"):
-        """Delegate to system field quantities."""
-        return self.sm.fq.Gi(Z, unit=unit)
+        # Reduce inputs to segments with crack advance
+        iscrack = k0 & ~ki
+        C_uncracked, C_cracked, li = (
+            C_uncracked[:, iscrack],
+            C_cracked[:, iscrack],
+            li[iscrack],
+        )
 
-    def Gii(self, Z, unit="kJ/m^2"):
-        """Delegate to system field quantities."""
-        return self.sm.fq.Gii(Z, unit=unit)
+        # Compute total crack lenght and initialize outputs
+        da = li.sum() if li.sum() > 0 else np.nan
+        Ginc1, Ginc2 = 0, 0
 
-    def int1(self, x, z0, z1):
+        # Loop through segments with crack advance
+        for j, length in enumerate(li):
+            # Uncracked (0) and cracked (1) solutions at integration points
+            z_uncracked = partial(
+                self.sm.z,
+                C=C_uncracked[:, [j]],
+                length=length,
+                phi=phi,
+                has_foundation=True,
+                qs=qs,
+            )
+            z_cracked = partial(
+                self.sm.z,
+                C=C_cracked[:, [j]],
+                length=length,
+                phi=phi,
+                has_foundation=False,
+                qs=qs,
+            )
+
+            # Mode I (1) and II (2) integrands at integration points
+            intGI = partial(
+                self._integrand_GI, z_uncracked=z_uncracked, z_cracked=z_cracked
+            )
+            intGII = partial(
+                self._integrand_GII, z_uncracked=z_uncracked, z_cracked=z_cracked
+            )
+
+            # Segement contributions to total crack opening integral
+            Ginc1 += quad(intGI, 0, length, epsabs=self.tol, epsrel=self.tol)[0] / (
+                2 * da
+            )
+            Ginc2 += quad(intGII, 0, length, epsabs=self.tol, epsrel=self.tol)[0] / (
+                2 * da
+            )
+
+        return np.array([Ginc1 + Ginc2, Ginc1, Ginc2]).flatten()
+
+    def differential_ERR(self, unit: str = "kJ/m^2"):
+        """
+        Compute differential energy release rate of all crack tips.
+
+        Returns
+        -------
+        ndarray
+            List of total, mode I, and mode II energy release rates.
+        """
+        li = self.sm.scenario.li
+        ki = self.sm.scenario.ki
+        C = self.sm.unknown_constants
+        phi = self.sm.scenario.phi
+        qs = self.sm.scenario.qs
+
+        # Get number and indices of segment transitions
+        ntr = len(li) - 1
+        itr = np.arange(ntr)
+
+        # Identify supported-free and free-supported transitions as crack tips
+        iscracktip = [ki[j] != ki[j + 1] for j in range(ntr)]
+
+        # Transition indices of crack tips and total number of crack tips
+        ict = itr[iscracktip]
+        nct = len(ict)
+
+        # Initialize energy release rate array
+        Gdif = np.zeros([3, nct])
+
+        # Compute energy relase rate of all crack tips
+        for j, idx in enumerate(ict):
+            # Solution at crack tip
+            z = self.sm.z(
+                li[idx], C[:, [idx]], li[idx], phi, has_foundation=ki[idx], qs=qs
+            )
+            # Mode I and II differential energy release rates
+            Gdif[1:, j] = np.concatenate(
+                (self.sm.fq.Gi(z, unit=unit), self.sm.fq.Gii(z, unit=unit))
+            )
+
+        # Sum mode I and II contributions
+        Gdif[0, :] = Gdif[1, :] + Gdif[2, :]
+
+        # Adjust contributions for center cracks
+        if nct > 1:
+            avgmask = np.full(nct, True)  # Initialize mask
+            avgmask[[0, -1]] = ki[[0, -1]]  # Do not weight edge cracks
+            Gdif[:, avgmask] *= 0.5  # Weigth with half crack length
+
+        # Return total differential energy release rate of all crack tips
+        return Gdif.sum(axis=1)
+
+    def _integrand_GI(
+        self, x: float | np.ndarray, z_uncracked, z_cracked
+    ) -> float | np.ndarray:
         """
         Mode I integrand for energy release rate calculation.
-        Computes sig_zz(z1) * (w(z1) - w(z0)).
         """
-        z0_vec = z0(x)
-        z1_vec = z1(x)
+        sig_uncracked = self.sm.fq.sig(z_uncracked(x))
+        eps_cracked = self.sm.fq.eps(z_cracked(x))
+        return sig_uncracked * eps_cracked * self.sm.weak_layer.h
 
-        # Ensure vectors are 2D arrays for fq methods
-        if z0_vec.ndim == 1:
-            z0_vec = z0_vec[:, np.newaxis]
-        if z1_vec.ndim == 1:
-            z1_vec = z1_vec[:, np.newaxis]
-
-        sig1 = self.sm.fq.sig(z1_vec)
-        w0 = self.sm.fq.w(z0_vec)
-        w1 = self.sm.fq.w(z1_vec)
-
-        return sig1[0] * (w1[0] - w0[0])
-
-    def int2(self, x, z0, z1):
+    def _integrand_GII(
+        self, x: float | np.ndarray, z_uncracked, z_cracked
+    ) -> float | np.ndarray:
         """
         Mode II integrand for energy release rate calculation.
-        Computes tau_xz(z1) * (u(z1) - u(z0)).
         """
-        z0_vec = z0(x)
-        z1_vec = z1(x)
-
-        # Ensure vectors are 2D arrays for fq methods
-        if z0_vec.ndim == 1:
-            z0_vec = z0_vec[:, np.newaxis]
-        if z1_vec.ndim == 1:
-            z1_vec = z1_vec[:, np.newaxis]
-
-        tau1 = self.sm.fq.tau(z1_vec)
-        u0 = self.sm.fq.u(z0_vec, h0=0)  # u at centerline
-        u1 = self.sm.fq.u(z1_vec, h0=0)
-
-        return tau1[0] * (u1[0] - u0[0])
+        tau_uncracked = self.sm.fq.tau(z_uncracked(x))
+        gamma_cracked = self.sm.fq.gamma(z_cracked(x))
+        return tau_uncracked * gamma_cracked * self.sm.weak_layer.h
 
     def total_potential(self, C, phi, L, **segments):
         """
@@ -737,168 +707,3 @@ class Analyzer:
             print("Input error: Only pst-setup implemented at the moment.")
 
         return Pi_int
-
-    def weaklayer_shearstress(self, x, z, unit="MPa", removeNaNs=False):
-        """
-        Wrapper around WeakLayer Shear Stress (Tau) which removes NaNs.
-
-        Arguments
-        ---------
-        x : ndarray
-            Discretized x-coordinates (mm) where coordinates of unsupported
-            (no foundation) segments are NaNs.
-        z : ndarray
-            Solution vectors at positions x as columns of matrix z.
-        unit : {'MPa', 'kPa'}, optional
-            Stress output unit. Default is MPa.
-        keepNaNs : bool
-            If set, do not remove
-
-        Returns
-        -------
-        x : ndarray
-            Horizontal coordinates (cm).
-        sig : ndarray
-            Normal stress (stress unit input).
-        """
-        # Convert coordinates from mm to cm and stresses from MPa to unit
-        x = x / 10
-        tau = self.tau(z, unit=unit)
-        # Filter stresses in unspupported segments
-        if removeNaNs:
-            # Remove coordinate-stress pairs where no weak layer is present
-            tau = tau[~np.isnan(x)]
-            x = x[~np.isnan(x)]
-        else:
-            # Set stress NaN where no weak layer is present
-            tau[np.isnan(x)] = np.nan
-
-        return x, tau
-
-    def weaklayer_normalstress(self, x, z, unit="MPa", removeNaNs=False):
-        """
-        Wrapper around WeakLayer Normal Stress (Sigma) which removes NaNs.
-
-        Arguments
-        ---------
-        x : ndarray
-            Discretized x-coordinates (mm) where coordinates of unsupported
-            (no foundation) segments are NaNs.
-        z : ndarray
-            Solution vectors at positions x as columns of matrix z.
-        unit : {'MPa', 'kPa'}, optional
-            Stress output unit. Default is MPa.
-        keepNaNs : bool
-            If set, do not remove
-
-        Returns
-        -------
-        x : ndarray
-            Horizontal coordinates (cm).
-        sig : ndarray
-            Normal stress (stress unit input).
-        """
-        # Convert coordinates from mm to cm and stresses from MPa to unit
-        x = x / 10
-        sig = self.sig(z, unit=unit)
-        # Filter stresses in unspupported segments
-        if removeNaNs:
-            # Remove coordinate-stress pairs where no weak layer is present
-            sig = sig[~np.isnan(x)]
-            x = x[~np.isnan(x)]
-        else:
-            # Set stress NaN where no weak layer is present
-            sig[np.isnan(x)] = np.nan
-
-        return x, sig
-
-    def get_slab_displacement(self, x, z, loc="mid", unit="mm"):
-        """
-        Compute horizontal slab displacement.
-
-        Arguments
-        ---------
-        x : ndarray
-            Discretized x-coordinates (mm) where coordinates of
-            unsupported (no foundation) segments are NaNs.
-        z : ndarray
-            Solution vectors at positions x as columns of matrix z.
-        loc : {'top', 'mid', 'bot'}
-            Get displacements of top, midplane or bottom of slab.
-            Default is mid.
-        unit : {'m', 'cm', 'mm', 'um'}, optional
-            Displacement output unit. Default is mm.
-
-        Returns
-        -------
-        x : ndarray
-            Horizontal coordinates (cm).
-        ndarray
-            Horizontal displacements (unit input).
-        """
-        # Coordinates (cm)
-        x = x / 10
-        # Locator
-        z0 = {"top": -self.h / 2, "mid": 0, "bot": self.h / 2}
-        # Displacement (unit)
-        u = self.u(z, z0=z0[loc], unit=unit)
-        # Output array
-        return x, u
-
-    def get_slab_deflection(self, x, z, unit="mm"):
-        """
-        Compute vertical slab displacement.
-
-        Arguments
-        ---------
-        x : ndarray
-            Discretized x-coordinates (mm) where coordinates of
-            unsupported (no foundation) segments are NaNs.
-        z : ndarray
-            Solution vectors at positions x as columns of matrix z.
-            Default is mid.
-        unit : {'m', 'cm', 'mm', 'um'}, optional
-            Displacement output unit. Default is mm.
-
-        Returns
-        -------
-        x : ndarray
-            Horizontal coordinates (cm).
-        ndarray
-            Vertical deflections (unit input).
-        """
-        # Coordinates (cm)
-        x = x / 10
-        # Deflection (unit)
-        w = self.w(z, unit=unit)
-        # Output array
-        return x, w
-
-    def get_slab_rotation(self, x, z, unit="degrees"):
-        """
-        Compute slab cross-section rotation angle.
-
-        Arguments
-        ---------
-        x : ndarray
-            Discretized x-coordinates (mm) where coordinates of
-            unsupported (no foundation) segments are NaNs.
-        z : ndarray
-            Solution vectors at positions x as columns of matrix z.
-            Default is mid.
-        unit : {'deg', degrees', 'rad', 'radians'}, optional
-            Rotation angle output unit. Default is degrees.
-
-        Returns
-        -------
-        x : ndarray
-            Horizontal coordinates (cm).
-        ndarray
-            Cross section rotations (unit input).
-        """
-        # Coordinates (cm)
-        x = x / 10
-        # Cross-section rotation angle (unit)
-        psi = self.psi(z, unit=unit)
-        # Output array
-        return x, psi

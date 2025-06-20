@@ -17,6 +17,7 @@ from weac_2.components import (
     Segment,
     WeakLayer,
 )
+from weac_2.core.scenario import Scenario
 from weac_2.core.system_model import SystemModel
 
 
@@ -26,10 +27,10 @@ class CriteriaEvaluator:
     elastic foundations, based on the logic from criterion_check.py.
     """
 
-    config: Config
     criteria_config: CriteriaConfig
+    system_model: SystemModel
 
-    def __init__(self, config: Config, criteria_config: CriteriaConfig):
+    def __init__(self, system_model: SystemModel, criteria_config: CriteriaConfig):
         """
         Initializes the evaluator with global simulation and criteria configurations.
 
@@ -37,7 +38,7 @@ class CriteriaEvaluator:
             config (Config): The main simulation configuration.
             criteria_config (CriteriaConfig): The configuration for failure criteria.
         """
-        self.config = config
+        self.system_model = system_model
         self.criteria_config = criteria_config
 
     def fracture_toughness_criterion(
@@ -112,7 +113,7 @@ class CriteriaEvaluator:
         tau = np.abs(np.asarray(tau))
         results = np.zeros_like(sigma)
 
-        envelope_method = self.config.stress_envelope_method
+        envelope_method = self.criteria_config.stress_envelope_method
         density = weak_layer.rho
         fn = self.criteria_config.fn
         fm = self.criteria_config.fm
@@ -181,7 +182,7 @@ class CriteriaEvaluator:
             segments=segments,
             scenario_config=scenario_config,
         )
-        return SystemModel(model_input=model_input, config=self.config)
+        return SystemModel(model_input=model_input, config=self.system_model.config)
 
     def _calculate_sigma_tau_at_x(
         self, x_value: float, system: SystemModel
@@ -280,11 +281,9 @@ class CriteriaEvaluator:
 
     def find_minimum_force(
         self,
-        layers: List[Layer],
-        weak_layer: WeakLayer,
+        system: SystemModel,
         phi: float,
-        order_of_magnitude: float = 1.0,
-    ):
+    ) -> tuple[float, SystemModel, float, float]:
         """
         Finds the minimum skier weight required to surpass the stress failure envelope.
 
@@ -310,8 +309,17 @@ class CriteriaEvaluator:
         dist_max = 0
 
         # Initial uncracked configuration
-        total_length = sum(layer.h for layer in layers) + weak_layer.h
-        segments = [Segment(length=total_length, has_foundation=True, m=0.0)]
+        total_length = system.scenario.L
+        segments = [
+            Segment(length=total_length / 2, has_foundation=True, m=0.0),
+            Segment(length=0, has_foundation=False, m=0.0),
+            Segment(length=0, has_foundation=False, m=0.0),
+            Segment(length=total_length / 2, has_foundation=True, m=0.0),
+        ]
+        system.update_scenario(segments=segments)
+
+        # TODO: Implement stress envelope calculation
+        dist_max = np.max(self.stress_envelope())
 
         while abs(dist_max - 1) > 0.005 and iteration_count < max_iterations:
             iteration_count += 1

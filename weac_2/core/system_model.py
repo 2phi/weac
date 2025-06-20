@@ -324,6 +324,7 @@ class SystemModel:
 
     def _invalidate_constants(self):
         self.__dict__.pop("unknown_constants", None)
+        self.__dict__.pop("uncracked_unknown_constants", None)
 
     # # Wrapper for the eigensystem.z method
     # def z(self, x: Union[float, Sequence[float], np.ndarray], C: np.ndarray, length: float, phi: float, has_foundation: bool = True, qs: float = 0) -> np.ndarray:

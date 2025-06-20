@@ -6,6 +6,7 @@ Mechanical properties of snow-pack layers.
 """
 
 import logging
+from typing import Literal
 
 from pydantic import BaseModel, ConfigDict, Field
 
@@ -109,6 +110,14 @@ class Layer(BaseModel):
     tensile_strength: float | None = Field(
         default=None, gt=0, description="Tensile strength [kPa]"
     )
+    tensile_strength_method: Literal["sigrist"] = Field(
+        default="sigrist",
+        description="Method to calculate the tensile strength",
+    )
+    youngs_modulus_method: Literal["bergfeld", "scapazzo", "gerling"] = Field(
+        default="bergfeld",
+        description="Method to calculate the Young's modulus",
+    )
 
     model_config = ConfigDict(
         frozen=True,
@@ -116,13 +125,28 @@ class Layer(BaseModel):
     )
 
     def model_post_init(self, _ctx):
-        object.__setattr__(self, "E", self.E or _bergfeld_youngs_modulus(self.rho))
+        if self.youngs_modulus_method == "bergfeld":
+            object.__setattr__(self, "E", self.E or _bergfeld_youngs_modulus(self.rho))
+        elif self.youngs_modulus_method == "scapazzo":
+            object.__setattr__(self, "E", self.E or _scapozza_youngs_modulus(self.rho))
+        elif self.youngs_modulus_method == "gerling":
+            object.__setattr__(self, "E", self.E or _gerling_youngs_modulus(self.rho))
+        else:
+            raise ValueError(
+                f"Invalid youngs_modulus_method: {self.youngs_modulus_method}"
+            )
         object.__setattr__(self, "G", self.G or self.E / (2 * (1 + self.nu)))
-        object.__setattr__(
-            self,
-            "tensile_strength",
-            self.tensile_strength or _sigrist_tensile_strength(self.rho, unit="kPa"),
-        )
+        if self.tensile_strength_method == "sigrist":
+            object.__setattr__(
+                self,
+                "tensile_strength",
+                self.tensile_strength
+                or _sigrist_tensile_strength(self.rho, unit="kPa"),
+            )
+        else:
+            raise ValueError(
+                f"Invalid tensile_strength_method: {self.tensile_strength_method}"
+            )
 
 
 class WeakLayer(BaseModel):
@@ -173,6 +197,10 @@ class WeakLayer(BaseModel):
     G_IIc: float = Field(
         default=0.79, gt=0, description="Mode-II fracture toughness GIIc [J/m^2]"
     )
+    youngs_modulus_method: Literal["bergfeld", "scapazzo", "gerling"] = Field(
+        default="bergfeld",
+        description="Method to calculate the Young's modulus",
+    )
 
     model_config = ConfigDict(
         frozen=True,
@@ -180,7 +208,16 @@ class WeakLayer(BaseModel):
     )
 
     def model_post_init(self, _ctx):
-        object.__setattr__(self, "E", self.E or _bergfeld_youngs_modulus(self.rho))
+        if self.youngs_modulus_method == "bergfeld":
+            object.__setattr__(self, "E", self.E or _bergfeld_youngs_modulus(self.rho))
+        elif self.youngs_modulus_method == "scapazzo":
+            object.__setattr__(self, "E", self.E or _scapozza_youngs_modulus(self.rho))
+        elif self.youngs_modulus_method == "gerling":
+            object.__setattr__(self, "E", self.E or _gerling_youngs_modulus(self.rho))
+        else:
+            raise ValueError(
+                f"Invalid youngs_modulus_method: {self.youngs_modulus_method}"
+            )
         object.__setattr__(self, "G", self.G or self.E / (2 * (1 + self.nu)))
         E_plane = self.E / (1 - self.nu**2)  # plane-strain Young
         object.__setattr__(self, "kn", self.kn or E_plane / self.h)

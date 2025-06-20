@@ -141,7 +141,6 @@ class AnalysisMixin:
         # Reduce inputs to segments with crack advance
         iscrack = k0 & ~ki
         C0, C1, li = C0[:, iscrack], C1[:, iscrack], li[iscrack]
-        print("cracked: ", C0, C1, li)
 
         # Compute total crack lenght and initialize outputs
         da = li.sum() if li.sum() > 0 else np.nan
@@ -205,7 +204,6 @@ class AnalysisMixin:
         for j, idx in enumerate(ict):
             # Solution at crack tip
             z = self.z(li[idx], C[:, [idx]], li[idx], phi, bed=ki[idx])
-            print("z", z)
             # Mode I and II differential energy release rates
             Gdif[1:, j] = np.concatenate(
                 (self.Gi(z, unit=unit), self.Gii(z, unit=unit))
@@ -284,12 +282,10 @@ class AnalysisMixin:
         zmesh = self.get_zmesh(dz=dz)
         zi = zmesh[:, 0]
         rho = 1e-12 * zmesh[:, 3]
-        print(rho[0], rho[-1])
 
         # Get dimensions of stress field (n rows, m columns)
         n = zmesh.shape[0]
         m = Z.shape[1]
-        print(n, m)
 
         # Initialize axial normal stress Sxx
         Sxx = np.zeros(shape=[n, m])
@@ -300,8 +296,6 @@ class AnalysisMixin:
 
         # Calculate weight load at grid points and superimpose on stress field
         qt = -rho * self.g * np.sin(np.deg2rad(phi))
-        print("self.g", self.g)
-        print("qt[0], qt[-1]", qt[0], qt[-1])
         for i, qi in enumerate(qt[:-1]):
             Sxx[i, :] += qi * (zi[i + 1] - zi[i])
         Sxx[-1, :] += qt[-1] * (zi[-1] - zi[-2])
@@ -464,11 +458,9 @@ class AnalysisMixin:
         Sxx = self.Sxx(Z=Z, phi=phi, dz=dz, unit=unit)
         Txz = self.Txz(Z=Z, phi=phi, dz=dz, unit=unit)
         Szz = self.Szz(Z=Z, phi=phi, dz=dz, unit=unit)
-        print(Sxx.min(), Sxx.max(), Txz.min(), Txz.max(), Szz.min(), Szz.max())
 
         # Calculate principal stress
         Ps = (Sxx + Szz) / 2 + m[val] * np.sqrt((Sxx - Szz) ** 2 + 4 * Txz**2) / 2
-        print(Ps.min(), Ps.max())
 
         # Raise error if normalization of compressive stresses is attempted
         if normalize and val == "min":
@@ -480,7 +472,6 @@ class AnalysisMixin:
             rho = self.get_zmesh(dz=dz)[:, 3]
             # Normlize maximum principal stress to layers' tensile strength
             normalized_Ps = Ps / tensile_strength_slab(rho, unit=unit)[:, None]
-            print(normalized_Ps.min(), normalized_Ps.max())
             return normalized_Ps
 
         # Return absolute principal stresses
