@@ -18,7 +18,6 @@ class Analyzer:
     elastic foundations.
     """
 
-    tol: float = 1e-6
     sm: SystemModel
 
     def __init__(self, system_model: SystemModel):
@@ -431,7 +430,7 @@ class Analyzer:
         # Return absolute principal stresses
         return ps
 
-    def incremental_ERR(self):
+    def incremental_ERR(self, tolerance: float = 1e-6):
         """
         Compute incremental energy release rate (ERR) of all cracks.
 
@@ -489,10 +488,10 @@ class Analyzer:
             )
 
             # Segement contributions to total crack opening integral
-            Ginc1 += quad(intGI, 0, length, epsabs=self.tol, epsrel=self.tol)[0] / (
+            Ginc1 += quad(intGI, 0, length, epsabs=tolerance, epsrel=tolerance)[0] / (
                 2 * da
             )
-            Ginc2 += quad(intGII, 0, length, epsabs=self.tol, epsrel=self.tol)[0] / (
+            Ginc2 += quad(intGII, 0, length, epsabs=tolerance, epsrel=tolerance)[0] / (
                 2 * da
             )
 

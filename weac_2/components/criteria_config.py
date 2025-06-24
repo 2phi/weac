@@ -37,12 +37,12 @@ class CriteriaConfig(BaseModel):
         description="Failure mode interaction exponent for shear stress (tau)",
     )
     gn: float = Field(
-        default=5.0,
+        default=1 / 0.2,
         gt=0,
         description="Failure mode interaction exponent for closing energy release rate (G_I)",
     )
     gm: float = Field(
-        default=2.22,
+        default=1 / 0.45,
         gt=0,
         description="Failure mode interaction exponent for shearing energy release rate (G_II)",
     )

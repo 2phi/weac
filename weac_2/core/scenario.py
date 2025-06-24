@@ -1,11 +1,11 @@
-from typing import List, Literal
-import numpy as np
 import logging
+from typing import List, Literal, Sequence, Union
 
-from weac_2.utils import decompose_to_normal_tangential
+import numpy as np
 
 from weac_2.components import ScenarioConfig, Segment, WeakLayer
 from weac_2.core.slab import Slab
+from weac_2.utils import decompose_to_normal_tangential
 
 logger = logging.getLogger(__name__)
 
@@ -50,6 +50,8 @@ class Scenario:
     ki: np.ndarray  # booleans indicating foundation support for segment i
     mi: np.ndarray  # skier masses (kg) on boundary of segment i and i+1 [kg]
 
+    cum_sum_li: np.ndarray  # cumulative sum of segment lengths [mm]
+
     system_type: Literal[
         "skier", "skiers", "pst-", "-pst", "vpst-", "-vpst", "rot", "trans"
     ]
@@ -93,6 +95,33 @@ class Scenario:
 
         self._setup_scenario()
         self._calc_crack_height()
+
+    def get_segment_idx(
+        self, x: Union[float, Sequence[float], np.ndarray]
+    ) -> Union[int, np.ndarray]:
+        """
+        Get the segment index for a given x-coordinate or coordinates.
+
+        Parameters
+        ----------
+        x: Union[float, Sequence[float], np.ndarray]
+            A single x-coordinate or a sequence of x-coordinates.
+
+        Returns
+        -------
+        Union[int, np.ndarray]
+            The segment index or an array of indices.
+        """
+        x_arr = np.asarray(x)
+        indices = np.digitize(x_arr, self.cum_sum_li)
+
+        if np.any(x_arr > self.L):
+            raise ValueError(f"Coordinate {x_arr} is outside the slab length.")
+
+        if x_arr.ndim == 0:
+            return int(indices)
+
+        return indices
 
     def _calc_tangential_load(self):
         """
@@ -139,6 +168,7 @@ class Scenario:
         self.ki = np.array([seg.has_foundation for seg in self.segments])
         # masses that act *between* segments: take all but the last one
         self.mi = np.array([seg.m for seg in self.segments[:-1]])
+        self.cum_sum_li = np.cumsum(self.li)
 
         # Add dummy segment if only one segment provided
         if len(self.li) == 1:
