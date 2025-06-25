@@ -191,7 +191,9 @@ def check_coupled_criterion_anticrack_nucleation(
     k0 = [True, True, True, True]  # Support boolean for uncracked solution
     li = [length / 2, 0, 0, length / 2]  # Length segments
     ki = [True, False, False, True]  # Length of segments with foundations
+    print("length: ", length)
 
+    t0 = time.time()
     # Find minimum critical force to initialize algorithm
     (
         critical_skier_weight,
@@ -215,9 +217,15 @@ def check_coupled_criterion_anticrack_nucleation(
         density=density,
         t=t,
     )
+    t1 = time.time()
+    print(f"find_minimum_force took {t1 - t0:.4f} seconds.")
+    print("critical_skier_weight: ", critical_skier_weight)
+    print("dist_max: ", dist_max)
+    print("dist_min: ", dist_min)
 
     # Exception: the entire solution is cracked
     if dist_min > 1:
+        print("Entire solution is cracked")
         crack_length = length
         skier_weight = 0
 
@@ -403,9 +411,15 @@ def check_coupled_criterion_anticrack_nucleation(
                     t=t,
                 )
                 crack_length = new_crack_length
+                print("li: ", li)
+                print("ki: ", ki)
+                print("skier_weight: ", skier_weight)
+                print("crack_length: ", crack_length)
+                breakpoint()
 
         # End of loop: convergence or max iterations reached
         if iteration_count < max_iterations and any(ki):
+            print("No Exception encountered - Converged successfully.")
             if crack_length > 0:
                 return (
                     True,
@@ -430,6 +444,7 @@ def check_coupled_criterion_anticrack_nucleation(
                     dist_max_values,
                 )
             else:
+                print("Called dampened version")
                 # Call dampened version to attempt to solve certain convergence issues
                 return check_coupled_criterion_anticrack_nucleation_dampened(
                     snow_profile,
@@ -612,6 +627,7 @@ def check_coupled_criterion_anticrack_nucleation_dampened(
         are calculated in kJ.
 
     """
+    print("Dampened Version called")
 
     # Trackers
     start_time = time.time()
@@ -623,7 +639,8 @@ def check_coupled_criterion_anticrack_nucleation_dampened(
     g_delta_values = []
 
     # Initialize parameters
-    length = 100 * sum(layer[1] for layer in snow_profile)  # Total length (mm)
+    length = 1000 * sum(layer[1] for layer in snow_profile)  # Total length (mm)
+    print("length: ", length)
     li = [length / 2, 0, 0, length / 2]  # Length segments
     ki = [True, False, False, True]  # Initial crack configuration
     k0 = [True] * len(ki)
@@ -651,8 +668,12 @@ def check_coupled_criterion_anticrack_nucleation_dampened(
         density=density,
         t=t,
     )
+    print("Critical skier weight: ", critical_skier_weight)
+    print("dist_max: ", dist_max)
+    print("dist_min: ", dist_min)
 
     if dist_min > 1:
+        print("Self collapse")
         self_collapse = True
         crack_length = length
         skier_weight = 0
@@ -719,6 +740,7 @@ def check_coupled_criterion_anticrack_nucleation_dampened(
         )
 
     elif (dist_min <= 1) and (critical_skier_weight >= 1):
+        print("Crack length")
         crack_length = 1
         err = 1000
         li = [
@@ -779,6 +801,7 @@ def check_coupled_criterion_anticrack_nucleation_dampened(
             )
 
         while abs(err) > 0.002 and iteration_count < max_iterations and any(ki):
+            print("Iteration: ", iteration_count)
             iteration_count += 1
             skier_weights.append(skier_weight)
             crack_lengths.append(crack_length)
@@ -888,9 +911,12 @@ def check_coupled_criterion_anticrack_nucleation_dampened(
                     t=t,
                 )
                 crack_length = new_crack_length
+                print("skier_weight: ", skier_weight)
+                print("crack_length: ", crack_length)
 
         # Check final convergence
         if iteration_count < max_iterations and any(ki):
+            print("Final iteration")
             return (
                 True,
                 crack_length,
@@ -1040,7 +1066,7 @@ def stress_envelope(
         sigma_c = 6.16 * (scaling_factor**order_of_magnitude)  # (kPa) 6.16 / 2.6
         tau_c = 5.09 * (scaling_factor**order_of_magnitude)  # (kPa) 5.09 / 0.7
 
-        return (sigma / sigma_c) ** 2 + (tau / tau_c) ** 2
+        return (sigma / sigma_c) ** 2.0 + (tau / tau_c) ** 2.0
 
     elif envelope == "schottner":
         rho_ice = 916.7
@@ -1454,6 +1480,7 @@ def find_new_anticrack_length(
     # Initialize object
     total_length = np.sum(li)
     midpoint = total_length / 2
+
     li = [midpoint, midpoint]
     ki = [True, True]
     skier, C, segments, x_cm, sigma_kPa, tau_kPa = create_skier_object(
@@ -1672,6 +1699,8 @@ def find_minimum_force(
     skier, C, segments, x_cm, sigma_kPa, tau_kPa = create_skier_object(
         snow_profile, skier_weight, phi, li, ki, crack_case="nocrack", E=E, t=t
     )
+    print("sigma_kPa: ", sigma_kPa)
+    print("tau_kPa: ", tau_kPa)
 
     # Calculate the distance to failure
     dist_max = np.max(
@@ -1694,6 +1723,8 @@ def find_minimum_force(
             density=density,
         )
     )
+    print("dist_min: ", dist_min)
+    print("dist_max: ", dist_max)
 
     if dist_min >= 1:
         # We are outside the stress envelope without any additional skier weight
@@ -1713,6 +1744,10 @@ def find_minimum_force(
 
     # While the stress envelope boundary is not superseeded in any point
     while np.abs(dist_max - 1) > 0.005 and iteration_count < 50:
+        iter_start_time = time.time()
+        print(
+            f"find_minimum_force iteration {iteration_count} with skier_weight {skier_weight:.2f}"
+        )
         # Scale with the inverse of the distance to stress failure envelope
         skier_weight = skier_weight / dist_max
 
@@ -1743,6 +1778,9 @@ def find_minimum_force(
             )
         )
         iteration_count = iteration_count + 1
+        print(
+            f"find_minimum_force iteration {iteration_count} finished in {time.time() - iter_start_time:.4f}s. max_dist_stress: {dist_max:.4f}"
+        )
 
     if iteration_count == 50:
         (

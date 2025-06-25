@@ -1,6 +1,6 @@
 # Standard library imports
 from functools import partial
-from typing import Callable
+from typing import Literal
 
 # Third party imports
 import numpy as np
@@ -25,6 +25,7 @@ class Analyzer:
 
     def rasterize_solution(
         self,
+        mode: Literal["cracked", "uncracked"],
         num: int = 250,
     ):
         """
@@ -32,6 +33,8 @@ class Analyzer:
 
         Parameters:
         ---------
+        mode : Literal["cracked", "uncracked"]
+            Mode of the solution.
         num : int
             Number of grid points.
 
@@ -48,9 +51,15 @@ class Analyzer:
         """
         phi = self.sm.scenario.phi
         li = self.sm.scenario.li
-        ki = self.sm.scenario.ki
         qs = self.sm.scenario.qs
-        C = self.sm.unknown_constants
+        ki = self.sm.scenario.ki
+
+        match mode:
+            case "cracked":
+                C = self.sm.unknown_constants
+            case "uncracked":
+                ki = np.full(len(ki), True)
+                C = self.sm.uncracked_unknown_constants
 
         # Drop zero-length segments
         li = abs(li)
@@ -413,8 +422,8 @@ class Analyzer:
         m = {"max": 1, "min": -1}
 
         # Get weak-layer normal and shear stresses
-        sig = self.sig(Z, unit=unit)
-        tau = self.tau(Z, unit=unit)
+        sig = self.sm.fq.sig(Z, unit=unit)
+        tau = self.sm.fq.tau(Z, unit=unit)
 
         # Calculate principal stress
         ps = sig / 2 + m[val] * np.sqrt(sig**2 + 4 * tau**2) / 2
@@ -430,7 +439,9 @@ class Analyzer:
         # Return absolute principal stresses
         return ps
 
-    def incremental_ERR(self, tolerance: float = 1e-6):
+    def incremental_ERR(
+        self, tolerance: float = 1e-6, unit: str = "kJ/m^2"
+    ) -> np.ndarray:
         """
         Compute incremental energy release rate (ERR) of all cracks.
 
@@ -442,8 +453,8 @@ class Analyzer:
         li = self.sm.scenario.li
         ki = self.sm.scenario.ki
         k0 = np.ones_like(ki, dtype=bool)
-        C_uncracked = self.sm.unknown_constants
-        C_cracked = self.sm.uncracked_unknown_constants
+        C_uncracked = self.sm.uncracked_unknown_constants
+        C_cracked = self.sm.unknown_constants
         phi = self.sm.scenario.phi
         qs = self.sm.scenario.qs
 
@@ -495,9 +506,10 @@ class Analyzer:
                 2 * da
             )
 
-        return np.array([Ginc1 + Ginc2, Ginc1, Ginc2]).flatten()
+        convert = {"kJ/m^2": 1, "J/m^2": 1e3}
+        return np.array([Ginc1 + Ginc2, Ginc1, Ginc2]).flatten() * convert[unit]
 
-    def differential_ERR(self, unit: str = "kJ/m^2"):
+    def differential_ERR(self, unit: str = "kJ/m^2") -> np.ndarray:
         """
         Compute differential energy release rate of all crack tips.
 
@@ -607,7 +619,7 @@ class Analyzer:
             Total external potential (Nmm).
         """
         # Rasterize solution
-        xq, zq, xb = self.rasterize_solution()
+        xq, zq, xb = self.rasterize_solution(mode="cracked")
         _ = xq, xb
         # Compute displacements where weight loads are applied
         w0 = self.sm.fq.w(zq)
@@ -673,7 +685,7 @@ class Analyzer:
         kt = self.sm.weak_layer.kt
 
         # Rasterize solution
-        xq, zq, xb = self.rasterize_solution()
+        xq, zq, xb = self.rasterize_solution(mode="cracked")
 
         # Compute section forces
         N, M, V = self.sm.fq.N(zq), self.sm.fq.M(zq), self.sm.fq.V(zq)

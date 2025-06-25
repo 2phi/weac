@@ -1,5 +1,7 @@
 # Standard library imports
 import copy
+import logging
+import time
 from dataclasses import dataclass
 from typing import List, Optional, Union
 
@@ -12,13 +14,12 @@ from weac_2.analysis.analyzer import Analyzer
 # weac imports
 from weac_2.components import (
     CriteriaConfig,
-    Layer,
-    ModelInput,
-    ScenarioConfig,
     Segment,
     WeakLayer,
 )
 from weac_2.core.system_model import SystemModel
+
+logger = logging.getLogger(__name__)
 
 
 @dataclass
@@ -34,7 +35,40 @@ class CoupledCriterionHistory:
 
 @dataclass
 class CoupledCriterionResult:
-    """Holds the results of the coupled criterion evaluation."""
+    """
+    Holds the results of the coupled criterion evaluation.
+
+    Attributes:
+    -----------
+    converged : bool
+        Whether the algorithm converged.
+    message : str
+        The message of the evaluation.
+    self_collapse : bool
+        Whether the system collapsed.
+    pure_stress_criteria : bool
+        Whether the pure stress criteria is satisfied.
+    critical_skier_weight : float
+        The critical skier weight.
+    initial_critical_skier_weight : float
+        The initial critical skier weight.
+    crack_length : float
+        The crack length.
+    g_delta : float
+        The g_delta value.
+    dist_ERR_envelope : float
+        The distance to the ERR envelope.
+    iterations : int
+        The number of iterations.
+    history : CoupledCriterionHistory
+        The history of the evaluation.
+    final_system : SystemModel
+        The final system model.
+    max_dist_stress : float
+        The maximum distance to failure.
+    min_dist_stress : float
+        The minimum distance to failure.
+    """
 
     converged: bool
     message: str
@@ -44,10 +78,39 @@ class CoupledCriterionResult:
     initial_critical_skier_weight: float
     crack_length: float
     g_delta: float
-    final_error: float
+    dist_ERR_envelope: float
     iterations: int
     history: Optional[CoupledCriterionHistory]
     final_system: Optional[SystemModel]
+    max_dist_stress: float
+    min_dist_stress: float
+
+
+@dataclass
+class FindMinimumForceResult:
+    """
+    Holds the results of the find_minimum_force evaluation.
+
+    Attributes:
+    -----------
+    success : bool
+        Whether the algorithm converged.
+    critical_skier_weight : float
+        The critical skier weight.
+    system : SystemModel
+        The system model.
+    iterations : int
+        The number of iterations.
+    max_dist_stress : float
+        The maximum distance to failure.
+    min_dist_stress : float
+        The minimum distance to failure.
+    """
+
+    success: bool
+    critical_skier_weight: float
+    system: SystemModel
+    iterations: int
     max_dist_stress: float
     min_dist_stress: float
 
@@ -59,22 +122,20 @@ class CriteriaEvaluator:
     """
 
     criteria_config: CriteriaConfig
-    system_model: SystemModel
 
-    def __init__(self, system_model: SystemModel, criteria_config: CriteriaConfig):
+    def __init__(self, criteria_config: CriteriaConfig):
         """
         Initializes the evaluator with global simulation and criteria configurations.
 
-        Args:
-            config (Config): The main simulation configuration.
-            criteria_config (CriteriaConfig): The configuration for failure criteria.
+        Parameters:
+        ----------
+        criteria_config (CriteriaConfig): The configuration for failure criteria.
         """
-        self.system_model = system_model
         self.criteria_config = criteria_config
 
     def fracture_toughness_criterion(
-        self, G_I: float, G_II: float, weak_layer: WeakLayer
-    ) -> float:
+        self, G_I: float | np.ndarray, G_II: float | np.ndarray, weak_layer: WeakLayer
+    ) -> float | np.ndarray:
         """
         Evaluates the fracture toughness criterion for a given combination of
         Mode I (G_I) and Mode II (G_II) energy release rates.
@@ -84,13 +145,19 @@ class CriteriaEvaluator:
 
         A value of 1 indicates the boundary of the fracture toughness envelope is reached.
 
-        Args:
-            G_I (float): Mode I energy release rate (ERR) in J/m².
-            G_II (float): Mode II energy release rate (ERR) in J/m².
-            weak_layer (WeakLayer): The weak layer object containing G_Ic and G_IIc.
+        Parameters:
+        -----------
+        G_I : float
+            Mode I energy release rate (ERR) in J/m².
+        G_II : float
+            Mode II energy release rate (ERR) in J/m².
+        weak_layer : WeakLayer
+            The weak layer object containing G_Ic and G_IIc.
 
         Returns:
-            float: Non-dimensional evaluation of the fracture toughness envelope.
+        -------
+        g_delta : float
+            Evaluation of the fracture toughness envelope.
         """
         g_delta = (np.abs(G_I) / weak_layer.G_Ic) ** self.criteria_config.gn + (
             np.abs(G_II) / weak_layer.G_IIc
@@ -149,6 +216,7 @@ class CriteriaEvaluator:
         fn = self.criteria_config.fn
         fm = self.criteria_config.fm
         order_of_magnitude = self.criteria_config.order_of_magnitude
+        scaling_factor = self.criteria_config.scaling_factor
 
         def mede_common_calculations(sigma, tau, p0, tau_T, p_T):
             in_first_range = (sigma >= (p_T - p0)) & (sigma <= p_T)
@@ -164,9 +232,6 @@ class CriteriaEvaluator:
             return results
 
         if envelope_method == "adam_unpublished":
-            density_baseline = 250.0
-            scaling_factor = density / density_baseline
-
             if scaling_factor > 1:
                 order_of_magnitude = 0.7
             if scaling_factor < 0.55:
@@ -200,21 +265,681 @@ class CriteriaEvaluator:
         else:
             raise ValueError(f"Invalid envelope type: {envelope_method}")
 
-    def _create_model(
+    def evaluate_coupled_criterion(
         self,
-        layers: List[Layer],
-        weak_layer: WeakLayer,
-        segments: List[Segment],
-        scenario_config: ScenarioConfig,
-    ) -> SystemModel:
-        """Instantiates a SystemModel for a given simulation state."""
-        model_input = ModelInput(
-            layers=layers,
-            weak_layer=weak_layer,
-            segments=segments,
-            scenario_config=scenario_config,
+        system: SystemModel,
+        max_iterations: int = 25,
+        dampening_ERR: float = 0.0,
+        tolerance_ERR: float = 0.002,
+        tolerance_stress: float = 0.005,
+    ) -> CoupledCriterionResult:
+        """
+        Evaluates the coupled criterion for anticrack nucleation, finding the
+        critical combination of skier weight and anticrack length.
+
+        Parameters:
+        ----------
+        system: SystemModel
+            The system model.
+        max_iterations: int
+            Max iterations for the solver. Defaults to 25.
+        dampening_ERR: float
+            Dampening factor for the ERR criterion. Defaults to 0.0.
+        tolerance_ERR: float, optional
+            Tolerance for g_delta convergence. Defaults to 0.002.
+        tolerance_stress: float, optional
+            Tolerance for stress envelope convergence. Defaults to 0.005.
+
+        Returns
+        -------
+        results: CoupledCriterionResult
+            An object containing the results of the analysis, including
+            critical skier weight, crack length, and convergence details.
+        """
+        logger.info("Starting coupled criterion evaluation.")
+        start_time = time.time()
+        L = system.scenario.L
+        weak_layer = system.weak_layer
+
+        logger.info("Finding minimum force...")
+        force_finding_start = time.time()
+
+        force_result = self.find_minimum_force(
+            system, tolerance_stress=tolerance_stress
         )
-        return SystemModel(model_input=model_input, config=self.system_model.config)
+        system = force_result.system
+        initial_critical_skier_weight = force_result.critical_skier_weight
+        max_dist_stress = force_result.max_dist_stress
+        min_dist_stress = force_result.min_dist_stress
+        logger.info(
+            f"Minimum force finding took {time.time() - force_finding_start:.4f} seconds."
+        )
+        print("initial_critical_skier_weight: ", initial_critical_skier_weight)
+        print("max_dist_stress: ", max_dist_stress)
+        print("min_dist_stress: ", min_dist_stress)
+
+        # --- Failure: in finding the critical skier weight ---
+        if not force_result.success:
+            return CoupledCriterionResult(
+                converged=False,
+                message="Failed to find critical skier weight.",
+                self_collapse=False,
+                pure_stress_criteria=False,
+                critical_skier_weight=0,
+                initial_critical_skier_weight=0,
+                crack_length=0,
+                g_delta=0,
+                dist_ERR_envelope=1,
+                iterations=0,
+                history=None,
+                final_system=system,
+                max_dist_stress=0,
+                min_dist_stress=0,
+            )
+
+        # --- Exception: the entire solution is cracked ---
+        if min_dist_stress > 1:
+            logger.info("The entire solution is cracked.")
+            # --- Larger scenario to calculate the incremental ERR ---
+            segments = copy.deepcopy(system.scenario.segments)
+            for segment in segments:
+                segment.has_foundation = False
+            # Add 50m of padding to the left and right of the system
+            segments.insert(0, Segment(length=50000, has_foundation=True, m=0))
+            segments.append(Segment(length=50000, has_foundation=True, m=0))
+            system.update_scenario(segments=segments)
+
+            analyzer = Analyzer(system)
+            inc_energy = analyzer.incremental_ERR()
+            print("inc_energy: ", inc_energy)
+            g_delta = self.fracture_toughness_criterion(
+                inc_energy[1] * 1000, inc_energy[2] * 1000, system.weak_layer
+            )
+
+            history_data = CoupledCriterionHistory([], [], [], [], [])
+            return CoupledCriterionResult(
+                converged=True,
+                message="System fails under its own weight (self-collapse).",
+                self_collapse=True,
+                pure_stress_criteria=False,
+                critical_skier_weight=0,
+                initial_critical_skier_weight=initial_critical_skier_weight,
+                crack_length=L,
+                g_delta=g_delta,
+                dist_ERR_envelope=0,
+                iterations=0,
+                history=history_data,
+                final_system=system,
+                max_dist_stress=max_dist_stress,
+                min_dist_stress=min_dist_stress,
+            )
+
+        # --- Main loop ---
+        elif initial_critical_skier_weight >= 1:
+            crack_length = 1.0
+            dist_ERR_envelope = 1000
+            g_delta = 0
+            history = CoupledCriterionHistory([], [], [], [], [])
+            iteration_count = 0
+            skier_weight = initial_critical_skier_weight * 1.005
+            min_skier_weight = initial_critical_skier_weight
+            max_skier_weight = 3 * initial_critical_skier_weight
+
+            # Ensure Max Weight surpasses fracture toughness criterion
+            max_weight_g_delta = 0
+            while max_weight_g_delta < 1:
+                max_skier_weight = max_skier_weight * 2
+                print("max_skier_weight: ", max_skier_weight)
+                print("max_weight_g_delta: ", max_weight_g_delta)
+
+                segments = [
+                    Segment(length=L / 2 - crack_length / 2, has_foundation=True, m=0),
+                    Segment(
+                        length=crack_length / 2,
+                        has_foundation=False,
+                        m=max_skier_weight,
+                    ),
+                    Segment(length=crack_length / 2, has_foundation=False, m=0),
+                    Segment(length=L / 2 - crack_length / 2, has_foundation=True, m=0),
+                ]
+
+                system.update_scenario(segments=segments)
+
+                analyzer = Analyzer(system)
+                # Calculate fracture toughness criterion
+                incr_energy = analyzer.incremental_ERR(unit="J/m^2")
+                max_weight_g_delta = self.fracture_toughness_criterion(
+                    incr_energy[1], incr_energy[2], weak_layer
+                )
+                dist_ERR_envelope = abs(g_delta - 1)
+
+            segments = [
+                Segment(
+                    length=L / 2 - crack_length / 2,
+                    has_foundation=True,
+                    m=0,
+                ),
+                Segment(length=crack_length / 2, has_foundation=False, m=skier_weight),
+                Segment(length=crack_length / 2, has_foundation=False, m=0),
+                Segment(length=L / 2 - crack_length / 2, has_foundation=True, m=0),
+            ]
+
+            while (
+                abs(dist_ERR_envelope) > tolerance_ERR
+                and iteration_count < max_iterations
+                and any(s.has_foundation for s in segments)
+            ):
+                iteration_count += 1
+                iter_start_time = time.time()
+                logger.info(
+                    f"Starting iteration {iteration_count} of coupled criterion evaluation."
+                )
+
+                system.update_scenario(segments=segments)
+                analyzer = Analyzer(system)
+                _, z, _ = analyzer.rasterize_solution(mode="uncracked", num=800)
+
+                # Calculate stress envelope
+                sigma_kPa = system.fq.sig(z, unit="kPa")
+                tau_kPa = system.fq.tau(z, unit="kPa")
+                stress_env = self.stress_envelope(sigma_kPa, tau_kPa, system.weak_layer)
+                max_dist_stress = np.max(stress_env)
+                min_dist_stress = np.min(stress_env)
+
+                # Calculate fracture toughness criterion
+                incr_energy = analyzer.incremental_ERR()
+                g_delta = self.fracture_toughness_criterion(
+                    incr_energy[1] * 1000, incr_energy[2] * 1000, weak_layer
+                )
+                dist_ERR_envelope = abs(g_delta - 1)
+
+                # Update history
+                history.skier_weights.append(skier_weight)
+                history.crack_lengths.append(crack_length)
+                history.g_deltas.append(g_delta)
+                history.dist_maxs.append(max_dist_stress)
+                history.dist_mins.append(min_dist_stress)
+
+                # --- Exception: pure stress criterion ---
+                # The fracture toughness is superseded for minimum critical skier weight
+                if iteration_count == 1 and (g_delta > 1 or dist_ERR_envelope < 0.02):
+                    return CoupledCriterionResult(
+                        converged=True,
+                        message="Fracture governed by pure stress criterion.",
+                        self_collapse=False,
+                        pure_stress_criteria=True,
+                        critical_skier_weight=skier_weight,
+                        initial_critical_skier_weight=initial_critical_skier_weight,
+                        crack_length=crack_length,
+                        g_delta=g_delta,
+                        dist_ERR_envelope=dist_ERR_envelope,
+                        iterations=iteration_count,
+                        history=history,
+                        final_system=system,
+                        max_dist_stress=max_dist_stress,
+                        min_dist_stress=min_dist_stress,
+                    )
+
+                # Update skier weight boundaries
+                if g_delta < 1:
+                    min_skier_weight = skier_weight
+                else:
+                    max_skier_weight = skier_weight
+
+                # Update skier weight
+                new_skier_weight = (min_skier_weight + max_skier_weight) / 2
+
+                # Apply damping to avoid oscillation around goal
+                if np.abs(dist_ERR_envelope) < 0.5 and dampening_ERR > 0:
+                    scaling = (
+                        dampening_ERR + 1 + (new_skier_weight / skier_weight)
+                    ) / (dampening_ERR + 2)
+                else:
+                    scaling = 1
+
+                # Find new anticrack length
+                if abs(dist_ERR_envelope) > tolerance_ERR:
+                    skier_weight = scaling * new_skier_weight
+                    # skier_weight = new_skier_weight
+                    crack_length, segments = self._find_new_anticrack_length(
+                        system, skier_weight
+                    )
+                    print("segments: ", segments)
+                    print("skier_weight: ", skier_weight)
+                    print("crack_length: ", crack_length)
+                    breakpoint()
+                logger.info(
+                    f"Iteration {iteration_count} took {time.time() - iter_start_time:.4f} seconds."
+                )
+
+            if iteration_count < max_iterations and any(
+                s.has_foundation for s in segments
+            ):
+                print("No Exception encountered - Converged successfully.")
+                if crack_length > 0:
+                    return CoupledCriterionResult(
+                        converged=True,
+                        message="No Exception encountered - Converged successfully.",
+                        self_collapse=False,
+                        pure_stress_criteria=False,
+                        critical_skier_weight=skier_weight,
+                        initial_critical_skier_weight=initial_critical_skier_weight,
+                        crack_length=crack_length,
+                        g_delta=g_delta,
+                        dist_ERR_envelope=dist_ERR_envelope,
+                        iterations=iteration_count,
+                        history=history,
+                        final_system=system,
+                        max_dist_stress=max_dist_stress,
+                        min_dist_stress=min_dist_stress,
+                    )
+                elif dampening_ERR < 5:
+                    print("Reached max dampening without converging.")
+                    return self.evaluate_coupled_criterion(
+                        system,
+                        dampening_ERR=dampening_ERR + 1,
+                        tolerance_ERR=tolerance_ERR,
+                        tolerance_stress=tolerance_stress,
+                    )
+                else:
+                    return CoupledCriterionResult(
+                        converged=False,
+                        message="Reached max dampening without converging.",
+                        self_collapse=False,
+                        pure_stress_criteria=False,
+                        critical_skier_weight=0,
+                        initial_critical_skier_weight=initial_critical_skier_weight,
+                        crack_length=crack_length,
+                        g_delta=g_delta,
+                        dist_ERR_envelope=dist_ERR_envelope,
+                        iterations=iteration_count,
+                        history=history,
+                        final_system=system,
+                        max_dist_stress=max_dist_stress,
+                        min_dist_stress=min_dist_stress,
+                    )
+            elif not any(s.has_foundation for s in segments):
+                return CoupledCriterionResult(
+                    converged=False,
+                    message="Reached max iterations without converging.",
+                    self_collapse=False,
+                    pure_stress_criteria=False,
+                    critical_skier_weight=0,
+                    initial_critical_skier_weight=initial_critical_skier_weight,
+                    crack_length=0,
+                    g_delta=0,
+                    dist_ERR_envelope=1,
+                    iterations=iteration_count,
+                    history=history,
+                    final_system=system,
+                    max_dist_stress=max_dist_stress,
+                    min_dist_stress=min_dist_stress,
+                )
+            else:
+                return self.evaluate_coupled_criterion(
+                    system,
+                    dampening_ERR=dampening_ERR + 1,
+                    tolerance_ERR=0.002,
+                    tolerance_stress=tolerance_stress,
+                )
+        # --- Exception: Critical skier weight < 1 ---
+        else:
+            return CoupledCriterionResult(
+                converged=False,
+                message="Critical skier weight is less than 1kg.",
+                self_collapse=False,
+                pure_stress_criteria=False,
+                critical_skier_weight=skier_weight,
+                initial_critical_skier_weight=initial_critical_skier_weight,
+                crack_length=crack_length,
+                g_delta=g_delta,
+                dist_ERR_envelope=dist_ERR_envelope,
+                iterations=iteration_count,
+                history=history,
+                final_system=system,
+                max_dist_stress=max_dist_stress,
+                min_dist_stress=min_dist_stress,
+            )
+
+    def find_minimum_force(
+        self,
+        system: SystemModel,
+        dampening: float = 0.0,
+        tolerance_stress: float = 0.005,
+    ) -> FindMinimumForceResult:
+        """
+        Finds the minimum skier weight required to surpass the stress failure envelope.
+
+        This method iteratively adjusts the skier weight until the maximum distance
+        to the stress envelope converges to 1, indicating the critical state.
+
+        Parameters:
+        -----------
+        system: SystemModel
+            The system model.
+        dampening: float, optional
+            Dampening factor for the skier weight. Defaults to 0.0.
+        tolerance_stress: float, optional
+            Tolerance for the stress envelope. Defaults to 0.005.
+
+        Returns:
+        --------
+        results: FindMinimumForceResult
+            An object containing the results of the analysis, including
+            critical skier weight, and convergence details.
+        """
+        logger.info(
+            "Starting to find minimum force to surpass stress failure envelope."
+        )
+        start_time = time.time()
+        skier_weight = 1.0  # Initial guess
+        iteration_count = 0
+        max_iterations = 50
+        max_dist_stress = 0
+
+        # --- Initial uncracked configuration ---
+        total_length = system.scenario.L
+        segments = [
+            Segment(length=total_length / 2, has_foundation=True, m=0.0),
+            Segment(length=0, has_foundation=False, m=skier_weight),
+            Segment(length=0, has_foundation=False, m=0.0),
+            Segment(length=total_length / 2, has_foundation=True, m=0.0),
+        ]
+        system.update_scenario(segments=segments)
+
+        analyzer = Analyzer(system)
+        _, z_skier, _ = analyzer.rasterize_solution(mode="uncracked", num=800)
+
+        sigma_kPa = system.fq.sig(z_skier, unit="kPa")
+        tau_kPa = system.fq.tau(z_skier, unit="kPa")
+        print("sigma_kPa: ", sigma_kPa)
+        print("tau_kPa: ", tau_kPa)
+
+        max_dist_stress = np.max(
+            self.stress_envelope(sigma_kPa, tau_kPa, system.weak_layer)
+        )
+        min_dist_stress = np.min(
+            self.stress_envelope(sigma_kPa, tau_kPa, system.weak_layer)
+        )
+        print("max_dist_stress: ", max_dist_stress)
+        print("min_dist_stress: ", min_dist_stress)
+
+        # --- Exception: the entire domain is cracked ---
+        if min_dist_stress >= 1:
+            return FindMinimumForceResult(
+                success=True,
+                critical_skier_weight=skier_weight,
+                system=system,
+                iterations=iteration_count,
+                max_dist_stress=max_dist_stress,
+                min_dist_stress=min_dist_stress,
+            )
+
+        while (
+            abs(max_dist_stress - 1) > tolerance_stress
+            and iteration_count < max_iterations
+        ):
+            iteration_count += 1
+            iter_start_time = time.time()
+            logger.debug(
+                f"find_minimum_force iteration {iteration_count} with skier_weight {skier_weight:.2f}"
+            )
+
+            skier_weight = (
+                (dampening + 1) * skier_weight / (dampening + max_dist_stress)
+            )
+
+            temp_segments = [
+                Segment(length=total_length / 2, has_foundation=True, m=0),
+                Segment(length=0, has_foundation=False, m=skier_weight),
+                Segment(length=0, has_foundation=False, m=0),
+                Segment(length=total_length / 2, has_foundation=True, m=0),
+            ]
+
+            system.update_scenario(segments=temp_segments)
+            analyzer = Analyzer(system)
+            _, z_skier, _ = analyzer.rasterize_solution(mode="cracked", num=800)
+
+            sigma_kPa = system.fq.sig(z_skier, unit="kPa")
+            tau_kPa = system.fq.tau(z_skier, unit="kPa")
+
+            # Calculate distance to failure
+            max_dist_stress = np.max(
+                self.stress_envelope(sigma_kPa, tau_kPa, system.weak_layer)
+            )
+            min_dist_stress = np.min(
+                self.stress_envelope(sigma_kPa, tau_kPa, system.weak_layer)
+            )
+
+            logger.debug(
+                f"find_minimum_force iteration {iteration_count} finished in {time.time() - iter_start_time:.4f}s. max_dist_stress: {max_dist_stress:.4f}"
+            )
+            if min_dist_stress >= 1:
+                return FindMinimumForceResult(
+                    success=True,
+                    critical_skier_weight=skier_weight,
+                    system=system,
+                    iterations=iteration_count,
+                    max_dist_stress=max_dist_stress,
+                    min_dist_stress=min_dist_stress,
+                )
+
+        if iteration_count == max_iterations:
+            if dampening < 5:
+                # Upon max iteration introduce dampening to avoid infinite loop
+                # and try again with a higher tolerance
+                return self.find_minimum_force(
+                    system, tolerance_stress=0.01, dampening=dampening + 1
+                )
+            else:
+                return FindMinimumForceResult(
+                    success=False,
+                    critical_skier_weight=0.0,
+                    system=system,
+                    iterations=iteration_count,
+                    max_dist_stress=max_dist_stress,
+                    min_dist_stress=min_dist_stress,
+                )
+
+        logger.info(
+            f"Finished find_minimum_force in {time.time() - start_time:.4f} seconds after {iteration_count} iterations."
+        )
+        return FindMinimumForceResult(
+            success=True,
+            critical_skier_weight=skier_weight,
+            system=system,
+            iterations=iteration_count,
+            max_dist_stress=max_dist_stress,
+            min_dist_stress=min_dist_stress,
+        )
+
+    def find_minimum_crack_length(
+        self,
+        system: SystemModel,
+        search_interval: tuple[float, float] = (),
+        target: float = 1,
+    ) -> float:
+        """
+        Finds the minimum crack length required to surpass the energy release rate envelope.
+
+        Parameters:
+        -----------
+        system: SystemModel
+            The system model.
+
+        Returns:
+        --------
+        results:
+        """
+        if search_interval == ():
+            a = system.scenario.li[0]
+            b = system.scenario.L
+        else:
+            a, b = search_interval
+
+        # Use root_scalar to find the root
+        result = root_scalar(
+            self._fracture_toughness_exceedance,
+            args=(system, target),
+            bracket=[a, b],  # Interval where the root is expected
+            method="brentq",  # Brent's method
+        )
+
+        if result.converged:
+            return result.root
+        else:
+            print("Root search did not converge.")
+            return None
+
+    def check_crack_self_propagation(
+        self,
+        system: SystemModel,
+    ) -> tuple[float, bool]:
+        """
+        Evaluates whether a crack will propagate without any additional load.
+        This method determines if a pre-existing crack will propagate without any
+        additional load.
+
+        Parameters:
+        ----------
+        system: SystemModel
+
+        Returns
+        -------
+        g_delta_diff: float
+            The evaluation of the fracture toughness envelope.
+        can_propagate: bool
+            True if the criterion is met (g_delta_diff >= 1).
+        """
+        logger.info("Checking for self-propagation of pre-existing crack.")
+        start_time = time.time()
+        # No skier weight is applied for self-propagation check
+        for seg in system.scenario.segments:
+            seg.m = 0
+        system.update_scenario(segments=system.scenario.segments)
+
+        analyzer = Analyzer(system)
+        diff_energy = analyzer.differential_ERR(unit="J/m^2")
+        G_I = diff_energy[1]
+        G_II = diff_energy[2]
+
+        # Evaluate the fracture toughness criterion
+        g_delta_diff = self.fracture_toughness_criterion(G_I, G_II, system.weak_layer)
+        can_propagate = g_delta_diff >= 1
+        logger.info(
+            f"Self-propagation check finished in {time.time() - start_time:.4f} seconds. Result: g_delta_diff={g_delta_diff:.4f}, can_propagate={can_propagate}"
+        )
+
+        return g_delta_diff, bool(can_propagate)
+
+    def _find_new_anticrack_length(
+        self,
+        system: SystemModel,
+        skier_weight: float,
+    ) -> tuple[float, List[Segment]]:
+        """
+        Finds the resulting anticrack length and updated segment configurations
+        for a given skier weight.
+
+        Parameters:
+        -----------
+        system: SystemModel
+            The system model.
+        skier_weight: float
+            The weight of the skier [kg]
+
+        Returns
+        -------
+        new_crack_length: float
+            The total length of the new cracked segments [mm]
+        new_segments: List[Segment]
+            The updated list of segments
+        """
+        logger.info(
+            f"Finding new anticrack length for skier weight {skier_weight:.2f} kg."
+        )
+        start_time = time.time()
+        total_length = system.scenario.L
+        weak_layer = system.weak_layer
+
+        initial_segments = [
+            Segment(length=total_length / 2, has_foundation=True, m=skier_weight),
+            Segment(length=total_length / 2, has_foundation=True, m=0),
+        ]
+        system.update_scenario(segments=initial_segments)
+
+        analyzer = Analyzer(system)
+        _, z, _ = analyzer.rasterize_solution(mode="cracked", num=800)
+        sigma_kPa = system.fq.sig(z, unit="kPa")
+        tau_kPa = system.fq.tau(z, unit="kPa")
+        min_dist_stress = np.min(self.stress_envelope(sigma_kPa, tau_kPa, weak_layer))
+
+        # Find all points where the stress envelope is crossed
+        crossings_start_time = time.time()
+        roots = self._find_stress_envelope_crossings(system, weak_layer)
+        logger.info(
+            f"Finding stress envelope crossings took {time.time() - crossings_start_time:.4f} seconds."
+        )
+
+        # --- Standard case: if roots exist ---
+        if len(roots) > 0:
+            # Reconstruct segments based on the roots
+            midpoint_load_application = total_length / 2
+            segment_boundaries = sorted(
+                list(set([0] + roots + [midpoint_load_application] + [total_length]))
+            )
+            new_segments = []
+
+            for i in range(len(segment_boundaries) - 1):
+                start = segment_boundaries[i]
+                end = segment_boundaries[i + 1]
+                midpoint = (start + end) / 2
+
+                # Check stress at the midpoint of the new potential segment
+                # to determine if it's cracked (has_foundation=False)
+                mid_sigma, mid_tau = self._calculate_sigma_tau_at_x(midpoint, system)
+                stress_check = self.stress_envelope(
+                    np.array([mid_sigma]), np.array([mid_tau]), weak_layer
+                )[0]
+
+                has_foundation = stress_check <= 1
+
+                # Re-apply the skier weight to the correct new segment
+                m = skier_weight if i == 1 else 0
+
+                new_segments.append(
+                    Segment(length=end - start, has_foundation=has_foundation, m=m)
+                )
+
+            # Consolidate mass onto one segment if it was split
+            mass_segments = [s for s in new_segments if s.m > 0]
+            if len(mass_segments) > 1:
+                for s in mass_segments[1:]:
+                    s.m = 0
+
+            new_crack_length = sum(
+                seg.length for seg in new_segments if not seg.has_foundation
+            )
+
+            logger.info(
+                f"Finished finding new anticrack length in {time.time() - start_time:.4f} seconds. New length: {new_crack_length:.2f} mm."
+            )
+
+        # --- Exception: the entire domain is cracked ---
+        elif min_dist_stress > 1:
+            # The entire domain is cracked
+            new_segments = [
+                Segment(length=total_length / 2, has_foundation=False, m=skier_weight),
+                Segment(length=total_length / 2, has_foundation=False, m=0),
+            ]
+            new_crack_length = total_length
+
+        elif not roots:
+            # No part of the slab is cracked
+            new_crack_length = 0
+            new_segments = initial_segments
+
+        return new_crack_length, new_segments
 
     def _calculate_sigma_tau_at_x(
         self, x_value: float, system: SystemModel
@@ -266,8 +991,10 @@ class CriteriaEvaluator:
         """
         Finds the exact x-coordinates where the stress envelope is crossed.
         """
+        logger.debug("Finding stress envelope crossings.")
+        start_time = time.time()
         analyzer = Analyzer(system)
-        x_coords, z, _ = analyzer.rasterize_solution()
+        x_coords, z, _ = analyzer.rasterize_solution(mode="cracked", num=800)
 
         sigma_kPa = system.fq.sig(z, unit="kPa")
         tau_kPa = system.fq.tau(z, unit="kPa")
@@ -289,6 +1016,10 @@ class CriteriaEvaluator:
 
         # Search for roots within the identified candidates
         roots = []
+        logger.debug(
+            f"Found {len(root_candidates)} potential crossing regions. Finding exact roots."
+        )
+        roots_start_time = time.time()
         for x_left, x_right in root_candidates:
             try:
                 root_result = root_scalar(
@@ -303,694 +1034,34 @@ class CriteriaEvaluator:
                 # This can happen if the signs at the bracket edges are not opposite.
                 # It's safe to ignore in this context.
                 pass
-
+        logger.debug(f"Root finding took {time.time() - roots_start_time:.4f} seconds.")
+        logger.info(
+            f"Found {len(roots)} stress envelope crossings in {time.time() - start_time:.4f} seconds."
+        )
         return roots
 
-    def find_minimum_force(
-        self,
-        system: SystemModel,
-        dampening: float = 0.0,
-        tolerance: float = 0.005,
-    ) -> tuple[bool, float, SystemModel, float, float]:
+    def _fracture_toughness_exceedance(
+        self, crack_length: float, system: SystemModel, target: float
+    ) -> float:
         """
-        Finds the minimum skier weight required to surpass the stress failure envelope.
-
-        This method iteratively adjusts the skier weight until the maximum distance
-        to the stress envelope converges to 1, indicating the critical state.
-
-        Parameters:
-        -----------
-        system: SystemModel
-            The system model.
-        dampening: float, optional
-            Dampening factor for the skier weight. Defaults to 0.0.
-        tolerance: float, optional
-            Tolerance for the stress envelope. Defaults to 0.005.
-
-        Returns:
-        --------
-        success: bool
-            Whether the method converged.
-        critical_skier_weight: float
-            The minimum skier weight (kg).
-        system: SystemModel
-            The system state at the critical load.
-        max_dist_stress: float
-            The maximum stress envelope value. Values > 1 indicate failure.
-        min_dist_stress: float
-            The minimum stress envelope value. Values > 1 indicate failure.
+        Objective function to evaluate the fracture toughness function.
         """
-        skier_weight = 1.0  # Initial guess
-        iteration_count = 0
-        max_iterations = 50
-        max_dist_stress = 0
-
-        # --- Initial uncracked configuration ---
-        total_length = system.scenario.L
+        length = system.scenario.L
         segments = [
-            Segment(length=total_length / 2, has_foundation=True, m=0.0),
-            Segment(length=0, has_foundation=False, m=skier_weight),
-            Segment(length=0, has_foundation=False, m=0.0),
-            Segment(length=total_length / 2, has_foundation=True, m=0.0),
+            Segment(length=length / 2 - crack_length / 2, has_foundation=True, m=0),
+            Segment(length=crack_length / 2, has_foundation=False, m=0),
+            Segment(length=crack_length / 2, has_foundation=False, m=0),
+            Segment(length=length / 2 - crack_length / 2, has_foundation=True, m=0),
         ]
         system.update_scenario(segments=segments)
 
         analyzer = Analyzer(system)
-        _, z_skier, _ = analyzer.rasterize_solution(num=800)
-
-        sigma_kPa = system.fq.sig(z_skier, unit="kPa")
-        tau_kPa = system.fq.tau(z_skier, unit="kPa")
-
-        max_dist_stress = np.max(
-            self.stress_envelope(sigma_kPa, tau_kPa, system.weak_layer)
-        )
-        min_dist_stress = np.min(
-            self.stress_envelope(sigma_kPa, tau_kPa, system.weak_layer)
-        )
-
-        # --- Exception: the entire domain is cracked ---
-        if min_dist_stress >= 1:
-            return (
-                True,
-                skier_weight,
-                system,
-                max_dist_stress,
-                min_dist_stress,
-            )
-
-        while abs(max_dist_stress - 1) > tolerance and iteration_count < max_iterations:
-            iteration_count += 1
-
-            skier_weight = (
-                (dampening + 1) * skier_weight / (dampening + max_dist_stress)
-            )
-
-            temp_segments = [
-                Segment(length=total_length / 2, has_foundation=True, m=0),
-                Segment(length=0, has_foundation=False, m=skier_weight),
-                Segment(length=0, has_foundation=False, m=0),
-                Segment(length=total_length / 2, has_foundation=True, m=0),
-            ]
-
-            system.update_scenario(segments=temp_segments)
-            analyzer = Analyzer(system)
-            _, z_skier, _ = analyzer.rasterize_solution(num=800)
-
-            sigma_kPa = system.fq.sig(z_skier, unit="kPa")
-            tau_kPa = system.fq.tau(z_skier, unit="kPa")
-
-            # Calculate distance to failure
-            max_dist_stress = np.max(
-                self.stress_envelope(sigma_kPa, tau_kPa, system.weak_layer)
-            )
-            min_dist_stress = np.min(
-                self.stress_envelope(sigma_kPa, tau_kPa, system.weak_layer)
-            )
-
-            if min_dist_stress >= 1:
-                return (
-                    True,
-                    skier_weight,
-                    system,
-                    max_dist_stress,
-                    min_dist_stress,
-                )
-
-        if iteration_count == max_iterations:
-            if dampening < 5:
-                # Upon max iteration introduce dampening to avoid infinite loop
-                # and try again with a higher tolerance
-                return self.find_minimum_force(
-                    system, tolerance=0.01, dampening=dampening + 1
-                )
-            else:
-                return (
-                    False,
-                    0.0,
-                    system,
-                    max_dist_stress,
-                    min_dist_stress,
-                )
-
-        return (
-            True,
-            skier_weight,
-            system,
-            max_dist_stress,
-            min_dist_stress,
-        )
-
-    def check_crack_propagation(
-        self,
-        layers: List[Layer],
-        weak_layer: WeakLayer,
-        segments: List[Segment],
-        phi: float,
-    ) -> tuple[float, bool]:
-        """
-        Evaluates the crack propagation criterion for a given configuration.
-
-        This method determines if a pre-existing crack will propagate without any
-        additional load (i.e., self-propagation).
-
-        Parameters:
-        ----------
-        layers: List[Layer]
-        weak_layer: WeakLayer
-        segments: List[Segment]
-        phi: float
-
-        Returns
-        -------
-        g_delta_diff: float
-            The evaluation of the fracture toughness envelope.
-        can_propagate: bool
-            True if the criterion is met (g_delta_diff >= 1).
-        """
-        # Ensure no skier weight is applied for self-propagation check
-        for seg in segments:
-            seg.m = 0
-
-        scenario_config = ScenarioConfig(phi=phi, system_type="skiers")
-        system = self._create_model(layers, weak_layer, segments, scenario_config)
-
-        analyzer = Analyzer(system)
-
-        # Get differential energy release rates at the crack tips
-        # Note: gdif returns [total, modeI, modeII] in kJ/m^2 by default
-        # We need J/m^2 for the fracture toughness criterion.
-        diff_energy = analyzer.differential_ERR(
-            C=system.unknown_constants,
-            phi=system.scenario.phi,
-            li=system.scenario.li,
-            ki=system.scenario.ki,
-            unit="J/m^2",
-        )
-
+        diff_energy = analyzer.differential_ERR(unit="J/m^2")
         G_I = diff_energy[1]
         G_II = diff_energy[2]
 
-        # Evaluate the fracture toughness criterion
-        g_delta_diff = self.fracture_toughness_criterion(G_I, G_II, weak_layer)
-        can_propagate = g_delta_diff >= 1
+        # Evaluate the fracture toughness function (boundary is equal to 1)
+        g_delta_diff = self.fracture_toughness_criterion(G_I, G_II, system.weak_layer)
 
-        return g_delta_diff, can_propagate
-
-    def find_new_anticrack_length(
-        self,
-        system: SystemModel,
-        skier_weight: float,
-    ) -> tuple[float, List[Segment]]:
-        """
-        Finds the resulting anticrack length and updated segment configurations
-        for a given skier weight.
-
-        Parameters:
-        -----------
-        system: SystemModel
-            The system model.
-        skier_weight: float
-            The weight of the skier [kg]
-
-        Returns
-        -------
-        new_crack_length: float
-            The total length of the new cracked segments [mm]
-        new_segments: List[Segment]
-            The updated list of segments
-        """
-        total_length = system.scenario.L
-        weak_layer = system.weak_layer
-
-        initial_segments = [
-            Segment(length=total_length / 2, has_foundation=True, m=skier_weight),
-            Segment(length=total_length / 2, has_foundation=True, m=0),
-        ]
-        system.update_scenario(segments=initial_segments)
-
-        analyzer = Analyzer(system)
-        _, z, _ = analyzer.rasterize_solution()
-        sigma_kPa = system.fq.sig(z, unit="kPa")
-        tau_kPa = system.fq.tau(z, unit="kPa")
-        min_dist_stress = np.min(self.stress_envelope(sigma_kPa, tau_kPa, weak_layer))
-
-        # Find all points where the stress envelope is crossed
-        roots = self._find_stress_envelope_crossings(system, weak_layer)
-
-        # --- Exception: the entire domain is cracked ---
-        if min_dist_stress > 1:
-            # The entire domain is cracked
-            new_segments = [
-                Segment(length=total_length / 2, has_foundation=False, m=skier_weight),
-                Segment(length=total_length / 2, has_foundation=False, m=0),
-            ]
-            new_crack_length = total_length
-            return new_crack_length, new_segments
-
-        if not roots:
-            # No part of the slab is cracked
-            new_crack_length = 0
-            # Return the original uncracked configuration but with the skier weight
-            return new_crack_length, initial_segments
-
-        # Reconstruct segments based on the roots
-        midpoint_load_application = total_length / 2
-        segment_boundaries = sorted(
-            list(set([0] + roots + [midpoint_load_application] + [total_length]))
-        )
-        new_segments = []
-
-        for i in range(len(segment_boundaries) - 1):
-            start = segment_boundaries[i]
-            end = segment_boundaries[i + 1]
-            midpoint = (start + end) / 2
-
-            # Check stress at the midpoint of the new potential segment
-            # to determine if it's cracked (has_foundation=False)
-            mid_sigma, mid_tau = self._calculate_sigma_tau_at_x(midpoint, system)
-            stress_check = self.stress_envelope(
-                np.array([mid_sigma]), np.array([mid_tau]), weak_layer
-            )[0]
-
-            has_foundation = stress_check <= 1
-
-            # Re-apply the skier weight to the correct new segment
-            m = skier_weight if start <= midpoint_load_application < end else 0
-
-            new_segments.append(
-                Segment(length=end - start, has_foundation=has_foundation, m=m)
-            )
-
-        # Consolidate mass onto one segment if it was split
-        mass_segments = [s for s in new_segments if s.m > 0]
-        if len(mass_segments) > 1:
-            for s in mass_segments[1:]:
-                s.m = 0
-
-        new_crack_length = sum(
-            seg.length for seg in new_segments if not seg.has_foundation
-        )
-
-        return new_crack_length, new_segments
-
-    def evaluate_coupled_criterion(
-        self,
-        system: SystemModel,
-        max_iterations: int = 25,
-        tolerance: float = 0.002,
-    ) -> CoupledCriterionResult:
-        """
-        Evaluates the coupled criterion for anticrack nucleation, finding the
-        critical combination of skier weight and anticrack length.
-
-        Parameters:
-        ----------
-        system: SystemModel
-            The system model.
-        max_iterations: int, optional
-            Max iterations for the solver. Defaults to 25.
-        tolerance: float, optional
-            Tolerance for g_delta convergence. Defaults to 0.002.
-
-        Returns
-        -------
-        results: CoupledCriterionResult
-            An object containing the results of the analysis, including
-            critical skier weight, crack length, and convergence details.
-        """
-        L = system.scenario.L
-        phi = system.scenario.phi
-        layers = system.layers
-        weak_layer = system.weak_layer
-
-        (
-            success,
-            initial_critical_skier_weight,
-            system_after_force_finding,
-            max_dist_stress,
-            min_dist_stress,
-        ) = self.find_minimum_force(system)
-
-        # --- Failure: in finding the critical skier weight ---
-        if not success:
-            return CoupledCriterionResult(
-                converged=False,
-                message="Failed to find critical skier weight.",
-                self_collapse=False,
-                pure_stress_criteria=False,
-                critical_skier_weight=0,
-                initial_critical_skier_weight=0,
-                crack_length=0,
-                g_delta=0,
-                final_error=1,
-                iterations=0,
-                history=None,
-                final_system=system,
-                max_dist_stress=0,
-                min_dist_stress=0,
-            )
-
-        # --- Exception: the entire solution is cracked ---
-        if min_dist_stress > 1:
-            # --- Larger scenario to calculate the incremental ERR ---
-            segments = copy.deepcopy(system.scenario.segments)
-            for segment in segments:
-                segment.has_foundation = False
-            # Add 50m of padding to the left and right of the system
-            segments.insert(0, Segment(length=50000, has_foundation=True, m=0))
-            segments.append(Segment(length=50000, has_foundation=True, m=0))
-            system.update_scenario(segments=segments)
-
-            analyzer = Analyzer(system)
-            inc_energy = analyzer.incremental_ERR()
-            g_delta = self.fracture_toughness_criterion(
-                inc_energy[1] * 1000, inc_energy[2] * 1000, system.weak_layer
-            )
-
-            history_data = CoupledCriterionHistory([], [], [], [], [])
-            return CoupledCriterionResult(
-                converged=True,
-                message="System fails under its own weight (self-collapse).",
-                self_collapse=True,
-                pure_stress_criteria=False,
-                critical_skier_weight=0,
-                initial_critical_skier_weight=initial_critical_skier_weight,
-                crack_length=L,
-                g_delta=g_delta,
-                final_error=0,
-                iterations=0,
-                history=history_data,
-                final_system=system,
-                max_dist_stress=max_dist_stress,
-                min_dist_stress=min_dist_stress,
-            )
-
-        # --- Main loop ---
-        elif initial_critical_skier_weight >= 1:
-            skier_weight = initial_critical_skier_weight * 1.005
-            min_skier_weight = initial_critical_skier_weight
-            max_skier_weight = 5 * skier_weight
-
-            crack_length = 1.0
-            dist_ERR_envelope = 1000
-            g_delta = 0
-            history = CoupledCriterionHistory([], [], [], [], [])
-            iteration_count = 0
-
-            segments = [
-                Segment(
-                    length=L / 2 - crack_length,
-                    has_foundation=True,
-                    m=0,
-                ),
-                Segment(length=crack_length, has_foundation=False, m=skier_weight),
-                Segment(length=crack_length, has_foundation=False, m=0),
-                Segment(length=L / 2 - crack_length, has_foundation=True, m=0),
-            ]
-
-            for i in range(max_iterations):
-                system.update_scenario(segments=segments)
-                analyzer = Analyzer(system)
-                _, z, _ = analyzer.rasterize_solution()
-
-                # Calculate stress envelope
-                sigma_kPa = system.fq.sig(z, unit="kPa")
-                tau_kPa = system.fq.tau(z, unit="kPa")
-                max_dist_stress = np.max(
-                    self.stress_envelope(sigma_kPa, tau_kPa, system.weak_layer)
-                )
-                min_dist_stress = np.min(
-                    self.stress_envelope(sigma_kPa, tau_kPa, system.weak_layer)
-                )
-
-                # Calculate fracture toughness criterion
-                incr_energy = analyzer.incremental_ERR()
-                g_delta = self.fracture_toughness_criterion(
-                    incr_energy[1] * 1000, incr_energy[2] * 1000, weak_layer
-                )
-                dist_ERR_envelope = abs(g_delta - 1)
-
-                # Update history
-                history.skier_weights.append(skier_weight)
-                history.crack_lengths.append(crack_length)
-                history.g_deltas.append(g_delta)
-                history.dist_maxs.append(max_dist_stress)
-                history.dist_mins.append(min_dist_stress)
-
-                # --- Exception: pure stress criterion ---
-                # The fracture toughness is superseded for minimum critical skier weight
-                if i == 0 and (g_delta > 1 or dist_ERR_envelope < 0.02):
-                    return CoupledCriterionResult(
-                        converged=True,
-                        message="Fracture governed by pure stress criterion.",
-                        self_collapse=False,
-                        pure_stress_criteria=True,
-                        critical_skier_weight=skier_weight,
-                        initial_critical_skier_weight=initial_critical_skier_weight,
-                        crack_length=crack_length,
-                        g_delta=g_delta,
-                        final_error=dist_ERR_envelope,
-                        iterations=i + 1,
-                        history=history,
-                        final_system=system,
-                        max_dist_stress=max_dist_stress,
-                        min_dist_stress=min_dist_stress,
-                    )
-
-                # Update skier weight boundaries
-                if g_delta < 1:
-                    min_skier_weight = skier_weight
-                else:
-                    max_skier_weight = skier_weight
-
-                # Update skier weight
-                skier_weight = (min_skier_weight + max_skier_weight) / 2
-
-                # Find new anticrack length
-                if abs(dist_ERR_envelope) > tolerance:
-            crack_length, segments = self.find_new_anticrack_length(
-                layers, weak_layer, skier_weight, phi
-            )
-
-            if crack_length == 0 and iteration_count < max_iterations:
-                return self._evaluate_coupled_criterion_dampened(system)
-
-            converged = dist_ERR_envelope < tolerance
-            message = (
-                "Converged successfully."
-                if converged
-                else "Reached max iterations without converging."
-            )
-            if not all(s.has_foundation for s in segments):
-                message = "Reached max iterations; calling dampened version."
-                return self._evaluate_coupled_criterion_dampened(system)
-
-            return CoupledCriterionResult(
-                converged=converged,
-                message=message,
-                self_collapse=False,
-                pure_stress_criteria=False,
-                critical_skier_weight=skier_weight,
-                initial_critical_skier_weight=initial_critical_skier_weight,
-                crack_length=crack_length,
-                g_delta=g_delta,
-                final_error=dist_ERR_envelope,
-                iterations=iteration_count,
-                history=history,
-                final_system=system,
-                max_dist_stress=max_dist_stress,
-                min_dist_stress=min_dist_stress,
-            )
-
-        else:  # critical_skier_weight < 1
-            return CoupledCriterionResult(
-                converged=False,
-                message="Critical skier weight is less than 1kg.",
-                self_collapse=False,
-                pure_stress_criteria=False,
-                critical_skier_weight=0,
-                initial_critical_skier_weight=initial_critical_skier_weight,
-                crack_length=0,
-                g_delta=0,
-                final_error=1,
-                iterations=0,
-                history=None,
-                final_system=system,
-                max_dist_stress=max_dist_stress,
-                min_dist_stress=min_dist_stress,
-            )
-
-    def _evaluate_coupled_criterion_dampened(
-        self,
-        system: SystemModel,
-        dampening: float = 1.0,
-        max_iterations: int = 50,
-        tolerance: float = 0.002,
-    ) -> CoupledCriterionResult:
-        """
-        Dampened version of evaluate_coupled_criterion to handle convergence issues.
-        """
-        L = system.scenario.L
-        phi = system.scenario.phi
-        layers = system.layers
-        weak_layer = system.weak_layer
-
-        (
-            success,
-            initial_critical_skier_weight,
-            _,
-            max_dist_stress,
-            min_dist_stress,
-        ) = self.find_minimum_force(system)
-
-        if not success or initial_critical_skier_weight < 1:
-            # Return failure if minimum force can't be found
-            return CoupledCriterionResult(
-                converged=False,
-                message="Dampened: Failed to find critical skier weight.",
-                self_collapse=False,
-                pure_stress_criteria=False,
-                critical_skier_weight=0,
-                initial_critical_skier_weight=0,
-                crack_length=0,
-                g_delta=0,
-                final_error=1,
-                iterations=0,
-                history=None,
-                final_system=system,
-                max_dist_stress=0,
-                min_dist_stress=0,
-            )
-
-        skier_weight = initial_critical_skier_weight * 1.005
-        min_skier_weight = initial_critical_skier_weight
-        max_skier_weight = 3 * initial_critical_skier_weight
-
-        # Ensure max_skier_weight is sufficient
-        g_delta_max_weight = 0
-        while g_delta_max_weight < 1:
-            max_skier_weight *= 2
-            # Simplified check, assuming some crack length
-            crack_length_check = L / 10
-            segments_check = [
-                Segment(L / 2 - crack_length_check, True, 0),
-                Segment(crack_length_check * 2, False, max_skier_weight),
-                Segment(L / 2 - crack_length_check, True, 0),
-            ]
-            system.update_scenario(segments=segments_check)
-            # This is a simplified check and does not perform the full incremental ERR
-            # For now, this loop ensures max_skier_weight is increased. A full g_delta
-            # check here would be computationally expensive.
-            # A placeholder g_delta is assumed to eventually exceed 1.
-            if max_skier_weight > 10 * initial_critical_skier_weight:
-                g_delta_max_weight = 1.1
-
-        err = 1000
-        iteration_count = 0
-        history = CoupledCriterionHistory([], [], [], [], [])
-        crack_length, segments = self.find_new_anticrack_length(
-            layers, weak_layer, skier_weight, phi
-        )
-
-        while (
-            abs(err) > tolerance
-            and iteration_count < max_iterations
-            and any(s.has_foundation for s in segments)
-        ):
-            iteration_count += 1
-            history.skier_weights.append(skier_weight)
-            history.crack_lengths.append(crack_length)
-
-            # Stress checks for history
-            uncracked_segments_stresses = [
-                Segment(length=L, has_foundation=True, m=skier_weight)
-            ]
-            system.update_scenario(segments=uncracked_segments_stresses)
-            analyzer = Analyzer(system)
-            x, z, _ = analyzer.rasterize_solution()
-            sigma = system.fq.sig(z, unit="kPa")
-            tau = system.fq.tau(z, unit="kPa")
-            max_dist_stress = np.max(self.stress_envelope(sigma, tau, weak_layer))
-            min_dist_stress = np.min(self.stress_envelope(sigma, tau, weak_layer))
-            history.dist_maxs.append(max_dist_stress)
-            history.dist_mins.append(min_dist_stress)
-
-            # Models for ginc
-            uncracked_segments = [
-                Segment(length=s.length, has_foundation=True, m=s.m) for s in segments
-            ]
-            scenario_config_uc = ScenarioConfig(phi=phi, system_type="skiers")
-            uncracked_system = self._create_model(
-                layers, weak_layer, uncracked_segments, scenario_config_uc
-            )
-
-            cracked_system = self._create_model(
-                layers,
-                weak_layer,
-                segments,
-                scenario_config_c=ScenarioConfig(phi=phi, system_type="skiers"),
-            )
-            analyzer = Analyzer(cracked_system)
-
-            incr_energy = analyzer.incremental_ERR(
-                C0=uncracked_system.unknown_constants,
-                C1=cracked_system.unknown_constants,
-                phi=phi,
-                li=np.array([s.length for s in segments]),
-                ki=np.array([s.has_foundation for s in segments]),
-                k0=np.array([True] * len(segments)),
-            )
-            g_delta = self.fracture_toughness_criterion(
-                incr_energy[1] * 1000, incr_energy[2] * 1000, weak_layer
-            )
-            history.g_deltas.append(g_delta)
-            err = abs(g_delta - 1)
-
-            if g_delta < 1:
-                min_skier_weight = skier_weight
-            else:
-                max_skier_weight = skier_weight
-
-            new_skier_weight = (min_skier_weight + max_skier_weight) / 2
-
-            scaling = 1.0
-            if abs(err) < 0.5:
-                scaling = (dampening + 1 + (new_skier_weight / skier_weight)) / (
-                    dampening + 2
-                )
-
-            skier_weight = scaling * new_skier_weight
-
-            if abs(err) > tolerance:
-                crack_length, segments = self.find_new_anticrack_length(
-                    layers, weak_layer, skier_weight, phi
-                )
-
-        if iteration_count == max_iterations and dampening < 5:
-            return self._evaluate_coupled_criterion_dampened(
-                system, dampening=dampening + 1
-            )
-
-        converged = err < tolerance
-        message = (
-            "Dampened: Converged successfully."
-            if converged
-            else "Dampened: Reached max iterations without converging."
-        )
-
-        return CoupledCriterionResult(
-            converged=converged,
-            message=message,
-            self_collapse=False,
-            pure_stress_criteria=False,
-            critical_skier_weight=skier_weight,
-            initial_critical_skier_weight=initial_critical_skier_weight,
-            crack_length=crack_length,
-            g_delta=g_delta,
-            final_error=err,
-            iterations=iteration_count,
-            history=history,
-            final_system=cracked_system,
-            max_dist_stress=max_dist_stress,
-            min_dist_stress=min_dist_stress,
-        )
+        # Return the difference from the target
+        return g_delta_diff - target
