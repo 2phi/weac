@@ -102,9 +102,9 @@ class Layer(BaseModel):
     # has to be provided
     rho: float = Field(..., gt=0, description="Density of the Slab  [kg m⁻³]")
     h: float = Field(..., gt=0, description="Height/Thickness of the slab  [mm]")
-    nu: float = Field(default=NU, ge=0, lt=0.5, description="Poisson's ratio [-]")
 
     # derived if not provided
+    nu: float = Field(default=NU, ge=0, lt=0.5, description="Poisson's ratio [-]")
     E: float | None = Field(default=None, gt=0, description="Young's modulus [MPa]")
     G: float | None = Field(default=None, gt=0, description="Shear modulus [MPa]")
     tensile_strength: float | None = Field(
@@ -114,7 +114,7 @@ class Layer(BaseModel):
         default="sigrist",
         description="Method to calculate the tensile strength",
     )
-    youngs_modulus_method: Literal["bergfeld", "scapazzo", "gerling"] = Field(
+    E_method: Literal["bergfeld", "scapazzo", "gerling"] = Field(
         default="bergfeld",
         description="Method to calculate the Young's modulus",
     )
@@ -125,16 +125,14 @@ class Layer(BaseModel):
     )
 
     def model_post_init(self, _ctx):
-        if self.youngs_modulus_method == "bergfeld":
+        if self.E_method == "bergfeld":
             object.__setattr__(self, "E", self.E or _bergfeld_youngs_modulus(self.rho))
-        elif self.youngs_modulus_method == "scapazzo":
+        elif self.E_method == "scapazzo":
             object.__setattr__(self, "E", self.E or _scapozza_youngs_modulus(self.rho))
-        elif self.youngs_modulus_method == "gerling":
+        elif self.E_method == "gerling":
             object.__setattr__(self, "E", self.E or _gerling_youngs_modulus(self.rho))
         else:
-            raise ValueError(
-                f"Invalid youngs_modulus_method: {self.youngs_modulus_method}"
-            )
+            raise ValueError(f"Invalid E_method: {self.E_method}")
         object.__setattr__(self, "G", self.G or self.E / (2 * (1 + self.nu)))
         if self.tensile_strength_method == "sigrist":
             object.__setattr__(
@@ -197,7 +195,7 @@ class WeakLayer(BaseModel):
     G_IIc: float = Field(
         default=0.79, gt=0, description="Mode-II fracture toughness GIIc [J/m^2]"
     )
-    youngs_modulus_method: Literal["bergfeld", "scapazzo", "gerling"] = Field(
+    E_method: Literal["bergfeld", "scapazzo", "gerling"] = Field(
         default="bergfeld",
         description="Method to calculate the Young's modulus",
     )
@@ -208,16 +206,14 @@ class WeakLayer(BaseModel):
     )
 
     def model_post_init(self, _ctx):
-        if self.youngs_modulus_method == "bergfeld":
+        if self.E_method == "bergfeld":
             object.__setattr__(self, "E", self.E or _bergfeld_youngs_modulus(self.rho))
-        elif self.youngs_modulus_method == "scapazzo":
+        elif self.E_method == "scapazzo":
             object.__setattr__(self, "E", self.E or _scapozza_youngs_modulus(self.rho))
-        elif self.youngs_modulus_method == "gerling":
+        elif self.E_method == "gerling":
             object.__setattr__(self, "E", self.E or _gerling_youngs_modulus(self.rho))
         else:
-            raise ValueError(
-                f"Invalid youngs_modulus_method: {self.youngs_modulus_method}"
-            )
+            raise ValueError(f"Invalid E_method: {self.E_method}")
         object.__setattr__(self, "G", self.G or self.E / (2 * (1 + self.nu)))
         E_plane = self.E / (1 - self.nu**2)  # plane-strain Young
         object.__setattr__(self, "kn", self.kn or E_plane / self.h)

@@ -51,7 +51,7 @@ class Analyzer:
         """
         phi = self.sm.scenario.phi
         li = self.sm.scenario.li
-        qs = self.sm.scenario.qs
+        qs = self.sm.scenario.surface_load
         ki = self.sm.scenario.ki
 
         match mode:
@@ -230,7 +230,7 @@ class Analyzer:
         zmesh = self.get_zmesh(dz=dz)
         zi = zmesh["z"]
         rho = zmesh["rho"]
-        qs = self.sm.scenario.qs
+        qs = self.sm.scenario.surface_load
 
         # Get dimensions of stress field (n rows, m columns)
         n = len(zi)
@@ -289,7 +289,7 @@ class Analyzer:
         zmesh = self.get_zmesh(dz=dz)
         zi = zmesh["z"]
         rho = zmesh["rho"]
-        qs = self.sm.scenario.qs
+        qs = self.sm.scenario.surface_load
         # Get dimensions of stress field (n rows, m columns)
         n = len(zi)
         m = Z.shape[1]
@@ -456,7 +456,7 @@ class Analyzer:
         C_uncracked = self.sm.uncracked_unknown_constants
         C_cracked = self.sm.unknown_constants
         phi = self.sm.scenario.phi
-        qs = self.sm.scenario.qs
+        qs = self.sm.scenario.surface_load
 
         # Reduce inputs to segments with crack advance
         iscrack = k0 & ~ki
@@ -522,7 +522,7 @@ class Analyzer:
         ki = self.sm.scenario.ki
         C = self.sm.unknown_constants
         phi = self.sm.scenario.phi
-        qs = self.sm.scenario.qs
+        qs = self.sm.scenario.surface_load
 
         # Get number and indices of segment transitions
         ntr = len(li) - 1

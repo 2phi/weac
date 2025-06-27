@@ -11,7 +11,9 @@ import numpy as np
 from weac_2.analysis.analyzer import Analyzer
 
 # Module imports
+from weac_2.components.layer import WeakLayer
 from weac_2.core.scenario import Scenario
+from weac_2.core.slab import Slab
 from weac_2.core.system_model import SystemModel
 from weac_2.utils import isnotebook
 
@@ -134,10 +136,6 @@ class Plotter:
 
     def __init__(
         self,
-        system: Optional[SystemModel] = None,
-        systems: Optional[List[SystemModel]] = None,
-        labels: Optional[List[str]] = None,
-        colors: Optional[List[str]] = None,
         plot_dir: str = "plots",
     ):
         """
@@ -156,28 +154,7 @@ class Plotter:
         plot_dir : str, default "plots"
             Directory to save plots
         """
-        # Handle system input
-        if system is not None and systems is not None:
-            raise ValueError("Provide either 'system' or 'systems', not both")
-        elif system is not None:
-            self.systems = [system]
-        elif systems is not None:
-            self.systems = systems
-        else:
-            raise ValueError("Must provide either 'system' or 'systems'")
-
-        self.n_systems = len(self.systems)
-
-        # Set up labels
-        if labels is None:
-            self.labels = [f"System {i + 1}" for i in range(self.n_systems)]
-        else:
-            if len(labels) != self.n_systems:
-                raise ValueError(
-                    f"Number of labels ({len(labels)}) must match number of systems ({self.n_systems})"
-                )
-            self.labels = labels
-
+        self.labels = LABELSTYLE
         self.colors = COLORS
 
         # Set up plot directory
@@ -229,12 +206,14 @@ class Plotter:
             raise ValueError(
                 "Provide either 'system_model' or 'system_models', not both"
             )
-        elif system_model is not None:
+        elif isinstance(system_model, SystemModel):
             return [system_model]
-        elif system_models is not None:
+        elif isinstance(system_models, list):
             return system_models
         else:
-            return self.systems
+            raise ValueError(
+                "Must provide either 'system_model' or 'system_models' as a SystemModel or list of SystemModels"
+            )
 
     def _save_figure(self, filename: str, fig: Optional[plt.Figure] = None):
         """Save figure with proper formatting."""
@@ -249,8 +228,9 @@ class Plotter:
 
     def plot_slab_profile(
         self,
-        system_model: Optional[SystemModel] = None,
-        system_models: Optional[List[SystemModel]] = None,
+        weak_layers: List[WeakLayer] | WeakLayer,
+        slabs: List[Slab] | Slab,
+        labels: Optional[List[str] | str] = None,
         filename: Optional[str] = None,
     ):
         """
@@ -258,8 +238,6 @@ class Plotter:
 
         Parameters
         ----------
-        system_model : SystemModel, optional
-            Single system to plot (overrides default)
         system_models : List[SystemModel], optional
             Multiple systems to plot (overrides default)
         filename : str, optional
@@ -270,29 +248,42 @@ class Plotter:
         matplotlib.axes.Axes
             The generated plot axes.
         """
-        systems_to_plot = self._get_systems_to_plot(system_model, system_models)
-        labels, colors = self.labels, self.colors
+        if isinstance(weak_layers, WeakLayer):
+            weak_layers = [weak_layers]
+        if isinstance(slabs, Slab):
+            slabs = [slabs]
+
+        if labels is None:
+            labels = [f"System {i + 1}" for i in range(len(weak_layers))]
+        elif isinstance(labels, str):
+            labels = [labels] * len(slabs)
+        elif len(labels) != len(slabs):
+            raise ValueError("Number of labels must match number of slabs")
+
+        colors = []
+        for i, label in enumerate(labels):
+            colors.append(COLORS[i])
 
         # Plot Setup
         plt.rcdefaults()
-        plt.rc("font", family="serif", size=10)
+        plt.rc("font", family="serif", size=8)
         plt.rc("mathtext", fontset="cm")
 
-        fig = plt.figure(figsize=(4, 7))
+        fig = plt.figure(figsize=(3.5, 4), dpi=300)
         ax1 = fig.gca()
 
         # Plot 1: Layer thickness and density
         max_height = 0
-        for system in systems_to_plot:
-            total_height = system.slab.H + system.weak_layer.h
+        for i, slab in enumerate(slabs):
+            total_height = slab.H + weak_layers[i].h
             max_height = max(max_height, total_height)
 
-        for i, (system, label, color) in enumerate(
-            zip(systems_to_plot, labels, colors)
+        for i, (weak_layer, slab, label, color) in enumerate(
+            zip(weak_layers, slabs, labels, colors)
         ):
             # Plot weak layer
-            wl_y = [-system.weak_layer.h, 0]
-            wl_x = [system.weak_layer.rho, system.weak_layer.rho]
+            wl_y = [-weak_layer.h, 0]
+            wl_x = [weak_layer.rho, weak_layer.rho]
             ax1.fill_betweenx(wl_y, 0, wl_x, color="red", alpha=0.8, hatch="///")
 
             # Plot slab layers
@@ -301,7 +292,7 @@ class Plotter:
             current_height = 0
 
             # As slab.layers is top-down
-            for layer in reversed(system.slab.layers):
+            for layer in reversed(slab.layers):
                 x_coords.extend([layer.rho, layer.rho])
                 y_coords.extend([current_height, current_height + layer.h])
                 current_height += layer.h
@@ -329,13 +320,12 @@ class Plotter:
 
         ax1.grid(True, alpha=0.3)
         ax1.set_xlim(500, 0)
-        ax1.set_ylim(-system.weak_layer.h, max_height)
+        ax1.set_ylim(-weak_layer.h, max_height)
 
         if filename:
             self._save_figure(filename, fig)
 
-        # Reset plot styles
-        plt.rcdefaults()
+        return fig
 
     def plot_section_forces(
         self,

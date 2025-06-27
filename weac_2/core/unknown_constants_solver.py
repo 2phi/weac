@@ -32,7 +32,9 @@ class UnknownConstantsSolver:
         cls,
         scenario: Scenario,
         eigensystem: Eigensystem,
-        system_type: Literal["skier", "skiers", "pst-", "pst+", "rot", "trans"],
+        system_type: Literal[
+            "skier", "skiers", "pst-", "-pst", "vpst-", "-vpst", "rot", "trans"
+        ],
         touchdown_distance: Optional[float] = None,
         touchdown_mode: Optional[
             Literal["A_free_hanging", "B_point_contact", "C_in_contact"]
@@ -61,7 +63,7 @@ class UnknownConstantsSolver:
         """
         logger.debug("Starting solve unknown constants")
         phi = scenario.phi
-        qs = scenario.qs
+        qs = scenario.surface_load
         li = scenario.li
         ki = scenario.ki
         mi = scenario.mi
@@ -219,7 +221,9 @@ class UnknownConstantsSolver:
         eigensystem: Eigensystem,
         has_foundation: bool,
         pos: Literal["l", "r", "m", "left", "right", "mid"],
-        system_type: Literal["skier", "skiers", "pst-", "pst+", "rot", "trans"],
+        system_type: Literal[
+            "skier", "skiers", "pst-", "-pst", "vpst-", "-vpst", "rot", "trans"
+        ],
         touchdown_mode: Optional[
             Literal["A_free_hanging", "B_point_contact", "C_in_contact"]
         ] = None,
@@ -324,7 +328,9 @@ class UnknownConstantsSolver:
         eigensystem: Eigensystem,
         has_foundation: bool,
         pos: Literal["l", "r", "m", "left", "right", "mid"],
-        system_type: Literal["skier", "skiers", "pst-", "pst+", "rot", "trans"],
+        system_type: Literal[
+            "skier", "skiers", "pst-", "-pst", "vpst-", "-vpst", "rot", "trans"
+        ],
         touchdown_mode: Optional[
             Literal["A_free_hanging", "B_point_contact", "C_in_contact"]
         ] = None,

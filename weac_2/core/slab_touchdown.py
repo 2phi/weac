@@ -83,7 +83,7 @@ class SlabTouchdown:
             crack_length=self.scenario.scenario_config.crack_length,
             collapse_factor=self.scenario.scenario_config.collapse_factor,
             stiffness_ratio=self.scenario.scenario_config.stiffness_ratio,
-            qs=self.scenario.scenario_config.qs,
+            qs=self.scenario.scenario_config.surface_load,
         )
 
         self._setup_touchdown_system()

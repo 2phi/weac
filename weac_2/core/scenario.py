@@ -30,7 +30,7 @@ class Scenario:
     mi : List[float]
         skier masses (kg) on boundary of segment i and i+1 [kg]
 
-    system_type : Literal['skier', 'skiers', 'pst-', 'pst+', 'rot', 'trans']
+    system_type : Literal['skier', 'skiers', 'pst-', '-pst', 'rot', 'trans']
     phi : float
         Angle of slab in positive in counter-clockwise direction [deg]
     L : float
@@ -56,10 +56,10 @@ class Scenario:
         "skier", "skiers", "pst-", "-pst", "vpst-", "-vpst", "rot", "trans"
     ]
     phi: float  # Angle in [deg]
-    qs: float  # Line-Load [N/mm]
-    qw: float  # Weight Load [N/mm]
-    qn: float  # Normal Load [N/mm]
-    qt: float  # Tangential Load [N/mm]
+    surface_load: float  # Surface Line-Load [N/mm]
+    qw: float  # Weight Line-Load [N/mm]
+    qn: float  # Total Normal Line-Load [N/mm]
+    qt: float  # Total Tangential Line-Load [N/mm]
     L: float  # Length of the model [mm]
     crack_h: float  # Height of the crack [mm]
     crack_l: float  # Length of the crack [mm]
@@ -78,7 +78,7 @@ class Scenario:
 
         self.system_type = scenario_config.system_type
         self.phi = scenario_config.phi
-        self.qs = scenario_config.qs
+        self.surface_load = scenario_config.surface_load
 
         self._setup_scenario()
         self._calc_normal_load()
@@ -91,7 +91,7 @@ class Scenario:
         and recompute derived attributes."""
         self.system_type = self.scenario_config.system_type
         self.phi = self.scenario_config.phi
-        self.qs = self.scenario_config.qs
+        self.surface_load = self.scenario_config.surface_load
 
         self._setup_scenario()
         self._calc_crack_height()
@@ -134,7 +134,7 @@ class Scenario:
         """
         # Surface Load & Weight Load
         qw = self.slab.qw
-        qs = self.qs
+        qs = self.surface_load
 
         # Normal components of forces
         phi = self.phi
@@ -154,7 +154,7 @@ class Scenario:
         """
         # Surface Load & Weight Load
         qw = self.slab.qw
-        qs = self.qs
+        qs = self.surface_load
 
         # Normal components of forces
         phi = self.phi

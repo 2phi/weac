@@ -27,18 +27,16 @@ class Config(BaseModel):
     ----------
     touchdown : bool
         Consider Touchdown of the Slab on Twisting (?)
-    youngs_modulus_method : Literal['bergfeld', 'scapazzo', 'gerling']
+    E_method : Literal['bergfeld', 'scapazzo', 'gerling']
         Method to calculate the density of the snowpack
-    stress_envelope_method : Literal[
-        'adam_unpublished', 'schottner', 'mede_s-RG1', 'mede_s-RG2', 'mede_s-FCDH'
-    ]
+
         Method to calculate the stress failure envelope
     """
 
     touchdown: bool = Field(
         default=False, description="Whether to calculate the touchdown of the slab"
     )
-    youngs_modulus_method: Literal["bergfeld", "scapazzo", "gerling"] = Field(
+    E_method: Literal["bergfeld", "scapazzo", "gerling"] = Field(
         default="bergfeld",
         description="Method to calculate the density of the snowpack",
     )
