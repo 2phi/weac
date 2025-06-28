@@ -148,28 +148,33 @@ class SystemModel:
 
     @cached_property
     def slab_touchdown(self) -> Optional[SlabTouchdown]:
-        if self.config.touchdown:  # and system_type == "pst-" or "-pst"
+        if self.config.touchdown and (
+            self.scenario.system_type == "pst-"
+            or self.scenario.system_type == "-pst"
+            or self.scenario.system_type == "vpst-"
+            or self.scenario.system_type == "-vpst"
+        ):
             logger.info("Solving for Slab Touchdown")
             slab_touchdown = SlabTouchdown(
                 scenario=self.scenario, eigensystem=self.eigensystem
             )
 
             logger.info(
-                f"Original crack_l: {self.scenario.crack_l}, touchdown_distance: {slab_touchdown.touchdown_distance}"
+                f"Original crack_length: {self.scenario.crack_length}, touchdown_distance: {slab_touchdown.touchdown_distance}"
             )
 
-            if self.scenario.system_type == "pst-":
+            if (
+                self.scenario.system_type == "pst-"
+                or self.scenario.system_type == "vpst-"
+            ):
                 new_segments = copy.deepcopy(self.scenario.segments)
                 new_segments[-1].length = slab_touchdown.touchdown_distance
-            elif self.scenario.system_type == "-pst":
+            elif (
+                self.scenario.system_type == "-pst"
+                or self.scenario.system_type == "-vpst"
+            ):
                 new_segments = copy.deepcopy(self.scenario.segments)
                 new_segments[0].length = slab_touchdown.touchdown_distance
-            else:
-                # For other systems, keep original segments
-                new_segments = self.scenario.segments
-                logger.warning(
-                    f"Touchdown scenario redefinition not implemented for system_type: {self.scenario.system_type}"
-                )
 
             # Create new scenario with updated segments
             self.scenario = Scenario(
@@ -281,38 +286,45 @@ class SystemModel:
             )
 
     # Changes that affect the *weak layer*  -> rebuild everything
-    def update_weak_layer(self, **kwargs):
-        # Create a new WeakLayer with updated values
-        current_values = self.weak_layer.model_dump()
-        current_values.update(kwargs)
-        self.weak_layer = WeakLayer(**current_values)
+    def update_weak_layer(self, weak_layer: WeakLayer):
+        self.weak_layer = weak_layer
+        self.scenario = Scenario(
+            scenario_config=self.scenario.scenario_config,
+            segments=self.scenario.segments,
+            weak_layer=weak_layer,
+            slab=self.slab,
+        )
         self._invalidate_eigensystem()
 
     # Changes that affect the *slab*  -> rebuild everything
-    def update_slab_layers(self, new_layers: List[Layer]):
-        self.slab.layers = new_layers
+    def update_layers(self, new_layers: List[Layer]):
+        slab = Slab(layers=new_layers)
+        self.slab = slab
+        self.scenario = Scenario(
+            scenario_config=self.scenario.scenario_config,
+            segments=self.scenario.segments,
+            weak_layer=self.weak_layer,
+            slab=slab,
+        )
         self._invalidate_eigensystem()
 
     # Changes that affect the *scenario*  -> only rebuild C constants
-    def update_scenario(self, **kwargs):
+    def update_scenario(self, scenario: Scenario):
         """
         Update fields on `scenario_config` (if present) or on the
         Scenario object itself, then refresh and invalidate constants.
         """
         logger.debug("Updating Scenario...")
-        for l, v in kwargs.items():
-            if hasattr(self.scenario.scenario_config, l):
-                setattr(self.scenario.scenario_config, l, v)
-            elif hasattr(self.scenario, l):
-                setattr(self.scenario, l, v)
-            else:
-                raise AttributeError(f"Unknown scenario field '{l}'")
-
-        # Pull new values through & recompute segment lengths, etc.
-        logger.debug(f"Old Phi: {self.scenario.phi}")
-        self.scenario.refresh_from_config()
-        logger.debug(f"New Phi: {self.scenario.phi}")
+        self.scenario = scenario
+        if self.config.touchdown:
+            self._invalidate_slab_touchdown()
         self._invalidate_constants()
+
+    def toggle_touchdown(self, touchdown: bool):
+        if self.config.touchdown != touchdown:
+            self.config.touchdown = touchdown
+            self._invalidate_slab_touchdown()
+            self._invalidate_constants()
 
     def _invalidate_eigensystem(self):
         self.__dict__.pop("eigensystem", None)

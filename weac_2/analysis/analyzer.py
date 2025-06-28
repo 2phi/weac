@@ -49,17 +49,16 @@ class Analyzer:
         x_founded : ndarray
             Grid point x-coordinates that lie on a foundation.
         """
-        phi = self.sm.scenario.phi
-        li = self.sm.scenario.li
-        qs = self.sm.scenario.surface_load
         ki = self.sm.scenario.ki
-
         match mode:
             case "cracked":
                 C = self.sm.unknown_constants
             case "uncracked":
                 ki = np.full(len(ki), True)
                 C = self.sm.uncracked_unknown_constants
+        phi = self.sm.scenario.phi
+        li = self.sm.scenario.li
+        qs = self.sm.scenario.surface_load
 
         # Drop zero-length segments
         li = abs(li)

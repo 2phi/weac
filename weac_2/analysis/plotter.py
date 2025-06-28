@@ -51,9 +51,12 @@ def _outline(grid):
     return np.hstack([top, right, bot, left])
 
 
-def _significant_digits(decimal):
+def _significant_digits(decimal: float) -> int:
     """Return the number of significant digits for a given decimal."""
-    return -int(np.floor(np.log10(decimal)))
+    if decimal == 0:
+        return 1
+    sig_digits = -int(np.floor(np.log10(decimal)))
+    return sig_digits
 
 
 def _tight_central_distribution(limit, samples=100, tightness=1.5):
@@ -215,11 +218,8 @@ class Plotter:
                 "Must provide either 'system_model' or 'system_models' as a SystemModel or list of SystemModels"
             )
 
-    def _save_figure(self, filename: str, fig: Optional[plt.Figure] = None):
+    def _save_figure(self, fig: plt.Figure, filename: str):
         """Save figure with proper formatting."""
-        if fig is None:
-            fig = plt.gcf()
-
         filepath = os.path.join(self.plot_dir, f"{filename}.png")
         fig.savefig(filepath, dpi=300, bbox_inches="tight", facecolor="white")
 
@@ -323,7 +323,7 @@ class Plotter:
         ax1.set_ylim(-weak_layer.h, max_height)
 
         if filename:
-            self._save_figure(filename, fig)
+            self._save_figure(fig, filename)
 
         return fig
 
@@ -390,7 +390,7 @@ class Plotter:
         plt.tight_layout()
 
         if filename:
-            self._save_figure(filename, fig)
+            self._save_figure(fig, filename)
 
         return fig
 
@@ -448,7 +448,7 @@ class Plotter:
         plt.tight_layout()
 
         if filename:
-            self._save_figure(filename, fig)
+            self._save_figure(fig, filename)
 
         return fig
 
@@ -467,7 +467,7 @@ class Plotter:
         field: Literal["w", "u", "principal", "Sxx", "Txz", "Szz"] = "w",
         normalize: bool = True,
         filename: Optional[str] = None,
-    ):
+    ) -> plt.Figure:
         """
         Plot deformed slab with field contours.
 
@@ -480,10 +480,8 @@ class Plotter:
         filename : str, optional
             Filename for saving plot
         """
-        # Plot Setup
-        plt.rcdefaults()
-        plt.rc("font", family="serif", size=10)
-        plt.rc("mathtext", fontset="cm")
+        fig = plt.figure(figsize=(10, 8))
+        ax = fig.add_subplot(111)
 
         zi = analyzer.get_zmesh(dz=dz)["z"]
         H = analyzer.sm.slab.H
@@ -494,6 +492,8 @@ class Plotter:
         # Compute slab displacements on grid (cm)
         Usl = np.vstack([fq.u(z, h0=h0, unit="cm") for h0 in zi])
         Wsl = np.vstack([fq.w(z, unit="cm") for _ in zi])
+        Sigmawl = np.where(np.isfinite(xwl), fq.sig(z, unit="kPa"), np.nan)
+        Tauwl = np.where(np.isfinite(xwl), fq.tau(z, unit="kPa"), np.nan)
 
         # Put coordinate origin at horizontal center
         if system_type in ["skier", "skiers"]:
@@ -508,7 +508,7 @@ class Plotter:
         xmax = np.min([np.max([Xsl, Xsl + scale * Usl]) + pad, xfocus + window / 2])
         xmin = np.max([np.min([Xsl, Xsl + scale * Usl]) - pad, xfocus - window / 2])
 
-        # Scale shown weak-layer thickness with to max deflection and add padding
+        # # Scale shown weak-layer thickness with to max deflection and add padding
         if analyzer.sm.config.touchdown:
             zmax = (
                 np.max(Zsl)
@@ -547,12 +547,12 @@ class Plotter:
             # Shear stresses (kPa)
             case "Txz":
                 slab = analyzer.Txz(z, phi, dz=dz, unit="kPa")
-                weak = analyzer.weaklayer_shearstress(x=xwl, z=z, unit="kPa")[1]
+                weak = Tauwl
                 label = r"$\tau_{xz}$ (kPa)"
             # Transverse normal stresses (kPa)
             case "Szz":
                 slab = analyzer.Szz(z, phi, dz=dz, unit="kPa")
-                weak = analyzer.weaklayer_normalstress(x=xwl, z=z, unit="kPa")[1]
+                weak = Sigmawl
                 label = r"$\sigma_{zz}$ (kPa)"
             # Principal stresses
             case "principal":
@@ -586,25 +586,28 @@ class Plotter:
 
         # Normalize colormap
         absmax = np.nanmax(np.abs([slab.min(), slab.max(), weak.min(), weak.max()]))
-        clim = np.round(absmax, _significant_digits(absmax))
+        if absmax == 0:
+            clim = 1.0
+        else:
+            clim = np.round(absmax, _significant_digits(absmax))
         levels = np.linspace(-clim, clim, num=levels + 1, endpoint=True)
         # nanmax = np.nanmax([slab.max(), weak.max()])
         # nanmin = np.nanmin([slab.min(), weak.min()])
         # norm = MidpointNormalize(vmin=nanmin, vmax=nanmax)
 
         # Plot baseline
-        plt.axhline(zmax, color="k", linewidth=1)
+        ax.axhline(zmax, color="k", linewidth=1)
 
         # Plot outlines of the undeformed and deformed slab
-        plt.plot(_outline(Xsl), _outline(Zsl), "k--", alpha=0.3, linewidth=1)
-        plt.plot(
+        ax.plot(_outline(Xsl), _outline(Zsl), "k--", alpha=0.3, linewidth=1)
+        ax.plot(
             _outline(Xsl + scale * Usl), _outline(Zsl + scale * Wsl), "k", linewidth=1
         )
 
         # Plot deformed weak-layer _outline
         if system_type in ["-pst", "pst-", "-vpst", "vpst-"]:
             nanmask = np.isfinite(xwl)
-            plt.plot(
+            ax.plot(
                 _outline(Xwl[:, nanmask] + scale * Uwl[:, nanmask]),
                 _outline(Zwl[:, nanmask] + scale * Wwl[:, nanmask]),
                 "k",
@@ -617,7 +620,7 @@ class Plotter:
         cmap.set_under(_adjust_lightness(cmap(0.0), 0.9))
 
         # Plot fields
-        plt.contourf(
+        contour = ax.contourf(
             Xsl + scale * Usl,
             Zsl + scale * Wsl,
             slab,
@@ -625,7 +628,7 @@ class Plotter:
             cmap=cmap,
             extend="both",
         )
-        plt.contourf(
+        ax.contourf(
             Xwl + scale * Uwl,
             Zwl + scale * Wwl,
             weak,
@@ -635,27 +638,33 @@ class Plotter:
         )
 
         # Plot setup
-        plt.axis("scaled")
-        plt.xlim([xmin, xmax])
-        plt.ylim([zmin, zmax])
-        plt.gca().set_aspect(aspect)
-        plt.gca().invert_yaxis()
-        plt.gca().use_sticky_edges = False
+        ax.axis("scaled")
+        ax.set_xlim([xmin, xmax])
+        ax.set_ylim([zmin, zmax])
+        ax.set_aspect(aspect)
+        ax.invert_yaxis()
+        ax.use_sticky_edges = False
 
         # Plot labels
-        plt.gca().set_xlabel(r"lateral position $x$ (cm) $\longrightarrow$")
-        plt.gca().set_ylabel("depth below surface\n" + r"$\longleftarrow $ $d$ (cm)")
-        plt.title(rf"${scale}\!\times\!$ scaled deformations (cm)", size=10)
+        ax.set_xlabel(r"lateral position $x$ (cm) $\longrightarrow$")
+        ax.set_ylabel("depth below surface\n" + r"$\longleftarrow $ $d$ (cm)")
+        ax.set_title(rf"${scale}\!\times\!$ scaled deformations (cm)", size=10)
 
         # Show colorbar
         ticks = np.linspace(levels[0], levels[-1], num=11, endpoint=True)
-        plt.colorbar(orientation="horizontal", ticks=ticks, label=label, aspect=35)
+        cbar = fig.colorbar(
+            contour,
+            orientation="horizontal",
+            ticks=ticks,
+            label=label,
+            aspect=35,
+            ax=ax,
+        )
 
         # Save figure
-        self._save_figure(filename)
+        self._save_figure(fig, filename)
 
-        # Reset plot styles
-        plt.rcdefaults()
+        return fig
 
     def plot_stress_envelope(
         self, system_model: Optional[SystemModel] = None, filename: Optional[str] = None
@@ -716,7 +725,7 @@ class Plotter:
         plt.tight_layout()
 
         if filename:
-            self._save_figure(filename, fig)
+            self._save_figure(fig, filename)
 
         return fig
 
@@ -895,7 +904,7 @@ class Plotter:
         plt.suptitle("WEAC Simulation Comparison Dashboard", fontsize=18, y=0.98)
 
         if filename:
-            self._save_figure(filename, fig)
+            self._save_figure(fig, filename)
 
         return fig
 
@@ -1128,7 +1137,7 @@ class Plotter:
                 ax2.text(xtx, ytx, label, color=line.get_color(), **LABELSTYLE)
 
         # Save figure
-        self._save_figure(name, fig)
+        self._save_figure(fig, name)
 
         # Reset plot styles
         plt.rcdefaults()

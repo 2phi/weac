@@ -5,7 +5,10 @@ import streamlit as st
 
 from weac_2.components import Layer
 from weac_2.components.layer import WeakLayer
+from weac_2.components.model_input import ModelInput
+from weac_2.components.scenario_config import ScenarioConfig
 from weac_2.core.slab import Slab
+from weac_2.core.system_model import SystemModel
 from weac_2.utils import load_dummy_profile
 
 st.set_page_config(page_title="Slab Definition", layout="wide")
@@ -209,24 +212,18 @@ with plot_placeholder.container():
     st.pyplot(fig)
     plt.close(fig)
 
-# # --- Next Step ---
-# st.header("Next Step")
-# if st.button("To Scenario Definition"):
-#     with st.spinner("Assembling system..."):
-#         st.session_state["weak_layer"] = weak_layer
-#         st.session_state["layers"] = layers
-#         st.success("Layers and weak layer defined successfully!")
-#         st.write("You can now proceed to the 'Scenario Definition' page.")
-# if "layers" in st.session_state and "weak_layer" in st.session_state:
-#     st.success("You can proceed to the next page.")
-
 # --- Next Step ---
 st.header("Next Step")
 
 if st.button("To Scenario Definition"):
-    st.session_state["weak_layer"] = weak_layer
-    st.session_state["layers"] = layers
+    model_input = ModelInput(
+        layers=layers,
+        weak_layer=weak_layer,
+    )
+
+    system = SystemModel(model_input=model_input)
+    st.session_state["system"] = system
     st.switch_page("pages/2_Scenario_Definition.py")
 
-if "layers" in st.session_state and "weak_layer" in st.session_state:
+if "system" in st.session_state:
     st.success("You can proceed to the next page.")

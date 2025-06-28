@@ -192,7 +192,7 @@ class UnknownConstantsSolver:
                     rhs[-3:] = np.vstack([0, 0, scenario.crack_h])
             # Set normal force and displacement BC for stage C
             if not has_foundation and bool(touchdown_mode in ["C_in_contact"]):
-                N = scenario.qt * (scenario.crack_l - touchdown_distance)
+                N = scenario.qt * (scenario.crack_length - touchdown_distance)
                 if i == 0:
                     rhs[:3] = np.vstack([-N, 0, scenario.crack_h])
                 if i == (nS - 1):

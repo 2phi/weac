@@ -62,7 +62,7 @@ class Scenario:
     qt: float  # Total Tangential Line-Load [N/mm]
     L: float  # Length of the model [mm]
     crack_h: float  # Height of the crack [mm]
-    crack_l: float  # Length of the crack [mm]
+    crack_length: float  # Length of the crack [mm]
 
     def __init__(
         self,
@@ -84,17 +84,7 @@ class Scenario:
         self._calc_normal_load()
         self._calc_tangential_load()
         self._calc_crack_height()
-        self.crack_l = scenario_config.crack_length
-
-    def refresh_from_config(self):
-        """Pull changed values out of scenario_config
-        and recompute derived attributes."""
-        self.system_type = self.scenario_config.system_type
-        self.phi = self.scenario_config.phi
-        self.surface_load = self.scenario_config.surface_load
-
-        self._setup_scenario()
-        self._calc_crack_height()
+        self.crack_length = scenario_config.crack_length
 
     def get_segment_idx(
         self, x: Union[float, Sequence[float], np.ndarray]

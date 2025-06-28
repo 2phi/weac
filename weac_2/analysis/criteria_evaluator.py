@@ -314,9 +314,6 @@ class CriteriaEvaluator:
         logger.info(
             f"Minimum force finding took {time.time() - force_finding_start:.4f} seconds."
         )
-        print("initial_critical_skier_weight: ", initial_critical_skier_weight)
-        print("max_dist_stress: ", max_dist_stress)
-        print("min_dist_stress: ", min_dist_stress)
 
         # --- Failure: in finding the critical skier weight ---
         if not force_result.success:
@@ -351,7 +348,6 @@ class CriteriaEvaluator:
 
             analyzer = Analyzer(system)
             inc_energy = analyzer.incremental_ERR()
-            print("inc_energy: ", inc_energy)
             g_delta = self.fracture_toughness_criterion(
                 inc_energy[1] * 1000, inc_energy[2] * 1000, system.weak_layer
             )
@@ -389,8 +385,6 @@ class CriteriaEvaluator:
             max_weight_g_delta = 0
             while max_weight_g_delta < 1:
                 max_skier_weight = max_skier_weight * 2
-                print("max_skier_weight: ", max_skier_weight)
-                print("max_weight_g_delta: ", max_weight_g_delta)
 
                 segments = [
                     Segment(length=L / 2 - crack_length / 2, has_foundation=True, m=0),
@@ -504,10 +498,6 @@ class CriteriaEvaluator:
                     crack_length, segments = self._find_new_anticrack_length(
                         system, skier_weight
                     )
-                    print("segments: ", segments)
-                    print("skier_weight: ", skier_weight)
-                    print("crack_length: ", crack_length)
-                    breakpoint()
                 logger.info(
                     f"Iteration {iteration_count} took {time.time() - iter_start_time:.4f} seconds."
                 )
@@ -652,8 +642,6 @@ class CriteriaEvaluator:
 
         sigma_kPa = system.fq.sig(z_skier, unit="kPa")
         tau_kPa = system.fq.tau(z_skier, unit="kPa")
-        print("sigma_kPa: ", sigma_kPa)
-        print("tau_kPa: ", tau_kPa)
 
         max_dist_stress = np.max(
             self.stress_envelope(sigma_kPa, tau_kPa, system.weak_layer)
@@ -661,8 +649,6 @@ class CriteriaEvaluator:
         min_dist_stress = np.min(
             self.stress_envelope(sigma_kPa, tau_kPa, system.weak_layer)
         )
-        print("max_dist_stress: ", max_dist_stress)
-        print("min_dist_stress: ", min_dist_stress)
 
         # --- Exception: the entire domain is cracked ---
         if min_dist_stress >= 1:
