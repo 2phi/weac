@@ -25,7 +25,7 @@ class Analyzer:
 
     def rasterize_solution(
         self,
-        mode: Literal["cracked", "uncracked"],
+        mode: Literal["cracked", "uncracked"] = "cracked",
         num: int = 250,
     ):
         """

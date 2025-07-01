@@ -18,7 +18,9 @@ import numpy as np
 from weac_2.components import (
     Config,
     Layer,
+    Segment,
     ModelInput,
+    ScenarioConfig,
     WeakLayer,
 )
 from weac_2.core.eigensystem import Eigensystem
@@ -160,7 +162,7 @@ class SystemModel:
             )
 
             logger.info(
-                f"Original crack_length: {self.scenario.crack_length}, touchdown_distance: {slab_touchdown.touchdown_distance}"
+                f"Original crack_length: {self.scenario.crack_l}, touchdown_distance: {slab_touchdown.touchdown_distance}"
             )
 
             if (
@@ -309,13 +311,26 @@ class SystemModel:
         self._invalidate_eigensystem()
 
     # Changes that affect the *scenario*  -> only rebuild C constants
-    def update_scenario(self, scenario: Scenario):
+    def update_scenario(
+        self,
+        segments: Optional[List[Segment]] = None,
+        scenario_config: Optional[ScenarioConfig] = None,
+    ):
         """
         Update fields on `scenario_config` (if present) or on the
         Scenario object itself, then refresh and invalidate constants.
         """
         logger.debug("Updating Scenario...")
-        self.scenario = scenario
+        if segments is None:
+            segments = self.scenario.segments
+        if scenario_config is None:
+            scenario_config = self.scenario.scenario_config
+        self.scenario = Scenario(
+            scenario_config=scenario_config,
+            segments=segments,
+            weak_layer=self.weak_layer,
+            slab=self.slab,
+        )
         if self.config.touchdown:
             self._invalidate_slab_touchdown()
         self._invalidate_constants()

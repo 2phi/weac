@@ -7,7 +7,13 @@ Tests validation, automatic property calculations, and edge cases.
 import unittest
 from pydantic import ValidationError
 
-from weac_2.components.layer import Layer, WeakLayer, bergfeld, scapozza, gerling
+from weac_2.components.layer import (
+    Layer,
+    WeakLayer,
+    _bergfeld_youngs_modulus,
+    _scapozza_youngs_modulus,
+    _gerling_youngs_modulus,
+)
 
 
 class TestLayerPropertyCalculations(unittest.TestCase):
@@ -16,23 +22,23 @@ class TestLayerPropertyCalculations(unittest.TestCase):
     def test_bergfeld_calculation(self):
         """Test Bergfeld Young's modulus calculation."""
         # Test with standard ice density
-        E = bergfeld(rho=917.0)  # Ice density
+        E = _bergfeld_youngs_modulus(rho=917.0)  # Ice density
         self.assertGreater(E, 0, "Young's modulus should be positive")
         self.assertIsInstance(E, float, "Result should be a float")
 
         # Test with typical snow densities
-        E_light = bergfeld(rho=100.0)
-        E_heavy = bergfeld(rho=400.0)
+        E_light = _bergfeld_youngs_modulus(rho=100.0)
+        E_heavy = _bergfeld_youngs_modulus(rho=400.0)
         self.assertLess(E_light, E_heavy, "Heavier snow should have higher modulus")
 
     def test_scapozza_calculation(self):
         """Test Scapozza Young's modulus calculation."""
-        E = scapozza(rho=200.0)
+        E = _scapozza_youngs_modulus(rho=200.0)
         self.assertGreater(E, 0, "Young's modulus should be positive")
 
     def test_gerling_calculation(self):
         """Test Gerling Young's modulus calculation."""
-        E = gerling(rho=250.0)
+        E = _gerling_youngs_modulus(rho=250.0)
         self.assertGreater(E, 0, "Young's modulus should be positive")
 
 

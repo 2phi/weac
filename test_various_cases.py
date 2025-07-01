@@ -58,9 +58,6 @@ system1 = SystemModel(model_input=model_input1, config=config1)
 logger.info("System 1 setup")
 unknown_constants = system1.get_unknown_constants()
 logger.info("Unknown constants: %s", unknown_constants)
-print(system1.scenario.phi)
-print(system1.scenario.crack_h)
-breakpoint()
 
 
 # Equivalent setup in new system

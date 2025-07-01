@@ -113,14 +113,7 @@ scenario_config = ScenarioConfig(
     surface_load=surface_load,
 )
 
-scenario = Scenario(
-    scenario_config=scenario_config,
-    segments=segments,
-    weak_layer=weak_layer,
-    slab=system.slab,
-)
-
-system.update_scenario(scenario)
+system.update_scenario(segments=segments, scenario_config=scenario_config)
 system.toggle_touchdown(touchdown=touchdown)
 # Plot the deformed slab
 analyzer = Analyzer(system_model=system)
@@ -136,7 +129,7 @@ with col2:
 field = col1.radio(
     "Field Quantity",
     ("w", "u", "principal", "Sxx", "Txz", "Szz"),
-    index=0,
+    index=2,
     horizontal=False,
 )
 fig = st.session_state.plotter.plot_deformed(

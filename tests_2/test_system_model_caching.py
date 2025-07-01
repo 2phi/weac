@@ -89,7 +89,7 @@ class TestSystemModelCaching(unittest.TestCase):
         constants_before = system.unknown_constants
 
         # Update the slab layers
-        system.update_slab_layers(new_layers=[Layer(rho=250, h=600)])
+        system.update_layers(new_layers=[Layer(rho=250, h=600)])
 
         eigensystem_after = system.eigensystem
         constants_after = system.unknown_constants
@@ -110,7 +110,7 @@ class TestSystemModelCaching(unittest.TestCase):
         constants_before = system.unknown_constants
 
         # Update the weak layer
-        system.update_weak_layer(rho=160, h=12)
+        system.update_weak_layer(WeakLayer(rho=160, h=12))
 
         eigensystem_after = system.eigensystem
         constants_after = system.unknown_constants
@@ -131,7 +131,9 @@ class TestSystemModelCaching(unittest.TestCase):
         constants_before = system.unknown_constants
 
         # Update the scenario
-        system.update_scenario(phi=45.0)
+        scenario_config = system.scenario.scenario_config
+        scenario_config.phi = 45.0
+        system.update_scenario(scenario_config=scenario_config)
 
         eigensystem_after = system.eigensystem
         constants_after = system.unknown_constants

@@ -5,14 +5,17 @@ import unittest
 import numpy as np
 
 # weac imports
-from weac_2.analysis.criteria_evaluator import CriteriaEvaluator
+from weac_2.analysis.criteria_evaluator import CoupledCriterionResult, CriteriaEvaluator
 from weac_2.components import (
     Config,
     CriteriaConfig,
     Layer,
+    ScenarioConfig,
     Segment,
     WeakLayer,
 )
+from weac_2.components.model_input import ModelInput
+from weac_2.core.system_model import SystemModel
 
 
 class TestCriteriaEvaluator(unittest.TestCase):
@@ -22,7 +25,7 @@ class TestCriteriaEvaluator(unittest.TestCase):
         """Set up common objects for testing."""
         self.config = Config()
         self.criteria_config = CriteriaConfig()
-        self.evaluator = CriteriaEvaluator(self.config, self.criteria_config)
+        self.evaluator = CriteriaEvaluator(self.criteria_config)
 
         # Based on demo.ipynb "myprofile"
         self.layers = [
@@ -45,11 +48,11 @@ class TestCriteriaEvaluator(unittest.TestCase):
         )
         # Expected: (|0.25| / 0.5)^5.0 + (|0.4| / 0.8)^2.22
         # = (0.5)^5 + (0.5)^2.22 = 0.03125 + 0.2146...
-        self.assertAlmostEqual(g_delta, 0.2459, places=4)
+        self.assertAlmostEqual(g_delta, 0.2455609957, places=5)
 
     def test_stress_envelope_adam_unpublished(self):
         """Test the 'adam_unpublished' stress envelope."""
-        self.config.stress_envelope_method = "adam_unpublished"
+        self.criteria_config.stress_envelope_method = "adam_unpublished"
         sigma, tau = np.array([2.0]), np.array([1.5])
         result = self.evaluator.stress_envelope(sigma, tau, self.weak_layer)
         self.assertGreater(result[0], 0)
@@ -58,9 +61,24 @@ class TestCriteriaEvaluator(unittest.TestCase):
 
     def test_find_minimum_force_convergence(self):
         """Test the convergence of find_minimum_force."""
-        skier_weight, system, _, _ = self.evaluator.find_minimum_force(
-            self.layers, self.weak_layer, self.phi
+        segments = [
+            Segment(length=self.segments_length, has_foundation=True, m=0),
+            Segment(length=0, has_foundation=False, m=0),
+            Segment(length=0, has_foundation=False, m=0),
+            Segment(length=self.segments_length, has_foundation=True, m=0),
+        ]
+        system = SystemModel(
+            model_input=ModelInput(
+                layers=self.layers,
+                weak_layer=self.weak_layer,
+                segments=segments,
+                scenario_config=ScenarioConfig(phi=self.phi),
+            ),
+            config=self.config,
         )
+        results = self.evaluator.find_minimum_force(system=system)
+        skier_weight = results.critical_skier_weight
+        system = results.system
         self.assertGreater(skier_weight, 0)
         # A simple check to ensure it returns a positive force
         self.assertIsNotNone(system)
@@ -68,8 +86,23 @@ class TestCriteriaEvaluator(unittest.TestCase):
     def test_find_new_anticrack_length(self):
         """Test the find_new_anticrack_length method."""
         skier_weight = 100  # A substantial weight
-        crack_len, segments = self.evaluator.find_new_anticrack_length(
-            self.layers, self.weak_layer, skier_weight, self.phi
+        segments = [
+            Segment(length=self.segments_length, has_foundation=True, m=0),
+            Segment(length=0, has_foundation=False, m=skier_weight),
+            Segment(length=0, has_foundation=False, m=0),
+            Segment(length=self.segments_length, has_foundation=True, m=0),
+        ]
+        system = SystemModel(
+            model_input=ModelInput(
+                layers=self.layers,
+                weak_layer=self.weak_layer,
+                segments=segments,
+                scenario_config=ScenarioConfig(phi=self.phi, crack_length=0),
+            ),
+            config=self.config,
+        )
+        crack_len, segments = self.evaluator._find_new_anticrack_length(
+            system, skier_weight
         )
         self.assertGreaterEqual(crack_len, 0)
         self.assertIsInstance(segments, list)
@@ -78,9 +111,16 @@ class TestCriteriaEvaluator(unittest.TestCase):
     def test_check_crack_propagation_stable(self):
         """Test check_crack_propagation for a stable scenario (no crack)."""
         segments = [Segment(length=self.segments_length, has_foundation=True, m=0)]
-        g_delta, can_propagate = self.evaluator.check_crack_propagation(
-            self.layers, self.weak_layer, segments, self.phi
+        system = SystemModel(
+            model_input=ModelInput(
+                layers=self.layers,
+                weak_layer=self.weak_layer,
+                segments=segments,
+                scenario_config=ScenarioConfig(phi=self.phi),
+            ),
+            config=self.config,
         )
+        g_delta, can_propagate = self.evaluator.check_crack_self_propagation(system)
         self.assertFalse(can_propagate)
         # With no crack, g_delta should be ~0 as there's no differential
         self.assertAlmostEqual(g_delta, 0, places=4)
@@ -99,23 +139,41 @@ class TestCriteriaEvaluator(unittest.TestCase):
             Segment(length=crack_length, has_foundation=False, m=0),
             Segment(length=side_length, has_foundation=True, m=0),
         ]
-        g_delta, can_propagate = self.evaluator.check_crack_propagation(
-            self.layers, unstable_weak_layer, segments, self.phi
+        system = SystemModel(
+            model_input=ModelInput(
+                layers=self.layers,
+                weak_layer=unstable_weak_layer,
+                segments=segments,
+                scenario_config=ScenarioConfig(phi=self.phi),
+            ),
+            config=self.config,
         )
-
+        g_delta, can_propagate = self.evaluator.check_crack_self_propagation(system)
         self.assertGreater(g_delta, 1)
         self.assertTrue(can_propagate)
 
     def test_evaluate_coupled_criterion_full_run(self):
         """Test the main evaluate_coupled_criterion workflow."""
-        results = self.evaluator.evaluate_coupled_criterion(
-            self.layers, self.weak_layer, self.phi
+        segments = [
+            Segment(length=self.segments_length, has_foundation=True, m=0),
+            Segment(length=0, has_foundation=False, m=0),
+            Segment(length=0, has_foundation=False, m=0),
+            Segment(length=self.segments_length, has_foundation=True, m=0),
+        ]
+        system = SystemModel(
+            model_input=ModelInput(
+                layers=self.layers,
+                weak_layer=self.weak_layer,
+                segments=segments,
+                scenario_config=ScenarioConfig(phi=self.phi),
+            ),
+            config=self.config,
         )
-        self.assertIsInstance(results, dict)
-        self.assertIn("critical_skier_weight", results)
-        self.assertIn("crack_length", results)
-        self.assertIn("converged", results)
-        self.assertGreater(results["critical_skier_weight"], 0)
+        results: CoupledCriterionResult = self.evaluator.evaluate_coupled_criterion(
+            system=system
+        )
+        self.assertIsInstance(results, CoupledCriterionResult)
+        self.assertGreater(results.critical_skier_weight, 0)
 
 
 if __name__ == "__main__":

@@ -8,9 +8,6 @@ import numpy as np
 # Add the project root to the Python path so we can import weac_2
 project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, project_root)
-from weac_2.logging_config import setup_logging
-
-setup_logging()
 
 
 class TestIntegrationOldVsNew(unittest.TestCase):
@@ -76,7 +73,7 @@ class TestIntegrationOldVsNew(unittest.TestCase):
             phi=inclination, system_type="pst-", crack_length=4000
         )
         weak_layer = WeakLayer(
-            rho=10, h=30, E=0.25, G_Ic=1
+            rho=50, h=30, E=0.25, G_Ic=1
         )  # Default weak layer properties
         criteria_config = CriteriaConfig(fn=1, fm=1, gn=1, gm=1)
         config = Config(touchdown=False)  # Use default configuration
@@ -158,7 +155,9 @@ class TestIntegrationOldVsNew(unittest.TestCase):
 
         # Compare all the attributes of the old and new model
         self.assertEqual(
-            old_model.a, new_system.scenario.crack_l, "Crack length should be the same"
+            old_model.a,
+            new_system.scenario.crack_l,
+            "Crack length should be the same",
         )
 
         # --- Compare results ---
@@ -259,7 +258,7 @@ class TestIntegrationOldVsNew(unittest.TestCase):
             phi=inclination, system_type="pst-", crack_length=4000
         )
         weak_layer = WeakLayer(
-            rho=10, h=30, E=0.25, G_Ic=1
+            rho=50, h=30, E=0.25, G_Ic=1
         )  # Default weak layer properties
         criteria_config = CriteriaConfig(fn=1, fm=1, gn=1, gm=1)
         config = Config(touchdown=True)  # Use default configuration
@@ -361,7 +360,9 @@ class TestIntegrationOldVsNew(unittest.TestCase):
 
         # Compare all the attributes of the old and new model
         self.assertEqual(
-            old_model.a, new_system.scenario.crack_l, "Crack length should be the same"
+            old_model.a,
+            new_system.scenario.crack_l,
+            "Crack length should be the same",
         )
 
         # --- Compare results ---

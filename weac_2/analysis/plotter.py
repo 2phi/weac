@@ -218,8 +218,11 @@ class Plotter:
                 "Must provide either 'system_model' or 'system_models' as a SystemModel or list of SystemModels"
             )
 
-    def _save_figure(self, fig: plt.Figure, filename: str):
+    def _save_figure(self, filename: str, fig: Optional[plt.Figure] = None):
         """Save figure with proper formatting."""
+        if fig is None:
+            fig = plt.gcf()
+
         filepath = os.path.join(self.plot_dir, f"{filename}.png")
         fig.savefig(filepath, dpi=300, bbox_inches="tight", facecolor="white")
 
@@ -230,8 +233,8 @@ class Plotter:
         self,
         weak_layers: List[WeakLayer] | WeakLayer,
         slabs: List[Slab] | Slab,
+        filename: str = "slab_profile",
         labels: Optional[List[str] | str] = None,
-        filename: Optional[str] = None,
     ):
         """
         Plot slab layer profiles for comparison.
@@ -323,7 +326,7 @@ class Plotter:
         ax1.set_ylim(-weak_layer.h, max_height)
 
         if filename:
-            self._save_figure(fig, filename)
+            self._save_figure(filename, fig)
 
         return fig
 
@@ -331,7 +334,7 @@ class Plotter:
         self,
         system_model: Optional[SystemModel] = None,
         system_models: Optional[List[SystemModel]] = None,
-        filename: Optional[str] = None,
+        filename: str = "section_forces",
     ):
         """
         Plot section forces (N, M, V) for comparison.
@@ -390,7 +393,7 @@ class Plotter:
         plt.tight_layout()
 
         if filename:
-            self._save_figure(fig, filename)
+            self._save_figure(filename, fig)
 
         return fig
 
@@ -398,7 +401,7 @@ class Plotter:
         self,
         system_model: Optional[SystemModel] = None,
         system_models: Optional[List[SystemModel]] = None,
-        filename: Optional[str] = None,
+        filename: str = "ERR",
     ):
         """
         Plot energy release rates (G_I, G_II) for comparison.
@@ -448,7 +451,7 @@ class Plotter:
         plt.tight_layout()
 
         if filename:
-            self._save_figure(fig, filename)
+            self._save_figure(filename, fig)
 
         return fig
 
@@ -466,7 +469,7 @@ class Plotter:
         aspect: int = 2,
         field: Literal["w", "u", "principal", "Sxx", "Txz", "Szz"] = "w",
         normalize: bool = True,
-        filename: Optional[str] = None,
+        filename: str = "deformed_slab",
     ) -> plt.Figure:
         """
         Plot deformed slab with field contours.
@@ -508,7 +511,7 @@ class Plotter:
         xmax = np.min([np.max([Xsl, Xsl + scale * Usl]) + pad, xfocus + window / 2])
         xmin = np.max([np.min([Xsl, Xsl + scale * Usl]) - pad, xfocus - window / 2])
 
-        # # Scale shown weak-layer thickness with to max deflection and add padding
+        # Scale shown weak-layer thickness with to max deflection and add padding
         if analyzer.sm.config.touchdown:
             zmax = (
                 np.max(Zsl)
@@ -547,12 +550,12 @@ class Plotter:
             # Shear stresses (kPa)
             case "Txz":
                 slab = analyzer.Txz(z, phi, dz=dz, unit="kPa")
-                weak = Tauwl
+                weak = analyzer.weaklayer_shearstress(x=xwl, z=z, unit="kPa")[1]
                 label = r"$\tau_{xz}$ (kPa)"
             # Transverse normal stresses (kPa)
             case "Szz":
                 slab = analyzer.Szz(z, phi, dz=dz, unit="kPa")
-                weak = Sigmawl
+                weak = analyzer.weaklayer_normalstress(x=xwl, z=z, unit="kPa")[1]
                 label = r"$\sigma_{zz}$ (kPa)"
             # Principal stresses
             case "principal":
@@ -586,10 +589,7 @@ class Plotter:
 
         # Normalize colormap
         absmax = np.nanmax(np.abs([slab.min(), slab.max(), weak.min(), weak.max()]))
-        if absmax == 0:
-            clim = 1.0
-        else:
-            clim = np.round(absmax, _significant_digits(absmax))
+        clim = np.round(absmax, _significant_digits(absmax))
         levels = np.linspace(-clim, clim, num=levels + 1, endpoint=True)
         # nanmax = np.nanmax([slab.max(), weak.max()])
         # nanmin = np.nanmin([slab.min(), weak.min()])
@@ -614,17 +614,16 @@ class Plotter:
                 linewidth=1,
             )
 
-        # Colormap
-        cmap = plt.cm.RdBu_r
+        cmap = plt.get_cmap("RdBu_r")
         cmap.set_over(_adjust_lightness(cmap(1.0), 0.9))
         cmap.set_under(_adjust_lightness(cmap(0.0), 0.9))
 
         # Plot fields
-        contour = ax.contourf(
+        ax.contourf(
             Xsl + scale * Usl,
             Zsl + scale * Wsl,
             slab,
-            levels=levels,  # norm=norm,
+            levels=levels,
             cmap=cmap,
             extend="both",
         )
@@ -632,7 +631,7 @@ class Plotter:
             Xwl + scale * Uwl,
             Zwl + scale * Wwl,
             weak,
-            levels=levels,  # norm=norm,
+            levels=levels,
             cmap=cmap,
             extend="both",
         )
@@ -653,16 +652,22 @@ class Plotter:
         # Show colorbar
         ticks = np.linspace(levels[0], levels[-1], num=11, endpoint=True)
         cbar = fig.colorbar(
-            contour,
+            ax.contourf(
+                Xsl + scale * Usl,
+                Zsl + scale * Wsl,
+                slab,
+                levels=levels,
+                cmap=cmap,
+                extend="both",
+            ),
             orientation="horizontal",
             ticks=ticks,
             label=label,
             aspect=35,
-            ax=ax,
         )
 
         # Save figure
-        self._save_figure(fig, filename)
+        self._save_figure(filename, fig)
 
         return fig
 
@@ -725,14 +730,14 @@ class Plotter:
         plt.tight_layout()
 
         if filename:
-            self._save_figure(fig, filename)
+            self._save_figure(filename, fig)
 
         return fig
 
     def create_comparison_dashboard(
         self,
         system_models: Optional[List[SystemModel]] = None,
-        filename: Optional[str] = None,
+        filename: str = "comparison_dashboard",
     ):
         """
         Create a comprehensive comparison dashboard.
@@ -904,7 +909,7 @@ class Plotter:
         plt.suptitle("WEAC Simulation Comparison Dashboard", fontsize=18, y=0.98)
 
         if filename:
-            self._save_figure(fig, filename)
+            self._save_figure(filename, fig)
 
         return fig
 
@@ -923,7 +928,7 @@ class Plotter:
             scenario=analyzer.sm.scenario,
             ax1label=r"Displacements",
             ax1data=data,
-            name="disp" + str(i),
+            filename="disp" + str(i),
         )
 
     def plot_stresses(
@@ -938,7 +943,7 @@ class Plotter:
             scenario=analyzer.sm.scenario,
             ax1label=r"Stress (kPa)",
             ax1data=data,
-            name="stress" + str(i),
+            filename="stress" + str(i),
         )
 
     def plot_stress_criteria(
@@ -950,7 +955,7 @@ class Plotter:
             scenario=analyzer.sm.scenario,
             ax1label=r"Criteria",
             ax1data=data,
-            name="crit",
+            filename="crit",
         )
 
     def plot_ERR_comp(
@@ -971,7 +976,7 @@ class Plotter:
             xlabel=r"Crack length $\Delta a$ (cm)",
             ax1label=r"Energy release rate (J/m$^2$)",
             ax1data=data,
-            name="err",
+            filename="err",
             vlines=False,
         )
 
@@ -990,7 +995,7 @@ class Plotter:
             xlabel=r"Crack length $a$ (cm)",
             ax1label=r"Energy release rate (J/m$^2$)",
             ax1data=data,
-            name="modes",
+            filename="modes",
             vlines=False,
         )
 
@@ -1012,7 +1017,7 @@ class Plotter:
             scenario=analyzer.sm.scenario,
             ax1label=r"Displacements (mm)",
             ax1data=data,
-            name="fea_disp",
+            filename="fea_disp",
             labelpos=-50,
         )
 
@@ -1030,7 +1035,7 @@ class Plotter:
             scenario=analyzer.sm.scenario,
             ax1label=r"Stress (kPa)",
             ax1data=data,
-            name="fea_stress",
+            filename="fea_stress",
             labelpos=-50,
         )
 
@@ -1039,7 +1044,7 @@ class Plotter:
     def _plot_data(
         self,
         scenario: Scenario,
-        name,
+        filename: str,
         ax1data,
         ax1label,
         ax2data=None,
@@ -1137,7 +1142,7 @@ class Plotter:
                 ax2.text(xtx, ytx, label, color=line.get_color(), **LABELSTYLE)
 
         # Save figure
-        self._save_figure(fig, name)
+        self._save_figure(filename, fig)
 
         # Reset plot styles
         plt.rcdefaults()

@@ -15,7 +15,9 @@ parent_dir = os.path.dirname(current_dir)
 if parent_dir not in sys.path:
     sys.path.insert(0, parent_dir)
 
-# Import all test modules from the current directory
+from weac_2.logging_config import setup_logging
+
+setup_logging(level="WARNING")
 
 
 def run_tests():

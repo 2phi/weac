@@ -411,11 +411,6 @@ def check_coupled_criterion_anticrack_nucleation(
                     t=t,
                 )
                 crack_length = new_crack_length
-                print("li: ", li)
-                print("ki: ", ki)
-                print("skier_weight: ", skier_weight)
-                print("crack_length: ", crack_length)
-                breakpoint()
 
         # End of loop: convergence or max iterations reached
         if iteration_count < max_iterations and any(ki):

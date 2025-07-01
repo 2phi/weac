@@ -24,8 +24,20 @@ plot_placeholder = col2.empty()
 with col1:
     st.header("Weak Layer Properties")
     col1, col2 = st.columns(2)
-    rho = col1.number_input("Density (kg/m^3)", key="rho_weak", value=100.0, step=10.0)
-    h = col2.number_input("Thickness (mm)", key="h_weak", value=30.0, step=5.0)
+    rho = col1.number_input(
+        "Density (kg/m^3)",
+        key="rho_weak",
+        value=100.0,
+        min_value=80.0,
+        step=10.0,
+    )
+    h = col2.number_input(
+        "Thickness (mm)",
+        key="h_weak",
+        value=30.0,
+        min_value=10.0,
+        step=5.0,
+    )
 
     # Create a default weak layer instance
     default_wl = WeakLayer(rho=rho, h=h)
@@ -155,8 +167,8 @@ with col1:
         current_defaults_count = len(st.session_state.custom_layer_defaults)
         if num_layers > current_defaults_count:
             for _ in range(num_layers - current_defaults_count):
-                density = random.randint(150, 300)
-                thickness = random.randint(50, 200)
+                density = random.randint(100, 300)
+                thickness = random.randint(10, 200)
                 st.session_state.custom_layer_defaults.append(
                     {"density": density, "thickness": thickness}
                 )
@@ -177,12 +189,14 @@ with col1:
                 "Density (kg/m^3)",
                 key=f"rho_{i}",
                 value=float(defaults["density"]),
+                min_value=110.0,
                 step=10.0,
             )
             h_layer = cols[2].number_input(
                 "Thickness (mm)",
                 key=f"h_{i}",
                 value=float(defaults["thickness"]),
+                min_value=10.0,
                 step=10.0,
             )
             layers.append(Layer(rho=rho_layer, h=h_layer))

@@ -44,7 +44,8 @@ class ModelInput(BaseModel):
     """
 
     weak_layer: WeakLayer = Field(
-        default_factory=WeakLayer(rho=10, h=30), description="Weak layer"
+        default_factory=lambda: WeakLayer(rho=70, h=30, E=0.25),
+        description="Weak layer",
     )
     layers: List[Layer] = Field(
         default_factory=lambda: [Layer(rho=250, h=100)], description="List of layers"
@@ -60,7 +61,7 @@ class ModelInput(BaseModel):
         description="Segments",
     )
     criteria_config: CriteriaConfig = Field(
-        default=CriteriaConfig(), description="Criteria overrides"
+        default_factory=CriteriaConfig, description="Criteria overrides"
     )
 
     def model_post_init(self, _ctx):

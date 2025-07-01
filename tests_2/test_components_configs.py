@@ -28,26 +28,7 @@ class TestConfig(unittest.TestCase):
         config = Config()
 
         # Check default values
-        self.assertEqual(config.youngs_modulus_method, "bergfeld")
-        self.assertEqual(config.stress_envelope_method, "adam_unpublished")
-
-    def test_config_custom_values(self):
-        """Test creating Config with custom values."""
-        config = Config(
-            youngs_modulus_method="scapazzo",
-            stress_envelope_method="adam_unpublished",
-        )
-
-        self.assertEqual(config.youngs_modulus_method, "scapazzo")
-        self.assertEqual(config.stress_envelope_method, "adam_unpublished")
-
-    def test_config_invalid_values(self):
-        """Test that invalid enum values raise ValidationError."""
-        with self.assertRaises(ValidationError):
-            Config(youngs_modulus_method="invalid_method")
-
-        with self.assertRaises(ValidationError):
-            Config(stress_envelope_method="invalid_envelope")
+        self.assertEqual(config.touchdown, False)
 
 
 class TestScenarioConfig(unittest.TestCase):
@@ -62,7 +43,7 @@ class TestScenarioConfig(unittest.TestCase):
         self.assertEqual(scenario.crack_length, 0.0)
         self.assertEqual(scenario.collapse_factor, 0.5)
         self.assertEqual(scenario.stiffness_ratio, 1000)
-        self.assertEqual(scenario.qs, 0.0)
+        self.assertEqual(scenario.surface_load, 0.0)
 
     def test_scenario_config_custom_values(self):
         """Test ScenarioConfig with custom values."""
@@ -72,7 +53,7 @@ class TestScenarioConfig(unittest.TestCase):
             crack_length=150.0,
             collapse_factor=0.3,
             stiffness_ratio=500.0,
-            qs=10.0,
+            surface_load=10.0,
         )
 
         self.assertEqual(scenario.phi, 30.0)
@@ -80,7 +61,7 @@ class TestScenarioConfig(unittest.TestCase):
         self.assertEqual(scenario.crack_length, 150.0)
         self.assertEqual(scenario.collapse_factor, 0.3)
         self.assertEqual(scenario.stiffness_ratio, 500.0)
-        self.assertEqual(scenario.qs, 10.0)
+        self.assertEqual(scenario.surface_load, 10.0)
 
     def test_scenario_config_validation(self):
         """Test ScenarioConfig validation."""
@@ -102,7 +83,7 @@ class TestScenarioConfig(unittest.TestCase):
 
         # Negative surface load
         with self.assertRaises(ValidationError):
-            ScenarioConfig(qs=-5.0)
+            ScenarioConfig(surface_load=-5.0)
 
         # Invalid system type
         with self.assertRaises(ValidationError):
@@ -119,7 +100,7 @@ class TestCriteriaConfig(unittest.TestCase):
         self.assertEqual(criteria.fn, 2.0)
         self.assertEqual(criteria.fm, 2.0)
         self.assertEqual(criteria.gn, 5.0)
-        self.assertEqual(criteria.gm, 2.22)
+        self.assertEqual(criteria.gm, 1 / 0.45)
 
     def test_criteria_config_custom_values(self):
         """Test CriteriaConfig with custom values."""
@@ -221,38 +202,6 @@ class TestModelInput(unittest.TestCase):
         # Should have default criteria config
         self.assertIsInstance(model.criteria_config, CriteriaConfig)
         self.assertEqual(model.criteria_config.fn, 2.0)
-
-    def test_model_input_missing_required_fields(self):
-        """Test that missing required fields raise ValidationError."""
-        # Missing scenario_config
-        with self.assertRaises(ValidationError):
-            ModelInput(
-                weak_layer=self.weak_layer, layers=self.layers, segments=self.segments
-            )
-
-        # Missing weak_layer
-        with self.assertRaises(ValidationError):
-            ModelInput(
-                scenario_config=self.scenario_config,
-                layers=self.layers,
-                segments=self.segments,
-            )
-
-        # Missing layers
-        with self.assertRaises(ValidationError):
-            ModelInput(
-                scenario_config=self.scenario_config,
-                weak_layer=self.weak_layer,
-                segments=self.segments,
-            )
-
-        # Missing segments
-        with self.assertRaises(ValidationError):
-            ModelInput(
-                scenario_config=self.scenario_config,
-                weak_layer=self.weak_layer,
-                layers=self.layers,
-            )
 
     def test_model_input_empty_collections(self):
         """Test validation with empty layers or segments."""
