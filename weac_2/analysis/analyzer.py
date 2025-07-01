@@ -1,5 +1,8 @@
 # Standard library imports
-from functools import partial
+import logging
+import time
+from collections import defaultdict
+from functools import partial, wraps
 from typing import Literal
 
 # Third party imports
@@ -10,6 +13,36 @@ from weac_2.constants import G_MM_S2
 
 # Module imports
 from weac_2.core.system_model import SystemModel
+
+logger = logging.getLogger(__name__)
+
+
+def track_analyzer_call(func):
+    """Decorator to track call count and execution time of Analyzer methods."""
+
+    @wraps(func)
+    def wrapper(self, *args, **kwargs):
+        """Wrapper that adds tracking functionality."""
+        if not hasattr(self, "call_stats"):
+            # Safeguard in case __init__ was not called, which it should be.
+            self.call_stats = defaultdict(lambda: {"count": 0, "total_time": 0.0})
+
+        start_time = time.perf_counter()
+        result = func(self, *args, **kwargs)
+        duration = time.perf_counter() - start_time
+
+        func_name = func.__name__
+        self.call_stats[func_name]["count"] += 1
+        self.call_stats[func_name]["total_time"] += duration
+
+        logger.debug(
+            f"Analyzer method '{func_name}' called. "
+            f"Execution time: {duration:.4f} seconds."
+        )
+
+        return result
+
+    return wrapper
 
 
 class Analyzer:
@@ -22,7 +55,38 @@ class Analyzer:
 
     def __init__(self, system_model: SystemModel):
         self.sm = system_model
+        self.call_stats = defaultdict(lambda: {"count": 0, "total_time": 0.0})
 
+    def get_call_stats(self):
+        """Returns the call statistics."""
+        return self.call_stats
+
+    def print_call_stats(self, message: str = "Analyzer Call Statistics"):
+        """Prints the call statistics in a readable format."""
+        print(f"--- {message} ---")
+        if not self.call_stats:
+            print("No methods have been called.")
+            return
+
+        sorted_stats = sorted(
+            self.call_stats.items(),
+            key=lambda item: item[1]["total_time"],
+            reverse=True,
+        )
+
+        for func_name, stats in sorted_stats:
+            count = stats["count"]
+            total_time = stats["total_time"]
+            avg_time = total_time / count if count > 0 else 0
+            print(
+                f"- {func_name}: "
+                f"called {count} times, "
+                f"total time {total_time:.4f}s, "
+                f"avg time {avg_time:.4f}s"
+            )
+        print("---------------------------------")
+
+    @track_analyzer_call
     def rasterize_solution(
         self,
         mode: Literal["cracked", "uncracked"] = "cracked",
@@ -105,6 +169,7 @@ class Analyzer:
 
         return xs, zs, xs_supported
 
+    @track_analyzer_call
     def get_zmesh(self, dz=2):
         """
         Get z-coordinates of grid points and corresponding elastic properties.
@@ -153,6 +218,7 @@ class Analyzer:
 
         return si
 
+    @track_analyzer_call
     def Sxx(self, Z, phi, dz=2, unit="kPa"):
         """
         Compute axial normal stress in slab layers.
@@ -203,6 +269,7 @@ class Analyzer:
         # Return axial normal stress in specified unit
         return convert[unit] * Sxx
 
+    @track_analyzer_call
     def Txz(self, Z, phi, dz=2, unit="kPa"):
         """
         Compute shear stress in slab layers.
@@ -260,6 +327,7 @@ class Analyzer:
         # Return shear stress Txz in specified unit
         return convert[unit] * Txz
 
+    @track_analyzer_call
     def Szz(self, Z, phi, dz=2, unit="kPa"):
         """
         Compute transverse normal stress in slab layers.
@@ -319,6 +387,7 @@ class Analyzer:
         # Return shear stress txz in specified unit
         return convert[unit] * Szz
 
+    @track_analyzer_call
     def principal_stress_slab(
         self, Z, phi, dz=2, unit="kPa", val="max", normalize=False
     ):
@@ -382,6 +451,7 @@ class Analyzer:
         # Return absolute principal stresses
         return Ps
 
+    @track_analyzer_call
     def principal_stress_weaklayer(
         self, Z, sc=2.6, unit="kPa", val="min", normalize=False
     ):
@@ -438,6 +508,7 @@ class Analyzer:
         # Return absolute principal stresses
         return ps
 
+    @track_analyzer_call
     def incremental_ERR(
         self, tolerance: float = 1e-6, unit: str = "kJ/m^2"
     ) -> np.ndarray:
@@ -508,6 +579,7 @@ class Analyzer:
         convert = {"kJ/m^2": 1, "J/m^2": 1e3}
         return np.array([Ginc1 + Ginc2, Ginc1, Ginc2]).flatten() * convert[unit]
 
+    @track_analyzer_call
     def differential_ERR(self, unit: str = "kJ/m^2") -> np.ndarray:
         """
         Compute differential energy release rate of all crack tips.
@@ -580,6 +652,7 @@ class Analyzer:
         gamma_cracked = self.sm.fq.gamma(z_cracked(x))
         return tau_uncracked * gamma_cracked * self.sm.weak_layer.h
 
+    @track_analyzer_call
     def total_potential(self, C, phi, L, **segments):
         """
         Returns total differential potential

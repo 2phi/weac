@@ -308,6 +308,7 @@ class CriteriaEvaluator:
             system, tolerance_stress=tolerance_stress
         )
         system = force_result.system
+        analyzer = Analyzer(system)
         initial_critical_skier_weight = force_result.critical_skier_weight
         max_dist_stress = force_result.max_dist_stress
         min_dist_stress = force_result.min_dist_stress
@@ -317,6 +318,9 @@ class CriteriaEvaluator:
 
         # --- Failure: in finding the critical skier weight ---
         if not force_result.success:
+            analyzer.print_call_stats(
+                message="evaluate_coupled_criterion Call Statistics"
+            )
             return CoupledCriterionResult(
                 converged=False,
                 message="Failed to find critical skier weight.",
@@ -346,13 +350,15 @@ class CriteriaEvaluator:
             segments.append(Segment(length=50000, has_foundation=True, m=0))
             system.update_scenario(segments=segments)
 
-            analyzer = Analyzer(system)
             inc_energy = analyzer.incremental_ERR()
             g_delta = self.fracture_toughness_criterion(
                 inc_energy[1] * 1000, inc_energy[2] * 1000, system.weak_layer
             )
 
             history_data = CoupledCriterionHistory([], [], [], [], [])
+            analyzer.print_call_stats(
+                message="evaluate_coupled_criterion Call Statistics"
+            )
             return CoupledCriterionResult(
                 converged=True,
                 message="System fails under its own weight (self-collapse).",
@@ -399,7 +405,6 @@ class CriteriaEvaluator:
 
                 system.update_scenario(segments=segments)
 
-                analyzer = Analyzer(system)
                 # Calculate fracture toughness criterion
                 incr_energy = analyzer.incremental_ERR(unit="J/m^2")
                 max_weight_g_delta = self.fracture_toughness_criterion(
@@ -430,7 +435,6 @@ class CriteriaEvaluator:
                 )
 
                 system.update_scenario(segments=segments)
-                analyzer = Analyzer(system)
                 _, z, _ = analyzer.rasterize_solution(mode="uncracked", num=800)
 
                 # Calculate stress envelope
@@ -457,6 +461,9 @@ class CriteriaEvaluator:
                 # --- Exception: pure stress criterion ---
                 # The fracture toughness is superseded for minimum critical skier weight
                 if iteration_count == 1 and (g_delta > 1 or dist_ERR_envelope < 0.02):
+                    analyzer.print_call_stats(
+                        message="evaluate_coupled_criterion Call Statistics"
+                    )
                     return CoupledCriterionResult(
                         converged=True,
                         message="Fracture governed by pure stress criterion.",
@@ -507,6 +514,9 @@ class CriteriaEvaluator:
             ):
                 print("No Exception encountered - Converged successfully.")
                 if crack_length > 0:
+                    analyzer.print_call_stats(
+                        message="evaluate_coupled_criterion Call Statistics"
+                    )
                     return CoupledCriterionResult(
                         converged=True,
                         message="No Exception encountered - Converged successfully.",
@@ -525,6 +535,9 @@ class CriteriaEvaluator:
                     )
                 elif dampening_ERR < 5:
                     print("Reached max dampening without converging.")
+                    analyzer.print_call_stats(
+                        message="evaluate_coupled_criterion Call Statistics"
+                    )
                     return self.evaluate_coupled_criterion(
                         system,
                         dampening_ERR=dampening_ERR + 1,
@@ -532,6 +545,9 @@ class CriteriaEvaluator:
                         tolerance_stress=tolerance_stress,
                     )
                 else:
+                    analyzer.print_call_stats(
+                        message="evaluate_coupled_criterion Call Statistics"
+                    )
                     return CoupledCriterionResult(
                         converged=False,
                         message="Reached max dampening without converging.",
@@ -549,6 +565,9 @@ class CriteriaEvaluator:
                         min_dist_stress=min_dist_stress,
                     )
             elif not any(s.has_foundation for s in segments):
+                analyzer.print_call_stats(
+                    message="evaluate_coupled_criterion Call Statistics"
+                )
                 return CoupledCriterionResult(
                     converged=False,
                     message="Reached max iterations without converging.",
@@ -566,6 +585,9 @@ class CriteriaEvaluator:
                     min_dist_stress=min_dist_stress,
                 )
             else:
+                analyzer.print_call_stats(
+                    message="evaluate_coupled_criterion Call Statistics"
+                )
                 return self.evaluate_coupled_criterion(
                     system,
                     dampening_ERR=dampening_ERR + 1,
@@ -574,6 +596,9 @@ class CriteriaEvaluator:
                 )
         # --- Exception: Critical skier weight < 1 ---
         else:
+            analyzer.print_call_stats(
+                message="evaluate_coupled_criterion Call Statistics"
+            )
             return CoupledCriterionResult(
                 converged=False,
                 message="Critical skier weight is less than 1kg.",
@@ -652,6 +677,7 @@ class CriteriaEvaluator:
 
         # --- Exception: the entire domain is cracked ---
         if min_dist_stress >= 1:
+            analyzer.print_call_stats(message="find_minimum_force Call Statistics")
             return FindMinimumForceResult(
                 success=True,
                 critical_skier_weight=skier_weight,
@@ -683,7 +709,6 @@ class CriteriaEvaluator:
             ]
 
             system.update_scenario(segments=temp_segments)
-            analyzer = Analyzer(system)
             _, z_skier, _ = analyzer.rasterize_solution(mode="cracked", num=800)
 
             sigma_kPa = system.fq.sig(z_skier, unit="kPa")
@@ -701,6 +726,7 @@ class CriteriaEvaluator:
                 f"find_minimum_force iteration {iteration_count} finished in {time.time() - iter_start_time:.4f}s. max_dist_stress: {max_dist_stress:.4f}"
             )
             if min_dist_stress >= 1:
+                analyzer.print_call_stats(message="find_minimum_force Call Statistics")
                 return FindMinimumForceResult(
                     success=True,
                     critical_skier_weight=skier_weight,
@@ -718,6 +744,7 @@ class CriteriaEvaluator:
                     system, tolerance_stress=0.01, dampening=dampening + 1
                 )
             else:
+                analyzer.print_call_stats(message="find_minimum_force Call Statistics")
                 return FindMinimumForceResult(
                     success=False,
                     critical_skier_weight=0.0,
@@ -730,6 +757,7 @@ class CriteriaEvaluator:
         logger.info(
             f"Finished find_minimum_force in {time.time() - start_time:.4f} seconds after {iteration_count} iterations."
         )
+        analyzer.print_call_stats(message="find_minimum_force Call Statistics")
         return FindMinimumForceResult(
             success=True,
             critical_skier_weight=skier_weight,
