@@ -653,23 +653,9 @@ class Analyzer:
         return tau_uncracked * gamma_cracked * self.sm.weak_layer.h
 
     @track_analyzer_call
-    def total_potential(self, C, phi, L, **segments):
+    def total_potential(self):
         """
         Returns total differential potential
-
-        Arguments
-        ---------
-        C : ndarray
-            Matrix(6xN) of solution constants for a system of N
-            segements. Columns contain the 6 constants of each segement.
-        phi : float
-            Inclination of the slab (°).
-        L : float, optional
-            Total length of model (mm).
-        segments : dict
-            Dictionary with lists of touchdown booleans (tdi), segement
-            lengths (li), skier weights (mi), and foundation booleans
-            in the cracked (ki) and uncracked (k0) configurations.
 
         Returns
         -------

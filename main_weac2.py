@@ -4,6 +4,10 @@ This script demonstrates the basic usage of the WEAC package to run a simulation
 
 import logging
 
+from weac_2.analysis.criteria_evaluator import (
+    CoupledCriterionResult,
+    CriteriaEvaluator,
+)
 from weac_2.analysis.plotter import Plotter
 from weac_2.components import (
     CriteriaConfig,
@@ -17,7 +21,7 @@ from weac_2.components.config import Config
 from weac_2.core.system_model import SystemModel
 from weac_2.logging_config import setup_logging
 
-setup_logging()
+setup_logging(level="INFO")
 
 # Suppress matplotlib debug logging
 logging.getLogger("matplotlib").setLevel(logging.WARNING)
@@ -32,7 +36,7 @@ config1 = Config(
 scenario_config1 = ScenarioConfig(phi=5, system_type="skier")  # Steeper slope
 criteria_config1 = CriteriaConfig(fn=1, fm=1, gn=1, gm=1)
 
-weak_layer1 = WeakLayer(rho=10, h=25, E=0.25, G_Ic=1)
+weak_layer1 = WeakLayer(rho=80, h=25, E=0.25, G_Ic=1)
 layers1 = [
     Layer(rho=170, h=100),  # Top Layer
     Layer(rho=280, h=100),  # Bottom Layer
@@ -59,7 +63,7 @@ config2 = Config(
     stress_envelope_method="adam_unpublished",
 )
 scenario_config2 = ScenarioConfig(phi=30, system_type="skier")  # Steeper slope
-weak_layer2 = WeakLayer(rho=10, h=25, E=0.25, G_Ic=1)
+weak_layer2 = WeakLayer(rho=80, h=25, E=0.25, G_Ic=1)
 layers2 = [
     Layer(rho=170, h=100),  # Top Layer
     Layer(rho=280, h=100),  # Bottom Layer
@@ -87,7 +91,7 @@ config3 = Config(
     stress_envelope_method="adam_unpublished",
 )
 scenario_config3 = ScenarioConfig(phi=15, system_type="skier")  # Medium slope
-weak_layer3 = WeakLayer(rho=15, h=25, E=0.3, G_Ic=1.2)  # Different weak layer
+weak_layer3 = WeakLayer(rho=80, h=25, E=0.3, G_Ic=1.2)  # Different weak layer
 layers3 = [
     Layer(rho=150, h=80),  # Lighter top layer
     Layer(rho=200, h=60),  # Medium layer
@@ -116,7 +120,7 @@ config4 = Config(
     stress_envelope_method="adam_unpublished",
 )
 scenario_config4 = ScenarioConfig(phi=38, system_type="skier")
-weak_layer4 = WeakLayer(rho=10, h=25, E=0.25, G_Ic=1)
+weak_layer4 = WeakLayer(rho=80, h=25, E=0.25, G_Ic=1)
 layers4 = [
     Layer(rho=170, h=100),  # (1) Top Layer
     Layer(rho=190, h=40),  # (2)
@@ -128,7 +132,7 @@ layers4 = [
 ]
 segments4 = [
     Segment(length=5000, has_foundation=True, m=80),
-    Segment(lengthengthength=3000, has_foundation=True, m=0),
+    Segment(length=3000, has_foundation=True, m=0),
     Segment(length=3000, has_foundation=False, m=0),
     Segment(length=4000, has_foundation=True, m=70),
     Segment(length=3000, has_foundation=True, m=0),
@@ -152,90 +156,149 @@ print("=== WEAC Plotting Demonstration ===")
 print("\n1. Single System Analysis:")
 print(f"   System 1 - φ={system1.scenario.phi}°, H={system1.slab.H}mm")
 
-plotter_single = Plotter(system1, labels=["φ=5° System"])
+plotter_single = Plotter()
+analyzer1 = plotter_single._get_analyzer(system1)
+xsl, z, xwl = analyzer1.rasterize_solution()
 
 # Generate individual plots
 print("   - Generating slab profile...")
-plotter_single.plot_slab_profile(filename="single_slab_profile")
+plotter_single.plot_slab_profile(
+    weak_layers=system1.weak_layer,
+    slabs=system1.slab,
+    labels=["φ=5° System"],
+    filename="single_slab_profile",
+)
 
 print("   - Generating displacement plot...")
-plotter_single.plot_displacements(filename="single_displacements")
+plotter_single.plot_displacements(
+    analyzer=analyzer1, x=xsl, z=z, filename="single_displacements"
+)
 
 print("   - Generating section forces plot...")
-plotter_single.plot_section_forces(filename="single_section_forces")
+plotter_single.plot_section_forces(
+    system_model=system1, filename="single_section_forces"
+)
 
 print("   - Generating stress plot...")
-plotter_single.plot_stresses(filename="single_stresses")
+plotter_single.plot_stresses(analyzer=analyzer1, x=xwl, z=z, filename="single_stresses")
 
 print("   - Generating deformed contour plot...")
-plotter_single.plot_deformed(field="w", filename="single_deformed_w")
-plotter_single.plot_deformed(field="principal", filename="single_deformed_principal")
+plotter_single.plot_deformed(
+    xsl, xwl, z, analyzer1, field="w", filename="single_deformed_w"
+)
+plotter_single.plot_deformed(
+    xsl, xwl, z, analyzer1, field="principal", filename="single_deformed_principal"
+)
 
 print("   - Generating stress envelope...")
-plotter_single.plot_stress_envelope(filename="single_stress_envelope")
+plotter_single.plot_stress_envelope(
+    system_model=system1,
+    criteria_evaluator=CriteriaEvaluator(criteria_config1),
+    all_envelopes=False,
+    filename="single_stress_envelope",
+)
 
-# # Multi-system comparison
-# print("\n2. Multi-System Comparison:")
-# print(f"   System 1: φ={system1.scenario.phi}°, H={system1.slab.H}mm")
-# print(f"   System 2: φ={system2.scenario.phi}°, H={system2.slab.H}mm")
-# print(f"   System 3: φ={system3.scenario.phi}°, H={system3.slab.H}mm")
+# === CRITERIA ANALYSIS DEMONSTRATION ===
+print("\n2. Coupled Criterion Analysis Example:")
+print("   This example is from the demo notebook and shows a more advanced analysis.")
 
-# plotter_multi = Plotter(
-#     systems=[system1, system2, system3],
-#     labels=[f"φ={system1.scenario.phi}° (Light)", f"φ={system2.scenario.phi}° (Steep)", f"φ={system3.scenario.phi}° (Multi-layer)"],
-#     colors=['#5D85C3', '#E6001A', '#009D81']  # Blue, Red, Teal
-# )
+# Define thinner snow profile (standard snow profile A), with higher weak layer Young's Modulus
+layers_analysis = [
+    Layer(rho=350, h=120),
+    Layer(rho=270, h=120),
+    Layer(rho=180, h=120),
+]
+scenario_config_analysis = ScenarioConfig(
+    system_type="skier",
+    phi=30,
+)
+segments_analysis = [
+    Segment(length=18000, has_foundation=True, m=0),
+    Segment(length=0, has_foundation=False, m=75),
+    Segment(length=0, has_foundation=False, m=0),
+    Segment(length=18000, has_foundation=False, m=0),
+]
+weak_layer_analysis = WeakLayer(
+    rho=150,
+    h=30,
+    E=1,
+)
+criteria_config_analysis = CriteriaConfig(
+    stress_envelope_method="adam_unpublished",
+    scaling_factor=1,
+    order_of_magnitude=1,
+)
+model_input_analysis = ModelInput(
+    scenario_config=scenario_config_analysis,
+    layers=layers_analysis,
+    segments=segments_analysis,
+    weak_layer=weak_layer_analysis,
+    criteria_config=criteria_config_analysis,
+)
 
-# print("   - Generating comparison plots...")
-# plotter_multi.plot_slab_profile(filename='comparison_slab_profiles')
-# plotter_multi.plot_displacements(filename='comparison_displacements')
-# plotter_multi.plot_section_forces(filename='comparison_section_forces')
-# plotter_multi.plot_stresses(filename='comparison_stresses')
-# plotter_multi.plot_energy_release_rates(filename='comparison_energy_release_rates')
+sys_model_analysis = SystemModel(
+    model_input=model_input_analysis,
+)
 
-# print("   - Generating comprehensive dashboard...")
-# plotter_multi.create_comparison_dashboard(filename='comparison_dashboard')
+criteria_evaluator = CriteriaEvaluator(
+    criteria_config=criteria_config_analysis,
+)
 
-# # Demonstrate system override functionality
-# print("\n3. System Override Examples:")
-# print("   - Plotting only systems 1 and 3 for displacement comparison...")
-# plotter_multi.plot_displacements(
-#     system_models=[system1, system3],
-#     filename='override_displacements_1_3'
-# )
+results: CoupledCriterionResult = criteria_evaluator.evaluate_coupled_criterion(
+    system=sys_model_analysis
+)
 
-# print("   - Plotting system 2 deformed shape...")
-# plotter_multi.plot_deformed(
-#     system_model=system2,
-#     field='principal',
-#     filename='override_deformed_system2'
-# )
+print("\n--- Coupled Criterion Analysis Results ---")
+print(
+    "The thinner snow profile, with adjusted weak layer Young's Modulus, is governed by a coupled criterion for anticrack nucleation."
+)
+print(
+    f"The critical skier weight is {results.critical_skier_weight:.1f} kg and the associated crack length is {results.crack_length:.1f} mm."
+)
+print("\nDetailed results:")
+print(f"  Algorithm convergence: {results.converged}")
+print(f"  Message: {results.message}")
+print(f"  Self-collapse: {results.self_collapse}")
+print(f"  Pure stress criteria: {results.pure_stress_criteria}")
+print(
+    f"  Initial critical skier weight: {results.initial_critical_skier_weight:.1f} kg"
+)
+print(f"  G delta: {results.g_delta:.4f}")
+print(f"  Final error: {results.dist_ERR_envelope:.4f}")
+print(f"  Max distance to failure: {results.max_dist_stress:.4f}")
+print(f"  Iterations: {results.iterations}")
 
-# # Print system information
-# print("\n=== System Information ===")
-# for i, system in enumerate([system1, system2, system3], 1):
-#     print(f"\nSystem {i}:")
-#     print(f"  Slope angle: {system.scenario.phi}°")
-#     print(f"  Total slab thickness: {system.slab.H} mm")
-#     print(f"  Number of layers: {len(system.slab.layers)}")
-#     print(f"  Weak layer thickness: {system.weak_layer.h} mm")
-#     print(f"  Weak layer density: {system.weak_layer.rho} kg/m³")
 
-#     # Calculate some basic results
-#     analyzer = Analyzer(system=system)
-#     x, z, _ = analyzer.rasterize_solution()
-#     fq = system.fq
+# Check for crack self-propagation
+system = results.final_system
+propagation_results = criteria_evaluator.check_crack_self_propagation(system)
+print("\n--- Crack Self-Propagation Check ---")
+print(
+    f"Results of crack propagation criterion: G_delta = {propagation_results[0]:.4f}, Propagation expected: {propagation_results[1]}"
+)
+print(
+    "As the crack propagation criterion is not met, we investigate the minimum self-propagation crack boundary."
+)
 
-#     max_deflection = np.max(np.abs(fq.w(z)))
-#     max_stress = np.max(np.abs(fq.tau(z, unit='kPa')))
 
-#     print(f"  Max vertical deflection: {max_deflection:.3f} mm")
-#     print(f"  Max shear stress: {max_stress:.3f} kPa")
+# Find minimum crack length for self-propagation
+initial_interval = (1, 3000)  # Interval for the crack length search (mm)
+min_crack_length = criteria_evaluator.find_minimum_crack_length(
+    system, search_interval=initial_interval
+)
 
-# print("\n=== Plotting Complete ===")
-# print("Check the 'plots/' directory for generated visualizations.")
-# print("\nPlot files generated:")
-# print("  Single system: single_*.png")
-# print("  Comparisons: comparison_*.png")
-# print("  Overrides: override_*.png")
-# print("  Dashboard: comparison_dashboard.png")
+print("\n--- Minimum Self-Propagation Crack Length ---")
+if min_crack_length is not None:
+    print(f"Minimum Crack Length for Self-Propagation: {min_crack_length:.1f} mm")
+else:
+    print("The search for the minimum crack length did not converge.")
+
+print(
+    "\nThe anticrack created is not sufficiently long to surpass the self-propagation boundary. The propensity of the generated anticrack to propagate is low."
+)
+
+
+print("\n=== Analysis Complete ===")
+print("Check the 'plots/' directory for generated visualizations.")
+print("\nPlot files generated:")
+print("  - single_*.png")

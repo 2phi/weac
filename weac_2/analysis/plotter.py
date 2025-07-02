@@ -7,8 +7,10 @@ from typing import List, Literal, Optional
 import matplotlib.colors as mc
 import matplotlib.pyplot as plt
 import numpy as np
+from scipy.optimize import brentq
 
 from weac_2.analysis.analyzer import Analyzer
+from weac_2.analysis.criteria_evaluator import CriteriaEvaluator
 
 # Module imports
 from weac_2.components.layer import WeakLayer
@@ -235,21 +237,28 @@ class Plotter:
         slabs: List[Slab] | Slab,
         filename: str = "slab_profile",
         labels: Optional[List[str] | str] = None,
+        colors: Optional[List[str]] = None,
     ):
         """
         Plot slab layer profiles for comparison.
 
         Parameters
         ----------
-        system_models : List[SystemModel], optional
-            Multiple systems to plot (overrides default)
+        weak_layers : List[WeakLayer] | WeakLayer
+            The weak layer or layers to plot.
+        slabs : List[Slab] | Slab
+            The slab or slabs to plot.
         filename : str, optional
             Filename for saving plot
+        labels : list of str, optional
+            Labels for each system.
+        colors : list of str, optional
+            Colors for each system.
 
         Returns
         -------
-        matplotlib.axes.Axes
-            The generated plot axes.
+        matplotlib.figure.Figure
+            The generated plot figure.
         """
         if isinstance(weak_layers, WeakLayer):
             weak_layers = [weak_layers]
@@ -263,9 +272,10 @@ class Plotter:
         elif len(labels) != len(slabs):
             raise ValueError("Number of labels must match number of slabs")
 
-        colors = []
-        for i, label in enumerate(labels):
-            colors.append(COLORS[i])
+        if colors is None:
+            plot_colors = [self.colors[i, 0] for i in range(len(slabs))]
+        else:
+            plot_colors = colors
 
         # Plot Setup
         plt.rcdefaults()
@@ -282,7 +292,7 @@ class Plotter:
             max_height = max(max_height, total_height)
 
         for i, (weak_layer, slab, label, color) in enumerate(
-            zip(weak_layers, slabs, labels, colors)
+            zip(weak_layers, slabs, labels, plot_colors)
         ):
             # Plot weak layer
             wl_y = [-weak_layer.h, 0]
@@ -335,6 +345,8 @@ class Plotter:
         system_model: Optional[SystemModel] = None,
         system_models: Optional[List[SystemModel]] = None,
         filename: str = "section_forces",
+        labels: Optional[List[str]] = None,
+        colors: Optional[List[str]] = None,
     ):
         """
         Plot section forces (N, M, V) for comparison.
@@ -347,13 +359,23 @@ class Plotter:
             Multiple systems to plot (overrides default)
         filename : str, optional
             Filename for saving plot
+        labels : list of str, optional
+            Labels for each system.
+        colors : list of str, optional
+            Colors for each system.
         """
         systems_to_plot = self._get_systems_to_plot(system_model, system_models)
-        labels, colors = self.labels, self.colors
+
+        if labels is None:
+            labels = [f"System {i + 1}" for i in range(len(systems_to_plot))]
+        if colors is None:
+            plot_colors = [self.colors[i, 0] for i in range(len(systems_to_plot))]
+        else:
+            plot_colors = colors
 
         fig, axes = plt.subplots(3, 1, figsize=(14, 12))
 
-        for system, label, color in zip(systems_to_plot, labels, colors):
+        for i, system in enumerate(systems_to_plot):
             analyzer = self._get_analyzer(system)
             x, z, _ = analyzer.rasterize_solution()
             fq = system.fq
@@ -363,15 +385,15 @@ class Plotter:
 
             # Plot axial force N
             N = fq.N(z)
-            axes[0].plot(x_m, N, color=color, label=label, linewidth=2)
+            axes[0].plot(x_m, N, color=plot_colors[i], label=labels[i], linewidth=2)
 
             # Plot bending moment M
             M = fq.M(z)
-            axes[1].plot(x_m, M, color=color, label=label, linewidth=2)
+            axes[1].plot(x_m, M, color=plot_colors[i], label=labels[i], linewidth=2)
 
             # Plot shear force V
             V = fq.V(z)
-            axes[2].plot(x_m, V, color=color, label=label, linewidth=2)
+            axes[2].plot(x_m, V, color=plot_colors[i], label=labels[i], linewidth=2)
 
         # Formatting
         axes[0].set_ylabel("N (N)")
@@ -402,6 +424,8 @@ class Plotter:
         system_model: Optional[SystemModel] = None,
         system_models: Optional[List[SystemModel]] = None,
         filename: str = "ERR",
+        labels: Optional[List[str]] = None,
+        colors: Optional[List[str]] = None,
     ):
         """
         Plot energy release rates (G_I, G_II) for comparison.
@@ -414,13 +438,23 @@ class Plotter:
             Multiple systems to plot (overrides default)
         filename : str, optional
             Filename for saving plot
+        labels : list of str, optional
+            Labels for each system.
+        colors : list of str, optional
+            Colors for each system.
         """
         systems_to_plot = self._get_systems_to_plot(system_model, system_models)
-        labels, colors = self.labels, self.colors
+
+        if labels is None:
+            labels = [f"System {i + 1}" for i in range(len(systems_to_plot))]
+        if colors is None:
+            plot_colors = [self.colors[i, 0] for i in range(len(systems_to_plot))]
+        else:
+            plot_colors = colors
 
         fig, axes = plt.subplots(2, 1, figsize=(14, 10))
 
-        for system, label, color in zip(systems_to_plot, labels, colors):
+        for i, system in enumerate(systems_to_plot):
             analyzer = self._get_analyzer(system)
             x, z, _ = analyzer.rasterize_solution()
             fq = system.fq
@@ -430,11 +464,11 @@ class Plotter:
 
             # Plot Mode I energy release rate
             G_I = fq.Gi(z, unit="kJ/m^2")
-            axes[0].plot(x_m, G_I, color=color, label=label, linewidth=2)
+            axes[0].plot(x_m, G_I, color=plot_colors[i], label=labels[i], linewidth=2)
 
             # Plot Mode II energy release rate
             G_II = fq.Gii(z, unit="kJ/m^2")
-            axes[1].plot(x_m, G_II, color=color, label=label, linewidth=2)
+            axes[1].plot(x_m, G_II, color=plot_colors[i], label=labels[i], linewidth=2)
 
         # Formatting
         axes[0].set_ylabel("G_I (kJ/m²)")
@@ -672,27 +706,32 @@ class Plotter:
         return fig
 
     def plot_stress_envelope(
-        self, system_model: Optional[SystemModel] = None, filename: Optional[str] = None
+        self,
+        system_model: SystemModel,
+        criteria_evaluator: CriteriaEvaluator,
+        all_envelopes: bool = False,
+        filename: Optional[str] = None,
     ):
         """
         Plot stress envelope in τ-σ space.
 
         Parameters
         ----------
-        system_model : SystemModel, optional
-            System to plot (uses first system if not specified)
+        system_model : SystemModel
+            System to plot
+        criteria_evaluator : CriteriaEvaluator
+            Criteria evaluator to use for the stress envelope
+        all_envelopes : bool, optional
+            Whether to plot all four quadrants of the envelope
         filename : str, optional
             Filename for saving plot
         """
-        if system_model is None:
-            system_model = self.systems[0]
-
         analyzer = self._get_analyzer(system_model)
-        x, z, _ = analyzer.rasterize_solution()
+        _, z, _ = analyzer.rasterize_solution(num=10000)
         fq = system_model.fq
 
         # Calculate stresses
-        sigma = fq.sig(z, unit="kPa")
+        sigma = np.abs(fq.sig(z, unit="kPa"))
         tau = fq.tau(z, unit="kPa")
 
         fig, ax = plt.subplots(figsize=(10, 8))
@@ -700,44 +739,262 @@ class Plotter:
         # Plot stress path
         ax.plot(sigma, tau, "b-", linewidth=2, label="Stress Path")
         ax.scatter(
-            sigma[0], tau[0], color="green", s=100, marker="o", label="Start", zorder=5
+            sigma[0], tau[0], color="green", s=10, marker="o", label="Start", zorder=5
         )
         ax.scatter(
-            sigma[-1], tau[-1], color="red", s=100, marker="s", label="End", zorder=5
+            sigma[-1], tau[-1], color="red", s=10, marker="s", label="End", zorder=5
         )
 
-        # Add failure envelope (simplified Mohr-Coulomb)
-        sigma_range = np.linspace(min(sigma.min(), 0), sigma.max() * 1.1, 100)
+        # --- Programmatic Envelope Calculation ---
+        weak_layer = system_model.weak_layer
 
-        # Typical values for snow (these could be made configurable)
-        cohesion = 2.0  # kPa
-        friction_angle = 30  # degrees
-        friction_coeff = np.tan(np.deg2rad(friction_angle))
+        # Define a function to find the root for a given tau
+        def find_sigma_for_tau(tau_val, sigma_c, method: Optional[str] = None):
+            # Target function to find the root of: envelope(sigma, tau) - 1 = 0
+            def envelope_root_func(sigma_val):
+                return (
+                    criteria_evaluator.stress_envelope(
+                        sigma_val, tau_val, weak_layer, method=method
+                    )
+                    - 1
+                )
 
-        tau_envelope = cohesion + friction_coeff * np.abs(sigma_range)
-        ax.plot(sigma_range, tau_envelope, "r--", linewidth=2, label="Failure Envelope")
-        ax.plot(sigma_range, -tau_envelope, "r--", linewidth=2)
+            try:
+                search_upper_bound = sigma_c * 1.1
+                sigma_root = brentq(
+                    envelope_root_func,
+                    a=0,
+                    b=search_upper_bound,
+                    xtol=1e-6,
+                    rtol=1e-6,
+                )
+                return sigma_root
+            except ValueError:
+                return np.nan
+
+        # Calculate the corresponding sigma for each tau
+        if all_envelopes:
+            methods = [
+                "mede_s-RG1",
+                "mede_s-RG2",
+                "mede_s-FCDH",
+                "schottner",
+                "adam_unpublished",
+            ]
+        else:
+            methods = [criteria_evaluator.criteria_config.stress_envelope_method]
+
+        colors = self.colors
+        colors = np.array(colors)
+        colors = np.tile(colors, (len(methods), 1))
+
+        max_sigma = 0
+        max_tau = 0
+        for i, method in enumerate(methods):
+            # Calculate tau_c for the given method to define tau_range
+            config = criteria_evaluator.criteria_config
+            density = weak_layer.rho
+            tau_c = 0.0  # fallback
+            sigma_c = 0.0
+            if method == "adam_unpublished":
+                scaling_factor = config.scaling_factor
+                order_of_magnitude = config.order_of_magnitude
+                if scaling_factor > 1:
+                    order_of_magnitude = 0.7
+                if scaling_factor < 0.55:
+                    scaling_factor = 0.55
+                tau_c = 5.09 * (scaling_factor**order_of_magnitude)
+                sigma_c = 6.16 * (scaling_factor**order_of_magnitude)
+            elif method == "schottner":
+                rho_ice = 916.7
+                sigma_y = 2000
+                sigma_c_adam = 6.16
+                tau_c_adam = 5.09
+                order_of_magnitude = config.order_of_magnitude
+                sigma_c = sigma_y * 13 * (density / rho_ice) ** order_of_magnitude
+                tau_c = tau_c_adam * (sigma_c / sigma_c_adam)
+                sigma_c = sigma_y * 13 * (density / rho_ice) ** order_of_magnitude
+            elif method == "mede_s-RG1":
+                tau_c = 3.53  # This is tau_T from Mede's paper
+                sigma_c = 7.00
+            elif method == "mede_s-RG2":
+                tau_c = 1.22  # This is tau_T from Mede's paper
+                sigma_c = 2.33
+            elif method == "mede_s-FCDH":
+                tau_c = 0.61  # This is tau_T from Mede's paper
+                sigma_c = 1.49
+
+            tau_range = np.linspace(0, tau_c, 100)
+            sigma_envelope = np.array(
+                [find_sigma_for_tau(t, sigma_c, method) for t in tau_range]
+            )
+
+            # Remove nan values where no root was found
+            valid_points = ~np.isnan(sigma_envelope)
+            valid_tau_range = tau_range[valid_points]
+            sigma_envelope = sigma_envelope[valid_points]
+
+            max_sigma = max(max_sigma, np.max(sigma_envelope))
+            max_tau = max(max_tau, np.max(np.abs(valid_tau_range)))
+            ax.plot(
+                sigma_envelope,
+                valid_tau_range,
+                "--",
+                linewidth=2,
+                label=method,
+                color=colors[i, 0],
+            )
+            ax.plot(
+                -sigma_envelope, valid_tau_range, "--", linewidth=2, color=colors[i, 0]
+            )
+            ax.plot(
+                -sigma_envelope,
+                -valid_tau_range,
+                "--",
+                linewidth=2,
+                color=colors[i, 0],
+            )
+            ax.plot(
+                sigma_envelope, -valid_tau_range, "--", linewidth=2, color=colors[i, 0]
+            )
+            ax.scatter(0, tau_c, color="black", s=10, marker="o")
+            ax.text(0, tau_c, r"$\tau_c$", color="black", ha="center", va="bottom")
+            ax.scatter(sigma_c, 0, color="black", s=10, marker="o")
+            ax.text(sigma_c, 0, r"$\sigma_c$", color="black", ha="left", va="center")
 
         # Formatting
-        ax.set_xlabel("Normal Stress σ (kPa)")
-        ax.set_ylabel("Shear Stress τ (kPa)")
+        ax.set_xlabel("Compressive Strength σ (kPa)")
+        ax.set_ylabel("Shear Strength τ (kPa)")
         ax.set_title("Weak Layer Stress Envelope")
         ax.legend()
         ax.grid(True, alpha=0.3)
         ax.axhline(y=0, color="k", linewidth=0.5)
         ax.axvline(x=0, color="k", linewidth=0.5)
 
+        max_tau = max(max_tau, max(np.abs(tau)))
+        max_sigma = max(max_sigma, max(np.abs(sigma)))
+        ax.set_xlim(0, max_sigma * 1.1)
+        ax.set_ylim(-max_tau * 1.1, max_tau * 1.1)
+
         plt.tight_layout()
 
         if filename:
             self._save_figure(filename, fig)
 
+        plt.close(fig)  # Close the figure to prevent duplicate output in notebooks
+        return fig
+
+    def plot_err_envelope(
+        self,
+        system_model: SystemModel,
+        criteria_evaluator: CriteriaEvaluator,
+        filename: str = "err_envelope",
+    ):
+        analyzer = self._get_analyzer(system_model)
+
+        incr_energy = analyzer.incremental_ERR(unit="J/m^2")
+        G_I = incr_energy[1]
+        G_II = incr_energy[2]
+
+        fig, ax = plt.subplots(figsize=(10, 8))
+
+        # Plot stress path
+        ax.scatter(
+            np.abs(G_I),
+            np.abs(G_II),
+            color="blue",
+            s=50,
+            marker="o",
+            label="Incremental ERR",
+            zorder=5,
+        )
+
+        G_Ic = system_model.weak_layer.G_Ic
+        G_IIc = system_model.weak_layer.G_IIc
+        ax.scatter(0, G_IIc, color="black", s=100, marker="o", zorder=5)
+        ax.text(
+            0.01,
+            G_IIc + 0.02,
+            r"$G_{IIc}$",
+            color="black",
+            ha="left",
+            va="center",
+        )
+        ax.scatter(G_Ic, 0, color="black", s=100, marker="o", zorder=5)
+        ax.text(
+            G_Ic + 0.01,
+            0.01,
+            r"$G_{Ic}$",
+            color="black",
+        )
+
+        # --- Programmatic Envelope Calculation ---
+        weak_layer = system_model.weak_layer
+
+        # Define a function to find the root for a given G_II
+        def find_GI_for_GII(GII_val):
+            # Target function to find the root of: envelope(sigma, tau) - 1 = 0
+            def envelope_root_func(GI_val):
+                return (
+                    criteria_evaluator.fracture_toughness_envelope(
+                        GI_val,
+                        GII_val,
+                        weak_layer,
+                    )
+                    - 1
+                )
+
+            try:
+                GI_root = brentq(envelope_root_func, a=0, b=50, xtol=1e-6, rtol=1e-6)
+                return GI_root
+            except ValueError:
+                return np.nan
+
+        # Generate a range of G values in the positive quadrant
+        GII_max = system_model.weak_layer.G_IIc * 1.1
+        GII_range = np.linspace(0, GII_max, 100)
+
+        GI_envelope = np.array([find_GI_for_GII(t) for t in GII_range])
+
+        # Remove nan values where no root was found
+        valid_points = ~np.isnan(GI_envelope)
+        valid_GII_range = GII_range[valid_points]
+        GI_envelope = GI_envelope[valid_points]
+
+        ax.plot(
+            GI_envelope,
+            valid_GII_range,
+            "--",
+            linewidth=2,
+            label="Fracture Toughness Envelope",
+            color="red",
+        )
+
+        # Formatting
+        ax.set_xlabel("GI (J/m²)")
+        ax.set_ylabel("GII (J/m²)")
+        ax.set_title("Fracture Toughness Envelope")
+        ax.legend()
+        ax.grid(True, alpha=0.3)
+        ax.axhline(y=0, color="k", linewidth=0.5)
+        ax.axvline(x=0, color="k", linewidth=0.5)
+        ax.set_xlim(0, max(np.abs(GI_envelope)) * 1.1)
+        ax.set_ylim(0, max(np.abs(valid_GII_range)) * 1.1)
+
+        plt.tight_layout()
+
+        if filename:
+            self._save_figure(filename, fig)
+
+        plt.close(fig)  # Close the figure to prevent duplicate output in notebooks
         return fig
 
     def create_comparison_dashboard(
         self,
         system_models: Optional[List[SystemModel]] = None,
         filename: str = "comparison_dashboard",
+        labels: Optional[List[str]] = None,
+        colors: Optional[List[str]] = None,
     ):
         """
         Create a comprehensive comparison dashboard.
@@ -748,11 +1005,20 @@ class Plotter:
             Systems to include in dashboard (uses all if not specified)
         filename : str, optional
             Filename for saving plot
+        labels : list of str, optional
+            Labels for each system.
+        colors : list of str, optional
+            Colors for each system.
         """
         if system_models is None:
-            system_models = self.systems
+            raise ValueError("system_models must be provided for comparison dashboard")
 
-        labels, colors = self.labels, self.colors
+        if labels is None:
+            labels = [f"System {i + 1}" for i in range(len(system_models))]
+        if colors is None:
+            plot_colors = [self.colors[i, 0] for i in range(len(system_models))]
+        else:
+            plot_colors = colors
 
         fig = plt.figure(figsize=(20, 16))
 
@@ -761,7 +1027,7 @@ class Plotter:
 
         # 1. Slab profiles
         ax1 = fig.add_subplot(gs[0, 0])
-        for system, label, color in zip(system_models, labels, colors):
+        for i, system in enumerate(system_models):
             slab = system.slab
             z_positions = np.concatenate(
                 [[0], np.cumsum([layer.h for layer in slab.layers])]
@@ -775,11 +1041,11 @@ class Plotter:
                     z_start,
                     rho,
                     height=z_end - z_start,
-                    color=color,
+                    color=plot_colors[i],
                     alpha=0.7,
                     edgecolor="black",
                     linewidth=0.5,
-                    label=label if j == 0 else "",
+                    label=labels[i] if j == 0 else "",
                 )
 
         ax1.set_xlabel("Density (kg/m³)")
@@ -790,11 +1056,11 @@ class Plotter:
 
         # 2. Vertical displacement
         ax2 = fig.add_subplot(gs[0, 1])
-        for system, label, color in zip(system_models, labels, colors):
+        for i, system in enumerate(system_models):
             analyzer = self._get_analyzer(system)
             x, z, _ = analyzer.rasterize_solution()
             w = system.fq.w(z, unit="mm")
-            ax2.plot(x / 1000, w, color=color, label=label, linewidth=2)
+            ax2.plot(x / 1000, w, color=plot_colors[i], label=labels[i], linewidth=2)
 
         ax2.set_xlabel("Distance (m)")
         ax2.set_ylabel("w (mm)")
@@ -804,11 +1070,13 @@ class Plotter:
 
         # 3. Normal stress
         ax3 = fig.add_subplot(gs[0, 2])
-        for system, label, color in zip(system_models, labels, colors):
+        for i, system in enumerate(system_models):
             analyzer = self._get_analyzer(system)
             x, z, _ = analyzer.rasterize_solution()
             sigma = system.fq.sig(z, unit="kPa")
-            ax3.plot(x / 1000, sigma, color=color, label=label, linewidth=2)
+            ax3.plot(
+                x / 1000, sigma, color=plot_colors[i], label=labels[i], linewidth=2
+            )
 
         ax3.set_xlabel("Distance (m)")
         ax3.set_ylabel("σ (kPa)")
@@ -818,11 +1086,11 @@ class Plotter:
 
         # 4. Shear stress
         ax4 = fig.add_subplot(gs[1, 0])
-        for system, label, color in zip(system_models, labels, colors):
+        for i, system in enumerate(system_models):
             analyzer = self._get_analyzer(system)
             x, z, _ = analyzer.rasterize_solution()
             tau = system.fq.tau(z, unit="kPa")
-            ax4.plot(x / 1000, tau, color=color, label=label, linewidth=2)
+            ax4.plot(x / 1000, tau, color=plot_colors[i], label=labels[i], linewidth=2)
 
         ax4.set_xlabel("Distance (m)")
         ax4.set_ylabel("τ (kPa)")
@@ -832,11 +1100,11 @@ class Plotter:
 
         # 5. Bending moment
         ax5 = fig.add_subplot(gs[1, 1])
-        for system, label, color in zip(system_models, labels, colors):
+        for i, system in enumerate(system_models):
             analyzer = self._get_analyzer(system)
             x, z, _ = analyzer.rasterize_solution()
             M = system.fq.M(z)
-            ax5.plot(x / 1000, M, color=color, label=label, linewidth=2)
+            ax5.plot(x / 1000, M, color=plot_colors[i], label=labels[i], linewidth=2)
 
         ax5.set_xlabel("Distance (m)")
         ax5.set_ylabel("M (Nmm)")
@@ -846,12 +1114,14 @@ class Plotter:
 
         # 6. Energy release rates
         ax6 = fig.add_subplot(gs[1, 2])
-        for system, label, color in zip(system_models, labels, colors):
+        for i, system in enumerate(system_models):
             analyzer = self._get_analyzer(system)
             x, z, _ = analyzer.rasterize_solution()
             G_I = system.fq.Gi(z, unit="kJ/m^2")
             G_II = system.fq.Gii(z, unit="kJ/m^2")
-            ax6.plot(x / 1000, G_I + G_II, color=color, label=label, linewidth=2)
+            ax6.plot(
+                x / 1000, G_I + G_II, color=plot_colors[i], label=labels[i], linewidth=2
+            )
 
         ax6.set_xlabel("Distance (m)")
         ax6.set_ylabel("G_total (kJ/m²)")
@@ -916,7 +1186,11 @@ class Plotter:
     # === PLOT WRAPPERS ===========================================================
 
     def plot_displacements(
-        self, analyzer: Analyzer, x: np.ndarray, z: np.ndarray, i: int = 0
+        self,
+        analyzer: Analyzer,
+        x: np.ndarray,
+        z: np.ndarray,
+        filename: str = "displacements",
     ):
         """Wrap for displacements plot."""
         data = [
@@ -928,11 +1202,15 @@ class Plotter:
             scenario=analyzer.sm.scenario,
             ax1label=r"Displacements",
             ax1data=data,
-            filename="disp" + str(i),
+            filename=filename,
         )
 
     def plot_stresses(
-        self, analyzer: Analyzer, x: np.ndarray, z: np.ndarray, i: int = 0
+        self,
+        analyzer: Analyzer,
+        x: np.ndarray,
+        z: np.ndarray,
+        filename: str = "stresses",
     ):
         """Wrap stress plot."""
         data = [
@@ -943,7 +1221,7 @@ class Plotter:
             scenario=analyzer.sm.scenario,
             ax1label=r"Stress (kPa)",
             ax1data=data,
-            filename="stress" + str(i),
+            filename=filename,
         )
 
     def plot_stress_criteria(

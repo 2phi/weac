@@ -28,6 +28,7 @@ class CoupledCriterionHistory:
 
     skier_weights: List[float]
     crack_lengths: List[float]
+    incr_energies: List[np.ndarray]
     g_deltas: List[float]
     dist_maxs: List[float]
     dist_mins: List[float]
@@ -133,7 +134,7 @@ class CriteriaEvaluator:
         """
         self.criteria_config = criteria_config
 
-    def fracture_toughness_criterion(
+    def fracture_toughness_envelope(
         self, G_I: float | np.ndarray, G_II: float | np.ndarray, weak_layer: WeakLayer
     ) -> float | np.ndarray:
         """
@@ -170,6 +171,7 @@ class CriteriaEvaluator:
         sigma: Union[float, np.ndarray],
         tau: Union[float, np.ndarray],
         weak_layer: WeakLayer,
+        method: Optional[str] = None,
     ) -> np.ndarray:
         """
         Evaluate the stress envelope for given stress components.
@@ -183,8 +185,8 @@ class CriteriaEvaluator:
             Shear stress components (kPa).
         weak_layer: WeakLayer
             The weak layer object, used to get density.
-        order_of_magnitude: float, optional
-            Exponent used for scaling. Defaults to 1.0.
+        method: str, optional
+            Method to use for the stress envelope. Defaults to None.
 
         Returns
         -------
@@ -211,7 +213,11 @@ class CriteriaEvaluator:
         tau = np.abs(np.asarray(tau))
         results = np.zeros_like(sigma)
 
-        envelope_method = self.criteria_config.stress_envelope_method
+        envelope_method = (
+            method
+            if method is not None
+            else self.criteria_config.stress_envelope_method
+        )
         density = weak_layer.rho
         fn = self.criteria_config.fn
         fm = self.criteria_config.fm
@@ -297,7 +303,6 @@ class CriteriaEvaluator:
             critical skier weight, crack length, and convergence details.
         """
         logger.info("Starting coupled criterion evaluation.")
-        start_time = time.time()
         L = system.scenario.L
         weak_layer = system.weak_layer
 
@@ -350,12 +355,12 @@ class CriteriaEvaluator:
             segments.append(Segment(length=50000, has_foundation=True, m=0))
             system.update_scenario(segments=segments)
 
-            inc_energy = analyzer.incremental_ERR()
-            g_delta = self.fracture_toughness_criterion(
-                inc_energy[1] * 1000, inc_energy[2] * 1000, system.weak_layer
+            inc_energy = analyzer.incremental_ERR(unit="J/m^2")
+            g_delta = self.fracture_toughness_envelope(
+                inc_energy[1], inc_energy[2], system.weak_layer
             )
 
-            history_data = CoupledCriterionHistory([], [], [], [], [])
+            history_data = CoupledCriterionHistory([], [], [], [], [], [])
             analyzer.print_call_stats(
                 message="evaluate_coupled_criterion Call Statistics"
             )
@@ -381,7 +386,7 @@ class CriteriaEvaluator:
             crack_length = 1.0
             dist_ERR_envelope = 1000
             g_delta = 0
-            history = CoupledCriterionHistory([], [], [], [], [])
+            history = CoupledCriterionHistory([], [], [], [], [], [])
             iteration_count = 0
             skier_weight = initial_critical_skier_weight * 1.005
             min_skier_weight = initial_critical_skier_weight
@@ -407,7 +412,7 @@ class CriteriaEvaluator:
 
                 # Calculate fracture toughness criterion
                 incr_energy = analyzer.incremental_ERR(unit="J/m^2")
-                max_weight_g_delta = self.fracture_toughness_criterion(
+                max_weight_g_delta = self.fracture_toughness_envelope(
                     incr_energy[1], incr_energy[2], weak_layer
                 )
                 dist_ERR_envelope = abs(g_delta - 1)
@@ -445,15 +450,16 @@ class CriteriaEvaluator:
                 min_dist_stress = np.min(stress_env)
 
                 # Calculate fracture toughness criterion
-                incr_energy = analyzer.incremental_ERR()
-                g_delta = self.fracture_toughness_criterion(
-                    incr_energy[1] * 1000, incr_energy[2] * 1000, weak_layer
+                incr_energy = analyzer.incremental_ERR(unit="J/m^2")
+                g_delta = self.fracture_toughness_envelope(
+                    incr_energy[1], incr_energy[2], weak_layer
                 )
                 dist_ERR_envelope = abs(g_delta - 1)
 
                 # Update history
                 history.skier_weights.append(skier_weight)
                 history.crack_lengths.append(crack_length)
+                history.incr_energies.append(incr_energy)
                 history.g_deltas.append(g_delta)
                 history.dist_maxs.append(max_dist_stress)
                 history.dist_mins.append(min_dist_stress)
@@ -512,7 +518,7 @@ class CriteriaEvaluator:
             if iteration_count < max_iterations and any(
                 s.has_foundation for s in segments
             ):
-                print("No Exception encountered - Converged successfully.")
+                logger.info("No Exception encountered - Converged successfully.")
                 if crack_length > 0:
                     analyzer.print_call_stats(
                         message="evaluate_coupled_criterion Call Statistics"
@@ -534,7 +540,7 @@ class CriteriaEvaluator:
                         min_dist_stress=min_dist_stress,
                     )
                 elif dampening_ERR < 5:
-                    print("Reached max dampening without converging.")
+                    logger.info("Reached max dampening without converging.")
                     analyzer.print_call_stats(
                         message="evaluate_coupled_criterion Call Statistics"
                     )
@@ -826,19 +832,23 @@ class CriteriaEvaluator:
             True if the criterion is met (g_delta_diff >= 1).
         """
         logger.info("Checking for self-propagation of pre-existing crack.")
+        new_system = copy.deepcopy(system)
+
         start_time = time.time()
         # No skier weight is applied for self-propagation check
-        for seg in system.scenario.segments:
+        for seg in new_system.scenario.segments:
             seg.m = 0
-        system.update_scenario(segments=system.scenario.segments)
+        new_system.update_scenario(segments=new_system.scenario.segments)
 
-        analyzer = Analyzer(system)
+        analyzer = Analyzer(new_system)
         diff_energy = analyzer.differential_ERR(unit="J/m^2")
         G_I = diff_energy[1]
         G_II = diff_energy[2]
 
         # Evaluate the fracture toughness criterion
-        g_delta_diff = self.fracture_toughness_criterion(G_I, G_II, system.weak_layer)
+        g_delta_diff = self.fracture_toughness_envelope(
+            G_I, G_II, new_system.weak_layer
+        )
         can_propagate = g_delta_diff >= 1
         logger.info(
             f"Self-propagation check finished in {time.time() - start_time:.4f} seconds. Result: g_delta_diff={g_delta_diff:.4f}, can_propagate={can_propagate}"
@@ -1075,7 +1085,7 @@ class CriteriaEvaluator:
         G_II = diff_energy[2]
 
         # Evaluate the fracture toughness function (boundary is equal to 1)
-        g_delta_diff = self.fracture_toughness_criterion(G_I, G_II, system.weak_layer)
+        g_delta_diff = self.fracture_toughness_envelope(G_I, G_II, system.weak_layer)
 
         # Return the difference from the target
         return g_delta_diff - target
