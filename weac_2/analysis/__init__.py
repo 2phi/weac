@@ -3,6 +3,7 @@ from .criteria_evaluator import (
     CriteriaEvaluator,
     CoupledCriterionHistory,
     CoupledCriterionResult,
+    FindMinimumForceResult,
 )
 from .plotter import Plotter
 
@@ -11,5 +12,6 @@ __all__ = [
     "CriteriaEvaluator",
     "CoupledCriterionHistory",
     "CoupledCriterionResult",
+    "FindMinimumForceResult",
     "Plotter",
 ]

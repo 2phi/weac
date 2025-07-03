@@ -34,7 +34,7 @@ system_type = configs[0].radio(
     horizontal=True,
 )
 slope_angle = st.slider(
-    "Slope Angle [deg]", min_value=-45, max_value=45, value=0, step=1
+    "Slope Angle [deg]", min_value=-45, max_value=45, value=22, step=1
 )
 crack_length = configs[1].number_input(
     "Crack Length [mm]", min_value=0.0, value=0.0, step=1.0
@@ -74,9 +74,14 @@ skier_weights = []
 
 # Length row
 for i in range(num_segments):
-    length = cols[i].number_input(
-        "Length [mm]", key=f"length_{i}", value=3000.0, step=100.0
-    )
+    if i == 0 or i == num_segments - 1:
+        length = cols[i].number_input(
+            "Length [mm]", key=f"length_{i}", value=10000.0, step=100.0
+        )
+    else:
+        length = cols[i].number_input(
+            "Length [mm]", key=f"length_{i}", value=5000.0, step=100.0
+        )
     lengths.append(length)
 
 # Foundation row
@@ -93,7 +98,7 @@ for i in range(2 * num_segments - 1):
             "Skier weight [kg]",
             key=f"skier_weight_{i}",
             min_value=0.0,
-            value=100.0,
+            value=50.0,
             step=1.0,
         )
         skier_weights.append(skier_weight)
@@ -151,8 +156,5 @@ plt.close(fig)
 
 st.header("Next Step")
 if st.button("To Analysis"):
-    with st.spinner("Assembling system..."):
-        st.session_state["system"] = system
-
-        st.success("Scenario defined successfully!")
-        st.write("You can now proceed to the 'Analysis' page.")
+    st.session_state["system"] = system
+    st.switch_page("pages/3_Analysis.py")

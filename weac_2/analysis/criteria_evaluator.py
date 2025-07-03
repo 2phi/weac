@@ -98,8 +98,8 @@ class FindMinimumForceResult:
         Whether the algorithm converged.
     critical_skier_weight : float
         The critical skier weight.
-    system : SystemModel
-        The system model.
+    old_segments : List[Segment]
+        The old segments.
     iterations : int
         The number of iterations.
     max_dist_stress : float
@@ -110,7 +110,7 @@ class FindMinimumForceResult:
 
     success: bool
     critical_skier_weight: float
-    system: SystemModel
+    old_segments: List[Segment]
     iterations: int
     max_dist_stress: float
     min_dist_stress: float
@@ -312,7 +312,7 @@ class CriteriaEvaluator:
         force_result = self.find_minimum_force(
             system, tolerance_stress=tolerance_stress
         )
-        system = force_result.system
+
         analyzer = Analyzer(system)
         initial_critical_skier_weight = force_result.critical_skier_weight
         max_dist_stress = force_result.max_dist_stress
@@ -508,7 +508,7 @@ class CriteriaEvaluator:
                 if abs(dist_ERR_envelope) > tolerance_ERR:
                     skier_weight = scaling * new_skier_weight
                     # skier_weight = new_skier_weight
-                    crack_length, segments = self._find_new_anticrack_length(
+                    crack_length, segments = self.find_crack_length_for_weight(
                         system, skier_weight
                     )
                 logger.info(
@@ -653,10 +653,12 @@ class CriteriaEvaluator:
             "Starting to find minimum force to surpass stress failure envelope."
         )
         start_time = time.time()
-        skier_weight = 1.0  # Initial guess
+        skier_weight = 1.0
         iteration_count = 0
         max_iterations = 50
         max_dist_stress = 0
+
+        old_segments = copy.deepcopy(system.scenario.segments)
 
         # --- Initial uncracked configuration ---
         total_length = system.scenario.L
@@ -687,7 +689,7 @@ class CriteriaEvaluator:
             return FindMinimumForceResult(
                 success=True,
                 critical_skier_weight=skier_weight,
-                system=system,
+                old_segments=old_segments,
                 iterations=iteration_count,
                 max_dist_stress=max_dist_stress,
                 min_dist_stress=min_dist_stress,
@@ -736,7 +738,7 @@ class CriteriaEvaluator:
                 return FindMinimumForceResult(
                     success=True,
                     critical_skier_weight=skier_weight,
-                    system=system,
+                    old_segments=old_segments,
                     iterations=iteration_count,
                     max_dist_stress=max_dist_stress,
                     min_dist_stress=min_dist_stress,
@@ -754,7 +756,7 @@ class CriteriaEvaluator:
                 return FindMinimumForceResult(
                     success=False,
                     critical_skier_weight=0.0,
-                    system=system,
+                    old_segments=old_segments,
                     iterations=iteration_count,
                     max_dist_stress=max_dist_stress,
                     min_dist_stress=min_dist_stress,
@@ -767,7 +769,7 @@ class CriteriaEvaluator:
         return FindMinimumForceResult(
             success=True,
             critical_skier_weight=skier_weight,
-            system=system,
+            old_segments=old_segments,
             iterations=iteration_count,
             max_dist_stress=max_dist_stress,
             min_dist_stress=min_dist_stress,
@@ -778,7 +780,7 @@ class CriteriaEvaluator:
         system: SystemModel,
         search_interval: tuple[float, float] = (),
         target: float = 1,
-    ) -> float:
+    ) -> tuple[float, List[Segment]]:
         """
         Finds the minimum crack length required to surpass the energy release rate envelope.
 
@@ -789,13 +791,24 @@ class CriteriaEvaluator:
 
         Returns:
         --------
-        results:
+        minimum_crack_length: float
+            The minimum crack length required to surpass the energy release rate envelope [mm]
+        segments: List[Segment]
+            The updated list of segments
         """
+        old_segments = copy.deepcopy(system.scenario.segments)
+
         if search_interval == ():
-            a = system.scenario.li[0]
+            a = 0
             b = system.scenario.L
         else:
             a, b = search_interval
+        print("Interval for crack length search: ", a, b)
+        print(
+            "Calculation of fracture toughness envelope: ",
+            self._fracture_toughness_exceedance(a, system),
+            self._fracture_toughness_exceedance(b, system),
+        )
 
         # Use root_scalar to find the root
         result = root_scalar(
@@ -804,6 +817,8 @@ class CriteriaEvaluator:
             bracket=[a, b],  # Interval where the root is expected
             method="brentq",  # Brent's method
         )
+
+        system.update_scenario(segments=old_segments)
 
         if result.converged:
             return result.root
@@ -814,6 +829,7 @@ class CriteriaEvaluator:
     def check_crack_self_propagation(
         self,
         system: SystemModel,
+        rm_skier_weight: bool = False,
     ) -> tuple[float, bool]:
         """
         Evaluates whether a crack will propagate without any additional load.
@@ -833,11 +849,13 @@ class CriteriaEvaluator:
         """
         logger.info("Checking for self-propagation of pre-existing crack.")
         new_system = copy.deepcopy(system)
+        print("Segments: ", new_system.scenario.segments)
 
         start_time = time.time()
         # No skier weight is applied for self-propagation check
-        for seg in new_system.scenario.segments:
-            seg.m = 0
+        if rm_skier_weight:
+            for seg in new_system.scenario.segments:
+                seg.m = 0
         new_system.update_scenario(segments=new_system.scenario.segments)
 
         analyzer = Analyzer(new_system)
@@ -856,7 +874,7 @@ class CriteriaEvaluator:
 
         return g_delta_diff, bool(can_propagate)
 
-    def _find_new_anticrack_length(
+    def find_crack_length_for_weight(
         self,
         system: SystemModel,
         skier_weight: float,
@@ -885,6 +903,8 @@ class CriteriaEvaluator:
         start_time = time.time()
         total_length = system.scenario.L
         weak_layer = system.weak_layer
+
+        old_segments = copy.deepcopy(system.scenario.segments)
 
         initial_segments = [
             Segment(length=total_length / 2, has_foundation=True, m=skier_weight),
@@ -962,6 +982,8 @@ class CriteriaEvaluator:
             # No part of the slab is cracked
             new_crack_length = 0
             new_segments = initial_segments
+
+        system.update_scenario(segments=old_segments)
 
         return new_crack_length, new_segments
 
@@ -1065,7 +1087,7 @@ class CriteriaEvaluator:
         return roots
 
     def _fracture_toughness_exceedance(
-        self, crack_length: float, system: SystemModel, target: float
+        self, crack_length: float, system: SystemModel, target: float = 1
     ) -> float:
         """
         Objective function to evaluate the fracture toughness function.

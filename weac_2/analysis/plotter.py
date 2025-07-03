@@ -10,7 +10,11 @@ import numpy as np
 from scipy.optimize import brentq
 
 from weac_2.analysis.analyzer import Analyzer
-from weac_2.analysis.criteria_evaluator import CriteriaEvaluator
+from weac_2.analysis.criteria_evaluator import (
+    CoupledCriterionResult,
+    CriteriaEvaluator,
+    FindMinimumForceResult,
+)
 
 # Module imports
 from weac_2.components.layer import WeakLayer
@@ -57,7 +61,10 @@ def _significant_digits(decimal: float) -> int:
     """Return the number of significant digits for a given decimal."""
     if decimal == 0:
         return 1
-    sig_digits = -int(np.floor(np.log10(decimal)))
+    try:
+        sig_digits = -int(np.floor(np.log10(decimal)))
+    except ValueError:
+        sig_digits = 3
     return sig_digits
 
 
@@ -584,12 +591,12 @@ class Plotter:
             # Shear stresses (kPa)
             case "Txz":
                 slab = analyzer.Txz(z, phi, dz=dz, unit="kPa")
-                weak = analyzer.weaklayer_shearstress(x=xwl, z=z, unit="kPa")[1]
+                weak = Tauwl
                 label = r"$\tau_{xz}$ (kPa)"
             # Transverse normal stresses (kPa)
             case "Szz":
                 slab = analyzer.Szz(z, phi, dz=dz, unit="kPa")
-                weak = analyzer.weaklayer_normalstress(x=xwl, z=z, unit="kPa")[1]
+                weak = Sigmawl
                 label = r"$\sigma_{zz}$ (kPa)"
             # Principal stresses
             case "principal":
@@ -987,6 +994,396 @@ class Plotter:
             self._save_figure(filename, fig)
 
         plt.close(fig)  # Close the figure to prevent duplicate output in notebooks
+        return fig
+
+    def plot_analysis(
+        self,
+        system: SystemModel,
+        criteria_evaluator: CriteriaEvaluator,
+        min_force_result: FindMinimumForceResult,
+        min_crack_length: float,
+        coupled_criterion_result: CoupledCriterionResult,
+        new_crack_length: float,
+        dz: int = 2,
+        deformation_scale: float = 100.0,
+        window: int = np.inf,
+        levels: int = 300,
+        normalize: bool = True,
+        filename: str = "analysis",
+    ) -> plt.Figure:
+        """
+        Plot deformed slab with field contours.
+
+        Parameters
+        ----------
+        field : str, default 'w'
+            Field to plot ('w', 'u', 'principal', 'sigma', 'tau')
+        system_model : SystemModel, optional
+            System to plot (uses first system if not specified)
+        filename : str, optional
+            Filename for saving plot
+        """
+        fig = plt.figure(figsize=(12, 10))
+        ax = fig.add_subplot(111)
+
+        print("System Segments: ", system.scenario.segments)
+        analyzer = Analyzer(system)
+        xsl, z, xwl = analyzer.rasterize_solution(mode="cracked", num=200)
+
+        zi = analyzer.get_zmesh(dz=dz)["z"]
+        H = analyzer.sm.slab.H
+        h = system.weak_layer.h
+        phi = analyzer.sm.scenario.phi
+        system_type = analyzer.sm.scenario.system_type
+        fq = analyzer.sm.fq
+
+        # Generate a window size which fits the plots
+        window = min(window, np.max(xwl) - np.min(xwl), 10000)
+
+        # Calculate scaling factors for proper aspect ratio and relative heights
+        # 7:1 aspect ratio: vertical extent = window / 7
+        total_vertical_extent = window / 7.0
+
+        # Slab should appear 2x taller than weak layer
+        # So slab gets 2/3 of vertical space, weak layer gets 1/3
+        slab_display_height = (2 / 3) * total_vertical_extent
+        weak_layer_display_height = (1 / 3) * total_vertical_extent
+
+        # Calculate separate scaling factors for coordinates
+        slab_z_scale = slab_display_height / H
+        weak_layer_z_scale = weak_layer_display_height / h
+
+        # Deformation scaling (separate from coordinate scaling)
+        scale = deformation_scale
+
+        # Compute slab displacements on grid (cm)
+        Usl = np.vstack([fq.u(z, h0=h0, unit="cm") for h0 in zi])
+        Wsl = np.vstack([fq.w(z, unit="cm") for _ in zi])
+        Sigmawl = np.where(np.isfinite(xwl), fq.sig(z, unit="kPa"), np.nan)
+        Tauwl = np.where(np.isfinite(xwl), fq.tau(z, unit="kPa"), np.nan)
+
+        # Put coordinate origin at horizontal center
+        if system_type in ["skier", "skiers"]:
+            xsl = xsl - max(xsl) / 2
+            xwl = xwl - max(xwl) / 2
+
+        # Compute slab grid coordinates with vertical origin at top surface (cm)
+        Xsl, Zsl = np.meshgrid(1e-1 * (xsl), 1e-1 * slab_z_scale * (zi - H / 2))
+
+        # Get x-coordinate of maximum deflection w (cm) and derive plot limits
+        xmax = np.min([np.max([Xsl, Xsl + scale * Usl]), 1e-1 * window / 2])
+        xmin = np.max([np.min([Xsl, Xsl + scale * Usl]), -1e-1 * window / 2])
+
+        # Compute weak-layer grid coordinates (cm)
+        # Position weak layer below the slab
+        Xwl, Zwl = np.meshgrid(
+            1e-1 * xwl,
+            [
+                0,  # Top of weak layer (at bottom of slab)
+                1e-1 * weak_layer_z_scale * h,  # Bottom of weak layer
+            ],
+        )
+
+        # Assemble weak-layer displacement field (top and bottom)
+        Uwl = np.vstack([Usl[-1, :], np.zeros(xwl.shape[0])])
+        Wwl = np.vstack([Wsl[-1, :], np.zeros(xwl.shape[0])])
+
+        stress_envelope = criteria_evaluator.stress_envelope(
+            Sigmawl, Tauwl, system.weak_layer
+        )
+        stress_envelope[np.isnan(stress_envelope)] = np.nanmax(stress_envelope)
+
+        # Assemble weak-layer output on grid
+        weak = np.vstack([stress_envelope, stress_envelope])
+
+        # Normalize colormap
+        absmax = np.nanmax(np.abs([stress_envelope.min(), stress_envelope.max()]))
+        clim = np.round(absmax, _significant_digits(absmax))
+        levels = np.linspace(0, clim, num=levels + 1, endpoint=True)
+
+        # Plot outlines of the undeformed and deformed slab
+        ax.plot(
+            _outline(Xsl),
+            _outline(Zsl),
+            "k--",
+            color="red",
+            alpha=0.3,
+            linewidth=1,
+        )
+        ax.plot(
+            _outline(Xsl + scale * Usl),
+            _outline(Zsl + scale * Wsl),
+            "k",
+            color="blue",
+            linewidth=1,
+        )
+
+        # Plot deformed weak-layer _outline
+        nanmask = np.isfinite(xwl)
+        ax.plot(
+            _outline(Xwl[:, nanmask] + scale * Uwl[:, nanmask]),
+            _outline(Zwl[:, nanmask] + scale * Wwl[:, nanmask]),
+            "k",
+            linewidth=1,
+        )
+
+        cmap = plt.get_cmap("RdBu_r")
+        cmap.set_over(_adjust_lightness(cmap(1.0), 0.9))
+        cmap.set_under(_adjust_lightness(cmap(0.0), 0.9))
+
+        ax.contourf(
+            Xwl + scale * Uwl,
+            Zwl + scale * Wwl,
+            weak,
+            levels=levels,
+            cmap=cmap,
+            extend="both",
+        )
+
+        # Plot setup
+        ax.axis("scaled")
+        ax.set_xlim([xmin, xmax])
+        ax.invert_yaxis()
+        ax.use_sticky_edges = False
+
+        # Set up custom y-axis ticks to show real scaled heights
+        # Calculate the actual extent of the plot
+        slab_top = 1e-1 * slab_z_scale * (zi[0] - H / 2)  # Top of slab
+        slab_bottom = 1e-1 * slab_z_scale * (zi[-1] - H / 2)  # Bottom of slab
+        weak_layer_bottom = 1e-1 * weak_layer_z_scale * h  # Bottom of weak layer
+
+        # Create tick positions and labels
+        y_ticks = []
+        y_labels = []
+
+        # Slab ticks (show actual slab heights in mm)
+        num_slab_ticks = 5
+        slab_tick_positions = np.linspace(slab_bottom, slab_top, num_slab_ticks)
+        slab_height_ticks = np.linspace(
+            0, -H, num_slab_ticks
+        )  # Actual slab heights in mm
+
+        for pos, height in zip(slab_tick_positions, slab_height_ticks):
+            y_ticks.append(pos)
+            y_labels.append(f"{height:.0f}")
+
+        # Weak layer ticks (show actual weak layer heights in mm)
+        num_wl_ticks = 3
+        wl_tick_positions = np.linspace(0, weak_layer_bottom, num_wl_ticks)
+        wl_height_ticks = np.linspace(
+            0, h, num_wl_ticks
+        )  # Actual weak layer heights in mm
+
+        for pos, height in zip(wl_tick_positions, wl_height_ticks):
+            y_ticks.append(pos)
+            y_labels.append(f"{height:.0f}")
+
+        # Set the custom ticks
+        ax.set_yticks(y_ticks)
+        ax.set_yticklabels(y_labels)
+
+        # Add grid lines for better readability
+        ax.grid(True, alpha=0.3)
+
+        # Add horizontal line to separate slab and weak layer
+        ax.axhline(y=slab_bottom, color="black", linewidth=1, alpha=0.5, linestyle="--")
+
+        # === ADD ANALYSIS ANNOTATIONS ===
+
+        # 1. Vertical lines for min_crack_length (centered at x=0)
+        min_crack_length_cm = min_crack_length / 10  # Convert mm to cm
+        ax.plot(
+            [-min_crack_length_cm, -min_crack_length_cm],
+            [0, weak_layer_bottom],
+            color="red",
+            linewidth=1,
+            alpha=0.7,
+            label=f"Crack Propagation: ±{min_crack_length:.0f}mm",
+        )
+        ax.plot(
+            [min_crack_length_cm, min_crack_length_cm],
+            [0, weak_layer_bottom],
+            color="red",
+            linewidth=1,
+            alpha=0.7,
+        )
+
+        # 2. Skier weight squares from segments
+        from matplotlib.patches import Rectangle
+
+        base_square_size = (1e-1 * window) / 25  # Base size for scaling
+        segment_position = 0  # Track cumulative position
+        square_spacing = 2.0  # Space above slab for squares
+
+        # Collect weight information for legend
+        weight_legend_items = []
+
+        for segment in system.scenario.segments:
+            segment_position += segment.length
+            if segment.m > 0:  # If there's a weight at this segment
+                # Convert position to cm and center at x=0
+                square_x = (segment_position / 10) - (1e-1 * max(xsl))
+                square_y = slab_top - square_spacing  # Position above slab
+
+                # Calculate square side length based on cube root of weight (volume scaling)
+                actual_side_length = base_square_size * (segment.m / 100) ** (1 / 3)
+
+                # Draw actual skier weight square (filled, blue)
+                actual_square = Rectangle(
+                    (square_x - actual_side_length / 2, square_y - actual_side_length),
+                    actual_side_length,
+                    actual_side_length,
+                    facecolor="blue",
+                    alpha=0.7,
+                    edgecolor="blue",
+                    linewidth=1,
+                )
+                ax.add_patch(actual_square)
+
+                # Add to weight legend
+                weight_legend_items.append(
+                    (f"Actual: {segment.m:.0f} kg", "blue", True)
+                )
+
+                # Draw critical weight square (outline only, orange)
+                critical_weight = min_force_result.critical_skier_weight
+                critical_side_length = base_square_size * (critical_weight / 100) ** (
+                    1 / 3
+                )
+                critical_square = Rectangle(
+                    (
+                        square_x - critical_side_length / 2,
+                        square_y - critical_side_length,
+                    ),
+                    critical_side_length,
+                    critical_side_length,
+                    facecolor="none",
+                    alpha=0.7,
+                    edgecolor="orange",
+                    linewidth=1,
+                )
+                ax.add_patch(critical_square)
+
+                # Add to weight legend (only once)
+                if not any("Critical" in item[0] for item in weight_legend_items):
+                    weight_legend_items.append(
+                        (f"Critical: {critical_weight:.0f} kg", "orange", False)
+                    )
+
+        # 3. Coupled criterion result square (centered at x=0)
+        coupled_weight = coupled_criterion_result.critical_skier_weight
+        coupled_side_length = base_square_size * (coupled_weight / 100) ** (1 / 3)
+        coupled_square = Rectangle(
+            (-coupled_side_length / 2, slab_top - square_spacing - coupled_side_length),
+            coupled_side_length,
+            coupled_side_length,
+            facecolor="none",
+            alpha=0.7,
+            edgecolor="green",
+            linewidth=1,
+        )
+        ax.add_patch(coupled_square)
+
+        # Add to weight legend
+        weight_legend_items.append(
+            (f"Coupled: {coupled_weight:.0f} kg", "green", False)
+        )
+
+        # 4. Vertical line for coupled criterion result (spans weak layer only)
+        cc_crack_length = coupled_criterion_result.crack_length / 10
+        ax.plot(
+            [cc_crack_length, cc_crack_length],
+            [0, weak_layer_bottom],
+            color="green",
+            linewidth=1,
+            alpha=0.7,
+        )
+        ax.plot(
+            [-cc_crack_length, -cc_crack_length],
+            [0, weak_layer_bottom],
+            color="green",
+            linewidth=1,
+            alpha=0.7,
+            label=f"Crack Nucleation: ±{coupled_criterion_result.crack_length:.0f}mm",
+        )
+
+        # Calculate and set proper y-axis limits to include squares
+        # Find the maximum extent of squares and text above the slab
+        max_weight = max(
+            [segment.m for segment in system.scenario.segments if segment.m > 0]
+            + [
+                min_force_result.critical_skier_weight,
+                coupled_criterion_result.critical_skier_weight,
+            ]
+        )
+        max_square_size = base_square_size * (max_weight / 100) ** (1 / 3)
+
+        # Calculate plot limits for inverted y-axis
+        # Top of plot (smallest y-value): above the squares and text
+        plot_top = slab_top - 3 * max_square_size - 5  # Include text space
+
+        # Bottom of plot (largest y-value): below weak layer
+        plot_bottom = weak_layer_bottom + 1.0
+
+        # Set y-limits [bottom, top] for inverted axis
+        ax.set_ylim([plot_bottom, plot_top])
+
+        # Create weight legend with custom proxy artists
+        from matplotlib.patches import Patch
+
+        weight_legend_handles = []
+        weight_legend_labels = []
+
+        for label, color, filled in weight_legend_items:
+            if filled:
+                # Filled square for actual weights
+                patch = Patch(facecolor=color, edgecolor=color, alpha=0.7)
+            else:
+                # Outline only square for critical/coupled weights
+                patch = Patch(facecolor="none", edgecolor=color, alpha=0.7, linewidth=1)
+
+            weight_legend_handles.append(patch)
+            weight_legend_labels.append(label)
+
+        # Plot labels
+        ax.set_xlabel(r"lateral position $x$ (cm) $\longrightarrow$")
+        ax.set_ylabel("Layer Height (mm)\n" + r"$\longleftarrow $ Slab | Weak Layer")
+
+        # Add primary legend for annotations (crack lengths)
+        legend1 = ax.legend(loc="upper right", fontsize=8)
+
+        # Add secondary legend for weights
+        legend2 = ax.legend(
+            weight_legend_handles,
+            weight_legend_labels,
+            loc="upper left",
+            fontsize=8,
+            title="Weight Values",
+        )
+
+        # Add the first legend back (matplotlib only shows the last legend by default)
+        ax.add_artist(legend1)
+
+        # Show colorbar
+        ticks = np.linspace(levels[0], levels[-1], num=11, endpoint=True)
+        cbar = fig.colorbar(
+            ax.contourf(
+                Xwl + scale * Uwl,
+                Zwl + scale * Wwl,
+                weak,
+                levels=levels,
+                cmap=cmap,
+                extend="both",
+            ),
+            orientation="horizontal",
+            ticks=ticks,
+            label="Stress Criterion: Failure > 1",
+            aspect=35,
+        )
+
+        # Save figure
+        self._save_figure(filename, fig)
+
         return fig
 
     def create_comparison_dashboard(

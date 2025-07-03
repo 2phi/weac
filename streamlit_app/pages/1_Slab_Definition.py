@@ -27,7 +27,7 @@ with col1:
     rho = col1.number_input(
         "Density (kg/m^3)",
         key="rho_weak",
-        value=100.0,
+        value=125.0,
         min_value=80.0,
         step=10.0,
     )
@@ -63,7 +63,7 @@ with col1:
         E = elastic_cols[2].number_input(
             "Young's modulus (MPa)",
             key="E_weak",
-            value=default_wl.E,
+            value=1.0,  # TODO: this is not default right now 'default_wl.E'
             step=0.01,
             disabled=not edit_wl,
         )
@@ -203,7 +203,7 @@ with col1:
     elif profile_type == "From Database":
         st.subheader("Database Slab Profile")
         col1, col2 = st.columns([1, 3], vertical_alignment="bottom")
-        profile_options = ["a", "b", "c", "d", "e", "f"]
+        profile_options = ["a", "b", "c", "d", "e", "f", "tested"]
         col1.write("Select Profile:")
         profile_name = col2.radio(
             "Select a profile",
@@ -238,6 +238,3 @@ if st.button("To Scenario Definition"):
     system = SystemModel(model_input=model_input)
     st.session_state["system"] = system
     st.switch_page("pages/2_Scenario_Definition.py")
-
-if "system" in st.session_state:
-    st.success("You can proceed to the next page.")

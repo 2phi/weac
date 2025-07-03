@@ -57,6 +57,12 @@ def load_dummy_profile(profile_id):
     medium_layer = Layer(rho=270, h=120, E=30)
     hard_layer = Layer(rho=350, h=120, E=93.8)
 
+    tested_layers = [
+        Layer(rho=350, h=120),
+        Layer(rho=270, h=120),
+        Layer(rho=180, h=120),
+    ]
+
     # Database (top to bottom)
     database = {
         # Layered
@@ -66,6 +72,7 @@ def load_dummy_profile(profile_id):
         "d": [soft_layer, hard_layer, soft_layer],
         "e": [hard_layer, soft_layer, soft_layer],
         "f": [soft_layer, soft_layer, hard_layer],
+        "tested": tested_layers,
         # Homogeneous
         "h": [medium_layer, medium_layer, medium_layer],
         "soft": [soft_layer, soft_layer, soft_layer],
