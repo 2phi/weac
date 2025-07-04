@@ -189,7 +189,7 @@ with col1:
                 "Density (kg/m^3)",
                 key=f"rho_{i}",
                 value=float(defaults["density"]),
-                min_value=110.0,
+                min_value=10.0,
                 step=10.0,
             )
             h_layer = cols[2].number_input(
