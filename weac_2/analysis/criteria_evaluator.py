@@ -82,7 +82,7 @@ class CoupledCriterionResult:
     dist_ERR_envelope: float
     iterations: int
     history: Optional[CoupledCriterionHistory]
-    final_system: Optional[SystemModel]
+    final_system: SystemModel
     max_dist_stress: float
     min_dist_stress: float
 
@@ -98,6 +98,8 @@ class FindMinimumForceResult:
         Whether the algorithm converged.
     critical_skier_weight : float
         The critical skier weight.
+    new_segments : List[Segment]
+        The new segments.
     old_segments : List[Segment]
         The old segments.
     iterations : int
@@ -107,9 +109,9 @@ class FindMinimumForceResult:
     min_dist_stress : float
         The minimum distance to failure.
     """
-
     success: bool
     critical_skier_weight: float
+    new_segments: List[Segment]
     old_segments: List[Segment]
     iterations: int
     max_dist_stress: float
@@ -664,14 +666,14 @@ class CriteriaEvaluator:
         total_length = system.scenario.L
         segments = [
             Segment(length=total_length / 2, has_foundation=True, m=0.0),
-            Segment(length=0, has_foundation=False, m=skier_weight),
-            Segment(length=0, has_foundation=False, m=0.0),
+            Segment(length=0, has_foundation=True, m=skier_weight),
+            Segment(length=0, has_foundation=True, m=0.0),
             Segment(length=total_length / 2, has_foundation=True, m=0.0),
         ]
         system.update_scenario(segments=segments)
 
         analyzer = Analyzer(system)
-        _, z_skier, _ = analyzer.rasterize_solution(mode="uncracked", num=800)
+        _, z_skier, _ = analyzer.rasterize_solution(mode="uncracked", num=2000)
 
         sigma_kPa = system.fq.sig(z_skier, unit="kPa")
         tau_kPa = system.fq.tau(z_skier, unit="kPa")
@@ -689,6 +691,7 @@ class CriteriaEvaluator:
             return FindMinimumForceResult(
                 success=True,
                 critical_skier_weight=skier_weight,
+                new_segments=segments,
                 old_segments=old_segments,
                 iterations=iteration_count,
                 max_dist_stress=max_dist_stress,
@@ -711,13 +714,13 @@ class CriteriaEvaluator:
 
             temp_segments = [
                 Segment(length=total_length / 2, has_foundation=True, m=0),
-                Segment(length=0, has_foundation=False, m=skier_weight),
-                Segment(length=0, has_foundation=False, m=0),
+                Segment(length=0, has_foundation=True, m=skier_weight),
+                Segment(length=0, has_foundation=True, m=0),
                 Segment(length=total_length / 2, has_foundation=True, m=0),
             ]
 
             system.update_scenario(segments=temp_segments)
-            _, z_skier, _ = analyzer.rasterize_solution(mode="cracked", num=800)
+            _, z_skier, _ = analyzer.rasterize_solution(mode="cracked", num=2000)
 
             sigma_kPa = system.fq.sig(z_skier, unit="kPa")
             tau_kPa = system.fq.tau(z_skier, unit="kPa")
@@ -738,6 +741,7 @@ class CriteriaEvaluator:
                 return FindMinimumForceResult(
                     success=True,
                     critical_skier_weight=skier_weight,
+                    new_segments=temp_segments,
                     old_segments=old_segments,
                     iterations=iteration_count,
                     max_dist_stress=max_dist_stress,
@@ -756,6 +760,7 @@ class CriteriaEvaluator:
                 return FindMinimumForceResult(
                     success=False,
                     critical_skier_weight=0.0,
+                    new_segments=temp_segments,
                     old_segments=old_segments,
                     iterations=iteration_count,
                     max_dist_stress=max_dist_stress,
@@ -763,12 +768,15 @@ class CriteriaEvaluator:
                 )
 
         logger.info(
-            f"Finished find_minimum_force in {time.time() - start_time:.4f} seconds after {iteration_count} iterations."
+            "Finished find_minimum_force in %.4f seconds after %d iterations.",
+            time.time() - start_time,
+            iteration_count
         )
         analyzer.print_call_stats(message="find_minimum_force Call Statistics")
         return FindMinimumForceResult(
             success=True,
             critical_skier_weight=skier_weight,
+            new_segments=temp_segments,
             old_segments=old_segments,
             iterations=iteration_count,
             max_dist_stress=max_dist_stress,
@@ -778,7 +786,7 @@ class CriteriaEvaluator:
     def find_minimum_crack_length(
         self,
         system: SystemModel,
-        search_interval: tuple[float, float] = (),
+        search_interval: tuple[float, float] | None = None,
         target: float = 1,
     ) -> tuple[float, List[Segment]]:
         """
@@ -793,12 +801,12 @@ class CriteriaEvaluator:
         --------
         minimum_crack_length: float
             The minimum crack length required to surpass the energy release rate envelope [mm]
-        segments: List[Segment]
+        new_segments: List[Segment]
             The updated list of segments
         """
         old_segments = copy.deepcopy(system.scenario.segments)
 
-        if search_interval == ():
+        if search_interval is None:
             a = 0
             b = system.scenario.L
         else:
@@ -817,14 +825,16 @@ class CriteriaEvaluator:
             bracket=[a, b],  # Interval where the root is expected
             method="brentq",  # Brent's method
         )
+        
+        new_segments = system.scenario.segments
 
         system.update_scenario(segments=old_segments)
 
         if result.converged:
-            return result.root
+            return result.root, new_segments
         else:
             print("Root search did not converge.")
-            return None
+            return 0.0, new_segments
 
     def check_crack_self_propagation(
         self,
@@ -869,7 +879,10 @@ class CriteriaEvaluator:
         )
         can_propagate = g_delta_diff >= 1
         logger.info(
-            f"Self-propagation check finished in {time.time() - start_time:.4f} seconds. Result: g_delta_diff={g_delta_diff:.4f}, can_propagate={can_propagate}"
+            "Self-propagation check finished in %.4f seconds. "
+            "Result: g_delta_diff=%.4f, can_propagate=%s" % (
+                time.time() - start_time, g_delta_diff, can_propagate
+            )
         )
 
         return g_delta_diff, bool(can_propagate)
