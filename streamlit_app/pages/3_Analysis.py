@@ -5,6 +5,10 @@ import streamlit as st
 from weac_2.analysis.analyzer import Analyzer
 from weac_2.analysis.criteria_evaluator import CriteriaEvaluator
 from weac_2.analysis.plotter import Plotter
+
+# Initialize plotter in session state if not already present
+if "plotter" not in st.session_state:
+    st.session_state.plotter = Plotter()
 from weac_2.components import (
     CriteriaConfig,
     Layer,
@@ -77,7 +81,7 @@ system_model = SystemModel(model_input)
 
 # --- Initialize Analysis Tools ---
 analyzer = Analyzer(system_model)
-plotter = Plotter()
+plotter = st.session_state.plotter  # Use plotter from session state
 criteria_evaluator = CriteriaEvaluator(criteria_config=criteria_config)
 
 

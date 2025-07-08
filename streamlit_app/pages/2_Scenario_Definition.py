@@ -8,6 +8,11 @@ from weac_2.components.segment import Segment
 from weac_2.core.scenario import Scenario
 from weac_2.core.system_model import SystemModel
 from weac_2.analysis.analyzer import Analyzer
+from weac_2.analysis.plotter import Plotter
+
+# Initialize plotter in session state if not already present
+if "plotter" not in st.session_state:
+    st.session_state.plotter = Plotter()
 
 st.set_page_config(page_title="Scenario and Analysis", layout="wide")
 
@@ -144,7 +149,7 @@ fig = st.session_state.plotter.plot_deformed(
     analyzer=analyzer,
     dz=2,
     scale=100,
-    window=np.inf,
+    window=int(1e6),  # Using large int instead of np.inf
     pad=2,
     levels=300,
     aspect=2,

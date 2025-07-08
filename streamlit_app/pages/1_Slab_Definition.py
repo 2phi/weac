@@ -10,8 +10,12 @@ from weac_2.components.scenario_config import ScenarioConfig
 from weac_2.core.slab import Slab
 from weac_2.core.system_model import SystemModel
 from weac_2.utils import load_dummy_profile
+from weac_2.analysis.plotter import Plotter
 
-st.set_page_config(page_title="Slab Definition", layout="wide")
+if "plotter" not in st.session_state:
+    st.session_state.plotter = Plotter()
+
+st.set_page_config(layout="wide")
 
 st.markdown("# Slab Definition")
 st.sidebar.header("Slab Definition")

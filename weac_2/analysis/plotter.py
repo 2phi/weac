@@ -6,7 +6,10 @@ from typing import List, Literal, Optional
 # Third party imports
 import matplotlib.colors as mc
 import matplotlib.pyplot as plt
+from matplotlib.figure import Figure
+from matplotlib.patches import Rectangle, Patch
 import numpy as np
+from referencing.typing import D
 from scipy.optimize import brentq
 
 from weac_2.analysis.analyzer import Analyzer
@@ -227,7 +230,7 @@ class Plotter:
                 "Must provide either 'system_model' or 'system_models' as a SystemModel or list of SystemModels"
             )
 
-    def _save_figure(self, filename: str, fig: Optional[plt.Figure] = None):
+    def _save_figure(self, filename: str, fig: Optional[Figure] = None):
         """Save figure with proper formatting."""
         if fig is None:
             fig = plt.gcf()
@@ -326,9 +329,6 @@ class Plotter:
         ax1.set_ylabel(r"Height above weak layer (mm) $\longrightarrow$")
 
         ax1.set_title("Slab Density Profile")
-
-        # Create custom legend
-        from matplotlib.patches import Patch
 
         handles, slab_labels = ax1.get_legend_handles_labels()
         weak_layer_patch = Patch(
@@ -511,7 +511,7 @@ class Plotter:
         field: Literal["w", "u", "principal", "Sxx", "Txz", "Szz"] = "w",
         normalize: bool = True,
         filename: str = "deformed_slab",
-    ) -> plt.Figure:
+    ) -> Figure:
         """
         Plot deformed slab with field contours.
 
@@ -896,7 +896,7 @@ class Plotter:
         system_model: SystemModel,
         criteria_evaluator: CriteriaEvaluator,
         filename: str = "err_envelope",
-    ):
+    ) -> Figure:
         analyzer = self._get_analyzer(system_model)
 
         incr_energy = analyzer.incremental_ERR(unit="J/m^2")
@@ -990,10 +990,8 @@ class Plotter:
 
         plt.tight_layout()
 
-        if filename:
-            self._save_figure(filename, fig)
+        self._save_figure(filename, fig)
 
-        plt.close(fig)  # Close the figure to prevent duplicate output in notebooks
         return fig
 
     def plot_analysis(
@@ -1010,7 +1008,7 @@ class Plotter:
         levels: int = 300,
         normalize: bool = True,
         filename: str = "analysis",
-    ) -> plt.Figure:
+    ) -> Figure:
         """
         Plot deformed slab with field contours.
 
@@ -1208,9 +1206,6 @@ class Plotter:
             alpha=0.7,
         )
 
-        # 2. Skier weight squares from segments
-        from matplotlib.patches import Rectangle
-
         base_square_size = (1e-1 * window) / 25  # Base size for scaling
         segment_position = 0  # Track cumulative position
         square_spacing = 2.0  # Space above slab for squares
@@ -1328,9 +1323,6 @@ class Plotter:
         # Set y-limits [bottom, top] for inverted axis
         ax.set_ylim([plot_bottom, plot_top])
 
-        # Create weight legend with custom proxy artists
-        from matplotlib.patches import Patch
-
         weight_legend_handles = []
         weight_legend_labels = []
 
@@ -1383,200 +1375,6 @@ class Plotter:
 
         # Save figure
         self._save_figure(filename, fig)
-
-        return fig
-
-    def create_comparison_dashboard(
-        self,
-        system_models: Optional[List[SystemModel]] = None,
-        filename: str = "comparison_dashboard",
-        labels: Optional[List[str]] = None,
-        colors: Optional[List[str]] = None,
-    ):
-        """
-        Create a comprehensive comparison dashboard.
-
-        Parameters
-        ----------
-        system_models : List[SystemModel], optional
-            Systems to include in dashboard (uses all if not specified)
-        filename : str, optional
-            Filename for saving plot
-        labels : list of str, optional
-            Labels for each system.
-        colors : list of str, optional
-            Colors for each system.
-        """
-        if system_models is None:
-            raise ValueError("system_models must be provided for comparison dashboard")
-
-        if labels is None:
-            labels = [f"System {i + 1}" for i in range(len(system_models))]
-        if colors is None:
-            plot_colors = [self.colors[i, 0] for i in range(len(system_models))]
-        else:
-            plot_colors = colors
-
-        fig = plt.figure(figsize=(20, 16))
-
-        # Create subplot grid
-        gs = fig.add_gridspec(4, 3, hspace=0.3, wspace=0.3)
-
-        # 1. Slab profiles
-        ax1 = fig.add_subplot(gs[0, 0])
-        for i, system in enumerate(system_models):
-            slab = system.slab
-            z_positions = np.concatenate(
-                [[0], np.cumsum([layer.h for layer in slab.layers])]
-            )
-            densities = [layer.rho for layer in slab.layers]
-
-            for j, (z_start, z_end, rho) in enumerate(
-                zip(z_positions[:-1], z_positions[1:], densities)
-            ):
-                ax1.barh(
-                    z_start,
-                    rho,
-                    height=z_end - z_start,
-                    color=plot_colors[i],
-                    alpha=0.7,
-                    edgecolor="black",
-                    linewidth=0.5,
-                    label=labels[i] if j == 0 else "",
-                )
-
-        ax1.set_xlabel("Density (kg/m³)")
-        ax1.set_ylabel("Height (mm)")
-        ax1.set_title("Slab Profiles")
-        ax1.legend()
-        ax1.grid(True, alpha=0.3)
-
-        # 2. Vertical displacement
-        ax2 = fig.add_subplot(gs[0, 1])
-        for i, system in enumerate(system_models):
-            analyzer = self._get_analyzer(system)
-            x, z, _ = analyzer.rasterize_solution()
-            w = system.fq.w(z, unit="mm")
-            ax2.plot(x / 1000, w, color=plot_colors[i], label=labels[i], linewidth=2)
-
-        ax2.set_xlabel("Distance (m)")
-        ax2.set_ylabel("w (mm)")
-        ax2.set_title("Vertical Displacement")
-        ax2.legend()
-        ax2.grid(True, alpha=0.3)
-
-        # 3. Normal stress
-        ax3 = fig.add_subplot(gs[0, 2])
-        for i, system in enumerate(system_models):
-            analyzer = self._get_analyzer(system)
-            x, z, _ = analyzer.rasterize_solution()
-            sigma = system.fq.sig(z, unit="kPa")
-            ax3.plot(
-                x / 1000, sigma, color=plot_colors[i], label=labels[i], linewidth=2
-            )
-
-        ax3.set_xlabel("Distance (m)")
-        ax3.set_ylabel("σ (kPa)")
-        ax3.set_title("Normal Stress")
-        ax3.legend()
-        ax3.grid(True, alpha=0.3)
-
-        # 4. Shear stress
-        ax4 = fig.add_subplot(gs[1, 0])
-        for i, system in enumerate(system_models):
-            analyzer = self._get_analyzer(system)
-            x, z, _ = analyzer.rasterize_solution()
-            tau = system.fq.tau(z, unit="kPa")
-            ax4.plot(x / 1000, tau, color=plot_colors[i], label=labels[i], linewidth=2)
-
-        ax4.set_xlabel("Distance (m)")
-        ax4.set_ylabel("τ (kPa)")
-        ax4.set_title("Shear Stress")
-        ax4.legend()
-        ax4.grid(True, alpha=0.3)
-
-        # 5. Bending moment
-        ax5 = fig.add_subplot(gs[1, 1])
-        for i, system in enumerate(system_models):
-            analyzer = self._get_analyzer(system)
-            x, z, _ = analyzer.rasterize_solution()
-            M = system.fq.M(z)
-            ax5.plot(x / 1000, M, color=plot_colors[i], label=labels[i], linewidth=2)
-
-        ax5.set_xlabel("Distance (m)")
-        ax5.set_ylabel("M (Nmm)")
-        ax5.set_title("Bending Moment")
-        ax5.legend()
-        ax5.grid(True, alpha=0.3)
-
-        # 6. Energy release rates
-        ax6 = fig.add_subplot(gs[1, 2])
-        for i, system in enumerate(system_models):
-            analyzer = self._get_analyzer(system)
-            x, z, _ = analyzer.rasterize_solution()
-            G_I = system.fq.Gi(z, unit="kJ/m^2")
-            G_II = system.fq.Gii(z, unit="kJ/m^2")
-            ax6.plot(
-                x / 1000, G_I + G_II, color=plot_colors[i], label=labels[i], linewidth=2
-            )
-
-        ax6.set_xlabel("Distance (m)")
-        ax6.set_ylabel("G_total (kJ/m²)")
-        ax6.set_title("Total Energy Release Rate")
-        ax6.legend()
-        ax6.grid(True, alpha=0.3)
-
-        # 7-9. System information table
-        ax7 = fig.add_subplot(gs[2:, :])
-        ax7.axis("off")
-
-        # Create system information table
-        table_data = []
-        headers = [
-            "System",
-            "Slope (°)",
-            "Slab H (mm)",
-            "WL h (mm)",
-            "WL ρ (kg/m³)",
-            "Max |w| (mm)",
-            "Max |τ| (kPa)",
-        ]
-
-        for i, (system, label) in enumerate(zip(system_models, labels)):
-            analyzer = self._get_analyzer(system)
-            x, z, _ = analyzer.rasterize_solution()
-
-            max_w = np.max(np.abs(system.fq.w(z, unit="mm")))
-            max_tau = np.max(np.abs(system.fq.tau(z, unit="kPa")))
-
-            row = [
-                label,
-                f"{system.scenario.phi:.1f}",
-                f"{system.slab.H:.0f}",
-                f"{system.weak_layer.h:.0f}",
-                f"{system.weak_layer.rho:.0f}",
-                f"{max_w:.3f}",
-                f"{max_tau:.3f}",
-            ]
-            table_data.append(row)
-
-        table = ax7.table(
-            cellText=table_data,
-            colLabels=headers,
-            cellLoc="center",
-            loc="center",
-            colColours=["lightgray"] * len(headers),
-        )
-        table.auto_set_font_size(False)
-        table.set_fontsize(10)
-        table.scale(1, 2)
-
-        ax7.set_title("System Comparison Summary", fontsize=16, pad=20)
-
-        plt.suptitle("WEAC Simulation Comparison Dashboard", fontsize=18, y=0.98)
-
-        if filename:
-            self._save_figure(filename, fig)
 
         return fig
 

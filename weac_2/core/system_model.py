@@ -256,9 +256,11 @@ class SystemModel:
 
     @cached_property
     def uncracked_unknown_constants(self) -> np.ndarray:
+        print("segments: ", self.scenario.segments)
         new_segments = copy.deepcopy(self.scenario.segments)
         for i, seg in enumerate(new_segments):
             seg.has_foundation = True
+        print("new_segments: ", new_segments)
         self.uncracked_scenario = Scenario(
             scenario_config=self.scenario.scenario_config,
             segments=new_segments,
