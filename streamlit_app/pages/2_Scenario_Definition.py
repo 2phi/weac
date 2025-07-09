@@ -1,6 +1,9 @@
+import sys
 from matplotlib import pyplot as plt
 import numpy as np
 import streamlit as st
+
+sys.path.append("/home/pillowbeast/Documents/weac")
 
 from weac_2.components.model_input import ModelInput
 from weac_2.components.scenario_config import ScenarioConfig

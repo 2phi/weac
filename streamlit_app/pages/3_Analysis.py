@@ -1,6 +1,8 @@
+import sys
 from typing import List
-
 import streamlit as st
+
+sys.path.append("/home/pillowbeast/Documents/weac")
 
 from weac_2.analysis.analyzer import Analyzer
 from weac_2.analysis.criteria_evaluator import CriteriaEvaluator
@@ -113,6 +115,12 @@ if run_full_analysis:
         coupled_criterion_result = criteria_evaluator.evaluate_coupled_criterion(
             system_model
         )
+        analyzer = Analyzer(coupled_criterion_result.final_system)
+        # Calculate fracture toughness criterion
+        diff_energy = analyzer.differential_ERR(unit="J/m^2")
+        diff_err = criteria_evaluator.fracture_toughness_envelope(
+            diff_energy[1], diff_energy[2], weak_layer
+        )
 
     progress_bar.progress(30)
 
@@ -129,7 +137,8 @@ if run_full_analysis:
 
     with col2:
         st.metric("Crack Length", f"{coupled_criterion_result.crack_length:.1f} mm")
-        st.metric("G Delta", f"{coupled_criterion_result.g_delta:.3f}")
+        st.metric("IERR Envelope", f"{coupled_criterion_result.g_delta:.3f}") # TODO: change to G_delta
+        st.metric("DERR Envelope", f"{diff_err:.3f}")
 
     with col3:
         st.metric("Iterations", f"{coupled_criterion_result.iterations}")
@@ -159,15 +168,15 @@ if run_full_analysis:
     # Display crack propagation results
     st.success("✅ Crack Propagation Analysis Complete")
     col1, col2 = st.columns(2)
-
+    st.header("Propagation of Crack")
     with col1:
-        st.subheader("With Skier Weight")
-        st.metric("G Delta", f"{g_delta_with_weight:.3f}")
+        st.subheader("With Critical Skier Weight")
+        st.metric("Differential ERR", f"{g_delta_with_weight:.3f}")
         st.metric("Can Propagate", "Yes" if propagation_with_weight else "No")
 
     with col2:
-        st.subheader("Without Skier Weight")
-        st.metric("G Delta", f"{g_delta_without_weight:.3f}")
+        st.subheader("Without Any Skier Weight")
+        st.metric("Differential ERR", f"{g_delta_without_weight:.3f}")
         st.metric("Can Propagate", "Yes" if propagation_without_weight else "No")
 
     # Step 3: Minimum Force Analysis
@@ -201,7 +210,7 @@ if run_full_analysis:
 
     with st.spinner("Finding minimum crack length..."):
         print(final_system.scenario.segments)
-        min_crack_length = criteria_evaluator.find_minimum_crack_length(final_system)
+        min_crack_length, new_segments = criteria_evaluator.find_minimum_crack_length(final_system)
 
     progress_bar.progress(90)
 
@@ -209,27 +218,27 @@ if run_full_analysis:
     st.success("✅ Minimum Crack Length Analysis Complete")
     st.metric("Minimum Crack Length", f"{min_crack_length:.1f} mm")
 
-    # Step 5: Find crack length for increased weight
-    status_text.text("Analyzing crack length for increased weight...")
-    with st.spinner("Analyzing crack length for increased weight..."):
-        increased_weight = min_force_result.critical_skier_weight + 20
-        new_crack_length, new_segments = (
-            criteria_evaluator.find_crack_length_for_weight(
-                final_system, increased_weight
-            )
-        )
+    # # Step 5: Find crack length for increased weight
+    # status_text.text("Analyzing crack length for increased weight...")
+    # with st.spinner("Analyzing crack length for increased weight..."):
+    #     increased_weight = min_force_result.critical_skier_weight + 20
+    #     new_crack_length, new_segments = (
+    #         criteria_evaluator.find_crack_length_for_weight(
+    #             final_system, increased_weight
+    #         )
+    #     )
 
-    progress_bar.progress(95)
+    # progress_bar.progress(95)
 
-    # Display increased weight results
-    st.success("✅ Crack Length for Increased Weight Analysis Complete")
-    col1, col2 = st.columns(2)
+    # # Display increased weight results
+    # st.success("✅ Crack Length for Increased Weight Analysis Complete")
+    # col1, col2 = st.columns(2)
 
-    with col1:
-        st.metric("Test Weight", f"{increased_weight:.1f} kg")
+    # with col1:
+    #     st.metric("Test Weight", f"{increased_weight:.1f} kg")
 
-    with col2:
-        st.metric("Resulting Crack Length", f"{new_crack_length:.1f} mm")
+    # with col2:
+    #     st.metric("Resulting Crack Length", f"{new_crack_length:.1f} mm")
 
     # Step 6: Generate Plots
     status_text.text("Generating plots...")
@@ -259,7 +268,7 @@ if run_full_analysis:
             min_force_result=min_force_result,
             min_crack_length=min_crack_length,
             coupled_criterion_result=coupled_criterion_result,
-            new_crack_length=new_crack_length,
+            new_crack_length=0.0,
             filename="analysis",
             deformation_scale=500.0,
         )
