@@ -36,8 +36,9 @@ def track_analyzer_call(func):
         self.call_stats[func_name]["total_time"] += duration
 
         logger.debug(
-            f"Analyzer method '{func_name}' called. "
-            f"Execution time: {duration:.4f} seconds."
+            "Analyzer method '%s' called. "
+            "Execution time: %.4f seconds.",
+            func_name, duration
         )
 
         return result
@@ -90,7 +91,7 @@ class Analyzer:
     def rasterize_solution(
         self,
         mode: Literal["cracked", "uncracked"] = "cracked",
-        num: int = 250,
+        num: int = 4000,
     ):
         """
         Compute rasterized solution vector.
@@ -568,7 +569,7 @@ class Analyzer:
                 self._integrand_GII, z_uncracked=z_uncracked, z_cracked=z_cracked
             )
 
-            # Segement contributions to total crack opening integral
+            # Segment contributions to total crack opening integral
             Ginc1 += quad(intGI, 0, length, epsabs=tolerance, epsrel=tolerance)[0] / (
                 2 * da
             )
@@ -677,7 +678,7 @@ class Analyzer:
             Total external potential (Nmm).
         """
         # Rasterize solution
-        xq, zq, xb = self.rasterize_solution(mode="cracked")
+        xq, zq, xb = self.rasterize_solution(mode="cracked", num=2000)
         _ = xq, xb
         # Compute displacements where weight loads are applied
         w0 = self.sm.fq.w(zq)
@@ -743,7 +744,7 @@ class Analyzer:
         kt = self.sm.weak_layer.kt
 
         # Rasterize solution
-        xq, zq, xb = self.rasterize_solution(mode="cracked")
+        xq, zq, xb = self.rasterize_solution(mode="cracked", num=2000)
 
         # Compute section forces
         N, M, V = self.sm.fq.N(zq), self.sm.fq.M(zq), self.sm.fq.V(zq)

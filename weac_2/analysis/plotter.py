@@ -1001,7 +1001,6 @@ class Plotter:
         min_force_result: FindMinimumForceResult,
         min_crack_length: float,
         coupled_criterion_result: CoupledCriterionResult,
-        new_crack_length: float,
         dz: int = 2,
         deformation_scale: float = 100.0,
         window: int = np.inf,
@@ -1097,14 +1096,14 @@ class Plotter:
         # Normalize colormap
         absmax = np.nanmax(np.abs([stress_envelope.min(), stress_envelope.max()]))
         clim = np.round(absmax, _significant_digits(absmax))
-        levels = np.linspace(0, clim, num=levels + 1, endpoint=True)
+        levels = np.linspace(0, 1, num=levels + 1, endpoint=True)
 
         # Plot outlines of the undeformed and deformed slab
         ax.plot(
             _outline(Xsl),
             _outline(Zsl),
             "k--",
-            color="red",
+            color="yellow",
             alpha=0.3,
             linewidth=1,
         )
@@ -1191,17 +1190,17 @@ class Plotter:
         # 1. Vertical lines for min_crack_length (centered at x=0)
         min_crack_length_cm = min_crack_length / 10  # Convert mm to cm
         ax.plot(
-            [-min_crack_length_cm, -min_crack_length_cm],
+            [-min_crack_length_cm/2, -min_crack_length_cm/2],
             [0, weak_layer_bottom],
-            color="red",
+            color="orange",
             linewidth=1,
             alpha=0.7,
-            label=f"Crack Propagation: ±{min_crack_length:.0f}mm",
+            label=f"Crack Propagation: ±{min_crack_length/2:.0f}mm",
         )
         ax.plot(
-            [min_crack_length_cm, min_crack_length_cm],
+            [min_crack_length_cm/2, min_crack_length_cm/2],
             [0, weak_layer_bottom],
-            color="red",
+            color="orange",
             linewidth=1,
             alpha=0.7,
         )
@@ -1240,7 +1239,7 @@ class Plotter:
                     (f"Actual: {segment.m:.0f} kg", "blue", True)
                 )
 
-                # Draw critical weight square (outline only, orange)
+                # Draw critical weight square (outline only, green)
                 critical_weight = min_force_result.critical_skier_weight
                 critical_side_length = base_square_size * (critical_weight / 100) ** (
                     1 / 3
@@ -1254,7 +1253,7 @@ class Plotter:
                     critical_side_length,
                     facecolor="none",
                     alpha=0.7,
-                    edgecolor="orange",
+                    edgecolor="green",
                     linewidth=1,
                 )
                 ax.add_patch(critical_square)
@@ -1262,7 +1261,7 @@ class Plotter:
                 # Add to weight legend (only once)
                 if not any("Critical" in item[0] for item in weight_legend_items):
                     weight_legend_items.append(
-                        (f"Critical: {critical_weight:.0f} kg", "orange", False)
+                        (f"Critical: {critical_weight:.0f} kg", "green", False)
                     )
 
         # 3. Coupled criterion result square (centered at x=0)
@@ -1274,32 +1273,32 @@ class Plotter:
             coupled_side_length,
             facecolor="none",
             alpha=0.7,
-            edgecolor="green",
+            edgecolor="red",
             linewidth=1,
         )
         ax.add_patch(coupled_square)
 
         # Add to weight legend
         weight_legend_items.append(
-            (f"Coupled: {coupled_weight:.0f} kg", "green", False)
+            (f"Coupled: {coupled_weight:.0f} kg", "red", False)
         )
 
         # 4. Vertical line for coupled criterion result (spans weak layer only)
         cc_crack_length = coupled_criterion_result.crack_length / 10
         ax.plot(
-            [cc_crack_length, cc_crack_length],
+            [cc_crack_length/2, cc_crack_length/2],
             [0, weak_layer_bottom],
-            color="green",
+            color="red",
             linewidth=1,
             alpha=0.7,
         )
         ax.plot(
-            [-cc_crack_length, -cc_crack_length],
+            [-cc_crack_length/2, -cc_crack_length/2],
             [0, weak_layer_bottom],
-            color="green",
+            color="red",
             linewidth=1,
             alpha=0.7,
-            label=f"Crack Nucleation: ±{coupled_criterion_result.crack_length:.0f}mm",
+            label=f"Crack Nucleation: ±{coupled_criterion_result.crack_length/2:.0f}mm",
         )
 
         # Calculate and set proper y-axis limits to include squares

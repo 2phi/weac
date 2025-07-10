@@ -130,7 +130,7 @@ system.update_scenario(segments=segments, scenario_config=scenario_config)
 system.toggle_touchdown(touchdown=touchdown)
 # Plot the deformed slab
 analyzer = Analyzer(system_model=system)
-xs, zs, xwls = analyzer.rasterize_solution(mode="cracked")
+xs, zs, xwls = analyzer.rasterize_solution(mode="cracked", num=2000)
 
 col1, col2 = st.columns([2, 14])
 with col1:
