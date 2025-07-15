@@ -60,7 +60,6 @@ model_input = ModelInput(
     layers=layers,
     segments=segments,
     weak_layer=weak_layer,
-    criteria_config=criteria_config,
 )
 
 sys_model = SystemModel(
