@@ -150,12 +150,7 @@ class SystemModel:
 
     @cached_property
     def slab_touchdown(self) -> Optional[SlabTouchdown]:
-        if self.config.touchdown and (
-            self.scenario.system_type == "pst-"
-            or self.scenario.system_type == "-pst"
-            or self.scenario.system_type == "vpst-"
-            or self.scenario.system_type == "-vpst"
-        ):
+        if self.config.touchdown:
             logger.info("Solving for Slab Touchdown")
             slab_touchdown = SlabTouchdown(
                 scenario=self.scenario, eigensystem=self.eigensystem
@@ -165,17 +160,16 @@ class SystemModel:
                 f"Original crack_length: {self.scenario.crack_l}, touchdown_distance: {slab_touchdown.touchdown_distance}"
             )
 
+            new_segments = copy.deepcopy(self.scenario.segments)
             if (
                 self.scenario.system_type == "pst-"
                 or self.scenario.system_type == "vpst-"
             ):
-                new_segments = copy.deepcopy(self.scenario.segments)
                 new_segments[-1].length = slab_touchdown.touchdown_distance
             elif (
                 self.scenario.system_type == "-pst"
                 or self.scenario.system_type == "-vpst"
             ):
-                new_segments = copy.deepcopy(self.scenario.segments)
                 new_segments[0].length = slab_touchdown.touchdown_distance
 
             # Create new scenario with updated segments
