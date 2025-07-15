@@ -36,9 +36,9 @@ def track_analyzer_call(func):
         self.call_stats[func_name]["total_time"] += duration
 
         logger.debug(
-            "Analyzer method '%s' called. "
-            "Execution time: %.4f seconds.",
-            func_name, duration
+            "Analyzer method '%s' called. Execution time: %.4f seconds.",
+            func_name,
+            duration,
         )
 
         return result
@@ -682,7 +682,7 @@ class Analyzer:
         _ = xq, xb
         # Compute displacements where weight loads are applied
         w0 = self.sm.fq.w(zq)
-        us = self.sm.fq.u(zq, z0=self.sm.slab.z_cog)
+        us = self.sm.fq.u(zq, h0=self.sm.slab.z_cog)
         # Get weight loads
         qn = self.sm.scenario.qn
         qt = self.sm.scenario.qt
@@ -755,7 +755,7 @@ class Analyzer:
 
         # Compute weak layer displacements
         wweak = self.sm.fq.w(zweak)
-        uweak = self.sm.fq.u(zweak, z0=self.sm.slab.H / 2)
+        uweak = self.sm.fq.u(zweak, h0=self.sm.slab.H / 2)
 
         # Compute stored energy of the slab (monte-carlo integration)
         n = len(xq)

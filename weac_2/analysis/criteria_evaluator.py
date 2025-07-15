@@ -109,6 +109,7 @@ class FindMinimumForceResult:
     min_dist_stress : float
         The minimum distance to failure.
     """
+
     success: bool
     critical_skier_weight: float
     new_segments: List[Segment]
@@ -192,7 +193,7 @@ class CriteriaEvaluator:
 
         Returns
         -------
-        results: ndarray
+        stress_envelope: ndarray
             Stress envelope evaluation values in [0, inf].
             Values > 1 indicate failure.
 
@@ -321,7 +322,7 @@ class CriteriaEvaluator:
         min_dist_stress = force_result.min_dist_stress
         logger.info(
             "Minimum force finding took %.4f seconds.",
-            time.time() - force_finding_start
+            time.time() - force_finding_start,
         )
 
         # --- Failure: in finding the critical skier weight ---
@@ -440,7 +441,7 @@ class CriteriaEvaluator:
                 iter_start_time = time.time()
                 logger.info(
                     "Starting iteration %d of coupled criterion evaluation.",
-                    iteration_count
+                    iteration_count,
                 )
 
                 system.update_scenario(segments=segments)
@@ -517,7 +518,8 @@ class CriteriaEvaluator:
                     )
                 logger.info(
                     "Iteration %d took %.4f seconds.",
-                    iteration_count, time.time() - iter_start_time
+                    iteration_count,
+                    time.time() - iter_start_time,
                 )
 
             if iteration_count < max_iterations and any(
@@ -688,7 +690,9 @@ class CriteriaEvaluator:
 
         # --- Exception: the entire domain is cracked ---
         if min_dist_stress >= 1:
-            analyzer.print_call_stats(message="min_dist_stress >= 1 in find_minimum_force Call Statistics")
+            analyzer.print_call_stats(
+                message="min_dist_stress >= 1 in find_minimum_force Call Statistics"
+            )
             return FindMinimumForceResult(
                 success=True,
                 critical_skier_weight=skier_weight,
@@ -707,7 +711,8 @@ class CriteriaEvaluator:
             iter_start_time = time.time()
             logger.debug(
                 "find_minimum_force iteration %d with skier_weight %.2f",
-                iteration_count, skier_weight
+                iteration_count,
+                skier_weight,
             )
 
             skier_weight = (
@@ -735,10 +740,14 @@ class CriteriaEvaluator:
 
             logger.debug(
                 "find_minimum_force iteration %d finished in %.4fs. max_dist_stress: %.4f",
-                iteration_count, time.time() - iter_start_time, max_dist_stress
+                iteration_count,
+                time.time() - iter_start_time,
+                max_dist_stress,
             )
             if min_dist_stress >= 1:
-                analyzer.print_call_stats(message="min_dist_stress >= 1 in find_minimum_force Call Statistics")
+                analyzer.print_call_stats(
+                    message="min_dist_stress >= 1 in find_minimum_force Call Statistics"
+                )
                 return FindMinimumForceResult(
                     success=True,
                     critical_skier_weight=skier_weight,
@@ -757,7 +766,9 @@ class CriteriaEvaluator:
                     system, tolerance_stress=0.01, dampening=dampening + 1
                 )
             else:
-                analyzer.print_call_stats(message="max iterations reached infind_minimum_force Call Statistics")
+                analyzer.print_call_stats(
+                    message="max iterations reached infind_minimum_force Call Statistics"
+                )
                 return FindMinimumForceResult(
                     success=False,
                     critical_skier_weight=0.0,
@@ -771,9 +782,11 @@ class CriteriaEvaluator:
         logger.info(
             "Finished find_minimum_force in %.4f seconds after %d iterations.",
             time.time() - start_time,
-            iteration_count
+            iteration_count,
         )
-        analyzer.print_call_stats(message="tolerance was met in find_minimum_force Call Statistics")
+        analyzer.print_call_stats(
+            message="tolerance was met in find_minimum_force Call Statistics"
+        )
         return FindMinimumForceResult(
             success=True,
             critical_skier_weight=skier_weight,
@@ -826,7 +839,7 @@ class CriteriaEvaluator:
             bracket=[a, b],  # Interval where the root is expected
             method="brentq",  # Brent's method
         )
-        
+
         new_segments = system.scenario.segments
 
         system.update_scenario(segments=old_segments)
@@ -881,9 +894,8 @@ class CriteriaEvaluator:
         can_propagate = g_delta_diff >= 1
         logger.info(
             "Self-propagation check finished in %.4f seconds. "
-            "Result: g_delta_diff=%.4f, can_propagate=%s" % (
-                time.time() - start_time, g_delta_diff, can_propagate
-            )
+            "Result: g_delta_diff=%.4f, can_propagate=%s"
+            % (time.time() - start_time, g_delta_diff, can_propagate)
         )
 
         return g_delta_diff, bool(can_propagate)
@@ -912,8 +924,7 @@ class CriteriaEvaluator:
             The updated list of segments
         """
         logger.info(
-            "Finding new anticrack length for skier weight %.2f kg.",
-            skier_weight
+            "Finding new anticrack length for skier weight %.2f kg.", skier_weight
         )
         start_time = time.time()
         total_length = system.scenario.L
@@ -938,7 +949,7 @@ class CriteriaEvaluator:
         roots = self._find_stress_envelope_crossings(system, weak_layer)
         logger.info(
             "Finding stress envelope crossings took %.4f seconds.",
-            time.time() - crossings_start_time
+            time.time() - crossings_start_time,
         )
 
         # --- Standard case: if roots exist ---
@@ -983,7 +994,8 @@ class CriteriaEvaluator:
 
             logger.info(
                 "Finished finding new anticrack length in %.4f seconds. New length: %.2f mm.",
-                time.time() - start_time, new_crack_length
+                time.time() - start_time,
+                new_crack_length,
             )
 
         # --- Exception: the entire domain is cracked ---
@@ -1081,7 +1093,7 @@ class CriteriaEvaluator:
         roots = []
         logger.debug(
             "Found %d potential crossing regions. Finding exact roots.",
-            len(root_candidates)
+            len(root_candidates),
         )
         roots_start_time = time.time()
         for x_left, x_right in root_candidates:
@@ -1101,7 +1113,8 @@ class CriteriaEvaluator:
         logger.debug("Root finding took %.4f seconds.", time.time() - roots_start_time)
         logger.info(
             "Found %d stress envelope crossings in %.4f seconds.",
-            len(roots), time.time() - start_time
+            len(roots),
+            time.time() - start_time,
         )
         return roots
 

@@ -7,7 +7,7 @@ from typing import List, Literal, Optional
 import matplotlib.colors as mc
 import matplotlib.pyplot as plt
 from matplotlib.figure import Figure
-from matplotlib.patches import Rectangle, Patch
+from matplotlib.patches import Rectangle, Patch, Polygon
 import numpy as np
 from referencing.typing import D
 from scipy.optimize import brentq
@@ -347,6 +347,289 @@ class Plotter:
 
         return fig
 
+    def plot_rotated_slab_profile(
+        self,
+        weak_layer: WeakLayer,
+        slab: Slab,
+        angle: float = 0,
+        weight: float = 0,
+        slab_width: float = 200,
+        filename: str = "rotated_slab_profile",
+        title: str = "Rotated Slab Profile",
+    ):
+        """
+        Plot a rectangular slab profile with layers stacked vertically, colored by density,
+        and rotated by the specified angle.
+
+        Parameters
+        ----------
+        weak_layer : WeakLayer
+            The weak layer to plot at the bottom.
+        slab : Slab
+            The slab with layers to plot.
+        angle : float, optional
+            Rotation angle in degrees. Default is 0.
+        slab_width : float, optional
+            Width of the slab rectangle in mm. Default is 200.
+        filename : str, optional
+            Filename for saving plot. Default is "rotated_slab_profile".
+        title : str, optional
+            Plot title. Default is "Rotated Slab Profile".
+
+        Returns
+        -------
+        matplotlib.figure.Figure
+            The generated plot figure.
+        """
+        # Plot Setup
+        plt.rcdefaults()
+        plt.rc("font", family="serif", size=10)
+        plt.rc("mathtext", fontset="cm")
+
+        fig = plt.figure(figsize=(8, 6), dpi=300)
+        ax = fig.gca()
+
+        # Calculate total height
+        total_height = slab.H + weak_layer.h
+
+        # Create density-based colormap
+        all_densities = [weak_layer.rho] + [layer.rho for layer in slab.layers]
+        min_density = min(all_densities)
+        max_density = max(all_densities)
+
+        # Normalize densities for color mapping
+        norm = mc.Normalize(vmin=min_density, vmax=max_density)
+        cmap = plt.get_cmap("viridis")  # You can change this to any colormap
+
+        # Function to create sloped layer (parallelogram)
+        def create_sloped_layer(x, y, width, height, angle_rad):
+            """Create a layer that follows the slope angle"""
+            # Calculate horizontal offset for the slope
+            slope_offset = width * np.sin(angle_rad)
+
+            # Create parallelogram corners
+            # Bottom edge is horizontal, top edge is shifted by slope_offset
+            corners = np.array(
+                [
+                    [x, y],  # Bottom left
+                    [x + width, y + slope_offset],  # Bottom right
+                    [x + width, y + height + slope_offset],  # Top right (shifted)
+                    [x, y + height],  # Top left (shifted)
+                ]
+            )
+
+            return corners
+
+        # Convert angle to radians
+        angle_rad = np.radians(angle)
+
+        # Start from bottom (weak layer)
+        current_y = 0
+
+        # Plot weak layer
+        wl_corners = create_sloped_layer(
+            0, current_y, slab_width, weak_layer.h, angle_rad
+        )
+        wl_color = cmap(norm(weak_layer.rho))
+        wl_patch = Polygon(
+            wl_corners,
+            facecolor=wl_color,
+            edgecolor="black",
+            linewidth=1,
+            alpha=0.8,
+            hatch="///",
+        )
+        ax.add_patch(wl_patch)
+
+        # Add density label for weak layer
+        wl_center = np.mean(wl_corners, axis=0)
+        ax.text(
+            wl_center[0],
+            wl_center[1],
+            f"{weak_layer.rho:.0f}\nkg/m³",
+            ha="center",
+            va="center",
+            fontsize=8,
+            fontweight="bold",
+        )
+
+        current_y += weak_layer.h
+
+        # Plot slab layers (from bottom to top)
+        top_layer_corners = None
+        for i, layer in enumerate(reversed(slab.layers)):
+            layer_corners = create_sloped_layer(
+                0, current_y, slab_width, layer.h, angle_rad
+            )
+            layer_color = cmap(norm(layer.rho))
+            layer_patch = Polygon(
+                layer_corners,
+                facecolor=layer_color,
+                edgecolor="black",
+                linewidth=1,
+                alpha=0.8,
+            )
+            ax.add_patch(layer_patch)
+
+            # Add density label for slab layer
+            layer_center = np.mean(layer_corners, axis=0)
+            ax.text(
+                layer_center[0],
+                layer_center[1],
+                f"{layer.rho:.0f}\nkg/m³",
+                ha="center",
+                va="center",
+                fontsize=8,
+                fontweight="bold",
+            )
+
+            current_y += layer.h
+            # Keep track of the top layer corners for arrow placement
+            top_layer_corners = layer_corners
+
+        # Add weight arrow if weight > 0 and we have layers
+        if weight > 0 and top_layer_corners is not None:
+            # Calculate midpoint of top edge of highest layer
+            # Top edge is between points 2 and 3 (top right and top left)
+            top_left = top_layer_corners[3]
+            top_right = top_layer_corners[2]
+            arrow_start_x = (top_left[0] + top_right[0]) / 2
+            arrow_start_y = (top_left[1] + top_right[1]) / 2
+
+            # Scale arrow based on weight (0-400 maps to 0-100, above 400 = 100)
+            max_arrow_height = 100
+            arrow_height = min(weight * max_arrow_height / 400, max_arrow_height)
+            arrow_width = arrow_height * 0.3  # Arrow width proportional to height
+
+            # Create arrow pointing downward
+            arrow_tip_x = arrow_start_x
+            arrow_tip_y = arrow_start_y
+
+            # Arrow shaft (rectangular part)
+            shaft_width = arrow_width * 0.3
+            shaft_left = arrow_start_x - shaft_width / 2
+            shaft_right = arrow_start_x + shaft_width / 2
+            shaft_top = arrow_start_y + arrow_height
+            shaft_bottom = arrow_tip_y + arrow_width * 0.4
+
+            # Arrow head (triangular part)
+            head_left = arrow_start_x - arrow_width / 2
+            head_right = arrow_start_x + arrow_width / 2
+            head_top = shaft_bottom
+
+            # Draw arrow shaft
+            shaft_corners = np.array(
+                [
+                    [shaft_left, shaft_top],
+                    [shaft_right, shaft_top],
+                    [shaft_right, shaft_bottom],
+                    [shaft_left, shaft_bottom],
+                ]
+            )
+            shaft_patch = Polygon(
+                shaft_corners,
+                facecolor="red",
+                edgecolor="darkred",
+                linewidth=2,
+                alpha=0.8,
+            )
+            ax.add_patch(shaft_patch)
+
+            # Draw arrow head
+            head_corners = np.array(
+                [
+                    [head_left, head_top],
+                    [head_right, head_top],
+                    [arrow_tip_x, arrow_tip_y],
+                ]
+            )
+            head_patch = Polygon(
+                head_corners,
+                facecolor="red",
+                edgecolor="darkred",
+                linewidth=2,
+                alpha=0.8,
+            )
+            ax.add_patch(head_patch)
+
+            # Add weight label
+            ax.text(
+                arrow_start_x + arrow_width * 0.7,
+                arrow_start_y - arrow_height / 2,
+                f"{weight:.0f} kg",
+                ha="left",
+                va="center",
+                fontsize=10,
+                fontweight="bold",
+                color="darkred",
+                bbox=dict(boxstyle="round,pad=0.3", facecolor="white", alpha=0.8),
+            )
+
+        # Calculate plot limits to accommodate rotated rectangle
+        margin = max(slab_width, total_height) * 0.2
+
+        # Find the bounds of all rotated rectangles
+        all_corners = []
+        current_y = 0
+
+        # Weak layer corners
+        wl_corners = create_sloped_layer(
+            0, current_y, slab_width, weak_layer.h, angle_rad
+        )
+        all_corners.extend(wl_corners)
+        current_y += weak_layer.h
+
+        # Slab layer corners
+        for layer in reversed(slab.layers):
+            layer_corners = create_sloped_layer(
+                0, current_y, slab_width, layer.h, angle_rad
+            )
+            all_corners.extend(layer_corners)
+            current_y += layer.h
+
+        all_corners = np.array(all_corners)
+        min_x, max_x = all_corners[:, 0].min(), all_corners[:, 0].max()
+        min_y, max_y = all_corners[:, 1].min(), all_corners[:, 1].max()
+
+        # Set axis limits with margin
+        ax.set_xlim(min_x - margin, max_x + margin)
+        ax.set_ylim(min_y - margin, max_y + margin)
+
+        # Set labels and title
+        ax.set_xlabel("Width (mm)")
+        ax.set_ylabel("Height (mm)")
+        ax.set_title(f"{title}\nSlope Angle: {angle}°")
+
+        # Add colorbar
+        sm = plt.cm.ScalarMappable(cmap=cmap, norm=norm)
+        sm.set_array([])
+        cbar = plt.colorbar(sm, ax=ax)
+        cbar.set_label("Density (kg/m³)")
+
+        # Add legend
+        weak_layer_patch = Patch(
+            facecolor=cmap(norm(weak_layer.rho)),
+            hatch="///",
+            edgecolor="black",
+            label="Weak Layer",
+        )
+        slab_patch = Patch(facecolor="gray", edgecolor="black", label="Slab Layers")
+        ax.legend(handles=[weak_layer_patch, slab_patch], loc="upper right")
+
+        # Equal aspect ratio and grid
+        ax.set_aspect("equal")
+        ax.grid(True, alpha=0.3)
+
+        # Remove axis ticks for cleaner look
+        ax.tick_params(axis="both", which="major", labelsize=8)
+
+        plt.tight_layout()
+
+        if filename:
+            self._save_figure(filename, fig)
+
+        return fig
+
     def plot_section_forces(
         self,
         system_model: Optional[SystemModel] = None,
@@ -504,7 +787,7 @@ class Plotter:
         analyzer: Analyzer,
         dz: int = 2,
         scale: int = 100,
-        window: int = np.inf,
+        window: float = np.inf,
         pad: int = 2,
         levels: int = 300,
         aspect: int = 2,
@@ -1190,15 +1473,15 @@ class Plotter:
         # 1. Vertical lines for min_crack_length (centered at x=0)
         min_crack_length_cm = min_crack_length / 10  # Convert mm to cm
         ax.plot(
-            [-min_crack_length_cm/2, -min_crack_length_cm/2],
+            [-min_crack_length_cm / 2, -min_crack_length_cm / 2],
             [0, weak_layer_bottom],
             color="orange",
             linewidth=1,
             alpha=0.7,
-            label=f"Crack Propagation: ±{min_crack_length/2:.0f}mm",
+            label=f"Crack Propagation: ±{min_crack_length / 2:.0f}mm",
         )
         ax.plot(
-            [min_crack_length_cm/2, min_crack_length_cm/2],
+            [min_crack_length_cm / 2, min_crack_length_cm / 2],
             [0, weak_layer_bottom],
             color="orange",
             linewidth=1,
@@ -1279,26 +1562,24 @@ class Plotter:
         ax.add_patch(coupled_square)
 
         # Add to weight legend
-        weight_legend_items.append(
-            (f"Coupled: {coupled_weight:.0f} kg", "red", False)
-        )
+        weight_legend_items.append((f"Coupled: {coupled_weight:.0f} kg", "red", False))
 
         # 4. Vertical line for coupled criterion result (spans weak layer only)
         cc_crack_length = coupled_criterion_result.crack_length / 10
         ax.plot(
-            [cc_crack_length/2, cc_crack_length/2],
+            [cc_crack_length / 2, cc_crack_length / 2],
             [0, weak_layer_bottom],
             color="red",
             linewidth=1,
             alpha=0.7,
         )
         ax.plot(
-            [-cc_crack_length/2, -cc_crack_length/2],
+            [-cc_crack_length / 2, -cc_crack_length / 2],
             [0, weak_layer_bottom],
             color="red",
             linewidth=1,
             alpha=0.7,
-            label=f"Crack Nucleation: ±{coupled_criterion_result.crack_length/2:.0f}mm",
+            label=f"Crack Nucleation: ±{coupled_criterion_result.crack_length / 2:.0f}mm",
         )
 
         # Calculate and set proper y-axis limits to include squares

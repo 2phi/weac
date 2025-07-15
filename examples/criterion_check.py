@@ -1694,8 +1694,6 @@ def find_minimum_force(
     skier, C, segments, x_cm, sigma_kPa, tau_kPa = create_skier_object(
         snow_profile, skier_weight, phi, li, ki, crack_case="nocrack", E=E, t=t
     )
-    print("sigma_kPa: ", sigma_kPa)
-    print("tau_kPa: ", tau_kPa)
 
     # Calculate the distance to failure
     dist_max = np.max(

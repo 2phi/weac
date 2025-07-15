@@ -180,11 +180,11 @@ class WeakLayer(BaseModel):
     rho: float = Field(..., gt=40, description="Density of the Slab  [kg m⁻³]")
     h: float = Field(..., gt=0, description="Height/Thickness of the slab  [mm]")
     nu: float = Field(default=NU, ge=0, lt=0.5, description="Poisson's ratio [-]")
-    E: float = Field(default=None, gt=0, description="Young's modulus [MPa]")
-    G: float = Field(default=None, gt=0, description="Shear modulus [MPa]")
+    E: float | None = Field(default=None, gt=0, description="Young's modulus [MPa]")
+    G: float | None = Field(default=None, gt=0, description="Shear modulus [MPa]")
     # Winkler springs (can be overridden by caller)
-    kn: float = Field(default=None, description="Normal stiffness  [N mm⁻³]")
-    kt: float = Field(default=None, description="Shear  stiffness  [N mm⁻³]")
+    kn: float | None = Field(default=None, description="Normal stiffness  [N mm⁻³]")
+    kt: float | None = Field(default=None, description="Shear  stiffness  [N mm⁻³]")
     # fracture-mechanics parameters
     G_c: float = Field(
         default=1.0, gt=0, description="Total fracture energy Gc [J/m^2]"

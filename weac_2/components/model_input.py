@@ -39,8 +39,6 @@ class ModelInput(BaseModel):
             List of snow slab layers.
         segments : List[Segment]
             List of segments defining the slab geometry and loading.
-        criteria_config : CriteriaConfig, optional
-            Criteria overrides.
     """
 
     weak_layer: WeakLayer = Field(
@@ -60,9 +58,6 @@ class ModelInput(BaseModel):
         ],
         description="Segments",
     )
-    criteria_config: CriteriaConfig = Field(
-        default_factory=CriteriaConfig, description="Criteria overrides"
-    )
 
     def model_post_init(self, _ctx):
         # Check that the last segment does not have a mass
@@ -76,7 +71,7 @@ class ModelInput(BaseModel):
 
 if __name__ == "__main__":
     # Example usage requiring all mandatory fields for proper instantiation
-    example_scenario_config = ScenarioConfig(phi=30, system="skiers")
+    example_scenario_config = ScenarioConfig(phi=30, system_type="skiers")
     # example_weak_layer = WeakLayer(
     #     rho=200, h=10
     # )  # grain_size, temp, E, G_I have defaults
@@ -89,14 +84,11 @@ if __name__ == "__main__":
         Segment(length=5000, has_foundation=True, m=80),
         Segment(length=3000, has_foundation=False, m=0),
     ]
-    example_criteria_overrides = CriteriaConfig()  # All fields have defaults
 
     model_input = ModelInput(
         scenario_config=example_scenario_config,
-        # weak_layer=example_weak_layer,
         layers=example_layers,
         segments=example_segments,
-        criteria_config=example_criteria_overrides,
     )
     print(model_input.model_dump_json(indent=2))
     print("\n\n")
