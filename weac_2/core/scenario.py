@@ -84,7 +84,7 @@ class Scenario:
         self._calc_normal_load()
         self._calc_tangential_load()
         self._calc_crack_height()
-        self.crack_l = scenario_config.crack_length
+        self.crack_length = scenario_config.crack_length
 
     def refresh_from_config(self):
         """Pull changed values out of scenario_config

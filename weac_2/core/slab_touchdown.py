@@ -102,20 +102,20 @@ class SlabTouchdown:
         self.l_AB = self._calc_l_AB()
         self.l_BC = self._calc_l_BC()
         # Assign stage
-        if self.scenario.crack_l <= self.l_AB:
+        if self.scenario.crack_length <= self.l_AB:
             touchdown_mode = "A_free_hanging"
-        elif self.l_AB < self.scenario.crack_l <= self.l_BC:
+        elif self.l_AB < self.scenario.crack_length <= self.l_BC:
             touchdown_mode = "B_point_contact"
-        elif self.l_BC < self.scenario.crack_l:
+        elif self.l_BC < self.scenario.crack_length:
             touchdown_mode = "C_in_contact"
         self.touchdown_mode = touchdown_mode
 
     def _calc_touchdown_distance(self):
         """Calculate touchdown distance"""
         if self.touchdown_mode in ["A_free_hanging"]:
-            self.touchdown_distance = self.scenario.crack_l
+            self.touchdown_distance = self.scenario.crack_length
         elif self.touchdown_mode in ["B_point_contact"]:
-            self.touchdown_distance = self.scenario.crack_l
+            self.touchdown_distance = self.scenario.crack_length
         elif self.touchdown_mode in ["C_in_contact"]:
             # Create collapsed weak layer and eigensystem internally
             self.collapsed_eigensystem = self._create_collapsed_eigensystem(
@@ -229,7 +229,7 @@ class SlabTouchdown:
         bs = -(self.eigensystem.B11**2 / self.eigensystem.A11 - self.eigensystem.D11)
         ss = self.eigensystem.kA55
         L = self.scenario.L
-        crack_l = self.scenario.crack_l
+        crack_l = self.scenario.crack_length
         crack_h = self.scenario.crack_h
         qn = self.scenario.qn
 
@@ -283,7 +283,7 @@ class SlabTouchdown:
         Calculate the rotational stiffness of the collapsed weak layer
         """
         straight_scenario = self._generate_straight_scenario(
-            self.scenario.crack_l - self.touchdown_distance
+            self.scenario.crack_length - self.touchdown_distance
         )
         kR = self._substitute_stiffness(
             straight_scenario, self.collapsed_eigensystem, "rot"

@@ -157,7 +157,7 @@ class SystemModel:
             )
 
             logger.info(
-                f"Original crack_length: {self.scenario.crack_l}, touchdown_distance: {slab_touchdown.touchdown_distance}"
+                f"Original crack_length: {self.scenario.crack_length}, touchdown_distance: {slab_touchdown.touchdown_distance}"
             )
 
             new_segments = copy.deepcopy(self.scenario.segments)

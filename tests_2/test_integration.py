@@ -156,7 +156,7 @@ class TestIntegrationOldVsNew(unittest.TestCase):
         # Compare all the attributes of the old and new model
         self.assertEqual(
             old_model.a,
-            new_system.scenario.crack_l,
+            new_system.scenario.crack_length,
             "Crack length should be the same",
         )
 
@@ -362,7 +362,7 @@ class TestIntegrationOldVsNew(unittest.TestCase):
         # Compare all the attributes of the old and new model
         self.assertEqual(
             old_model.a,
-            new_system.scenario.crack_l,
+            new_system.scenario.crack_length,
             "Crack length should be the same",
         )
 
