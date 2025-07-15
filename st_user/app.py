@@ -247,10 +247,10 @@ with main_col:
 
             # Create a simple scenario with one skier
             segments = [
-                Segment(length=1000, has_foundation=True, m=0),
+                Segment(length=18000, has_foundation=True, m=0),
                 Segment(length=0, has_foundation=False, m=skier_weight),
                 Segment(length=0, has_foundation=False, m=0),
-                Segment(length=1000, has_foundation=True, m=0),
+                Segment(length=18000, has_foundation=True, m=0),
             ]
             scenario_config = ScenarioConfig(
                 phi=slope_angle,
@@ -312,18 +312,17 @@ with main_col:
 
             # Extract touchdown distance
             if system.slab_touchdown is not None:
-                touchdown_distance = system.slab_touchdown.l_BC
-                print("TOUCHDOWN DISTANCE", touchdown_distance)
-                touchdown_distance = 1000
+                l_BC = system.slab_touchdown.l_BC
+                l_AB = system.slab_touchdown.l_AB
                 segments = [
                     Segment(length=18000, has_foundation=True, m=0),
-                    Segment(length=touchdown_distance, has_foundation=False, m=0),
-                    Segment(length=18000, has_foundation=False, m=0),
+                    Segment(length=2 * l_BC, has_foundation=False, m=0),
+                    # Segment(length=18000, has_foundation=True, m=0),
                 ]
                 scenario_config = ScenarioConfig(
                     phi=slope_angle,
-                    system_type="skiers",
-                    crack_length=touchdown_distance,
+                    system_type="pst-",
+                    crack_length=2 * l_BC,
                     surface_load=0.0,
                 )
                 model_input = ModelInput(
