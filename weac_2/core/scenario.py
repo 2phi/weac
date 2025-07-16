@@ -184,5 +184,5 @@ class Scenario:
         Crack Height: Difference between collapsed weak layer and
             Weak Layer (Winkler type) under slab load
         """
-        cf = self.scenario_config.collapse_factor
-        self.crack_h = cf * self.weak_layer.h - self.qn / self.weak_layer.kn
+        collapsed_height = self.weak_layer.h - self.weak_layer.collapse_height
+        self.crack_h = collapsed_height - self.qn / self.weak_layer.kn

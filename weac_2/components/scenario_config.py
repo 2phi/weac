@@ -15,8 +15,6 @@ class ScenarioConfig(BaseModel):
         Type of system, '-pst', '+pst', ....
     crack_length : float
         Crack Length from PST [mm]
-    collapse_factor : float, optional
-        Fractional collapse factor (0 <= f < 1)
     stiffness_factor : float, optional
         Stiffness ratio between collapsed and uncollapsed weak layer
     surface_load : float, optional
@@ -34,12 +32,6 @@ class ScenarioConfig(BaseModel):
     ] = Field(default="skiers", description="Type of system, '-pst', '+pst', ....")
     crack_length: float = Field(
         default=0.0, ge=0, description="Initial crack length [mm]"
-    )
-    collapse_factor: float = Field(
-        default=0.5,
-        ge=0.0,
-        lt=1.0,
-        description="Fractional collapse factor (0 <= f < 1)",
     )
     stiffness_ratio: float = Field(
         default=1000,

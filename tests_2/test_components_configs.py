@@ -41,7 +41,6 @@ class TestScenarioConfig(unittest.TestCase):
         self.assertEqual(scenario.phi, 0)
         self.assertEqual(scenario.system_type, "skiers")
         self.assertEqual(scenario.crack_length, 0.0)
-        self.assertEqual(scenario.collapse_factor, 0.5)
         self.assertEqual(scenario.stiffness_ratio, 1000)
         self.assertEqual(scenario.surface_load, 0.0)
 
@@ -51,7 +50,6 @@ class TestScenarioConfig(unittest.TestCase):
             phi=30.0,
             system_type="skier",
             crack_length=150.0,
-            collapse_factor=0.3,
             stiffness_ratio=500.0,
             surface_load=10.0,
         )
@@ -59,7 +57,6 @@ class TestScenarioConfig(unittest.TestCase):
         self.assertEqual(scenario.phi, 30.0)
         self.assertEqual(scenario.system_type, "skier")
         self.assertEqual(scenario.crack_length, 150.0)
-        self.assertEqual(scenario.collapse_factor, 0.3)
         self.assertEqual(scenario.stiffness_ratio, 500.0)
         self.assertEqual(scenario.surface_load, 10.0)
 
@@ -68,14 +65,6 @@ class TestScenarioConfig(unittest.TestCase):
         # Negative crack length
         with self.assertRaises(ValidationError):
             ScenarioConfig(crack_length=-10.0)
-
-        # Invalid collapse factor (>= 1)
-        with self.assertRaises(ValidationError):
-            ScenarioConfig(collapse_factor=1.0)
-
-        # Invalid collapse factor (< 0)
-        with self.assertRaises(ValidationError):
-            ScenarioConfig(collapse_factor=-0.1)
 
         # Invalid stiffness ratio (<= 0)
         with self.assertRaises(ValidationError):

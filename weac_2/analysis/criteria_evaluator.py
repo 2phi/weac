@@ -18,6 +18,7 @@ from weac_2.components import (
     WeakLayer,
 )
 from weac_2.core.system_model import SystemModel
+from weac_2.constants import RHO_ICE
 
 logger = logging.getLogger(__name__)
 
@@ -222,6 +223,8 @@ class CriteriaEvaluator:
             else self.criteria_config.stress_envelope_method
         )
         density = weak_layer.rho
+        sigma_c = weak_layer.sigma_c
+        tau_c = weak_layer.tau_c
         fn = self.criteria_config.fn
         fm = self.criteria_config.fm
         order_of_magnitude = self.criteria_config.order_of_magnitude
@@ -246,21 +249,18 @@ class CriteriaEvaluator:
             if scaling_factor < 0.55:
                 scaling_factor = 0.55
 
-            sigma_c = 6.16 * (scaling_factor**order_of_magnitude)
-            tau_c = 5.09 * (scaling_factor**order_of_magnitude)
+            scaled_sigma_c = sigma_c * (scaling_factor**order_of_magnitude)
+            scaled_tau_c = tau_c * (scaling_factor**order_of_magnitude)
 
-            return (sigma / sigma_c) ** fn + (tau / tau_c) ** fm
+            return (sigma / scaled_sigma_c) ** fn + (tau / scaled_tau_c) ** fm
 
         elif envelope_method == "schottner":
-            rho_ice = 916.7
             sigma_y = 2000
-            sigma_c_adam = 6.16
-            tau_c_adam = 5.09
 
-            sigma_c = sigma_y * 13 * (density / rho_ice) ** order_of_magnitude
-            tau_c = tau_c_adam * (sigma_c / sigma_c_adam)
+            scaled_sigma_c = sigma_y * 13 * (density / RHO_ICE) ** order_of_magnitude
+            scaled_tau_c = tau_c * (scaled_sigma_c / sigma_c)
 
-            return (sigma / sigma_c) ** fn + (tau / tau_c) ** fm
+            return (sigma / scaled_sigma_c) ** fn + (tau / scaled_tau_c) ** fm
 
         elif envelope_method == "mede_s-RG1":
             p0, tau_T, p_T = 7.00, 3.53, 1.49

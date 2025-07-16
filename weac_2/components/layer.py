@@ -10,7 +10,7 @@ from typing import Literal
 
 from pydantic import BaseModel, ConfigDict, Field
 
-from weac_2.constants import CB0, CB1, CG0, CG1, NU, RHO0
+from weac_2.constants import CB0, CB1, CG0, CG1, NU, RHO_ICE
 
 logger = logging.getLogger(__name__)
 
@@ -29,14 +29,14 @@ def _bergfeld_youngs_modulus(rho: float, C_0: float = CB0, C_1: float = CB1) -> 
         Exponent of Young modulus parameterization according to
         Bergfeld et al. (2023). Default is 4.4.
     """
-    return C_0 * 1e3 * (rho / RHO0) ** C_1
+    return C_0 * 1e3 * (rho / RHO_ICE) ** C_1
 
 
 def _scapozza_youngs_modulus(rho: float) -> float:
     """Young's modulus from Scapazzo - return MPa
     `rho` in [kg/m^3]"""
     rho = rho * 1e-12  # Convert to [t/mm^3]
-    rho_0 = RHO0 * 1e-12  # Desity of ice in [t/mm^3]
+    rho_0 = RHO_ICE * 1e-12  # Desity of ice in [t/mm^3]
     return 5.07e3 * (rho / rho_0) ** 5.13
 
 
@@ -76,9 +76,8 @@ def _sigrist_tensile_strength(rho, unit="kPa"):
         Tensile strenght in specified unit.
     """
     convert = {"kPa": 1, "MPa": 1e-3}
-    rho_ice = 917
     # Sigrist's equation is given in kPa
-    return convert[unit] * 240 * (rho / rho_ice) ** 2.44
+    return convert[unit] * 240 * (rho / RHO_ICE) ** 2.44
 
 
 class Layer(BaseModel):
@@ -105,10 +104,10 @@ class Layer(BaseModel):
 
     # derived if not provided
     nu: float = Field(default=NU, ge=0, lt=0.5, description="Poisson's ratio [-]")
-    E: float | None = Field(default=None, gt=0, description="Young's modulus [MPa]")
-    G: float | None = Field(default=None, gt=0, description="Shear modulus [MPa]")
-    tensile_strength: float | None = Field(
-        default=None, gt=0, description="Tensile strength [kPa]"
+    E: float = Field(default=0.0, gt=0, description="Young's modulus [MPa]")
+    G: float = Field(default=0.0, gt=0, description="Shear modulus [MPa]")
+    tensile_strength: float = Field(
+        default=0.0, gt=0, description="Tensile strength [kPa]"
     )
     tensile_strength_method: Literal["sigrist"] = Field(
         default="sigrist",
@@ -177,14 +176,17 @@ class WeakLayer(BaseModel):
         Mode-II fracture toughness GIIc [J/m^2].  Default 0.79 J/m^2.
     """
 
-    rho: float = Field(..., gt=40, description="Density of the Slab  [kg m⁻³]")
-    h: float = Field(..., gt=0, description="Height/Thickness of the slab  [mm]")
+    rho: float = Field(125, gt=70, description="Density of the Slab  [kg m⁻³]")
+    h: float = Field(30, gt=0, description="Height/Thickness of the slab  [mm]")
+    collapse_height: float = Field(
+        default=5.0, gt=0, description="Collapse height [mm]"
+    )
     nu: float = Field(default=NU, ge=0, lt=0.5, description="Poisson's ratio [-]")
-    E: float | None = Field(default=None, gt=0, description="Young's modulus [MPa]")
-    G: float | None = Field(default=None, gt=0, description="Shear modulus [MPa]")
+    E: float = Field(default=0.0, gt=0, description="Young's modulus [MPa]")
+    G: float = Field(default=0.0, gt=0, description="Shear modulus [MPa]")
     # Winkler springs (can be overridden by caller)
-    kn: float | None = Field(default=None, description="Normal stiffness  [N mm⁻³]")
-    kt: float | None = Field(default=None, description="Shear  stiffness  [N mm⁻³]")
+    kn: float = Field(default=0.0, description="Normal stiffness  [N mm⁻³]")
+    kt: float = Field(default=0.0, description="Shear  stiffness  [N mm⁻³]")
     # fracture-mechanics parameters
     G_c: float = Field(
         default=1.0, gt=0, description="Total fracture energy Gc [J/m^2]"
@@ -195,6 +197,8 @@ class WeakLayer(BaseModel):
     G_IIc: float = Field(
         default=0.79, gt=0, description="Mode-II fracture toughness GIIc [J/m^2]"
     )
+    sigma_c: float = Field(default=6.16, gt=0, description="Tensile strength [kPa]")
+    tau_c: float = Field(default=5.09, gt=0, description="Shear strength [kPa]")
     E_method: Literal["bergfeld", "scapazzo", "gerling"] = Field(
         default="bergfeld",
         description="Method to calculate the Young's modulus",

@@ -80,7 +80,6 @@ class SlabTouchdown:
             phi=0.0,  # Flat slab for collapsed scenario
             system_type=self.scenario.scenario_config.system_type,
             crack_length=self.scenario.scenario_config.crack_length,
-            collapse_factor=self.scenario.scenario_config.collapse_factor,
             stiffness_ratio=self.scenario.scenario_config.stiffness_ratio,
             surface_load=self.scenario.scenario_config.surface_load,
         )
@@ -117,10 +116,6 @@ class SlabTouchdown:
         elif self.touchdown_mode in ["B_point_contact"]:
             self.touchdown_distance = self.scenario.crack_length
         elif self.touchdown_mode in ["C_in_contact"]:
-            # Create collapsed weak layer and eigensystem internally
-            self.collapsed_eigensystem = self._create_collapsed_eigensystem(
-                qs=self.scenario.scenario_config.surface_load,
-            )
             self.touchdown_distance = self._calc_touchdown_distance_in_mode_C()
             self.collapsed_weak_layer_kR = self._calc_collapsed_weak_layer_kR()
 
