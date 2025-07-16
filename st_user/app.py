@@ -30,6 +30,8 @@ from weac_2.analysis import (
 from weac_2.analysis.analyzer import Analyzer
 from weac_2.utils import load_dummy_profile
 
+NORMAL_SKIER_WEIGHT = 100
+
 # Initialize session state
 if "plotter" not in st.session_state:
     st.session_state.plotter = Plotter()
@@ -53,9 +55,21 @@ SLAB_TYPES = {
 
 # Predefined weak layer types
 WEAK_LAYER_TYPES = {
-    "Very Weak": {"density": 50, "thickness": 30},
-    "Weak": {"density": 75, "thickness": 30},
-    "Less Weak": {"density": 150, "thickness": 30},
+    "Very Weak": {
+        "density": 125,
+        "thickness": 10,
+        "sigma_c": 5.16,
+        "tau_c": 4.09,
+        "E": 2.0,
+    },
+    "Weak": {"density": 125, "thickness": 10, "sigma_c": 6.16, "tau_c": 5.09, "E": 2.0},
+    "Less Weak": {
+        "density": 125,
+        "thickness": 10,
+        "sigma_c": 7.16,
+        "tau_c": 6.09,
+        "E": 2.0,
+    },
 }
 
 st.set_page_config(page_title="Avalanche Risk Assessment", layout="wide")
@@ -140,20 +154,30 @@ with main_col:
 
         # Weak layer section
         st.write("**Select Weak Layer:**")
-        weak_layer_choice = st.radio(
-            "Choose weak layer type:",
-            index=0,
-            options=list(WEAK_LAYER_TYPES.keys()),
-            key="weak_layer_radio",
-        )
+        wl_col1, wl_col2 = st.columns([1, 1])
+        with wl_col1:
+            weak_layer_choice = st.radio(
+                "Choose weak layer type:",
+                index=0,
+                options=list(WEAK_LAYER_TYPES.keys()),
+                key="weak_layer_radio",
+            )
 
-        weak_props = WEAK_LAYER_TYPES[weak_layer_choice]
-        st.session_state.selected_weak_layer = WeakLayer(
-            rho=weak_props["density"], h=weak_props["thickness"]
-        )
-        st.write(
-            f"Selected: {weak_layer_choice} (ρ={weak_props['density']} kg/m³, h={weak_props['thickness']}mm)"
-        )
+            weak_props = WEAK_LAYER_TYPES[weak_layer_choice]
+            st.session_state.selected_weak_layer = WeakLayer(
+                rho=weak_props["density"],
+                h=weak_props["thickness"],
+                sigma_c=weak_props["sigma_c"],
+                tau_c=weak_props["tau_c"],
+                E=weak_props["E"],
+            )
+
+            st.write(f"ρ={weak_props['density']} kg/m³")
+            st.write(f"h={weak_props['thickness']}mm")
+        with wl_col2:
+            st.write(f"σ_c={weak_props['sigma_c']} kPa")
+            st.write(f"τ_c={weak_props['tau_c']} kPa")
+            st.write(f"E={weak_props['E']}")
 
     with col2:
         st.subheader("Slab Profile")
@@ -176,9 +200,17 @@ with main_col:
 
     # STAGE 2: Scenario Setup
     col1, col2 = st.columns([1, 1])
-
+    # Vertically center the content in col1 using st.markdown with custom CSS
     with col1:
         st.subheader("Scenario Parameters")
+
+        # Add vertical centering using st.markdown and CSS
+        st.markdown(
+            """
+            <div style="display: flex; flex-direction: column; justify-content: center; height: 100%; min-height: 300px;">
+            """,
+            unsafe_allow_html=True,
+        )
 
         # Slope angle slider
         slope_angle = st.slider(
@@ -192,21 +224,7 @@ with main_col:
         )
         st.session_state.slope_angle = slope_angle
 
-        # Skier weight slider
-        skier_weight = st.slider(
-            "Skier Weight (kg)",
-            min_value=0,
-            max_value=300,
-            value=st.session_state.get("skier_weight", 80),
-            step=5,
-            help="Weight of the skier in kilograms",
-            key="skier_weight_slider",
-        )
-        st.session_state.skier_weight = skier_weight
-
-        st.write("**Current Settings:**")
-        st.write(f"- Slope Angle: {slope_angle}°")
-        st.write(f"- Skier Weight: {skier_weight} kg")
+        st.markdown("</div>", unsafe_allow_html=True)
 
     with col2:
         st.subheader("Slab Visualization")
@@ -223,7 +241,7 @@ with main_col:
                 weak_layer=weak_layer,
                 slab=slab,
                 angle=slope_angle,
-                weight=skier_weight,
+                weight=NORMAL_SKIER_WEIGHT,
                 title="Slab Visualization",
             )
             st.pyplot(fig)
@@ -235,27 +253,85 @@ with main_col:
     if st.session_state.slab_layers and st.session_state.selected_weak_layer:
         # Get current parameters from session state or defaults
         slope_angle = st.session_state.get("slope_angle", 30)
-        skier_weight = st.session_state.get("skier_weight", 80)
 
-        try:
-            # Build the system model
-            layers = [
-                layer_info["layer"] for layer_info in st.session_state.slab_layers
-            ]
-            weak_layer = st.session_state.selected_weak_layer
-            print("weak_layer", weak_layer)
+        # Build the system model
+        layers = [layer_info["layer"] for layer_info in st.session_state.slab_layers]
+        weak_layer = st.session_state.selected_weak_layer
+        print("weak_layer", weak_layer)
 
-            # Create a simple scenario with one skier
+        # Create a simple scenario with one skier
+        segments = [
+            Segment(length=18000, has_foundation=True, m=0),
+            Segment(length=0, has_foundation=False, m=NORMAL_SKIER_WEIGHT),
+            Segment(length=0, has_foundation=False, m=0),
+            Segment(length=18000, has_foundation=True, m=0),
+        ]
+        scenario_config = ScenarioConfig(
+            phi=slope_angle,
+            system_type="skier",
+            crack_length=0.0,
+            surface_load=0.0,
+        )
+        model_input = ModelInput(
+            scenario_config=scenario_config,
+            weak_layer=weak_layer,
+            layers=layers,
+            segments=segments,
+        )
+
+        system = SystemModel(model_input, config=Config(touchdown=True))
+        criteria_evaluator = CriteriaEvaluator(CriteriaConfig())
+        analyzer = Analyzer(system)
+
+        # Debug: Check if the system actually has the correct weak layer
+        print("=== SYSTEM DEBUG ===")
+        print("System weak layer kn:", system.eigensystem.weak_layer.kn)
+        print("System weak layer kt:", system.eigensystem.weak_layer.kt)
+        print("System weak layer rho:", system.eigensystem.weak_layer.rho)
+        print("Field quantities weak layer kn:", system.fq.es.weak_layer.kn)
+        print("Field quantities weak layer kt:", system.fq.es.weak_layer.kt)
+
+        # Evaluate stress envelope for the slab without skier
+        xs, zs, x_founded = analyzer.rasterize_solution(mode="uncracked", num=4000)
+        sigma_kPa = system.fq.sig(zs, unit="kPa")
+        tau_kPa = system.fq.tau(zs, unit="kPa")
+        print("sigma_kPa", sigma_kPa)
+        print("tau_kPa", tau_kPa)
+        print("Max Sigma", np.max(np.abs(sigma_kPa)))
+        print("Max Tau", np.max(np.abs(tau_kPa)))
+        print("kn", weak_layer.kn)
+        print("kt", weak_layer.kt)
+
+        stress_envelope = criteria_evaluator.stress_envelope(
+            sigma=sigma_kPa,
+            tau=tau_kPa,
+            weak_layer=weak_layer,
+        )
+
+        max_stress = np.max(np.abs(stress_envelope))
+        print("max_stress", max_stress)
+
+        st.session_state.max_stress = max_stress
+
+        coupled_result = criteria_evaluator.evaluate_coupled_criterion(deepcopy(system))
+
+        # Determine risk level based on analysis
+        coupled_critical = coupled_result.critical_skier_weight
+        min_force_critical = coupled_result.initial_critical_skier_weight
+
+        # Extract touchdown distance
+        if system.slab_touchdown is not None:
+            l_BC = system.slab_touchdown.l_BC
+            # l_AB = system.slab_touchdown.l_AB
             segments = [
                 Segment(length=18000, has_foundation=True, m=0),
-                Segment(length=0, has_foundation=False, m=skier_weight),
-                Segment(length=0, has_foundation=False, m=0),
-                Segment(length=18000, has_foundation=True, m=0),
+                Segment(length=2 * l_BC, has_foundation=False, m=0),
+                # Segment(length=18000, has_foundation=True, m=0),
             ]
             scenario_config = ScenarioConfig(
                 phi=slope_angle,
-                system_type="skier",
-                crack_length=0.0,
+                system_type="pst-",
+                crack_length=2 * l_BC,
                 surface_load=0.0,
             )
             model_input = ModelInput(
@@ -266,139 +342,27 @@ with main_col:
             )
 
             system = SystemModel(model_input, config=Config(touchdown=True))
-            criteria_evaluator = CriteriaEvaluator(CriteriaConfig())
+            print("Touchdown distance", system.slab_touchdown.touchdown_distance)
+            touchdown_distance = system.slab_touchdown.touchdown_distance
             analyzer = Analyzer(system)
-
-            # Debug: Check if the system actually has the correct weak layer
-            print("=== SYSTEM DEBUG ===")
-            print("System weak layer kn:", system.eigensystem.weak_layer.kn)
-            print("System weak layer kt:", system.eigensystem.weak_layer.kt)
-            print("System weak layer rho:", system.eigensystem.weak_layer.rho)
-            print("Field quantities weak layer kn:", system.fq.es.weak_layer.kn)
-            print("Field quantities weak layer kt:", system.fq.es.weak_layer.kt)
-
-            # Evaluate stress envelope for the slab without skier
-            xs, zs, x_founded = analyzer.rasterize_solution(mode="uncracked", num=4000)
-            sigma_kPa = system.fq.sig(zs, unit="kPa")
-            tau_kPa = system.fq.tau(zs, unit="kPa")
-            print("sigma_kPa", sigma_kPa)
-            print("tau_kPa", tau_kPa)
-            print("Max Sigma", np.max(np.abs(sigma_kPa)))
-            print("Max Tau", np.max(np.abs(tau_kPa)))
-            print("kn", weak_layer.kn)
-            print("kt", weak_layer.kt)
-
-            stress_envelope = criteria_evaluator.stress_envelope(
-                sigma=sigma_kPa,
-                tau=tau_kPa,
-                weak_layer=weak_layer,
+            diff_energy = analyzer.differential_ERR(unit="J/m^2")
+            DERR_I = diff_energy[1]
+            DERR_II = diff_energy[2]
+            g_delta = criteria_evaluator.fracture_toughness_envelope(
+                G_I=DERR_I, G_II=DERR_II, weak_layer=weak_layer
             )
+            print("GDELTA", g_delta)
+        else:
+            touchdown_distance = 0.0
+            g_delta = 0.0
 
-            max_stress = np.max(np.abs(stress_envelope))
-            print("max_stress", max_stress)
+        # Store g_delta in session state for later use
+        st.session_state.g_delta = g_delta
+        st.session_state.touchdown_distance = touchdown_distance
 
-            st.session_state.max_stress = max_stress
-
-            coupled_result = criteria_evaluator.evaluate_coupled_criterion(
-                deepcopy(system)
-            )
-
-            # Determine risk level based on analysis
-            coupled_critical = coupled_result.critical_skier_weight
-            min_force_critical = coupled_result.initial_critical_skier_weight
-
-            # Use the lower of the two critical weights as the threshold
-            critical_weight = min(min_force_critical, coupled_critical)
-
-            # Extract touchdown distance
-            if system.slab_touchdown is not None:
-                l_BC = system.slab_touchdown.l_BC
-                l_AB = system.slab_touchdown.l_AB
-                segments = [
-                    Segment(length=18000, has_foundation=True, m=0),
-                    Segment(length=2 * l_BC, has_foundation=False, m=0),
-                    # Segment(length=18000, has_foundation=True, m=0),
-                ]
-                scenario_config = ScenarioConfig(
-                    phi=slope_angle,
-                    system_type="pst-",
-                    crack_length=2 * l_BC,
-                    surface_load=0.0,
-                )
-                model_input = ModelInput(
-                    scenario_config=scenario_config,
-                    weak_layer=weak_layer,
-                    layers=layers,
-                    segments=segments,
-                )
-
-                system = SystemModel(model_input, config=Config(touchdown=True))
-                analyzer = Analyzer(system)
-                diff_energy = analyzer.differential_ERR(unit="J/m^2")
-                DERR_I = diff_energy[1]
-                DERR_II = diff_energy[2]
-                g_delta = criteria_evaluator.fracture_toughness_envelope(
-                    G_I=DERR_I, G_II=DERR_II, weak_layer=weak_layer
-                )
-                print("GDELTA", g_delta)
-            else:
-                touchdown_distance = 0.0
-                g_delta = 0.0
-
-            # Store g_delta in session state for later use
-            st.session_state.g_delta = g_delta
-
-            # Store results for display
-            st.session_state.min_force_critical = min_force_critical
-            st.session_state.coupled_critical = coupled_critical
-            st.session_state.critical_weight = critical_weight
-
-            if skier_weight < critical_weight * 0.7:
-                risk_level = "LOW"
-                color = "🟢"
-            elif skier_weight < critical_weight * 0.9:
-                risk_level = "MODERATE"
-                color = "🟡"
-            else:
-                risk_level = "HIGH"
-                color = "🔴"
-
-        except Exception as e:
-            # Fallback to dummy logic if calculation fails
-            st.error(f"Calculation error: {str(e)}")
-            if slope_angle < 15 and skier_weight < 60:
-                risk_level = "LOW"
-                color = "🟢"
-            elif slope_angle < 30 and skier_weight < 100:
-                risk_level = "MODERATE"
-                color = "🟡"
-            else:
-                risk_level = "HIGH"
-                color = "🔴"
-    # else:
-    #     # Fallback logic
-    #     slope_angle = st.session_state.get("slope_angle", 30)
-    #     skier_weight = st.session_state.get("skier_weight", 80)
-
-    #     if slope_angle < 15 and skier_weight < 60:
-    #         risk_level = "LOW"
-    #         color = "🟢"
-    #     elif slope_angle < 30 and skier_weight < 100:
-    #         risk_level = "MODERATE"
-    #         color = "🟡"
-    #     else:
-    #         risk_level = "HIGH"
-    #         color = "🔴"
-
-    # # Display traffic light
-    # st.markdown(
-    #     f"<div style='text-align: center; font-size: 100px;'>{color}</div>",
-    #     unsafe_allow_html=True,
-    # )
-    # st.markdown(
-    #     f"<div style='text-align: center; font-size: 30px; font-weight: bold;'>{risk_level} RISK</div>",
-    #     unsafe_allow_html=True,
-    # )
+        # Store results for display
+        st.session_state.min_force_critical = min_force_critical
+        st.session_state.coupled_critical = coupled_critical
 
     # Impact Resistance -> Distance to stress envelope
     if (
@@ -423,7 +387,19 @@ with main_col:
             "base": "light",
         }
 
-        st.subheader("Impact Resistance")
+        with st.expander("Impact Resistance", expanded=False):
+            st.write("""
+                Impact resistance measures the ability of the slab to resist the impact of a skier.
+                It's based on the differential energy release rate (ERR) - the amount of energy available to drive crack growth.
+                
+                **Interpretation:**
+                - **High bar position (red zone)**: High impact resistance - skier likely to bounce off
+                - **Medium bar position (yellow zone)**: Moderate impact resistance - skier may bounce off under certain conditions  
+                - **Low bar position (green zone)**: Low impact resistance - skier likely to bounce off
+                
+                This is calculated from the mechanical properties of the slab and weak layer, considering the energy balance during impact.
+                """)
+
         impact_resistance_fig = plot_traffic_light(bar_position, theme)
         st.plotly_chart(
             impact_resistance_fig,
@@ -432,22 +408,19 @@ with main_col:
         )
 
     # Fracture resistance visualization
-    if (
-        hasattr(st.session_state, "critical_weight")
-        and st.session_state.critical_weight is not None
-    ):
-        safety_factor = st.session_state.critical_weight / 100
+    if hasattr(st.session_state, "coupled_critical"):
+        ratio_weights = st.session_state.coupled_critical / NORMAL_SKIER_WEIGHT
 
-        min_safety_factor = 0.1
-        max_safety_factor_val = 5.0
+        min_ratio_weights = 1.0
+        max_ratio_weights_val = 5.0
         min_bar = 0.0
         max_bar = 1.0
-        clamped_safety_factor = min(
-            max(safety_factor, min_safety_factor), max_safety_factor_val
+        clamped_ratio_weights = min(
+            max(ratio_weights, min_ratio_weights), max_ratio_weights_val
         )
-        bar_position = max_bar - (clamped_safety_factor - min_safety_factor) * (
+        bar_position = max_bar - (clamped_ratio_weights - min_ratio_weights) * (
             max_bar - min_bar
-        ) / (max_safety_factor_val - min_safety_factor)
+        ) / (max_ratio_weights_val - min_ratio_weights)
 
         # Create theme for the plot
         theme = {
@@ -456,7 +429,19 @@ with main_col:
             "base": "light",
         }
 
-        st.subheader("Fracture Resistance")
+        with st.expander("Fracture Resistance", expanded=False):
+            st.write("""
+                Fracture resistance measures the ability of the slab to resist crack propagation.
+                It's based on the differential energy release rate (ERR) - the amount of energy available to drive crack growth.
+                
+                **Interpretation:**
+                - **High bar position (red zone)**: High fracture resistance - crack likely to spread rapidly
+                - **Medium bar position (yellow zone)**: Moderate fracture resistance - crack may propagate under certain conditions  
+                - **Low bar position (green zone)**: Low fracture resistance - crack growth is unlikely
+                
+                This is calculated from the mechanical properties of the slab and weak layer, considering the energy balance during crack propagation.
+                """)
+
         fracture_resistance_fig = plot_traffic_light(bar_position, theme)
         st.plotly_chart(
             fracture_resistance_fig,
@@ -466,15 +451,26 @@ with main_col:
 
     # Propagation potential visualization
     if hasattr(st.session_state, "g_delta") and st.session_state.g_delta is not None:
-        g_delta = st.session_state.g_delta
-        min_g_delta = 0.3
-        max_g_delta_val = 1.0
+        # g_delta = st.session_state.g_delta
+        # min_g_delta = 0.3
+        # max_g_delta_val = 1.0
+        # min_bar = 0.0
+        # max_bar = 1.0
+        # clamped_g_delta = min(max(g_delta, min_g_delta), max_g_delta_val)
+        # bar_position = min_bar + (clamped_g_delta - min_g_delta) * (
+        #     max_bar - min_bar
+        # ) / (max_g_delta_val - min_g_delta)
+        touchdown_distance = st.session_state.touchdown_distance
+        min_touchdown_distance = 1500
+        max_touchdown_distance_val = 4000
         min_bar = 0.0
         max_bar = 1.0
-        clamped_g_delta = min(max(g_delta, min_g_delta), max_g_delta_val)
-        bar_position = min_bar + (clamped_g_delta - min_g_delta) * (
-            max_bar - min_bar
-        ) / (max_g_delta_val - min_g_delta)
+        clamped_touchdown_distance = min(
+            max(touchdown_distance, min_touchdown_distance), max_touchdown_distance_val
+        )
+        bar_position = min_bar + (
+            clamped_touchdown_distance - min_touchdown_distance
+        ) * (max_bar - min_bar) / (max_touchdown_distance_val - min_touchdown_distance)
 
         # Create theme for the plot
         theme = {
@@ -483,7 +479,19 @@ with main_col:
             "base": "light",
         }
 
-        st.subheader("Propagation Potential")
+        with st.expander("Propagation Potential", expanded=False):
+            st.write("""
+            Propagation potential measures how likely a crack is to propagate through the weak layer once initiated. 
+            It's based on the differential energy release rate (ERR) - the amount of energy available to drive crack growth.
+            
+            **Interpretation:**
+            - **High bar position (red zone)**: High propagation potential - crack likely to spread rapidly
+            - **Medium bar position (yellow zone)**: Moderate propagation potential - crack may propagate under certain conditions  
+            - **Low bar position (green zone)**: Low propagation potential - crack growth is unlikely
+            
+            This is calculated from the mechanical properties of the slab and weak layer, considering the energy balance during crack propagation.
+            """)
+
         propagation_potential_fig = plot_traffic_light(bar_position, theme)
         st.plotly_chart(
             propagation_potential_fig,
@@ -491,43 +499,44 @@ with main_col:
             key="propagation_potential_fig",
         )
 
-    # Additional risk information
-    st.write("**Assessment Summary:**")
-    st.write(f"- Slope Angle: {slope_angle}°")
-    st.write(f"- Skier Weight: {skier_weight} kg")
-    st.write(f"- Slab Layers: {len(st.session_state.slab_layers)}")
-    st.write(
-        f"- Weak Layer: {st.session_state.get('weak_layer_radio', 'Not selected')}"
-    )
-
-    # Show critical weights if calculated
-    if hasattr(st.session_state, "min_force_critical") and hasattr(
-        st.session_state, "coupled_critical"
-    ):
-        st.write("**Analysis Results:**")
-        st.write(
-            f"- Min Force Critical Weight: {st.session_state.min_force_critical:.1f} kg"
-        )
-        st.write(
-            f"- Coupled Criterion Critical Weight: {st.session_state.coupled_critical:.1f} kg"
-        )
-        st.write(
-            f"- Overall Critical Weight: {st.session_state.critical_weight:.1f} kg"
-        )
-
-        safety_factor = (
-            st.session_state.critical_weight / skier_weight
-            if skier_weight > 0
-            else float("inf")
-        )
-        st.write(f"- Safety Factor: {safety_factor:.2f}")
-
-        if safety_factor >= 1.43:  # 1/0.7
+    if hasattr(st.session_state, "coupled_critical"):
+        ratio_weights = st.session_state.coupled_critical / NORMAL_SKIER_WEIGHT
+        if ratio_weights >= 3.0:  # 1/0.7
             st.success("✅ Well below critical threshold")
-        elif safety_factor >= 1.11:  # 1/0.9
+        elif ratio_weights >= 2.0:  # 1/0.9
             st.warning("⚠️ Approaching critical threshold")
         else:
             st.error("❌ Above critical threshold")
+
+    col1, col2 = st.columns([1, 1])
+    with col1:
+        # Additional risk information
+        st.write("**Assessment Summary:**")
+        st.write(f"- Slope Angle: {slope_angle}°")
+        st.write(f"- Slab Layers: {len(st.session_state.slab_layers)}")
+        st.write(
+            f"- Weak Layer: {st.session_state.get('weak_layer_radio', 'Not selected')}"
+        )
+
+    with col2:
+        # Show critical weights if calculated
+        if hasattr(st.session_state, "min_force_critical") and hasattr(
+            st.session_state, "coupled_critical"
+        ):
+            st.write("**Analysis Results:**")
+            st.write(
+                f"- Min Force Critical Weight: {st.session_state.min_force_critical:.1f} kg"
+            )
+            st.write(
+                f"- Coupled Criterion Critical Weight: {st.session_state.coupled_critical:.1f} kg"
+            )
+            st.write(
+                f"- Overall Critical Weight: {st.session_state.coupled_critical:.1f} kg"
+            )
+            st.write(f"Steady State ERR: {st.session_state.g_delta:.2f}")
+            st.write(
+                f"Touchdown Distance: {system.slab_touchdown.touchdown_distance:.2f} m"
+            )
 
     # Footer
     st.divider()
