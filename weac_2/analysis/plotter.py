@@ -24,7 +24,7 @@ from weac_2.components.layer import WeakLayer
 from weac_2.core.scenario import Scenario
 from weac_2.core.slab import Slab
 from weac_2.core.system_model import SystemModel
-from weac_2.utils import isnotebook
+from weac_2.utils.misc import isnotebook
 
 LABELSTYLE = {
     "backgroundcolor": "w",

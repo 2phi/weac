@@ -5,7 +5,7 @@ import numpy as np
 
 from weac_2.components import ScenarioConfig, Segment, WeakLayer
 from weac_2.core.slab import Slab
-from weac_2.utils import decompose_to_normal_tangential
+from weac_2.utils.misc import decompose_to_normal_tangential
 
 logger = logging.getLogger(__name__)
 

@@ -17,7 +17,7 @@ from weac_2.core.field_quantities import FieldQuantities
 from weac_2.core.scenario import Scenario
 
 # from weac_2.constants import G_MM_S2, LSKI_MM
-from weac_2.utils import decompose_to_normal_tangential, get_skier_point_load
+from weac_2.utils.misc import decompose_to_normal_tangential, get_skier_point_load
 
 logger = logging.getLogger(__name__)
 
