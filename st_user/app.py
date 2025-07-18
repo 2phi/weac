@@ -28,7 +28,7 @@ from weac_2.analysis import (
     FindMinimumForceResult,
 )
 from weac_2.analysis.analyzer import Analyzer
-from weac_2.utils import load_dummy_profile
+from weac_2.utils.misc import load_dummy_profile
 
 NORMAL_SKIER_WEIGHT = 100
 
