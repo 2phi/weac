@@ -1,7 +1,7 @@
 import logging
 
 from weac_2.logging_config import setup_logging
-from weac_2.utils.CAAML_to_weac import convert_snowpit_to_weac
+from weac_2.utils.snowpilot_parser import convert_snowpit_to_weac
 
 setup_logging(level="INFO")
 
