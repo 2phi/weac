@@ -17,7 +17,6 @@ from typing import List
 
 from pydantic import BaseModel, Field
 
-from weac_2.components.criteria_config import CriteriaConfig
 from weac_2.components.layer import Layer, WeakLayer
 from weac_2.components.scenario_config import ScenarioConfig
 from weac_2.components.segment import Segment

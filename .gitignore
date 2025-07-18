@@ -18,6 +18,14 @@ dist/
 # IDE setup
 .vscode/
 
+# Environments
+.venv/
+
+# Data
+*.xml
+*.caaml
+*.txt
+
 # Secrets
 .env
 
@@ -26,5 +34,3 @@ dist/
 plots/
 test/
 scratch/
-
-.venv/
