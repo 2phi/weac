@@ -8,11 +8,24 @@ Mechanical properties of snow-pack layers.
 import logging
 from typing import Literal
 
+import numpy as np
 from pydantic import BaseModel, ConfigDict, Field
 
 from weac_2.constants import CB0, CB1, CG0, CG1, NU, RHO_ICE
 
 logger = logging.getLogger(__name__)
+
+
+def _collapse_height(h: float) -> float:
+    """
+    Based on data from Herwijnen (insert paper here)
+
+    Arguments:
+    ----------
+    h : float
+        Height/Thickness of the layer [mm].
+    """
+    return 4.70 * (1 - np.exp(-h / 7.78))
 
 
 def _bergfeld_youngs_modulus(rho: float, C_0: float = CB0, C_1: float = CB1) -> float:
@@ -178,10 +191,10 @@ class WeakLayer(BaseModel):
 
     rho: float = Field(125, gt=70, description="Density of the Slab  [kg m⁻³]")
     h: float = Field(30, gt=0, description="Height/Thickness of the slab  [mm]")
-    collapse_height: float = Field(
-        default=5.0, gt=0, description="Collapse height [mm]"
-    )
     nu: float = Field(default=NU, ge=0, lt=0.5, description="Poisson's ratio [-]")
+    collapse_height: float = Field(
+        default=0.0, gt=0, description="Collapse height [mm]"
+    )
     E: float = Field(default=0.0, gt=0, description="Young's modulus [MPa]")
     G: float = Field(default=0.0, gt=0, description="Shear modulus [MPa]")
     # Winkler springs (can be overridden by caller)
@@ -218,6 +231,9 @@ class WeakLayer(BaseModel):
             object.__setattr__(self, "E", self.E or _gerling_youngs_modulus(self.rho))
         else:
             raise ValueError(f"Invalid E_method: {self.E_method}")
+        object.__setattr__(
+            self, "collapse_height", self.collapse_height or _collapse_height(self.h)
+        )
         object.__setattr__(self, "G", self.G or self.E / (2 * (1 + self.nu)))
         E_plane = self.E / (1 - self.nu**2)  # plane-strain Young
         object.__setattr__(self, "kn", self.kn or E_plane / self.h)

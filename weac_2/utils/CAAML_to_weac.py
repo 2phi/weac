@@ -182,8 +182,7 @@ def extract_scenarios(snowpit: SnowPit, layers: List[Layer]) -> List[ModelInput]
             )
         )
         logger.info(
-            "Adding scenario with depth_top %s and weak_layer depth %s",
-            depth_top,
+            "Adding scenario with depth_top %s mm",
             sum([layer.h for layer in layers_above]),
         )
 
