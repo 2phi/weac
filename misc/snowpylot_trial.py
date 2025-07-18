@@ -2,13 +2,18 @@ from snowpylot import caaml_parser
 from snowpylot.snow_pit import SnowPit
 
 # Parse a CAAML file
-snowpit: SnowPit = caaml_parser("/home/ubuntu/Documents/weac/misc/Cairn Gully-10-Jun.caaml")
+snowpit: SnowPit = caaml_parser(
+    "/home/pillowbeast/Documents/weac/misc/Cairn Gully-10-Jun.caaml"
+)
 
 print(f"Snowpit: {snowpit}")
 print(f"Core Info: {snowpit.core_info}")
 print(f"Snow Profile: {snowpit.snow_profile}")
 print(f"Stability Tests: {snowpit.stability_tests}")
 print(f"Whumpf Data: {snowpit.whumpf_data}")
+
+with open("snowpit.txt", "w") as f:
+    f.write(str(snowpit))
 
 # # Access basic information
 # print(f"Pit ID: {snowpit.core_info.pit_id}")
