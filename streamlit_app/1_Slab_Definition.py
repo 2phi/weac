@@ -11,7 +11,7 @@ from weac_2.components.model_input import ModelInput
 from weac_2.components.scenario_config import ScenarioConfig
 from weac_2.core.slab import Slab
 from weac_2.core.system_model import SystemModel
-from weac_2.utils import load_dummy_profile
+from weac_2.utils.misc import load_dummy_profile
 from weac_2.analysis.plotter import Plotter
 
 if "plotter" not in st.session_state:
