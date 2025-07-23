@@ -102,7 +102,6 @@ def compute_density(grainform: str, hardness: str | Tuple[str, str]) -> float:
     `https://arc.lib.montana.edu/snow-science/objects/issw-2000-121-127.pdf`
     """
     # Adaptation based on CAAML profiles (which sometimes provide top and bottom hardness)
-    print(grainform, hardness)
     if isinstance(hardness, tuple):
         hardness_top, hardness_bottom = hardness
         hardness_value = (
