@@ -78,6 +78,7 @@ def load_dummy_profile(profile_id):
 
     return layers, E
 
+
 def calc_center_of_gravity(layers: np.ndarray) -> tuple[float, float]:
     """
     Calculate z-coordinate of the center of gravity.
@@ -209,7 +210,7 @@ def gerling(rho, C0=6.0, C1=4.6):
     return C0 * 1e-10 * rho**C1
 
 
-def bergfeld(rho, rho0=917, C0=6.5, C1=4.4):
+def bergfeld(rho, rho0=916.7, C0=6.5, C1=4.4):
     """
     Compute Young's modulus from density according to Bergfeld et al. (2023).
 
@@ -218,7 +219,7 @@ def bergfeld(rho, rho0=917, C0=6.5, C1=4.4):
     rho : float or ndarray
         Density (kg/m^3).
     rho0 : float, optional
-        Density of ice (kg/m^3). Default is 917.
+        Density of ice (kg/m^3). Default is 916.7.
     C0 : float, optional
         Multiplicative constant of Young modulus parametrization
         according to Bergfeld et al. (2023). Default is 6.5.
