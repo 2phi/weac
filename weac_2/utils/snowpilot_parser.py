@@ -25,6 +25,7 @@ import numpy as np
 
 from snowpylot import caaml_parser
 from snowpylot.snow_pit import SnowPit
+from snowpylot.snow_profile import DensityObs
 from snowpylot.stability_tests import PropSawTest, ExtColumnTest, ComprTest, RBlockTest
 from snowpylot.layer import Layer as SnowpylotLayer
 
@@ -63,6 +64,7 @@ class SnowPilotParser:
 
     def _extract_layers(self, snowpit: SnowPit) -> List[Layer]:
         """Extract layers from snowpit."""
+        # Extract layers from snowpit: List[SnowpylotLayer]
         sp_layers: List[SnowpylotLayer] = [
             layer
             for layer in snowpit.snow_profile.layers
@@ -70,34 +72,18 @@ class SnowPilotParser:
         ]
         sp_layers = sorted(sp_layers, key=lambda x: x.depth_top[0])  # type: ignore
 
+        # Extract density layers from snowpit: List[DensityObs]
+        sp_density_layers: List[DensityObs] = [
+            layer
+            for layer in snowpit.snow_profile.density_profile
+            if layer.depth_top is not None
+        ]
+        sp_density_layers = sorted(sp_density_layers, key=lambda x: x.depth_top[0])  # type: ignore
+
+        # Populate WEAC layers: List[Layer]
         layers: List[Layer] = []
         for layer in sp_layers:
-            # Extract hardness from [hardness, hardness_top, hardness_bottom]
-            if layer.hardness is not None:
-                hardness = layer.hardness
-            elif layer.hardness_top is not None and layer.hardness_bottom is not None:
-                hardness = (layer.hardness_top, layer.hardness_bottom)
-            else:
-                raise ValueError(
-                    "Hardness not found for layer: "
-                    + str(layer.depth_top)
-                    + " "
-                    + str(layer.thickness)
-                )
-            if (
-                layer.grain_form_primary is not None
-                and layer.grain_form_primary.grain_form is not None
-            ):
-                grain_form = layer.grain_form_primary.grain_form
-            else:
-                raise ValueError(
-                    "Grain form not found for layer: "
-                    + str(layer.depth_top)
-                    + " "
-                    + str(layer.thickness)
-                )
-
-            density = compute_density(grain_form, hardness)
+            # Extract thickness and convert to mm
             if layer.thickness is not None:
                 thickness, unit = layer.thickness
                 thickness = thickness * convert_to_mm[unit]  # Convert to mm
@@ -108,10 +94,129 @@ class SnowPilotParser:
                     + " "
                     + str(layer.thickness)
                 )
+
+            # Get layer depth range in mm for density matching
+            layer_depth_top_mm = layer.depth_top[0] * convert_to_mm[layer.depth_top[1]]
+            layer_depth_bottom_mm = layer_depth_top_mm + thickness
+
+            # Try to find density measurement that overlaps with this layer
+            measured_density = self._get_density_for_layer_range(
+                layer_depth_top_mm, layer_depth_bottom_mm, sp_density_layers
+            )
+
+            if measured_density is not None:
+                density = measured_density
+                logger.info(
+                    "Using measured density %s kg/m³ for layer at depth %s-%s mm",
+                    density,
+                    layer_depth_top_mm,
+                    layer_depth_bottom_mm,
+                )
+            else:
+                # Fall back to computing density from hardness and grain type
+                # Extract hardness from [hardness, hardness_top, hardness_bottom]
+                if layer.hardness is not None:
+                    hardness = layer.hardness
+                elif (
+                    layer.hardness_top is not None and layer.hardness_bottom is not None
+                ):
+                    hardness = (layer.hardness_top, layer.hardness_bottom)
+                else:
+                    raise ValueError(
+                        "Hardness not found for layer: "
+                        + str(layer.depth_top)
+                        + " "
+                        + str(layer.thickness)
+                    )
+                if (
+                    layer.grain_form_primary is not None
+                    and layer.grain_form_primary.grain_form is not None
+                ):
+                    grain_form = layer.grain_form_primary.grain_form
+                else:
+                    raise ValueError(
+                        "Grain form not found for layer: "
+                        + str(layer.depth_top)
+                        + " "
+                        + str(layer.thickness)
+                    )
+
+                density = compute_density(grain_form, hardness)
+                logger.info(
+                    "Using computed density %s kg/m³ for layer at depth %s-%s mm (no density measurement available)",
+                    density,
+                    layer_depth_top_mm,
+                    layer_depth_bottom_mm,
+                )
+
             layers.append(Layer(rho=density, h=thickness))
         if len(layers) == 0:
             raise ValueError("No layers found for snowpit")
         return layers
+
+    def _get_density_for_layer_range(
+        self,
+        layer_top_mm: float,
+        layer_bottom_mm: float,
+        sp_density_layers: List[DensityObs],
+    ) -> float | None:
+        """Find density measurements that overlap with the given layer depth range.
+
+        Args:
+            layer_top_mm: Top depth of layer in mm
+            layer_bottom_mm: Bottom depth of layer in mm
+            sp_density_layers: List of density observations
+
+        Returns:
+            Average density from overlapping measurements, or None if no overlap
+        """
+        if not sp_density_layers:
+            return None
+
+        overlapping_densities = []
+        overlapping_weights = []
+
+        for density_obs in sp_density_layers:
+            if density_obs.depth_top is None or density_obs.thickness is None:
+                continue
+
+            # Convert density observation depth range to mm
+            density_top_mm = (
+                density_obs.depth_top[0] * convert_to_mm[density_obs.depth_top[1]]
+            )
+            density_thickness_mm = (
+                density_obs.thickness[0] * convert_to_mm[density_obs.thickness[1]]
+            )
+            density_bottom_mm = density_top_mm + density_thickness_mm
+
+            # Check for overlap between layer and density measurement
+            overlap_top = max(layer_top_mm, density_top_mm)
+            overlap_bottom = min(layer_bottom_mm, density_bottom_mm)
+
+            if overlap_top < overlap_bottom:  # There is overlap
+                overlap_thickness = overlap_bottom - overlap_top
+
+                # Extract density value
+                if density_obs.density is not None:
+                    density_value = density_obs.density[0]  # (value, unit)
+
+                    overlapping_densities.append(density_value)
+                    overlapping_weights.append(overlap_thickness)
+
+        if overlapping_densities:
+            # Calculate weighted average based on overlap thickness
+            total_weight = sum(overlapping_weights)
+            if total_weight > 0:
+                weighted_density = (
+                    sum(
+                        d * w
+                        for d, w in zip(overlapping_densities, overlapping_weights)
+                    )
+                    / total_weight
+                )
+                return float(weighted_density)
+
+        return None
 
     def _assemble_model_inputs(
         self, snowpit: SnowPit, layers: List[Layer]
