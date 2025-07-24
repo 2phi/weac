@@ -5,7 +5,11 @@ import unittest
 import numpy as np
 
 # weac imports
-from weac_2.analysis.criteria_evaluator import CoupledCriterionResult, CriteriaEvaluator
+from weac_2.analysis.criteria_evaluator import (
+    CoupledCriterionResult,
+    CriteriaEvaluator,
+    FindMinimumForceResult,
+)
 from weac_2.components import (
     Config,
     CriteriaConfig,
@@ -43,7 +47,7 @@ class TestCriteriaEvaluator(unittest.TestCase):
 
     def test_fracture_toughness_criterion(self):
         """Test the fracture toughness criterion calculation."""
-        g_delta = self.evaluator.fracture_toughness_criterion(
+        g_delta = self.evaluator.fracture_toughness_envelope(
             G_I=0.25, G_II=0.4, weak_layer=self.weak_layer
         )
         # Expected: (|0.25| / 0.5)^5.0 + (|0.4| / 0.8)^2.22
@@ -76,12 +80,14 @@ class TestCriteriaEvaluator(unittest.TestCase):
             ),
             config=self.config,
         )
-        results = self.evaluator.find_minimum_force(system=system)
+        results: FindMinimumForceResult = self.evaluator.find_minimum_force(
+            system=system
+        )
         skier_weight = results.critical_skier_weight
-        system = results.system
+        new_segments = results.new_segments
         self.assertGreater(skier_weight, 0)
         # A simple check to ensure it returns a positive force
-        self.assertIsNotNone(system)
+        self.assertIsNotNone(new_segments)
 
     def test_find_new_anticrack_length(self):
         """Test the find_new_anticrack_length method."""
@@ -101,7 +107,7 @@ class TestCriteriaEvaluator(unittest.TestCase):
             ),
             config=self.config,
         )
-        crack_len, segments = self.evaluator._find_new_anticrack_length(
+        crack_len, segments = self.evaluator.find_crack_length_for_weight(
             system, skier_weight
         )
         self.assertGreaterEqual(crack_len, 0)

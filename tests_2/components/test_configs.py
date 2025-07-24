@@ -161,7 +161,6 @@ class TestModelInput(unittest.TestCase):
             Segment(length=3000, has_foundation=True, m=70),
             Segment(length=4000, has_foundation=True, m=0),
         ]
-        self.criteria_config = CriteriaConfig(fn=1, fm=1, gn=1, gm=1)
 
     def test_model_input_complete(self):
         """Test creating complete ModelInput."""
@@ -170,27 +169,12 @@ class TestModelInput(unittest.TestCase):
             weak_layer=self.weak_layer,
             layers=self.layers,
             segments=self.segments,
-            criteria_config=self.criteria_config,
         )
 
         self.assertEqual(model.scenario_config, self.scenario_config)
         self.assertEqual(model.weak_layer, self.weak_layer)
         self.assertEqual(model.layers, self.layers)
         self.assertEqual(model.segments, self.segments)
-        self.assertEqual(model.criteria_config, self.criteria_config)
-
-    def test_model_input_default_criteria(self):
-        """Test ModelInput with default criteria config."""
-        model = ModelInput(
-            scenario_config=self.scenario_config,
-            weak_layer=self.weak_layer,
-            layers=self.layers,
-            segments=self.segments,
-        )
-
-        # Should have default criteria config
-        self.assertIsInstance(model.criteria_config, CriteriaConfig)
-        self.assertEqual(model.criteria_config.fn, 2.0)
 
     def test_model_input_empty_collections(self):
         """Test validation with empty layers or segments."""
@@ -219,7 +203,6 @@ class TestModelInput(unittest.TestCase):
             weak_layer=self.weak_layer,
             layers=self.layers,
             segments=self.segments,
-            criteria_config=self.criteria_config,
         )
 
         # Test JSON serialization

@@ -259,7 +259,7 @@ class TestIntegrationOldVsNew(unittest.TestCase):
             phi=inclination, system_type="pst-", crack_length=4000
         )
         weak_layer = WeakLayer(
-            rho=50, h=30, E=0.35, nu=0.1, G_Ic=1
+            rho=50, h=30, E=0.35, nu=0.1, G_Ic=1, collapse_height=15
         )  # Default weak layer properties
         criteria_config = CriteriaConfig(fn=1, fm=1, gn=1, gm=1)
         config = Config(touchdown=True)  # Use default configuration

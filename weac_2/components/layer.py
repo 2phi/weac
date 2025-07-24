@@ -191,10 +191,11 @@ class WeakLayer(BaseModel):
 
     rho: float = Field(125, gt=0, description="Density of the Slab  [kg m⁻³]")
     h: float = Field(30, gt=0, description="Height/Thickness of the slab  [mm]")
-    nu: float = Field(default=NU, ge=0, lt=0.5, description="Poisson's ratio [-]")
     collapse_height: float = Field(
         default=0.0, gt=0, description="Collapse height [mm]"
     )
+    nu: float = Field(default=NU, ge=0, lt=0.5, description="Poisson's ratio [-]")
+
     E: float = Field(default=0.0, gt=0, description="Young's modulus [MPa]")
     G: float = Field(default=0.0, gt=0, description="Shear modulus [MPa]")
     # Winkler springs (can be overridden by caller)
@@ -234,6 +235,15 @@ class WeakLayer(BaseModel):
         object.__setattr__(
             self, "collapse_height", self.collapse_height or _collapse_height(self.h)
         )
+
+        # Validate that collapse height is smaller than layer height
+        if self.collapse_height >= self.h:
+            raise ValueError(
+                f"Collapse height ({self.collapse_height:.2f} mm) must be smaller than "
+                f"layer height ({self.h:.2f} mm). Consider reducing collapse_height or "
+                f"increasing layer thickness."
+            )
+
         object.__setattr__(self, "G", self.G or self.E / (2 * (1 + self.nu)))
         E_plane = self.E / (1 - self.nu**2)  # plane-strain Young
         object.__setattr__(self, "kn", self.kn or E_plane / self.h)
