@@ -13,6 +13,7 @@ from typing import Tuple
 
 DENSITY_PARAMETERS = {
     "!skip": (0, 0),
+    "SH": (125, 0),  # 125 kg/m^3 so that bergfeld is E~1.0
     "PP": (45, 36),
     "PPgp": (83, 37),
     "DF": (65, 36),
@@ -66,10 +67,10 @@ GRAIN_TYPE = {
     "RGsr": "RGmx",
     "RGwp": "RGmx",
     "RGxf": "RGmx",
-    "SH": "!skip",
-    "SHcv": "!skip",
-    "SHsu": "!skip",
-    "SHxr": "!skip",
+    "SH": "SH",
+    "SHcv": "SH",
+    "SHsu": "SH",
+    "SHxr": "SH",
 }
 
 # Translate hand hardness to numerical values
@@ -112,8 +113,14 @@ def compute_density(grainform: str, hardness: str | Tuple[str, str]) -> float:
     grain_type = GRAIN_TYPE[grainform]
     a, b = DENSITY_PARAMETERS[grain_type]
 
+    if grain_type == "!skip":
+        raise ValueError("Grain type is !skip")
+    if hardness_value == "!skip":
+        raise ValueError("Hardness value is !skip")
+
     if grain_type == "RG":
         # Special computation for 'RG' grain form
-        return a + b * (hardness_value**3.15)
+        rho = a + b * (hardness_value**3.15)
     else:
-        return a + b * hardness_value
+        rho = a + b * hardness_value
+    return rho
