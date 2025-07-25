@@ -131,15 +131,10 @@ class Layer(BaseModel):
         default="bergfeld",
         description="Method to calculate the Young's modulus",
     )
-    grain_type: GRAIN_TYPES = Field(default=None, description="Grain type")
-    grain_size: float = Field(default=None, description="Grain size [mm]")
-    hand_hardness: HAND_HARDNESS_VALUES = Field(
+    grain_type: GRAIN_TYPES | None = Field(default=None, description="Grain type")
+    grain_size: float | None = Field(default=None, description="Grain size [mm]")
+    hand_hardness: HAND_HARDNESS_VALUES | None = Field(
         default=None, description="Hand hardness"
-    )
-
-    model_config = ConfigDict(
-        frozen=True,
-        extra="forbid",
     )
 
     def model_post_init(self, _ctx):
@@ -223,9 +218,9 @@ class WeakLayer(BaseModel):
         default="bergfeld",
         description="Method to calculate the Young's modulus",
     )
-    grain_type: GRAIN_TYPES = Field(default=None, description="Grain type")
-    grain_size: float = Field(default=None, description="Grain size [mm]")
-    hand_hardness: HAND_HARDNESS_VALUES = Field(
+    grain_type: GRAIN_TYPES | None = Field(default=None, description="Grain type")
+    grain_size: float | None = Field(default=None, description="Grain size [mm]")
+    hand_hardness: HAND_HARDNESS_VALUES | None = Field(
         default=None, description="Hand hardness"
     )
 
