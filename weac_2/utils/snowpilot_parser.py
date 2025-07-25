@@ -22,6 +22,7 @@ The `the column length` is the column length of the PropSawTest.
 import logging
 from typing import List, Tuple
 import numpy as np
+import pandas as pd
 
 from snowpylot import caaml_parser
 from snowpylot.snow_pit import SnowPit
@@ -49,10 +50,18 @@ class SnowPilotParser:
     def __init__(self, file_path: str):
         self.snowpit: SnowPit = caaml_parser(file_path)
 
-    def run(self) -> List[ModelInput]:
-        self.layers: List[Layer] = self._extract_layers(self.snowpit)
+    def run(
+        self,
+        psts: bool = True,
+        ects: bool = True,
+        cts: bool = True,
+        rblocks: bool = True,
+    ) -> List[ModelInput]:
+        print("Extracting layers")
+        self.layers: List[Layer] = self.extract_layers()
+        print("Assembling model inputs")
         self.model_inputs: List[ModelInput] = self._assemble_model_inputs(
-            self.snowpit, self.layers
+            self.snowpit, self.layers, psts, ects, cts, rblocks
         )
         return self.model_inputs
 
@@ -62,8 +71,9 @@ class SnowPilotParser:
     def get_layers(self) -> List[Layer]:
         return self.layers
 
-    def _extract_layers(self, snowpit: SnowPit) -> List[Layer]:
+    def extract_layers(self) -> List[Layer]:
         """Extract layers from snowpit."""
+        snowpit = self.snowpit
         # Extract layers from snowpit: List[SnowpylotLayer]
         sp_layers: List[SnowpylotLayer] = [
             layer
@@ -83,73 +93,118 @@ class SnowPilotParser:
         # Populate WEAC layers: List[Layer]
         layers: List[Layer] = []
         for layer in sp_layers:
-            # Extract thickness and convert to mm
+            # Parameters
+            grain_type = None
+            grain_size = None
+            hand_hardness = None
+            density = None
+            thickness = None
+
+            # extract THICKNESS
             if layer.thickness is not None:
                 thickness, unit = layer.thickness
                 thickness = thickness * convert_to_mm[unit]  # Convert to mm
             else:
-                raise ValueError(
-                    "Thickness not found for layer: "
-                    + str(layer.depth_top)
-                    + " "
-                    + str(layer.thickness)
-                )
+                raise ValueError("Thickness not found")
 
+            # extract GRAIN TYPE and SIZE
+            if layer.grain_form_primary:
+                if layer.grain_form_primary.grain_form:
+                    grain_type = layer.grain_form_primary.grain_form
+                    if layer.grain_form_primary.grain_size_avg:
+                        grain_size = (
+                            layer.grain_form_primary.grain_size_avg[0]
+                            * convert_to_mm[layer.grain_form_primary.grain_size_avg[1]]
+                        )
+                    elif layer.grain_form_primary.grain_size_max:
+                        grain_size = (
+                            layer.grain_form_primary.grain_size_max[0]
+                            * convert_to_mm[layer.grain_form_primary.grain_size_max[1]]
+                        )
+
+            # extract DENSITY
             # Get layer depth range in mm for density matching
             layer_depth_top_mm = layer.depth_top[0] * convert_to_mm[layer.depth_top[1]]
             layer_depth_bottom_mm = layer_depth_top_mm + thickness
-
             # Try to find density measurement that overlaps with this layer
             measured_density = self._get_density_for_layer_range(
                 layer_depth_top_mm, layer_depth_bottom_mm, sp_density_layers
             )
+            print("Measured density: ", measured_density)
 
-            if measured_density is not None:
-                density = measured_density
-                logger.info(
-                    "Using measured density %s kg/m³ for layer at depth %s-%s mm",
-                    density,
-                    layer_depth_top_mm,
-                    layer_depth_bottom_mm,
+            # Handle hardness and create layers accordingly
+            if layer.hardness_top is not None and layer.hardness_bottom is not None:
+                hand_hardness_top = layer.hardness_top
+                hand_hardness_bottom = layer.hardness_bottom
+
+                # Two hardness values - split into two layers
+                half_thickness = thickness / 2
+                layer_mid_depth_mm = layer_depth_top_mm + half_thickness
+
+                # Create top layer (first half)
+                if measured_density is not None:
+                    density_top = self._get_density_for_layer_range(
+                        layer_depth_top_mm, layer_mid_depth_mm, sp_density_layers
+                    )
+                else:
+                    density_top = compute_density(grain_type, hand_hardness_top)
+
+                layers.append(
+                    Layer(
+                        rho=density_top,
+                        h=half_thickness,
+                        grain_type=grain_type,
+                        grain_size=grain_size,
+                        hand_hardness=hand_hardness_top,
+                    )
+                )
+
+                # Create bottom layer (second half)
+                if measured_density is not None:
+                    density_bottom = self._get_density_for_layer_range(
+                        layer_mid_depth_mm, layer_depth_bottom_mm, sp_density_layers
+                    )
+                else:
+                    try:
+                        density_bottom = compute_density(
+                            grain_type, hand_hardness_bottom
+                        )
+                    except Exception as e:
+                        raise ValueError(
+                            f"Error computing density for layer {layer.depth_top}: {e}"
+                        )
+
+                layers.append(
+                    Layer(
+                        rho=density_bottom,
+                        h=half_thickness,
+                        grain_type=grain_type,
+                        grain_size=grain_size,
+                        hand_hardness=hand_hardness_bottom,
+                    )
                 )
             else:
-                # Fall back to computing density from hardness and grain type
-                # Extract hardness from [hardness, hardness_top, hardness_bottom]
-                if layer.hardness is not None:
-                    hardness = layer.hardness
-                elif (
-                    layer.hardness_top is not None and layer.hardness_bottom is not None
-                ):
-                    hardness = (layer.hardness_top, layer.hardness_bottom)
-                else:
-                    raise ValueError(
-                        "Hardness not found for layer: "
-                        + str(layer.depth_top)
-                        + " "
-                        + str(layer.thickness)
-                    )
-                if (
-                    layer.grain_form_primary is not None
-                    and layer.grain_form_primary.grain_form is not None
-                ):
-                    grain_form = layer.grain_form_primary.grain_form
-                else:
-                    raise ValueError(
-                        "Grain form not found for layer: "
-                        + str(layer.depth_top)
-                        + " "
-                        + str(layer.thickness)
-                    )
+                # Single hardness value - create one layer
+                hand_hardness = layer.hardness
 
-                density = compute_density(grain_form, hardness)
-                logger.info(
-                    "Using computed density %s kg/m³ for layer at depth %s-%s mm (no density measurement available)",
-                    density,
-                    layer_depth_top_mm,
-                    layer_depth_bottom_mm,
+                if measured_density is not None:
+                    density = measured_density
+                else:
+                    try:
+                        density = compute_density(grain_type, hand_hardness)
+                    except Exception as e:
+                        raise
+
+                layers.append(
+                    Layer(
+                        rho=density,
+                        h=thickness,
+                        grain_type=grain_type,
+                        grain_size=grain_size,
+                        hand_hardness=hand_hardness,
+                    )
                 )
 
-            layers.append(Layer(rho=density, h=thickness))
         if len(layers) == 0:
             raise ValueError("No layers found for snowpit")
         return layers
@@ -219,7 +274,13 @@ class SnowPilotParser:
         return None
 
     def _assemble_model_inputs(
-        self, snowpit: SnowPit, layers: List[Layer]
+        self,
+        snowpit: SnowPit,
+        layers: List[Layer],
+        psts: bool = True,
+        ects: bool = True,
+        cts: bool = True,
+        rblocks: bool = True,
     ) -> List[ModelInput]:
         """Extract scenarios from snowpit stability tests."""
         scenarios: List[ModelInput] = []
@@ -233,9 +294,13 @@ class SnowPilotParser:
 
         # Add scenarios for PropSawTest
         psts: List[PropSawTest] = snowpit.stability_tests.PST
-        if len(psts) > 0:
+        print("Printing available PSTs: ", len(psts))
+        if len(psts) > 0 and psts:
+            print("Calculating PST scenarios")
             # Implement logic that finds cut length based on PST
             for pst in psts:
+                if pst.failure:
+                    continue
                 segments = []
                 if (
                     pst.cut_length is not None
@@ -261,7 +326,6 @@ class SnowPilotParser:
                     )
                     weak_layer, layers_above = (
                         self._extract_weak_layer_and_layers_above(
-                            snowpit,
                             pst.depth_top[0] * convert_to_mm[pst.depth_top[1]],
                             layers,
                         )
@@ -292,17 +356,17 @@ class SnowPilotParser:
         standard_scenario_config = ScenarioConfig(system_type="skier", phi=slope_angle)
         depth_tops = set()
         ects: List[ExtColumnTest] = snowpit.stability_tests.ECT
-        if len(ects) > 0:
+        if len(ects) > 0 and ects:
             for ect in ects:
                 if ect.depth_top is not None:
                     depth_tops.add(ect.depth_top[0] * convert_to_mm[ect.depth_top[1]])
         cts: List[ComprTest] = snowpit.stability_tests.CT
-        if len(cts) > 0:
+        if len(cts) > 0 and cts:
             for ct in cts:
                 if ct.depth_top is not None:
                     depth_tops.add(ct.depth_top[0] * convert_to_mm[ct.depth_top[1]])
         rblocks: List[RBlockTest] = snowpit.stability_tests.RBlock
-        if len(rblocks) > 0:
+        if len(rblocks) > 0 and rblocks:
             for rblock in rblocks:
                 if rblock.depth_top is not None:
                     depth_tops.add(
@@ -311,7 +375,7 @@ class SnowPilotParser:
 
         for depth_top in sorted(depth_tops):
             weak_layer, layers_above = self._extract_weak_layer_and_layers_above(
-                snowpit, depth_top, layers
+                depth_top, layers
             )
             scenarios.append(
                 ModelInput(
@@ -338,31 +402,51 @@ class SnowPilotParser:
             )
         return scenarios
 
-    def _extract_weak_layer_and_layers_above(
-        self, snowpit: SnowPit, depth_top: float, layers: List[Layer]
+    def extract_weak_layer_and_layers_above(
+        self, weak_layer_depth: float, layers: List[Layer]
     ) -> Tuple[WeakLayer, List[Layer]]:
         """Extract weak layer and layers above the weak layer for the given depth_top extracted from the stability test."""
         depth = 0
         layers_above = []
         for i, layer in enumerate(layers):
-            if depth + layer.h < depth_top:
+            print(depth)
+            print(layer.h)
+            print(weak_layer_depth)
+            if depth + layer.h < weak_layer_depth:
                 layers_above.append(layer)
                 depth += layer.h
-            elif depth < depth_top and depth + layer.h > depth_top:
-                layers_above.append(Layer(rho=layers[i].rho, h=depth_top - depth))
+            elif depth < weak_layer_depth and depth + layer.h > weak_layer_depth:
+                layer.h = weak_layer_depth - depth
+                layers_above.append(layer)
                 weak_layer_rho = layers[i].rho
-                weak_layer_h = layer.h - (depth_top - depth)
+                weak_layer_hand_hardness = layers[i].hand_hardness
+                weak_layer_grain_type = layers[i].grain_type
+                weak_layer_grain_size = layers[i].grain_size
                 break
-            elif depth + layer.h == depth_top:
+            elif depth + layer.h == weak_layer_depth:
                 if i + 1 < len(layers):
                     layers_above.append(layer)
                     weak_layer_rho = layers[i + 1].rho
-                    weak_layer_h = layers[i + 1].h
+                    weak_layer_hand_hardness = layers[i + 1].hand_hardness
+                    weak_layer_grain_type = layers[i + 1].grain_type
+                    weak_layer_grain_size = layers[i + 1].grain_size
                 else:
                     weak_layer_rho = layers[i].rho
-                    weak_layer_h = layers[i].h
+                    weak_layer_hand_hardness = layers[i].hand_hardness
+                    weak_layer_grain_type = layers[i].grain_type
+                    weak_layer_grain_size = layers[i].grain_size
                 break
-        weak_layer = WeakLayer(rho=weak_layer_rho, h=weak_layer_h)
+        print(weak_layer_rho)
+        print(weak_layer_hand_hardness)
+        print(weak_layer_grain_type)
+        print(weak_layer_grain_size)
+        weak_layer = WeakLayer(
+            rho=weak_layer_rho,
+            h=20.0,
+            hand_hardness=weak_layer_hand_hardness,
+            grain_type=weak_layer_grain_type,
+            grain_size=weak_layer_grain_size,
+        )
         if len(layers_above) == 0:
             raise ValueError("No layers above weak layer found")
         return weak_layer, layers_above
