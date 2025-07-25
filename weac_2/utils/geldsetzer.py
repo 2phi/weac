@@ -55,6 +55,7 @@ GRAIN_TYPE = {
     "PP": "PP",
     "PPco": "PP",
     "PPgp": "PPgp",
+    "gp": "PPgp",
     "PPhl": "PP",
     "PPip": "PP",
     "PPir": "PP",
@@ -71,6 +72,7 @@ GRAIN_TYPE = {
     "SHcv": "SH",
     "SHsu": "SH",
     "SHxr": "SH",
+    "WG": "WG",
 }
 
 # Translate hand hardness to numerical values
@@ -96,20 +98,56 @@ HAND_HARDNESS = {
     "I+": 6.33,
 }
 
+GRAIN_TYPE_TO_DENSITY = {
+    "PP": 84.9,
+    "PPgp": 162.3,
+    "DF": 136.3,
+    "RG": 247.4,
+    "RGmx": 220.6,
+    "FC": 248.2,
+    "FCmx": 288.8,
+    "DH": 252.8,
+    "WG": 254.3,
+    "MFCr": 292.3,
+    "SH": 125,
+}
 
-def compute_density(grainform: str, hardness: str | Tuple[str, str]) -> float:
+HAND_HARDNESS_TO_DENSITY = {
+    "F-": 71.7,
+    "F": 103.7,
+    "F+": 118.4,
+    "4F-": 127.9,
+    "4F": 158.2,
+    "4F+": 163.7,
+    "1F-": 188.6,
+    "1F": 208,
+    "1F+": 224.4,
+    "P-": 252.8,
+    "P": 275.9,
+    "P+": 314.6,
+    "K-": 359.1,
+    "K": 347.4,
+    "K+": 407.8,
+    "I-": 407.8,
+    "I": 407.8,
+    "I+": 407.8,
+}
+
+
+def compute_density(grainform: str | None, hardness: str | None) -> float:
     """
     Geldsetzer & Jamieson (2000)
     `https://arc.lib.montana.edu/snow-science/objects/issw-2000-121-127.pdf`
     """
     # Adaptation based on CAAML profiles (which sometimes provide top and bottom hardness)
-    if isinstance(hardness, tuple):
-        hardness_top, hardness_bottom = hardness
-        hardness_value = (
-            HAND_HARDNESS[hardness_top] + HAND_HARDNESS[hardness_bottom]
-        ) / 2
-    else:
-        hardness_value = HAND_HARDNESS[hardness]
+    if hardness is None and grainform is None:
+        raise ValueError("Provide at least one of grainform or hardness")
+    if hardness is None:
+        return GRAIN_TYPE_TO_DENSITY[grainform]
+    if grainform is None:
+        return HAND_HARDNESS_TO_DENSITY[hardness]
+
+    hardness_value = HAND_HARDNESS[hardness]
     grain_type = GRAIN_TYPE[grainform]
     a, b = DENSITY_PARAMETERS[grain_type]
 
