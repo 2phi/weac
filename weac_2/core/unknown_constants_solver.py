@@ -10,6 +10,7 @@ import logging
 from typing import Literal, Optional
 
 import numpy as np
+from numpy.linalg import LinAlgError
 
 from weac_2.constants import G_MM_S2
 from weac_2.core.eigensystem import Eigensystem
@@ -209,7 +210,10 @@ class UnknownConstantsSolver:
             rhs[2] = 1
 
         # Solve z0 = Zh0*C + Zp0 = rhs for constants, i.e. Zh0*C = rhs - Zp0
-        C = np.linalg.solve(Zh0, rhs - Zp0)
+        try:
+            C = np.linalg.solve(Zh0, rhs - Zp0)
+        except LinAlgError as e:
+            raise e
         # Sort (nDOF = 6) constants for each segment into columns of a matrix
         return C.reshape([-1, nDOF]).T
 

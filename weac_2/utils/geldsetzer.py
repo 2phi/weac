@@ -143,7 +143,8 @@ def compute_density(grainform: str | None, hardness: str | None) -> float:
     if hardness is None and grainform is None:
         raise ValueError("Provide at least one of grainform or hardness")
     if hardness is None:
-        return GRAIN_TYPE_TO_DENSITY[grainform]
+        grain_type = GRAIN_TYPE[grainform]
+        return GRAIN_TYPE_TO_DENSITY[grain_type]
     if grainform is None:
         return HAND_HARDNESS_TO_DENSITY[hardness]
 

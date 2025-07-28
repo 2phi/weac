@@ -58,7 +58,7 @@ class SnowPilotParser:
         rblocks: bool = True,
     ) -> List[ModelInput]:
         print("Extracting layers")
-        self.layers: List[Layer] = self.extract_layers()
+        self.layers, self.density_method = self.extract_layers()
         print("Assembling model inputs")
         self.model_inputs: List[ModelInput] = self._assemble_model_inputs(
             self.snowpit, self.layers, psts, ects, cts, rblocks
@@ -71,8 +71,9 @@ class SnowPilotParser:
     def get_layers(self) -> List[Layer]:
         return self.layers
 
-    def extract_layers(self) -> List[Layer]:
+    def extract_layers(self) -> Tuple[List[Layer], str]:
         """Extract layers from snowpit."""
+        density_method = "density_obs"
         snowpit = self.snowpit
         # Extract layers from snowpit: List[SnowpylotLayer]
         sp_layers: List[SnowpylotLayer] = [
@@ -130,7 +131,6 @@ class SnowPilotParser:
             measured_density = self._get_density_for_layer_range(
                 layer_depth_top_mm, layer_depth_bottom_mm, sp_density_layers
             )
-            print("Measured density: ", measured_density)
 
             # Handle hardness and create layers accordingly
             if layer.hardness_top is not None and layer.hardness_bottom is not None:
@@ -146,7 +146,11 @@ class SnowPilotParser:
                     density_top = self._get_density_for_layer_range(
                         layer_depth_top_mm, layer_mid_depth_mm, sp_density_layers
                     )
+                    if density_top is None:
+                        density_method = "geldsetzer"
+                        density_top = compute_density(grain_type, hand_hardness_top)
                 else:
+                    density_method = "geldsetzer"
                     density_top = compute_density(grain_type, hand_hardness_top)
 
                 layers.append(
@@ -164,8 +168,14 @@ class SnowPilotParser:
                     density_bottom = self._get_density_for_layer_range(
                         layer_mid_depth_mm, layer_depth_bottom_mm, sp_density_layers
                     )
+                    if density_bottom is None:
+                        density_method = "geldsetzer"
+                        density_bottom = compute_density(
+                            grain_type, hand_hardness_bottom
+                        )
                 else:
                     try:
+                        density_method = "geldsetzer"
                         density_bottom = compute_density(
                             grain_type, hand_hardness_bottom
                         )
@@ -191,9 +201,12 @@ class SnowPilotParser:
                     density = measured_density
                 else:
                     try:
+                        density_method = "geldsetzer"
                         density = compute_density(grain_type, hand_hardness)
-                    except Exception as e:
-                        raise
+                    except Exception:
+                        raise AttributeError(
+                            "Layer is missing density information; density profile, hand hardness and grain type are all missing. Excluding SnowPit from calculations."
+                        )
 
                 layers.append(
                     Layer(
@@ -206,8 +219,10 @@ class SnowPilotParser:
                 )
 
         if len(layers) == 0:
-            raise ValueError("No layers found for snowpit")
-        return layers
+            raise AttributeError(
+                "No layers found for snowpit. Excluding SnowPit from calculations."
+            )
+        return layers, density_method
 
     def _get_density_for_layer_range(
         self,
@@ -270,7 +285,6 @@ class SnowPilotParser:
                     / total_weight
                 )
                 return float(weighted_density)
-
         return None
 
     def _assemble_model_inputs(
@@ -294,9 +308,7 @@ class SnowPilotParser:
 
         # Add scenarios for PropSawTest
         psts: List[PropSawTest] = snowpit.stability_tests.PST
-        print("Printing available PSTs: ", len(psts))
         if len(psts) > 0 and psts:
-            print("Calculating PST scenarios")
             # Implement logic that finds cut length based on PST
             for pst in psts:
                 if pst.failure:
@@ -307,6 +319,16 @@ class SnowPilotParser:
                     and pst.column_length is not None
                     and pst.depth_top is not None
                 ):
+                    if pst.depth_top <= 0:
+                        raise ValueError(
+                            "The depth of the weak layer is not positive. Excluding SnowPit from calculations."
+                        )
+                    if pst.depth_top[0] * convert_to_mm[pst.depth_top[1]] > sum(
+                        [layer.h for layer in layers]
+                    ):
+                        raise ValueError(
+                            "The depth of the weak layer is below the recorded layers. Excluding SnowPit from calculations."
+                        )
                     cut_length = pst.cut_length[0] * convert_to_mm[pst.cut_length[1]]
                     column_length = (
                         pst.column_length[0] * convert_to_mm[pst.column_length[1]]
@@ -408,10 +430,19 @@ class SnowPilotParser:
         """Extract weak layer and layers above the weak layer for the given depth_top extracted from the stability test."""
         depth = 0
         layers_above = []
+        weak_layer_rho = None
+        weak_layer_hand_hardness = None
+        weak_layer_grain_type = None
+        weak_layer_grain_size = None
+        if weak_layer_depth <= 0:
+            raise ValueError(
+                "The depth of the weak layer is not positive. Excluding SnowPit from calculations."
+            )
+        if weak_layer_depth > sum([layer.h for layer in layers]):
+            raise ValueError(
+                "The depth of the weak layer is below the recorded layers. Excluding SnowPit from calculations."
+            )
         for i, layer in enumerate(layers):
-            print(depth)
-            print(layer.h)
-            print(weak_layer_depth)
             if depth + layer.h < weak_layer_depth:
                 layers_above.append(layer)
                 depth += layer.h
@@ -436,10 +467,7 @@ class SnowPilotParser:
                     weak_layer_grain_type = layers[i].grain_type
                     weak_layer_grain_size = layers[i].grain_size
                 break
-        print(weak_layer_rho)
-        print(weak_layer_hand_hardness)
-        print(weak_layer_grain_type)
-        print(weak_layer_grain_size)
+
         weak_layer = WeakLayer(
             rho=weak_layer_rho,
             h=20.0,
