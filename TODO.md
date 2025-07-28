@@ -5,6 +5,7 @@
 
 # Minor
 - [ ] SNOWPACK Parser
+- [ ] SMP Parser
 - [ ] Build Tests: Integration -> Pure
 
 # Patch
