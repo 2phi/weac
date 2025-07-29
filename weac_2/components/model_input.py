@@ -41,7 +41,7 @@ class ModelInput(BaseModel):
     """
 
     weak_layer: WeakLayer = Field(
-        default_factory=lambda: WeakLayer(rho=70, h=30, E=0.25),
+        default_factory=lambda: WeakLayer(rho=125, h=20, E=1.0),
         description="Weak layer",
     )
     layers: List[Layer] = Field(

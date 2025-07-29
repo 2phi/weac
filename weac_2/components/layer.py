@@ -113,8 +113,8 @@ class Layer(BaseModel):
     """
 
     # has to be provided
-    rho: float = Field(..., gt=0, description="Density of the Slab  [kg m⁻³]")
-    h: float = Field(..., gt=0, description="Height/Thickness of the slab  [mm]")
+    rho: float = Field(125, gt=0, description="Density of the Slab  [kg m⁻³]")
+    h: float = Field(20, gt=0, description="Height/Thickness of the slab  [mm]")
 
     # derived if not provided
     nu: float = Field(default=NU, ge=0, lt=0.5, description="Poisson's ratio [-]")
