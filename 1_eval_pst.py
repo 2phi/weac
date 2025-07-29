@@ -7,7 +7,7 @@ import tqdm
 
 from weac_2.analysis import Analyzer
 from weac_2.core.system_model import SystemModel
-from weac_2.components import ModelInput, Segment, ScenarioConfig
+from weac_2.components import ModelInput, Segment, ScenarioConfig, WeakLayer
 from weac_2.utils.snowpilot_parser import SnowPilotParser, convert_to_mm, convert_to_deg
 
 
@@ -42,6 +42,7 @@ slope_angle_is_None = 0
 failed_to_extract_weak_layer = 0
 
 data_rows = []
+standard_weak_layer = WeakLayer(rho=125, h=20, E=1.0)
 for i, (file_path, parser) in tqdm.tqdm(
     enumerate(zip(pst_paths, pst_parsers)), total=len(pst_paths)
 ):
