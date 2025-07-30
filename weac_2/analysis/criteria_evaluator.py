@@ -315,8 +315,6 @@ class CriteriaEvaluator:
         force_result = self.find_minimum_force(
             system, tolerance_stress=tolerance_stress
         )
-
-        analyzer = Analyzer(system)
         initial_critical_skier_weight = force_result.critical_skier_weight
         max_dist_stress = force_result.max_dist_stress
         min_dist_stress = force_result.min_dist_stress
@@ -325,6 +323,7 @@ class CriteriaEvaluator:
             time.time() - force_finding_start,
         )
 
+        analyzer = Analyzer(system, printing_enabled=False)
         # --- Failure: in finding the critical skier weight ---
         if not force_result.success:
             analyzer.print_call_stats(
@@ -675,7 +674,7 @@ class CriteriaEvaluator:
         ]
         system.update_scenario(segments=segments)
 
-        analyzer = Analyzer(system)
+        analyzer = Analyzer(system, printing_enabled=False)
         _, z_skier, _ = analyzer.rasterize_solution(mode="uncracked", num=2000)
 
         sigma_kPa = system.fq.sig(z_skier, unit="kPa")

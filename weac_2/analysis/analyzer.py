@@ -53,10 +53,12 @@ class Analyzer:
     """
 
     sm: SystemModel
+    printing_enabled: bool = True
 
-    def __init__(self, system_model: SystemModel):
+    def __init__(self, system_model: SystemModel, printing_enabled: bool = True):
         self.sm = system_model
         self.call_stats = defaultdict(lambda: {"count": 0, "total_time": 0.0})
+        self.printing_enabled = printing_enabled
 
     def get_call_stats(self):
         """Returns the call statistics."""
@@ -64,28 +66,29 @@ class Analyzer:
 
     def print_call_stats(self, message: str = "Analyzer Call Statistics"):
         """Prints the call statistics in a readable format."""
-        print(f"--- {message} ---")
-        if not self.call_stats:
-            print("No methods have been called.")
-            return
+        if self.printing_enabled:
+            print(f"--- {message} ---")
+            if not self.call_stats:
+                print("No methods have been called.")
+                return
 
-        sorted_stats = sorted(
-            self.call_stats.items(),
-            key=lambda item: item[1]["total_time"],
-            reverse=True,
-        )
-
-        for func_name, stats in sorted_stats:
-            count = stats["count"]
-            total_time = stats["total_time"]
-            avg_time = total_time / count if count > 0 else 0
-            print(
-                f"- {func_name}: "
-                f"called {count} times, "
-                f"total time {total_time:.4f}s, "
-                f"avg time {avg_time:.4f}s"
+            sorted_stats = sorted(
+                self.call_stats.items(),
+                key=lambda item: item[1]["total_time"],
+                reverse=True,
             )
-        print("---------------------------------")
+
+            for func_name, stats in sorted_stats:
+                count = stats["count"]
+                total_time = stats["total_time"]
+                avg_time = total_time / count if count > 0 else 0
+                print(
+                    f"- {func_name}: "
+                    f"called {count} times, "
+                    f"total time {total_time:.4f}s, "
+                    f"avg time {avg_time:.4f}s"
+                )
+            print("---------------------------------")
 
     @track_analyzer_call
     def rasterize_solution(

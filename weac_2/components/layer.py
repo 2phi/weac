@@ -191,7 +191,7 @@ class WeakLayer(BaseModel):
     """
 
     rho: float = Field(125, gt=0, description="Density of the Slab  [kg m⁻³]")
-    h: float = Field(30, gt=0, description="Height/Thickness of the slab  [mm]")
+    h: float = Field(20, gt=0, description="Height/Thickness of the slab  [mm]")
     collapse_height: float = Field(
         default=0.0, gt=0, description="Collapse height [mm]"
     )
