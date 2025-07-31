@@ -266,6 +266,7 @@ def touchdown_distance(
     Ewl: float = 0.25,
     t: float = 10,
     phi: float = 0,
+    vertical: bool = False,
 ):
     """
     Calculate cut length at first contanct and steady-state touchdown distance.
@@ -309,7 +310,10 @@ def touchdown_distance(
     )
 
     # Initialize model with user input
-    touchdown = weac.Layered(system="pst-", touchdown=True)
+    if vertical:
+        touchdown = weac.Layered(system="vpst-", touchdown=True)
+    else:
+        touchdown = weac.Layered(system="pst-", touchdown=True)
 
     # Set material properties
     touchdown.set_foundation_properties(E=Ewl, t=t, update=True)
