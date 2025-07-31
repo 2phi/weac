@@ -4,7 +4,8 @@
 - [ ] Automatically set boundary conditions based on system
 
 # Minor
-- [ ] Florian CriterionEvaluator Implementierung
+- [ ] resolve fracture criterion also when lower than strength crtierion
+- [ ] Florian CriterionEvaluator Implementierung -> dampening is stupid (find_minimum_force / evaluate_coupled_crit)
 - [ ] Make rasterize_solution smarter (iterativ konvergieren)
 - [ ] SNOWPACK Parser
 - [ ] SMP Parser

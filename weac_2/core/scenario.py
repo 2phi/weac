@@ -184,5 +184,6 @@ class Scenario:
         Crack Height: Difference between collapsed weak layer and
             Weak Layer (Winkler type) under slab load
         """
+        # TODO: Is crack height the height of the collapsed weak layer or the height the height that is lost on collapse?
         collapsed_height = self.weak_layer.h - self.weak_layer.collapse_height
         self.crack_h = collapsed_height - self.qn / self.weak_layer.kn

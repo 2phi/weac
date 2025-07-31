@@ -3,10 +3,12 @@ from __future__ import annotations
 """Mixin for slab contact."""
 # Standard library imports
 from functools import partial
+
 # Third party imports
 import numpy as np
 from scipy.integrate import cumulative_trapezoid, quad
 from scipy.optimize import brentq
+
 # Module imports
 from weac.tools import calc_vertical_bc_center_of_gravity, tensile_strength_slab
 
@@ -85,7 +87,6 @@ class SlabContactMixin:
         """
         self.a = a
 
-
     def set_phi(self, phi):
         """
         Set inclination of the slab.
@@ -109,7 +110,10 @@ class SlabContactMixin:
         """
         # subtract displacement under constact load from collapsed wl height
         qn = self.calc_qn()
-        self.tc = cf * self.t - qn / self.kn
+        # TODO: replaced with Adam formula
+        # self.tc = cf * self.t - qn / self.kn
+        collapse_height = 4.70 * (1 - np.exp(-self.t / 7.78))
+        self.tc = self.t - collapse_height - qn / self.kn
 
     def set_stiffness_ratio(self, ratio=1000):
         """
@@ -175,8 +179,12 @@ class SlabContactMixin:
         # Create polynomial function
         def polynomial(x):
             # Spring stiffness supported segment
-            kRl = self.substitute_stiffness(L - x, "supported", "rot")    # rotational spring stiffness
-            kNl = self.substitute_stiffness(L - x, "supported", "trans")  # linear spring stiffness
+            kRl = self.substitute_stiffness(
+                L - x, "supported", "rot"
+            )  # rotational spring stiffness
+            kNl = self.substitute_stiffness(
+                L - x, "supported", "trans"
+            )  # linear spring stiffness
             c1 = ss**2 * kRl * kNl * qn
             c2 = 6 * ss**2 * bs * kNl * qn
             c3 = 30 * bs * ss * kRl * kNl * qn
@@ -220,13 +228,12 @@ class SlabContactMixin:
         a = self.a
         tc = self.tc
         qn = self.calc_qn()
-        
+
         # Spring stiffness supported segment
         kRl = self.substitute_stiffness(L - a, "supported", "rot")
         kNl = self.substitute_stiffness(L - a, "supported", "trans")
 
         def polynomial(x):
-            
             # Spring stiffness rested segment
             kRr = self.substitute_stiffness(a - x, "rested", "rot")
             # define constants

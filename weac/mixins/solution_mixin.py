@@ -104,12 +104,12 @@ class SolutionMixin:
             ki = np.array([False, True])  # Crack
             k0 = np.array([True, True])  # No crack
         elif self.system == "vpst-":
-            li = np.array([L - a, a])  # Segment lengths
+            li = np.array([L - a, self.td])  # Segment lengths
             mi = np.array([0])  # Skier weights
             ki = np.array([True, False])  # Crack
             k0 = np.array([True, True])  # No crack
         elif self.system == "-vpst":
-            li = np.array([a, L - a])  # Segment lengths
+            li = np.array([self.td, L - a])  # Segment lengths
             mi = np.array([0])  # Skier weights
             ki = np.array([False, True])  # Crack
             k0 = np.array([True, True])  # No crack
