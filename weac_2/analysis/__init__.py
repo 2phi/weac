@@ -4,6 +4,7 @@ from .criteria_evaluator import (
     CoupledCriterionHistory,
     CoupledCriterionResult,
     FindMinimumForceResult,
+    SSERRResult,
 )
 from .plotter import Plotter
 
@@ -13,5 +14,6 @@ __all__ = [
     "CoupledCriterionHistory",
     "CoupledCriterionResult",
     "FindMinimumForceResult",
+    "SSERRResult",
     "Plotter",
 ]

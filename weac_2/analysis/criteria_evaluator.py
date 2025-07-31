@@ -7,7 +7,7 @@ from typing import List, Optional, Union
 
 # Third party imports
 import numpy as np
-from scipy.optimize import root_scalar
+from scipy.optimize import root_scalar, brentq
 
 from weac_2.analysis.analyzer import Analyzer
 
@@ -16,6 +16,7 @@ from weac_2.components import (
     CriteriaConfig,
     Segment,
     WeakLayer,
+    ScenarioConfig,
 )
 from weac_2.core.system_model import SystemModel
 from weac_2.constants import RHO_ICE
@@ -86,6 +87,18 @@ class CoupledCriterionResult:
     final_system: SystemModel
     max_dist_stress: float
     min_dist_stress: float
+
+
+@dataclass
+class SSERRResult:
+    """
+    Holds the results of the SSERR evaluation.
+    """
+
+    converged: bool
+    message: str
+    touchdown_distance: float
+    SSERR: float
 
 
 @dataclass
@@ -281,6 +294,7 @@ class CriteriaEvaluator:
         dampening_ERR: float = 0.0,
         tolerance_ERR: float = 0.002,
         tolerance_stress: float = 0.005,
+        print_call_stats: bool = False,
     ) -> CoupledCriterionResult:
         """
         Evaluates the coupled criterion for anticrack nucleation, finding the
@@ -313,7 +327,7 @@ class CriteriaEvaluator:
         force_finding_start = time.time()
 
         force_result = self.find_minimum_force(
-            system, tolerance_stress=tolerance_stress
+            system, tolerance_stress=tolerance_stress, print_call_stats=print_call_stats
         )
         initial_critical_skier_weight = force_result.critical_skier_weight
         max_dist_stress = force_result.max_dist_stress
@@ -323,9 +337,10 @@ class CriteriaEvaluator:
             time.time() - force_finding_start,
         )
 
-        analyzer = Analyzer(system, printing_enabled=False)
+        analyzer = Analyzer(system, printing_enabled=print_call_stats)
         # --- Failure: in finding the critical skier weight ---
         if not force_result.success:
+            print("--- No critical skier weight found ---")
             analyzer.print_call_stats(
                 message="evaluate_coupled_criterion Call Statistics"
             )
@@ -348,6 +363,7 @@ class CriteriaEvaluator:
 
         # --- Exception: the entire solution is cracked ---
         if min_dist_stress > 1:
+            print("--- The entire solution is cracked ---")
             logger.info("The entire solution is cracked.")
             # --- Larger scenario to calculate the incremental ERR ---
             segments = copy.deepcopy(system.scenario.segments)
@@ -628,11 +644,45 @@ class CriteriaEvaluator:
                 min_dist_stress=min_dist_stress,
             )
 
+    def evaluate_SSERR(
+        self, system: SystemModel, vertical: bool = False
+    ) -> SSERRResult:
+        """
+        Evaluates the Touchdown Distance in the Steady State and the Steady State Energy Release Rate.
+
+        Parameters:
+        -----------
+        system: SystemModel
+            The system model.
+        """
+        system_copy = copy.deepcopy(system)
+        segments = [
+            Segment(length=1e5, has_foundation=True, m=0.0),
+            Segment(length=1e5, has_foundation=False, m=0.0),
+        ]
+        scenario_config = ScenarioConfig(
+            system_type="vpst-" if vertical else "pst-",
+            phi=system.scenario.phi,
+            crack_length=1e5,
+        )
+        system_copy.config.touchdown = True
+        system_copy.update_scenario(segments=segments, scenario_config=scenario_config)
+        touchdown_distance = system_copy.slab_touchdown.touchdown_distance
+        analyzer = Analyzer(system_copy)
+        G, GIc, GIIc = analyzer.differential_ERR(unit="J/m^2")
+        return SSERRResult(
+            converged=True,
+            message="SSERR evaluation successful.",
+            touchdown_distance=touchdown_distance,
+            SSERR=G,
+        )
+
     def find_minimum_force(
         self,
         system: SystemModel,
         dampening: float = 0.0,
         tolerance_stress: float = 0.005,
+        print_call_stats: bool = False,
     ) -> FindMinimumForceResult:
         """
         Finds the minimum skier weight required to surpass the stress failure envelope.
@@ -658,28 +708,19 @@ class CriteriaEvaluator:
         logger.info(
             "Starting to find minimum force to surpass stress failure envelope."
         )
-        start_time = time.time()
-        skier_weight = 1.0
-        iteration_count = 0
-        max_iterations = 50
-        max_dist_stress = 0
-
         old_segments = copy.deepcopy(system.scenario.segments)
+        total_length = system.scenario.L
+        analyzer = Analyzer(system, printing_enabled=print_call_stats)
 
         # --- Initial uncracked configuration ---
-        total_length = system.scenario.L
         segments = [
-            Segment(length=total_length / 2, has_foundation=True, m=skier_weight),
+            Segment(length=total_length / 2, has_foundation=True, m=0.0),
             Segment(length=total_length / 2, has_foundation=True, m=0.0),
         ]
         system.update_scenario(segments=segments)
-
-        analyzer = Analyzer(system, printing_enabled=False)
         _, z_skier, _ = analyzer.rasterize_solution(mode="uncracked", num=2000)
-
         sigma_kPa = system.fq.sig(z_skier, unit="kPa")
         tau_kPa = system.fq.tau(z_skier, unit="kPa")
-
         max_dist_stress = np.max(
             self.stress_envelope(sigma_kPa, tau_kPa, system.weak_layer)
         )
@@ -687,114 +728,297 @@ class CriteriaEvaluator:
             self.stress_envelope(sigma_kPa, tau_kPa, system.weak_layer)
         )
 
-        # --- Exception: the entire domain is cracked ---
+        # --- Early Exit: entire domain is cracked ---
         if min_dist_stress >= 1:
             analyzer.print_call_stats(
                 message="min_dist_stress >= 1 in find_minimum_force Call Statistics"
             )
             return FindMinimumForceResult(
                 success=True,
-                critical_skier_weight=skier_weight,
+                critical_skier_weight=0.0,
                 new_segments=segments,
                 old_segments=old_segments,
-                iterations=iteration_count,
+                iterations=0,
                 max_dist_stress=max_dist_stress,
                 min_dist_stress=min_dist_stress,
             )
 
-        while (
-            abs(max_dist_stress - 1) > tolerance_stress
-            and iteration_count < max_iterations
-        ):
-            iteration_count += 1
-            iter_start_time = time.time()
-            logger.debug(
-                "find_minimum_force iteration %d with skier_weight %.2f",
-                iteration_count,
-                skier_weight,
-            )
-
-            skier_weight = (
-                (dampening + 1) * skier_weight / (dampening + max_dist_stress)
-            )
-
-            temp_segments = [
+        def stress_envelope_residual(skier_weight: float, system: SystemModel) -> float:
+            print("skier_weight: ", skier_weight)
+            segments = [
                 Segment(length=total_length / 2, has_foundation=True, m=skier_weight),
-                Segment(length=total_length / 2, has_foundation=True, m=0),
+                Segment(length=total_length / 2, has_foundation=True, m=0.0),
             ]
-
-            system.update_scenario(segments=temp_segments)
+            system.update_scenario(segments=segments)
             _, z_skier, _ = analyzer.rasterize_solution(mode="cracked", num=2000)
-
             sigma_kPa = system.fq.sig(z_skier, unit="kPa")
             tau_kPa = system.fq.tau(z_skier, unit="kPa")
-
-            # Calculate distance to failure
-            max_dist_stress = np.max(
+            max_dist = np.max(
                 self.stress_envelope(sigma_kPa, tau_kPa, system.weak_layer)
             )
-            min_dist_stress = np.min(
-                self.stress_envelope(sigma_kPa, tau_kPa, system.weak_layer)
-            )
+            return max_dist - 1
 
-            logger.debug(
-                "find_minimum_force iteration %d finished in %.4fs. max_dist_stress: %.4f",
-                iteration_count,
-                time.time() - iter_start_time,
-                max_dist_stress,
-            )
-            if min_dist_stress >= 1:
-                analyzer.print_call_stats(
-                    message="min_dist_stress >= 1 in find_minimum_force Call Statistics"
-                )
-                return FindMinimumForceResult(
-                    success=True,
-                    critical_skier_weight=skier_weight,
-                    new_segments=temp_segments,
-                    old_segments=old_segments,
-                    iterations=iteration_count,
-                    max_dist_stress=max_dist_stress,
-                    min_dist_stress=min_dist_stress,
-                )
+        # Now do root finding with brentq
+        def root_fn(weight):
+            return stress_envelope_residual(weight, system)
 
-        if iteration_count == max_iterations:
-            if dampening < 5:
-                # Upon max iteration introduce dampening to avoid infinite loop
-                # and try again with a higher tolerance
-                return self.find_minimum_force(
-                    system, tolerance_stress=0.01, dampening=dampening + 1
-                )
-            else:
-                analyzer.print_call_stats(
-                    message="max iterations reached infind_minimum_force Call Statistics"
-                )
-                return FindMinimumForceResult(
-                    success=False,
-                    critical_skier_weight=0.0,
-                    new_segments=temp_segments,
-                    old_segments=old_segments,
-                    iterations=iteration_count,
-                    max_dist_stress=max_dist_stress,
-                    min_dist_stress=min_dist_stress,
-                )
+        # # Search interval
+        # w_min = 0.0
+        # w_max = 300.0
+        # fn_min = root_fn(w_min)
+        # fn_max = root_fn(w_max)
+        # while fn_min * fn_max > 0:
+        #     w_max = w_max * 2
+        #     fn_max = root_fn(w_max)
+        #     if w_max > 10000:
+        #         raise ValueError(
+        #             "No sign change found in [w_min, w_max]. Cannot use brentq."
+        #         )
 
-        logger.info(
-            "Finished find_minimum_force in %.4f seconds after %d iterations.",
-            time.time() - start_time,
-            iteration_count,
+        # critical_weight = brentq(root_fn, w_min, w_max, xtol=tolerance_stress)
+
+        # Search interval
+        w_min = 0.0
+        w_max = 300.0
+        while True:
+            try:
+                critical_weight = brentq(root_fn, w_min, w_max, xtol=tolerance_stress)
+                break
+            except ValueError:
+                w_max = w_max * 2
+                if w_max > 10000:
+                    raise ValueError(
+                        "No sign change found in [w_min, w_max]. Cannot use brentq."
+                    )
+
+        # Final evaluation
+        system.update_scenario(
+            segments=[
+                Segment(
+                    length=total_length / 2, has_foundation=True, m=critical_weight
+                ),
+                Segment(length=total_length / 2, has_foundation=True, m=0.0),
+            ]
         )
-        analyzer.print_call_stats(
-            message="tolerance was met in find_minimum_force Call Statistics"
+        _, z_skier, _ = analyzer.rasterize_solution(mode="cracked", num=2000)
+        sigma_kPa = system.fq.sig(z_skier, unit="kPa")
+        tau_kPa = system.fq.tau(z_skier, unit="kPa")
+        max_dist_stress = np.max(
+            self.stress_envelope(sigma_kPa, tau_kPa, system.weak_layer)
         )
+        min_dist_stress = np.min(
+            self.stress_envelope(sigma_kPa, tau_kPa, system.weak_layer)
+        )
+
+        analyzer.print_call_stats(message="find_minimum_force Call Statistics")
         return FindMinimumForceResult(
             success=True,
-            critical_skier_weight=skier_weight,
-            new_segments=temp_segments,
+            critical_skier_weight=critical_weight,
+            new_segments=copy.deepcopy(system.scenario.segments),
             old_segments=old_segments,
-            iterations=iteration_count,
+            iterations=None,
             max_dist_stress=max_dist_stress,
             min_dist_stress=min_dist_stress,
         )
+
+    # def find_minimum_force(
+    #     self,
+    #     system: SystemModel,
+    #     dampening: float = 0.0,
+    #     tolerance_stress: float = 0.005,
+    #     print_call_stats: bool = False,
+    # ) -> FindMinimumForceResult:
+    #     """
+    #     Finds the minimum skier weight required to surpass the stress failure envelope.
+
+    #     This method iteratively adjusts the skier weight until the maximum distance
+    #     to the stress envelope converges to 1, indicating the critical state.
+
+    #     Parameters:
+    #     -----------
+    #     system: SystemModel
+    #         The system model.
+    #     dampening: float, optional
+    #         Dampening factor for the skier weight. Defaults to 0.0.
+    #     tolerance_stress: float, optional
+    #         Tolerance for the stress envelope. Defaults to 0.005.
+
+    #     Returns:
+    #     --------
+    #     results: FindMinimumForceResult
+    #         An object containing the results of the analysis, including
+    #         critical skier weight, and convergence details.
+    #     """
+    #     print(f"--- Starting to find minimum force with dampening {dampening} ---")
+    #     logger.info(
+    #         "Starting to find minimum force to surpass stress failure envelope."
+    #     )
+    #     start_time = time.time()
+    #     skier_weight = 0.0
+    #     iteration_count = 0
+    #     max_iterations = 50
+    #     max_dist_stress = 0
+
+    #     old_segments = copy.deepcopy(system.scenario.segments)
+
+    #     # --- Initial uncracked configuration ---
+    #     total_length = system.scenario.L
+    #     segments = [
+    #         Segment(length=total_length / 2, has_foundation=True, m=skier_weight),
+    #         Segment(length=total_length / 2, has_foundation=True, m=0.0),
+    #     ]
+    #     system.update_scenario(segments=segments)
+
+    #     analyzer = Analyzer(system, printing_enabled=print_call_stats)
+    #     _, z_skier, _ = analyzer.rasterize_solution(mode="uncracked", num=2000)
+
+    #     sigma_kPa = system.fq.sig(z_skier, unit="kPa")
+    #     tau_kPa = system.fq.tau(z_skier, unit="kPa")
+
+    #     max_dist_stress = np.max(
+    #         self.stress_envelope(sigma_kPa, tau_kPa, system.weak_layer)
+    #     )
+    #     min_dist_stress = np.min(
+    #         self.stress_envelope(sigma_kPa, tau_kPa, system.weak_layer)
+    #     )
+
+    #     # --- Exception: the entire domain is cracked ---
+    #     if min_dist_stress >= 1:
+    #         analyzer.print_call_stats(
+    #             message="min_dist_stress >= 1 in find_minimum_force Call Statistics"
+    #         )
+    #         return FindMinimumForceResult(
+    #             success=True,
+    #             critical_skier_weight=skier_weight,
+    #             new_segments=segments,
+    #             old_segments=old_segments,
+    #             iterations=iteration_count,
+    #             max_dist_stress=max_dist_stress,
+    #             min_dist_stress=min_dist_stress,
+    #         )
+
+    #     old_skier_weight = skier_weight
+    #     old_max_dist_stress = max_dist_stress
+    #     skier_weight = 1.0
+    #     print("skier_weight: ", 0.0)
+    #     print("envelope distance: ", np.abs(max_dist_stress - 1))
+    #     while (
+    #         abs(max_dist_stress - 1) > tolerance_stress
+    #         and iteration_count < max_iterations
+    #     ):
+    #         iteration_count += 1
+    #         iter_start_time = time.time()
+    #         logger.debug(
+    #             "find_minimum_force iteration %d with skier_weight %.2f",
+    #             iteration_count,
+    #             skier_weight,
+    #         )
+
+    #         print("Iteration: ", iteration_count)
+    #         print("skier_weight: ", skier_weight)
+    #         breakpoint()
+
+    #         temp_segments = [
+    #             Segment(length=total_length / 2, has_foundation=True, m=skier_weight),
+    #             Segment(length=total_length / 2, has_foundation=True, m=0),
+    #         ]
+
+    #         system.update_scenario(segments=temp_segments)
+    #         _, z_skier, _ = analyzer.rasterize_solution(mode="cracked", num=2000)
+
+    #         sigma_kPa = system.fq.sig(z_skier, unit="kPa")
+    #         tau_kPa = system.fq.tau(z_skier, unit="kPa")
+
+    #         # Calculate distance to failure
+    #         max_dist_stress = np.max(
+    #             self.stress_envelope(sigma_kPa, tau_kPa, system.weak_layer)
+    #         )
+    #         min_dist_stress = np.min(
+    #             self.stress_envelope(sigma_kPa, tau_kPa, system.weak_layer)
+    #         )
+    #         print("envelope distance: ", np.abs(max_dist_stress - 1))
+
+    #         logger.debug(
+    #             "find_minimum_force iteration %d finished in %.4fs. max_dist_stress: %.4f",
+    #             iteration_count,
+    #             time.time() - iter_start_time,
+    #             max_dist_stress,
+    #         )
+    #         if min_dist_stress >= 1:
+    #             analyzer.print_call_stats(
+    #                 message="min_dist_stress >= 1 in find_minimum_force Call Statistics"
+    #             )
+    #             return FindMinimumForceResult(
+    #                 success=True,
+    #                 critical_skier_weight=skier_weight,
+    #                 new_segments=temp_segments,
+    #                 old_segments=old_segments,
+    #                 iterations=iteration_count,
+    #                 max_dist_stress=max_dist_stress,
+    #                 min_dist_stress=min_dist_stress,
+    #             )
+
+    #         # skier_weight = (dampening + 1) * skier_weight / (dampening + max_dist_stress)
+
+    #         if (max_dist_stress - 1) > (old_max_dist_stress - 1):
+    #             print("Old was better, taking middle")
+    #             print("skier_weight: ", skier_weight)
+    #             print("old_skier_weight: ", old_skier_weight)
+    #             new_skier_weight = (skier_weight + old_skier_weight) / 2
+    #             print("new skier_weight: ", new_skier_weight)
+    #         else:
+    #             print("New was better, increasing skier_weight")
+    #             print("skier_weight: ", skier_weight)
+    #             print("old_skier_weight: ", old_skier_weight)
+    #             new_skier_weight = (
+    #                 (max_dist_stress * 5) * skier_weight / (dampening + 1)
+    #             )
+    #             print("new skier_weight: ", new_skier_weight)
+    #         old_skier_weight = skier_weight
+    #         old_max_dist_stress = max_dist_stress
+    #         skier_weight = new_skier_weight
+
+    #     if iteration_count == max_iterations:
+    #         if dampening < 5:
+    #             # Upon max iteration introduce dampening to avoid infinite loop
+    #             # and try again with a higher tolerance
+    #             return self.find_minimum_force(
+    #                 system,
+    #                 tolerance_stress=0.01,
+    #                 dampening=dampening + 1,
+    #                 print_call_stats=print_call_stats,
+    #             )
+    #         else:
+    #             analyzer.print_call_stats(
+    #                 message="max iterations reached infind_minimum_force Call Statistics"
+    #             )
+    #             return FindMinimumForceResult(
+    #                 success=False,
+    #                 critical_skier_weight=0.0,
+    #                 new_segments=temp_segments,
+    #                 old_segments=old_segments,
+    #                 iterations=iteration_count,
+    #                 max_dist_stress=max_dist_stress,
+    #                 min_dist_stress=min_dist_stress,
+    #             )
+
+    #     logger.info(
+    #         "Finished find_minimum_force in %.4f seconds after %d iterations.",
+    #         time.time() - start_time,
+    #         iteration_count,
+    #     )
+    #     analyzer.print_call_stats(
+    #         message="tolerance was met in find_minimum_force Call Statistics"
+    #     )
+    #     return FindMinimumForceResult(
+    #         success=True,
+    #         critical_skier_weight=skier_weight,
+    #         new_segments=temp_segments,
+    #         old_segments=old_segments,
+    #         iterations=iteration_count,
+    #         max_dist_stress=max_dist_stress,
+    #         min_dist_stress=min_dist_stress,
+    #     )
 
     def find_minimum_crack_length(
         self,
