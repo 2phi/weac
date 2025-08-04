@@ -330,8 +330,14 @@ def touchdown_distance(
 
     # Compute steady-state touchdown distance in a dummy PST with a cut
     # of 5 times the first contact distance
-    touchdown.calc_segments(L=1e5, a=5 * first_contact, phi=phi)
+    seg_touchdown = touchdown.calc_segments(L=1e5, a=5 * first_contact, phi=phi)
     steady_state = touchdown.calc_lC()
+
+    C_touchdown = touchdown.assemble_and_solve(phi=phi, **seg_touchdown["crack"])
+    Gdif = touchdown.gdif(
+        C=C_touchdown, phi=phi, unit="J/m^2", **seg_touchdown["crack"]
+    )
+    print("Gdif: ", Gdif)
 
     # Return first-contact cut length, full-contact cut length,
     # and steady-state touchdown distance (mm)
