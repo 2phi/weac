@@ -183,7 +183,8 @@ class Scenario:
         """
         Crack Height: Difference between collapsed weak layer and
             Weak Layer (Winkler type) under slab load
+
+        Example:
+        if the collapse layer has a height of 5 and the non-collapsed layer has a height of 15 the collapse height is 10
         """
-        # TODO: Is crack height the height of the collapsed weak layer or the height the height that is lost on collapse?
-        collapsed_height = self.weak_layer.h - self.weak_layer.collapse_height
-        self.crack_h = collapsed_height - self.qn / self.weak_layer.kn
+        self.crack_h = self.weak_layer.collapse_height - self.qn / self.weak_layer.kn

@@ -113,7 +113,7 @@ class SlabContactMixin:
         # TODO: replaced with Adam formula
         # self.tc = cf * self.t - qn / self.kn
         collapse_height = 4.70 * (1 - np.exp(-self.t / 7.78))
-        self.tc = self.t - collapse_height - qn / self.kn
+        self.tc = collapse_height - qn / self.kn
 
     def set_stiffness_ratio(self, ratio=1000):
         """
