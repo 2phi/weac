@@ -50,26 +50,26 @@ class SnowPilotParser:
     def __init__(self, file_path: str):
         self.snowpit: SnowPit = caaml_parser(file_path)
 
-    def run(
-        self,
-        psts: bool = True,
-        ects: bool = True,
-        cts: bool = True,
-        rblocks: bool = True,
-    ) -> List[ModelInput]:
-        print("Extracting layers")
-        self.layers, self.density_method = self.extract_layers()
-        print("Assembling model inputs")
-        self.model_inputs: List[ModelInput] = self._assemble_model_inputs(
-            self.snowpit, self.layers, psts, ects, cts, rblocks
-        )
-        return self.model_inputs
+    # def run(
+    #     self,
+    #     psts: bool = True,
+    #     ects: bool = True,
+    #     cts: bool = True,
+    #     rblocks: bool = True,
+    # ) -> List[ModelInput]:
+    #     print("Extracting layers")
+    #     self.layers, self.density_method = self.extract_layers()
+    #     print("Assembling model inputs")
+    #     self.model_inputs: List[ModelInput] = self._assemble_model_inputs(
+    #         self.snowpit, self.layers, psts, ects, cts, rblocks
+    #     )
+    #     return self.model_inputs
 
-    def get_model_inputs(self) -> List[ModelInput]:
-        return self.model_inputs
+    # def get_model_inputs(self) -> List[ModelInput]:
+    #     return self.model_inputs
 
-    def get_layers(self) -> List[Layer]:
-        return self.layers
+    # def get_layers(self) -> List[Layer]:
+    #     return self.layers
 
     def extract_layers(self) -> Tuple[List[Layer], str]:
         """Extract layers from snowpit."""
@@ -287,142 +287,142 @@ class SnowPilotParser:
                 return float(weighted_density)
         return None
 
-    def _assemble_model_inputs(
-        self,
-        snowpit: SnowPit,
-        layers: List[Layer],
-        psts: bool = True,
-        ects: bool = True,
-        cts: bool = True,
-        rblocks: bool = True,
-    ) -> List[ModelInput]:
-        """Extract scenarios from snowpit stability tests."""
-        scenarios: List[ModelInput] = []
+    # def _assemble_model_inputs(
+    #     self,
+    #     snowpit: SnowPit,
+    #     layers: List[Layer],
+    #     psts: bool = True,
+    #     ects: bool = True,
+    #     cts: bool = True,
+    #     rblocks: bool = True,
+    # ) -> List[ModelInput]:
+    #     """Extract scenarios from snowpit stability tests."""
+    #     scenarios: List[ModelInput] = []
 
-        # Extract slope angle from snowpit
-        slope_angle = snowpit.core_info.location.slope_angle
-        if slope_angle is not None:
-            slope_angle = slope_angle[0] * convert_to_deg[slope_angle[1]]
-        else:
-            raise ValueError("Slope angle not found for snowpit")
+    #     # Extract slope angle from snowpit
+    #     slope_angle = snowpit.core_info.location.slope_angle
+    #     if slope_angle is not None:
+    #         slope_angle = slope_angle[0] * convert_to_deg[slope_angle[1]]
+    #     else:
+    #         raise ValueError("Slope angle not found for snowpit")
 
-        # Add scenarios for PropSawTest
-        psts: List[PropSawTest] = snowpit.stability_tests.PST
-        if len(psts) > 0 and psts:
-            # Implement logic that finds cut length based on PST
-            for pst in psts:
-                if pst.failure:
-                    continue
-                segments = []
-                if (
-                    pst.cut_length is not None
-                    and pst.column_length is not None
-                    and pst.depth_top is not None
-                ):
-                    if pst.depth_top <= 0:
-                        raise ValueError(
-                            "The depth of the weak layer is not positive. Excluding SnowPit from calculations."
-                        )
-                    if pst.depth_top[0] * convert_to_mm[pst.depth_top[1]] > sum(
-                        [layer.h for layer in layers]
-                    ):
-                        raise ValueError(
-                            "The depth of the weak layer is below the recorded layers. Excluding SnowPit from calculations."
-                        )
-                    cut_length = pst.cut_length[0] * convert_to_mm[pst.cut_length[1]]
-                    column_length = (
-                        pst.column_length[0] * convert_to_mm[pst.column_length[1]]
-                    )
-                    segments.append(
-                        Segment(length=cut_length, has_foundation=False, m=0)
-                    )
-                    segments.append(
-                        Segment(
-                            length=column_length - cut_length, has_foundation=True, m=0
-                        )
-                    )
-                    scenario_config = ScenarioConfig(
-                        system_type="-pst",
-                        phi=slope_angle,
-                        crack_length=cut_length,
-                    )
-                    weak_layer, layers_above = (
-                        self._extract_weak_layer_and_layers_above(
-                            pst.depth_top[0] * convert_to_mm[pst.depth_top[1]],
-                            layers,
-                        )
-                    )
-                    if weak_layer is not None:
-                        logger.info(
-                            "Adding PST scenario with cut_length %s and column_length %s and weak_layer depth %s",
-                            cut_length,
-                            column_length,
-                            sum([layer.h for layer in layers_above]),
-                        )
-                        scenarios.append(
-                            ModelInput(
-                                layers=layers_above,
-                                weak_layer=weak_layer,
-                                scenario_config=scenario_config,
-                                segments=segments,
-                            )
-                        )
-                else:
-                    continue
+    #     # Add scenarios for PropSawTest
+    #     psts: List[PropSawTest] = snowpit.stability_tests.PST
+    #     if len(psts) > 0 and psts:
+    #         # Implement logic that finds cut length based on PST
+    #         for pst in psts:
+    #             if pst.failure:
+    #                 continue
+    #             segments = []
+    #             if (
+    #                 pst.cut_length is not None
+    #                 and pst.column_length is not None
+    #                 and pst.depth_top is not None
+    #             ):
+    #                 if pst.depth_top <= 0:
+    #                     raise ValueError(
+    #                         "The depth of the weak layer is not positive. Excluding SnowPit from calculations."
+    #                     )
+    #                 if pst.depth_top[0] * convert_to_mm[pst.depth_top[1]] > sum(
+    #                     [layer.h for layer in layers]
+    #                 ):
+    #                     raise ValueError(
+    #                         "The depth of the weak layer is below the recorded layers. Excluding SnowPit from calculations."
+    #                     )
+    #                 cut_length = pst.cut_length[0] * convert_to_mm[pst.cut_length[1]]
+    #                 column_length = (
+    #                     pst.column_length[0] * convert_to_mm[pst.column_length[1]]
+    #                 )
+    #                 segments.append(
+    #                     Segment(length=cut_length, has_foundation=False, m=0)
+    #                 )
+    #                 segments.append(
+    #                     Segment(
+    #                         length=column_length - cut_length, has_foundation=True, m=0
+    #                     )
+    #                 )
+    #                 scenario_config = ScenarioConfig(
+    #                     system_type="-pst",
+    #                     phi=slope_angle,
+    #                     crack_length=cut_length,
+    #                 )
+    #                 weak_layer, layers_above = (
+    #                     self._extract_weak_layer_and_layers_above(
+    #                         pst.depth_top[0] * convert_to_mm[pst.depth_top[1]],
+    #                         layers,
+    #                     )
+    #                 )
+    #                 if weak_layer is not None:
+    #                     logger.info(
+    #                         "Adding PST scenario with cut_length %s and column_length %s and weak_layer depth %s",
+    #                         cut_length,
+    #                         column_length,
+    #                         sum([layer.h for layer in layers_above]),
+    #                     )
+    #                     scenarios.append(
+    #                         ModelInput(
+    #                             layers=layers_above,
+    #                             weak_layer=weak_layer,
+    #                             scenario_config=scenario_config,
+    #                             segments=segments,
+    #                         )
+    #                     )
+    #             else:
+    #                 continue
 
-        # Add scenarios for ExtColumnTest, ComprTest, and RBlockTest
-        standard_segments = [
-            Segment(length=1000, has_foundation=True, m=0),
-            Segment(length=1000, has_foundation=True, m=0),
-        ]
-        standard_scenario_config = ScenarioConfig(system_type="skier", phi=slope_angle)
-        depth_tops = set()
-        ects: List[ExtColumnTest] = snowpit.stability_tests.ECT
-        if len(ects) > 0 and ects:
-            for ect in ects:
-                if ect.depth_top is not None:
-                    depth_tops.add(ect.depth_top[0] * convert_to_mm[ect.depth_top[1]])
-        cts: List[ComprTest] = snowpit.stability_tests.CT
-        if len(cts) > 0 and cts:
-            for ct in cts:
-                if ct.depth_top is not None:
-                    depth_tops.add(ct.depth_top[0] * convert_to_mm[ct.depth_top[1]])
-        rblocks: List[RBlockTest] = snowpit.stability_tests.RBlock
-        if len(rblocks) > 0 and rblocks:
-            for rblock in rblocks:
-                if rblock.depth_top is not None:
-                    depth_tops.add(
-                        rblock.depth_top[0] * convert_to_mm[rblock.depth_top[1]]
-                    )
+    #     # Add scenarios for ExtColumnTest, ComprTest, and RBlockTest
+    #     standard_segments = [
+    #         Segment(length=1000, has_foundation=True, m=0),
+    #         Segment(length=1000, has_foundation=True, m=0),
+    #     ]
+    #     standard_scenario_config = ScenarioConfig(system_type="skier", phi=slope_angle)
+    #     depth_tops = set()
+    #     ects: List[ExtColumnTest] = snowpit.stability_tests.ECT
+    #     if len(ects) > 0 and ects:
+    #         for ect in ects:
+    #             if ect.depth_top is not None:
+    #                 depth_tops.add(ect.depth_top[0] * convert_to_mm[ect.depth_top[1]])
+    #     cts: List[ComprTest] = snowpit.stability_tests.CT
+    #     if len(cts) > 0 and cts:
+    #         for ct in cts:
+    #             if ct.depth_top is not None:
+    #                 depth_tops.add(ct.depth_top[0] * convert_to_mm[ct.depth_top[1]])
+    #     rblocks: List[RBlockTest] = snowpit.stability_tests.RBlock
+    #     if len(rblocks) > 0 and rblocks:
+    #         for rblock in rblocks:
+    #             if rblock.depth_top is not None:
+    #                 depth_tops.add(
+    #                     rblock.depth_top[0] * convert_to_mm[rblock.depth_top[1]]
+    #                 )
 
-        for depth_top in sorted(depth_tops):
-            weak_layer, layers_above = self._extract_weak_layer_and_layers_above(
-                depth_top, layers
-            )
-            scenarios.append(
-                ModelInput(
-                    layers=layers_above,
-                    weak_layer=weak_layer,
-                    scenario_config=standard_scenario_config,
-                    segments=standard_segments,
-                )
-            )
-            logger.info(
-                "Adding scenario with depth_top %s mm",
-                sum([layer.h for layer in layers_above]),
-            )
+    #     for depth_top in sorted(depth_tops):
+    #         weak_layer, layers_above = self._extract_weak_layer_and_layers_above(
+    #             depth_top, layers
+    #         )
+    #         scenarios.append(
+    #             ModelInput(
+    #                 layers=layers_above,
+    #                 weak_layer=weak_layer,
+    #                 scenario_config=standard_scenario_config,
+    #                 segments=standard_segments,
+    #             )
+    #         )
+    #         logger.info(
+    #             "Adding scenario with depth_top %s mm",
+    #             sum([layer.h for layer in layers_above]),
+    #         )
 
-        # Add scenario for no stability tests
-        if len(scenarios) == 0:
-            scenarios.append(
-                ModelInput(
-                    layers=layers,
-                    weak_layer=WeakLayer(rho=125, h=30),
-                    scenario_config=standard_scenario_config,
-                    segments=standard_segments,
-                )
-            )
-        return scenarios
+    #     # Add scenario for no stability tests
+    #     if len(scenarios) == 0:
+    #         scenarios.append(
+    #             ModelInput(
+    #                 layers=layers,
+    #                 weak_layer=WeakLayer(rho=125, h=30),
+    #                 scenario_config=standard_scenario_config,
+    #                 segments=standard_segments,
+    #             )
+    #         )
+    #     return scenarios
 
     def extract_weak_layer_and_layers_above(
         self, weak_layer_depth: float, layers: List[Layer]

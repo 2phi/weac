@@ -363,7 +363,6 @@ class CriteriaEvaluator:
 
         # --- Exception: the entire solution is cracked ---
         if min_dist_stress > 1:
-            print("--- The entire solution is cracked ---")
             logger.info("The entire solution is cracked.")
             # --- Larger scenario to calculate the incremental ERR ---
             segments = copy.deepcopy(system.scenario.segments)
@@ -645,7 +644,10 @@ class CriteriaEvaluator:
             )
 
     def evaluate_SSERR(
-        self, system: SystemModel, vertical: bool = False
+        self,
+        system: SystemModel,
+        vertical: bool = False,
+        print_call_stats: bool = False,
     ) -> SSERRResult:
         """
         Evaluates the Touchdown Distance in the Steady State and the Steady State Energy Release Rate.
@@ -654,6 +656,11 @@ class CriteriaEvaluator:
         -----------
         system: SystemModel
             The system model.
+        vertical: bool, optional
+            Whether to evaluate the system in a vertical configuration.
+            Defaults to False.
+
+        IMPORTANT: There is a bug in vertical = True, so always slope normal, i.e. vertical=False should be used.
         """
         system_copy = copy.deepcopy(system)
         segments = [
@@ -668,7 +675,7 @@ class CriteriaEvaluator:
         system_copy.config.touchdown = True
         system_copy.update_scenario(segments=segments, scenario_config=scenario_config)
         touchdown_distance = system_copy.slab_touchdown.touchdown_distance
-        analyzer = Analyzer(system_copy)
+        analyzer = Analyzer(system_copy, printing_enabled=print_call_stats)
         G, GIc, GIIc = analyzer.differential_ERR(unit="J/m^2")
         return SSERRResult(
             converged=True,
