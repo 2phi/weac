@@ -197,7 +197,6 @@ def snow_profile(weaklayer: WeakLayer, layers: list[Layer]):
         current_table_y = table_top
 
     # Additional cases which are not covered by the loop
-    print(previous_density)
     # Additional case: Add density line from last layer to x=0
     fig.add_shape(
         type="line",
@@ -229,7 +228,7 @@ def snow_profile(weaklayer: WeakLayer, layers: list[Layer]):
     fig.add_annotation(
         x=x_pos["col0_start"],
         y=total_height,
-        text=str(round(0)),
+        text=str(total_height),
         showarrow=False,
         font=dict(size=10),
         xanchor="left",
@@ -312,6 +311,18 @@ def snow_profile(weaklayer: WeakLayer, layers: list[Layer]):
         align="left",
     )
 
+    # Add horizontal grid lines at spacing of 100mm
+    for y in np.arange(0, total_height, 100):
+        fig.add_trace(
+            go.Scatter(
+                x=[0, -1.05 * x_max],
+                y=[y, y],
+                mode="lines",
+                line=dict(color="lightgrey", width=1.0),
+                showlegend=False,
+            )
+        )
+
     # Set axes properties
     fig.update_layout(
         xaxis=dict(
@@ -321,12 +332,12 @@ def snow_profile(weaklayer: WeakLayer, layers: list[Layer]):
             ticktext=["400", "300", "200", "100", "0"],
         ),
         yaxis=dict(
-            range=[total_height, -200.0],
+            range=[total_height, -1 / 10 * total_height],
             domain=[0.0, 1.0],
             # showgrid=True,
             # gridcolor="lightgray",
             # gridwidth=1,
-            zeroline=True,
+            zeroline=False,
             zerolinecolor="gray",
             zerolinewidth=1,
             showticklabels=False,
@@ -550,7 +561,7 @@ def criticality_plots(
         # Main y-axis
         yaxis=dict(
             title="Depth [mm]",  # Remove built-in title, we'll use annotation
-            range=[depth, -200.0],
+            range=[depth, -1 / 10 * depth],
             domain=[0.0, 1.0],
             showgrid=True,
             gridcolor="lightgray",
@@ -560,7 +571,7 @@ def criticality_plots(
             zerolinewidth=2,
             tickmode="linear",
             tick0=0,
-            dtick=max(depth * 0.2, 10),  # Tick every 50 units
+            dtick=100,
             tickcolor="black",
             tickwidth=2,
             ticklen=5,
@@ -730,40 +741,41 @@ def criticality_heatmap(
     )
 
     # Create a scaling between the two heatmaps
-    z_combined = z_cc * 0.35 + z_sserr * 0.75
+    z_combined = z_cc * 0.5 + z_sserr * 0.5
+    # z_combined = z_cc * z_sserr
     z_combined = np.where(z_cc == 0.0, 0.0, z_combined)
     z_combined = np.where(z_sserr == 0.0, 0.0, z_combined)
     z_combined = np.clip(z_combined, 0.0, 1.0)
     x_vals_3 = [2.0, 2.5, 3.0]
 
-    # traffic_light_fade = [
-    #     [0.00, "rgb(0,180,0)"],  # green
-    #     [0.10, "rgb(80,200,0)"],  # lighter green
-    #     [0.20, "rgb(170,220,0)"],  # yellow-green
-    #     [0.33, "yellow"],  # yellow
-    #     [0.45, "rgb(255,180,0)"],  # yellow-orange
-    #     [0.55, "orange"],  # orange
-    #     [0.70, "orangered"],  # deep orange
-    #     [0.85, "red"],
-    #     [1.00, "darkred"],
-    # ]
-    twilight_fade = [
-        [0.00, "rgb(20,30,80)"],  # deep indigo / night sky
-        [0.15, "rgb(60,50,150)"],  # violet
-        [0.30, "rgb(120,60,200)"],  # magenta
-        [0.45, "rgb(200,90,220)"],  # soft pink-violet
-        [0.60, "rgb(255,140,180)"],  # pink-orange
-        [0.75, "rgb(255,180,120)"],  # warm peach
-        [0.90, "rgb(255,210,100)"],  # sunset orange
-        [1.00, "rgb(255,240,150)"],  # fading gold
+    light_fade = [
+        [0.00, "rgb(0,180,0)"],  # green
+        [0.10, "rgb(80,200,0)"],  # lighter green
+        [0.20, "rgb(170,220,0)"],  # yellow-green
+        [0.33, "yellow"],  # yellow
+        [0.45, "rgb(255,180,0)"],  # yellow-orange
+        [0.55, "orange"],  # orange
+        [0.70, "orangered"],  # deep orange
+        [0.85, "red"],
+        [1.00, "darkred"],
     ]
+    # light_fade = [
+    #     [0.00, "rgb(20,30,80)"],  # deep indigo / night sky
+    #     [0.15, "rgb(60,50,150)"],  # violet
+    #     [0.30, "rgb(120,60,200)"],  # magenta
+    #     [0.45, "rgb(200,90,220)"],  # soft pink-violet
+    #     [0.60, "rgb(255,140,180)"],  # pink-orange
+    #     [0.75, "rgb(255,180,120)"],  # warm peach
+    #     [0.90, "rgb(255,210,100)"],  # sunset orange
+    #     [1.00, "rgb(255,240,150)"],  # fading gold
+    # ]
 
     fig.add_trace(
         go.Heatmap(
             z=z_combined,
             x=x_vals_3,
             y=y_depths,
-            colorscale=twilight_fade[::-1],
+            colorscale=light_fade,
             showscale=True,
             colorbar=dict(title="Cum."),
             zmin=0.0,
@@ -784,7 +796,7 @@ def criticality_heatmap(
         )
 
     # Manual horizontal grid lines (y-direction)
-    y_step = 50  # or however you want to space the grid
+    y_step = 100  # or however you want to space the grid
     y_grid = np.arange(0, depth + y_step, y_step)
 
     for y in y_grid:
@@ -813,7 +825,7 @@ def criticality_heatmap(
     fig.update_layout(
         yaxis=dict(
             autorange=False,
-            range=[depth, -200.0],
+            range=[depth, -1 / 10 * depth],
             domain=[0.0, 1.0],
             # showgrid=False,
             # gridcolor="white",
