@@ -22,9 +22,9 @@ class ScenarioConfig(BaseModel):
     """
 
     phi: float = Field(
-        default=0,
-        gt=-90,
-        lt=90,
+        default=0.0,
+        ge=-50.0,
+        le=50.0,
         description="Slope angle in degrees, counterclockwise positive",
     )
     system_type: Literal[
@@ -34,7 +34,7 @@ class ScenarioConfig(BaseModel):
         default=0.0, ge=0, description="Initial crack length [mm]"
     )
     stiffness_ratio: float = Field(
-        default=1000,
+        default=1000.0,
         gt=0.0,
         description="Stiffness ratio between collapsed and uncollapsed weak layer",
     )
