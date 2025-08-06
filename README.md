@@ -253,10 +253,11 @@ See the [open issues](https://github.com/2phi/weac/issues) for a list of propose
 ## How to contribute
 
 1. Fork the project
-2. Create your feature branch (`git checkout -b feature/amazingfeature`)
-3. Commit your changes (`git commit -m 'Add some amazing feature'`)
-4. Push to the branch (`git push origin feature/amazingfeature`)
-5. Open a pull request
+2. Initialize submodules
+3. Create your feature branch (`git checkout -b feature/amazingfeature`)
+4. Commit your changes (`git commit -m 'Add some amazing feature'`)
+5. Push to the branch (`git push origin feature/amazingfeature`)
+6. Open a pull request
 
 
 <!-- WORKFLOWS -->
