@@ -22,7 +22,6 @@ dist/
 .venv/
 
 # Data
-data/
 *.xml
 *.caaml
 *.txt
