@@ -32,7 +32,7 @@ def run_tests():
 
     # Discover all tests in the tests directory (recursive by default)
     test_suite = unittest.defaultTestLoader.discover(
-        test_dir, pattern="test_*.py", top_level_dir=test_dir
+        test_dir, pattern="test_*.py", top_level_dir=parent_dir
     )
 
     # Count and display discovered tests
