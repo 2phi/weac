@@ -90,7 +90,7 @@ class Eigensystem:
         Describes the stiffnesses of weak-layer and slab.
     """
 
-    def __init__(self, system='pst-', touchdown=False):
+    def __init__(self, system="pst-", touchdown=False):
         """
         Initialize eigensystem with user input.
 
@@ -108,54 +108,51 @@ class Eigensystem:
             to one layer. Default is [[240, 200], ].
         """
         # Assign global attributes
-        self.g = 9810           # Gravitaiton (mm/s^2)
-        self.lski = 1000        # Effective out-of-plane length of skis (mm)
-        self.tol = 1e-3         # Relative Romberg integration tolerance
-        self.system = system    # 'pst-', '-pst', 'vpst-', '-vpst', 'skier', 'skiers'
+        self.g = 9810  # Gravitaiton (mm/s^2)
+        self.lski = 1000  # Effective out-of-plane length of skis (mm)
+        self.tol = 1e-3  # Relative Romberg integration tolerance
+        self.system = system  # 'pst-', '-pst', 'vpst-', '-vpst', 'skier', 'skiers'
 
         # Initialize weak-layer attributes that will be filled later
-        self.weak = False           # Weak-layer properties dictionary
-        self.t = False              # Weak-layer thickness (mm)
-        self.kn = False             # Weak-layer compressive stiffness
-        self.kt = False             # Weak-layer shear stiffness
+        self.weak = False  # Weak-layer properties dictionary
+        self.t = False  # Weak-layer thickness (mm)
+        self.kn = False  # Weak-layer compressive stiffness
+        self.kt = False  # Weak-layer shear stiffness
 
         # Initialize slab attributes
-        self.p = 0                  # Surface line load (N/mm)
-        self.slab = False           # Slab properties dictionary
-        self.k = False              # Slab shear correction factor
-        self.h = False              # Total slab height (mm)
-        self.zs = False             # Z-coordinate of slab center of gravity (mm)
-        self.phi = False            # Slab inclination (°)
-        self.A11 = False            # Slab extensional stiffness
-        self.B11 = False            # Slab bending-extension coupling stiffness
-        self.D11 = False            # Slab bending stiffness
-        self.kA55 = False           # Slab shear stiffness
-        self.K0 = False             # Stiffness determinant
+        self.p = 0  # Surface line load (N/mm)
+        self.slab = False  # Slab properties dictionary
+        self.k = False  # Slab shear correction factor
+        self.h = False  # Total slab height (mm)
+        self.zs = False  # Z-coordinate of slab center of gravity (mm)
+        self.phi = False  # Slab inclination (°)
+        self.A11 = False  # Slab extensional stiffness
+        self.B11 = False  # Slab bending-extension coupling stiffness
+        self.D11 = False  # Slab bending stiffness
+        self.kA55 = False  # Slab shear stiffness
+        self.K0 = False  # Stiffness determinant
 
         # Inizialize eigensystem attributes
-        self.ewC = False            # Complex eigenvalues
-        self.ewR = False            # Real eigenvalues
-        self.evC = False            # Complex eigenvectors
-        self.evR = False            # Real eigenvectors
-        self.sC = False             # Stability shift of complex eigenvalues
-        self.sR = False             # Stability shift of real eigenvalues
+        self.ewC = False  # Complex eigenvalues
+        self.ewR = False  # Real eigenvalues
+        self.evC = False  # Complex eigenvectors
+        self.evR = False  # Real eigenvectors
+        self.sC = False  # Stability shift of complex eigenvalues
+        self.sR = False  # Stability shift of real eigenvalues
 
         # Initialize touchdown attributes
         self.touchdown = touchdown  # Flag whether touchdown is possible
-        self.a = False              # Cracklength
-        self.tc = False             # Weak-layer collapse height (mm)
-        self.ratio = False          # Stiffness ratio of collapsed to uncollapsed weak-layer
-        self.betaU = False          # Ratio of slab to bedding stiffness (uncollapsed)
-        self.betaC = False          # Ratio of slab to bedding stiffness (collapsed)
-        self.mode = False           # Touchdown-mode can be either A, B, C or D
-        self.td = False             # Touchdown length
+        self.a = False  # Cracklength
+        self.tc = False  # Weak-layer collapse height (mm)
+        self.ratio = False  # Stiffness ratio of collapsed to uncollapsed weak-layer
+        self.betaU = False  # Ratio of slab to bedding stiffness (uncollapsed)
+        self.betaC = False  # Ratio of slab to bedding stiffness (collapsed)
+        self.mode = False  # Touchdown-mode can be either A, B, C or D
+        self.td = False  # Touchdown length
 
     def set_foundation_properties(
-            self,
-            t: float = 30.0,
-            E: float = 0.25,
-            nu: float = 0.25,
-            update: bool = False):
+        self, t: float = 30.0, E: float = 0.25, nu: float = 0.25, update: bool = False
+    ):
         """
         Set material properties and geometry of foundation (weak layer).
 
@@ -163,9 +160,6 @@ class Eigensystem:
         ---------
         t : float, optional
             Weak-layer thickness (mm). Default is 30.
-        cf : float
-            Fraction by which the weak-layer thickness is reduced
-            due to collapse. Default is 0.5.
         E : float, optional
             Weak-layer Young modulus (MPa). Default is 0.25.
         nu : float, optional
@@ -175,20 +169,19 @@ class Eigensystem:
             foundation properties have changed.
         """
         # Geometry
-        self.t = t              # Weak-layer thickness (mm)
+        self.t = t  # Weak-layer thickness (mm)
 
         # Material properties
         self.weak = {
-            'nu': nu,           # Poisson's ratio (-)
-            'E': E              # Young's modulus (MPa)
+            "nu": nu,  # Poisson's ratio (-)
+            "E": E,  # Young's modulus (MPa)
         }
 
         # Recalculate the fundamental system after properties have changed
         if update:
             self.calc_fundamental_system()
 
-    def set_beam_properties(self, layers, C0=6.5, C1=4.4,
-                            nu=0.25, update=False):
+    def set_beam_properties(self, layers, C0=6.5, C1=4.4, nu=0.25, update=False):
         """
         Set material and properties geometry of beam (slab).
 
@@ -220,9 +213,9 @@ class Eigensystem:
             E = bergfeld(layers[:, 0], C0=C0, C1=C1)  # Young's modulus
 
         # Derive other elastic properties
-        nu = nu*np.ones(layers.shape[0])         # Global poisson's ratio
-        G = E/(2*(1 + nu))                       # Shear modulus
-        self.k = 5/6                             # Shear correction factor
+        nu = nu * np.ones(layers.shape[0])  # Global poisson's ratio
+        G = E / (2 * (1 + nu))  # Shear modulus
+        self.k = 5 / 6  # Shear correction factor
 
         # Compute total slab thickness and center of gravity
         self.h, self.zs = calc_center_of_gravity(layers)
@@ -257,12 +250,12 @@ class Eigensystem:
     def calc_foundation_stiffness(self):
         """Compute foundation normal and shear stiffness."""
         # Elastic moduli (MPa) under plane-strain conditions
-        G = self.weak['E']/(2*(1 + self.weak['nu']))    # Shear modulus
-        E = self.weak['E']/(1 - self.weak['nu']**2)     # Young's modulus
+        G = self.weak["E"] / (2 * (1 + self.weak["nu"]))  # Shear modulus
+        E = self.weak["E"] / (1 - self.weak["nu"] ** 2)  # Young's modulus
 
         # Foundation (weak layer) stiffnesses (N/mm^3)
-        self.kn = E/self.t                              # Normal stiffness
-        self.kt = G/self.t                              # Shear stiffness
+        self.kn = E / self.t  # Normal stiffness
+        self.kt = G / self.t  # Shear stiffness
 
     def get_ply_coordinates(self):
         """
@@ -278,7 +271,7 @@ class Eigensystem:
         # Get list of ply (layer) thicknesses and prepend 0
         t = np.concatenate(([0], self.slab[:, 1]))
         # Calculate and return ply z-coordiantes
-        return np.cumsum(t) - self.h/2
+        return np.cumsum(t) - self.h / 2
 
     def calc_laminate_stiffness_matrix(self):
         """
@@ -293,16 +286,16 @@ class Eigensystem:
         # Add layerwise contributions
         for i in range(len(z) - 1):
             E, G, nu = self.slab[i, 2:5]
-            A11 = A11 + E/(1 - nu**2)*(z[i+1] - z[i])
-            B11 = B11 + 1/2*E/(1 - nu**2)*(z[i+1]**2 - z[i]**2)
-            D11 = D11 + 1/3*E/(1 - nu**2)*(z[i+1]**3 - z[i]**3)
-            kA55 = kA55 + self.k*G*(z[i+1] - z[i])
+            A11 = A11 + E / (1 - nu**2) * (z[i + 1] - z[i])
+            B11 = B11 + 1 / 2 * E / (1 - nu**2) * (z[i + 1] ** 2 - z[i] ** 2)
+            D11 = D11 + 1 / 3 * E / (1 - nu**2) * (z[i + 1] ** 3 - z[i] ** 3)
+            kA55 = kA55 + self.k * G * (z[i + 1] - z[i])
 
         self.A11 = A11
         self.B11 = B11
         self.D11 = D11
         self.kA55 = kA55
-        self.K0 = B11**2 - A11*D11
+        self.K0 = B11**2 - A11 * D11
 
     def get_load_vector(self, phi):
         """
@@ -324,16 +317,28 @@ class Eigensystem:
         """
         qn, qt = self.get_weight_load(phi)
         pn, pt = self.get_surface_load(phi)
-        return np.array([
-            [0],
-            [(self.B11*(self.h*pt - 2*qt*self.zs)
-              + 2*self.D11*(qt + pt))/(2*self.K0)],
-            [0],
-            [-(qn + pn)/self.kA55],
-            [0],
-            [-(self.A11*(self.h*pt - 2*qt*self.zs)
-               + 2*self.B11*(qt + pt))/(2*self.K0)]
-        ])
+        return np.array(
+            [
+                [0],
+                [
+                    (
+                        self.B11 * (self.h * pt - 2 * qt * self.zs)
+                        + 2 * self.D11 * (qt + pt)
+                    )
+                    / (2 * self.K0)
+                ],
+                [0],
+                [-(qn + pn) / self.kA55],
+                [0],
+                [
+                    -(
+                        self.A11 * (self.h * pt - 2 * qt * self.zs)
+                        + 2 * self.B11 * (qt + pt)
+                    )
+                    / (2 * self.K0)
+                ],
+            ]
+        )
 
     def calc_fundamental_system(self):
         """Calculate the fundamental system of the problem."""
@@ -347,7 +352,7 @@ class Eigensystem:
         ew, ev = np.linalg.eig(self.calc_system_matrix())
         # Classify real and complex eigenvalues
         real = (ew.imag == 0) & (ew.real != 0)  # real eigenvalues
-        cmplx = ew.imag > 0                   # positive complex conjugates
+        cmplx = ew.imag > 0  # positive complex conjugates
         # Eigenvalues
         self.ewC = ew[cmplx]
         self.ewR = ew[real].real
@@ -375,29 +380,39 @@ class Eigensystem:
         kt = self.kt
 
         # Abbreviations (MIT t/2 im GGW, MIT w' in Kinematik)
-        K21 = kt*(-2*self.D11 + self.B11*(self.h + self.t))/(2*self.K0)
-        K24 = (2*self.D11*kt*self.t
-               - self.B11*kt*self.t*(self.h + self.t)
-               + 4*self.B11*self.kA55)/(4*self.K0)
-        K25 = (-2*self.D11*self.h*kt
-               + self.B11*self.h*kt*(self.h + self.t)
-               + 4*self.B11*self.kA55)/(4*self.K0)
-        K43 = kn/self.kA55
-        K61 = kt*(2*self.B11 - self.A11*(self.h + self.t))/(2*self.K0)
-        K64 = (-2*self.B11*kt*self.t
-               + self.A11*kt*self.t*(self.h+self.t)
-               - 4*self.A11*self.kA55)/(4*self.K0)
-        K65 = (2*self.B11*self.h*kt
-               - self.A11*self.h*kt*(self.h+self.t)
-               - 4*self.A11*self.kA55)/(4*self.K0)
+        K21 = kt * (-2 * self.D11 + self.B11 * (self.h + self.t)) / (2 * self.K0)
+        K24 = (
+            2 * self.D11 * kt * self.t
+            - self.B11 * kt * self.t * (self.h + self.t)
+            + 4 * self.B11 * self.kA55
+        ) / (4 * self.K0)
+        K25 = (
+            -2 * self.D11 * self.h * kt
+            + self.B11 * self.h * kt * (self.h + self.t)
+            + 4 * self.B11 * self.kA55
+        ) / (4 * self.K0)
+        K43 = kn / self.kA55
+        K61 = kt * (2 * self.B11 - self.A11 * (self.h + self.t)) / (2 * self.K0)
+        K64 = (
+            -2 * self.B11 * kt * self.t
+            + self.A11 * kt * self.t * (self.h + self.t)
+            - 4 * self.A11 * self.kA55
+        ) / (4 * self.K0)
+        K65 = (
+            2 * self.B11 * self.h * kt
+            - self.A11 * self.h * kt * (self.h + self.t)
+            - 4 * self.A11 * self.kA55
+        ) / (4 * self.K0)
 
         # System matrix
-        K = [[0,    1,    0,    0,    0,    0],
-             [K21,  0,    0,  K24,  K25,    0],
-             [0,    0,    0,    1,    0,    0],
-             [0,    0,  K43,    0,    0,   -1],
-             [0,    0,    0,    0,    0,    1],
-             [K61,  0,    0,  K64,  K65,    0]]
+        K = [
+            [0, 1, 0, 0, 0, 0],
+            [K21, 0, 0, K24, K25, 0],
+            [0, 0, 0, 1, 0, 0],
+            [0, 0, K43, 0, 0, -1],
+            [0, 0, 0, 0, 0, 1],
+            [K61, 0, 0, K64, K65, 0],
+        ]
 
         return np.array(K)
 
@@ -418,13 +433,13 @@ class Eigensystem:
             Line load (N/mm) at center of gravity in tangential direction.
         """
         # Convert units
-        phi = np.deg2rad(phi)                   # Convert inclination to rad
-        rho = self.slab[:, 0]*1e-12             # Convert density to t/mm^3
+        phi = np.deg2rad(phi)  # Convert inclination to rad
+        rho = self.slab[:, 0] * 1e-12  # Convert density to t/mm^3
         # Sum up layer weight loads
-        q = sum(rho*self.g*self.slab[:, 1])     # Line load (N/mm)
+        q = sum(rho * self.g * self.slab[:, 1])  # Line load (N/mm)
         # Split into components
-        qn = q*np.cos(phi)                      # Normal direction
-        qt = -q*np.sin(phi)                     # Tangential direction
+        qn = q * np.cos(phi)  # Normal direction
+        qt = -q * np.sin(phi)  # Tangential direction
 
         return qn, qt
 
@@ -445,10 +460,10 @@ class Eigensystem:
             Surface line load (N/mm) in tangential direction.
         """
         # Convert units
-        phi = np.deg2rad(phi)                   # Convert inclination to rad
+        phi = np.deg2rad(phi)  # Convert inclination to rad
         # Split into components
-        pn = self.p*np.cos(phi)                 # Normal direction
-        pt = -self.p*np.sin(phi)                # Tangential direction
+        pn = self.p * np.cos(phi)  # Normal direction
+        pt = -self.p * np.sin(phi)  # Tangential direction
 
         return pn, pt
 
@@ -470,10 +485,10 @@ class Eigensystem:
         Ft : float
             Skier load (N) in tangential direction.
         """
-        phi = np.deg2rad(phi)                   # Convert inclination to rad
-        F = 1e-3*np.array(m)*self.g/self.lski   # Total skier load (N)
-        Fn = F*np.cos(phi)                      # Normal skier load (N)
-        Ft = -F*np.sin(phi)                     # Tangential skier load (N)
+        phi = np.deg2rad(phi)  # Convert inclination to rad
+        F = 1e-3 * np.array(m) * self.g / self.lski  # Total skier load (N)
+        Fn = F * np.cos(phi)  # Normal skier load (N)
+        Ft = -F * np.sin(phi)  # Tangential skier load (N)
 
         return Fn, Ft
 
@@ -497,30 +512,41 @@ class Eigensystem:
             Complementary solution matrix (6x6) at position x.
         """
         if bed:
-            zh = np.concatenate([
-                # Real
-                self.evR*np.exp(self.ewR*(x + l*self.sR)),
-                # Complex
-                np.exp(self.ewC.real*(x + l*self.sC))*(
-                       self.evC.real*np.cos(self.ewC.imag*x)
-                       - self.evC.imag*np.sin(self.ewC.imag*x)),
-                # Complex
-                np.exp(self.ewC.real*(x + l*self.sC))*(
-                       self.evC.imag*np.cos(self.ewC.imag*x)
-                       + self.evC.real*np.sin(self.ewC.imag*x))], axis=1)
+            zh = np.concatenate(
+                [
+                    # Real
+                    self.evR * np.exp(self.ewR * (x + l * self.sR)),
+                    # Complex
+                    np.exp(self.ewC.real * (x + l * self.sC))
+                    * (
+                        self.evC.real * np.cos(self.ewC.imag * x)
+                        - self.evC.imag * np.sin(self.ewC.imag * x)
+                    ),
+                    # Complex
+                    np.exp(self.ewC.real * (x + l * self.sC))
+                    * (
+                        self.evC.imag * np.cos(self.ewC.imag * x)
+                        + self.evC.real * np.sin(self.ewC.imag * x)
+                    ),
+                ],
+                axis=1,
+            )
         else:
             # Abbreviations
-            H14 = 3*self.B11/self.A11*x**2
-            H24 = 6*self.B11/self.A11*x
-            H54 = -3*x**2 + 6*self.K0/(self.A11*self.kA55)
+            H14 = 3 * self.B11 / self.A11 * x**2
+            H24 = 6 * self.B11 / self.A11 * x
+            H54 = -3 * x**2 + 6 * self.K0 / (self.A11 * self.kA55)
             # Complementary solution matrix of free segments
             zh = np.array(
-                [[0,      0,      0,    H14,      1,      x],
-                 [0,      0,      0,    H24,      0,      1],
-                 [1,      x,   x**2,   x**3,      0,      0],
-                 [0,      1,    2*x, 3*x**2,      0,      0],
-                 [0,     -1,   -2*x,    H54,      0,      0],
-                 [0,      0,     -2,   -6*x,      0,      0]])
+                [
+                    [0, 0, 0, H14, 1, x],
+                    [0, 0, 0, H24, 0, 1],
+                    [1, x, x**2, x**3, 0, 0],
+                    [0, 1, 2 * x, 3 * x**2, 0, 0],
+                    [0, -1, -2 * x, H54, 0, 0],
+                    [0, 0, -2, -6 * x, 0, 0],
+                ]
+            )
 
         return zh
 
@@ -564,23 +590,34 @@ class Eigensystem:
 
         # Assemble particular integral vectors
         if bed:
-            zp = np.array([
-                [(qt + pt)/kt + h*qt*(h + t - 2*zs)/(4*kA55)
-                    + h*pt*(2*h + t)/(4*kA55)],
-                [0],
-                [(qn + pn)/kn],
-                [0],
-                [-(qt*(h + t - 2*zs) + pt*(2*h + t))/(2*kA55)],
-                [0]])
+            zp = np.array(
+                [
+                    [
+                        (qt + pt) / kt
+                        + h * qt * (h + t - 2 * zs) / (4 * kA55)
+                        + h * pt * (2 * h + t) / (4 * kA55)
+                    ],
+                    [0],
+                    [(qn + pn) / kn],
+                    [0],
+                    [-(qt * (h + t - 2 * zs) + pt * (2 * h + t)) / (2 * kA55)],
+                    [0],
+                ]
+            )
         else:
-            zp = np.array([
-                [(-3*(qt + pt)/A11 - B11*(qn + pn)*x/K0)/6*x**2],
-                [(-2*(qt + pt)/A11 - B11*(qn + pn)*x/K0)/2*x],
-                [-A11*(qn + pn)*x**4/(24*K0)],
-                [-A11*(qn + pn)*x**3/(6*K0)],
-                [A11*(qn + pn)*x**3/(6*K0)
-                 + ((zs - B11/A11)*qt - h*pt/2 - (qn + pn)*x)/kA55],
-                [(qn + pn)*(A11*x**2/(2*K0) - 1/kA55)]])
+            zp = np.array(
+                [
+                    [(-3 * (qt + pt) / A11 - B11 * (qn + pn) * x / K0) / 6 * x**2],
+                    [(-2 * (qt + pt) / A11 - B11 * (qn + pn) * x / K0) / 2 * x],
+                    [-A11 * (qn + pn) * x**4 / (24 * K0)],
+                    [-A11 * (qn + pn) * x**3 / (6 * K0)],
+                    [
+                        A11 * (qn + pn) * x**3 / (6 * K0)
+                        + ((zs - B11 / A11) * qt - h * pt / 2 - (qn + pn) * x) / kA55
+                    ],
+                    [(qn + pn) * (A11 * x**2 / (2 * K0) - 1 / kA55)],
+                ]
+            )
 
         return zp
 
@@ -608,9 +645,10 @@ class Eigensystem:
             Solution vector (6xN) at position x.
         """
         if isinstance(x, (list, tuple, np.ndarray)):
-            z = np.concatenate([
-                np.dot(self.zh(xi, l, bed), C)
-                + self.zp(xi, phi, bed) for xi in x], axis=1)
+            z = np.concatenate(
+                [np.dot(self.zh(xi, l, bed), C) + self.zp(xi, phi, bed) for xi in x],
+                axis=1,
+            )
         else:
             z = np.dot(self.zh(x, l, bed), C) + self.zp(x, phi, bed)
 
