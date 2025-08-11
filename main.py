@@ -2,178 +2,303 @@
 This script demonstrates the basic usage of the WEAC package to run a simulation.
 """
 
-import old_weac
+import logging
 
-# 1. Define a snow profile
-# Columns are density (kg/m^3) and layer thickness (mm)
-# One row corresponds to one layer counted from top (below surface) to bottom (above weak layer).
-my_profile = [
-    [170, 100],  # (1) surface layer
-    [190, 40],  # (2)
-    [230, 130],  #  :
-    [250, 20],  #  :
-    [210, 70],  # (i)
-    [380, 20],  #  :
-    [280, 100],  # (N) last slab layer above weak layer
+from weac.analysis.criteria_evaluator import (
+    CoupledCriterionResult,
+    CriteriaEvaluator,
+)
+from weac.analysis.plotter import Plotter
+from weac.components import (
+    CriteriaConfig,
+    Layer,
+    ModelInput,
+    ScenarioConfig,
+    Segment,
+    WeakLayer,
+)
+from weac.components.config import Config
+from weac.core.system_model import SystemModel
+from weac.logging_config import setup_logging
+
+setup_logging(level="INFO")
+
+# Suppress matplotlib debug logging
+logging.getLogger("matplotlib").setLevel(logging.WARNING)
+logging.getLogger("matplotlib.font_manager").setLevel(logging.WARNING)
+
+# === SYSTEM 1: Basic Configuration ===
+config1 = Config(
+    touchdown=True,
+    youngs_modulus_method="bergfeld",
+    stress_envelope_method="adam_unpublished",
+)
+scenario_config1 = ScenarioConfig(phi=5, system_type="skier")  # Steeper slope
+criteria_config1 = CriteriaConfig(fn=1, fm=1, gn=1, gm=1)
+
+weak_layer1 = WeakLayer(rho=80, h=25, E=0.25, G_Ic=1)
+layers1 = [
+    Layer(rho=170, h=100),  # Top Layer
+    Layer(rho=280, h=100),  # Bottom Layer
+]
+segments1 = [
+    Segment(length=3000, has_foundation=True, m=70),
+    Segment(length=4000, has_foundation=True, m=0),
 ]
 
-# 2. Create a model instance
-# System can be 'skier', 'pst-' (Propagation Saw Test from left), etc.
-skier_model = old_weac.Layered(system="skiers", layers=my_profile, touchdown=False)
-
-# Optional: Set foundation properties if different from default
-# skier_model.set_foundation_properties(E=0.25, t=30) # E in MPa, t in mm
-
-# 3. Calculate segments for a more complex scenario
-# We will define custom segment lengths (li), loads per segment (mi),
-# and foundation support per segment (ki)
-
-# li_custom: list of segment lengths in mm
-li_custom = [500.0, 2000.0, 300.0, 800.0, 700.0]  # Total length 1500mm (1.5m)
-
-# mi_custom: list of skier masses (kg) for each segment. 0 means no point load.
-# Represents two skiers on segments 1 and 3.
-mi_custom = [80.0, 0.0, 0.0, 70.0]
-
-# ki_custom: list of booleans indicating foundation support for each segment.
-# True = foundation present, False = no foundation (e.g., bridging a gap).
-# Segment 2 has no foundation.
-ki_custom = [True, True, False, True, True]
-
-# Calculate total length from custom segments for consistency if needed by other parts,
-# though 'li_custom' will primarily define the geometry.
-L_total = sum(li_custom)
-
-# 'a' (initial crack length) and 'm' (single skier mass) are set to 0
-# as 'ki_custom' and 'mi_custom' now define these aspects.
-# We still select the 'crack' configuration from the output dictionary,
-# which will use our custom ki, mi, etc.
-segments_data = skier_model.calc_segments(
-    L=L_total, a=0, m=0, li=li_custom, mi=mi_custom, ki=ki_custom
-)["crack"]
-
-# 4. Assemble the system of linear equations and solve
-# Input: inclination phi (degrees, counterclockwise positive)
-inclination_angle = 38  # degrees
-unknown_constants = skier_model.assemble_and_solve(
-    phi=inclination_angle, **segments_data
+model_input1 = ModelInput(
+    scenario_config=scenario_config1,
+    weak_layer=weak_layer1,
+    layers=layers1,
+    segments=segments1,
+    criteria_config=criteria_config1,
 )
 
-# 5. Prepare the output by rasterizing the solution
-# Input: Solution constants C, inclination phi, and segments data
-xsl_slab, z_solution, xwl_weak_layer = skier_model.rasterize_solution(
-    C=unknown_constants, phi=inclination_angle, **segments_data
+system1 = SystemModel(config=config1, model_input=model_input1)
+
+# === SYSTEM 2: Different Slope Angle ===
+config2 = Config(
+    touchdown=False,
+    youngs_modulus_method="bergfeld",
+    stress_envelope_method="adam_unpublished",
+)
+scenario_config2 = ScenarioConfig(phi=30, system_type="skier")  # Steeper slope
+weak_layer2 = WeakLayer(rho=80, h=25, E=0.25, G_Ic=1)
+layers2 = [
+    Layer(rho=170, h=100),  # Top Layer
+    Layer(rho=280, h=100),  # Bottom Layer
+]
+segments2 = [
+    Segment(length=3000, has_foundation=True, m=70),
+    Segment(length=4000, has_foundation=True, m=0),
+]
+criteria_config2 = CriteriaConfig(fn=1, fm=1, gn=1, gm=1)
+
+model_input2 = ModelInput(
+    scenario_config=scenario_config2,
+    weak_layer=weak_layer2,
+    layers=layers2,
+    segments=segments2,
+    criteria_config=criteria_config2,
 )
 
-print("Simulation completed. Solution constants C:", unknown_constants)
-print("Slab x-coordinates (xsl_slab):", xsl_slab)
-print("Solution vector (z_solution):", z_solution)
-print("Weak layer x-coordinates (xwl_weak_layer):", xwl_weak_layer)
+system2 = SystemModel(config=config2, model_input=model_input2)
 
-# 6. Visualize the results (optional, requires matplotlib)
-# Ensure you have matplotlib installed: pip install matplotlib
-try:
-    # Visualize deformations as a contour plot
-    old_weac.plot.deformed(
-        skier_model,
-        xsl=xsl_slab,
-        xwl=xwl_weak_layer,
-        z=z_solution,
-        phi=inclination_angle,
-        window=L_total / 2,
-        scale=200,
-        field="u",
-        filename="deformed_plot_u",
-    )
-    old_weac.plot.deformed(
-        skier_model,
-        xsl=xsl_slab,
-        xwl=xwl_weak_layer,
-        z=z_solution,
-        phi=inclination_angle,
-        window=L_total / 2,
-        scale=200,
-        field="w",
-        filename="deformed_plot_w",
-    )
-    old_weac.plot.deformed(
-        skier_model,
-        xsl=xsl_slab,
-        xwl=xwl_weak_layer,
-        z=z_solution,
-        phi=inclination_angle,
-        window=L_total / 2,
-        scale=200,
-        field="Sxx",
-        filename="deformed_plot_Sxx",
-    )
-    old_weac.plot.deformed(
-        skier_model,
-        xsl=xsl_slab,
-        xwl=xwl_weak_layer,
-        z=z_solution,
-        phi=inclination_angle,
-        window=L_total / 2,
-        scale=200,
-        field="Szz",
-        filename="deformed_plot_Szz",
-    )
-    old_weac.plot.deformed(
-        skier_model,
-        xsl=xsl_slab,
-        xwl=xwl_weak_layer,
-        z=z_solution,
-        phi=inclination_angle,
-        window=L_total / 2,
-        scale=200,
-        field="Txz",
-        filename="deformed_plot_Txz",
-    )
-    old_weac.plot.deformed(
-        skier_model,
-        xsl=xsl_slab,
-        xwl=xwl_weak_layer,
-        z=z_solution,
-        phi=inclination_angle,
-        window=L_total / 2,
-        scale=200,
-        field="principal",
-        filename="deformed_plot_principal",
-    )
+# === SYSTEM 3: Different Layer Configuration ===
+config3 = Config(
+    touchdown=False,
+    youngs_modulus_method="bergfeld",
+    stress_envelope_method="adam_unpublished",
+)
+scenario_config3 = ScenarioConfig(phi=15, system_type="skier")  # Medium slope
+weak_layer3 = WeakLayer(rho=80, h=25, E=0.3, G_Ic=1.2)  # Different weak layer
+layers3 = [
+    Layer(rho=150, h=80),  # Lighter top layer
+    Layer(rho=200, h=60),  # Medium layer
+    Layer(rho=320, h=120),  # Heavier bottom layer
+]
+segments3 = [
+    Segment(length=3500, has_foundation=True, m=60),  # Different skier mass
+    Segment(length=3500, has_foundation=True, m=0),
+]
+criteria_config3 = CriteriaConfig(fn=1, fm=1, gn=1, gm=1)
 
-    # Plot slab displacements
-    old_weac.plot.displacements(skier_model, x=xsl_slab, z=z_solution, **segments_data)
+model_input3 = ModelInput(
+    scenario_config=scenario_config3,
+    weak_layer=weak_layer3,
+    layers=layers3,
+    segments=segments3,
+    criteria_config=criteria_config3,
+)
 
-    # Plot weak-layer stresses
-    old_weac.plot.stresses(skier_model, x=xwl_weak_layer, z=z_solution, **segments_data)
+system3 = SystemModel(config=config3, model_input=model_input3)
 
-    # Plot shear/normal stress criteria
-    old_weac.plot.stress_envelope(
-        skier_model, x=xwl_weak_layer, z=z_solution, **segments_data
-    )
+# === SYSTEM 4: Advanced Configuration ===
+config4 = Config(
+    touchdown=False,
+    youngs_modulus_method="bergfeld",
+    stress_envelope_method="adam_unpublished",
+)
+scenario_config4 = ScenarioConfig(phi=38, system_type="skier")
+weak_layer4 = WeakLayer(rho=80, h=25, E=0.25, G_Ic=1)
+layers4 = [
+    Layer(rho=170, h=100),  # (1) Top Layer
+    Layer(rho=190, h=40),  # (2)
+    Layer(rho=230, h=130),
+    Layer(rho=250, h=20),
+    Layer(rho=210, h=70),
+    Layer(rho=380, h=20),
+    Layer(rho=280, h=100),  # (N) Bottom Layer
+]
+segments4 = [
+    Segment(length=5000, has_foundation=True, m=80),
+    Segment(length=3000, has_foundation=True, m=0),
+    Segment(length=3000, has_foundation=False, m=0),
+    Segment(length=4000, has_foundation=True, m=70),
+    Segment(length=3000, has_foundation=True, m=0),
+]
+criteria_config4 = CriteriaConfig(fn=1, fm=1, gn=1, gm=1)
+model_input4 = ModelInput(
+    scenario_config=scenario_config4,
+    weak_layer=weak_layer4,
+    layers=layers4,
+    segments=segments4,
+    criteria_config=criteria_config4,
+)
 
-except ImportError:
-    print(
-        "Matplotlib not found. Skipping plot generation. Install with: pip install matplotlib"
-    )
-except Exception as e:
-    print(f"An error occurred during plotting: {e}")
+system4 = SystemModel(config=config4, model_input=model_input4)
 
-# 7. Compute output quantities (optional)
-# Slab deflections
-x_cm_deflection, w_um_deflection = skier_model.get_slab_deflection(
-    x=xsl_slab, z=z_solution, unit="um"
+# === DEMONSTRATION OF PLOTTING CAPABILITIES ===
+
+print("=== WEAC Plotting Demonstration ===")
+
+# Single system plotting
+print("\n1. Single System Analysis:")
+print(f"   System 1 - φ={system1.scenario.phi}°, H={system1.slab.H}mm")
+
+plotter_single = Plotter()
+analyzer1 = plotter_single._get_analyzer(system1)
+xsl, z, xwl = analyzer1.rasterize_solution()
+
+# Generate individual plots
+print("   - Generating slab profile...")
+plotter_single.plot_slab_profile(
+    weak_layers=system1.weak_layer,
+    slabs=system1.slab,
+    labels=["φ=5° System"],
+    filename="single_slab_profile",
+)
+
+print("   - Generating displacement plot...")
+plotter_single.plot_displacements(
+    analyzer=analyzer1, x=xsl, z=z, filename="single_displacements"
+)
+
+print("   - Generating section forces plot...")
+plotter_single.plot_section_forces(
+    system_model=system1, filename="single_section_forces"
+)
+
+print("   - Generating stress plot...")
+plotter_single.plot_stresses(analyzer=analyzer1, x=xwl, z=z, filename="single_stresses")
+
+print("   - Generating deformed contour plot...")
+plotter_single.plot_deformed(
+    xsl, xwl, z, analyzer1, field="w", filename="single_deformed_w"
+)
+plotter_single.plot_deformed(
+    xsl, xwl, z, analyzer1, field="principal", filename="single_deformed_principal"
+)
+
+print("   - Generating stress envelope...")
+plotter_single.plot_stress_envelope(
+    system_model=system1,
+    criteria_evaluator=CriteriaEvaluator(criteria_config1),
+    all_envelopes=False,
+    filename="single_stress_envelope",
+)
+
+# === CRITERIA ANALYSIS DEMONSTRATION ===
+print("\n2. Coupled Criterion Analysis Example:")
+print("   This example is from the demo notebook and shows a more advanced analysis.")
+
+# Define thinner snow profile (standard snow profile A), with higher weak layer Young's Modulus
+layers_analysis = [
+    Layer(rho=350, h=120),
+    Layer(rho=270, h=120),
+    Layer(rho=180, h=120),
+]
+scenario_config_analysis = ScenarioConfig(
+    system_type="skier",
+    phi=30,
+)
+segments_analysis = [
+    Segment(length=18000, has_foundation=True, m=0),
+    Segment(length=0, has_foundation=False, m=75),
+    Segment(length=0, has_foundation=False, m=0),
+    Segment(length=18000, has_foundation=False, m=0),
+]
+weak_layer_analysis = WeakLayer(
+    rho=150,
+    h=30,
+    E=1,
+)
+criteria_config_analysis = CriteriaConfig(
+    stress_envelope_method="adam_unpublished",
+    scaling_factor=1,
+    order_of_magnitude=1,
+)
+model_input_analysis = ModelInput(
+    scenario_config=scenario_config_analysis,
+    layers=layers_analysis,
+    segments=segments_analysis,
+    weak_layer=weak_layer_analysis,
+    criteria_config=criteria_config_analysis,
+)
+
+sys_model_analysis = SystemModel(
+    model_input=model_input_analysis,
+)
+
+criteria_evaluator = CriteriaEvaluator(
+    criteria_config=criteria_config_analysis,
+)
+
+results: CoupledCriterionResult = criteria_evaluator.evaluate_coupled_criterion(
+    system=sys_model_analysis
+)
+
+print("\n--- Coupled Criterion Analysis Results ---")
+print(
+    "The thinner snow profile, with adjusted weak layer Young's Modulus, is governed by a coupled criterion for anticrack nucleation."
 )
 print(
-    "Slab deflection (x_cm, w_um):", list(zip(x_cm_deflection, w_um_deflection))[:5]
-)  # Print first 5 for brevity
+    f"The critical skier weight is {results.critical_skier_weight:.1f} kg and the associated crack length is {results.crack_length:.1f} mm."
+)
+print("\nDetailed results:")
+print(f"  Algorithm convergence: {results.converged}")
+print(f"  Message: {results.message}")
+print(f"  Self-collapse: {results.self_collapse}")
+print(f"  Pure stress criteria: {results.pure_stress_criteria}")
+print(
+    f"  Initial critical skier weight: {results.initial_critical_skier_weight:.1f} kg"
+)
+print(f"  G delta: {results.g_delta:.4f}")
+print(f"  Final error: {results.dist_ERR_envelope:.4f}")
+print(f"  Max distance to failure: {results.max_dist_stress:.4f}")
+print(f"  Iterations: {results.iterations}")
 
-# Weak-layer shear stress
-x_cm_shear, tau_kPa_shear = skier_model.get_weaklayer_shearstress(
-    x=xwl_weak_layer, z=z_solution, unit="kPa"
+
+# Check for crack self-propagation
+system = results.final_system
+propagation_results = criteria_evaluator.check_crack_self_propagation(system)
+print("\n--- Crack Self-Propagation Check ---")
+print(
+    f"Results of crack propagation criterion: G_delta = {propagation_results[0]:.4f}, Propagation expected: {propagation_results[1]}"
 )
 print(
-    "Weak-layer shear stress (x_cm, tau_kPa):", list(zip(x_cm_shear, tau_kPa_shear))[:5]
-)  # Print first 5
+    "As the crack propagation criterion is not met, we investigate the minimum self-propagation crack boundary."
+)
 
-print("\nSuccessfully ran a basic WEAC simulation.")
+
+# Find minimum crack length for self-propagation
+initial_interval = (1, 3000)  # Interval for the crack length search (mm)
+min_crack_length = criteria_evaluator.find_minimum_crack_length(
+    system, search_interval=initial_interval
+)
+
+print("\n--- Minimum Self-Propagation Crack Length ---")
+if min_crack_length is not None:
+    print(f"Minimum Crack Length for Self-Propagation: {min_crack_length:.1f} mm")
+else:
+    print("The search for the minimum crack length did not converge.")
+
+print(
+    "\nThe anticrack created is not sufficiently long to surpass the self-propagation boundary. The propensity of the generated anticrack to propagate is low."
+)
+
+
+print("\n=== Analysis Complete ===")
+print("Check the 'plots/' directory for generated visualizations.")
+print("\nPlot files generated:")
+print("  - single_*.png")
