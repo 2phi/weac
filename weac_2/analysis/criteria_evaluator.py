@@ -93,6 +93,14 @@ class CoupledCriterionResult:
 class SSERRResult:
     """
     Holds the results of the SSERR evaluation.
+
+    Attributes:
+    -----------
+    converged : bool
+        Whether the algorithm converged.
+    message : str
+        The message of the evaluation.
+    touchdown_distance : float
     """
 
     converged: bool

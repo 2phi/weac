@@ -50,30 +50,8 @@ class SnowPilotParser:
     def __init__(self, file_path: str):
         self.snowpit: SnowPit = caaml_parser(file_path)
 
-    # def run(
-    #     self,
-    #     psts: bool = True,
-    #     ects: bool = True,
-    #     cts: bool = True,
-    #     rblocks: bool = True,
-    # ) -> List[ModelInput]:
-    #     print("Extracting layers")
-    #     self.layers, self.density_method = self.extract_layers()
-    #     print("Assembling model inputs")
-    #     self.model_inputs: List[ModelInput] = self._assemble_model_inputs(
-    #         self.snowpit, self.layers, psts, ects, cts, rblocks
-    #     )
-    #     return self.model_inputs
-
-    # def get_model_inputs(self) -> List[ModelInput]:
-    #     return self.model_inputs
-
-    # def get_layers(self) -> List[Layer]:
-    #     return self.layers
-
-    def extract_layers(self) -> Tuple[List[Layer], str]:
+    def extract_layers(self) -> Tuple[List[Layer], List[str]]:
         """Extract layers from snowpit."""
-        density_method = "density_obs"
         snowpit = self.snowpit
         # Extract layers from snowpit: List[SnowpylotLayer]
         sp_layers: List[SnowpylotLayer] = [
@@ -93,7 +71,8 @@ class SnowPilotParser:
 
         # Populate WEAC layers: List[Layer]
         layers: List[Layer] = []
-        for layer in sp_layers:
+        density_methods: List[str] = []
+        for i, layer in enumerate(sp_layers):
             # Parameters
             grain_type = None
             grain_size = None
@@ -147,10 +126,12 @@ class SnowPilotParser:
                         layer_depth_top_mm, layer_mid_depth_mm, sp_density_layers
                     )
                     if density_top is None:
-                        density_method = "geldsetzer"
+                        density_methods.append("geldsetzer")
                         density_top = compute_density(grain_type, hand_hardness_top)
+                    else:
+                        density_methods.append("density_obs")
                 else:
-                    density_method = "geldsetzer"
+                    density_methods.append("geldsetzer")
                     density_top = compute_density(grain_type, hand_hardness_top)
 
                 layers.append(
@@ -169,13 +150,15 @@ class SnowPilotParser:
                         layer_mid_depth_mm, layer_depth_bottom_mm, sp_density_layers
                     )
                     if density_bottom is None:
-                        density_method = "geldsetzer"
+                        density_methods.append("geldsetzer")
                         density_bottom = compute_density(
                             grain_type, hand_hardness_bottom
                         )
+                    else:
+                        density_methods.append("density_obs")
                 else:
                     try:
-                        density_method = "geldsetzer"
+                        density_methods.append("geldsetzer")
                         density_bottom = compute_density(
                             grain_type, hand_hardness_bottom
                         )
@@ -199,9 +182,10 @@ class SnowPilotParser:
 
                 if measured_density is not None:
                     density = measured_density
+                    density_methods.append("density_obs")
                 else:
                     try:
-                        density_method = "geldsetzer"
+                        density_methods.append("geldsetzer")
                         density = compute_density(grain_type, hand_hardness)
                     except Exception:
                         raise AttributeError(
@@ -222,7 +206,7 @@ class SnowPilotParser:
             raise AttributeError(
                 "No layers found for snowpit. Excluding SnowPit from calculations."
             )
-        return layers, density_method
+        return layers, density_methods
 
     def _get_density_for_layer_range(
         self,
@@ -286,6 +270,61 @@ class SnowPilotParser:
                 )
                 return float(weighted_density)
         return None
+
+    def extract_weak_layer_and_layers_above(
+        self, weak_layer_depth: float, layers: List[Layer]
+    ) -> Tuple[WeakLayer, List[Layer]]:
+        """Extract weak layer and layers above the weak layer for the given depth_top extracted from the stability test."""
+        depth = 0
+        layers_above = []
+        weak_layer_rho = None
+        weak_layer_hand_hardness = None
+        weak_layer_grain_type = None
+        weak_layer_grain_size = None
+        if weak_layer_depth <= 0:
+            raise ValueError(
+                "The depth of the weak layer is not positive. Excluding SnowPit from calculations."
+            )
+        if weak_layer_depth > sum([layer.h for layer in layers]):
+            raise ValueError(
+                "The depth of the weak layer is below the recorded layers. Excluding SnowPit from calculations."
+            )
+        for i, layer in enumerate(layers):
+            if depth + layer.h < weak_layer_depth:
+                layers_above.append(layer)
+                depth += layer.h
+            elif depth < weak_layer_depth and depth + layer.h > weak_layer_depth:
+                layer.h = weak_layer_depth - depth
+                layers_above.append(layer)
+                weak_layer_rho = layers[i].rho
+                weak_layer_hand_hardness = layers[i].hand_hardness
+                weak_layer_grain_type = layers[i].grain_type
+                weak_layer_grain_size = layers[i].grain_size
+                break
+            elif depth + layer.h == weak_layer_depth:
+                if i + 1 < len(layers):
+                    layers_above.append(layer)
+                    weak_layer_rho = layers[i + 1].rho
+                    weak_layer_hand_hardness = layers[i + 1].hand_hardness
+                    weak_layer_grain_type = layers[i + 1].grain_type
+                    weak_layer_grain_size = layers[i + 1].grain_size
+                else:
+                    weak_layer_rho = layers[i].rho
+                    weak_layer_hand_hardness = layers[i].hand_hardness
+                    weak_layer_grain_type = layers[i].grain_type
+                    weak_layer_grain_size = layers[i].grain_size
+                break
+
+        weak_layer = WeakLayer(
+            rho=weak_layer_rho,
+            h=20.0,
+            hand_hardness=weak_layer_hand_hardness,
+            grain_type=weak_layer_grain_type,
+            grain_size=weak_layer_grain_size,
+        )
+        if len(layers_above) == 0:
+            raise ValueError("No layers above weak layer found")
+        return weak_layer, layers_above
 
     # def _assemble_model_inputs(
     #     self,
@@ -423,58 +462,3 @@ class SnowPilotParser:
     #             )
     #         )
     #     return scenarios
-
-    def extract_weak_layer_and_layers_above(
-        self, weak_layer_depth: float, layers: List[Layer]
-    ) -> Tuple[WeakLayer, List[Layer]]:
-        """Extract weak layer and layers above the weak layer for the given depth_top extracted from the stability test."""
-        depth = 0
-        layers_above = []
-        weak_layer_rho = None
-        weak_layer_hand_hardness = None
-        weak_layer_grain_type = None
-        weak_layer_grain_size = None
-        if weak_layer_depth <= 0:
-            raise ValueError(
-                "The depth of the weak layer is not positive. Excluding SnowPit from calculations."
-            )
-        if weak_layer_depth > sum([layer.h for layer in layers]):
-            raise ValueError(
-                "The depth of the weak layer is below the recorded layers. Excluding SnowPit from calculations."
-            )
-        for i, layer in enumerate(layers):
-            if depth + layer.h < weak_layer_depth:
-                layers_above.append(layer)
-                depth += layer.h
-            elif depth < weak_layer_depth and depth + layer.h > weak_layer_depth:
-                layer.h = weak_layer_depth - depth
-                layers_above.append(layer)
-                weak_layer_rho = layers[i].rho
-                weak_layer_hand_hardness = layers[i].hand_hardness
-                weak_layer_grain_type = layers[i].grain_type
-                weak_layer_grain_size = layers[i].grain_size
-                break
-            elif depth + layer.h == weak_layer_depth:
-                if i + 1 < len(layers):
-                    layers_above.append(layer)
-                    weak_layer_rho = layers[i + 1].rho
-                    weak_layer_hand_hardness = layers[i + 1].hand_hardness
-                    weak_layer_grain_type = layers[i + 1].grain_type
-                    weak_layer_grain_size = layers[i + 1].grain_size
-                else:
-                    weak_layer_rho = layers[i].rho
-                    weak_layer_hand_hardness = layers[i].hand_hardness
-                    weak_layer_grain_type = layers[i].grain_type
-                    weak_layer_grain_size = layers[i].grain_size
-                break
-
-        weak_layer = WeakLayer(
-            rho=weak_layer_rho,
-            h=20.0,
-            hand_hardness=weak_layer_hand_hardness,
-            grain_type=weak_layer_grain_type,
-            grain_size=weak_layer_grain_size,
-        )
-        if len(layers_above) == 0:
-            raise ValueError("No layers above weak layer found")
-        return weak_layer, layers_above

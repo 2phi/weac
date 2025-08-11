@@ -113,8 +113,10 @@ class Layer(BaseModel):
     """
 
     # has to be provided
-    rho: float = Field(125, gt=0, description="Density of the Slab  [kg m⁻³]")
-    h: float = Field(20, gt=0, description="Height/Thickness of the slab  [mm]")
+    rho: float = Field(default=150, gt=0, description="Density of the Slab  [kg m⁻³]")
+    h: float = Field(
+        default=200, gt=0, description="Height/Thickness of the slab  [mm]"
+    )
 
     # derived if not provided
     nu: float = Field(default=NU, ge=0, lt=0.5, description="Poisson's ratio [-]")
@@ -190,8 +192,8 @@ class WeakLayer(BaseModel):
         Mode-II fracture toughness GIIc [J/m^2].  Default 0.79 J/m^2.
     """
 
-    rho: float = Field(125, gt=0, description="Density of the Slab  [kg m⁻³]")
-    h: float = Field(20, gt=0, description="Height/Thickness of the slab  [mm]")
+    rho: float = Field(default=125, gt=0, description="Density of the Slab  [kg m⁻³]")
+    h: float = Field(default=20, gt=0, description="Height/Thickness of the slab  [mm]")
     collapse_height: float = Field(
         default=0.0, gt=0, description="Collapse height [mm]"
     )

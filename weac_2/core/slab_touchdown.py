@@ -98,8 +98,14 @@ class SlabTouchdown:
     def _calc_touchdown_mode(self):
         """Calculate touchdown-mode from thresholds"""
         # Calculate stage transitions
-        self.l_AB = self._calc_l_AB()
-        self.l_BC = self._calc_l_BC()
+        try:
+            self.l_AB = self._calc_l_AB()
+        except ValueError:
+            self.l_AB = self.scenario.L
+        try:
+            self.l_BC = self._calc_l_BC()
+        except ValueError:
+            self.l_BC = self.scenario.L
         # Assign stage
         if self.scenario.crack_length <= self.l_AB:
             touchdown_mode = "A_free_hanging"

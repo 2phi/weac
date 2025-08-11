@@ -393,10 +393,16 @@ class Analyzer:
 
     @track_analyzer_call
     def principal_stress_slab(
-        self, Z, phi, dz=2, unit="kPa", val="max", normalize=False
+        self,
+        Z,
+        phi: float,
+        dz: float = 2,
+        unit: Literal["kPa", "MPa"] = "kPa",
+        val: Literal["min", "max"] = "max",
+        normalize: bool = False,
     ):
         """
-        Compute maxium or minimum principal stress in slab layers.
+        Compute maximum or minimum principal stress in slab layers.
 
         Arguments
         ---------
@@ -442,13 +448,13 @@ class Analyzer:
 
         # Raise error if normalization of compressive stresses is attempted
         if normalize and val == "min":
-            raise ValueError("Can only normlize tensile stresses.")
+            raise ValueError("Can only normalize tensile stresses.")
 
         # Normalize tensile stresses to tensile strength
         if normalize and val == "max":
             zmesh = self.get_zmesh(dz=dz)
             tensile_strength = zmesh["tensile_strength"]
-            # Normlize maximum principal stress to layers' tensile strength
+            # Normalize maximum principal stress to layers' tensile strength
             normalized_Ps = Ps / tensile_strength[:, None]
             return normalized_Ps
 
@@ -457,10 +463,15 @@ class Analyzer:
 
     @track_analyzer_call
     def principal_stress_weaklayer(
-        self, Z, sc=2.6, unit="kPa", val="min", normalize=False
+        self,
+        Z,
+        sc: float = 2.6,
+        unit: Literal["kPa", "MPa"] = "kPa",
+        val: Literal["min", "max"] = "min",
+        normalize: bool = False,
     ):
         """
-        Compute maxium or minimum principal stress in the weak layer.
+        Compute maximum or minimum principal stress in the weak layer.
 
         Arguments
         ---------
@@ -514,7 +525,7 @@ class Analyzer:
 
     @track_analyzer_call
     def incremental_ERR(
-        self, tolerance: float = 1e-6, unit: str = "kJ/m^2"
+        self, tolerance: float = 1e-6, unit: Literal["kJ/m^2", "J/m^2"] = "kJ/m^2"
     ) -> np.ndarray:
         """
         Compute incremental energy release rate (ERR) of all cracks.
@@ -584,7 +595,9 @@ class Analyzer:
         return np.array([Ginc1 + Ginc2, Ginc1, Ginc2]).flatten() * convert[unit]
 
     @track_analyzer_call
-    def differential_ERR(self, unit: str = "kJ/m^2") -> np.ndarray:
+    def differential_ERR(
+        self, unit: Literal["kJ/m^2", "J/m^2"] = "kJ/m^2"
+    ) -> np.ndarray:
         """
         Compute differential energy release rate of all crack tips.
 
@@ -659,7 +672,8 @@ class Analyzer:
     @track_analyzer_call
     def total_potential(self):
         """
-        Returns total differential potential
+        Returns total differential potential.
+        Currently only implemented for PST systems.
 
         Returns
         -------
@@ -678,7 +692,7 @@ class Analyzer:
         Returns
         -------
         Pi_ext : float
-            Total external potential (Nmm).
+            Total external potential [Nmm].
         """
         # Rasterize solution
         xq, zq, xb = self.rasterize_solution(mode="cracked", num=2000)
@@ -717,24 +731,10 @@ class Analyzer:
         """
         Compute total internal potential (pst only).
 
-        Arguments
-        ---------
-        C : ndarray
-            Matrix(6xN) of solution constants for a system of N
-            segements. Columns contain the 6 constants of each segement.
-        phi : float
-            Inclination of the slab (°).
-        L : float, optional
-            Total length of model (mm).
-        segments : dict
-            Dictionary with lists of touchdown booleans (tdi), segement
-            lengths (li), skier weights (mi), and foundation booleans
-            in the cracked (ki) and uncracked (k0) configurations.
-
         Returns
         -------
         Pi_int : float
-            Total internal potential (Nmm).
+            Total internal potential [Nmm].
         """
         # Extract system parameters
         L = self.sm.scenario.L
