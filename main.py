@@ -289,7 +289,7 @@ min_crack_length = criteria_evaluator.find_minimum_crack_length(
 
 print("\n--- Minimum Self-Propagation Crack Length ---")
 if min_crack_length is not None:
-    print(f"Minimum Crack Length for Self-Propagation: {min_crack_length:.1f} mm")
+    print(f"Minimum Crack Length for Self-Propagation: {min_crack_length[0]:.1f} mm")
 else:
     print("The search for the minimum crack length did not converge.")
 

@@ -21,10 +21,6 @@ dist/
 # Environments
 .venv/
 
-# Data
-*.caaml
-*.txt
-
 # Secrets
 .env
 

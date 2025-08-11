@@ -9,7 +9,6 @@ import matplotlib.pyplot as plt
 from matplotlib.figure import Figure
 from matplotlib.patches import Rectangle, Patch, Polygon
 import numpy as np
-from referencing.typing import D
 from scipy.optimize import brentq
 
 from weac.analysis.analyzer import Analyzer
@@ -1666,7 +1665,7 @@ class Plotter:
         x: np.ndarray,
         z: np.ndarray,
         filename: str = "displacements",
-    ):
+    ) -> Figure:
         """Wrap for displacements plot."""
         data = [
             [x / 10, analyzer.sm.fq.u(z, unit="mm"), r"$u_0\ (\mathrm{mm})$"],
@@ -1686,7 +1685,7 @@ class Plotter:
         x: np.ndarray,
         z: np.ndarray,
         filename: str = "stresses",
-    ):
+    ) -> Figure:
         """Wrap stress plot."""
         data = [
             [x / 10, analyzer.sm.fq.tau(z, unit="kPa"), r"$\tau$"],
@@ -1701,7 +1700,7 @@ class Plotter:
 
     def plot_stress_criteria(
         self, analyzer: Analyzer, x: np.ndarray, stress: np.ndarray
-    ):
+    ) -> Figure:
         """Wrap plot of stress and energy criteria."""
         data = [[x / 10, stress, r"$\sigma/\sigma_\mathrm{c}$"]]
         self._plot_data(
@@ -1718,7 +1717,7 @@ class Plotter:
         Gdif: np.ndarray,
         Ginc: np.ndarray,
         mode: int = 0,
-    ):
+    ) -> Figure:
         """Wrap energy release rate plot."""
         data = [
             [da / 10, 1e3 * Gdif[mode, :], r"$\mathcal{G}$"],
@@ -1735,7 +1734,7 @@ class Plotter:
 
     def plot_ERR_modes(
         self, analyzer: Analyzer, da: np.ndarray, G: np.ndarray, kind: str = "inc"
-    ):
+    ) -> Figure:
         """Wrap energy release rate plot."""
         label = r"$\bar{\mathcal{G}}$" if kind == "inc" else r"$\mathcal{G}$"
         data = [
@@ -1754,7 +1753,7 @@ class Plotter:
 
     def plot_fea_disp(
         self, analyzer: Analyzer, x: np.ndarray, z: np.ndarray, fea: np.ndarray
-    ):
+    ) -> Figure:
         """Wrap displacements plot."""
         data = [
             [fea[:, 0] / 10, -np.flipud(fea[:, 1]), r"FEA $u_0$"],
@@ -1776,7 +1775,7 @@ class Plotter:
 
     def plot_fea_stress(
         self, analyzer: Analyzer, xb: np.ndarray, zb: np.ndarray, fea: np.ndarray
-    ):
+    ) -> Figure:
         """Wrap stress plot."""
         data = [
             [fea[:, 0] / 10, 1e3 * np.flipud(fea[:, 2]), r"FEA $\sigma_2$"],
@@ -1805,7 +1804,7 @@ class Plotter:
         labelpos=None,
         vlines=True,
         xlabel=r"Horizontal position $x$ (cm)",
-    ):
+    ) -> Figure:
         """Plot data. Base function."""
         # Figure setup
         plt.rcdefaults()
@@ -1895,7 +1894,7 @@ class Plotter:
                 ax2.text(xtx, ytx, label, color=line.get_color(), **LABELSTYLE)
 
         # Save figure
-        self._save_figure(filename, fig)
+        if filename:
+            self._save_figure(filename, fig)
 
-        # Reset plot styles
-        plt.rcdefaults()
+        return fig
