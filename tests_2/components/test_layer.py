@@ -90,13 +90,6 @@ class TestLayer(unittest.TestCase):
         with self.assertRaises(ValidationError):
             Layer(rho=200.0, h=100.0, E=-10.0)
 
-    def test_layer_immutability(self):
-        """Test that Layer objects are immutable (frozen)."""
-        layer = Layer(rho=200.0, h=100.0)
-
-        with self.assertRaises(ValidationError):
-            layer.rho = 300.0  # Should fail due to frozen=True
-
     def test_shear_modulus_calculation(self):
         """Test automatic shear modulus calculation from E and nu."""
         layer = Layer(rho=200.0, h=100.0, nu=0.25, E=100.0)

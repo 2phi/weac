@@ -9,6 +9,7 @@ from weac_2.analysis.criteria_evaluator import (
     CoupledCriterionResult,
     CriteriaEvaluator,
     FindMinimumForceResult,
+    SSERRResult,
 )
 from weac_2.components import (
     Config,
@@ -31,7 +32,6 @@ class TestCriteriaEvaluator(unittest.TestCase):
         self.criteria_config = CriteriaConfig()
         self.evaluator = CriteriaEvaluator(self.criteria_config)
 
-        # Based on demo.ipynb "myprofile"
         self.layers = [
             Layer(rho=170, h=100),
             Layer(rho=190, h=40),
@@ -60,8 +60,6 @@ class TestCriteriaEvaluator(unittest.TestCase):
         sigma, tau = np.array([2.0]), np.array([1.5])
         result = self.evaluator.stress_envelope(sigma, tau, self.weak_layer)
         self.assertGreater(result[0], 0)
-        # With default parameters, this should be calculable.
-        # Note: This test is basic and assumes the function runs without error.
 
     def test_find_minimum_force_convergence(self):
         """Test the convergence of find_minimum_force."""
@@ -86,7 +84,6 @@ class TestCriteriaEvaluator(unittest.TestCase):
         skier_weight = results.critical_skier_weight
         new_segments = results.new_segments
         self.assertGreater(skier_weight, 0)
-        # A simple check to ensure it returns a positive force
         self.assertIsNotNone(new_segments)
 
     def test_find_new_anticrack_length(self):
@@ -128,7 +125,6 @@ class TestCriteriaEvaluator(unittest.TestCase):
         )
         g_delta, can_propagate = self.evaluator.check_crack_self_propagation(system)
         self.assertFalse(can_propagate)
-        # With no crack, g_delta should be ~0 as there's no differential
         self.assertAlmostEqual(g_delta, 0, places=4)
 
     def test_check_crack_propagation_unstable(self):
@@ -180,6 +176,47 @@ class TestCriteriaEvaluator(unittest.TestCase):
         )
         self.assertIsInstance(results, CoupledCriterionResult)
         self.assertGreater(results.critical_skier_weight, 0)
+
+    def test_evaluate_SSERR(self):
+        """Test the evaluate_SSERR method."""
+        segments = [
+            Segment(length=self.segments_length, has_foundation=True, m=0),
+            Segment(length=self.segments_length, has_foundation=True, m=0),
+        ]
+        system = SystemModel(
+            model_input=ModelInput(
+                layers=self.layers,
+                weak_layer=self.weak_layer,
+                segments=segments,
+                scenario_config=ScenarioConfig(phi=self.phi),
+            ),
+            config=self.config,
+        )
+        results: SSERRResult = self.evaluator.evaluate_SSERR(system)
+        self.assertTrue(results.converged)
+        self.assertGreater(results.SSERR, 0)
+        self.assertGreater(results.touchdown_distance, 0)
+        self.assertLess(results.touchdown_distance, system.scenario.L)
+
+    def test_find_minimum_crack_length(self):
+        """Test the find_minimum_crack_length method."""
+        segments = [
+            Segment(length=self.segments_length, has_foundation=True, m=0),
+            Segment(length=self.segments_length, has_foundation=True, m=0),
+        ]
+        system = SystemModel(
+            model_input=ModelInput(
+                layers=self.layers,
+                weak_layer=self.weak_layer,
+                segments=segments,
+                scenario_config=ScenarioConfig(phi=self.phi),
+            ),
+            config=self.config,
+        )
+        crack_length, new_segments = self.evaluator.find_minimum_crack_length(system)
+        self.assertGreater(crack_length, 0)
+        self.assertIsInstance(new_segments, list)
+        self.assertTrue(all(isinstance(s, Segment) for s in new_segments))
 
 
 if __name__ == "__main__":

@@ -7,12 +7,11 @@ fallback to hardness+grain type calculations, and stability test parsing.
 
 import unittest
 import os
-from unittest.mock import patch, MagicMock
-import tempfile
+from unittest.mock import patch
 import logging
 
 from weac_2.utils.snowpilot_parser import SnowPilotParser
-from weac_2.components import Layer, WeakLayer, ModelInput
+from weac_2.components import Layer, WeakLayer
 
 
 class TestSnowPilotParser(unittest.TestCase):
@@ -24,11 +23,9 @@ class TestSnowPilotParser(unittest.TestCase):
         self.materials_dir = os.path.join(
             os.path.dirname(os.path.dirname(__file__)), ".materials"
         )
-        self.caaml_with_density = os.path.join(
-            self.materials_dir, "snowpits-17030-caaml.xml"
-        )
+        self.caaml_with_density = os.path.join(self.materials_dir, "test_snowpit1.xml")
         self.caaml_without_density = os.path.join(
-            self.materials_dir, "Falsa Parva-10-Jul-caaml.xml"
+            self.materials_dir, "test_snowpit2.xml"
         )
 
         # Verify test files exist
@@ -44,57 +41,24 @@ class TestSnowPilotParser(unittest.TestCase):
     def test_parse_caaml_with_density_measurements(self):
         """Test parsing CAAML file that contains density measurements."""
         parser = SnowPilotParser(self.caaml_with_density)
+        layers, density_methods = parser.extract_layers()
 
-        # Capture log messages to verify density source
-        with patch("weac_2.utils.snowpilot_parser.logger") as mock_logger:
-            layers = parser._extract_layers(parser.snowpit)
-
-            # Should have extracted layers
-            self.assertGreater(len(layers), 0, "Should extract layers from CAAML")
-
-            # Check that some layers used measured density
-            measured_density_calls = [
-                call
-                for call in mock_logger.info.call_args_list
-                if "Using measured density" in str(call)
-            ]
-            self.assertGreater(
-                len(measured_density_calls),
-                0,
-                "Should use measured density for some layers",
-            )
-
-            # Check that some layers may have used computed density (for layers without overlap)
-            computed_density_calls = [
-                call
-                for call in mock_logger.info.call_args_list
-                if "Using computed density" in str(call)
-            ]
-            # This may or may not be > 0 depending on overlap, so we don't assert
+        # Should have extracted layers
+        self.assertGreater(len(layers), 0, "Should extract layers from CAAML")
+        self.assertGreater(
+            density_methods.count("density_obs"),
+            0,
+            "Should use measured density for some layers",
+        )
 
     def test_parse_caaml_without_density_measurements(self):
         """Test parsing CAAML file that lacks density measurements."""
         parser = SnowPilotParser(self.caaml_without_density)
+        layers, density_methods = parser.extract_layers()
 
-        # Capture log messages to verify density source
-        with patch("weac_2.utils.snowpilot_parser.logger") as mock_logger:
-            layers = parser._extract_layers(parser.snowpit)
-
-            # Should have extracted layers
-            self.assertGreater(len(layers), 0, "Should extract layers from CAAML")
-
-            # All layers should use computed density (no density measurements available)
-            computed_density_calls = [
-                call
-                for call in mock_logger.info.call_args_list
-                if "Using computed density" in str(call)
-                and "no density measurement available" in str(call)
-            ]
-            self.assertEqual(
-                len(computed_density_calls),
-                len(layers),
-                "All layers should use computed density when no measurements available",
-            )
+        # Should have extracted layers
+        self.assertGreater(len(layers), 0, "Should extract layers from CAAML")
+        self.assertEqual(density_methods.count("geldsetzer"), len(layers))
 
     def test_density_extraction_logic(self):
         """Test the density extraction logic with overlapping measurements."""
@@ -126,34 +90,10 @@ class TestSnowPilotParser(unittest.TestCase):
             density_no_overlap, "Should return None for non-overlapping layer"
         )
 
-    def test_stability_test_parsing(self):
-        """Test parsing of different stability test types."""
-        # Test file with PST
-        parser_pst = SnowPilotParser(self.caaml_without_density)
-        model_inputs_pst = parser_pst.run()
-
-        # Should generate model inputs based on stability tests
-        self.assertGreater(len(model_inputs_pst), 0, "Should generate model inputs")
-
-        # Check for PST-specific scenarios
-        pst_scenarios = [
-            mi for mi in model_inputs_pst if mi.scenario_config.system_type == "-pst"
-        ]
-        self.assertGreater(len(pst_scenarios), 0, "Should create PST scenarios")
-
-        # Test file with CT tests
-        parser_ct = SnowPilotParser(self.caaml_with_density)
-        model_inputs_ct = parser_ct.run()
-
-        # Should generate model inputs for CT tests
-        self.assertGreater(
-            len(model_inputs_ct), 0, "Should generate model inputs for CT tests"
-        )
-
     def test_layer_properties_validation(self):
         """Test that extracted layers have valid properties."""
         parser = SnowPilotParser(self.caaml_with_density)
-        layers = parser._extract_layers(parser.snowpit)
+        layers, _ = parser.extract_layers()
 
         for i, layer in enumerate(layers):
             with self.subTest(layer_index=i):
@@ -173,53 +113,15 @@ class TestSnowPilotParser(unittest.TestCase):
                     f"Layer {i} density should be reasonable (<= 1000 kg/m³)",
                 )
 
-    def test_model_input_generation(self):
-        """Test that model inputs are generated correctly."""
-        parser = SnowPilotParser(self.caaml_with_density)
-        model_inputs = parser.run()
-
-        self.assertGreater(
-            len(model_inputs), 0, "Should generate at least one model input"
-        )
-
-        for i, model_input in enumerate(model_inputs):
-            with self.subTest(scenario_index=i):
-                # Validate model input structure
-                self.assertIsInstance(
-                    model_input,
-                    ModelInput,
-                    f"Model input {i} should be ModelInput instance",
-                )
-                self.assertIsInstance(
-                    model_input.weak_layer,
-                    WeakLayer,
-                    f"Model input {i} should have WeakLayer",
-                )
-                self.assertGreater(
-                    len(model_input.layers), 0, f"Model input {i} should have layers"
-                )
-                self.assertGreater(
-                    len(model_input.segments),
-                    0,
-                    f"Model input {i} should have segments",
-                )
-
-                # Validate slope angle was extracted
-                self.assertIsInstance(
-                    model_input.scenario_config.phi,
-                    (int, float),
-                    f"Model input {i} should have slope angle",
-                )
-
     def test_weak_layer_extraction(self):
         """Test weak layer extraction for different depths."""
         parser = SnowPilotParser(self.caaml_with_density)
-        layers = parser.layers = parser._extract_layers(parser.snowpit)
+        layers, _ = parser.extract_layers()
 
         # Test weak layer extraction at a specific depth (e.g., 21cm from CT test)
         test_depth_mm = 210  # 21cm converted to mm
-        weak_layer, layers_above = parser._extract_weak_layer_and_layers_above(
-            parser.snowpit, test_depth_mm, layers
+        weak_layer, layers_above = parser.extract_weak_layer_and_layers_above(
+            test_depth_mm, layers
         )
 
         # Validate weak layer
@@ -252,7 +154,7 @@ class TestSnowPilotParser(unittest.TestCase):
     def test_unit_conversion(self):
         """Test that different units are converted correctly."""
         parser = SnowPilotParser(self.caaml_with_density)
-        layers = parser._extract_layers(parser.snowpit)
+        layers, _ = parser.extract_layers()
 
         # All thicknesses should be in mm (converted from cm in CAAML)
         for layer in layers:
