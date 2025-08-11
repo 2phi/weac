@@ -415,8 +415,8 @@ class CriteriaEvaluator:
             history = CoupledCriterionHistory([], [], [], [], [], [])
             iteration_count = 0
             skier_weight = initial_critical_skier_weight * 1.005
-            min_skier_weight = initial_critical_skier_weight
-            max_skier_weight = 3 * initial_critical_skier_weight
+            min_skier_weight = 0.1
+            max_skier_weight = 200
 
             # Ensure Max Weight surpasses fracture toughness criterion
             max_weight_g_delta = 0
@@ -443,6 +443,7 @@ class CriteriaEvaluator:
                 )
                 dist_ERR_envelope = abs(g_delta - 1)
 
+            logger.info("Max weight to look at: %.2f kg", max_skier_weight)
             segments = [
                 Segment(
                     length=L / 2 - crack_length / 2,
@@ -534,10 +535,10 @@ class CriteriaEvaluator:
                 # Find new anticrack length
                 if abs(dist_ERR_envelope) > tolerance_ERR:
                     skier_weight = scaling * new_skier_weight
-                    # skier_weight = new_skier_weight
                     crack_length, segments = self.find_crack_length_for_weight(
                         system, skier_weight
                     )
+                logger.info("New skier weight: %.2f kg", skier_weight)
                 logger.info(
                     "Iteration %d took %.4f seconds.",
                     iteration_count,
@@ -626,7 +627,7 @@ class CriteriaEvaluator:
                 return self.evaluate_coupled_criterion(
                     system,
                     dampening_ERR=dampening_ERR + 1,
-                    tolerance_ERR=0.002,
+                    tolerance_ERR=tolerance_ERR,
                     tolerance_stress=tolerance_stress,
                 )
         # --- Exception: Critical skier weight < 1 ---
@@ -696,7 +697,7 @@ class CriteriaEvaluator:
         self,
         system: SystemModel,
         dampening: float = 0.0,
-        tolerance_stress: float = 0.005,
+        tolerance_stress: float = 0.0005,
         print_call_stats: bool = False,
     ) -> FindMinimumForceResult:
         """
@@ -720,9 +721,7 @@ class CriteriaEvaluator:
             An object containing the results of the analysis, including
             critical skier weight, and convergence details.
         """
-        logger.info(
-            "Starting to find minimum force to surpass stress failure envelope."
-        )
+        logger.info("Start: Find Minimum force to surpass Stress Env.")
         old_segments = copy.deepcopy(system.scenario.segments)
         total_length = system.scenario.L
         analyzer = Analyzer(system, printing_enabled=print_call_stats)
@@ -759,6 +758,7 @@ class CriteriaEvaluator:
             )
 
         def stress_envelope_residual(skier_weight: float, system: SystemModel) -> float:
+            logger.info("Eval. Stress Envelope for weight %.2f kg.", skier_weight)
             segments = [
                 Segment(length=total_length / 2, has_foundation=True, m=skier_weight),
                 Segment(length=total_length / 2, has_foundation=True, m=0.0),
@@ -791,6 +791,7 @@ class CriteriaEvaluator:
                     )
 
         # Final evaluation
+        logger.info("Final evaluation for skier weight %.2f kg.", critical_weight)
         system.update_scenario(
             segments=[
                 Segment(

@@ -240,6 +240,7 @@ class SlabTouchdown:
         kNl = self._substitute_stiffness(straight_scenario, self.eigensystem, "trans")
 
         def polynomial(x: float) -> float:
+            logger.info("Eval. Slab Geometry with Touchdown Distance x=%.2f mm", x)
             # Spring stiffness of collapsed eigensystem of length crack_l - x
             straight_scenario = self._generate_straight_scenario(crack_l - x)
             kRr = self._substitute_stiffness(
@@ -302,7 +303,6 @@ class SlabTouchdown:
             weak_layer=self.scenario.weak_layer,
             slab=self.scenario.slab,
         )
-        logger.info("Generating straight scenario with length %s", L)
         return straight_scenario
 
     def _substitute_stiffness(

@@ -271,7 +271,6 @@ class SystemModel:
                 collapsed_weak_layer_kR=self.slab_touchdown.collapsed_weak_layer_kR,
             )
         else:
-            logger.info("Solving for Uncracked Unknown Constants")
             return UnknownConstantsSolver.solve_for_unknown_constants(
                 scenario=self.uncracked_scenario,
                 eigensystem=self.eigensystem,
