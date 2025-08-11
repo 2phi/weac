@@ -3,7 +3,7 @@ import time
 import numpy as np
 from scipy.optimize import root_scalar
 
-import weac
+import old_weac
 
 
 def check_crack_propagation_criterion(
@@ -2433,7 +2433,7 @@ def create_skier_object(
     """
 
     # Define a skier object - skiers is used to allow for multiple cracked segments
-    skier = weac.Layered(system="skiers", layers=snow_profile)
+    skier = old_weac.Layered(system="skiers", layers=snow_profile)
     skier.set_foundation_properties(E=E, t=t, update=True)
 
     n = len(ki_x) - 1

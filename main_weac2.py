@@ -4,12 +4,12 @@ This script demonstrates the basic usage of the WEAC package to run a simulation
 
 import logging
 
-from weac_2.analysis.criteria_evaluator import (
+from weac.analysis.criteria_evaluator import (
     CoupledCriterionResult,
     CriteriaEvaluator,
 )
-from weac_2.analysis.plotter import Plotter
-from weac_2.components import (
+from weac.analysis.plotter import Plotter
+from weac.components import (
     CriteriaConfig,
     Layer,
     ModelInput,
@@ -17,9 +17,9 @@ from weac_2.components import (
     Segment,
     WeakLayer,
 )
-from weac_2.components.config import Config
-from weac_2.core.system_model import SystemModel
-from weac_2.logging_config import setup_logging
+from weac.components.config import Config
+from weac.core.system_model import SystemModel
+from weac.logging_config import setup_logging
 
 setup_logging(level="INFO")
 

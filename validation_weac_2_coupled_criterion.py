@@ -4,9 +4,9 @@ This script demonstrates the basic usage of the WEAC package to run a simulation
 
 import logging
 
-from weac_2.analysis import criteria_evaluator
-from weac_2.analysis.plotter import Plotter
-from weac_2.components import (
+from weac.analysis import criteria_evaluator
+from weac.analysis.plotter import Plotter
+from weac.components import (
     CriteriaConfig,
     Layer,
     ModelInput,
@@ -14,20 +14,20 @@ from weac_2.components import (
     Segment,
     WeakLayer,
 )
-from weac_2.components.config import Config
-from weac_2.core.system_model import SystemModel
-from weac_2.logging_config import setup_logging
+from weac.components.config import Config
+from weac.core.system_model import SystemModel
+from weac.logging_config import setup_logging
 
-from weac_2.components.criteria_config import CriteriaConfig
-from weac_2.analysis.criteria_evaluator import CriteriaEvaluator, CoupledCriterionResult
+from weac.components.criteria_config import CriteriaConfig
+from weac.analysis.criteria_evaluator import CriteriaEvaluator, CoupledCriterionResult
 
 setup_logging()
 
 # Suppress matplotlib debug logging
 logging.getLogger("matplotlib").setLevel(logging.WARNING)
 logging.getLogger("matplotlib.font_manager").setLevel(logging.WARNING)
-logging.getLogger("weac_2.core").setLevel(logging.WARNING)
-logging.getLogger("weac_2.analysis").setLevel(logging.WARNING)
+logging.getLogger("weac.core").setLevel(logging.WARNING)
+logging.getLogger("weac.analysis").setLevel(logging.WARNING)
 
 # Define thinner snow profile (standard snow profile A), with higher weak layer Young's Modulus
 layers = [
