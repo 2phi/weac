@@ -20,10 +20,23 @@ dist/
 
 # Environments
 .venv/
+venv/
+.python-version
 
 # Secrets
 .env
+.env.local
+.env.*
 
+# Caches
+.ruff_cache/
+.pytest_cache/
+.mypy_cache/
+__pycache__/
+
+# Coverage
+.coverage
+coverage.xml
 # misc
 *.stats
 plots/
