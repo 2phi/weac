@@ -404,7 +404,7 @@ class UnknownConstantsSolver:
             bc = np.array([fq.N(z), fq.M(z), fq.V(z)])
         else:
             raise ValueError(
-                f"Boundary conditions not defined forsystem of type {system_type}."
+                f"Boundary conditions not defined for system of type {system_type}."
             )
 
         return bc
