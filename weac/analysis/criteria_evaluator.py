@@ -348,7 +348,7 @@ class CriteriaEvaluator:
         analyzer = Analyzer(system, printing_enabled=print_call_stats)
         # --- Failure: in finding the critical skier weight ---
         if not force_result.success:
-            print("--- No critical skier weight found ---")
+            logger.warning("No critical skier weight found")
             analyzer.print_call_stats(
                 message="evaluate_coupled_criterion Call Statistics"
             )
