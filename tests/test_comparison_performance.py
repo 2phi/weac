@@ -273,8 +273,9 @@ class DetailedProfiler:
         Analyze the overhead of importing different modules.
         """
         print(f"\n{'=' * 60}")
-        print(f"IMPORT OVERHEAD ANALYSIS")
-        print(f"{'=' * 60}")
+        print("=" * 60)
+        print("IMPORT OVERHEAD ANALYSIS")
+        print("=" * 60)
 
         # Time imports for new implementation
         with timer_context("Importing weac.components"):
