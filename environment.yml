@@ -2,8 +2,9 @@ name: weac
 channels:
   - conda-forge
 dependencies:
-  - ipykernel
-  - pydantic
   - python=3.10
+  - pip
+  - ipykernel
+  - pydantic>=2.11.7
   - pip:
-    - -e .
+      - -e .
