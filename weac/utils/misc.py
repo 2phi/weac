@@ -12,9 +12,11 @@ def decompose_to_normal_tangential(f: float, phi: float) -> Tuple[float, float]:
 
     Parameters
     ----------
-    f_vec : float
+    f : float
         is interpreted as a vertical load magnitude
         acting straight downward (global y negative).
+    """
+    # ... rest of implementation ...
     phi : float
         Surface dip angle `in degrees`, measured from horizontal.
         Positive `phi` means the surface slopes upward in +x.
