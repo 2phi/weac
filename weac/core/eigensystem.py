@@ -5,7 +5,7 @@ The Eigenvalue problem is solved for the system properties and the mechanical pr
 """
 
 import logging
-from typing import Literal, Optional
+from typing import Optional
 import numpy as np
 from numpy.typing import NDArray
 
