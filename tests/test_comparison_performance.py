@@ -10,8 +10,6 @@ import io
 from contextlib import contextmanager
 import sys
 import os
-from typing import Dict, List
-import numpy as np
 
 # Add the project root to the Python path
 project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
