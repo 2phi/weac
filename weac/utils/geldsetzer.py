@@ -9,7 +9,6 @@ Output:
 Density [kg/m^3]
 """
 
-from typing import Tuple
 
 DENSITY_PARAMETERS = {
     "!skip": (0, 0),
