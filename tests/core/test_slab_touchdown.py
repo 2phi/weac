@@ -229,7 +229,7 @@ class TestSlabTouchdownHelpers(SlabTouchdownTestBase):
                 SlabTouchdown, "_calc_touchdown_distance", return_value=None
             ) as m2,
         ):
-            td = SlabTouchdown(scenario, eig)
+            SlabTouchdown(scenario, eig)
             # The constructor calls _setup_touchdown_system which should call both
             self.assertTrue(m1.called)
             self.assertTrue(m2.called)
