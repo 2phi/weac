@@ -26,7 +26,7 @@ class SlabTouchdown:
         `B_point_contact` : End of slab is in contact with the collapsed weak layer
             touchdown_distance `=` crack_l -> the unsupported segment (touchdown_distance) equals the crack length
         `C_in_contact` : more of the slab is in contact with the collapsed weak layer
-            touchdown_distance `<` crack_l -> the unsupported segment (touchdown_distance) i striclty smaller than the crack length
+            touchdown_distance `<` crack_l -> the unsupported segment (touchdown_distance) is strictly smaller than the crack length
 
     The Module does:
     1. Calculation of Zones of modes `[A_free_hanging, B_point_contact, C_in_contact]`::
