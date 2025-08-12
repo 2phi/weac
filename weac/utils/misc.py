@@ -15,8 +15,6 @@ def decompose_to_normal_tangential(f: float, phi: float) -> Tuple[float, float]:
     f : float
         is interpreted as a vertical load magnitude
         acting straight downward (global y negative).
-    """
-    # ... rest of implementation ...
     phi : float
         Surface dip angle `in degrees`, measured from horizontal.
         Positive `phi` means the surface slopes upward in +x.
@@ -49,7 +47,7 @@ def get_skier_point_load(m: float):
     f : float
         Skier load (N).
     """
-    F = 1e-3 * np.array(m) * G_MM_S2 / LSKI_MM  # Total skier
+    F = 1e-3 * m * G_MM_S2 / LSKI_MM  # Total skier
     return F
 
 
