@@ -21,22 +21,17 @@ The `the column length` is the column length of the PropSawTest.
 
 import logging
 from typing import List, Tuple
-import numpy as np
-import pandas as pd
 
+import numpy as np
 from snowpylot import caaml_parser
+from snowpylot.layer import Layer as SnowpylotLayer
 from snowpylot.snow_pit import SnowPit
 from snowpylot.snow_profile import DensityObs
-from snowpylot.stability_tests import PropSawTest, ExtColumnTest, ComprTest, RBlockTest
-from snowpylot.layer import Layer as SnowpylotLayer
 
 # Import WEAC components
 from weac.components import (
     Layer,
     WeakLayer,
-    ScenarioConfig,
-    Segment,
-    ModelInput,
 )
 from weac.utils.geldsetzer import compute_density
 
@@ -289,6 +284,7 @@ class SnowPilotParser:
             raise ValueError(
                 "The depth of the weak layer is below the recorded layers. Excluding SnowPit from calculations."
             )
+        layers = layers.copy(deep=True)
         for i, layer in enumerate(layers):
             if depth + layer.h < weak_layer_depth:
                 layers_above.append(layer)
