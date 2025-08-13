@@ -61,7 +61,6 @@ class Slab:
         self._calc_slab_params()
 
     def _calc_slab_params(self) -> None:
-        n = len(self.layers)  # Number of layers
         rhoi = (
             np.array([ly.rho for ly in self.layers]) * 1e-12
         )  # Layer densities (kg/m^3 -> t/mm^3)
@@ -71,7 +70,10 @@ class Slab:
         nui = np.array([ly.nu for ly in self.layers])
 
         H = hi.sum()
-        zi_mid = [float(H / 2 - sum(hi[j:n]) + hi[j] / 2) for j in range(n)]
+        # Vectorized midpoint coordinates per layer (top to bottom)
+        # previously: zi_mid = [float(H / 2 - sum(hi[j:n]) + hi[j] / 2) for j in range(n)]
+        suffix_cumsum = np.cumsum(hi[::-1])[::-1]
+        zi_mid = H / 2 - suffix_cumsum + hi / 2
         zi_bottom = np.cumsum(hi) - H / 2
         z_cog = sum(zi_mid * hi * rhoi) / sum(hi * rhoi)
 
