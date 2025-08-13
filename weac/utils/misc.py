@@ -1,11 +1,10 @@
 import numpy as np
-from typing import Tuple
 
-from weac.constants import G_MM_S2, LSKI_MM
 from weac.components import Layer
+from weac.constants import G_MM_S2, LSKI_MM
 
 
-def decompose_to_normal_tangential(f: float, phi: float) -> Tuple[float, float]:
+def decompose_to_normal_tangential(f: float, phi: float) -> tuple[float, float]:
     """
     Resolve a gravity-type force/line-load into its tangential (downslope) and
     normal (into-slope) components with respect to an inclined surface.
@@ -33,7 +32,7 @@ def decompose_to_normal_tangential(f: float, phi: float) -> Tuple[float, float]:
     return f_norm, f_tan
 
 
-def get_skier_point_load(m: float):
+def get_skier_point_load(m: float) -> float:
     """
     Calculate skier point load.
 
@@ -51,7 +50,7 @@ def get_skier_point_load(m: float):
     return F
 
 
-def load_dummy_profile(profile_id):
+def load_dummy_profile(profile_id: str) -> list[Layer]:
     """Define standard layering types for comparison."""
     soft_layer = Layer(rho=180, h=120, E=5)
     medium_layer = Layer(rho=270, h=120, E=30)
