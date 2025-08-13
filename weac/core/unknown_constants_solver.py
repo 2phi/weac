@@ -213,7 +213,26 @@ class UnknownConstantsSolver:
         try:
             C = np.linalg.solve(Zh0, rhs - Zp0)
         except LinAlgError as e:
-            raise e
+            zh_shape = Zh0.shape
+            rhs_shape = rhs.shape
+            zp_shape = Zp0.shape
+            rank = int(np.linalg.matrix_rank(Zh0))
+            min_dim = min(zh_shape)
+            try:
+                cond_val = float(np.linalg.cond(Zh0))
+                cond_text = f"{cond_val:.3e}"
+            except Exception:  # Fallback if condition number fails
+                cond_val = float("inf")
+                cond_text = "inf"
+            rank_status = "singular" if rank < min_dim else "full-rank"
+            msg = (
+                "Failed to solve linear system (np.linalg.solve) with diagnostics: "
+                f"Zh0.shape={zh_shape}, rhs.shape={rhs_shape}, Zp0.shape={zp_shape}, "
+                f"rank(Zh0)={rank}/{min_dim} ({rank_status}), cond(Zh0)={cond_text}. "
+                f"Original error: {e}"
+            )
+            logger.error(msg)
+            raise LinAlgError(msg) from e
         # Sort (nDOF = 6) constants for each segment into columns of a matrix
         return C.reshape([-1, nDOF]).T
 

@@ -3,13 +3,13 @@
 Clean performance benchmark excluding import overhead to get accurate timing comparisons.
 """
 
-import time
-import numpy as np
-import sys
 import os
--from typing import Dict, List, Tuple
-+from typing import Dict, List
+import sys
+import time
 from functools import wraps
+from typing import Dict, List
+
+import numpy as np
 
 # Add the project root to the Python path
 project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -18,13 +18,14 @@ sys.path.insert(0, project_root)
 # PRE-IMPORT all modules to exclude import overhead from timing
 print("🔄 Pre-loading modules...")
 import old_weac
+
 from weac.components import (
-    ModelInput,
-    Layer,
-    Segment,
     CriteriaConfig,
-    WeakLayer,
+    Layer,
+    ModelInput,
     ScenarioConfig,
+    Segment,
+    WeakLayer,
 )
 from weac.components.config import Config
 from weac.core.system_model import SystemModel
@@ -265,7 +266,7 @@ class CleanPerformanceBenchmark:
             Dictionary with timing results for different layer counts
         """
         print(f"\n{'=' * 70}")
-        print(f"🔢 CLEAN SCALABILITY BENCHMARK")
+        print("🔢 CLEAN SCALABILITY BENCHMARK")
         print(f"Number of runs per configuration: {num_runs}")
         print(f"{'=' * 70}")
 
@@ -331,12 +332,12 @@ class CleanPerformanceBenchmark:
     def print_detailed_summary(self):
         """Print a comprehensive summary of all clean benchmark results."""
         print(f"\n{'=' * 80}")
-        print(f"🏆 CLEAN PERFORMANCE BENCHMARK SUMMARY")
+        print("🏆 CLEAN PERFORMANCE BENCHMARK SUMMARY")
         print(f"{'=' * 80}")
 
         for test_name, results in self.results.items():
             if test_name == "clean_scalability":
-                print(f"\n📊 CLEAN SCALABILITY RESULTS:")
+                print("\n📊 CLEAN SCALABILITY RESULTS:")
                 print(
                     f"{'Layers':<8} {'Runs':<6} {'Old (ms)':<12} {'New (ms)':<12} {'Speedup':<10} {'Change (%)':<12}"
                 )
@@ -360,7 +361,7 @@ class CleanPerformanceBenchmark:
                 new_stats = results["new_implementation"]
 
                 print(f"  Runs: {results['num_runs']}")
-                print(f"  Old implementation:")
+                print("  Old implementation:")
                 print(
                     f"    Mean:   {old_stats['mean_time'] * 1000:.3f}ms ± {old_stats['std_time'] * 1000:.3f}ms"
                 )
@@ -369,7 +370,7 @@ class CleanPerformanceBenchmark:
                     f"    Range:  {old_stats['min_time'] * 1000:.3f}ms - {old_stats['max_time'] * 1000:.3f}ms"
                 )
 
-                print(f"  New implementation:")
+                print("  New implementation:")
                 print(
                     f"    Mean:   {new_stats['mean_time'] * 1000:.3f}ms ± {new_stats['std_time'] * 1000:.3f}ms"
                 )
@@ -378,7 +379,7 @@ class CleanPerformanceBenchmark:
                     f"    Range:  {new_stats['min_time'] * 1000:.3f}ms - {new_stats['max_time'] * 1000:.3f}ms"
                 )
 
-                print(f"  📈 Performance Analysis:")
+                print("  📈 Performance Analysis:")
                 print(f"    Speedup: {results['speedup']:.3f}x")
 
                 if results["speedup"] > 1.05:
@@ -390,7 +391,7 @@ class CleanPerformanceBenchmark:
                         f"    ⚠️  New implementation is {1 / results['speedup']:.2f}x SLOWER"
                     )
                 else:
-                    print(f"    ➡️  Both implementations have similar performance")
+                    print("    ➡️  Both implementations have similar performance")
 
                 print(f"    Performance change: {results['performance_change']:+.1f}%")
 
@@ -408,7 +409,7 @@ class CleanPerformanceBenchmark:
         # Print comprehensive summary
         self.print_detailed_summary()
 
-        print(f"\n✅ Clean benchmark complete! Pure execution timing results obtained.")
+        print("\n✅ Clean benchmark complete! Pure execution timing results obtained.")
         return self.results
 
 
@@ -439,4 +440,4 @@ if __name__ == "__main__":
 
         json.dump(json_results, f, indent=2)
 
-    print(f"\n📁 Clean benchmark results saved to 'clean_benchmark_results.json'")
+    print("\n📁 Clean benchmark results saved to 'clean_benchmark_results.json'")
