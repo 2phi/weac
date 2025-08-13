@@ -18,7 +18,7 @@ class TestRegressionSimulation(unittest.TestCase):
             Segment(length=10000, has_foundation=True, m=80),
             Segment(length=4000, has_foundation=True, m=0),
         ]
-        sc = ScenarioConfig(phi=10.0, system_type="skier", crack_length=0)
+        sc = ScenarioConfig(phi=10.0, system_type="skier", cut_length=0)
         mi = ModelInput(layers=layers, weak_layer=wl, segments=segs, scenario_config=sc)
         sm = SystemModel(model_input=mi, config=Config(touchdown=False))
 
@@ -47,7 +47,7 @@ class TestRegressionSimulation(unittest.TestCase):
             Segment(length=2000, has_foundation=True, m=35.0),
             Segment(length=5e3, has_foundation=True, m=0.0),
         ]
-        sc = ScenarioConfig(phi=10.0, system_type="skiers", crack_length=0.0)
+        sc = ScenarioConfig(phi=10.0, system_type="skiers", cut_length=0.0)
         mi = ModelInput(layers=layers, weak_layer=wl, segments=segs, scenario_config=sc)
         sm = SystemModel(model_input=mi, config=Config(touchdown=False))
         C = sm.unknown_constants
@@ -73,7 +73,7 @@ class TestRegressionSimulation(unittest.TestCase):
             Segment(length=10000, has_foundation=True, m=0),
             Segment(length=4000, has_foundation=False, m=0),
         ]
-        sc = ScenarioConfig(phi=30.0, system_type="pst-", crack_length=4000)
+        sc = ScenarioConfig(phi=30.0, system_type="pst-", cut_length=4000)
         mi = ModelInput(layers=layers, weak_layer=wl, segments=segs, scenario_config=sc)
         sm = SystemModel(model_input=mi, config=Config(touchdown=False))
 
@@ -100,7 +100,7 @@ class TestRegressionSimulation(unittest.TestCase):
             Segment(length=10000, has_foundation=True, m=0),
             Segment(length=4000, has_foundation=False, m=0),
         ]
-        sc = ScenarioConfig(phi=30.0, system_type="pst-", crack_length=4000)
+        sc = ScenarioConfig(phi=30.0, system_type="pst-", cut_length=4000)
         mi = ModelInput(layers=layers, weak_layer=wl, segments=segs, scenario_config=sc)
         sm = SystemModel(model_input=mi, config=Config(touchdown=True))
 
@@ -135,7 +135,7 @@ class TestRegressionSimulation(unittest.TestCase):
         layers = [Layer(rho=170, h=100), Layer(rho=230, h=130)]
         wl = WeakLayer(rho=180, h=20)
         segs = [Segment(length=10000, has_foundation=True, m=0)]
-        sc = ScenarioConfig(phi=30.0, system_type="skier", crack_length=0.0)
+        sc = ScenarioConfig(phi=30.0, system_type="skier", cut_length=0.0)
         mi = ModelInput(layers=layers, weak_layer=wl, segments=segs, scenario_config=sc)
         sm = SystemModel(model_input=mi, config=Config(touchdown=False))
 
@@ -156,7 +156,7 @@ class TestRegressionSimulation(unittest.TestCase):
         self.assertGreater(ss.touchdown_distance, 0)
         # Baseline values recorded
         self.assertAlmostEqual(ss.touchdown_distance, 1320.108936137, places=6)
-        self.assertAlmostEqual(ss.SSERR, 2.168112101045914, rtol=1e-8)
+        self.assertAlmostEqual(ss.SSERR, 2.168112101045914, places=8)
 
         # evaluate_coupled_criterion baseline
         cc = evaluator.evaluate_coupled_criterion(system=sm, max_iterations=10)

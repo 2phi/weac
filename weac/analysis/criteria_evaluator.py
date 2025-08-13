@@ -682,7 +682,7 @@ class CriteriaEvaluator:
         scenario_config = ScenarioConfig(
             system_type="vpst-" if vertical else "pst-",
             phi=system.scenario.phi,
-            crack_length=5e3,
+            cut_length=5e3,
         )
         system_copy.config.touchdown = True
         system_copy.update_scenario(segments=segments, scenario_config=scenario_config)

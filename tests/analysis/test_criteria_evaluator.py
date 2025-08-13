@@ -100,7 +100,7 @@ class TestCriteriaEvaluator(unittest.TestCase):
                 layers=self.layers,
                 weak_layer=self.weak_layer,
                 segments=segments,
-                scenario_config=ScenarioConfig(phi=self.phi, crack_length=0),
+                scenario_config=ScenarioConfig(phi=self.phi, cut_length=0),
             ),
             config=self.config,
         )

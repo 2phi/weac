@@ -13,8 +13,8 @@ class ScenarioConfig(BaseModel):
         Slope angle in degrees.
     system : Literal['skier', 'skiers', 'pst-', '-pst', 'rot', 'trans', 'vpst-', '-vpst'], optional
         Type of system, '-pst', '+pst', ....
-    crack_length : float
-        Crack Length from PST [mm]
+    cut_length : float
+        Cut Length from PST [mm]
     stiffness_factor : float, optional
         Stiffness ratio between collapsed and uncollapsed weak layer
     surface_load : float, optional
@@ -30,9 +30,7 @@ class ScenarioConfig(BaseModel):
     system_type: Literal[
         "skier", "skiers", "pst-", "-pst", "rot", "trans", "vpst-", "-vpst"
     ] = Field(default="skiers", description="Type of system, '-pst', '+pst', ....")
-    crack_length: float = Field(
-        default=0.0, ge=0, description="Initial crack length [mm]"
-    )
+    cut_length: float = Field(default=0.0, ge=0, description="Initial cut length [mm]")
     stiffness_ratio: float = Field(
         default=1000.0,
         gt=0.0,

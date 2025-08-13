@@ -153,14 +153,14 @@ class TestSystemModelBehavior(unittest.TestCase):
             Segment(length=4000, has_foundation=False, m=0),
         ]
         self.scenario_config = ScenarioConfig(
-            phi=10.0, system_type="skiers", crack_length=3000.0
+            phi=10.0, system_type="skiers", cut_length=3000.0
         )
 
     def _build_model(
         self, touchdown: bool = False, system_type: str = "skiers"
     ) -> SystemModel:
         config = Config(touchdown=touchdown)
-        sc = ScenarioConfig(phi=10.0, system_type=system_type, crack_length=3000.0)
+        sc = ScenarioConfig(phi=10.0, system_type=system_type, cut_length=3000.0)
         model_input = ModelInput(
             layers=self.layers,
             weak_layer=self.weak_layer,

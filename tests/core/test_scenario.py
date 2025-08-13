@@ -21,7 +21,7 @@ class TestScenario(unittest.TestCase):
         ]
         # Config with non-zero angle and surface load to exercise load decomposition
         self.cfg = ScenarioConfig(
-            phi=10.0, system_type="skiers", surface_load=2.5, crack_length=123.0
+            phi=10.0, system_type="skiers", surface_load=2.5, cut_length=123.0
         )
 
     def test_init_sets_core_attributes(self):
@@ -31,8 +31,8 @@ class TestScenario(unittest.TestCase):
         self.assertAlmostEqual(s.surface_load, self.cfg.surface_load)
         # L is total length
         self.assertAlmostEqual(s.L, sum(seg.length for seg in self.segments_two))
-        # crack_length is propagated
-        self.assertAlmostEqual(s.crack_length, self.cfg.crack_length)
+        # cut_length is propagated
+        self.assertAlmostEqual(s.cut_length, self.cfg.cut_length)
 
     def test_setup_scenario_multiple_segments(self):
         s = Scenario(self.cfg, self.segments_two, self.weak_layer, self.slab)

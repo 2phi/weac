@@ -22,7 +22,7 @@ class SlabTouchdownTestBase(unittest.TestCase):
             Segment(length=200.0, has_foundation=False, m=0.0),
         ]
         cfg = ScenarioConfig(
-            phi=10.0, system_type="pst-", crack_length=200.0, surface_load=0.0
+            phi=10.0, system_type="pst-", cut_length=200.0, surface_load=0.0
         )
         scenario = Scenario(cfg, segments, weak_layer, slab)
         eig = Eigensystem(weak_layer, slab)
@@ -39,9 +39,7 @@ class TestSlabTouchdownInitialization(SlabTouchdownTestBase):
         self.assertEqual(
             td.flat_config.system_type, scenario.scenario_config.system_type
         )
-        self.assertEqual(
-            td.flat_config.crack_length, scenario.scenario_config.crack_length
-        )
+        self.assertEqual(td.flat_config.cut_length, scenario.scenario_config.cut_length)
         self.assertEqual(
             td.flat_config.surface_load, scenario.scenario_config.surface_load
         )
@@ -99,19 +97,19 @@ class TestSlabTouchdownModeAndDistance(SlabTouchdownTestBase):
             patch.object(td, "_calc_l_AB", return_value=300.0),
             patch.object(td, "_calc_l_BC", return_value=600.0),
         ):
-            # Mode A: crack_length <= l_AB
-            td.scenario.scenario_config.crack_length = 200.0
-            td.scenario.crack_length = 200.0
+            # Mode A: cut_length <= l_AB
+            td.scenario.scenario_config.cut_length = 200.0
+            td.scenario.cut_length = 200.0
             td._calc_touchdown_mode()
             self.assertEqual(td.touchdown_mode, "A_free_hanging")
-            # Mode B: l_AB < crack_length <= l_BC
-            td.scenario.scenario_config.crack_length = 400.0
-            td.scenario.crack_length = 400.0
+            # Mode B: l_AB < cut_length <= l_BC
+            td.scenario.scenario_config.cut_length = 400.0
+            td.scenario.cut_length = 400.0
             td._calc_touchdown_mode()
             self.assertEqual(td.touchdown_mode, "B_point_contact")
-            # Mode C: crack_length > l_BC
-            td.scenario.scenario_config.crack_length = 800.0
-            td.scenario.crack_length = 800.0
+            # Mode C: cut_length > l_BC
+            td.scenario.scenario_config.cut_length = 800.0
+            td.scenario.cut_length = 800.0
             td._calc_touchdown_mode()
             self.assertEqual(td.touchdown_mode, "C_in_contact")
 
@@ -119,14 +117,14 @@ class TestSlabTouchdownModeAndDistance(SlabTouchdownTestBase):
         scenario, eig = self.make_base_objects()
         with patch.object(SlabTouchdown, "_setup_touchdown_system", return_value=None):
             td = SlabTouchdown(scenario, eig)
-        # Mode A/B: equals crack_length
+        # Mode A/B: equals cut_length
         td.touchdown_mode = "A_free_hanging"
-        td.scenario.crack_length = 123.0
+        td.scenario.cut_length = 123.0
         td._calc_touchdown_distance()
         self.assertEqual(td.touchdown_distance, 123.0)
 
         td.touchdown_mode = "B_point_contact"
-        td.scenario.crack_length = 321.0
+        td.scenario.cut_length = 321.0
         td._calc_touchdown_distance()
         self.assertEqual(td.touchdown_distance, 321.0)
 
@@ -171,8 +169,8 @@ class TestSlabTouchdownHelpers(SlabTouchdownTestBase):
 
     def test_calc_touchdown_distance_in_mode_C_root_in_range(self):
         scenario, eig = self.make_base_objects()
-        scenario.scenario_config.crack_length = 300.0
-        scenario.crack_length = 300.0
+        scenario.scenario_config.cut_length = 300.0
+        scenario.cut_length = 300.0
         with patch.object(SlabTouchdown, "_setup_touchdown_system", return_value=None):
             td = SlabTouchdown(scenario, eig)
         # Make bs positive and control substitute stiffness values by inspecting args
@@ -192,7 +190,7 @@ class TestSlabTouchdownHelpers(SlabTouchdownTestBase):
         with patch.object(td, "_substitute_stiffness", side_effect=fake_subst):
             d = td._calc_touchdown_distance_in_mode_C()
         self.assertGreater(d, 0.0)
-        self.assertLess(d, scenario.crack_length)
+        self.assertLess(d, scenario.cut_length)
 
     def test_calc_collapsed_weak_layer_kR_returns_positive(self):
         scenario, eig = self.make_base_objects()

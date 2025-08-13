@@ -68,7 +68,7 @@ class DetailedProfiler:
 
         inclination = 30.0
         scenario_config = ScenarioConfig(
-            phi=inclination, system_type="skier", crack_length=2000
+            phi=inclination, system_type="skier", cut_length=2000
         )
         weak_layer = WeakLayer(rho=10, h=30, E=0.25, G_Ic=1)
         criteria_config = CriteriaConfig(fn=1, fm=1, gn=1, gm=1)
@@ -194,9 +194,7 @@ class DetailedProfiler:
             Segment(length=6000, has_foundation=True, m=0),
         ]
 
-        scenario_config = ScenarioConfig(
-            phi=30.0, system_type="skier", crack_length=2000
-        )
+        scenario_config = ScenarioConfig(phi=30.0, system_type="skier", cut_length=2000)
         weak_layer = WeakLayer(rho=10, h=30, E=0.25, G_Ic=1)
         criteria_config = CriteriaConfig(fn=1, fm=1, gn=1, gm=1)
         config = Config(touchdown=touchdown)

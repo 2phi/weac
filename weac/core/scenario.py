@@ -62,7 +62,7 @@ class Scenario:
     qt: float  # Total Tangential Line-Load [N/mm]
     L: float  # Length of the model [mm]
     crack_h: float  # Height of the crack [mm]
-    crack_l: float  # Length of the crack [mm]
+    cut_length: float  # Length of the cut [mm]
 
     def __init__(
         self,
@@ -79,12 +79,12 @@ class Scenario:
         self.system_type = scenario_config.system_type
         self.phi = scenario_config.phi
         self.surface_load = scenario_config.surface_load
+        self.cut_length = scenario_config.cut_length
 
         self._setup_scenario()
         self._calc_normal_load()
         self._calc_tangential_load()
         self._calc_crack_height()
-        self.crack_length = scenario_config.crack_length
 
     def refresh_from_config(self):
         """Pull changed values out of scenario_config
@@ -92,10 +92,11 @@ class Scenario:
         self.system_type = self.scenario_config.system_type
         self.phi = self.scenario_config.phi
         self.surface_load = self.scenario_config.surface_load
-        self.crack_length = self.scenario_config.crack_length
+        self.cut_length = self.scenario_config.cut_length
 
         self._setup_scenario()
         self._calc_crack_height()
+
     def get_segment_idx(
         self, x: Union[float, Sequence[float], np.ndarray]
     ) -> Union[int, np.ndarray]:
@@ -122,6 +123,22 @@ class Scenario:
             return int(indices)
 
         return indices
+
+    def _setup_scenario(self):
+        self.li = np.array([seg.length for seg in self.segments])
+        self.ki = np.array([seg.has_foundation for seg in self.segments])
+        # masses that act *between* segments: take all but the last one
+        self.mi = np.array([seg.m for seg in self.segments[:-1]])
+        self.cum_sum_li = np.cumsum(self.li)
+
+        # Add dummy segment if only one segment provided
+        if len(self.li) == 1:
+            self.li = np.append(self.li, 0)
+            self.ki = np.append(self.ki, True)
+            self.mi = np.append(self.mi, 0)
+
+        # Calculate the total slab length
+        self.L = np.sum(self.li)
 
     def _calc_tangential_load(self):
         """
@@ -162,22 +179,6 @@ class Scenario:
         qsn, _ = decompose_to_normal_tangential(qs, phi)
         qn = qwn + qsn
         self.qn = qn
-
-    def _setup_scenario(self):
-        self.li = np.array([seg.length for seg in self.segments])
-        self.ki = np.array([seg.has_foundation for seg in self.segments])
-        # masses that act *between* segments: take all but the last one
-        self.mi = np.array([seg.m for seg in self.segments[:-1]])
-        self.cum_sum_li = np.cumsum(self.li)
-
-        # Add dummy segment if only one segment provided
-        if len(self.li) == 1:
-            self.li = np.append(self.li, 0)
-            self.ki = np.append(self.ki, True)
-            self.mi = np.append(self.mi, 0)
-
-        # Calculate the total slab length
-        self.L = np.sum(self.li)
 
     def _calc_crack_height(self):
         """

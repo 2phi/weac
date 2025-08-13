@@ -379,7 +379,7 @@ class SnowPilotParser:
     #                 scenario_config = ScenarioConfig(
     #                     system_type="-pst",
     #                     phi=slope_angle,
-    #                     crack_length=cut_length,
+    #                     cut_length=cut_length,
     #                 )
     #                 weak_layer, layers_above = (
     #                     self._extract_weak_layer_and_layers_above(

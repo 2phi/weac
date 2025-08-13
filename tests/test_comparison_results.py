@@ -70,7 +70,7 @@ class TestIntegrationOldVsNew(unittest.TestCase):
         ]
 
         scenario_config = ScenarioConfig(
-            phi=inclination, system_type="pst-", crack_length=4000
+            phi=inclination, system_type="pst-", cut_length=4000
         )
         weak_layer = WeakLayer(
             rho=50, h=30, E=0.25, G_Ic=1
@@ -156,8 +156,8 @@ class TestIntegrationOldVsNew(unittest.TestCase):
         # Compare all the attributes of the old and new model
         self.assertEqual(
             old_model.a,
-            new_system.scenario.crack_length,
-            "Crack length should be the same",
+            new_system.scenario.cut_length,
+            "Cut length should be the same",
         )
 
         # --- Compare results ---
@@ -258,7 +258,7 @@ class TestIntegrationOldVsNew(unittest.TestCase):
         ]
 
         scenario_config = ScenarioConfig(
-            phi=inclination, system_type="pst-", crack_length=4000
+            phi=inclination, system_type="pst-", cut_length=4000
         )
         weak_layer = WeakLayer(
             rho=50, h=20, E=0.35, nu=0.1, G_Ic=1
@@ -364,8 +364,8 @@ class TestIntegrationOldVsNew(unittest.TestCase):
         # Compare all the attributes of the old and new model
         self.assertEqual(
             old_model.a,
-            new_system.scenario.crack_length,
-            "Crack length should be the same",
+            new_system.scenario.cut_length,
+            "Cut length should be the same",
         )
 
         # --- Compare results ---
