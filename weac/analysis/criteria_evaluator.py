@@ -256,17 +256,18 @@ class CriteriaEvaluator:
         scaling_factor = self.criteria_config.scaling_factor
 
         def mede_common_calculations(sigma, tau, p0, tau_T, p_T):
+            results_local = np.zeros_like(sigma)
             in_first_range = (sigma >= (p_T - p0)) & (sigma <= p_T)
             in_second_range = sigma > p_T
-            results[in_first_range] = (
+            results_local[in_first_range] = (
                 -tau[in_first_range] * (p0 / (tau_T * p_T))
                 + sigma[in_first_range] * (1 / p_T)
                 + p0 / p_T
             )
-            results[in_second_range] = (tau[in_second_range] ** 2) + (
+            results_local[in_second_range] = (tau[in_second_range] ** 2) + (
                 (tau_T / p0) ** 2
             ) * ((sigma[in_second_range] - p_T) ** 2)
-            return results
+            return results_local
 
         if envelope_method == "adam_unpublished":
             if scaling_factor > 1:
@@ -289,13 +290,16 @@ class CriteriaEvaluator:
 
         elif envelope_method == "mede_s-RG1":
             p0, tau_T, p_T = 7.00, 3.53, 1.49
-            return mede_common_calculations(sigma, tau, p0, tau_T, p_T)
+            results = mede_common_calculations(sigma, tau, p0, tau_T, p_T)
+            return results
         elif envelope_method == "mede_s-RG2":
             p0, tau_T, p_T = 2.33, 1.22, 0.19
-            return mede_common_calculations(sigma, tau, p0, tau_T, p_T)
+            results = mede_common_calculations(sigma, tau, p0, tau_T, p_T)
+            return results
         elif envelope_method == "mede_s-FCDH":
             p0, tau_T, p_T = 1.45, 0.61, 0.17
-            return mede_common_calculations(sigma, tau, p0, tau_T, p_T)
+            results = mede_common_calculations(sigma, tau, p0, tau_T, p_T)
+            return results
         else:
             raise ValueError(f"Invalid envelope type: {envelope_method}")
 
