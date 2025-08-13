@@ -1,7 +1,6 @@
-docs/
-LICENSE
-.venv/
-data/
-img/
-demo/
-docs/_build/
+/docs/
+/.venv/
+/data/
+/img/
+/demo/
+/LICENSE
