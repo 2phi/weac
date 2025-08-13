@@ -102,7 +102,7 @@ class TestAnalyzer(unittest.TestCase):
     def test_energy_release_rates_shapes(self):
         Ginc = self.an_ski.incremental_ERR()
         self.assertEqual(Ginc.shape, (3,))
-        self.assertTrue(np.isfinite(Ginc).all() | np.isnan(Ginc).any())
+        self.assertTrue(np.isfinite(Ginc).all())
 
         Gdif = self.an_ski.differential_ERR()
         self.assertEqual(Gdif.shape, (3,))

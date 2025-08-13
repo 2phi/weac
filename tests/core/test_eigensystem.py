@@ -344,7 +344,7 @@ class TestEigensystemPhysicalConsistency(unittest.TestCase):
         eigensystem = Eigensystem(weak_layer, slab)
 
         # Test continuity for bedded segments
-        x1, x2 = 100.0, 100.0  # Very close points
+        x1, x2 = 100.0, 100.000001  # Very close points
         length = 1000.0
 
         zh1 = eigensystem.zh(x1, length, True)

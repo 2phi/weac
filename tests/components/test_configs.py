@@ -154,7 +154,7 @@ class TestModelInput(unittest.TestCase):
 
     def setUp(self):
         """Set up common test data."""
-        self.scenario_config = ScenarioConfig(phi=25, system="skier")
+        self.scenario_config = ScenarioConfig(phi=25, system_type="skier")
         self.weak_layer = WeakLayer(rho=50, h=30, E=0.25, G_Ic=1)
         self.layers = [Layer(rho=200, h=100), Layer(rho=300, h=150)]
         self.segments = [

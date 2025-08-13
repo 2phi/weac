@@ -1,8 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<caaml:SnowProfile xmlns:caaml="http://caaml.org/Schemas/SnowProfileIACS/v6.0.3" xmlns:gml="http://www.opengis.net/gml" xmlns:snowpilot="http://www.snowpilot.org/Schemas/caaml" gml:id="SnowPilot-17030">
+<caaml:SnowProfile xmlns:caaml="http://caaml.org/Schemas/SnowProfileIACS/v6.0.3"
+  xmlns:gml="http://www.opengis.net/gml" xmlns:snowpilot="http://www.snowpilot.org/Schemas/caaml"
+  gml:id="SnowPilot-17030">
   <caaml:metaData>
     <caaml:comment>HS 200 cm. HST 30 cm.</caaml:comment>
-    <caaml:customData/>
+    <caaml:customData />
   </caaml:metaData>
   <caaml:timeRef>
     <caaml:recordTime>
@@ -14,10 +16,10 @@
     <caaml:dateTimeLastEdit>2019-10-04T13:29:49-08:00</caaml:dateTimeLastEdit>
   </caaml:timeRef>
   <caaml:srcRef>
-    <caaml:Operation gml:id="SnowPilot-Group-1278">
-      <caaml:name>Centro de Información de avalanchas de Tierra del Fuego</caaml:name>
-      <caaml:contactPerson gml:id="SnowPilot-User-7632">
-        <caaml:name>info@avalanchastdf.com.ar</caaml:name>
+    <caaml:Operation gml:id="musterfirma">
+      <caaml:name>Musterfirma</caaml:name>
+      <caaml:contactPerson gml:id="mustermann">
+        <caaml:name>hans.mueller@muster.de</caaml:name>
       </caaml:contactPerson>
     </caaml:Operation>
   </caaml:srcRef>
@@ -49,7 +51,7 @@
   </caaml:locRef>
   <caaml:snowProfileResultsOf>
     <caaml:SnowProfileMeasurements dir="top down">
-      <caaml:metaData/>
+      <caaml:metaData />
       <caaml:profileDepth uom="cm">100</caaml:profileDepth>
       <caaml:weatherCond>
         <caaml:skyCond>BKN</caaml:skyCond>
@@ -213,7 +215,7 @@
         </caaml:Layer>
       </caaml:stratProfile>
       <caaml:tempProfile>
-        <caaml:tempMetaData/>
+        <caaml:tempMetaData />
         <caaml:Obs>
           <caaml:depth uom="cm">0</caaml:depth>
           <caaml:snowTemp uom="degC">-2.0</caaml:snowTemp>
@@ -301,8 +303,8 @@
       </caaml:tempProfile>
       <caaml:densityProfile>
         <caaml:densityMetaData>
-          <caaml:comment/>
-          <caaml:customData/>
+          <caaml:comment />
+          <caaml:customData />
           <caaml:methodOfMeas>unknown</caaml:methodOfMeas>
         </caaml:densityMetaData>
         <caaml:Layer>

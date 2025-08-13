@@ -8,6 +8,7 @@ from weac.analysis.criteria_evaluator import (
     CoupledCriterionResult,
     CriteriaEvaluator,
 )
+from weac.analysis.analyzer import Analyzer
 from weac.analysis.plotter import Plotter
 from weac.components import (
     CriteriaConfig,
@@ -157,7 +158,7 @@ print("\n1. Single System Analysis:")
 print(f"   System 1 - φ={system1.scenario.phi}°, H={system1.slab.H}mm")
 
 plotter_single = Plotter()
-analyzer1 = plotter_single._get_analyzer(system1)
+analyzer1 = Analyzer(system1)
 xsl, z, xwl = analyzer1.rasterize_solution()
 
 # Generate individual plots

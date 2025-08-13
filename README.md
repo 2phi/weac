@@ -120,7 +120,7 @@ git clone https://github.com/2phi/weac
 ```
 for local use.
 
-Needs (see also [requirements.txt](https://github.com/2phi/weac/blob/main/weac/requirements.txt)):
+Needs (runtime dependencies are declared in [pyproject.toml](https://github.com/2phi/weac/blob/main/pyproject.toml)):
 - [Python](https://www.python.org/downloads/release/python-3100/) &ge; 3.10
 - [Numpy](https://numpy.org/) &ge; 2.0.1
 - [Scipy](https://www.scipy.org/) &ge; 1.14.0
@@ -254,6 +254,11 @@ See the [open issues](https://github.com/2phi/weac/issues) for a list of propose
 
 1. Fork the project
 2. Initialize submodules
+
+```bash  
+git submodule update --init --recursive
+```
+
 3. Create your feature branch (`git checkout -b feature/amazingfeature`)
 4. Commit your changes (`git commit -m 'Add some amazing feature'`)
 5. Push to the branch (`git push origin feature/amazingfeature`)

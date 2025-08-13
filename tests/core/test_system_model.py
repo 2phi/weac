@@ -1,5 +1,5 @@
 import unittest
-from unittest.mock import patch
+from unittest.mock import patch, MagicMock
 
 from weac.components import (
     Config,
@@ -11,7 +11,6 @@ from weac.components import (
 )
 from weac.core.system_model import SystemModel
 import numpy as np
-from unittest.mock import MagicMock
 
 
 class TestSystemModelCaching(unittest.TestCase):
@@ -381,8 +380,10 @@ class TestSystemModelBehavior(unittest.TestCase):
                 x=100.0, C=C, length=1000.0, phi=10.0, has_foundation=True, qs=0.0
             )
             self.assertEqual(z_scalar.shape, (6, 6))
-            np.testing.assert_allclose(z_scalar, 2.0 * I6 + np.ones((6, 1)))
-
+            expected = 2.0 * I6 + np.ones((6, 1)) @ np.ones(
+                (1, 6)
+            )  # Broadcast to (6, 6)
+            np.testing.assert_allclose(z_scalar, expected)
             # Array x of length 3 -> concatenation along axis=1
             z_array = system.z(
                 x=[0.0, 50.0, 100.0],
