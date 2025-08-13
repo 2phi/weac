@@ -22,6 +22,7 @@ dist/
 .venv/
 venv/
 .python-version
+.weac-reference/
 
 # Secrets
 .env

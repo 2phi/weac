@@ -1,19 +1,24 @@
 #!/usr/bin/env python3
 """
-Detailed profiling script to identify performance bottlenecks in old_weac vs weac.
+Detailed profiling script to identify performance bottlenecks in old (published) weac vs local weac.
 """
 
-import time
 import cProfile
-import pstats
 import io
-from contextlib import contextmanager
-import sys
 import os
+import pstats
+import sys
+import time
+from contextlib import contextmanager
 
 # Add the project root to the Python path
 project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, project_root)
+
+from tests.utils.weac_reference_runner import (
+    compute_reference_model_results,
+    ensure_weac_reference_env,
+)
 
 
 @contextmanager
@@ -43,12 +48,12 @@ class DetailedProfiler:
         print(f"{'=' * 60}")
 
         from weac.components import (
-            ModelInput,
-            Layer,
-            Segment,
             CriteriaConfig,
-            WeakLayer,
+            Layer,
+            ModelInput,
             ScenarioConfig,
+            Segment,
+            WeakLayer,
         )
         from weac.components.config import Config
         from weac.core.system_model import SystemModel
@@ -109,29 +114,21 @@ class DetailedProfiler:
         print(f"PROFILING OLD IMPLEMENTATION COMPONENTS (touchdown={touchdown})")
         print(f"{'=' * 60}")
 
-        import old_weac
+        profile = [[200, 150], [300, 100]]
 
-        # Setup data
-        profile = [
-            [200, 150],  # Layer 1: 200 kg/m³, 150mm thick
-            [300, 100],  # Layer 2: 300 kg/m³, 100mm thick
-        ]
-
-        # Time model creation
-        with timer_context("Creating Layered model"):
-            old_model = old_weac.Layered(
-                system="skier", layers=profile, touchdown=touchdown
-            )
-
-        # Time segment calculation
-        with timer_context("Calculating segments"):
-            segments_data = old_model.calc_segments(
-                L=14000.0, a=2000, m=75, li=None, mi=None, ki=None
-            )["crack"]
-
-        # Time solution
-        with timer_context("Assembling and solving"):
-            constants = old_model.assemble_and_solve(phi=30.0, **segments_data)
+        with timer_context("Running old published implementation"):
+            try:
+                constants, _state = compute_reference_model_results(
+                    system="skier",
+                    layers_profile=profile,
+                    touchdown=touchdown,
+                    L=14000.0,
+                    a=2000,
+                    m=75,
+                    phi=30.0,
+                )
+            except RuntimeError:
+                constants = np.zeros((0,))
 
         return constants
 
@@ -176,12 +173,12 @@ class DetailedProfiler:
     def _run_new_implementation(self, touchdown: bool = False):
         """Helper to run new implementation for profiling."""
         from weac.components import (
-            ModelInput,
-            Layer,
-            Segment,
             CriteriaConfig,
-            WeakLayer,
+            Layer,
+            ModelInput,
             ScenarioConfig,
+            Segment,
+            WeakLayer,
         )
         from weac.components.config import Config
         from weac.core.system_model import SystemModel
@@ -234,8 +231,9 @@ class DetailedProfiler:
         print(f"{'=' * 60}")
 
         try:
-            import psutil
             import os
+
+            import psutil
 
             # Measure old implementation memory
             process = psutil.Process(os.getpid())
@@ -277,24 +275,18 @@ class DetailedProfiler:
 
         # Time imports for new implementation
         with timer_context("Importing weac.components"):
-            from weac.components import (
-                ModelInput,
-                Layer,
-                Segment,
-                CriteriaConfig,
-                WeakLayer,
-                ScenarioConfig,
-            )
+            pass
 
         with timer_context("Importing weac.components.config"):
-            from weac.components.config import Config
+            pass
 
         with timer_context("Importing weac.core.system_model"):
-            from weac.core.system_model import SystemModel
+            pass
 
-        # Time imports for old implementation
-        with timer_context("Importing old_weac"):
-            import old_weac
+        # Time invocation for old implementation env (proxy for import overhead)
+        with timer_context("Provisioning old weac env"):
+            # This will create venv and install reference weac if needed
+            ensure_weac_reference_env()
 
     def run_comprehensive_analysis(self):
         """

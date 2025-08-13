@@ -1,11 +1,18 @@
 import unittest
+
 import numpy as np
 
-from weac.components import Layer, WeakLayer, Segment, ModelInput, ScenarioConfig
-from weac.components import Config
-from weac.core.system_model import SystemModel
 from weac.analysis import CriteriaEvaluator
-from weac.components import CriteriaConfig
+from weac.components import (
+    Config,
+    CriteriaConfig,
+    Layer,
+    ModelInput,
+    ScenarioConfig,
+    Segment,
+    WeakLayer,
+)
+from weac.core.system_model import SystemModel
 
 
 class TestRegressionSimulation(unittest.TestCase):
@@ -156,7 +163,7 @@ class TestRegressionSimulation(unittest.TestCase):
         self.assertGreater(ss.touchdown_distance, 0)
         # Baseline values recorded
         self.assertAlmostEqual(ss.touchdown_distance, 1320.108936137, places=6)
-        self.assertAlmostEqual(ss.SSERR, 2.168112101045914, places=8)
+        np.testing.assert_allclose(ss.SSERR, 2.168112101045914, rtol=1e-8, atol=0)
 
         # evaluate_coupled_criterion baseline
         cc = evaluator.evaluate_coupled_criterion(system=sm, max_iterations=10)

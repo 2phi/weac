@@ -1,4 +1,3 @@
-# tests/test_system_model.py
 import os
 import sys
 import unittest
@@ -9,6 +8,8 @@ import numpy as np
 project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, project_root)
 
+from tests.utils.weac_reference_runner import compute_reference_model_results
+
 
 class TestIntegrationOldVsNew(unittest.TestCase):
     """Integration tests comparing old weac implementation with new weac implementation."""
@@ -17,34 +18,25 @@ class TestIntegrationOldVsNew(unittest.TestCase):
         """
         Test that old and new implementations produce identical results for a simple two-layer setup.
         """
-        # --- Setup for OLD implementation (main.py style) ---
-        import old_weac
-
-        # Simple two-layer profile
+        # --- Setup for OLD implementation (published weac==2.6.1) ---
         profile = [
-            [200, 150],  # Layer 1: 200 kg/m³, 150mm thick
-            [300, 100],  # Layer 2: 300 kg/m³, 100mm thick
+            [200, 150],
+            [300, 100],
         ]
-
-        # Create old model
-        old_model = old_weac.Layered(system="pst-", layers=profile, touchdown=False)
-
-        # Solve with 30-degree inclination
         inclination = 30.0
-
-        # Simple segment setup - for 'skier' system with a=0, this creates 4 segments: [L/2, 0, 0, L/2]
-        total_length = 14000.0  # 14m total
-        segments_data = old_model.calc_segments(
-            L=total_length,
-            a=4000,  # no initial crack
-            m=0,  # 75kg skier
-            li=None,  # use default segmentation
-            mi=None,  # single point load
-            ki=None,  # default foundation support
-            phi=inclination,
-        )["crack"]
-
-        old_constants = old_model.assemble_and_solve(phi=inclination, **segments_data)
+        total_length = 14000.0
+        try:
+            old_constants, old_state = compute_reference_model_results(
+                system="pst-",
+                layers_profile=profile,
+                touchdown=False,
+                L=total_length,
+                a=4000,
+                m=0,
+                phi=inclination,
+            )
+        except RuntimeError as exc:
+            self.skipTest(f"Old weac environment unavailable: {exc}")
 
         # --- Setup for NEW implementation (main_weac2.py style) ---
         from weac.components import (
@@ -91,71 +83,76 @@ class TestIntegrationOldVsNew(unittest.TestCase):
 
         # Compare the WeakLayer attributes
         self.assertEqual(
-            old_model.weak["nu"],
+            old_state["weak"]["nu"],
             new_system.weak_layer.nu,
             "Weak layer Poisson's ratio should be the same",
         )
         self.assertEqual(
-            old_model.weak["E"],
+            old_state["weak"]["E"],
             new_system.weak_layer.E,
             "Weak layer Young's modulus should be the same",
         )
         self.assertEqual(
-            old_model.t,
+            old_state["t"],
             new_system.weak_layer.h,
             "Weak layer thickness should be the same",
         )
         self.assertEqual(
-            old_model.kn,
+            old_state["kn"],
             new_system.weak_layer.kn,
             "Weak layer normal stiffness should be the same",
         )
         self.assertEqual(
-            old_model.kt,
+            old_state["kt"],
             new_system.weak_layer.kt,
             "Weak layer shear stiffness should be the same",
         )
 
         # Compare the Slab properties
         self.assertEqual(
-            old_model.h, new_system.slab.H, "Slab thickness should be the same"
+            old_state["h"], new_system.slab.H, "Slab thickness should be the same"
         )
         self.assertEqual(
-            old_model.zs,
+            old_state["zs"],
             new_system.slab.z_cog,
             "Slab center of gravity should be the same",
         )
 
         # Compare the Layer properties
-        np.testing.assert_array_equal(
-            old_model.slab[:, 0] * 1e-12,
-            new_system.slab.rhoi,
-            "Layer density should be the same",
+        old_slab = (
+            np.asarray(old_state["slab"]) if old_state["slab"] is not None else None
         )
-        np.testing.assert_array_equal(
-            old_model.slab[:, 1],
-            new_system.slab.hi,
-            "Layer thickness should be the same",
-        )
-        np.testing.assert_array_equal(
-            old_model.slab[:, 2],
-            new_system.slab.Ei,
-            "Layer Young's modulus should be the same",
-        )
-        np.testing.assert_array_equal(
-            old_model.slab[:, 3],
-            new_system.slab.Gi,
-            "Layer shear modulus should be the same",
-        )
-        np.testing.assert_array_equal(
-            old_model.slab[:, 4],
-            new_system.slab.nui,
-            "Layer Poisson's ratio should be the same",
-        )
+        self.assertIsNotNone(old_slab, "Old slab data should be available")
+        if old_slab is not None:
+            np.testing.assert_array_equal(
+                old_slab[:, 0] * 1e-12,
+                new_system.slab.rhoi,
+                "Layer density should be the same",
+            )
+            np.testing.assert_array_equal(
+                old_slab[:, 1],
+                new_system.slab.hi,
+                "Layer thickness should be the same",
+            )
+            np.testing.assert_array_equal(
+                old_slab[:, 2],
+                new_system.slab.Ei,
+                "Layer Young's modulus should be the same",
+            )
+            np.testing.assert_array_equal(
+                old_slab[:, 3],
+                new_system.slab.Gi,
+                "Layer shear modulus should be the same",
+            )
+            np.testing.assert_array_equal(
+                old_slab[:, 4],
+                new_system.slab.nui,
+                "Layer Poisson's ratio should be the same",
+            )
 
         # Compare all the attributes of the old and new model
         self.assertEqual(
-            old_model.a,
+            old_state["a"],
             new_system.scenario.cut_length,
             "Cut length should be the same",
         )
@@ -202,35 +199,26 @@ class TestIntegrationOldVsNew(unittest.TestCase):
         """
         Test that old and new implementations produce identical results for a simple two-layer setup with touchdown=True.
         """
-        # --- Setup for OLD implementation (main.py style) ---
-        import old_weac
-
-        # Simple two-layer profile
+        # --- Setup for OLD implementation (published weac==2.6.1) ---
         profile = [
-            [200, 150],  # Layer 1: 200 kg/m³, 150mm thick
-            [300, 100],  # Layer 2: 300 kg/m³, 100mm thick
+            [200, 150],
+            [300, 100],
         ]
-
-        # Create old model with touchdown=True
-        old_model = old_weac.Layered(system="pst-", layers=profile, touchdown=True)
-        old_model.set_foundation_properties(t=20, E=0.35, nu=0.1, update=True)
-
-        # Solve with 30-degree inclination
         inclination = 30.0
-
-        # Simple segment setup - for 'skier' system with touchdown=True
-        total_length = 14000.0  # 14m total
-        segments_data = old_model.calc_segments(
-            L=total_length,
-            a=4000,  # 2m initial crack
-            m=0,  # 75kg skier
-            li=None,  # use default segmentation
-            mi=None,  # single point load
-            ki=None,  # default foundation support
-            phi=inclination,
-        )["crack"]
-
-        old_constants = old_model.assemble_and_solve(phi=inclination, **segments_data)
+        total_length = 14000.0
+        try:
+            old_constants, old_state = compute_reference_model_results(
+                system="pst-",
+                layers_profile=profile,
+                touchdown=True,
+                L=total_length,
+                a=4000,
+                m=0,
+                phi=inclination,
+                set_foundation={"t": 20, "E": 0.35, "nu": 0.1},
+            )
+        except RuntimeError as exc:
+            self.skipTest(f"Old weac environment unavailable: {exc}")
 
         # --- Setup for NEW implementation (main_weac2.py style) ---
         from weac.components import (
@@ -279,91 +267,98 @@ class TestIntegrationOldVsNew(unittest.TestCase):
 
         # Compare the WeakLayer attributes
         self.assertEqual(
-            old_model.weak["nu"],
+            old_state["weak"]["nu"],
             new_system.weak_layer.nu,
             "Weak layer Poisson's ratio should be the same",
         )
         self.assertEqual(
-            old_model.weak["E"],
+            old_state["weak"]["E"],
             new_system.weak_layer.E,
             "Weak layer Young's modulus should be the same",
         )
         self.assertEqual(
-            old_model.t,
+            old_state["t"],
             new_system.weak_layer.h,
             "Weak layer thickness should be the same",
         )
         self.assertEqual(
-            old_model.kn,
+            old_state["kn"],
             new_system.weak_layer.kn,
             "Weak layer normal stiffness should be the same",
         )
         self.assertEqual(
-            old_model.kt,
+            old_state["kt"],
             new_system.weak_layer.kt,
             "Weak layer shear stiffness should be the same",
         )
 
         # Compare the Slab Touchdown attributes
         self.assertEqual(
-            old_model.tc, new_system.scenario.crack_h, "Crack height should be the same"
+            old_state["touchdown"]["tc"],
+            new_system.scenario.crack_h,
+            "Crack height should be the same",
         )
         self.assertEqual(
-            old_model.a1,
+            old_state["touchdown"]["a1"],
             new_system.slab_touchdown.l_AB,
             "Transition length A should be the same",
         )
         self.assertEqual(
-            old_model.a2,
+            old_state["touchdown"]["a2"],
             new_system.slab_touchdown.l_BC,
             "Transition length B should be the same",
         )
         self.assertEqual(
-            old_model.td,
+            old_state["touchdown"]["td"],
             new_system.slab_touchdown.touchdown_distance,
             "Touchdown distance should be the same",
         )
 
         # Compare the Slab properties
         self.assertEqual(
-            old_model.h, new_system.slab.H, "Slab thickness should be the same"
+            old_state["h"], new_system.slab.H, "Slab thickness should be the same"
         )
         self.assertEqual(
-            old_model.zs,
+            old_state["zs"],
             new_system.slab.z_cog,
             "Slab center of gravity should be the same",
         )
 
         # Compare the Layer properties
-        np.testing.assert_array_equal(
-            old_model.slab[:, 0] * 1e-12,
-            new_system.slab.rhoi,
-            "Layer density should be the same",
+        old_slab = (
+            np.asarray(old_state["slab"]) if old_state["slab"] is not None else None
         )
-        np.testing.assert_array_equal(
-            old_model.slab[:, 1],
-            new_system.slab.hi,
-            "Layer thickness should be the same",
-        )
-        np.testing.assert_array_equal(
-            old_model.slab[:, 2],
-            new_system.slab.Ei,
-            "Layer Young's modulus should be the same",
-        )
-        np.testing.assert_array_equal(
-            old_model.slab[:, 3],
-            new_system.slab.Gi,
-            "Layer shear modulus should be the same",
-        )
-        np.testing.assert_array_equal(
-            old_model.slab[:, 4],
-            new_system.slab.nui,
-            "Layer Poisson's ratio should be the same",
-        )
+        self.assertIsNotNone(old_slab, "Old slab data should be available")
+        if old_slab is not None:
+            np.testing.assert_array_equal(
+                old_slab[:, 0] * 1e-12,
+                new_system.slab.rhoi,
+                "Layer density should be the same",
+            )
+            np.testing.assert_array_equal(
+                old_slab[:, 1],
+                new_system.slab.hi,
+                "Layer thickness should be the same",
+            )
+            np.testing.assert_array_equal(
+                old_slab[:, 2],
+                new_system.slab.Ei,
+                "Layer Young's modulus should be the same",
+            )
+            np.testing.assert_array_equal(
+                old_slab[:, 3],
+                new_system.slab.Gi,
+                "Layer shear modulus should be the same",
+            )
+            np.testing.assert_array_equal(
+                old_slab[:, 4],
+                new_system.slab.nui,
+                "Layer Poisson's ratio should be the same",
+            )
 
         # Compare all the attributes of the old and new model
         self.assertEqual(
-            old_model.a,
+            old_state["a"],
             new_system.scenario.cut_length,
             "Cut length should be the same",
         )
