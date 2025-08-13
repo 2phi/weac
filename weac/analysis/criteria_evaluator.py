@@ -101,6 +101,9 @@ class SSERRResult:
     message : str
         The message of the evaluation.
     touchdown_distance : float
+        The touchdown distance.
+    SSERR : float
+        The Steady-State Energy Release Rate calculated with the touchdown distance from G_I and G_II.
     """
 
     converged: bool
