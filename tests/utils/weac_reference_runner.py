@@ -27,7 +27,7 @@ except Exception:  # noqa: BLE001
     _np = Any  # type: ignore
 
 
-DEFAULT_REFERENCE_VERSION = os.environ.get("WEAC_REFERENCE_VERSION", "2.6.1")
+DEFAULT_REFERENCE_VERSION = os.environ.get("WEAC_REFERENCE_VERSION", "2.6.2")
 REFERENCE_HOME = os.environ.get("WEAC_REFERENCE_HOME", None)
 
 
