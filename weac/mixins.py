@@ -526,9 +526,12 @@ class SlabContactMixin:
             Collapse-factor. Ratio of the crack height to the
             uncollapsed weak-layer height.
         """
+        # mark argument as intentionally unused (API compatibility)
+        _ = cf
         # subtract displacement under constact load from collapsed wl height
         qn = self.calc_qn()
-        self.tc = cf * self.t - qn / self.kn
+        collapse_height = 4.70 * (1 - np.exp(-self.t / 7.78))
+        self.tc = collapse_height - qn / self.kn
 
     def set_phi(self, phi):
         """

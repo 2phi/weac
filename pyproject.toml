@@ -61,13 +61,17 @@ target-version = "py312"
 ignore = ["E741"]
 
 [tool.ruff.lint.per-file-ignores]
-"**/*.ipynb" = ["F403", "F405"]
+"**/*.ipynb" = ["F403", "F405", "F401"]
 
 [tool.ruff.format]
 line-ending = "lf"
 
 [tool.pylint.typecheck]
 generated-members = "matplotlib.cm.*"
+
+[tool.pylint.main]
+# Ignore notebook files for pylint to avoid false positives and unused-import in exploratory cells
+ignore-patterns = [".*\\.ipynb$"]
 
 [tool.pycodestyle]
 ignore = ["E121", "E123", "E126", "E211", "E226", "E24", "E704", "W503", "W504", "E741"]

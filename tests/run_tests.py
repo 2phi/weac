@@ -6,12 +6,13 @@ This script discovers and runs all tests in the tests directory.
 Provides a pytest-like output with detailed reporting.
 """
 
+import io
 import os
 import sys
 import time
 import unittest
 from collections import defaultdict
-from typing import Dict
+from contextlib import redirect_stderr, redirect_stdout
 
 
 class PytestLikeTextTestResult(unittest.TextTestResult):
@@ -34,12 +35,13 @@ class PytestLikeTextTestResult(unittest.TextTestResult):
         )
         self.successes = []
         self.start_time = time.time()
-        self.test_times: Dict[str, float] = {}
-        self.module_counts: Dict[str, Dict[str, int]] = defaultdict(
+        self.test_times: dict[str, float] = {}
+        self.module_counts: dict[str, dict[str, int]] = defaultdict(
             lambda: defaultdict(int)
         )
         self.total_tests = 0
         self.test_counter = 0
+        self.test_start_time = 0.0
 
         # Print header
         self.stream.write(
@@ -71,7 +73,7 @@ class PytestLikeTextTestResult(unittest.TextTestResult):
             module_name, class_name, test_name = test_id.split(".")[-3:]
 
             # Get test description
-            doc = test._testMethodDoc or ""
+            doc = test.shortDescription() or ""
 
             # Print the test name with progress indicator and description
             progress = f"[ {self.test_counter}/{self.total_tests} ]"
@@ -162,7 +164,6 @@ class PytestLikeTextTestResult(unittest.TextTestResult):
         )
 
         for module, counts in sorted(self.module_counts.items()):
-            module_total = sum(counts.values())
             result_str = []
             if counts["passed"]:
                 result_str.append(f"{self.PASS}{counts['passed']} passed{self.END}")
@@ -220,7 +221,6 @@ class PytestLikeTextTestRunner(unittest.TextTestRunner):
         self.stream.write(f"collecting ... {result.total_tests} items collected\n")
 
         # Run tests
-        startTime = time.time()
         startTestRun = getattr(result, "startTestRun", None)
         if startTestRun is not None:
             startTestRun()
@@ -235,12 +235,15 @@ class PytestLikeTextTestRunner(unittest.TextTestRunner):
         result.printTotal()
         return result
 
+    def get_runner_name(self) -> str:
+        """Return a human-readable name for this runner."""
+        return self.__class__.__name__
+
     def _count_tests(self, test):
         """Count the total number of tests in a test suite."""
-        if hasattr(test, "_tests"):
-            return sum(self._count_tests(t) for t in test._tests)
-        else:
-            return 1
+        if isinstance(test, unittest.TestSuite):
+            return sum(self._count_tests(t) for t in test)
+        return 1
 
 
 class CustomTextTestRunner(unittest.TextTestRunner):
@@ -251,14 +254,13 @@ class CustomTextTestRunner(unittest.TextTestRunner):
         result = super().run(test)
         return result
 
+    def get_runner_name(self) -> str:
+        """Return a human-readable name for this runner."""
+        return self.__class__.__name__
+
 
 def run_tests():
     """Discover and run all tests in the tests directory."""
-    # Redirect both standard out and standard error to capture unittest output
-    # This prevents duplicate output from the standard unittest runner
-    import io
-    from contextlib import redirect_stderr, redirect_stdout
-
     f = io.StringIO()
 
     # Get the directory containing this script

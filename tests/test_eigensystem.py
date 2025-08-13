@@ -3,7 +3,7 @@ Unit tests for the Eigensystem class in the WEAC package.
 """
 
 import unittest
-import unittest.mock as mock
+from unittest import mock
 
 import numpy as np
 
@@ -88,7 +88,7 @@ class TestEigensystem(unittest.TestCase):
 
         # Compare eigenvalues between different PST variants
         # Corresponding eigenvalues may differ in sign but should have similar magnitudes
-        for i in range(len(systems["pst-"].ewC)):
+        for i, _ in enumerate(systems["pst-"].ewC):
             # Compare magnitudes of complex eigenvalues between PST variants
             mag_pst_right = abs(systems["pst-"].ewC[i])
             mag_pst_left = abs(systems["-pst"].ewC[i])
