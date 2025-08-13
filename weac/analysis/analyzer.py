@@ -23,9 +23,6 @@ def track_analyzer_call(func):
     @wraps(func)
     def wrapper(self, *args, **kwargs):
         """Wrapper that adds tracking functionality."""
-        if not hasattr(self, "call_stats"):
-            # Safeguard in case __init__ was not called, which it should be.
-            self.call_stats = defaultdict(lambda: {"count": 0, "total_time": 0.0})
 
         start_time = time.perf_counter()
         result = func(self, *args, **kwargs)
@@ -266,9 +263,14 @@ class Analyzer:
 
         # Calculate weight load at grid points and superimpose on stress field
         qt = -rho * G_MM_S2 * np.sin(np.deg2rad(phi))
-        for i, qi in enumerate(qt[:-1]):
-            Sxx[i, :] += qi * (zi[i + 1] - zi[i])
-        Sxx[-1, :] += qt[-1] * (zi[-1] - zi[-2])
+        # Old Implementation: Changed for numerical stability
+        # for i, qi in enumerate(qt[:-1]):
+        #     Sxx[i, :] += qi * (zi[i + 1] - zi[i])
+        # Sxx[-1, :] += qt[-1] * (zi[-1] - zi[-2])
+        # New Implementation: Changed for numerical stability
+        dz = np.diff(zi)
+        Sxx[:-1, :] += qt[:-1, np.newaxis] * dz[:, np.newaxis]
+        Sxx[-1, :] += qt[-1] * dz[-1]
 
         # Return axial normal stress in specified unit
         return convert[unit] * Sxx
@@ -514,7 +516,7 @@ class Analyzer:
 
         # Raise error if normalization of tensile stresses is attempted
         if normalize and val == "max":
-            raise ValueError("Can only normlize compressive stresses.")
+            raise ValueError("Can only normalize compressive stresses.")
 
         # Normalize compressive stresses to compressive strength
         if normalize and val == "min":
@@ -694,6 +696,10 @@ class Analyzer:
         Pi_ext : float
             Total external potential [Nmm].
         """
+        if self.sm.scenario.system_type not in ["pst-", "-pst"]:
+            logger.error("Input error: Only pst-setup implemented at the moment.")
+            raise NotImplementedError("Only pst-setup implemented at the moment.")
+
         # Rasterize solution
         xq, zq, xb = self.rasterize_solution(mode="cracked", num=2000)
         _ = xq, xb
@@ -722,8 +728,6 @@ class Analyzer:
             * (self.sm.scenario.L - (self.sm.scenario.li[0] + self.sm.scenario.li[1]))
             * ub
         )
-        if self.sm.scenario.system_type not in ["pst-", "-pst"]:
-            print("Input error: Only pst-setup implemented at the moment.")
 
         return Pi_ext
 
@@ -736,6 +740,10 @@ class Analyzer:
         Pi_int : float
             Total internal potential [Nmm].
         """
+        if self.sm.scenario.system_type not in ["pst-", "-pst"]:
+            logger.error("Input error: Only pst-setup implemented at the moment.")
+            raise NotImplementedError("Only pst-setup implemented at the moment.")
+
         # Extract system parameters
         L = self.sm.scenario.L
         system_type = self.sm.scenario.system_type
@@ -776,7 +784,5 @@ class Analyzer:
             Pi_int += 1 / 2 * M[-1] * (self.sm.fq.psi(zq)[-1]) ** 2
         elif system_type in ["-pst"]:
             Pi_int += 1 / 2 * M[0] * (self.sm.fq.psi(zq)[0]) ** 2
-        else:
-            print("Input error: Only pst-setup implemented at the moment.")
 
         return Pi_int

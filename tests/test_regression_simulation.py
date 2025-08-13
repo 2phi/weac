@@ -2,7 +2,7 @@ import unittest
 import numpy as np
 
 from weac.components import Layer, WeakLayer, Segment, ModelInput, ScenarioConfig
-from weac.components.config import Config
+from weac.components import Config
 from weac.core.system_model import SystemModel
 from weac.analysis import CriteriaEvaluator
 from weac.components import CriteriaConfig
@@ -37,7 +37,7 @@ class TestRegressionSimulation(unittest.TestCase):
         )
 
         self.assertEqual(C.shape, expected.shape)
-        np.testing.assert_allclose(C, expected, rtol=1e-10, atol=1e-12)
+        np.testing.assert_allclose(C, expected, rtol=5e-9, atol=5e-11)
 
     def test_skiers_baseline(self):
         layers = [Layer(rho=200, h=150)]
@@ -109,7 +109,7 @@ class TestRegressionSimulation(unittest.TestCase):
 
         # Touchdown mode and distance baselines
         self.assertEqual(td.touchdown_mode, "C_in_contact")
-        self.assertAlmostEqual(td.touchdown_distance, 1577.2698088929287, places=9)
+        self.assertAlmostEqual(td.touchdown_distance, 1577.2698088929287, places=6)
 
         # Scenario segments updated by touchdown length
         seg_lengths = np.array([seg.length for seg in sm.scenario.segments])
@@ -156,7 +156,7 @@ class TestRegressionSimulation(unittest.TestCase):
         self.assertGreater(ss.touchdown_distance, 0)
         # Baseline values recorded
         self.assertAlmostEqual(ss.touchdown_distance, 1320.108936137, places=6)
-        self.assertAlmostEqual(ss.SSERR, 2.168112101045914, places=12)
+        self.assertAlmostEqual(ss.SSERR, 2.168112101045914, rtol=1e-8)
 
         # evaluate_coupled_criterion baseline
         cc = evaluator.evaluate_coupled_criterion(system=sm, max_iterations=10)

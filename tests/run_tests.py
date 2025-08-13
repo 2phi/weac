@@ -51,9 +51,15 @@ def run_tests():
     print(f"Tests run: {result.testsRun}")
     print(f"Failures: {len(result.failures)}")
     print(f"Errors: {len(result.errors)}")
-    print(
-        f"Success rate: {(result.testsRun - len(result.failures) - len(result.errors)) / result.testsRun * 100:.1f}%"
-    )
+    if result.testsRun > 0:
+        success_rate = (
+            (result.testsRun - len(result.failures) - len(result.errors))
+            / result.testsRun
+            * 100
+        )
+        print(f"Success rate: {success_rate:.1f}%")
+    else:
+        print("No tests were run")
 
     return result
 

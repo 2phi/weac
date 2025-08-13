@@ -331,9 +331,9 @@ class CleanPerformanceBenchmark:
 
     def print_detailed_summary(self):
         """Print a comprehensive summary of all clean benchmark results."""
-        print(f"\n{'=' * 80}")
+        print("\n{'=' * 80}")
         print("🏆 CLEAN PERFORMANCE BENCHMARK SUMMARY")
-        print(f"{'=' * 80}")
+        print("{'=' * 80}")
 
         for test_name, results in self.results.items():
             if test_name == "clean_scalability":

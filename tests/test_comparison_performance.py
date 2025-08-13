@@ -243,7 +243,7 @@ class DetailedProfiler:
             process = psutil.Process(os.getpid())
             mem_before_old = process.memory_info().rss / 1024 / 1024  # MB
 
-            old_result = self._run_old_implementation(touchdown=touchdown)
+            _ = self._run_old_implementation(touchdown=touchdown)
 
             mem_after_old = process.memory_info().rss / 1024 / 1024  # MB
             old_memory_delta = mem_after_old - mem_before_old
@@ -253,7 +253,7 @@ class DetailedProfiler:
             # Reset and measure new implementation memory
             mem_before_new = process.memory_info().rss / 1024 / 1024  # MB
 
-            new_result = self._run_new_implementation(touchdown=touchdown)
+            _ = self._run_new_implementation(touchdown=touchdown)
 
             mem_after_new = process.memory_info().rss / 1024 / 1024  # MB
             new_memory_delta = mem_after_new - mem_before_new

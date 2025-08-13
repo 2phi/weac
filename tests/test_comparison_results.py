@@ -193,7 +193,9 @@ class TestIntegrationOldVsNew(unittest.TestCase):
         )
 
         # Assert that differences are within reasonable engineering tolerances
-        self.assertLess(max_rel_diff, 0.001, "Relative differences should be < 0.1%")
+        self.assertLess(
+            max_rel_diff, 0.001, "Relative differences should be < 0.1% (0.001)"
+        )
         self.assertLess(max_abs_diff, 0.001, "Absolute differences should be < 0.001")
 
     def test_simple_two_layer_setup_with_touchdown(self):

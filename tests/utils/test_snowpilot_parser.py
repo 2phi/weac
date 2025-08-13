@@ -7,7 +7,6 @@ fallback to hardness+grain type calculations, and stability test parsing.
 
 import unittest
 import os
-from unittest.mock import patch
 import logging
 
 from weac.utils.snowpilot_parser import SnowPilotParser
