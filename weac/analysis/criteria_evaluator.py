@@ -2,6 +2,7 @@
 import copy
 import logging
 import time
+import warnings
 from dataclasses import dataclass
 from typing import List, Optional, Union
 
@@ -306,6 +307,7 @@ class CriteriaEvaluator:
         tolerance_ERR: float = 0.002,
         tolerance_stress: float = 0.005,
         print_call_stats: bool = False,
+        _recursion_depth: int = 0,
     ) -> CoupledCriterionResult:
         """
         Evaluates the coupled criterion for anticrack nucleation, finding the
@@ -323,6 +325,10 @@ class CriteriaEvaluator:
             Tolerance for g_delta convergence. Defaults to 0.002.
         tolerance_stress: float, optional
             Tolerance for stress envelope convergence. Defaults to 0.005.
+        print_call_stats: bool
+            Whether to print the call statistics. Defaults to False.
+        _recursion_depth: int
+            The depth of the recursion. Defaults to 0.
 
         Returns
         -------
@@ -444,7 +450,7 @@ class CriteriaEvaluator:
                 max_weight_g_delta = self.fracture_toughness_envelope(
                     incr_energy[1], incr_energy[2], weak_layer
                 )
-                dist_ERR_envelope = abs(g_delta - 1)
+                dist_ERR_envelope = abs(max_weight_g_delta - 1)
 
             logger.info("Max weight to look at: %.2f kg", max_skier_weight)
             segments = [
@@ -572,7 +578,7 @@ class CriteriaEvaluator:
                         max_dist_stress=max_dist_stress,
                         min_dist_stress=min_dist_stress,
                     )
-                elif dampening_ERR < 5:
+                elif _recursion_depth < 5:
                     logger.info("Reached max dampening without converging.")
                     analyzer.print_call_stats(
                         message="evaluate_coupled_criterion Call Statistics"
@@ -582,6 +588,7 @@ class CriteriaEvaluator:
                         dampening_ERR=dampening_ERR + 1,
                         tolerance_ERR=tolerance_ERR,
                         tolerance_stress=tolerance_stress,
+                        _recursion_depth=_recursion_depth + 1,
                     )
                 else:
                     analyzer.print_call_stats(
@@ -632,28 +639,8 @@ class CriteriaEvaluator:
                     dampening_ERR=dampening_ERR + 1,
                     tolerance_ERR=tolerance_ERR,
                     tolerance_stress=tolerance_stress,
+                    _recursion_depth=_recursion_depth + 1,
                 )
-        # # --- Exception: Critical skier weight < 1 ---
-        # else:
-        #     analyzer.print_call_stats(
-        #         message="evaluate_coupled_criterion Call Statistics"
-        #     )
-        #     return CoupledCriterionResult(
-        #         converged=False,
-        #         message="Critical skier weight is less than 1kg.",
-        #         self_collapse=False,
-        #         pure_stress_criteria=False,
-        #         critical_skier_weight=skier_weight,
-        #         initial_critical_skier_weight=initial_critical_skier_weight,
-        #         crack_length=crack_length,
-        #         g_delta=g_delta,
-        #         dist_ERR_envelope=dist_ERR_envelope,
-        #         iterations=iteration_count,
-        #         history=history,
-        #         final_system=system,
-        #         max_dist_stress=max_dist_stress,
-        #         min_dist_stress=min_dist_stress,
-        #     )
 
     def evaluate_SSERR(
         self,
@@ -674,6 +661,13 @@ class CriteriaEvaluator:
 
         IMPORTANT: There is a bug in vertical = True, so always slope normal, i.e. vertical=False should be used.
         """
+        if vertical:
+            warnings.warn(
+                "vertical=True mode is currently buggy — results may be invalid. "
+                "Please set vertical=False until this is fixed.",
+                UserWarning,
+            )
+            # TODO: investigate and resolve vertical=True bug (see issue #9: VPST leads to unphysical Differential ERR of cracks)
         system_copy = copy.deepcopy(system)
         segments = [
             Segment(length=5e3, has_foundation=True, m=0.0),
@@ -688,7 +682,7 @@ class CriteriaEvaluator:
         system_copy.update_scenario(segments=segments, scenario_config=scenario_config)
         touchdown_distance = system_copy.slab_touchdown.touchdown_distance
         analyzer = Analyzer(system_copy, printing_enabled=print_call_stats)
-        G, GIc, GIIc = analyzer.differential_ERR(unit="J/m^2")
+        G, _, _ = analyzer.differential_ERR(unit="J/m^2")
         return SSERRResult(
             converged=True,
             message="SSERR evaluation successful.",
@@ -852,9 +846,9 @@ class CriteriaEvaluator:
             b = system.scenario.L / 2
         else:
             a, b = search_interval
-        print("Interval for crack length search: ", a, b)
-        print(
-            "Calculation of fracture toughness envelope: ",
+        logger.info("Interval for crack length search: %s, %s", a, b)
+        logger.info(
+            "Calculation of fracture toughness envelope: %s, %s",
             self._fracture_toughness_exceedance(a, system),
             self._fracture_toughness_exceedance(b, system),
         )
@@ -874,7 +868,7 @@ class CriteriaEvaluator:
         if result.converged:
             return result.root, new_segments
         else:
-            print("Root search did not converge.")
+            logger.error("Root search did not converge.")
             return 0.0, new_segments
 
     def check_crack_self_propagation(
@@ -900,7 +894,7 @@ class CriteriaEvaluator:
         """
         logger.info("Checking for self-propagation of pre-existing crack.")
         new_system = copy.deepcopy(system)
-        print("Segments: ", new_system.scenario.segments)
+        logger.debug("Segments: %s", new_system.scenario.segments)
 
         start_time = time.time()
         # No skier weight is applied for self-propagation check
@@ -1067,7 +1061,7 @@ class CriteriaEvaluator:
         )
 
         # Calculate the stresses
-        tau = -system.fq.tau(Z, unit="kPa")
+        tau = -system.fq.tau(Z, unit="kPa")  # Negated to match sign convention
         sigma = system.fq.sig(Z, unit="kPa")
 
         return sigma, tau
