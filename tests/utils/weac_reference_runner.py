@@ -38,6 +38,14 @@ class ReferenceEnv:
     version: str
 
 
+# New: ensure subprocesses don't see local project on sys.path or user site
+def _clean_env() -> Dict[str, str]:
+    env = os.environ.copy()
+    env.pop("PYTHONPATH", None)
+    env["PYTHONNOUSERSITE"] = "1"
+    return env
+
+
 def _project_root() -> str:
     # tests/utils/weac_reference_runner.py -> tests -> project root
     return os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
@@ -98,15 +106,19 @@ def ensure_weac_reference_env(
 
         # Install exact version if not present or mismatched
         code = (
-            "import importlib, sys;\n"
+            "import sys\n"
             "try:\n"
-            "    m = importlib.import_module('weac');\n"
-            "    v = getattr(m, '__version__', None)\n"
-            f"    sys.exit(0 if v == '{version}' else 1)\n"
+            "    from importlib.metadata import version, PackageNotFoundError\n"
             "except Exception:\n"
+            "    from importlib_metadata import version, PackageNotFoundError\n"
+            "try:\n"
+            f"    v = version('weac'); sys.exit(0 if v == '{version}' else 1)\n"
+            "except PackageNotFoundError:\n"
             "    sys.exit(2)\n"
         )
-        check_proc = subprocess.run([py_exe, "-c", code])
+        check_proc = subprocess.run(
+            [py_exe, "-c", code], cwd=venv_dir, env=_clean_env()
+        )
         if check_proc.returncode != 0:
             # Install pinned reference version and its deps
             subprocess.run(
@@ -121,6 +133,7 @@ def ensure_weac_reference_env(
                 stdout=subprocess.PIPE,
                 stderr=subprocess.STDOUT,
                 text=True,
+                env=_clean_env(),
             )
 
         return ReferenceEnv(python_exe=py_exe, venv_dir=venv_dir, version=version)
@@ -138,6 +151,15 @@ def _write_runner_script(script_path: str) -> None:
 import json
 import sys
 import numpy as np
+
+# Ensure numpy types are JSON serializable
+def _json_default(o):
+    if isinstance(o, np.ndarray):
+        return o.tolist()
+    if isinstance(o, np.generic):  # covers np.int64, np.float64, np.bool_, etc.
+        return o.item()
+    return str(o)
+
 
 def main():
     cfg_path = sys.argv[1]
@@ -187,7 +209,7 @@ def main():
     }
 
     out = {"constants": np.asarray(constants).tolist(), "state": state}
-    print(json.dumps(out))
+    print(json.dumps(out, default=_json_default))
 
 if __name__ == '__main__':
     main()
@@ -245,6 +267,8 @@ def compute_reference_model_results(
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE,
             text=True,
+            cwd=tmp_dir,
+            env=_clean_env(),
         )
 
         if proc.returncode != 0:
