@@ -162,7 +162,6 @@ class PytestLikeTextTestResult(unittest.TextTestResult):
         )
 
         for module, counts in sorted(self.module_counts.items()):
-            module_total = sum(counts.values())
             result_str = []
             if counts["passed"]:
                 result_str.append(f"{self.PASS}{counts['passed']} passed{self.END}")
@@ -220,7 +219,6 @@ class PytestLikeTextTestRunner(unittest.TextTestRunner):
         self.stream.write(f"collecting ... {result.total_tests} items collected\n")
 
         # Run tests
-        startTime = time.time()
         startTestRun = getattr(result, "startTestRun", None)
         if startTestRun is not None:
             startTestRun()
