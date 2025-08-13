@@ -7,7 +7,6 @@ fallback to hardness+grain type calculations, and stability test parsing.
 
 import unittest
 import os
-import logging
 
 from weac.utils.snowpilot_parser import SnowPilotParser
 from weac.components import Layer, WeakLayer
@@ -194,6 +193,8 @@ class TestSnowPilotParser(unittest.TestCase):
 
 if __name__ == "__main__":
     # Set up logging to see debug info during tests
+    import logging
+
     logging.basicConfig(level=logging.INFO)
 
     unittest.main()

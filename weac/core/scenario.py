@@ -95,6 +95,8 @@ class Scenario:
         self.cut_length = self.scenario_config.cut_length
 
         self._setup_scenario()
+        self._calc_normal_load()
+        self._calc_tangential_load()
         self._calc_crack_height()
 
     def get_segment_idx(
@@ -117,7 +119,7 @@ class Scenario:
         indices = np.digitize(x_arr, self.cum_sum_li)
 
         if np.any(x_arr > self.L):
-            raise ValueError(f"Coordinate {x_arr} is outside the slab length.")
+            raise ValueError(f"Coordinate {x_arr} exceeds the slab length.")
 
         if x_arr.ndim == 0:
             return int(indices)
@@ -189,3 +191,7 @@ class Scenario:
         if the collapse layer has a height of 5 and the non-collapsed layer has a height of 15 the collapse height is 10
         """
         self.crack_h = self.weak_layer.collapse_height - self.qn / self.weak_layer.kn
+        if self.crack_h < 0:
+            raise ValueError(
+                f"Crack height is negative: {self.crack_h} decrease the surface load"
+            )

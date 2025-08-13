@@ -39,7 +39,7 @@ segments = [
     Segment(length=18000, has_foundation=True, m=0),
     Segment(length=0, has_foundation=False, m=75),
     Segment(length=0, has_foundation=False, m=0),
-    Segment(length=18000, has_foundation=False, m=0),
+    Segment(length=18000, has_foundation=True, m=0),
 ]
 weak_layer = WeakLayer(
     rho=150,

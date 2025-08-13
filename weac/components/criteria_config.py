@@ -28,16 +28,22 @@ class CriteriaConfig(BaseModel):
     """
     Parameters defining the interaction between different failure modes.
 
-    Args:
-    -----
-        fn : float
-            Failure mode interaction exponent for normal stress (sigma). Default is 2.0.
-        fm : float
-            Failure mode interaction exponent for shear stress (tau). Default is 2.0.
-        gn : float
-            Failure mode interaction exponent for closing energy release rate (G_I). Default is 5.0.
-        gm : float
-            Failure mode interaction exponent for shearing energy release rate (G_II). Default is 2.22.
+    Attributes
+    ----------
+    fn : float
+        Failure mode interaction exponent for normal stress (sigma). Default is 2.0.
+    fm : float
+        Failure mode interaction exponent for shear stress (tau). Default is 2.0.
+    gn : float
+        Failure mode interaction exponent for closing energy release rate (G_I). Default is 5.0.
+    gm : float
+        Failure mode interaction exponent for shearing energy release rate (G_II). Default is 2.22.
+    stress_envelope_method : str
+        Method to calculate the stress failure envelope. Default is "adam_unpublished".
+    scaling_factor : float
+        Scaling factor for stress envelope. Default is 1.0.
+    order_of_magnitude : float
+        Order of magnitude for stress envelope. Default is 1.0.
     """
 
     fn: float = Field(

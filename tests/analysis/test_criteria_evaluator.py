@@ -52,7 +52,7 @@ class TestCriteriaEvaluator(unittest.TestCase):
         )
         # Expected: (|0.25| / 0.5)^5.0 + (|0.4| / 0.8)^2.22
         # = (0.5)^5 + (0.5)^2.22 = 0.03125 + 0.2146...
-        self.assertAlmostEqual(g_delta, 0.2455609957, places=5)
+        np.testing.assert_almost_equal(g_delta, 0.2455609957, decimal=5)
 
     def test_stress_envelope_adam_unpublished(self):
         """Test the 'adam_unpublished' stress envelope."""
@@ -86,8 +86,8 @@ class TestCriteriaEvaluator(unittest.TestCase):
         self.assertGreater(skier_weight, 0)
         self.assertIsNotNone(new_segments)
 
-    def test_find_new_anticrack_length(self):
-        """Test the find_new_anticrack_length method."""
+    def test_find_crack_length_for_weight(self):
+        """Test the find_crack_length_for_weight method."""
         skier_weight = 100  # A substantial weight
         segments = [
             Segment(length=self.segments_length, has_foundation=True, m=0),

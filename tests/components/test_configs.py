@@ -51,14 +51,14 @@ class TestScenarioConfig(unittest.TestCase):
             system_type="skier",
             cut_length=150.0,
             stiffness_ratio=500.0,
-            surface_load=10.0,
+            surface_load=0.1,
         )
 
         self.assertEqual(scenario.phi, 30.0)
         self.assertEqual(scenario.system_type, "skier")
         self.assertEqual(scenario.cut_length, 150.0)
         self.assertEqual(scenario.stiffness_ratio, 500.0)
-        self.assertEqual(scenario.surface_load, 10.0)
+        self.assertEqual(scenario.surface_load, 0.1)
 
     def test_scenario_config_validation(self):
         """Test ScenarioConfig validation."""
@@ -89,7 +89,7 @@ class TestCriteriaConfig(unittest.TestCase):
         self.assertEqual(criteria.fn, 2.0)
         self.assertEqual(criteria.fm, 2.0)
         self.assertEqual(criteria.gn, 5.0)
-        self.assertEqual(criteria.gm, 1 / 0.45)
+        self.assertAlmostEqual(criteria.gm, 1 / 0.45, places=10)
 
     def test_criteria_config_custom_values(self):
         """Test CriteriaConfig with custom values."""

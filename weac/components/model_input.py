@@ -28,16 +28,16 @@ class ModelInput(BaseModel):
     """
     Comprehensive input data model for a WEAC simulation.
 
-    Parameters:
+    Attributes
     ----------
-        scenario_config : ScenarioConfig
-            Scenario configuration.
-        weak_layer : WeakLayer
-            Weak layer properties.
-        layers : List[Layer]
-            List of snow slab layers.
-        segments : List[Segment]
-            List of segments defining the slab geometry and loading.
+    scenario_config : ScenarioConfig
+        Scenario configuration.
+    weak_layer : WeakLayer
+        Weak layer properties.
+    layers : List[Layer]
+        List of snow slab layers.
+    segments : List[Segment]
+        List of segments defining the slab geometry and loading.
     """
 
     weak_layer: WeakLayer = Field(

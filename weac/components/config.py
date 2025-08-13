@@ -1,14 +1,13 @@
 """
-This module defines the configuration for the WEAC simulation.
-The configuration is used to set runtime parameters for the WEAC simulation.
-In general, the configuration should only be changed by the developers and is
-static for the users with the most stable configuration.
+Configuration for the WEAC simulation.
+These settings control runtime parameters for WEAC.
+In general, developers maintain these defaults; end users should see a stable configuration.
 
 We utilize the pydantic library to define the configuration.
 
 Pydantic syntax is for a field:
 field_name: type = Field(..., gt=0, description="Description")
-- typing, default value, conditions, description
+- typing, default value, constraints, description
 """
 
 import logging
@@ -25,11 +24,11 @@ class Config(BaseModel):
     Attributes
     ----------
     touchdown : bool
-        Consider Touchdown of the Slab on the Collapse Weak Layer
+        Whether slab touchdown on the collapsed weak layer is considered.
     """
 
     touchdown: bool = Field(
-        default=False, description="Whether to calculate the touchdown of the slab"
+        default=False, description="Whether to include slab touchdown in the analysis"
     )
 
 

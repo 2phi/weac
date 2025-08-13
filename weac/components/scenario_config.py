@@ -9,16 +9,16 @@ class ScenarioConfig(BaseModel):
 
     Attributes
     ----------
-    phi: float, optional
-        Slope angle in degrees.
+    phi : float, optional
+        Slope angle in degrees (counterclockwise positive).
     system_type : Literal['skier', 'skiers', 'pst-', '-pst', 'rot', 'trans', 'vpst-', '-vpst'], optional
-        Type of system, '-pst', 'pst-', ....
-    cut_length : float
-        Cut Length from PST [mm]
+        Type of system. Allowed: 'skier', 'skiers', 'pst-', '-pst', 'rot', 'trans', 'vpst-', '-vpst'.
+    cut_length : float, optional
+        Cut length for PST/VPST [mm].
     stiffness_ratio : float, optional
-        Stiffness ratio between collapsed and uncollapsed weak layer
+        Stiffness ratio between collapsed and uncollapsed weak layer.
     surface_load : float, optional
-        Surface load on slab [N/mm]
+        Surface line-load on slab [N/mm] (force per mm of out-of-plane width).
     """
 
     system_type: Literal[
@@ -52,5 +52,6 @@ class ScenarioConfig(BaseModel):
     surface_load: float = Field(
         default=0.0,
         ge=0.0,
+        lt=1.0,
         description="Surface line-load on slab [N/mm], e.g. evenly spaced weights, Adam et al. (2024)",
     )

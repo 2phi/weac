@@ -4,16 +4,13 @@ Detailed profiling script to identify performance bottlenecks in old (published)
 """
 
 import cProfile
-import io
 import os
-import pstats
-import sys
+import io
 import time
+import pstats
 from contextlib import contextmanager
 
-# Add the project root to the Python path
-project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-sys.path.insert(0, project_root)
+import numpy as np
 
 from tests.utils.weac_reference_runner import (
     compute_reference_model_results,
@@ -231,8 +228,6 @@ class DetailedProfiler:
         print(f"{'=' * 60}")
 
         try:
-            import os
-
             import psutil
 
             # Measure old implementation memory
@@ -268,20 +263,19 @@ class DetailedProfiler:
         """
         Analyze the overhead of importing different modules.
         """
-        print(f"\n{'=' * 60}")
         print("=" * 60)
         print("IMPORT OVERHEAD ANALYSIS")
         print("=" * 60)
 
         # Time imports for new implementation
         with timer_context("Importing weac.components"):
-            pass
+            import weac.components
 
         with timer_context("Importing weac.components.config"):
-            pass
+            import weac.components.config
 
         with timer_context("Importing weac.core.system_model"):
-            pass
+            import weac.core.system_model
 
         # Time invocation for old implementation env (proxy for import overhead)
         with timer_context("Provisioning old weac env"):

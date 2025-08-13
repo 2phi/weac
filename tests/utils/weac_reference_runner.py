@@ -21,10 +21,15 @@ from dataclasses import dataclass
 from typing import Any, Dict, Optional, Tuple
 
 # For type hints without importing numpy at module import time
-try:  # pragma: no cover - best effort typing
+try:
     import numpy as _np
-except Exception:  # noqa: BLE001
-    _np = Any  # type: ignore
+except ImportError:
+    from typing import TYPE_CHECKING
+
+    if TYPE_CHECKING:
+        import numpy as _np
+    else:
+        _np = Any  # type: ignore[assignment, misc]
 
 
 DEFAULT_REFERENCE_VERSION = os.environ.get("WEAC_REFERENCE_VERSION", "2.6.2")
@@ -151,14 +156,7 @@ def _write_runner_script(script_path: str) -> None:
 import json
 import sys
 import numpy as np
-
-# Ensure numpy types are JSON serializable
-def _json_default(o):
-    if isinstance(o, np.ndarray):
-        return o.tolist()
-    if isinstance(o, np.generic):  # covers np.int64, np.float64, np.bool_, etc.
-        return o.item()
-    return str(o)
+from json_helpers import json_default
 
 
 def main():
@@ -209,7 +207,7 @@ def main():
     }
 
     out = {"constants": np.asarray(constants).tolist(), "state": state}
-    print(json.dumps(out, default=_json_default))
+    print(json.dumps(out, default=json_default))
 
 if __name__ == '__main__':
     main()
@@ -243,6 +241,10 @@ def compute_reference_model_results(
 
     tmp_dir = tempfile.mkdtemp(prefix="weac_reference_run_")
     try:
+        # Copy helper to be available to the runner script
+        json_helpers_src = os.path.join(os.path.dirname(__file__), "json_helpers.py")
+        shutil.copy(json_helpers_src, tmp_dir)
+
         cfg = {
             "system": system,
             "layers_profile": layers_profile,

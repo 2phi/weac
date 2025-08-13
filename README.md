@@ -254,10 +254,9 @@ See the [open issues](https://github.com/2phi/weac/issues) for a list of propose
 
 1. Fork the project
 2. Initialize submodules
-
-```bash  
-git submodule update --init --recursive
-```
+    ```bash  
+    git submodule update --init --recursive
+    ```
 
 3. Create your feature branch (`git checkout -b feature/amazingfeature`)
 4. Commit your changes (`git commit -m 'Add some amazing feature'`)

@@ -802,12 +802,37 @@ class Plotter:
 
         Parameters
         ----------
-        field : str, default 'w'
-            Field to plot ('w', 'u', 'principal', 'sigma', 'tau')
-        system_model : SystemModel, optional
-            System to plot (uses first system if not specified)
+        xsl : np.ndarray
+            Slab x-coordinates.
+        xwl : np.ndarray
+            Weak layer x-coordinates.
+        z : np.ndarray
+            Solution vector.
+        analyzer : Analyzer
+            Analyzer instance.
+        dz : int, optional
+            Element size along z-axis (mm). Default is 2 mm.
+        scale : int, optional
+            Deformation scale factor. Default is 100.
+        window : float, optional
+            Plot window width. Default is inf.
+        pad : int, optional
+            Padding around plot. Default is 2.
+        levels : int, optional
+            Number of contour levels. Default is 300.
+        aspect : int, optional
+            Aspect ratio. Default is 2.
+        field : str, optional
+            Field to plot ('w', 'u', 'principal', 'Sxx', 'Txz', 'Szz'). Default is 'w'.
+        normalize : bool, optional
+            Toggle normalization. Default is True.
         filename : str, optional
-            Filename for saving plot
+            Filename for saving plot. Default is "deformed_slab".
+
+        Returns
+        -------
+        matplotlib.figure.Figure
+            The generated plot figure.
         """
         fig = plt.figure(figsize=(10, 8))
         ax = fig.add_subplot(111)
@@ -1173,7 +1198,6 @@ class Plotter:
         if filename:
             self._save_figure(filename, fig)
 
-        plt.close(fig)  # Close the figure to prevent duplicate output in notebooks
         return fig
 
     def plot_err_envelope(

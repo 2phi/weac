@@ -31,8 +31,6 @@ logging.getLogger("matplotlib.font_manager").setLevel(logging.WARNING)
 # === SYSTEM 1: Basic Configuration ===
 config1 = Config(
     touchdown=True,
-    youngs_modulus_method="bergfeld",
-    stress_envelope_method="adam_unpublished",
 )
 scenario_config1 = ScenarioConfig(phi=5, system_type="skier")  # Steeper slope
 criteria_config1 = CriteriaConfig(fn=1, fm=1, gn=1, gm=1)
@@ -60,8 +58,6 @@ system1 = SystemModel(config=config1, model_input=model_input1)
 # === SYSTEM 2: Different Slope Angle ===
 config2 = Config(
     touchdown=False,
-    youngs_modulus_method="bergfeld",
-    stress_envelope_method="adam_unpublished",
 )
 scenario_config2 = ScenarioConfig(phi=30, system_type="skier")  # Steeper slope
 weak_layer2 = WeakLayer(rho=80, h=25, E=0.25, G_Ic=1)
@@ -88,8 +84,6 @@ system2 = SystemModel(config=config2, model_input=model_input2)
 # === SYSTEM 3: Different Layer Configuration ===
 config3 = Config(
     touchdown=False,
-    youngs_modulus_method="bergfeld",
-    stress_envelope_method="adam_unpublished",
 )
 scenario_config3 = ScenarioConfig(phi=15, system_type="skier")  # Medium slope
 weak_layer3 = WeakLayer(rho=80, h=25, E=0.3, G_Ic=1.2)  # Different weak layer
@@ -117,8 +111,6 @@ system3 = SystemModel(config=config3, model_input=model_input3)
 # === SYSTEM 4: Advanced Configuration ===
 config4 = Config(
     touchdown=False,
-    youngs_modulus_method="bergfeld",
-    stress_envelope_method="adam_unpublished",
 )
 scenario_config4 = ScenarioConfig(phi=38, system_type="skier")
 weak_layer4 = WeakLayer(rho=80, h=25, E=0.25, G_Ic=1)

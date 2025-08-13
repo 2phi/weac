@@ -21,7 +21,7 @@ class TestScenario(unittest.TestCase):
         ]
         # Config with non-zero angle and surface load to exercise load decomposition
         self.cfg = ScenarioConfig(
-            phi=10.0, system_type="skiers", surface_load=2.5, cut_length=123.0
+            phi=10.0, system_type="skiers", surface_load=0.2, cut_length=123.0
         )
 
     def test_init_sets_core_attributes(self):
@@ -56,7 +56,7 @@ class TestScenario(unittest.TestCase):
             np.array([0, 0, 1, 1, 1]),
         )
         # out of bounds (> L) raises
-        with self.assertRaises(ValueError):
+        with self.assertRaisesRegex(ValueError, r"out of bounds|exceeds|beyond"):
             s.get_segment_idx(1000.0001)
 
     def test_setup_scenario_single_segment_adds_dummy(self):
@@ -74,7 +74,7 @@ class TestScenario(unittest.TestCase):
         self.assertEqual(s.get_segment_idx(749.9999), 0)
         # x == L is allowed and maps to bin 1
         self.assertEqual(s.get_segment_idx(750.0), 1)
-        with self.assertRaises(ValueError):
+        with self.assertRaisesRegex(ValueError, r"out of bounds|exceeds|beyond"):
             s.get_segment_idx(750.0001)
 
     def test_calc_normal_and_tangential_loads(self):
@@ -94,27 +94,19 @@ class TestScenario(unittest.TestCase):
         self.assertTrue(np.isfinite(expected_crack_h))
         self.assertAlmostEqual(s.crack_h, expected_crack_h)
 
-    def test_refresh_from_config_updates_attributes_and_recomputes_crack_height_only(
+    def test_refresh_from_config_updates_attributes(
         self,
     ):
         s = Scenario(self.cfg, self.segments_two, self.weak_layer, self.slab)
-        old_qn = s.qn
-        old_qt = s.qt
-        old_crack_h = s.crack_h
         # Change config values
         s.scenario_config.phi = 25.0
-        s.scenario_config.surface_load = 10.0
+        s.scenario_config.surface_load = 0.2
         s.scenario_config.system_type = "pst-"
         s.refresh_from_config()
         # Attributes copied from config
         self.assertEqual(s.system_type, "pst-")
         self.assertAlmostEqual(s.phi, 25.0)
-        self.assertAlmostEqual(s.surface_load, 10.0)
-        # Current implementation does not recalc qn/qt on refresh
-        self.assertAlmostEqual(s.qn, old_qn)
-        self.assertAlmostEqual(s.qt, old_qt)
-        # Crack height recomputed using existing qn -> unchanged
-        self.assertAlmostEqual(s.crack_h, old_crack_h)
+        self.assertAlmostEqual(s.surface_load, 0.2)
 
     def test_refresh_recomputes_setup_when_segments_change(self):
         s = Scenario(self.cfg, self.segments_two, self.weak_layer, self.slab)
