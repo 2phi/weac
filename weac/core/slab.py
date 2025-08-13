@@ -1,8 +1,9 @@
 from typing import List
+
 import numpy as np
 
-from weac.constants import G_MM_S2
 from weac.components import Layer
+from weac.constants import EPS, G_MM_S2
 
 
 class Slab:
@@ -112,7 +113,7 @@ class Slab:
         phi = np.deg2rad(phi)
 
         # Catch flat-field case
-        if phi == 0:
+        if abs(phi) < EPS:
             x_cog = 0
             z_cog = 0
             w = 0
@@ -125,9 +126,11 @@ class Slab:
             z = np.array([-H / 2 + sum(hi[0:j]) for j in range(n + 1)])
             zi = z[:-1]
             zii = z[1:]
-            # Center of gravity of all layers (top to bottom)
+            # Center of gravity of all layers (top to bottom) derived from
+            # triangular slab geometry
             zsi = zi + hi / 3 * (3 / 2 * H - zi - 2 * zii) / (H - zi - zii)
-            # Surface area of all layers (top to bottom)
+            # Surface area of all layers (top to bottom), area = heigth * base/2
+            # where base varies with slop angle
             Ai = hi / 2 * (H - zi - zii) * np.tan(phi)
             # Center of gravity in vertical direction
             z_cog = sum(zsi * rho * Ai) / sum(rho * Ai)

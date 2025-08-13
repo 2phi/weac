@@ -10,8 +10,9 @@ SHEAR_CORRECTION_FACTOR: Final[float] = 5.0 / 6.0  # Shear-correction factor (sl
 STIFFNESS_COLLAPSE_FACTOR: Final[float] = (
     1000.0  # Stiffness ratio between collapsed and uncollapsed weak layer.
 )
-ROMBERG_TOL: float = 1e-3  # Romberg integration tolerance
-LSKI_MM: float = 1000.0  # Effective out-of-plane length of skis (mm)
+ROMBERG_TOL: Final[float] = 1e-3  # Romberg integration tolerance
+LSKI_MM: Final[float] = 1000.0  # Effective out-of-plane length of skis (mm)
+EPS: Final[float] = 1e-9  # Global numeric tolerance for float comparisons
 
 RHO_ICE: Final[float] = 916.7  # Density of ice (kg/m^3)
 CB0: Final[float] = (

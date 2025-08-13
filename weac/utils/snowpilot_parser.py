@@ -284,7 +284,7 @@ class SnowPilotParser:
             raise ValueError(
                 "The depth of the weak layer is below the recorded layers. Excluding SnowPit from calculations."
             )
-        layers = layers.copy(deep=True)
+        layers = [layer.model_copy(deep=True) for layer in layers]
         for i, layer in enumerate(layers):
             if depth + layer.h < weak_layer_depth:
                 layers_above.append(layer)
