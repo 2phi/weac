@@ -1,77 +1,82 @@
 """
-Snow grain types and hand hardness values for type annotations.
+Snow grain types and hand hardness values.
 
 These values are used in Pydantic models for validation and correspond to the
-parameterizations available in geldsetzer.py.
+parameterizations available in `geldsetzer.py`.
 """
 
-from typing import Literal
+from enum import Enum
 
-# Grain types from SnowPilot notation (keys from GRAIN_TYPE in geldsetzer.py)
-GRAIN_TYPES = Literal[
-    "DF",
-    "DFbk",
-    "DFdc",
-    "DH",
-    "DHch",
-    "DHcp",
-    "DHla",
-    "DHpr",
-    "DHxr",
-    "FC",
-    "FCsf",
-    "FCso",
-    "FCxr",
-    "IF",
-    "IFbi",
-    "IFic",
-    "IFil",
-    "IFrc",
-    "IFsc",
-    "MF",
-    "MFcl",
-    "MFcr",
-    "MFpc",
-    "MFsl",
-    "PP",
-    "PPco",
-    "PPgp",
-    "PPhl",
-    "PPip",
-    "PPir",
-    "PPnd",
-    "PPpl",
-    "PPrm",
-    "PPsd",
-    "RG",
-    "RGlr",
-    "RGsr",
-    "RGwp",
-    "RGxf",
-    "SH",
-    "SHcv",
-    "SHsu",
-    "SHxr",
-]
 
-# Hand hardness values from field notation (keys from HAND_HARDNESS in geldsetzer.py)
-HAND_HARDNESS_VALUES = Literal[
-    "F-",
-    "F",
-    "F+",
-    "4F-",
-    "4F",
-    "4F+",
-    "1F-",
-    "1F",
-    "1F+",
-    "P-",
-    "P",
-    "P+",
-    "K-",
-    "K",
-    "K+",
-    "I-",
-    "I",
-    "I+",
-]
+class GrainType(str, Enum):
+    """SnowPilot grain type codes (see `geldsetzer.GRAIN_TYPE`)."""
+
+    DF = "DF"
+    DFbk = "DFbk"
+    DFdc = "DFdc"
+    DH = "DH"
+    DHch = "DHch"
+    DHcp = "DHcp"
+    DHla = "DHla"
+    DHpr = "DHpr"
+    DHxr = "DHxr"
+    FC = "FC"
+    FCsf = "FCsf"
+    FCso = "FCso"
+    FCxr = "FCxr"
+    IF = "IF"
+    IFbi = "IFbi"
+    IFic = "IFic"
+    IFil = "IFil"
+    IFrc = "IFrc"
+    IFsc = "IFsc"
+    MF = "MF"
+    MFcl = "MFcl"
+    MFcr = "MFcr"
+    MFpc = "MFpc"
+    MFsl = "MFsl"
+    PP = "PP"
+    PPco = "PPco"
+    PPgp = "PPgp"
+    PPhl = "PPhl"
+    PPip = "PPip"
+    PPir = "PPir"
+    PPnd = "PPnd"
+    PPpl = "PPpl"
+    PPrm = "PPrm"
+    PPsd = "PPsd"
+    RG = "RG"
+    RGlr = "RGlr"
+    RGsr = "RGsr"
+    RGwp = "RGwp"
+    RGxf = "RGxf"
+    SH = "SH"
+    SHcv = "SHcv"
+    SHsu = "SHsu"
+    SHxr = "SHxr"
+
+
+class HandHardness(str, Enum):
+    """Field hand hardness codes (see `geldsetzer.HAND_HARDNESS`).
+
+    Enum member names avoid starting with digits and special characters.
+    """
+
+    Fm = "F-"
+    F = "F"
+    Fp = "F+"
+    _4Fm = "4F-"
+    _4F = "4F"
+    _4Fp = "4F+"
+    _1Fm = "1F-"
+    _1F = "1F"
+    _1Fp = "1F+"
+    Pm = "P-"
+    P = "P"
+    Pp = "P+"
+    Km = "K-"
+    K = "K"
+    Kp = "K+"
+    Im = "I-"
+    I = "I"
+    Ip = "I+"

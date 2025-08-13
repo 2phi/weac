@@ -12,7 +12,7 @@ import numpy as np
 from pydantic import BaseModel, ConfigDict, Field
 
 from weac.constants import CB0, CB1, CG0, CG1, NU, RHO_ICE
-from weac.utils.snow_types import GRAIN_TYPES, HAND_HARDNESS_VALUES
+from weac.utils.snow_types import GrainType, HandHardness
 
 logger = logging.getLogger(__name__)
 
@@ -133,9 +133,9 @@ class Layer(BaseModel):
         default="bergfeld",
         description="Method to calculate the Young's modulus",
     )
-    grain_type: GRAIN_TYPES | None = Field(default=None, description="Grain type")
+    grain_type: GrainType | None = Field(default=None, description="Grain type")
     grain_size: float | None = Field(default=None, description="Grain size [mm]")
-    hand_hardness: HAND_HARDNESS_VALUES | None = Field(
+    hand_hardness: HandHardness | None = Field(
         default=None, description="Hand hardness"
     )
 
@@ -220,9 +220,9 @@ class WeakLayer(BaseModel):
         default="bergfeld",
         description="Method to calculate the Young's modulus",
     )
-    grain_type: GRAIN_TYPES | None = Field(default=None, description="Grain type")
+    grain_type: GrainType | None = Field(default=None, description="Grain type")
     grain_size: float | None = Field(default=None, description="Grain size [mm]")
-    hand_hardness: HAND_HARDNESS_VALUES | None = Field(
+    hand_hardness: HandHardness | None = Field(
         default=None, description="Hand hardness"
     )
 
