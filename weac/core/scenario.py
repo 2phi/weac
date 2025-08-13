@@ -92,10 +92,10 @@ class Scenario:
         self.system_type = self.scenario_config.system_type
         self.phi = self.scenario_config.phi
         self.surface_load = self.scenario_config.surface_load
+        self.crack_length = self.scenario_config.crack_length
 
         self._setup_scenario()
         self._calc_crack_height()
-
     def get_segment_idx(
         self, x: Union[float, Sequence[float], np.ndarray]
     ) -> Union[int, np.ndarray]:
