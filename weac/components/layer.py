@@ -47,15 +47,15 @@ def _bergfeld_youngs_modulus(rho: float, C_0: float = CB0, C_1: float = CB1) -> 
 
 
 def _scapozza_youngs_modulus(rho: float) -> float:
-    """Young's modulus from Scapazzo - return MPa
+    """Young's modulus from Scapozzo et al. (2019) - return MPa
     `rho` in [kg/m^3]"""
     rho = rho * 1e-12  # Convert to [t/mm^3]
-    rho_0 = RHO_ICE * 1e-12  # Desity of ice in [t/mm^3]
+    rho_0 = RHO_ICE * 1e-12  # Density of ice in [t/mm^3]
     return 5.07e3 * (rho / rho_0) ** 5.13
 
 
 def _gerling_youngs_modulus(rho: float, C_0: float = CG0, C_1: float = CG1) -> float:
-    """Young's modulus according to Gerling et al. 2017.
+    """Young's modulus according to Gerling et al. (2017).
 
     Arguments
     ---------
@@ -73,7 +73,7 @@ def _gerling_youngs_modulus(rho: float, C_0: float = CG0, C_1: float = CG1) -> f
 
 def _sigrist_tensile_strength(rho, unit="kPa"):
     """
-    Estimate the tensile strenght of a slab layer from its density.
+    Estimate the tensile strength of a slab layer from its density.
 
     Uses the density parametrization of Sigrist (2006).
 
@@ -87,7 +87,7 @@ def _sigrist_tensile_strength(rho, unit="kPa"):
     Returns
     -------
     ndarray
-        Tensile strenght in specified unit.
+        Tensile strength in specified unit.
     """
     convert = {"kPa": 1, "MPa": 1e-3}
     # Sigrist's equation is given in kPa

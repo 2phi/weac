@@ -1,13 +1,27 @@
 """
-TODO: blabla
-"""
+Module for configuring failure-mode interaction criteria and stress failure envelope selection.
 
-import logging
+Main fields:
+- fn, fm: interaction exponents for normal (sigma) and shear (tau) stresses (> 0).
+- gn, gm: interaction exponents for mode-I (G_I) and mode-II (G_II) energy release rates (> 0).
+- stress_envelope_method: one of {"adam_unpublished", "schottner", "mede_s-RG1", "mede_s-RG2", "mede_s-FCDH"}.
+- scaling_factor, order_of_magnitude: positive scalars applied to the stress envelope.
+
+Typical usage:
+    from weac.components.criteria_config import CriteriaConfig
+
+    config = CriteriaConfig(
+        stress_envelope_method="schottner",
+        scaling_factor=1.0,
+        order_of_magnitude=1.0,
+    )
+
+See also:
+- weac.analysis.criteria_evaluator for how these parameters influence failure checks.
+"""
 
 from typing import Literal
 from pydantic import BaseModel, Field
-
-logger = logging.getLogger(__name__)
 
 
 class CriteriaConfig(BaseModel):

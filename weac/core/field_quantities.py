@@ -3,9 +3,7 @@ from typing import Literal
 
 from weac.core.eigensystem import Eigensystem
 
-Unit = Literal[
-    "m", "cm", "mm", "um", "deg", "degree", "degrees", "rad", "radian", "radians"
-]
+Unit = Literal["m", "cm", "mm", "um", "deg", "rad", "Pa", "kPa", "MPa", "GPa"]
 
 _UNIT_FACTOR: dict[str, float] = {
     "m": 1e-3,
@@ -14,6 +12,13 @@ _UNIT_FACTOR: dict[str, float] = {
     "um": 1e3,
     "rad": 1,
     "deg": 180 / np.pi,
+    "Pa": 1e6,
+    "kPa": 1e3,
+    "MPa": 1,
+    "GPa": 1e-3,
+    "J/m^2": 1e3,  # joule per square meter
+    "kJ/m^2": 1,  # kilojoule per square meter
+    "N/mm": 1,  # newton per millimeter
 }
 
 
@@ -89,16 +94,14 @@ class FieldQuantities:
         self, Z: np.ndarray, unit: Literal["kPa", "MPa"] = "MPa"
     ) -> float | np.ndarray:
         """Weak-layer normal stress"""
-        convert = {"kPa": 1e3, "MPa": 1}
-        return -convert[unit] * self.es.weak_layer.kn * self.w(Z)
+        return -self._unit_factor(unit) * self.es.weak_layer.kn * self.w(Z)
 
     def tau(
         self, Z: np.ndarray, unit: Literal["kPa", "MPa"] = "MPa"
     ) -> float | np.ndarray:
         """Weak-layer shear stress"""
-        convert = {"kPa": 1e3, "MPa": 1}
         return (
-            -convert[unit]
+            -self._unit_factor(unit)
             * self.es.weak_layer.kt
             * (
                 self.dw_dx(Z) * self.es.weak_layer.h / 2
@@ -129,12 +132,9 @@ class FieldQuantities:
         unit : {'N/mm', 'kJ/m^2', 'J/m^2'}, optional
             Desired output unit. Default is kJ/m^2.
         """
-        convert = {
-            "J/m^2": 1e3,  # joule per square meter
-            "kJ/m^2": 1,  # kilojoule per square meter
-            "N/mm": 1,  # newton per millimeter
-        }
-        return convert[unit] * self.sig(Ztip) ** 2 / (2 * self.es.weak_layer.kn)
+        return (
+            self._unit_factor(unit) * self.sig(Ztip) ** 2 / (2 * self.es.weak_layer.kn)
+        )
 
     def Gii(
         self, Ztip: np.ndarray, unit: Literal["J/m^2", "kJ/m^2", "N/mm"] = "kJ/m^2"
@@ -149,12 +149,9 @@ class FieldQuantities:
         unit : {'N/mm', 'kJ/m^2', 'J/m^2'}, optional
             Desired output unit. Default is kJ/m^2 = N/mm.
         """
-        convert = {
-            "J/m^2": 1e3,  # joule per square meter
-            "kJ/m^2": 1,  # kilojoule per square meter
-            "N/mm": 1,  # newton per millimeter
-        }
-        return convert[unit] * self.tau(Ztip) ** 2 / (2 * self.es.weak_layer.kt)
+        return (
+            self._unit_factor(unit) * self.tau(Ztip) ** 2 / (2 * self.es.weak_layer.kt)
+        )
 
     def dz_dx(self, z: np.ndarray, phi: float, qs: float = 0) -> np.ndarray:
         """First derivative z'(x) = K*z(x) + q of the solution vector.

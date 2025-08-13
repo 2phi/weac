@@ -12,7 +12,6 @@ field_name: type = Field(..., gt=0, description="Description")
 """
 
 import logging
-from typing import Literal
 
 from pydantic import BaseModel, Field
 
@@ -26,7 +25,7 @@ class Config(BaseModel):
     Attributes
     ----------
     touchdown : bool
-        Consider Touchdown of the Slab on Twisting (?)
+        Consider Touchdown of the Slab on the Collapse Weak Layer
     """
 
     touchdown: bool = Field(

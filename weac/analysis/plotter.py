@@ -1,6 +1,7 @@
 # Standard library imports
 import colorsys
 import os
+import logging
 from typing import List, Literal, Optional
 
 # Third party imports
@@ -24,6 +25,8 @@ from weac.core.scenario import Scenario
 from weac.core.slab import Slab
 from weac.core.system_model import SystemModel
 from weac.utils.misc import isnotebook
+
+logger = logging.getLogger(__name__)
 
 LABELSTYLE = {
     "backgroundcolor": "w",
@@ -1305,14 +1308,13 @@ class Plotter:
         fig = plt.figure(figsize=(12, 10))
         ax = fig.add_subplot(111)
 
-        print("System Segments: ", system.scenario.segments)
+        logger.debug("System Segments: %s", system.scenario.segments)
         analyzer = Analyzer(system)
         xsl, z, xwl = analyzer.rasterize_solution(mode="cracked", num=200)
 
         zi = analyzer.get_zmesh(dz=dz)["z"]
         H = analyzer.sm.slab.H
         h = system.weak_layer.h
-        phi = analyzer.sm.scenario.phi
         system_type = analyzer.sm.scenario.system_type
         fq = analyzer.sm.fq
 
@@ -1376,8 +1378,6 @@ class Plotter:
         weak = np.vstack([stress_envelope, stress_envelope])
 
         # Normalize colormap
-        absmax = np.nanmax(np.abs([stress_envelope.min(), stress_envelope.max()]))
-        clim = np.round(absmax, _significant_digits(absmax))
         levels = np.linspace(0, 1, num=levels + 1, endpoint=True)
 
         # Plot outlines of the undeformed and deformed slab
