@@ -8,19 +8,19 @@ from typing import List, Optional, Union
 
 # Third party imports
 import numpy as np
-from scipy.optimize import root_scalar, brentq
+from scipy.optimize import brentq, root_scalar
 
 from weac.analysis.analyzer import Analyzer
 
 # weac imports
 from weac.components import (
     CriteriaConfig,
+    ScenarioConfig,
     Segment,
     WeakLayer,
-    ScenarioConfig,
 )
-from weac.core.system_model import SystemModel
 from weac.constants import RHO_ICE
+from weac.core.system_model import SystemModel
 
 logger = logging.getLogger(__name__)
 
@@ -140,7 +140,7 @@ class FindMinimumForceResult:
     critical_skier_weight: float
     new_segments: List[Segment]
     old_segments: List[Segment]
-    iterations: int
+    iterations: Optional[int]
     max_dist_stress: float
     min_dist_stress: float
 
