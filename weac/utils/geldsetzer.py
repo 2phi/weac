@@ -9,9 +9,11 @@ Output:
 Density [kg/m^3]
 """
 
+SKIP_VALUE = "!skip"
+
 
 DENSITY_PARAMETERS = {
-    "!skip": (0, 0),
+    SKIP_VALUE: (0, 0),
     "SH": (125, 0),  # 125 kg/m^3 so that bergfeld is E~1.0
     "PP": (45, 36),
     "PPgp": (83, 37),
@@ -26,7 +28,7 @@ DENSITY_PARAMETERS = {
 
 # Map SnowPilot grain type to those we know
 GRAIN_TYPE = {
-    "": "!skip",
+    "": SKIP_VALUE,
     "DF": "DF",
     "DFbk": "DF",
     "DFdc": "DF",
@@ -76,7 +78,7 @@ GRAIN_TYPE = {
 
 # Translate hand hardness to numerical values
 HAND_HARDNESS = {
-    "": "!skip",
+    "": SKIP_VALUE,
     "F-": 0.67,
     "F": 1,
     "F+": 1.33,
@@ -151,10 +153,10 @@ def compute_density(grainform: str | None, hardness: str | None) -> float:
     grain_type = GRAIN_TYPE[grainform]
     a, b = DENSITY_PARAMETERS[grain_type]
 
-    if grain_type == "!skip":
-        raise ValueError("Grain type is !skip")
-    if hardness_value == "!skip":
-        raise ValueError("Hardness value is !skip")
+    if grain_type == SKIP_VALUE:
+        raise ValueError(f"Grain type is {SKIP_VALUE}")
+    if hardness_value == SKIP_VALUE:
+        raise ValueError(f"Hardness value is {SKIP_VALUE}")
 
     if grain_type == "RG":
         # Special computation for 'RG' grain form
