@@ -408,14 +408,14 @@ class CriteriaEvaluator:
             )
 
         # --- Main loop ---
-        elif initial_critical_skier_weight >= 1:
+        else:
             crack_length = 1.0
             dist_ERR_envelope = 1000
             g_delta = 0
             history = CoupledCriterionHistory([], [], [], [], [], [])
             iteration_count = 0
             skier_weight = initial_critical_skier_weight * 1.005
-            min_skier_weight = 0.1
+            min_skier_weight = 1e-6
             max_skier_weight = 200
 
             # Ensure Max Weight surpasses fracture toughness criterion
@@ -630,27 +630,27 @@ class CriteriaEvaluator:
                     tolerance_ERR=tolerance_ERR,
                     tolerance_stress=tolerance_stress,
                 )
-        # --- Exception: Critical skier weight < 1 ---
-        else:
-            analyzer.print_call_stats(
-                message="evaluate_coupled_criterion Call Statistics"
-            )
-            return CoupledCriterionResult(
-                converged=False,
-                message="Critical skier weight is less than 1kg.",
-                self_collapse=False,
-                pure_stress_criteria=False,
-                critical_skier_weight=skier_weight,
-                initial_critical_skier_weight=initial_critical_skier_weight,
-                crack_length=crack_length,
-                g_delta=g_delta,
-                dist_ERR_envelope=dist_ERR_envelope,
-                iterations=iteration_count,
-                history=history,
-                final_system=system,
-                max_dist_stress=max_dist_stress,
-                min_dist_stress=min_dist_stress,
-            )
+        # # --- Exception: Critical skier weight < 1 ---
+        # else:
+        #     analyzer.print_call_stats(
+        #         message="evaluate_coupled_criterion Call Statistics"
+        #     )
+        #     return CoupledCriterionResult(
+        #         converged=False,
+        #         message="Critical skier weight is less than 1kg.",
+        #         self_collapse=False,
+        #         pure_stress_criteria=False,
+        #         critical_skier_weight=skier_weight,
+        #         initial_critical_skier_weight=initial_critical_skier_weight,
+        #         crack_length=crack_length,
+        #         g_delta=g_delta,
+        #         dist_ERR_envelope=dist_ERR_envelope,
+        #         iterations=iteration_count,
+        #         history=history,
+        #         final_system=system,
+        #         max_dist_stress=max_dist_stress,
+        #         min_dist_stress=min_dist_stress,
+        #     )
 
     def evaluate_SSERR(
         self,
