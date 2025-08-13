@@ -6,12 +6,12 @@ This script discovers and runs all tests in the tests directory.
 Provides a pytest-like output with detailed reporting.
 """
 
+import io
 import os
 import sys
 import time
 import unittest
 from collections import defaultdict
-import io
 from contextlib import redirect_stderr, redirect_stdout
 
 
