@@ -209,7 +209,7 @@ def gerling(rho, C0=6.0, C1=4.6):
     return C0 * 1e-10 * rho**C1
 
 
-def bergfeld(rho, rho0=917, C0=6.5, C1=4.4):
+def bergfeld(rho, rho0=916.7, C0=6.5, C1=4.4):
     """
     Compute Young's modulus from density according to Bergfeld et al. (2023).
 
