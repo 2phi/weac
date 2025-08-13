@@ -31,8 +31,47 @@ Documentation = "https://2phi.github.io/weac"
 "Issues and feature requests" = "https://github.com/2phi/weac/issues"
 
 [project.optional-dependencies]
-interactive = ["jupyter", "ipython>=8.12.3"]
+interactive = [
+    "jupyter",
+    "ipython>=8.37.0",
+    "ipykernel>=6.30.1",
+    "jupyter_client>=8.6.3",
+    "jupyter_core>=5.8.1",
+    "matplotlib-inline>=0.1.7",
+    "nest-asyncio>=1.6.0",
+    "pyzmq>=27.0.1",
+    "tornado>=6.5.2",
+    "traitlets>=5.14.3",
+]
 docs = ["sphinx", "sphinxawesome-theme"]
+dev = [
+    # Notebook execution (to run demo.ipynb non-interactively)
+    "nbclient>=0.10.0",
+    "nbconvert>=7.16.4",
+    "nbformat>=5.10.0",
+
+    # Jupyter stack for interactive development
+    "jupyter",
+    "ipython>=8.37.0",
+    "ipykernel>=6.30.1",
+    "jupyter_client>=8.6.3",
+    "jupyter_core>=5.8.1",
+    "matplotlib-inline>=0.1.7",
+    "nest-asyncio>=1.6.0",
+    "pyzmq>=27.0.1",
+    "tornado>=6.5.2",
+    "traitlets>=5.14.3",
+
+    # Linters/formatters aligned with configured tools
+    "ruff>=0.4.0",
+    "pylint>=3.2.0",
+    "pycodestyle>=2.11.1",
+    "black>=24.4.0",
+    "isort>=5.13.0",
+
+    # Versioning helper matching [tool.bumpversion]
+    "bump2version>=1.0.1",
+]
 
 [tool.setuptools]
 packages = ["weac"]
