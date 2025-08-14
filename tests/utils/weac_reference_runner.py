@@ -32,7 +32,7 @@ except ImportError:
         _np = Any  # type: ignore[assignment, misc]
 
 
-DEFAULT_REFERENCE_VERSION = os.environ.get("WEAC_REFERENCE_VERSION", "2.6.2")
+DEFAULT_REFERENCE_VERSION = os.environ.get("WEAC_REFERENCE_VERSION", "2.6.3")
 REFERENCE_HOME = os.environ.get("WEAC_REFERENCE_HOME", None)
 
 

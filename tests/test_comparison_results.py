@@ -18,7 +18,7 @@ class TestIntegrationOldVsNew(unittest.TestCase):
         """
         Test that old and new implementations produce identical results for a simple two-layer setup.
         """
-        # --- Setup for OLD implementation (published weac==2.6.2) ---
+        # --- Setup for OLD implementation (published weac==2.6.X) ---
         profile = [
             [200, 150],
             [300, 100],
@@ -199,7 +199,7 @@ class TestIntegrationOldVsNew(unittest.TestCase):
         """
         Test that old and new implementations produce identical results for a simple two-layer setup with touchdown=True.
         """
-        # --- Setup for OLD implementation (published weac==2.6.2) ---
+        # --- Setup for OLD implementation (published weac==2.6.X) ---
         profile = [
             [200, 150],
             [300, 100],
