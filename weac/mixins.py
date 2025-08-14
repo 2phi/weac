@@ -779,8 +779,8 @@ class SlabContactMixin:
         """Set class attributes for touchdown consideration"""
         self.set_columnlength(L)
         self.set_cracklength(a)
-        self.set_tc(cf)
         self.set_phi(phi)
+        self.set_tc(cf)
         self.set_stiffness_ratio(ratio)
 
     def calc_touchdown_mode(self):
