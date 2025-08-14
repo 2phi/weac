@@ -11,7 +11,7 @@ from weac.inverse import Inverse
 from weac.layered import Layered
 
 # Version
-__version__ = "2.6.3"
+__version__ = "2.6.4"
 
 # Public names
 __all__ = ["Layered", "Inverse", "plot"]
