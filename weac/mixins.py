@@ -787,14 +787,14 @@ class SlabContactMixin:
         """Calculate touchdown-mode from thresholds"""
         if self.touchdown:
             # Calculate stage transitions
-            a1 = self.calc_a1()
-            a2 = self.calc_a2()
+            self.a1 = self.calc_a1()
+            self.a2 = self.calc_a2()
             # Assign stage
-            if self.a <= a1:
+            if self.a <= self.a1:
                 mode = "A"
-            elif a1 < self.a <= a2:
+            elif self.a1 < self.a <= self.a2:
                 mode = "B"
-            elif a2 < self.a:
+            elif self.a2 < self.a:
                 mode = "C"
             self.mode = mode
         else:
