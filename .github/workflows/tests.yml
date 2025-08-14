@@ -1,0 +1,32 @@
+name: Run unit tests 🤖
+
+# Trigger conditions for the workflow
+on:
+  # Run tests on push events for all branches except main and develop
+  push:
+    branches-ignore: [ main, develop ]
+  # Run tests on pull_request events only for main and develop branches
+  pull_request:
+    branches: [ main, develop ]
+  # Allow this workflow to be called by other workflows
+  workflow_call:
+
+jobs:
+  test:
+    name: Run unit tests 🤖
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Set up Python 3.12
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.12'
+
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        python -m pip install -e .
+
+    - name: Run tests
+      run: python tests/run_tests.py 
