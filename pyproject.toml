@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "weac"
-version = "2.6.2"
+version = "2.6.3"
 authors = [
     {name = "2phi GbR", email = "mail@2phi.de"},
 ]
@@ -77,7 +77,7 @@ ignore-patterns = [".*\\.ipynb$"]
 ignore = ["E121", "E123", "E126", "E211", "E226", "E24", "E704", "W503", "W504", "E741"]
 
 [tool.bumpversion]
-current_version = "2.6.2"
+current_version = "2.6.3"
 tag = true
 commit = true
 
@@ -89,13 +89,13 @@ filename = "CITATION.cff"
 
 [[tool.bumpversion.files]]
 filename = "weac/__init__.py"
-search = "__version__ = '{current_version}'"
-replace = "__version__ = '{new_version}'"
+search = "__version__ = \"{current_version}\""
+replace = "__version__ = \"{new_version}\""
 
 [[tool.bumpversion.files]]
 filename = "demo/demo.ipynb"
 
 [[tool.bumpversion.files]]
 filename = "docs/sphinx/conf.py"
-search = "release = '{current_version}'"
-replace = "release = '{new_version}'"
+search = "release = \"{current_version}\""
+replace = "release = \"{new_version}\""
