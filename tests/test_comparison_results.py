@@ -3,6 +3,7 @@ import sys
 import unittest
 
 import numpy as np
+from pprint import pprint
 
 # Add the project root to the Python path so we can import weac
 project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -26,7 +27,7 @@ class TestIntegrationOldVsNew(unittest.TestCase):
         inclination = 30.0
         total_length = 14000.0
         try:
-            old_constants, old_state = compute_reference_model_results(
+            old_constants, old_state, old_z = compute_reference_model_results(
                 system="pst-",
                 layers_profile=profile,
                 touchdown=False,
@@ -80,6 +81,22 @@ class TestIntegrationOldVsNew(unittest.TestCase):
 
         new_system = SystemModel(config=config, model_input=model_input)
         new_constants = new_system.unknown_constants
+
+        z1 = new_system.z(
+            x=[0, 5000, 10000],
+            C=new_constants[:, [0]],
+            length=10000,
+            phi=inclination,
+            has_foundation=True,
+        )
+        z2 = new_system.z(
+            x=[0, 2000, 4000],
+            C=new_constants[:, [1]],
+            length=4000,
+            phi=inclination,
+            has_foundation=False,
+        )
+        new_z = np.hstack([z1, z2])
 
         # Compare the WeakLayer attributes
         self.assertEqual(
@@ -157,43 +174,15 @@ class TestIntegrationOldVsNew(unittest.TestCase):
             "Cut length should be the same",
         )
 
-        # --- Compare results ---
-        self.assertEqual(
-            old_constants.shape,
-            new_constants.shape,
-            "Result arrays should have the same shape",
-        )
-
-        # Use reasonable tolerances for integration testing between implementations
-        # Small differences (~0.5%) are acceptable due to:
-        # - Different numerical precision in calculations
-        # - Possible minor algorithmic differences in the refactored code
-        # - Floating-point arithmetic accumulation differences
+        # Compare the z vectors
+        self.assertEqual(old_z.shape, new_z.shape, "Z-vector shapes should match")
         np.testing.assert_allclose(
-            old_constants,
-            new_constants,
-            rtol=1e-2,
-            atol=1e-6,
-            err_msg="Old and new implementations should produce very similar results",
+            old_z,
+            new_z,
+            rtol=1e-10,
+            atol=1e-12,
+            err_msg="Old and new implementations should produce very similar z vectors",
         )
-
-        max_rel_diff = np.max(np.abs((old_constants - new_constants) / old_constants))
-        max_abs_diff = np.max(np.abs(old_constants - new_constants))
-
-        print(
-            "✓ Integration test passed - implementations produce very similar results"
-        )
-        print(f"  Result shape: {old_constants.shape}")
-        print(f"  Max absolute difference: {max_abs_diff:.2e}")
-        print(
-            f"  Max relative difference: {max_rel_diff:.2e} ({max_rel_diff * 100:.3f}%)"
-        )
-
-        # Assert that differences are within reasonable engineering tolerances
-        self.assertLess(
-            max_rel_diff, 0.001, "Relative differences should be < 0.1% (0.001)"
-        )
-        self.assertLess(max_abs_diff, 0.001, "Absolute differences should be < 0.001")
 
     def test_simple_two_layer_setup_with_touchdown(self):
         """
@@ -207,7 +196,7 @@ class TestIntegrationOldVsNew(unittest.TestCase):
         inclination = 30.0
         total_length = 14000.0
         try:
-            old_constants, old_state = compute_reference_model_results(
+            old_constants, old_state, old_z = compute_reference_model_results(
                 system="pst-",
                 layers_profile=profile,
                 touchdown=True,
@@ -264,6 +253,21 @@ class TestIntegrationOldVsNew(unittest.TestCase):
 
         new_system = SystemModel(config=config, model_input=model_input)
         new_constants = new_system.unknown_constants
+
+        # Calculate z-vector for each segment using its actual length
+        z_parts = []
+        for i, segment in enumerate(new_system.scenario.segments):
+            length = segment.length
+            x_coords = [0, length / 2, length]
+            z_segment = new_system.z(
+                x=x_coords,
+                C=new_constants[:, [i]],
+                length=length,
+                phi=inclination,
+                has_foundation=segment.has_foundation,
+            )
+            z_parts.append(z_segment)
+        new_z = np.hstack(z_parts)
 
         # Compare the WeakLayer attributes
         self.assertEqual(
@@ -365,39 +369,19 @@ class TestIntegrationOldVsNew(unittest.TestCase):
 
         # --- Compare results ---
         self.assertEqual(
-            old_constants.shape,
-            new_constants.shape,
+            old_z.shape,
+            new_z.shape,
             "Result arrays should have the same shape",
         )
 
-        # Use reasonable tolerances for integration testing between implementations
-        # Small differences (~0.5%) are acceptable due to:
-        # - Different numerical precision in calculations
-        # - Possible minor algorithmic differences in the refactored code
-        # - Floating-point arithmetic accumulation differences
+        # Numerical differences lie in the absolute realm of e-12
         np.testing.assert_allclose(
-            old_constants,
-            new_constants,
-            rtol=1e-2,
-            atol=1e-6,
+            old_z,
+            new_z,
+            rtol=1e-10,
+            atol=1e-12,
             err_msg="Old and new implementations should produce very similar results",
         )
-
-        max_rel_diff = np.max(np.abs((old_constants - new_constants) / old_constants))
-        max_abs_diff = np.max(np.abs(old_constants - new_constants))
-
-        print(
-            "✓ Integration test with touchdown passed - implementations produce very similar results"
-        )
-        print(f"  Result shape: {old_constants.shape}")
-        print(f"  Max absolute difference: {max_abs_diff:.2e}")
-        print(
-            f"  Max relative difference: {max_rel_diff:.2e} ({max_rel_diff * 100:.3f}%)"
-        )
-
-        # Assert that differences are within reasonable engineering tolerances
-        self.assertLess(max_rel_diff, 0.01, "Relative differences should be < 1%")
-        self.assertLess(max_abs_diff, 0.001, "Absolute differences should be < 0.001")
 
 
 if __name__ == "__main__":

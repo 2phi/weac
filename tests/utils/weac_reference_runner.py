@@ -185,6 +185,34 @@ def main():
     segs = model.calc_segments(L=L, a=a, m=m, li=None, mi=None, ki=None, phi=phi)["crack"]
     constants = model.assemble_and_solve(phi=phi, **segs)
 
+    z_parts = []
+    num_segments = constants.shape[1]
+    # The 'pst-' system returns segments in lists under 'li', 'mi', 'ki'
+    seg_lengths = segs.get('li', [])
+    seg_foundations = segs.get('ki', [])
+
+    for i in range(num_segments):
+        seg_len = seg_lengths[i]
+        is_bed = seg_foundations[i]
+        x_coords = [0, seg_len/2, seg_len]
+        C_seg = constants[:, [i]]
+
+        z_segment = model.z(
+            x=x_coords,
+            C=C_seg,
+            l=seg_len,
+            phi=phi,
+            bed=is_bed
+        )
+        z_parts.append(np.asarray(z_segment))
+
+    if z_parts:
+        z_combined = np.hstack(z_parts)
+        z_list = z_combined.tolist()
+    else:
+        z_list = []
+
+
     # Extract state needed by tests
     state = {
         "weak": {
@@ -204,9 +232,10 @@ def main():
             "a2": getattr(model, 'a2', None),
             "td": getattr(model, 'td', None),
         },
+        "segs": segs,
     }
 
-    out = {"constants": np.asarray(constants).tolist(), "state": state}
+    out = {"constants": np.asarray(constants).tolist(), "state": state, "z": z_list}
     print(json.dumps(out, default=json_default))
 
 if __name__ == '__main__':
@@ -227,8 +256,8 @@ def compute_reference_model_results(
     phi: float,
     set_foundation: Optional[Dict[str, Any]] = None,
     version: str = DEFAULT_REFERENCE_VERSION,
-) -> Tuple["_np.ndarray", Dict[str, Any]]:
-    """Run the reference published weac implementation and return (constants, state).
+) -> Tuple["_np.ndarray", Dict[str, Any], "_np.ndarray"]:
+    """Run the reference published weac implementation and return (constants, state, z).
 
     The return constants is a numpy array; state is a JSON-serializable dict
     with selected model attributes used in tests.
@@ -285,6 +314,7 @@ def compute_reference_model_results(
 
         constants = np.asarray(data["constants"])
         state = data["state"]
-        return constants, state
+        z = np.asarray(data["z"])
+        return constants, state, z
     finally:
         shutil.rmtree(tmp_dir, ignore_errors=True)
