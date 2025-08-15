@@ -27,19 +27,22 @@ class TestIntegrationOldVsNew(unittest.TestCase):
         inclination = 30.0
         total_length = 14000.0
         try:
-            old_constants, old_state, old_z = compute_reference_model_results(
-                system="pst-",
-                layers_profile=profile,
-                touchdown=False,
-                L=total_length,
-                a=4000,
-                m=0,
-                phi=inclination,
+            old_constants, old_state, old_z, old_analysis = (
+                compute_reference_model_results(
+                    system="pst-",
+                    layers_profile=profile,
+                    touchdown=False,
+                    L=total_length,
+                    a=4000,
+                    m=0,
+                    phi=inclination,
+                )
             )
         except RuntimeError as exc:
             self.skipTest(f"Old weac environment unavailable: {exc}")
 
         # --- Setup for NEW implementation (main_weac2.py style) ---
+        from weac.analysis.analyzer import Analyzer
         from weac.components import (
             CriteriaConfig,
             Layer,
@@ -97,6 +100,17 @@ class TestIntegrationOldVsNew(unittest.TestCase):
             has_foundation=False,
         )
         new_z = np.hstack([z1, z2])
+
+        # --- Analysis for NEW implementation ---
+        analyzer = Analyzer(new_system, printing_enabled=False)
+        new_raster_x, new_raster_z, new_raster_xb = analyzer.rasterize_solution(num=100)
+        new_z_mesh_dict = analyzer.get_zmesh(dz=2)
+        new_sxx = analyzer.Sxx(new_raster_z, inclination, dz=2, unit="kPa")
+        new_txz = analyzer.Txz(new_raster_z, inclination, dz=2, unit="kPa")
+        new_szz = analyzer.Szz(new_raster_z, inclination, dz=2, unit="kPa")
+        new_principal_stress_slab = analyzer.principal_stress_slab(
+            new_raster_z, inclination, dz=2, val="max", unit="kPa", normalize=False
+        )
 
         # Compare the WeakLayer attributes
         self.assertEqual(
@@ -184,6 +198,87 @@ class TestIntegrationOldVsNew(unittest.TestCase):
             err_msg="Old and new implementations should produce very similar z vectors",
         )
 
+        # Compare analysis results
+        np.testing.assert_allclose(
+            old_analysis["raster_x"],
+            new_raster_x,
+            rtol=1e-10,
+            atol=1e-12,
+            err_msg="Rasterized x-coordinates should be very similar",
+        )
+        np.testing.assert_allclose(
+            old_analysis["raster_z"],
+            new_raster_z,
+            rtol=1e-10,
+            atol=1e-12,
+            err_msg="Rasterized z-solutions should be very similar",
+        )
+        # For raster_xb, we need to handle NaNs
+        np.testing.assert_allclose(
+            old_analysis["raster_xb"],
+            new_raster_xb,
+            rtol=1e-10,
+            atol=1e-12,
+            err_msg="Rasterized founded x-coordinates should be very similar",
+            equal_nan=True,
+        )
+        np.testing.assert_allclose(
+            old_analysis["z_mesh"][:, 0],
+            new_z_mesh_dict["z"],
+            rtol=1e-10,
+            atol=1e-12,
+            err_msg="Z-mesh should be very similar",
+        )
+        np.testing.assert_allclose(
+            old_analysis["z_mesh"][:, 1],
+            new_z_mesh_dict["E"],
+            rtol=1e-10,
+            atol=1e-12,
+            err_msg="Z-mesh should be very similar",
+        )
+        np.testing.assert_allclose(
+            old_analysis["z_mesh"][:, 2],
+            new_z_mesh_dict["nu"],
+            rtol=1e-10,
+            atol=1e-12,
+            err_msg="Z-mesh should be very similar",
+        )
+        np.testing.assert_allclose(
+            old_analysis["z_mesh"][:, 3],
+            new_z_mesh_dict["rho"] * 1e12,
+            rtol=1e-10,
+            atol=1e-12,
+            err_msg="Z-mesh should be very similar",
+        )
+        np.testing.assert_allclose(
+            old_analysis["sxx"],
+            new_sxx,
+            rtol=1e-10,
+            atol=1e-12,
+            err_msg="Sxx stress should be very similar",
+        )
+        np.testing.assert_allclose(
+            old_analysis["txz"],
+            new_txz,
+            rtol=1e-10,
+            atol=1e-12,
+            err_msg="Txz stress should be very similar",
+        )
+        np.testing.assert_allclose(
+            old_analysis["szz"],
+            new_szz,
+            rtol=1e-10,
+            atol=1e-12,
+            err_msg="Szz stress should be very similar",
+        )
+        np.testing.assert_allclose(
+            old_analysis["principal_stress_slab"],
+            new_principal_stress_slab,
+            rtol=1e-10,
+            atol=1e-12,
+            err_msg="Principal slab stress should be very similar",
+        )
+
     def test_simple_two_layer_setup_with_touchdown(self):
         """
         Test that old and new implementations produce identical results for a simple two-layer setup with touchdown=True.
@@ -196,20 +291,23 @@ class TestIntegrationOldVsNew(unittest.TestCase):
         inclination = 30.0
         total_length = 14000.0
         try:
-            old_constants, old_state, old_z = compute_reference_model_results(
-                system="pst-",
-                layers_profile=profile,
-                touchdown=True,
-                L=total_length,
-                a=4000,
-                m=0,
-                phi=inclination,
-                set_foundation={"t": 20, "E": 0.35, "nu": 0.1},
+            old_constants, old_state, old_z, old_analysis = (
+                compute_reference_model_results(
+                    system="pst-",
+                    layers_profile=profile,
+                    touchdown=True,
+                    L=total_length,
+                    a=4000,
+                    m=0,
+                    phi=inclination,
+                    set_foundation={"t": 20, "E": 0.35, "nu": 0.1},
+                )
             )
         except RuntimeError as exc:
             self.skipTest(f"Old weac environment unavailable: {exc}")
 
         # --- Setup for NEW implementation (main_weac2.py style) ---
+        from weac.analysis.analyzer import Analyzer
         from weac.components import (
             CriteriaConfig,
             Layer,
@@ -268,6 +366,17 @@ class TestIntegrationOldVsNew(unittest.TestCase):
             )
             z_parts.append(z_segment)
         new_z = np.hstack(z_parts)
+
+        # --- Analysis for NEW implementation ---
+        analyzer = Analyzer(new_system, printing_enabled=False)
+        new_raster_x, new_raster_z, new_raster_xb = analyzer.rasterize_solution(num=100)
+        new_z_mesh_dict = analyzer.get_zmesh(dz=2)
+        new_sxx = analyzer.Sxx(new_raster_z, inclination, dz=2, unit="kPa")
+        new_txz = analyzer.Txz(new_raster_z, inclination, dz=2, unit="kPa")
+        new_szz = analyzer.Szz(new_raster_z, inclination, dz=2, unit="kPa")
+        new_principal_stress_slab = analyzer.principal_stress_slab(
+            new_raster_z, inclination, dz=2, val="max", unit="kPa", normalize=False
+        )
 
         # Compare the WeakLayer attributes
         self.assertEqual(
@@ -381,6 +490,87 @@ class TestIntegrationOldVsNew(unittest.TestCase):
             rtol=1e-10,
             atol=1e-12,
             err_msg="Old and new implementations should produce very similar results",
+        )
+
+        # Compare analysis results
+        np.testing.assert_allclose(
+            old_analysis["raster_x"],
+            new_raster_x,
+            rtol=1e-10,
+            atol=1e-12,
+            err_msg="Rasterized x-coordinates should be very similar",
+        )
+        np.testing.assert_allclose(
+            old_analysis["raster_z"],
+            new_raster_z,
+            rtol=1e-10,
+            atol=1e-12,
+            err_msg="Rasterized z-solutions should be very similar",
+        )
+        # For raster_xb, we need to handle NaNs
+        np.testing.assert_allclose(
+            old_analysis["raster_xb"],
+            new_raster_xb,
+            rtol=1e-10,
+            atol=1e-12,
+            err_msg="Rasterized founded x-coordinates should be very similar",
+            equal_nan=True,
+        )
+        np.testing.assert_allclose(
+            old_analysis["z_mesh"][:, 0],
+            new_z_mesh_dict["z"],
+            rtol=1e-10,
+            atol=1e-12,
+            err_msg="Z-mesh should be very similar",
+        )
+        np.testing.assert_allclose(
+            old_analysis["z_mesh"][:, 1],
+            new_z_mesh_dict["E"],
+            rtol=1e-10,
+            atol=1e-12,
+            err_msg="Z-mesh should be very similar",
+        )
+        np.testing.assert_allclose(
+            old_analysis["z_mesh"][:, 2],
+            new_z_mesh_dict["nu"],
+            rtol=1e-10,
+            atol=1e-12,
+            err_msg="Z-mesh should be very similar",
+        )
+        np.testing.assert_allclose(
+            old_analysis["z_mesh"][:, 3],
+            new_z_mesh_dict["rho"] * 1e12,
+            rtol=1e-10,
+            atol=1e-12,
+            err_msg="Z-mesh should be very similar",
+        )
+        np.testing.assert_allclose(
+            old_analysis["sxx"],
+            new_sxx,
+            rtol=1e-10,
+            atol=1e-12,
+            err_msg="Sxx stress should be very similar",
+        )
+        np.testing.assert_allclose(
+            old_analysis["txz"],
+            new_txz,
+            rtol=1e-10,
+            atol=1e-12,
+            err_msg="Txz stress should be very similar",
+        )
+        np.testing.assert_allclose(
+            old_analysis["szz"],
+            new_szz,
+            rtol=1e-10,
+            atol=1e-12,
+            err_msg="Szz stress should be very similar",
+        )
+        np.testing.assert_allclose(
+            old_analysis["principal_stress_slab"],
+            new_principal_stress_slab,
+            rtol=1e-10,
+            atol=1e-12,
+            err_msg="Principal slab stress should be very similar",
         )
 
 

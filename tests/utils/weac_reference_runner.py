@@ -213,6 +213,31 @@ def main():
         z_list = []
 
 
+    # --- Analysis ---
+    analysis_results = {}
+    if num_segments > 0:
+        raster_x, raster_z, raster_xb = model.rasterize_solution(
+            C=constants, phi=phi, li=seg_lengths, ki=seg_foundations, num=100
+        )
+        z_mesh = model.get_zmesh(dz=2)
+        sxx = model.Sxx(raster_z, phi, dz=2, unit="kPa")
+        txz = model.Txz(raster_z, phi, dz=2, unit="kPa")
+        szz = model.Szz(raster_z, phi, dz=2, unit="kPa")
+        principal_stress_slab = model.principal_stress_slab(
+            raster_z, phi, dz=2, val="max", unit="kPa", normalize=False
+        )
+
+        analysis_results = {
+            "raster_x": np.asarray(raster_x).tolist(),
+            "raster_z": np.asarray(raster_z).tolist(),
+            "raster_xb": np.asarray(raster_xb).tolist(),
+            "z_mesh": np.asarray(z_mesh).tolist(),
+            "sxx": np.asarray(sxx).tolist(),
+            "txz": np.asarray(txz).tolist(),
+            "szz": np.asarray(szz).tolist(),
+            "principal_stress_slab": np.asarray(principal_stress_slab).tolist(),
+        }
+
     # Extract state needed by tests
     state = {
         "weak": {
@@ -235,7 +260,7 @@ def main():
         "segs": segs,
     }
 
-    out = {"constants": np.asarray(constants).tolist(), "state": state, "z": z_list}
+    out = {"constants": np.asarray(constants).tolist(), "state": state, "z": z_list, "analysis": analysis_results}
     print(json.dumps(out, default=json_default))
 
 if __name__ == '__main__':
@@ -256,7 +281,7 @@ def compute_reference_model_results(
     phi: float,
     set_foundation: Optional[Dict[str, Any]] = None,
     version: str = DEFAULT_REFERENCE_VERSION,
-) -> Tuple["_np.ndarray", Dict[str, Any], "_np.ndarray"]:
+) -> Tuple["_np.ndarray", Dict[str, Any], "_np.ndarray", Dict[str, Any]]:
     """Run the reference published weac implementation and return (constants, state, z).
 
     The return constants is a numpy array; state is a JSON-serializable dict
@@ -315,6 +340,26 @@ def compute_reference_model_results(
         constants = np.asarray(data["constants"])
         state = data["state"]
         z = np.asarray(data["z"])
-        return constants, state, z
+        analysis = data.get("analysis", {})
+        if "raster_x" in analysis:
+            analysis["raster_x"] = np.asarray(analysis["raster_x"])
+        if "raster_z" in analysis:
+            analysis["raster_z"] = np.asarray(analysis["raster_z"])
+        if "raster_xb" in analysis:
+            analysis["raster_xb"] = np.asarray(analysis["raster_xb"])
+        if "z_mesh" in analysis:
+            analysis["z_mesh"] = np.asarray(analysis["z_mesh"])
+        if "sxx" in analysis:
+            analysis["sxx"] = np.asarray(analysis["sxx"])
+        if "txz" in analysis:
+            analysis["txz"] = np.asarray(analysis["txz"])
+        if "szz" in analysis:
+            analysis["szz"] = np.asarray(analysis["szz"])
+        if "principal_stress_slab" in analysis:
+            analysis["principal_stress_slab"] = np.asarray(
+                analysis["principal_stress_slab"]
+            )
+
+        return constants, state, z, analysis
     finally:
         shutil.rmtree(tmp_dir, ignore_errors=True)
