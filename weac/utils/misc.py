@@ -112,7 +112,7 @@ def isnotebook() -> bool:
     """
     try:
         # Check if we're in IPython
-        from IPython import get_ipython
+        from IPython import get_ipython  # pylint: disable=import-outside-toplevel
 
         if get_ipython() is None:
             return False

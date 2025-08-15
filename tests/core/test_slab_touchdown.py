@@ -19,6 +19,7 @@ class SlabTouchdownTestBase(unittest.TestCase):
     """Base class for SlabTouchdown tests, providing common setup."""
 
     def make_base_objects(self):
+        """Make base objects for testing."""
         layers = [Layer(rho=220, h=120)]
         slab = Slab(layers)
         weak_layer = WeakLayer(rho=120, h=25)
@@ -39,6 +40,7 @@ class TestSlabTouchdownInitialization(SlabTouchdownTestBase):
     """Test the initialization of the SlabTouchdown class."""
 
     def test_init_sets_flat_config_and_collapsed_eigensystem(self):
+        """Test the initialization of the SlabTouchdown class."""
         scenario, eig = self.make_base_objects()
         with patch.object(SlabTouchdown, "_setup_touchdown_system", return_value=None):
             td = SlabTouchdown(scenario, eig)
@@ -69,6 +71,7 @@ class TestSlabTouchdownBoundaries(SlabTouchdownTestBase):
     """Test the calculation of touchdown mode boundaries."""
 
     def test_calc_l_AB_root_exists_and_within_bounds(self):
+        """Test the calculation of touchdown mode boundaries."""
         scenario, eig = self.make_base_objects()
         # Avoid heavy setup
         with patch.object(SlabTouchdown, "_setup_touchdown_system", return_value=None):
@@ -84,6 +87,7 @@ class TestSlabTouchdownBoundaries(SlabTouchdownTestBase):
         self.assertLess(l_ab, td.scenario.L)
 
     def test_calc_l_BC_root_exists_and_within_bounds(self):
+        """Test the calculation of touchdown mode boundaries."""
         scenario, eig = self.make_base_objects()
         with patch.object(SlabTouchdown, "_setup_touchdown_system", return_value=None):
             td = SlabTouchdown(scenario, eig)
@@ -102,6 +106,7 @@ class TestSlabTouchdownModeAndDistance(SlabTouchdownTestBase):
     """Test the calculation of touchdown mode and distance."""
 
     def test_calc_touchdown_mode_assigns_correct_mode(self):
+        """Test the calculation of touchdown mode and distance."""
         scenario, eig = self.make_base_objects()
         with patch.object(SlabTouchdown, "_setup_touchdown_system", return_value=None):
             td = SlabTouchdown(scenario, eig)
@@ -126,6 +131,7 @@ class TestSlabTouchdownModeAndDistance(SlabTouchdownTestBase):
             self.assertEqual(td.touchdown_mode, "C_in_contact")
 
     def test_calc_touchdown_distance_sets_expected_values(self):
+        """Test the calculation of touchdown mode and distance."""
         scenario, eig = self.make_base_objects()
         with patch.object(SlabTouchdown, "_setup_touchdown_system", return_value=None):
             td = SlabTouchdown(scenario, eig)
@@ -155,6 +161,7 @@ class TestSlabTouchdownHelpers(SlabTouchdownTestBase):
     """Test helper methods for the SlabTouchdown class."""
 
     def test_generate_straight_scenario(self):
+        """Test the generation of a straight scenario."""
         scenario, eig = self.make_base_objects()
         with patch.object(SlabTouchdown, "_setup_touchdown_system", return_value=None):
             td = SlabTouchdown(scenario, eig)
@@ -167,13 +174,14 @@ class TestSlabTouchdownHelpers(SlabTouchdownTestBase):
         self.assertTrue(bool(straight.ki[0]))
 
     def test_create_collapsed_eigensystem_scales_weak_layer(self):
+        """Test the creation of a collapsed eigensystem."""
         scenario, eig = self.make_base_objects()
         with patch.object(SlabTouchdown, "_setup_touchdown_system", return_value=None):
             td = SlabTouchdown(scenario, eig)
         # Recreate to test method in isolation
         collapsed = td._create_collapsed_eigensystem(
             qs=scenario.scenario_config.surface_load
-        )
+        )  # pylint: disable=protected-access
         self.assertAlmostEqual(
             collapsed.weak_layer.kn, scenario.weak_layer.kn * STIFFNESS_COLLAPSE_FACTOR
         )
@@ -182,6 +190,7 @@ class TestSlabTouchdownHelpers(SlabTouchdownTestBase):
         )
 
     def test_calc_touchdown_distance_in_mode_C_root_in_range(self):
+        """Test the calculation of touchdown mode and distance."""
         scenario, eig = self.make_base_objects()
         scenario.scenario_config.cut_length = 300.0
         scenario.cut_length = 300.0
@@ -202,36 +211,40 @@ class TestSlabTouchdownHelpers(SlabTouchdownTestBase):
             return 3.0
 
         with patch.object(td, "_substitute_stiffness", side_effect=fake_subst):
-            d = td._calc_touchdown_distance_in_mode_C()
+            d = td._calc_touchdown_distance_in_mode_C()  # pylint: disable=protected-access
+
         self.assertGreater(d, 0.0)
         self.assertLess(d, scenario.cut_length)
 
     def test_calc_collapsed_weak_layer_kR_returns_positive(self):
+        """Test the calculation of collapsed weak layer stiffness."""
         scenario, eig = self.make_base_objects()
         with patch.object(SlabTouchdown, "_setup_touchdown_system", return_value=None):
             td = SlabTouchdown(scenario, eig)
         td.touchdown_mode = "A_free_hanging"
         td.touchdown_distance = 100.0
         with patch.object(td, "_substitute_stiffness", return_value=7.5):
-            kR = td._calc_collapsed_weak_layer_kR()
+            kR = td._calc_collapsed_weak_layer_kR()  # pylint: disable=protected-access
         self.assertGreater(kR, 0.0)
         self.assertAlmostEqual(kR, 7.5)
 
     def test_substitute_stiffness_rot_and_trans_are_finite(self):
+        """Test the calculation of substitute stiffness."""
         scenario, eig = self.make_base_objects()
         # Avoid running setup (roots) and use method directly
         with patch.object(SlabTouchdown, "_setup_touchdown_system", return_value=None):
             td = SlabTouchdown(scenario, eig)
         # Use a small, straight scenario to compute substitute stiffness
-        straight = td._generate_straight_scenario(L=400.0)
-        kR = td._substitute_stiffness(straight, td.eigensystem, dof="rot")
-        kN = td._substitute_stiffness(straight, td.eigensystem, dof="trans")
+        straight = td._generate_straight_scenario(L=400.0)  # pylint: disable=protected-access
+        kR = td._substitute_stiffness(straight, td.eigensystem, dof="rot")  # pylint: disable=protected-access
+        kN = td._substitute_stiffness(straight, td.eigensystem, dof="trans")  # pylint: disable=protected-access
         self.assertTrue(np.isfinite(kR))
         self.assertTrue(np.isfinite(kN))
         self.assertGreater(kR, 0.0)
         self.assertGreater(kN, 0.0)
 
     def test_setup_touchdown_system_calls_subroutines(self):
+        """Test the setup of the touchdown system."""
         scenario, eig = self.make_base_objects()
         with (
             patch.object(

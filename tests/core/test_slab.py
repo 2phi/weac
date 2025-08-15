@@ -176,8 +176,8 @@ class TestSlabVerticalCenterOfGravity(unittest.TestCase):
         layers = [Layer(rho=250, h=80)]
         slab = Slab(layers)
 
-        x_cog_30, z_cog_30, w_30 = slab.calc_vertical_center_of_gravity(phi=30)
-        x_cog_60, z_cog_60, w_60 = slab.calc_vertical_center_of_gravity(phi=60)
+        x_cog_30, _, w_30 = slab.calc_vertical_center_of_gravity(phi=30)
+        x_cog_60, _, w_60 = slab.calc_vertical_center_of_gravity(phi=60)
 
         # Steeper inclination should result in larger displacements and weights
         self.assertGreater(

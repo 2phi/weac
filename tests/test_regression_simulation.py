@@ -253,6 +253,7 @@ class TestRegressionSimulation(unittest.TestCase):
     """Regression tests asserting stable outputs for key scenarios."""
 
     def test_skier_baseline(self):
+        """Test the skier baseline."""
         layers = [Layer(rho=200, h=150)]
         wl = WeakLayer(rho=150, h=10)
         segs = [
@@ -283,6 +284,7 @@ class TestRegressionSimulation(unittest.TestCase):
         np.testing.assert_allclose(GT_skier_baseline, zz, rtol=1e-10, atol=1e-12)
 
     def test_skiers_baseline(self):
+        """Test the skiers baseline."""
         layers = [Layer(rho=200, h=150)]
         wl = WeakLayer()
         segs = [
@@ -321,6 +323,7 @@ class TestRegressionSimulation(unittest.TestCase):
         np.testing.assert_allclose(GT_skiers_baseline, zz, rtol=1e-10, atol=1e-12)
 
     def test_pst_without_touchdown_baseline(self):
+        """Test the pst without touchdown baseline."""
         layers = [Layer(rho=200, h=150), Layer(rho=300, h=100)]
         wl = WeakLayer(rho=170, h=20)
         segs = [
@@ -351,6 +354,7 @@ class TestRegressionSimulation(unittest.TestCase):
         np.testing.assert_allclose(GT_pst_without_touchdown, zz, rtol=1e-10, atol=1e-12)
 
     def test_pst_with_touchdown_baseline(self):
+        """Test the pst with touchdown baseline."""
         layers = [Layer(rho=200, h=150), Layer(rho=300, h=100)]
         wl = WeakLayer(rho=50, h=20, E=0.35, nu=0.1)
         segs = [

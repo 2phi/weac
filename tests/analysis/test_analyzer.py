@@ -46,6 +46,7 @@ class TestAnalyzer(unittest.TestCase):
         self.an_pst = Analyzer(system_model=self.sm_pst, printing_enabled=False)
 
     def test_rasterize_solution_runs_and_shapes(self):
+        """Test rasterize_solution runs and shapes."""
         for mode in ("cracked", "uncracked"):
             xs, Z, xs_supported = self.an_ski.rasterize_solution(mode=mode, num=200)
             self.assertEqual(Z.shape[0], 6)
@@ -54,6 +55,7 @@ class TestAnalyzer(unittest.TestCase):
             self.assertTrue(np.all(np.diff(xs[~np.isnan(xs)]) >= 0))
 
     def test_get_zmesh_contains_expected_keys(self):
+        """Test get_zmesh contains expected keys."""
         zmesh = self.an_ski.get_zmesh(dz=5)
         for key in ("z", "E", "nu", "rho", "tensile_strength"):
             self.assertIn(key, zmesh)
@@ -61,6 +63,7 @@ class TestAnalyzer(unittest.TestCase):
         self.assertGreater(len(zmesh["z"]), 1)
 
     def test_stress_fields_shapes_and_finite(self):
+        """Test stress fields shapes and finite values."""
         _, Z, _ = self.an_ski.rasterize_solution(num=150)
         phi = self.sm_ski.scenario.phi
         Sxx = self.an_ski.Sxx(Z=Z, phi=phi, dz=5)
@@ -75,6 +78,7 @@ class TestAnalyzer(unittest.TestCase):
         self.assertTrue(np.isfinite(Szz).all())
 
     def test_principal_stress_slab_variants(self):
+        """Test principal stress slab variants."""
         _, Z, _ = self.an_ski.rasterize_solution(num=120)
         phi = self.sm_ski.scenario.phi
         for val in ("max", "min"):
@@ -92,6 +96,7 @@ class TestAnalyzer(unittest.TestCase):
             )
 
     def test_principal_stress_weaklayer_variants(self):
+        """Test principal stress weaklayer variants."""
         _, Z, _ = self.an_ski.rasterize_solution(num=120)
         for val in ("max", "min"):
             ps = self.an_ski.principal_stress_weaklayer(Z=Z, val=val)
@@ -104,6 +109,7 @@ class TestAnalyzer(unittest.TestCase):
             _ = self.an_ski.principal_stress_weaklayer(Z=Z, val="max", normalize=True)
 
     def test_energy_release_rates_shapes(self):
+        """Test energy release rates shapes."""
         Ginc = self.an_ski.incremental_ERR()
         self.assertEqual(Ginc.shape, (3,))
         self.assertTrue(np.isfinite(Ginc).all())
@@ -113,14 +119,17 @@ class TestAnalyzer(unittest.TestCase):
         self.assertTrue(np.isfinite(Gdif).all())
 
     def test_internal_and_external_potentials_pst(self):
+        """Test internal and external potentials for PST."""
         # Ensure PST-specific methods run
         Pi_total = self.an_pst.total_potential()
         self.assertTrue(np.isfinite(Pi_total))
 
-        Pi_ext = self.an_pst._external_potential()
+        Pi_ext = self.an_pst._external_potential()  # pylint: disable=protected-access
+
         self.assertTrue(np.isfinite(Pi_ext))
 
-        Pi_int = self.an_pst._internal_potential()
+        Pi_int = self.an_pst._internal_potential()  # pylint: disable=protected-access
+
         self.assertTrue(np.isfinite(Pi_int))
         # Consistency: total ≈ int + ext
         self.assertAlmostEqual(Pi_total, Pi_int + Pi_ext, places=6)

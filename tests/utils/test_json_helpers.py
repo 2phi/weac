@@ -27,8 +27,7 @@ class TestJsonHelpers(unittest.TestCase):
             "bool_true": np.bool_(True),
             "bool_false": np.bool_(False),
         }
-        data = {k: v for k, v in cases.items()}
-        result = json.dumps(data, default=json_default)
+        result = json.dumps(cases, default=json_default)
         expected = (
             '{"int64": 42, "float64": 3.14, "bool_true": true, "bool_false": false}'
         )

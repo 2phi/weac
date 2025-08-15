@@ -161,7 +161,7 @@ from json_helpers import json_default
 
 def main():
     cfg_path = sys.argv[1]
-    with open(cfg_path, 'r') as f:
+    with open(cfg_path, 'r', encoding='utf-8') as f:
         cfg = json.load(f)
 
     import weac as ref_weac

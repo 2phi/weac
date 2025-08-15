@@ -42,6 +42,8 @@ convert_to_deg = {"deg": 1, "rad": 180 / np.pi}
 
 
 class SnowPilotParser:
+    """Parser for SnowPilot files using the snowpylot library."""
+
     def __init__(self, file_path: str):
         self.snowpit: SnowPit = caaml_parser(file_path)
 
@@ -157,10 +159,10 @@ class SnowPilotParser:
                         density_bottom = compute_density(
                             grain_type, hand_hardness_bottom
                         )
-                    except Exception as e:
-                        raise ValueError(
-                            f"Error computing density for layer {layer.depth_top}: {e}"
-                        )
+                    except Exception as exc:
+                        raise AttributeError(
+                            "Layer is missing density information; density profile, hand hardness and grain type are all missing. Excluding SnowPit from calculations."
+                        ) from exc
 
                 layers.append(
                     Layer(
@@ -182,10 +184,10 @@ class SnowPilotParser:
                     try:
                         density_methods.append("geldsetzer")
                         density = compute_density(grain_type, hand_hardness)
-                    except Exception:
+                    except Exception as exc:
                         raise AttributeError(
                             "Layer is missing density information; density profile, hand hardness and grain type are all missing. Excluding SnowPit from calculations."
-                        )
+                        ) from exc
 
                 layers.append(
                     Layer(
@@ -280,7 +282,7 @@ class SnowPilotParser:
             raise ValueError(
                 "The depth of the weak layer is not positive. Excluding SnowPit from calculations."
             )
-        if weak_layer_depth > sum([layer.h for layer in layers]):
+        if weak_layer_depth > sum(layer.h for layer in layers):
             raise ValueError(
                 "The depth of the weak layer is below the recorded layers. Excluding SnowPit from calculations."
             )

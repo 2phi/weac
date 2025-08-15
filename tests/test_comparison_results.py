@@ -2,16 +2,21 @@
 This module contains tests that compare the results of the old and new WEAC implementations.
 """
 
-import os
-import sys
 import unittest
 
 import numpy as np
 
-# Add the project root to the Python path so we can import weac
-project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-sys.path.insert(0, project_root)
-
+from weac.analysis.analyzer import Analyzer
+from weac.components import (
+    CriteriaConfig,
+    Layer,
+    ModelInput,
+    ScenarioConfig,
+    Segment,
+    WeakLayer,
+)
+from weac.components.config import Config
+from weac.core.system_model import SystemModel
 from tests.utils.weac_reference_runner import (  # noqa: E402
     compute_reference_model_results,
 )
@@ -47,18 +52,6 @@ class TestIntegrationOldVsNew(unittest.TestCase):
             self.skipTest(f"Old weac environment unavailable: {exc}")
 
         # --- Setup for NEW implementation (main_weac2.py style) ---
-        from weac.analysis.analyzer import Analyzer
-        from weac.components import (
-            CriteriaConfig,
-            Layer,
-            ModelInput,
-            ScenarioConfig,
-            Segment,
-            WeakLayer,
-        )
-        from weac.components.config import Config
-        from weac.core.system_model import SystemModel
-
         # Equivalent setup in new system
         layers = [
             Layer(rho=200, h=150),
@@ -312,18 +305,6 @@ class TestIntegrationOldVsNew(unittest.TestCase):
             self.skipTest(f"Old weac environment unavailable: {exc}")
 
         # --- Setup for NEW implementation (main_weac2.py style) ---
-        from weac.analysis.analyzer import Analyzer
-        from weac.components import (
-            CriteriaConfig,
-            Layer,
-            ModelInput,
-            ScenarioConfig,
-            Segment,
-            WeakLayer,
-        )
-        from weac.components.config import Config
-        from weac.core.system_model import SystemModel
-
         # Equivalent setup in new system
         layers = [
             Layer(rho=200, h=150),
