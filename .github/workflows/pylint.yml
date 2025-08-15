@@ -1,8 +1,6 @@
 name: Static code analysis 🔎
 
 on:
-  push:
-    branches-ignore: [ main, develop ]
   pull_request:
     branches: [ main, develop ]
   workflow_call:

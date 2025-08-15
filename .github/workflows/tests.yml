@@ -2,9 +2,6 @@ name: Run unit tests 🤖
 
 # Trigger conditions for the workflow
 on:
-  # Run tests on push events for all branches except main and develop
-  push:
-    branches-ignore: [ main, develop ]
   # Run tests on pull_request events only for main and develop branches
   pull_request:
     branches: [ main, develop ]
