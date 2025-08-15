@@ -1,3 +1,7 @@
+"""
+This module contains tests that compare the results of the old and new WEAC implementations.
+"""
+
 import os
 import sys
 import unittest

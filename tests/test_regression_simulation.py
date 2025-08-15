@@ -1,3 +1,7 @@
+"""
+This module contains regression tests for the WEAC model.
+"""
+
 import unittest
 
 import numpy as np

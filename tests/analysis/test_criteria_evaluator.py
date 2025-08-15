@@ -1,3 +1,7 @@
+"""
+This module contains tests for the CriteriaEvaluator class.
+"""
+
 # Standard library imports
 import unittest
 

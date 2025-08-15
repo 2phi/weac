@@ -1,3 +1,7 @@
+"""
+This module contains tests for the SystemModel class.
+"""
+
 import unittest
 from unittest.mock import MagicMock, patch
 

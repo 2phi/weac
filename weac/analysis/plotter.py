@@ -1,3 +1,7 @@
+"""
+This module provides plotting functions for visualizing the results of the WEAC model.
+"""
+
 # Standard library imports
 import colorsys
 import logging

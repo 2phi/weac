@@ -1,3 +1,7 @@
+"""
+This module handles the calculation of slab touchdown events.    Handling the touchdown situation in a PST.
+"""
+
 import logging
 from typing import Literal, Optional
 

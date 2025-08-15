@@ -1,3 +1,7 @@
+"""
+This module contains tests for the Scenario class.
+"""
+
 import unittest
 
 import numpy as np

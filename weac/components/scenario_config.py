@@ -1,3 +1,7 @@
+"""
+This module defines the ScenarioConfig class, which contains the configuration for a given scenario.
+"""
+
 from typing import Literal
 
 from pydantic import BaseModel, Field

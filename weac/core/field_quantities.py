@@ -1,3 +1,9 @@
+"""
+This module defines the FieldQuantities class, which is responsible for calculating
+and providing access to various physical quantities within the slab.
+"""
+
+import numpy as np
 from typing import Literal
 
 import numpy as np

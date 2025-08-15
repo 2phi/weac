@@ -1,3 +1,7 @@
+"""
+Component Classes for Inputs of the WEAC model.
+"""
+
 from .config import Config
 from .criteria_config import CriteriaConfig
 from .layer import Layer, WeakLayer

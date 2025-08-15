@@ -1,3 +1,7 @@
+"""
+This module defines the Scenario class, which encapsulates the physical setup of the model.
+"""
+
 import logging
 from typing import List, Literal, Sequence, Union
 

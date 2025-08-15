@@ -1,3 +1,7 @@
+"""
+This module defines the Segment class, which represents a segment of the snowpack.
+"""
+
 from pydantic import BaseModel, Field
 
 

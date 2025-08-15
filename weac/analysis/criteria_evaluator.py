@@ -1,3 +1,8 @@
+"""
+This module provides the CriteriaEvaluator class, which is used to evaluate various
+fracture criteria based on the model results.
+"""
+
 # Standard library imports
 import copy
 import logging

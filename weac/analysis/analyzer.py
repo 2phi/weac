@@ -1,3 +1,7 @@
+"""
+This module provides the Analyzer class, which is used to analyze the results of the WEAC model.
+"""
+
 # Standard library imports
 import logging
 import time

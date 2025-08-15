@@ -1,3 +1,7 @@
+"""
+This package contains modules for analyzing the results of the WEAC model.
+"""
+
 from .analyzer import Analyzer
 from .criteria_evaluator import (
     CoupledCriterionHistory,
