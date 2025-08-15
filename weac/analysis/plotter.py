@@ -1051,7 +1051,7 @@ class Plotter:
         sigma = np.abs(fq.sig(z, unit="kPa"))
         tau = fq.tau(z, unit="kPa")
 
-        fig, ax = plt.subplots(figsize=(10, 8))
+        fig, ax = plt.subplots(figsize=(4, 8 / 3))
 
         # Plot stress path
         ax.plot(sigma, tau, "b-", linewidth=2, label="Stress Path")
@@ -1212,7 +1212,7 @@ class Plotter:
         G_I = incr_energy[1]
         G_II = incr_energy[2]
 
-        fig, ax = plt.subplots(figsize=(10, 8))
+        fig, ax = plt.subplots(figsize=(4, 8 / 3))
 
         # Plot stress path
         ax.scatter(
