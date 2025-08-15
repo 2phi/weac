@@ -8,7 +8,7 @@ version = "2.6.1"
 authors = [{ name = "2phi GbR", email = "mail@2phi.de" }]
 description = "Weak layer anticrack nucleation model"
 readme = "README.md"
-requires-python = ">=3.10"
+requires-python = ">=3.12"
 license = { text = "Proprietary" }
 classifiers = [
     "Programming Language :: Python :: 3",
