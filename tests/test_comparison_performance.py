@@ -4,10 +4,10 @@ Detailed profiling script to identify performance bottlenecks in old (published)
 """
 
 import cProfile
-import os
 import io
-import time
+import os
 import pstats
+import time
 from contextlib import contextmanager
 
 import numpy as np
@@ -269,13 +269,13 @@ class DetailedProfiler:
 
         # Time imports for new implementation
         with timer_context("Importing weac.components"):
-            import weac.components
+            pass
 
         with timer_context("Importing weac.components.config"):
-            import weac.components.config
+            pass
 
         with timer_context("Importing weac.core.system_model"):
-            import weac.core.system_model
+            pass
 
         # Time invocation for old implementation env (proxy for import overhead)
         with timer_context("Provisioning old weac env"):

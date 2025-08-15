@@ -5,11 +5,11 @@ Tests the parsing of CAAML files, density measurement extraction,
 fallback to hardness+grain type calculations, and stability test parsing.
 """
 
-import unittest
 import os
+import unittest
 
-from weac.utils.snowpilot_parser import SnowPilotParser
 from weac.components import Layer, WeakLayer
+from weac.utils.snowpilot_parser import SnowPilotParser
 
 
 class TestSnowPilotParser(unittest.TestCase):

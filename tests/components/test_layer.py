@@ -5,14 +5,15 @@ Tests validation, automatic property calculations, and edge cases.
 """
 
 import unittest
+
 from pydantic import ValidationError
 
 from weac.components.layer import (
     Layer,
     WeakLayer,
     _bergfeld_youngs_modulus,
-    _scapozza_youngs_modulus,
     _gerling_youngs_modulus,
+    _scapozza_youngs_modulus,
 )
 
 

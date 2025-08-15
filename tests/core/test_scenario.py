@@ -1,9 +1,10 @@
 import unittest
+
 import numpy as np
 
-from weac.components import ScenarioConfig, Segment, WeakLayer, Layer
-from weac.core.slab import Slab
+from weac.components import Layer, ScenarioConfig, Segment, WeakLayer
 from weac.core.scenario import Scenario
+from weac.core.slab import Slab
 from weac.utils.misc import decompose_to_normal_tangential
 
 

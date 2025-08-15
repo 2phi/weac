@@ -1,5 +1,7 @@
 import unittest
-from unittest.mock import patch, MagicMock
+from unittest.mock import MagicMock, patch
+
+import numpy as np
 
 from weac.components import (
     Config,
@@ -10,7 +12,6 @@ from weac.components import (
     WeakLayer,
 )
 from weac.core.system_model import SystemModel
-import numpy as np
 
 
 class TestSystemModelCaching(unittest.TestCase):

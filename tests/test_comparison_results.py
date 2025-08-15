@@ -3,7 +3,6 @@ import sys
 import unittest
 
 import numpy as np
-from pprint import pprint
 
 # Add the project root to the Python path so we can import weac
 project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))

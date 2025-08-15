@@ -1,5 +1,6 @@
 import logging
 from typing import Literal, Optional
+
 from scipy.optimize import brentq
 
 from weac.components.layer import WeakLayer

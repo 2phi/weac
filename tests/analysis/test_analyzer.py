@@ -4,6 +4,7 @@ import unittest
 # Third party imports
 import numpy as np
 
+from weac.analysis.analyzer import Analyzer
 from weac.components import (
     Config,
     Layer,
@@ -13,7 +14,6 @@ from weac.components import (
 )
 from weac.components.model_input import ModelInput
 from weac.core.system_model import SystemModel
-from weac.analysis.analyzer import Analyzer
 
 
 class TestAnalyzer(unittest.TestCase):

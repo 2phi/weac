@@ -14,7 +14,6 @@ from weac.components import (
 )
 from weac.core.system_model import SystemModel
 
-
 GT_skier_baseline = np.array(
     [
         [

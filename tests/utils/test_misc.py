@@ -5,10 +5,11 @@ Tests force decomposition, skier load calculations, and other utility functions.
 """
 
 import unittest
+
 import numpy as np
 
-from weac.utils.misc import decompose_to_normal_tangential, get_skier_point_load
 from weac.constants import G_MM_S2, LSKI_MM
+from weac.utils.misc import decompose_to_normal_tangential, get_skier_point_load
 
 
 class TestForceDecomposition(unittest.TestCase):

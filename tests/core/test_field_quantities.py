@@ -6,12 +6,13 @@ and other field quantity computations.
 """
 
 import unittest
+
 import numpy as np
 
 from weac.components import Layer, WeakLayer
-from weac.core.slab import Slab
 from weac.core.eigensystem import Eigensystem
 from weac.core.field_quantities import FieldQuantities
+from weac.core.slab import Slab
 
 
 class TestFieldQuantitiesBasic(unittest.TestCase):

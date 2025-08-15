@@ -18,9 +18,9 @@ import numpy as np
 from weac.components import (
     Config,
     Layer,
-    Segment,
     ModelInput,
     ScenarioConfig,
+    Segment,
     WeakLayer,
 )
 from weac.core.eigensystem import Eigensystem

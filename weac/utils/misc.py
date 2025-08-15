@@ -1,5 +1,6 @@
-import numpy as np
 from typing import Literal
+
+import numpy as np
 
 from weac.components import Layer
 from weac.constants import G_MM_S2, LSKI_MM

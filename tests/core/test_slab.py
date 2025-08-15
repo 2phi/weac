@@ -5,11 +5,12 @@ Tests layer assembly, property calculations, center of gravity, and physical con
 """
 
 import unittest
+
 import numpy as np
 
 from weac.components import Layer
-from weac.core.slab import Slab
 from weac.constants import G_MM_S2
+from weac.core.slab import Slab
 
 
 class TestSlabBasicOperations(unittest.TestCase):

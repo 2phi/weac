@@ -6,11 +6,12 @@ complementary and particular solutions.
 """
 
 import unittest
+
 import numpy as np
 
 from weac.components import Layer, WeakLayer
-from weac.core.slab import Slab
 from weac.core.eigensystem import Eigensystem
+from weac.core.slab import Slab
 
 
 class TestEigensystemBasicProperties(unittest.TestCase):

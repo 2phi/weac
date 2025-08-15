@@ -3,12 +3,12 @@ from unittest.mock import patch
 
 import numpy as np
 
-from weac.components import Layer, WeakLayer, Segment, ScenarioConfig
-from weac.core.slab import Slab
-from weac.core.scenario import Scenario
-from weac.core.eigensystem import Eigensystem
-from weac.core.slab_touchdown import SlabTouchdown
+from weac.components import Layer, ScenarioConfig, Segment, WeakLayer
 from weac.constants import STIFFNESS_COLLAPSE_FACTOR
+from weac.core.eigensystem import Eigensystem
+from weac.core.scenario import Scenario
+from weac.core.slab import Slab
+from weac.core.slab_touchdown import SlabTouchdown
 
 
 class SlabTouchdownTestBase(unittest.TestCase):

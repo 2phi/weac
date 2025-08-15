@@ -6,13 +6,14 @@ The Eigenvalue problem is solved for the system properties and the mechanical pr
 
 import logging
 from typing import Optional
+
 import numpy as np
 from numpy.typing import NDArray
 
-from weac.utils.misc import decompose_to_normal_tangential
-from weac.constants import SHEAR_CORRECTION_FACTOR
 from weac.components import WeakLayer
+from weac.constants import SHEAR_CORRECTION_FACTOR
 from weac.core.slab import Slab
+from weac.utils.misc import decompose_to_normal_tangential
 
 logger = logging.getLogger(__name__)
 

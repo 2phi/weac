@@ -1,15 +1,15 @@
 # Standard library imports
 import colorsys
-import os
 import logging
+import os
 from typing import List, Literal, Optional
 
 # Third party imports
 import matplotlib.colors as mc
 import matplotlib.pyplot as plt
-from matplotlib.figure import Figure
-from matplotlib.patches import Rectangle, Patch, Polygon
 import numpy as np
+from matplotlib.figure import Figure
+from matplotlib.patches import Patch, Polygon, Rectangle
 from scipy.optimize import brentq
 
 from weac.analysis.analyzer import Analyzer

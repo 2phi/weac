@@ -1,8 +1,8 @@
 from .analyzer import Analyzer
 from .criteria_evaluator import (
-    CriteriaEvaluator,
     CoupledCriterionHistory,
     CoupledCriterionResult,
+    CriteriaEvaluator,
     FindMinimumForceResult,
     SSERRResult,
 )
