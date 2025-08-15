@@ -83,6 +83,9 @@ ignore = ["E741"]
 [tool.pylint.typecheck]
 generated-members = "matplotlib.cm.*"
 
+[tool.pylint.messages_control]
+disable = ["C0103"]
+
 [tool.pycodestyle]
 ignore = [
     "E121",
