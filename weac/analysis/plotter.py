@@ -294,7 +294,7 @@ class Plotter:
         plt.rc("font", family="serif", size=8)
         plt.rc("mathtext", fontset="cm")
 
-        fig = plt.figure(figsize=(3.5, 4), dpi=300)
+        fig = plt.figure(figsize=(8 / 3, 4))
         ax1 = fig.gca()
 
         # Plot 1: Layer thickness and density

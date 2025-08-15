@@ -1,4 +1,5 @@
 import numpy as np
+from typing import Literal
 
 from weac.components import Layer
 from weac.constants import G_MM_S2, LSKI_MM
@@ -50,7 +51,11 @@ def get_skier_point_load(m: float) -> float:
     return F
 
 
-def load_dummy_profile(profile_id: str) -> list[Layer]:
+def load_dummy_profile(
+    profile_id: Literal[
+        "a", "b", "c", "d", "e", "f", "h", "soft", "medium", "hard", "comp"
+    ],
+) -> list[Layer]:
     """Define standard layering types for comparison."""
     soft_layer = Layer(rho=180, h=120, E=5)
     medium_layer = Layer(rho=270, h=120, E=30)
