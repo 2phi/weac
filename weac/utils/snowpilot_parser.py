@@ -102,7 +102,7 @@ class SnowPilotParser:
             layer_depth_top_mm = layer.depth_top[0] * convert_to_mm[layer.depth_top[1]]
             layer_depth_bottom_mm = layer_depth_top_mm + thickness
             # Try to find density measurement that overlaps with this layer
-            measured_density = self._get_density_for_layer_range(
+            measured_density = self.get_density_for_layer_range(
                 layer_depth_top_mm, layer_depth_bottom_mm, sp_density_layers
             )
 
@@ -117,7 +117,7 @@ class SnowPilotParser:
 
                 # Create top layer (first half)
                 if measured_density is not None:
-                    density_top = self._get_density_for_layer_range(
+                    density_top = self.get_density_for_layer_range(
                         layer_depth_top_mm, layer_mid_depth_mm, sp_density_layers
                     )
                     if density_top is None:
@@ -141,7 +141,7 @@ class SnowPilotParser:
 
                 # Create bottom layer (second half)
                 if measured_density is not None:
-                    density_bottom = self._get_density_for_layer_range(
+                    density_bottom = self.get_density_for_layer_range(
                         layer_mid_depth_mm, layer_depth_bottom_mm, sp_density_layers
                     )
                     if density_bottom is None:
@@ -203,7 +203,7 @@ class SnowPilotParser:
             )
         return layers, density_methods
 
-    def _get_density_for_layer_range(
+    def get_density_for_layer_range(
         self,
         layer_top_mm: float,
         layer_bottom_mm: float,

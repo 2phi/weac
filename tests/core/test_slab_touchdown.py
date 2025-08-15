@@ -16,6 +16,8 @@ from weac.core.slab_touchdown import SlabTouchdown
 
 
 class SlabTouchdownTestBase(unittest.TestCase):
+    """Base class for SlabTouchdown tests, providing common setup."""
+
     def make_base_objects(self):
         layers = [Layer(rho=220, h=120)]
         slab = Slab(layers)
@@ -34,6 +36,8 @@ class SlabTouchdownTestBase(unittest.TestCase):
 
 
 class TestSlabTouchdownInitialization(SlabTouchdownTestBase):
+    """Test the initialization of the SlabTouchdown class."""
+
     def test_init_sets_flat_config_and_collapsed_eigensystem(self):
         scenario, eig = self.make_base_objects()
         with patch.object(SlabTouchdown, "_setup_touchdown_system", return_value=None):
@@ -62,6 +66,8 @@ class TestSlabTouchdownInitialization(SlabTouchdownTestBase):
 
 
 class TestSlabTouchdownBoundaries(SlabTouchdownTestBase):
+    """Test the calculation of touchdown mode boundaries."""
+
     def test_calc_l_AB_root_exists_and_within_bounds(self):
         scenario, eig = self.make_base_objects()
         # Avoid heavy setup
@@ -93,6 +99,8 @@ class TestSlabTouchdownBoundaries(SlabTouchdownTestBase):
 
 
 class TestSlabTouchdownModeAndDistance(SlabTouchdownTestBase):
+    """Test the calculation of touchdown mode and distance."""
+
     def test_calc_touchdown_mode_assigns_correct_mode(self):
         scenario, eig = self.make_base_objects()
         with patch.object(SlabTouchdown, "_setup_touchdown_system", return_value=None):
@@ -144,6 +152,8 @@ class TestSlabTouchdownModeAndDistance(SlabTouchdownTestBase):
 
 
 class TestSlabTouchdownHelpers(SlabTouchdownTestBase):
+    """Test helper methods for the SlabTouchdown class."""
+
     def test_generate_straight_scenario(self):
         scenario, eig = self.make_base_objects()
         with patch.object(SlabTouchdown, "_setup_touchdown_system", return_value=None):

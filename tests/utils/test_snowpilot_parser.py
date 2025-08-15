@@ -72,7 +72,7 @@ class TestSnowPilotParser(unittest.TestCase):
         # Test case 1: Layer that should overlap with density measurements
         # From the CAAML file, we have density measurements at 0-4cm, 10-14cm, etc.
         # Test a layer at 2-6cm (should overlap with 0-4cm measurement)
-        density = parser._get_density_for_layer_range(
+        density = parser.get_density_for_layer_range(
             20, 60, sp_density_layers
         )  # 2-6cm in mm
         self.assertIsNotNone(density, "Should find density for overlapping layer")
@@ -81,7 +81,7 @@ class TestSnowPilotParser(unittest.TestCase):
 
         # Test case 2: Layer with no overlap
         # Test a layer well beyond the density measurements
-        density_no_overlap = parser._get_density_for_layer_range(
+        density_no_overlap = parser.get_density_for_layer_range(
             1000, 1100, sp_density_layers
         )  # 100-110cm
         self.assertIsNone(
@@ -146,7 +146,7 @@ class TestSnowPilotParser(unittest.TestCase):
         parser = SnowPilotParser(self.caaml_without_density)
 
         # Test with empty density layers list
-        result = parser._get_density_for_layer_range(0, 100, [])
+        result = parser.get_density_for_layer_range(0, 100, [])
         self.assertIsNone(result, "Should return None for empty density layers")
 
     def test_unit_conversion(self):
@@ -178,7 +178,7 @@ class TestSnowPilotParser(unittest.TestCase):
         # 0-4cm (20 kg/m³), 10-14cm (20 kg/m³), 20-24cm (20 kg/m³), etc.
 
         # Test layer from 0-25cm (should span first 3 measurements)
-        density = parser._get_density_for_layer_range(
+        density = parser.get_density_for_layer_range(
             0, 250, sp_density_layers
         )  # 0-25cm in mm
 

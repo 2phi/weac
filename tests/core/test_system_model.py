@@ -149,6 +149,8 @@ class TestSystemModelCaching(unittest.TestCase):
 
 
 class TestSystemModelBehavior(unittest.TestCase):
+    """Test the behavior of the SystemModel class."""
+
     def setUp(self):
         self.config = Config()
         self.layers = [Layer(rho=200, h=500)]

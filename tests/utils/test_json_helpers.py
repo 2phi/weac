@@ -11,6 +11,8 @@ from .json_helpers import json_default
 
 
 class TestJsonHelpers(unittest.TestCase):
+    """Test the JSON serialization helpers."""
+
     def test_json_default_numpy_array(self):
         """Verify numpy arrays are serialized to lists."""
         data = {"a": np.array([1, 2, 3])}

@@ -1,7 +1,5 @@
 """
-This module defines the system properties for the WEAC simulation.
-The system properties are used to define the system of the WEAC simulation.
-The Eigenvalue problem is solved for the system properties and the mechanical properties are calculated.
+This module provides the Eigensystem class, which is used to solve the eigenvalue problem for a layered beam on an elastic foundation.
 """
 
 import logging
@@ -131,7 +129,7 @@ class Eigensystem:
         H = self.slab.H  # total slab thickness
         h = self.weak_layer.h  # weak layer thickness
 
-        # Abbreviations (MIT h/2 im GGW, MIT w' in Kinematik)
+        # Abbreviations
         K21 = kt * (-2 * self.D11 + self.B11 * (H + h)) / (2 * self.K0)
         K24 = (
             2 * self.D11 * kt * h
