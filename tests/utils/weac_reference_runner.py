@@ -38,6 +38,8 @@ REFERENCE_HOME = os.environ.get("WEAC_REFERENCE_HOME", None)
 
 @dataclass
 class ReferenceEnv:
+    """Reference environment for running the reference weac implementation."""
+
     python_exe: str
     venv_dir: str
     version: str
@@ -122,7 +124,10 @@ def ensure_weac_reference_env(
             "    sys.exit(2)\n"
         )
         check_proc = subprocess.run(
-            [py_exe, "-c", code], cwd=venv_dir, env=_clean_env()
+            [py_exe, "-c", code],
+            cwd=venv_dir,
+            env=_clean_env(),
+            check=True,
         )
         if check_proc.returncode != 0:
             # Install pinned reference version and its deps
@@ -335,7 +340,7 @@ def compute_reference_model_results(
         data = json.loads(proc.stdout)
 
         # Lazy import numpy only in the main environment
-        import numpy as np  # type: ignore
+        import numpy as np  # pylint: disable=import-outside-toplevel
 
         constants = np.asarray(data["constants"])
         state = data["state"]

@@ -10,7 +10,7 @@ from weac.components import Layer
 from weac.constants import EPS, G_MM_S2
 
 
-class Slab:
+class Slab:  # pylint: disable=too-many-instance-attributes,too-few-public-methods
     """
     Parameters of all layers assembled into a slab,
     provided as np.ndarray for easier access.
@@ -64,38 +64,6 @@ class Slab:
         self.layers = layers
         self._calc_slab_params()
 
-    def _calc_slab_params(self) -> None:
-        rhoi = (
-            np.array([ly.rho for ly in self.layers]) * 1e-12
-        )  # Layer densities (kg/m^3 -> t/mm^3)
-        hi = np.array([ly.h for ly in self.layers])  # Layer thickness
-        Ei = np.array([ly.E for ly in self.layers])
-        Gi = np.array([ly.G for ly in self.layers])
-        nui = np.array([ly.nu for ly in self.layers])
-
-        H = hi.sum()
-        # Vectorized midpoint coordinates per layer (top to bottom)
-        # previously: zi_mid = [float(H / 2 - sum(hi[j:n]) + hi[j] / 2) for j in range(n)]
-        suffix_cumsum = np.cumsum(hi[::-1])[::-1]
-        zi_mid = H / 2 - suffix_cumsum + hi / 2
-        zi_bottom = np.cumsum(hi) - H / 2
-        z_cog = sum(zi_mid * hi * rhoi) / sum(hi * rhoi)
-
-        qw = sum(rhoi * G_MM_S2 * hi)  # Line load [N/mm]
-
-        self.rhoi = rhoi
-        self.hi = hi
-        self.Ei = Ei
-        self.Gi = Gi
-        self.nui = nui
-
-        self.zi_mid = zi_mid
-        self.zi_bottom = zi_bottom
-        self.z0 = -H / 2  # z-coordinate of the top of the slab
-        self.H = H
-        self.z_cog = z_cog
-        self.qw = qw
-
     def calc_vertical_center_of_gravity(self, phi: float):
         """
         Vertical PSTs use triangular slabs (with horizontal cuts on the slab ends)
@@ -147,3 +115,35 @@ class Slab:
 
         # Return center of gravity and weight of slab segment
         return x_cog, z_cog, w
+
+    def _calc_slab_params(self) -> None:
+        rhoi = (
+            np.array([ly.rho for ly in self.layers]) * 1e-12
+        )  # Layer densities (kg/m^3 -> t/mm^3)
+        hi = np.array([ly.h for ly in self.layers])  # Layer thickness
+        Ei = np.array([ly.E for ly in self.layers])
+        Gi = np.array([ly.G for ly in self.layers])
+        nui = np.array([ly.nu for ly in self.layers])
+
+        H = hi.sum()
+        # Vectorized midpoint coordinates per layer (top to bottom)
+        # previously: zi_mid = [float(H / 2 - sum(hi[j:n]) + hi[j] / 2) for j in range(n)]
+        suffix_cumsum = np.cumsum(hi[::-1])[::-1]
+        zi_mid = H / 2 - suffix_cumsum + hi / 2
+        zi_bottom = np.cumsum(hi) - H / 2
+        z_cog = sum(zi_mid * hi * rhoi) / sum(hi * rhoi)
+
+        qw = sum(rhoi * G_MM_S2 * hi)  # Line load [N/mm]
+
+        self.rhoi = rhoi
+        self.hi = hi
+        self.Ei = Ei
+        self.Gi = Gi
+        self.nui = nui
+
+        self.zi_mid = zi_mid
+        self.zi_bottom = zi_bottom
+        self.z0 = -H / 2  # z-coordinate of the top of the slab
+        self.H = H
+        self.z_cog = z_cog
+        self.qw = qw

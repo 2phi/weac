@@ -397,6 +397,7 @@ class TestRegressionSimulation(unittest.TestCase):
         np.testing.assert_allclose(GT_pst_with_touchdown, zz, rtol=1e-10, atol=1e-12)
 
     def test_criteria_evaluator_regressions(self):
+        """Test the criteria evaluator regressions."""
         layers = [Layer(rho=170, h=100), Layer(rho=230, h=130)]
         wl = WeakLayer(rho=180, h=20)
         segs = [Segment(length=10000, has_foundation=True, m=0)]

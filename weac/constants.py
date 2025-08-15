@@ -16,14 +16,22 @@ EPS: Final[float] = 1e-9  # Global numeric tolerance for float comparisons
 
 RHO_ICE: Final[float] = 916.7  # Density of ice (kg/m^3)
 CB0: Final[float] = (
-    6.5  # Multiplicative constant of Young modulus parametrization according to Bergfeld et al. (2023)
+    6.5
+    # Multiplicative constant of Young modulus
+    # parametrization according to Bergfeld et al. (2023)
 )
 CB1: Final[float] = (
-    4.4  # Exponent of Young modulus parameterization according to Bergfeld et al. (2023)
+    4.4
+    # Exponent of Young modulus parameterization
+    # according to Bergfeld et al. (2023)
 )
 CG0: Final[float] = (
-    6.0  # Multiplicative constant of Young modulus parametrization according to Gerling et al. (2017)
+    6.0
+    # Multiplicative constant of Young modulus
+    # parametrization according to Gerling et al. (2017)
 )
 CG1: Final[float] = (
-    4.5  # Exponent of Young modulus parameterization according to Gerling et al. (2017)
+    4.5
+    # Exponent of Young modulus parameterization
+    # according to Gerling et al. (2017)
 )

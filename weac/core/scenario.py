@@ -192,7 +192,8 @@ class Scenario:
             Weak Layer (Winkler type) under slab load
 
         Example:
-        if the collapse layer has a height of 5 and the non-collapsed layer has a height of 15 the collapse height is 10
+        if the collapse layer has a height of 5 and the non-collapsed layer
+        has a height of 15 the collapse height is 10
         """
         self.crack_h = self.weak_layer.collapse_height - self.qn / self.weak_layer.kn
         if self.crack_h < 0:

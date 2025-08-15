@@ -1,7 +1,8 @@
 """
-This module defines the system model for the WEAC simulation.
-The system model is the heart of the WEAC simulation. All data sources are bundled into the system model.
-The system model initializes and calculates all the parameterizations and passes relevant data to the different components.
+This module defines the system model for the WEAC simulation. The system
+model is the heart of the WEAC simulation. All data sources are bundled into
+the system model. The system model initializes and calculates all the
+parameterizations and passes relevant data to the different components.
 
 We utilize the pydantic library to define the system model.
 """
@@ -72,7 +73,7 @@ class UnknownConstantsSolver:
         # Determine size of linear system of equations
         nS = len(li)  # Number of beam segments
         nDOF = 6  # Number of free constants per segment
-        logger.debug(f"Number of segments: {nS}, DOF per segment: {nDOF}")
+        logger.debug("Number of segments: %s, DOF per segment: %s", nS, nDOF)
 
         # Assemble position vector
         pi = np.full(nS, "m")
@@ -83,7 +84,10 @@ class UnknownConstantsSolver:
         Zp0 = np.zeros([nS * 6, 1])
         rhs = np.zeros([nS * 6, 1])
         logger.debug(
-            f"Initialized Zh0 shape: {Zh0.shape}, Zp0 shape: {Zp0.shape}, rhs shape: {rhs.shape}"
+            "Initialized Zh0 shape: %s, Zp0 shape: %s, rhs shape: %s",
+            Zh0.shape,
+            Zp0.shape,
+            rhs.shape,
         )
 
         # LHS: Transmission & Boundary Conditions between segments
@@ -92,7 +96,11 @@ class UnknownConstantsSolver:
             length, has_foundation, pos = li[i], ki[i], pi[i]
 
             logger.debug(
-                f"Assembling segment {i}: length={length}, has_foundation={has_foundation}, pos={pos}"
+                "Assembling segment %s: length=%s, has_foundation=%s, pos=%s",
+                i,
+                length,
+                has_foundation,
+                pos,
             )
             # Matrix of Size one of: (l: [9,6], m: [12,6], r: [9,6])
             Zhi = cls._setup_conditions(
@@ -127,7 +135,9 @@ class UnknownConstantsSolver:
             # Assemble left-hand side
             Zh0[(6 * i - start) : (6 * i + stop), i * nDOF : (i + 1) * nDOF] = Zhi
             Zp0[(6 * i - start) : (6 * i + stop)] += zpi
-            logger.debug(f"Segment {i}: Zhi shape: {Zhi.shape}, zpi shape: {zpi.shape}")
+            logger.debug(
+                "Segment %s: Zhi shape: %s, zpi shape: %s", i, Zhi.shape, zpi.shape
+            )
 
         # Loop through loads to assemble right-hand side
         for i, m in enumerate(mi, start=1):
@@ -136,11 +146,11 @@ class UnknownConstantsSolver:
             Fn, Ft = decompose_to_normal_tangential(f=F, phi=phi)
             # Right-hand side for transmission from segment i-1 to segment i
             rhs[6 * i : 6 * i + 3] = np.vstack([Ft, -Ft * scenario.slab.H / 2, Fn])
-            logger.debug(f"Load {i}: m={m}, F={F}, Fn={Fn}, Ft={Ft}")
-            logger.debug(f"RHS {rhs[6 * i : 6 * i + 3]}")
+            logger.debug("Load %s: m=%s, F=%s, Fn=%s, Ft=%s", i, m, F, Fn, Ft)
+            logger.debug("RHS %s", rhs[6 * i : 6 * i + 3])
         # Set RHS so that Complementary Integral vanishes at boundaries
         if system_type not in ["pst-", "-pst", "rested"]:
-            logger.debug(f"Pre RHS {rhs[:3]}")
+            logger.debug("Pre RHS %s", rhs[:3])
             rhs[:3] = cls._boundary_conditions(
                 eigensystem.zp(x=0, phi=phi, has_foundation=ki[0], qs=qs),
                 eigensystem,
@@ -150,7 +160,7 @@ class UnknownConstantsSolver:
                 touchdown_mode,
                 collapsed_weak_layer_kR,
             )
-            logger.debug(f"Post RHS {rhs[:3]}")
+            logger.debug("Post RHS %s", rhs[:3])
             rhs[-3:] = cls._boundary_conditions(
                 eigensystem.zp(x=li[-1], phi=phi, has_foundation=ki[-1], qs=qs),
                 eigensystem,
@@ -160,7 +170,7 @@ class UnknownConstantsSolver:
                 touchdown_mode,
                 collapsed_weak_layer_kR,
             )
-            logger.debug(f"Post RHS {rhs[-3:]}")
+            logger.debug("Post RHS %s", rhs[-3:])
             logger.debug("Set complementary integral vanishing at boundaries.")
 
         # Set rhs for vertical faces
@@ -168,7 +178,7 @@ class UnknownConstantsSolver:
             # Calculate center of gravity and mass of added or cut off slab segement
             x_cog, z_cog, m = scenario.slab.calc_vertical_center_of_gravity(phi)
             logger.debug(
-                f"Vertical center of gravity: x_cog={x_cog}, z_cog={z_cog}, m={m}"
+                "Vertical center of gravity: x_cog=%s, z_cog=%s, m=%s", x_cog, z_cog, m
             )
             # Convert slope angle to radians
             phi = np.deg2rad(phi)
@@ -179,7 +189,7 @@ class UnknownConstantsSolver:
             # Add to right-hand side
             rhs[:3] = np.vstack([N, M, V])  # left end
             rhs[-3:] = np.vstack([N, M, V])  # right end
-            logger.debug(f"Vertical faces: N={N}, M={M}, V={V}")
+            logger.debug("Vertical faces: N=%s, M=%s, V=%s", N, M, V)
 
         # Loop through segments to set touchdown conditions at rhs
         for i in range(nS):
@@ -221,18 +231,28 @@ class UnknownConstantsSolver:
             try:
                 cond_val = float(np.linalg.cond(Zh0))
                 cond_text = f"{cond_val:.3e}"
-            except Exception:  # Fallback if condition number fails
+            except np.linalg.LinAlgError:  # Fallback if condition number fails
                 cond_val = float("inf")
                 cond_text = "inf"
             rank_status = "singular" if rank < min_dim else "full-rank"
-            msg = (
+            msg_format = (
                 "Failed to solve linear system (np.linalg.solve) with diagnostics: "
-                f"Zh0.shape={zh_shape}, rhs.shape={rhs_shape}, Zp0.shape={zp_shape}, "
-                f"rank(Zh0)={rank}/{min_dim} ({rank_status}), cond(Zh0)={cond_text}. "
-                f"Original error: {e}"
+                "Zh0.shape=%s, rhs.shape=%s, Zp0.shape=%s, "
+                "rank(Zh0)=%s/%s (%s), cond(Zh0)=%s. "
+                "Original error: %s"
             )
-            logger.error(msg)
-            raise LinAlgError(msg) from e
+            msg_args = (
+                zh_shape,
+                rhs_shape,
+                zp_shape,
+                rank,
+                min_dim,
+                rank_status,
+                cond_text,
+                e,
+            )
+            logger.error(msg_format, *msg_args)
+            raise LinAlgError(msg_format % msg_args) from e
         # Sort (nDOF = 6) constants for each segment into columns of a matrix
         return C.reshape([-1, nDOF]).T
 
@@ -341,7 +361,7 @@ class UnknownConstantsSolver:
                     bcs[2],
                 ]
             )
-        logger.debug(f"Boundary Conditions at pos {pos}: {conditions.shape}")
+        logger.debug("Boundary Conditions at pos %s: %s", pos, conditions.shape)  # pylint: disable=E0606
         return conditions
 
     @classmethod

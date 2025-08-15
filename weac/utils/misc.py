@@ -120,9 +120,8 @@ def isnotebook() -> bool:
         # Check if we're specifically in a notebook (not just IPython terminal)
         if get_ipython().__class__.__name__ == "ZMQInteractiveShell":
             return True  # Jupyter notebook
-        elif get_ipython().__class__.__name__ == "TerminalInteractiveShell":
+        if get_ipython().__class__.__name__ == "TerminalInteractiveShell":
             return False  # IPython terminal
-        else:
-            return False  # Other IPython environments
+        return False  # Other IPython environments
     except ImportError:
         return False  # IPython not available

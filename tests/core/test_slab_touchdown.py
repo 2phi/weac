@@ -82,7 +82,7 @@ class TestSlabTouchdownBoundaries(SlabTouchdownTestBase):
         td.eigensystem.D11 = 100.0
         td.eigensystem.kA55 = 10.0
         with patch.object(td, "_substitute_stiffness", return_value=2.0):
-            l_ab = td._calc_l_AB()
+            l_ab = td._calc_l_AB()  # pylint: disable=protected-access
         self.assertGreater(l_ab, 0.0)
         self.assertLess(l_ab, td.scenario.L)
 
@@ -97,7 +97,7 @@ class TestSlabTouchdownBoundaries(SlabTouchdownTestBase):
         td.eigensystem.D11 = 100.0
         td.eigensystem.kA55 = 10.0
         with patch.object(td, "_substitute_stiffness", return_value=3.0):
-            l_bc = td._calc_l_BC()
+            l_bc = td._calc_l_BC()  # pylint: disable=protected-access
         self.assertGreater(l_bc, 0.0)
         self.assertLess(l_bc, td.scenario.L)
 
@@ -117,17 +117,17 @@ class TestSlabTouchdownModeAndDistance(SlabTouchdownTestBase):
             # Mode A: cut_length <= l_AB
             td.scenario.scenario_config.cut_length = 200.0
             td.scenario.cut_length = 200.0
-            td._calc_touchdown_mode()
+            td._calc_touchdown_mode()  # pylint: disable=protected-access
             self.assertEqual(td.touchdown_mode, "A_free_hanging")
             # Mode B: l_AB < cut_length <= l_BC
             td.scenario.scenario_config.cut_length = 400.0
             td.scenario.cut_length = 400.0
-            td._calc_touchdown_mode()
+            td._calc_touchdown_mode()  # pylint: disable=protected-access
             self.assertEqual(td.touchdown_mode, "B_point_contact")
             # Mode C: cut_length > l_BC
             td.scenario.scenario_config.cut_length = 800.0
             td.scenario.cut_length = 800.0
-            td._calc_touchdown_mode()
+            td._calc_touchdown_mode()  # pylint: disable=protected-access
             self.assertEqual(td.touchdown_mode, "C_in_contact")
 
     def test_calc_touchdown_distance_sets_expected_values(self):
@@ -138,12 +138,12 @@ class TestSlabTouchdownModeAndDistance(SlabTouchdownTestBase):
         # Mode A/B: equals cut_length
         td.touchdown_mode = "A_free_hanging"
         td.scenario.cut_length = 123.0
-        td._calc_touchdown_distance()
+        td._calc_touchdown_distance()  # pylint: disable=protected-access
         self.assertEqual(td.touchdown_distance, 123.0)
 
         td.touchdown_mode = "B_point_contact"
         td.scenario.cut_length = 321.0
-        td._calc_touchdown_distance()
+        td._calc_touchdown_distance()  # pylint: disable=protected-access
         self.assertEqual(td.touchdown_distance, 321.0)
 
         # Mode C: uses helper methods
@@ -152,7 +152,7 @@ class TestSlabTouchdownModeAndDistance(SlabTouchdownTestBase):
             patch.object(td, "_calc_touchdown_distance_in_mode_C", return_value=111.0),
             patch.object(td, "_calc_collapsed_weak_layer_kR", return_value=222.0),
         ):
-            td._calc_touchdown_distance()
+            td._calc_touchdown_distance()  # pylint: disable=protected-access
         self.assertEqual(td.touchdown_distance, 111.0)
         self.assertEqual(td.collapsed_weak_layer_kR, 222.0)
 
@@ -166,7 +166,7 @@ class TestSlabTouchdownHelpers(SlabTouchdownTestBase):
         with patch.object(SlabTouchdown, "_setup_touchdown_system", return_value=None):
             td = SlabTouchdown(scenario, eig)
         L = 555.5
-        straight = td._generate_straight_scenario(L)
+        straight = td._generate_straight_scenario(L)  # pylint: disable=protected-access
         self.assertAlmostEqual(straight.L, L)
         self.assertEqual(straight.phi, 0.0)
         # First segment should be the provided one, dummy appended internally
@@ -179,9 +179,7 @@ class TestSlabTouchdownHelpers(SlabTouchdownTestBase):
         with patch.object(SlabTouchdown, "_setup_touchdown_system", return_value=None):
             td = SlabTouchdown(scenario, eig)
         # Recreate to test method in isolation
-        collapsed = td._create_collapsed_eigensystem(
-            qs=scenario.scenario_config.surface_load
-        )  # pylint: disable=protected-access
+        collapsed = td._create_collapsed_eigensystem()  # pylint: disable=protected-access
         self.assertAlmostEqual(
             collapsed.weak_layer.kn, scenario.weak_layer.kn * STIFFNESS_COLLAPSE_FACTOR
         )
@@ -202,7 +200,8 @@ class TestSlabTouchdownHelpers(SlabTouchdownTestBase):
         td.eigensystem.D11 = 100.0
         td.eigensystem.kA55 = 10.0
 
-        def fake_subst(straight_scenario, es, dof):
+        def fake_subst(straight_scenario, es, dof):  # pylint: disable=unused-argument
+            """Fake substitute stiffness."""
             # Return different constants for original vs collapsed eigensystem
             if es is td.eigensystem:
                 return 2.0  # kRl or kNl

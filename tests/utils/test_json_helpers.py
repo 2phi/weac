@@ -1,7 +1,5 @@
 """Unit tests for JSON helpers."""
 
-from __future__ import annotations
-
 import json
 import unittest
 
@@ -62,7 +60,9 @@ class TestJsonHelpers(unittest.TestCase):
     def test_json_default_unhandled_type(self):
         """Verify unhandled types are converted to their string representation."""
 
-        class Unserializable:
+        class Unserializable:  # pylint: disable=too-few-public-methods
+            """Unserializable object."""
+
             def __str__(self):
                 return "UnserializableObject"
 

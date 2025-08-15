@@ -13,6 +13,8 @@ from weac.utils.misc import decompose_to_normal_tangential
 
 
 class TestScenario(unittest.TestCase):
+    """Test the Scenario class."""
+
     def setUp(self):
         # Simple slab with a single layer
         self.layer = Layer(rho=200, h=100)
@@ -30,6 +32,7 @@ class TestScenario(unittest.TestCase):
         )
 
     def test_init_sets_core_attributes(self):
+        """Test that init sets core attributes correctly."""
         s = Scenario(self.cfg, self.segments_two, self.weak_layer, self.slab)
         self.assertEqual(s.system_type, self.cfg.system_type)
         self.assertAlmostEqual(s.phi, self.cfg.phi)
@@ -40,6 +43,7 @@ class TestScenario(unittest.TestCase):
         self.assertAlmostEqual(s.cut_length, self.cfg.cut_length)
 
     def test_setup_scenario_multiple_segments(self):
+        """Test that setup_scenario sets up correctly for multiple segments."""
         s = Scenario(self.cfg, self.segments_two, self.weak_layer, self.slab)
         # li is segment lengths
         np.testing.assert_allclose(s.li, np.array([400.0, 600.0]))
@@ -65,6 +69,7 @@ class TestScenario(unittest.TestCase):
             s.get_segment_idx(1000.0001)
 
     def test_setup_scenario_single_segment_adds_dummy(self):
+        """Test that setup_scenario adds a dummy segment for single segment case."""
         segments_one = [Segment(length=750.0, has_foundation=True, m=0.0)]
         s = Scenario(self.cfg, segments_one, self.weak_layer, self.slab)
         # Dummy segment appended
@@ -83,6 +88,7 @@ class TestScenario(unittest.TestCase):
             s.get_segment_idx(750.0001)
 
     def test_calc_normal_and_tangential_loads(self):
+        """Test that calc_normal_and_tangential_loads computes expected loads."""
         s = Scenario(self.cfg, self.segments_two, self.weak_layer, self.slab)
         # Expected from decomposition of slab weight and surface load
         qwn, qwt = decompose_to_normal_tangential(self.slab.qw, self.cfg.phi)
@@ -94,6 +100,7 @@ class TestScenario(unittest.TestCase):
         self.assertLessEqual(s.qt, 0.0)
 
     def test_calc_crack_height(self):
+        """Test that calc_crack_height computes expected crack height."""
         s = Scenario(self.cfg, self.segments_two, self.weak_layer, self.slab)
         expected_crack_h = self.weak_layer.collapse_height - s.qn / self.weak_layer.kn
         self.assertTrue(np.isfinite(expected_crack_h))
@@ -102,6 +109,7 @@ class TestScenario(unittest.TestCase):
     def test_refresh_from_config_updates_attributes(
         self,
     ):
+        """Test that refresh_from_config updates attributes."""
         s = Scenario(self.cfg, self.segments_two, self.weak_layer, self.slab)
         # Change config values
         s.scenario_config.phi = 25.0
@@ -114,6 +122,7 @@ class TestScenario(unittest.TestCase):
         self.assertAlmostEqual(s.surface_load, 0.2)
 
     def test_refresh_recomputes_setup_when_segments_change(self):
+        """Test that refresh_from_config recomputes setup when segments change."""
         s = Scenario(self.cfg, self.segments_two, self.weak_layer, self.slab)
         # Mutate segments: change lengths and foundation flags
         new_segments = [

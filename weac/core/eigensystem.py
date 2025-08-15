@@ -1,5 +1,6 @@
 """
-This module provides the Eigensystem class, which is used to solve the eigenvalue problem for a layered beam on an elastic foundation.
+This module provides the Eigensystem class, which is used to solve
+the eigenvalue problem for a layered beam on an elastic foundation.
 """
 
 import logging
@@ -18,7 +19,8 @@ logger = logging.getLogger(__name__)
 
 class Eigensystem:
     """
-    Calculates system properties and solves the eigenvalue problem for a layered beam on an elastic foundation (Winkler model).
+    Calculates system properties and solves the eigenvalue problem
+    for a layered beam on an elastic foundation (Winkler model).
 
     Attributes
     ----------
@@ -39,8 +41,10 @@ class Eigensystem:
     ewR: NDArray[np.float64]        # shape (k): Real Eigenvalues
     evC: NDArray[np.complex128]     # shape (6, k): Complex Eigenvectors
     evR: NDArray[np.float64]        # shape (6, k): Real Eigenvectors
-    sR: NDArray[np.float64]         # shape (k): Real positive eigenvalue shifts (for numerical robustness)
-    sC: NDArray[np.float64]         # shape (k): Complex positive eigenvalue shifts (for numerical robustness)
+    sR: NDArray[np.float64]         # shape (k): Real positive eigenvalue shifts
+                                    # (for numerical robustness)
+    sC: NDArray[np.float64]         # shape (k): Complex positive eigenvalue shifts
+                                    # (for numerical robustness)
     """
 
     # Input data
@@ -189,8 +193,10 @@ class Eigensystem:
         ewR: NDArray[np.float64]        # shape (g): Real Eigenvalues
         evC: NDArray[np.complex128]     # shape (6, k): Complex Eigenvectors
         evR: NDArray[np.float64]        # shape (6, g): Real Eigenvectors
-        sR: NDArray[np.float64]         # shape (k): Real positive eigenvalue shifts (for numerical robustness)
-        sC: NDArray[np.float64]         # shape (g): Complex positive eigenvalue shifts (for numerical robustness)
+        sR: NDArray[np.float64]         # shape (k): Real positive eigenvalue shifts
+                                        # (for numerical robustness)
+        sC: NDArray[np.float64]         # shape (g): Complex positive eigenvalue shifts
+                                        # (for numerical robustness)
         """
         # Calculate eigenvalues (ew) and eigenvectors (ev)
         ew, ev = np.linalg.eig(system_matrix)

@@ -150,7 +150,8 @@ class Analyzer:
         # Loop through segments
         for i, length in enumerate(li):
             # Get local x-coordinates of segment i
-            xi = np.linspace(0, length, num=ni[i], endpoint=(i == li.size - 1))
+            endpoint = i == li.size - 1
+            xi = np.linspace(0, length, num=ni[i], endpoint=endpoint)
             # Compute start and end coordinates of segment i
             x0 = lic[i]
             # Assemble global coordinate vector
@@ -722,10 +723,7 @@ class Analyzer:
             * self.sm.scenario.crack_h
         )
         # Ensure
-        if self.sm.scenario.system_type in ["pst-"]:
-            ub = us[-1]
-        elif self.sm.scenario.system_type in ["-pst"]:
-            ub = us[0]
+        ub = us[0] if self.sm.scenario.system_type in ["-pst"] else us[-1]
         Pi_ext += (
             -qt * (self.sm.scenario.li[0] + self.sm.scenario.li[1]) * np.average(us)
             - qt

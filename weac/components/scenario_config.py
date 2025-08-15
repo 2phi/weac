@@ -15,8 +15,9 @@ class ScenarioConfig(BaseModel):
     ----------
     phi : float, optional
         Slope angle in degrees (counterclockwise positive).
-    system_type : Literal['skier', 'skiers', 'pst-', '-pst', 'rot', 'trans', 'vpst-', '-vpst'], optional
-        Type of system. Allowed: 'skier', 'skiers', 'pst-', '-pst', 'rot', 'trans', 'vpst-', '-vpst'.
+    system_type : Literal['skier', 'skiers', 'pst-',
+                        '-pst', 'rot', 'trans', 'vpst-', '-vpst']
+        Type of system.
     cut_length : float, optional
         Cut length for PST/VPST [mm].
     stiffness_ratio : float, optional
@@ -57,5 +58,6 @@ class ScenarioConfig(BaseModel):
         default=0.0,
         ge=0.0,
         lt=1.0,
-        description="Surface line-load on slab [N/mm], e.g. evenly spaced weights, Adam et al. (2024)",
+        description="Surface line-load on slab [N/mm], e.g. evenly spaced weights, "
+        "Adam et al. (2024)",
     )

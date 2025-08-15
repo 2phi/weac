@@ -139,7 +139,7 @@ class Layer(BaseModel):
         default=None, description="Hand hardness"
     )
 
-    def model_post_init(self, _ctx):
+    def model_post_init(self, _ctx):  # pylint: disable=arguments-differ
         if self.E_method == "bergfeld":
             object.__setattr__(self, "E", self.E or _bergfeld_youngs_modulus(self.rho))
         elif self.E_method == "scapazzo":
@@ -231,7 +231,7 @@ class WeakLayer(BaseModel):
         extra="forbid",
     )
 
-    def model_post_init(self, _ctx):
+    def model_post_init(self, _ctx):  # pylint: disable=arguments-differ
         if self.E_method == "bergfeld":
             object.__setattr__(self, "E", self.E or _bergfeld_youngs_modulus(self.rho))
         elif self.E_method == "scapazzo":

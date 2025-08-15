@@ -152,6 +152,7 @@ class TestSystemModelBehavior(unittest.TestCase):
     """Test the behavior of the SystemModel class."""
 
     def setUp(self):
+        """Set up the test environment."""
         self.config = Config()
         self.layers = [Layer(rho=200, h=500)]
         self.weak_layer = WeakLayer(rho=150, h=10)
@@ -178,6 +179,7 @@ class TestSystemModelBehavior(unittest.TestCase):
 
     @patch("weac.core.system_model.SlabTouchdown")
     def test_touchdown_updates_segments_for_pst_minus(self, mock_td):
+        """Test that touchdown updates segments for pst-."""
         mock_inst = MagicMock()
         mock_inst.touchdown_distance = 1234.0
         mock_inst.touchdown_mode = "B_point_contact"
@@ -191,6 +193,7 @@ class TestSystemModelBehavior(unittest.TestCase):
 
     @patch("weac.core.system_model.SlabTouchdown")
     def test_touchdown_updates_segments_for_minus_pst(self, mock_td):
+        """Test that touchdown updates segments for -pst."""
         mock_inst = MagicMock()
         mock_inst.touchdown_distance = 2222.0
         mock_inst.touchdown_mode = "B_point_contact"
@@ -207,6 +210,7 @@ class TestSystemModelBehavior(unittest.TestCase):
     def test_unknown_constants_uses_touchdown_params_when_enabled(
         self, mock_td, mock_solve
     ):
+        """Test that unknown constants uses touchdown params when enabled."""
         mock_inst = MagicMock()
         mock_inst.touchdown_distance = 1500.0
         mock_inst.touchdown_mode = "C_in_contact"
@@ -215,11 +219,11 @@ class TestSystemModelBehavior(unittest.TestCase):
 
         def solver_side_effect(
             scenario,
-            eigensystem,
-            system_type,
-            touchdown_distance,
-            touchdown_mode,
-            collapsed_weak_layer_kR,
+            eigensystem,  # pylint: disable=unused-argument
+            system_type,  # pylint: disable=unused-argument
+            touchdown_distance,  # pylint: disable=unused-argument
+            touchdown_mode,  # pylint: disable=unused-argument
+            collapsed_weak_layer_kR,  # pylint: disable=unused-argument
         ):
             n = len(scenario.segments)
             return np.zeros((6, n))
@@ -237,10 +241,12 @@ class TestSystemModelBehavior(unittest.TestCase):
 
     @patch("weac.core.system_model.UnknownConstantsSolver.solve_for_unknown_constants")
     def test_unknown_constants_without_touchdown_passes_none(self, mock_solve):
+        """Test that unknown constants without touchdown passes None."""
+
         def solver_side_effect(
             scenario,
-            eigensystem,
-            system_type,
+            eigensystem,  # pylint: disable=unused-argument
+            system_type,  # pylint: disable=unused-argument
             touchdown_distance,
             touchdown_mode,
             collapsed_weak_layer_kR,
@@ -259,15 +265,16 @@ class TestSystemModelBehavior(unittest.TestCase):
 
     @patch("weac.core.system_model.UnknownConstantsSolver.solve_for_unknown_constants")
     def test_uncracked_unknown_constants_sets_all_foundation(self, mock_solve):
+        """Test that uncracked_unknown_constants sets all foundation."""
         captured_scenarios = []
 
         def solver_side_effect(
             scenario,
-            eigensystem,
-            system_type,
-            touchdown_distance,
-            touchdown_mode,
-            collapsed_weak_layer_kR,
+            eigensystem,  # pylint: disable=unused-argument
+            system_type,  # pylint: disable=unused-argument
+            touchdown_distance,  # pylint: disable=unused-argument
+            touchdown_mode,  # pylint: disable=unused-argument
+            collapsed_weak_layer_kR,  # pylint: disable=unused-argument
         ):
             captured_scenarios.append(scenario)
             n = len(scenario.segments)
@@ -292,6 +299,7 @@ class TestSystemModelBehavior(unittest.TestCase):
     def test_update_scenario_invalidates_touchdown_and_constants(
         self, mock_solve, mock_td
     ):
+        """Test that update_scenario invalidates touchdown and constants."""
         mock_inst = MagicMock()
         mock_inst.touchdown_distance = 1800.0
         mock_inst.touchdown_mode = "B_point_contact"
@@ -300,11 +308,11 @@ class TestSystemModelBehavior(unittest.TestCase):
 
         def solver_side_effect(
             scenario,
-            eigensystem,
-            system_type,
-            touchdown_distance,
-            touchdown_mode,
-            collapsed_weak_layer_kR,
+            eigensystem,  # pylint: disable=unused-argument
+            system_type,  # pylint: disable=unused-argument
+            touchdown_distance,  # pylint: disable=unused-argument
+            touchdown_mode,  # pylint: disable=unused-argument
+            collapsed_weak_layer_kR,  # pylint: disable=unused-argument
         ):
             n = len(scenario.segments)
             return np.zeros((6, n))
@@ -330,15 +338,16 @@ class TestSystemModelBehavior(unittest.TestCase):
 
     @patch("weac.core.system_model.UnknownConstantsSolver.solve_for_unknown_constants")
     def test_toggle_touchdown_switches_solver_arguments(self, mock_solve):
+        """Test that toggle_touchdown switches the solver arguments."""
         calls = []
 
         def solver_side_effect(
             scenario,
-            eigensystem,
-            system_type,
-            touchdown_distance,
-            touchdown_mode,
-            collapsed_weak_layer_kR,
+            eigensystem,  # pylint: disable=unused-argument
+            system_type,  # pylint: disable=unused-argument
+            touchdown_distance,  # pylint: disable=unused-argument
+            touchdown_mode,  # pylint: disable=unused-argument
+            collapsed_weak_layer_kR,  # pylint: disable=unused-argument
         ):
             calls.append((touchdown_distance, touchdown_mode, collapsed_weak_layer_kR))
             n = len(scenario.segments)
@@ -366,15 +375,16 @@ class TestSystemModelBehavior(unittest.TestCase):
         self.assertEqual(calls[1], (900.0, "A_free_hanging", None))
 
     def test_z_function_scalar_and_array(self):
+        """Test the z function with scalar and array inputs."""
         system = self._build_model(touchdown=False, system_type="skiers")
 
         # Patch eigensystem methods on the instance to simple deterministic outputs
         I6 = np.eye(6)
 
-        def fake_zh(x, length, has_foundation):
+        def fake_zh(x, length, has_foundation):  # pylint: disable=unused-argument
             return 2.0 * I6
 
-        def fake_zp(x, phi, has_foundation, qs):
+        def fake_zp(x, phi, has_foundation, qs):  # pylint: disable=unused-argument
             return np.ones((6, 1))
 
         with (

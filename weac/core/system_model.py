@@ -1,7 +1,9 @@
 """
 This module defines the system model for the WEAC simulation.
-The system model is the heart of the WEAC simulation. All data sources are bundled into the system model.
-The system model initializes and calculates all the parameterizations and passes relevant data to the different components.
+The system model is the heart of the WEAC simulation. All data sources
+are bundled into the system model. The system model initializes and
+calculates all the parameterizations and passes relevant data to the
+different components.
 
 We utilize the pydantic library to define the system model.
 """
@@ -145,31 +147,28 @@ class SystemModel:
 
     @cached_property
     def eigensystem(self) -> Eigensystem:  # heavy
+        """Solve for the eigensystem."""
         logger.info("Solving for Eigensystem")
         return Eigensystem(weak_layer=self.weak_layer, slab=self.slab)
 
     @cached_property
     def slab_touchdown(self) -> Optional[SlabTouchdown]:
+        """Solve for the slab touchdown."""
         if self.config.touchdown:
             logger.info("Solving for Slab Touchdown")
             slab_touchdown = SlabTouchdown(
                 scenario=self.scenario, eigensystem=self.eigensystem
             )
-
             logger.info(
-                f"Original cut_length: {self.scenario.cut_length}, touchdown_distance: {slab_touchdown.touchdown_distance}"
+                "Original cut_length: %s, touchdown_distance: %s",
+                self.scenario.cut_length,
+                slab_touchdown.touchdown_distance,
             )
 
             new_segments = copy.deepcopy(self.scenario.segments)
-            if (
-                self.scenario.system_type == "pst-"
-                or self.scenario.system_type == "vpst-"
-            ):
+            if self.scenario.system_type in ("pst-", "vpst-"):
                 new_segments[-1].length = slab_touchdown.touchdown_distance
-            elif (
-                self.scenario.system_type == "-pst"
-                or self.scenario.system_type == "-vpst"
-            ):
+            elif self.scenario.system_type in ("-pst", "-vpst"):
                 new_segments[0].length = slab_touchdown.touchdown_distance
 
             # Create new scenario with updated segments
@@ -180,7 +179,8 @@ class SystemModel:
                 slab=self.slab,
             )
             logger.info(
-                f"Updated scenario with new segment lengths: {[seg.length for seg in new_segments]}"
+                "Updated scenario with new segment lengths: %s",
+                [seg.length for seg in new_segments],
             )
 
             return slab_touchdown
@@ -237,21 +237,21 @@ class SystemModel:
                 touchdown_mode=self.slab_touchdown.touchdown_mode,
                 collapsed_weak_layer_kR=self.slab_touchdown.collapsed_weak_layer_kR,
             )
-        else:
-            logger.info("Solving for Unknown Constants")
-            return UnknownConstantsSolver.solve_for_unknown_constants(
-                scenario=self.scenario,
-                eigensystem=self.eigensystem,
-                system_type=self.scenario.system_type,
-                touchdown_distance=None,
-                touchdown_mode=None,
-                collapsed_weak_layer_kR=None,
-            )
+        logger.info("Solving for Unknown Constants")
+        return UnknownConstantsSolver.solve_for_unknown_constants(
+            scenario=self.scenario,
+            eigensystem=self.eigensystem,
+            system_type=self.scenario.system_type,
+            touchdown_distance=None,
+            touchdown_mode=None,
+            collapsed_weak_layer_kR=None,
+        )
 
     @cached_property
     def uncracked_unknown_constants(self) -> np.ndarray:
+        """Solve for the uncracked unknown constants."""
         new_segments = copy.deepcopy(self.scenario.segments)
-        for i, seg in enumerate(new_segments):
+        for _, seg in enumerate(new_segments):
             seg.has_foundation = True
         self.uncracked_scenario = Scenario(
             scenario_config=self.scenario.scenario_config,
@@ -270,18 +270,18 @@ class SystemModel:
                 touchdown_mode=self.slab_touchdown.touchdown_mode,
                 collapsed_weak_layer_kR=self.slab_touchdown.collapsed_weak_layer_kR,
             )
-        else:
-            return UnknownConstantsSolver.solve_for_unknown_constants(
-                scenario=self.uncracked_scenario,
-                eigensystem=self.eigensystem,
-                system_type=self.scenario.system_type,
-                touchdown_distance=None,
-                touchdown_mode=None,
-                collapsed_weak_layer_kR=None,
-            )
+        return UnknownConstantsSolver.solve_for_unknown_constants(
+            scenario=self.uncracked_scenario,
+            eigensystem=self.eigensystem,
+            system_type=self.scenario.system_type,
+            touchdown_distance=None,
+            touchdown_mode=None,
+            collapsed_weak_layer_kR=None,
+        )
 
     # Changes that affect the *weak layer*  -> rebuild everything
     def update_weak_layer(self, weak_layer: WeakLayer):
+        """Update the weak layer."""
         self.weak_layer = weak_layer
         self.scenario = Scenario(
             scenario_config=self.scenario.scenario_config,
@@ -293,6 +293,7 @@ class SystemModel:
 
     # Changes that affect the *slab*  -> rebuild everything
     def update_layers(self, new_layers: List[Layer]):
+        """Update the layers."""
         slab = Slab(layers=new_layers)
         self.slab = slab
         self.scenario = Scenario(
@@ -329,20 +330,24 @@ class SystemModel:
         self._invalidate_constants()
 
     def toggle_touchdown(self, touchdown: bool):
+        """Toggle the touchdown."""
         if self.config.touchdown != touchdown:
             self.config.touchdown = touchdown
             self._invalidate_slab_touchdown()
             self._invalidate_constants()
 
     def _invalidate_eigensystem(self):
+        """Invalidate the eigensystem."""
         self.__dict__.pop("eigensystem", None)
         self.__dict__.pop("unknown_constants", None)
         self.__dict__.pop("slab_touchdown", None)
 
     def _invalidate_slab_touchdown(self):
+        """Invalidate the slab touchdown."""
         self.__dict__.pop("slab_touchdown", None)
 
     def _invalidate_constants(self):
+        """Invalidate the constants."""
         self.__dict__.pop("unknown_constants", None)
         self.__dict__.pop("uncracked_unknown_constants", None)
 

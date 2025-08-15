@@ -32,7 +32,7 @@ _UNIT_FACTOR: dict[str, float] = {
 }
 
 
-class FieldQuantities:
+class FieldQuantities:  # pylint: disable=too-many-instance-attributes, too-many-public-methods
     """
     Convenience accessors for a 6xN solution matrix Z =
     [u, u', w, w', ψ, ψ']ᵀ.  All functions are *vectorized* along the second

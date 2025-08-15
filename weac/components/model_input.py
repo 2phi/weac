@@ -1,7 +1,8 @@
 """
 This module defines the input data model for the WEAC simulation.
 
-We utilize the pydantic library instead of dataclasses to define the input data model. The advantages of pydantic are:
+We utilize the pydantic library instead of dataclasses to define the input
+data model. The advantages of pydantic are:
 1. validate the input data for the WEAC simulation, compared to __post_init__ methods.
 2. generate JSON schemas for the input data, which is good for API endpoints.
 3. generate the documentation for the input data.
@@ -58,7 +59,8 @@ class ModelInput(BaseModel):
         description="Segments",
     )
 
-    def model_post_init(self, _ctx):
+    def model_post_init(self, _ctx):  # pylint: disable=arguments-differ
+        """Post-initialization checks."""
         # Check that the last segment does not have a mass
         if len(self.segments) == 0:
             raise ValueError("At least one segment is required")

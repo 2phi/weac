@@ -27,7 +27,8 @@ class TestIntegrationOldVsNew(unittest.TestCase):
 
     def test_simple_two_layer_setup(self):
         """
-        Test that old and new implementations produce identical results for a simple two-layer setup.
+        Test that old and new implementations produce identical results
+        for a simple two-layer setup.
         """
         # --- Setup for OLD implementation (published weac==2.6.X) ---
         profile = [
@@ -37,16 +38,14 @@ class TestIntegrationOldVsNew(unittest.TestCase):
         inclination = 30.0
         total_length = 14000.0
         try:
-            old_constants, old_state, old_z, old_analysis = (
-                compute_reference_model_results(
-                    system="pst-",
-                    layers_profile=profile,
-                    touchdown=False,
-                    L=total_length,
-                    a=4000,
-                    m=0,
-                    phi=inclination,
-                )
+            _, old_state, old_z, old_analysis = compute_reference_model_results(
+                system="pst-",
+                layers_profile=profile,
+                touchdown=False,
+                L=total_length,
+                a=4000,
+                m=0,
+                phi=inclination,
             )
         except RuntimeError as exc:
             self.skipTest(f"Old weac environment unavailable: {exc}")
@@ -279,7 +278,8 @@ class TestIntegrationOldVsNew(unittest.TestCase):
 
     def test_simple_two_layer_setup_with_touchdown(self):
         """
-        Test that old and new implementations produce identical results for a simple two-layer setup with touchdown=True.
+        Test that old and new implementations produce identical results
+        for a simple two-layer setup with touchdown=True.
         """
         # --- Setup for OLD implementation (published weac==2.6.X) ---
         profile = [
@@ -289,17 +289,15 @@ class TestIntegrationOldVsNew(unittest.TestCase):
         inclination = 30.0
         total_length = 14000.0
         try:
-            old_constants, old_state, old_z, old_analysis = (
-                compute_reference_model_results(
-                    system="pst-",
-                    layers_profile=profile,
-                    touchdown=True,
-                    L=total_length,
-                    a=4000,
-                    m=0,
-                    phi=inclination,
-                    set_foundation={"t": 20, "E": 0.35, "nu": 0.1},
-                )
+            _, old_state, old_z, old_analysis = compute_reference_model_results(
+                system="pst-",
+                layers_profile=profile,
+                touchdown=True,
+                L=total_length,
+                a=4000,
+                m=0,
+                phi=inclination,
+                set_foundation={"t": 20, "E": 0.35, "nu": 0.1},
             )
         except RuntimeError as exc:
             self.skipTest(f"Old weac environment unavailable: {exc}")

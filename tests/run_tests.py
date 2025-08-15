@@ -6,18 +6,13 @@ This script discovers and runs all tests in the tests directory.
 """
 
 import os
-import sys
 import unittest
-
-# Ensure the parent directory is in the system path to find the 'weac' package
-current_dir = os.path.dirname(os.path.abspath(__file__))
-parent_dir = os.path.dirname(current_dir)
-if parent_dir not in sys.path:
-    sys.path.insert(0, parent_dir)
 
 from weac.logging_config import setup_logging  # noqa: E402
 
 setup_logging(level="WARNING")
+current_dir = os.path.dirname(os.path.abspath(__file__))
+parent_dir = os.path.dirname(current_dir)
 
 
 def run_tests():

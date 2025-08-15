@@ -227,14 +227,14 @@ class Plotter:
             raise ValueError(
                 "Provide either 'system_model' or 'system_models', not both"
             )
-        elif isinstance(system_model, SystemModel):
+        if isinstance(system_model, SystemModel):
             return [system_model]
-        elif isinstance(system_models, list):
+        if isinstance(system_models, list):
             return system_models
-        else:
-            raise ValueError(
-                "Must provide either 'system_model' or 'system_models' as a SystemModel or list of SystemModels"
-            )
+        raise ValueError(
+            "Must provide either 'system_model' or 'system_models' as a "
+            "SystemModel or list of SystemModels"
+        )
 
     def _save_figure(self, filename: str, fig: Optional[Figure] = None):
         """Save figure with proper formatting."""
@@ -346,7 +346,7 @@ class Plotter:
 
         ax1.grid(True, alpha=0.3)
         ax1.set_xlim(500, 0)
-        ax1.set_ylim(-weak_layer.h, max_height)
+        ax1.set_ylim(-min(weak_layer.h for weak_layer in weak_layers), max_height)
 
         if filename:
             self._save_figure(filename, fig)
@@ -463,7 +463,7 @@ class Plotter:
 
         # Plot slab layers (from bottom to top)
         top_layer_corners = None
-        for i, layer in enumerate(reversed(slab.layers)):
+        for _i, layer in enumerate(reversed(slab.layers)):
             layer_corners = create_sloped_layer(
                 0, current_y, slab_width, layer.h, angle_rad
             )
@@ -568,7 +568,11 @@ class Plotter:
                 fontsize=10,
                 fontweight="bold",
                 color="darkred",
-                bbox=dict(boxstyle="round,pad=0.3", facecolor="white", alpha=0.8),
+                bbox={
+                    "boxstyle": "round,pad=0.3",
+                    "facecolor": "white",
+                    "alpha": 0.8,
+                },
             )
 
         # Calculate plot limits to accommodate rotated rectangle
@@ -1006,7 +1010,7 @@ class Plotter:
 
         # Show colorbar
         ticks = np.linspace(levels[0], levels[-1], num=11, endpoint=True)
-        cbar = fig.colorbar(
+        fig.colorbar(
             ax.contourf(
                 Xsl + scale * Usl,
                 Zsl + scale * Wsl,
@@ -1122,8 +1126,8 @@ class Plotter:
                 order_of_magnitude = config.order_of_magnitude
                 if scaling_factor > 1:
                     order_of_magnitude = 0.7
-                if scaling_factor < 0.55:
-                    scaling_factor = 0.55
+                scaling_factor = max(scaling_factor, 0.55)
+
                 tau_c = 5.09 * (scaling_factor**order_of_magnitude)
                 sigma_c = 6.16 * (scaling_factor**order_of_magnitude)
             elif method == "schottner":
@@ -1192,8 +1196,8 @@ class Plotter:
         ax.axhline(y=0, color="k", linewidth=0.5)
         ax.axvline(x=0, color="k", linewidth=0.5)
 
-        max_tau = max(max_tau, max(np.abs(tau)))
-        max_sigma = max(max_sigma, max(np.abs(sigma)))
+        max_tau = max(max_tau, np.abs(tau))
+        max_sigma = max(max_sigma, np.abs(sigma))
         ax.set_xlim(0, max_sigma * 1.1)
         ax.set_ylim(-max_tau * 1.1, max_tau * 1.1)
 
@@ -1210,6 +1214,7 @@ class Plotter:
         criteria_evaluator: CriteriaEvaluator,
         filename: str = "err_envelope",
     ) -> Figure:
+        """Plot the ERR envelope."""
         analyzer = self._get_analyzer(system_model)
 
         incr_energy = analyzer.incremental_ERR(unit="J/m^2")
@@ -1318,7 +1323,6 @@ class Plotter:
         deformation_scale: float = 100.0,
         window: int = np.inf,
         levels: int = 300,
-        normalize: bool = True,
         filename: str = "analysis",
     ) -> Figure:
         """
@@ -1651,21 +1655,12 @@ class Plotter:
         # Add primary legend for annotations (crack lengths)
         legend1 = ax.legend(loc="upper right", fontsize=8)
 
-        # Add secondary legend for weights
-        legend2 = ax.legend(
-            weight_legend_handles,
-            weight_legend_labels,
-            loc="upper left",
-            fontsize=8,
-            title="Weight Values",
-        )
-
         # Add the first legend back (matplotlib only shows the last legend by default)
         ax.add_artist(legend1)
 
         # Show colorbar
         ticks = np.linspace(levels[0], levels[-1], num=11, endpoint=True)
-        cbar = fig.colorbar(
+        fig.colorbar(
             ax.contourf(
                 Xwl + scale * Uwl,
                 Zwl + scale * Wwl,

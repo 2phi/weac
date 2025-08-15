@@ -1,5 +1,6 @@
 """
-This module handles the calculation of slab touchdown events.    Handling the touchdown situation in a PST.
+This module handles the calculation of slab touchdown events.
+Handling the touchdown situation in a PST.
 """
 
 import logging
@@ -19,7 +20,7 @@ from weac.core.unknown_constants_solver import UnknownConstantsSolver
 logger = logging.getLogger(__name__)
 
 
-class SlabTouchdown:
+class SlabTouchdown:  # pylint: disable=too-many-instance-attributes,too-few-public-methods
     """
     Handling the touchdown situation in a PST.
     Calculations follow paper Rosendahl et al. (2024)
@@ -27,11 +28,14 @@ class SlabTouchdown:
 
     Types of Touchdown:
         `A_free_hanging` : Slab is free hanging (not in contact with the collapsed weak layer)
-            touchdown_distance `=` cut_length -> the unsupported segment (touchdown_distance) equals the cut length
+            touchdown_distance `=` cut_length -> the unsupported segment (touchdown_distance)
+            equals the cut length
         `B_point_contact` : End of slab is in contact with the collapsed weak layer
-            touchdown_distance `=` cut_length -> the unsupported segment (touchdown_distance) equals the cut length
+            touchdown_distance `=` cut_length -> the unsupported segment (touchdown_distance)
+            equals the cut length
         `C_in_contact` : more of the slab is in contact with the collapsed weak layer
-            touchdown_distance `<` cut_length -> the unsupported segment (touchdown_distance) is strictly smaller than the cut length
+            touchdown_distance `<` cut_length -> the unsupported segment (touchdown_distance)
+            is strictly smaller than the cut length
 
     The Module does:
     1. Calculation of Zones of modes `[A_free_hanging, B_point_contact, C_in_contact]`::
@@ -89,9 +93,7 @@ class SlabTouchdown:
             surface_load=self.scenario.scenario_config.surface_load,
         )
 
-        self.collapsed_eigensystem = self._create_collapsed_eigensystem(
-            qs=self.scenario.scenario_config.surface_load,
-        )
+        self.collapsed_eigensystem = self._create_collapsed_eigensystem()
 
         self._setup_touchdown_system()
 
@@ -112,6 +114,7 @@ class SlabTouchdown:
         except ValueError:
             self.l_BC = self.scenario.L
         # Assign stage
+        touchdown_mode = "A_free_hanging"
         if self.scenario.cut_length <= self.l_AB:
             touchdown_mode = "A_free_hanging"
         elif self.l_AB < self.scenario.cut_length <= self.l_BC:
@@ -208,7 +211,7 @@ class SlabTouchdown:
 
         return l_BC
 
-    def _create_collapsed_eigensystem(self, qs: float) -> Eigensystem:
+    def _create_collapsed_eigensystem(self) -> Eigensystem:
         """
         Create the collapsed weak layer and eigensystem with modified stiffness values.
         This centralizes all collapsed-related logic within the SlabTouchdown class.
@@ -344,6 +347,7 @@ class SlabTouchdown:
         # Calculate stiffness based on field quantities
         fq = FieldQuantities(eigensystem=eigensystem)
 
+        has_foundation = True
         if dof in ["rot"]:
             # For rotational stiffness: has_foundation = M / psi
             psi_val = fq.psi(z_at_x0)[0]  # Extract scalar value from the result
