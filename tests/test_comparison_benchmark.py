@@ -16,8 +16,8 @@ import numpy as np
 project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, project_root)
 
-from tests.utils.weac_reference_runner import (
-    compute_reference_model_results,  # noqa: E402
+from tests.utils.weac_reference_runner import (  # noqa: E402
+    compute_reference_model_results,
 )
 from weac.components import (  # noqa: E402
     CriteriaConfig,
