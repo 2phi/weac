@@ -671,8 +671,6 @@ class CriteriaEvaluator:
                 "Please set vertical=False until this is fixed.",
                 UserWarning,
             )
-            # TODO: investigate and resolve vertical=True bug (see issue #9: VPST
-            # leads to unphysical Differential ERR of cracks)
         system_copy = copy.deepcopy(system)
         segments = [
             Segment(length=5e3, has_foundation=True, m=0.0),

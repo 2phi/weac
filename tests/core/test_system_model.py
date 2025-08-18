@@ -12,6 +12,7 @@ from weac.components import (
     Layer,
     ModelInput,
     ScenarioConfig,
+    SystemType,
     Segment,
     WeakLayer,
 )
@@ -165,7 +166,7 @@ class TestSystemModelBehavior(unittest.TestCase):
         )
 
     def _build_model(
-        self, touchdown: bool = False, system_type: str = "skiers"
+        self, touchdown: bool = False, system_type: SystemType = "skiers"
     ) -> SystemModel:
         config = Config(touchdown=touchdown)
         sc = ScenarioConfig(phi=10.0, system_type=system_type, cut_length=3000.0)

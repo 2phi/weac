@@ -90,7 +90,8 @@ class SystemModel:
 
     # Define system components
     layers = [Layer(rho=200, h=150), Layer(rho=300, h=100)]
-    segments = [Segment(length=10000, has_foundation=True, m=0), Segment(length=4000, has_foundation=False, m=0)]
+    segments = [Segment(length=10000, has_foundation=True, m=0),
+                Segment(length=4000, has_foundation=False, m=0)]
 
     # Create system
     system = SystemModel(model_input=model_input, config=Config(touchdown=True))

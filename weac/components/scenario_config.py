@@ -7,6 +7,11 @@ from typing import Literal
 from pydantic import BaseModel, Field
 
 
+SystemType = Literal[
+    "skier", "skiers", "pst-", "-pst", "rot", "trans", "vpst-", "-vpst"
+]
+
+
 class ScenarioConfig(BaseModel):
     """
     Configuration for the overall scenario, such as slope angle.
@@ -15,8 +20,7 @@ class ScenarioConfig(BaseModel):
     ----------
     phi : float, optional
         Slope angle in degrees (counterclockwise positive).
-    system_type : Literal['skier', 'skiers', 'pst-',
-                        '-pst', 'rot', 'trans', 'vpst-', '-vpst']
+    system_type : SystemType
         Type of system.
     cut_length : float, optional
         Cut length for PST/VPST [mm].
@@ -26,9 +30,7 @@ class ScenarioConfig(BaseModel):
         Surface line-load on slab [N/mm] (force per mm of out-of-plane width).
     """
 
-    system_type: Literal[
-        "skier", "skiers", "pst-", "-pst", "rot", "trans", "vpst-", "-vpst"
-    ] = Field(
+    system_type: SystemType = Field(
         default="skiers",
         description="Type of system, '-pst', 'pst-', ....; \n"
         "skier: single skier in-between two segments, \n"

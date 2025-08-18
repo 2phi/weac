@@ -13,6 +13,7 @@ from typing import Literal, Optional
 import numpy as np
 from numpy.linalg import LinAlgError
 
+from weac.components import SystemType
 from weac.constants import G_MM_S2
 from weac.core.eigensystem import Eigensystem
 from weac.core.field_quantities import FieldQuantities
@@ -34,9 +35,7 @@ class UnknownConstantsSolver:
         cls,
         scenario: Scenario,
         eigensystem: Eigensystem,
-        system_type: Literal[
-            "skier", "skiers", "pst-", "-pst", "vpst-", "-vpst", "rot", "trans"
-        ],
+        system_type: SystemType,
         touchdown_distance: Optional[float] = None,
         touchdown_mode: Optional[
             Literal["A_free_hanging", "B_point_contact", "C_in_contact"]
@@ -264,9 +263,7 @@ class UnknownConstantsSolver:
         eigensystem: Eigensystem,
         has_foundation: bool,
         pos: Literal["l", "r", "m", "left", "right", "mid"],
-        system_type: Literal[
-            "skier", "skiers", "pst-", "-pst", "vpst-", "-vpst", "rot", "trans"
-        ],
+        system_type: SystemType,
         touchdown_mode: Optional[
             Literal["A_free_hanging", "B_point_contact", "C_in_contact"]
         ] = None,
@@ -371,9 +368,7 @@ class UnknownConstantsSolver:
         eigensystem: Eigensystem,
         has_foundation: bool,
         pos: Literal["l", "r", "m", "left", "right", "mid"],
-        system_type: Literal[
-            "skier", "skiers", "pst-", "-pst", "vpst-", "-vpst", "rot", "trans"
-        ],
+        system_type: SystemType,
         touchdown_mode: Optional[
             Literal["A_free_hanging", "B_point_contact", "C_in_contact"]
         ] = None,

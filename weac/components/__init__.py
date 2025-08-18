@@ -6,6 +6,7 @@ from .config import Config
 from .criteria_config import CriteriaConfig
 from .layer import Layer, WeakLayer
 from .model_input import ModelInput, ScenarioConfig, Segment
+from .scenario_config import SystemType
 
 __all__ = [
     "Config",
@@ -15,4 +16,5 @@ __all__ = [
     "CriteriaConfig",
     "ScenarioConfig",
     "ModelInput",
+    "SystemType",
 ]

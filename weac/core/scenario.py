@@ -3,11 +3,11 @@ This module defines the Scenario class, which encapsulates the physical setup of
 """
 
 import logging
-from typing import List, Literal, Sequence, Union
+from typing import List, Sequence, Union
 
 import numpy as np
 
-from weac.components import ScenarioConfig, Segment, WeakLayer
+from weac.components import ScenarioConfig, Segment, SystemType, WeakLayer
 from weac.core.slab import Slab
 from weac.utils.misc import decompose_to_normal_tangential
 
@@ -34,7 +34,7 @@ class Scenario:
     mi : List[float]
         skier masses (kg) on boundary of segment i and i+1 [kg]
 
-    system_type : Literal['skier', 'skiers', 'pst-', '-pst', 'rot', 'trans']
+    system_type : SystemType
     phi : float
         Angle of slab in positive in counter-clockwise direction [deg]
     L : float
@@ -56,9 +56,7 @@ class Scenario:
 
     cum_sum_li: np.ndarray  # cumulative sum of segment lengths [mm]
 
-    system_type: Literal[
-        "skier", "skiers", "pst-", "-pst", "vpst-", "-vpst", "rot", "trans"
-    ]
+    system_type: SystemType
     phi: float  # Angle in [deg]
     surface_load: float  # Surface Line-Load [N/mm]
     qw: float  # Weight Line-Load [N/mm]

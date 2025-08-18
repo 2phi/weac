@@ -84,7 +84,18 @@ ignore = ["E741"]
 generated-members = "matplotlib.cm.*"
 
 [tool.pylint.messages_control]
-disable = ["C0103"]
+disable = [
+    "C0103", # Invalid naming convention
+    "C0302", # Too many lines in module
+    "R0902", # Too many instance attributes
+    "R0903", # Too few public methods
+    "R0911", # Too many return statements
+    "R0912", # Too many branches
+    "R0913", # Too many arguments for function
+    "R0914", # Too many local variables
+    "R0915", # Too many statements
+    "R0917", # Too many positional arguments for function
+]
 
 [tool.pycodestyle]
 ignore = [
