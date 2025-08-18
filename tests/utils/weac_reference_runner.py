@@ -127,7 +127,7 @@ def ensure_weac_reference_env(
             [py_exe, "-c", code],
             cwd=venv_dir,
             env=_clean_env(),
-            check=True,
+            check=False,
         )
         if check_proc.returncode != 0:
             # Install pinned reference version and its deps
