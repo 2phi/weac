@@ -21,7 +21,15 @@ class ScenarioConfig(BaseModel):
     phi : float, optional
         Slope angle in degrees (counterclockwise positive).
     system_type : SystemType
-        Type of system.
+        Type of system. Allowed values are:
+        - skier: single skier in-between two segments
+        - skiers: multiple skiers spread over the slope
+        - pst-: positive PST: down-slope + slab-normal cuts
+        - -pst: negative PST: up-slope + slab-normal cuts
+        - rot: rotation: rotation of the slab
+        - trans: translation: translation of the slab
+        - vpst-: positive VPST: down-slope + vertical cuts
+        - -vpst: negative VPST: up-slope + vertical cuts
     cut_length : float, optional
         Cut length for PST/VPST [mm].
     stiffness_ratio : float, optional

@@ -299,21 +299,25 @@ See the [open issues](https://github.com/2phi/weac/issues) for a list of propose
 ### v2.6
 
 - Finite fracture mechanics implementation for layered snow covers (?)
-- Implement anistropic weak layer (?)
+- Implement anisotropic weak layer (?)
 - Add demo gif (?)
 
 ### v2.5
+
 - Analyze slab touchdown in PST experiments by setting `touchdown=True`
 - Completely redesigned and significantly improved API documentation
 
 ### v2.4
-- Choose between slope-normal (`'-pst'`, `'pst-'`) or vertial (`'-vpst'`, `'vpst-'`) PST boundary conditions
+
+- Choose between slope-normal (`'-pst'`, `'pst-'`) or vertical (`'-vpst'`, `'vpst-'`) PST boundary conditions
 
 ### v2.3
+
 - Stress plots on deformed contours
 - PSTs now account for slab touchdown
 
 ### v2.2
+
 - Sign of inclination `phi` consistent with the coordinate system (positive counterclockwise)
 - Dimension arguments to field-quantity methods added
 - Improved aspect ratio of profile views and contour plots
@@ -323,11 +327,13 @@ See the [open issues](https://github.com/2phi/weac/issues) for a list of propose
 - Now allows for distributed surface loads
 
 ### v2.1
+
 - Consistent use of coordinate system with downward pointing z-axis
 - Consitent top-to-bottom numbering of slab layers
 - Implementation of PSTs cut from either left or right side
 
 ### v2.0
+
 - Completely rewritten in 🐍 Python
 - Coupled bending-extension ODE solver implemented
 - Stress analysis of arbitrarily layered snow slabs
@@ -347,7 +353,6 @@ See the [open issues](https://github.com/2phi/weac/issues) for a list of propose
 - Finite fracture mechanics implementation
 - Prediction of anticrack nucleation
 
-
 <!-- CONTRIBUTING -->
 ## How to contribute
 
@@ -363,13 +368,10 @@ See the [open issues](https://github.com/2phi/weac/issues) for a list of propose
 5. Push to the branch (`git push origin feature/amazingfeature`)
 6. Open a pull request
 
-
 <!-- WORKFLOWS -->
 ## Workflows
 [![Publish Python 🐍 releases 📦 to PyPI ](https://github.com/2phi/weac/actions/workflows/release.yml/badge.svg)](https://github.com/2phi/weac/actions/workflows/release.yml)<br>
 [![Build and publish Sphinx 🪬 documentation ](https://github.com/2phi/weac/actions/workflows/docs.yml/badge.svg)](https://github.com/2phi/weac/actions/workflows/docs.yml)
-
-
 
 <!-- LICENSE -->
 ## License

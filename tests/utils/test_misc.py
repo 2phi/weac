@@ -106,8 +106,8 @@ class TestForceDecomposition(unittest.TestCase):
 
         f_norm, f_tan = decompose_to_normal_tangential(f, phi)
 
-        # Normal component should still be positive and equal to f*cos(|phi|)
-        # Tangential should be positive (upslope for negative angle) with magnitude f*sin(|phi|)
+        # Normal component should still be positive and equal to f*cos(phi)
+        # Tangential should be positive (upslope for negative angle) with magnitude f*sin(phi)
         expected_norm = f * np.cos(np.deg2rad(phi))
         expected_tan = -f * np.sin(np.deg2rad(phi))
         self.assertAlmostEqual(f_norm, expected_norm, places=10)

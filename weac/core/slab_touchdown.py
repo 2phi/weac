@@ -248,7 +248,7 @@ class SlabTouchdown:  # pylint: disable=too-many-instance-attributes,too-few-pub
         kNl = self._substitute_stiffness(straight_scenario, self.eigensystem, "trans")
 
         def polynomial(x: float) -> float:
-            logger.info("Eval. Slab Geometry with Touchdown Distance x=%.2f mm", x)
+            logger.debug("Eval. Slab Geometry with Touchdown Distance x=%.2f mm", x)
             # Spring stiffness of collapsed eigensystem of length cut_length - x
             straight_scenario = self._generate_straight_scenario(cut_length - x)
             kRr = self._substitute_stiffness(

@@ -286,10 +286,6 @@ class TestSystemModelBehavior(unittest.TestCase):
         system = self._build_model(touchdown=False, system_type="skiers")
         _ = system.uncracked_unknown_constants
 
-        self.assertIsNotNone(system.uncracked_scenario)
-        self.assertTrue(
-            all(seg.has_foundation for seg in system.uncracked_scenario.segments)
-        )
         self.assertGreater(len(captured_scenarios), 0)
         self.assertTrue(
             all(seg.has_foundation for seg in captured_scenarios[-1].segments)

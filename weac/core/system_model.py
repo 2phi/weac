@@ -121,10 +121,11 @@ class SystemModel:
     scenario: Scenario
     slab_touchdown: Optional[SlabTouchdown]
     unknown_constants: np.ndarray
-    uncracked_scenario: Scenario
     uncracked_unknown_constants: np.ndarray
 
-    def __init__(self, model_input: ModelInput, config: Config = Config()):
+    def __init__(self, model_input: ModelInput, config: Optional[Config] = None):
+        if config is None:
+            config = Config()
         self.config = config
         self.weak_layer = model_input.weak_layer
         self.slab = Slab(layers=model_input.layers)
@@ -256,11 +257,14 @@ class SystemModel:
 
     @cached_property
     def uncracked_unknown_constants(self) -> np.ndarray:
-        """Solve for the uncracked unknown constants."""
+        """
+        Solve for the uncracked unknown constants.
+        This is the solution for the case where the slab is cracked nowhere.
+        """
         new_segments = copy.deepcopy(self.scenario.segments)
         for _, seg in enumerate(new_segments):
             seg.has_foundation = True
-        self.uncracked_scenario = Scenario(
+        uncracked_scenario = Scenario(
             scenario_config=self.scenario.scenario_config,
             segments=new_segments,
             weak_layer=self.weak_layer,
@@ -270,7 +274,7 @@ class SystemModel:
         logger.info("Solving for Uncracked Unknown Constants")
         if self.slab_touchdown is not None:
             return UnknownConstantsSolver.solve_for_unknown_constants(
-                scenario=self.uncracked_scenario,
+                scenario=uncracked_scenario,
                 eigensystem=self.eigensystem,
                 system_type=self.scenario.system_type,
                 touchdown_distance=self.slab_touchdown.touchdown_distance,
@@ -278,7 +282,7 @@ class SystemModel:
                 collapsed_weak_layer_kR=self.slab_touchdown.collapsed_weak_layer_kR,
             )
         return UnknownConstantsSolver.solve_for_unknown_constants(
-            scenario=self.uncracked_scenario,
+            scenario=uncracked_scenario,
             eigensystem=self.eigensystem,
             system_type=self.scenario.system_type,
             touchdown_distance=None,
@@ -346,9 +350,9 @@ class SystemModel:
     def _invalidate_eigensystem(self):
         """Invalidate the eigensystem."""
         self.__dict__.pop("eigensystem", None)
-        self.__dict__.pop("unknown_constants", None)
         self.__dict__.pop("slab_touchdown", None)
         self.__dict__.pop("fq", None)
+        self._invalidate_constants()
 
     def _invalidate_slab_touchdown(self):
         """Invalidate the slab touchdown."""

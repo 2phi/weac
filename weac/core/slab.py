@@ -104,7 +104,7 @@ class Slab:  # pylint: disable=too-many-instance-attributes,too-few-public-metho
             # triangular slab geometry
             zsi = zi + hi / 3 * (3 / 2 * H - zi - 2 * zii) / (H - zi - zii)
             # Surface area of all layers (top to bottom), area = height * base / 2
-            # where base varies with slop angle
+            # where base varies with slope angle
             Ai = hi / 2 * (H - zi - zii) * np.tan(phi)
             # Center of gravity in vertical direction
             z_cog = sum(zsi * rho * Ai) / sum(rho * Ai)
