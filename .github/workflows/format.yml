@@ -1,11 +1,13 @@
 name: Make sure code is ruff-formatted 🐶
 
 on:
-  push:
-    branches-ignore: [ main, develop ]
+  # Run format checks on pull_request events
   pull_request:
-    branches: [ main, develop ]
+    types: [opened, reopened, synchronize, ready_for_review]
+  # Allow this workflow to be called by other workflows
   workflow_call:
+  # Allow this workflow to be called manually (e.g. from the GitHub Actions UI)
+  workflow_dispatch:
 
 jobs:
   format:
