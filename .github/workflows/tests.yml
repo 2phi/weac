@@ -2,14 +2,13 @@ name: Run unit tests 🤖
 
 # Trigger conditions for the workflow
 on:
-  # Run tests on push events for all branches except main and develop
-  push:
-    branches-ignore: [ main, develop ]
-  # Run tests on pull_request events only for main and develop branches
+  # Run tests on pull_request events
   pull_request:
-    branches: [ main, develop ]
+    types: [opened, reopened, synchronize, ready_for_review]
   # Allow this workflow to be called by other workflows
   workflow_call:
+  # Allow this workflow to be called manually (e.g. from the GitHub Actions UI)
+  workflow_dispatch:
 
 jobs:
   test:
