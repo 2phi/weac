@@ -20,7 +20,12 @@ jobs:
       - name: Set up Python 3.12
         uses: actions/setup-python@v5
         with:
-          python-version: '3.12'
+          python-version: "3.12"
+
+      - name: Install venv for Python 3.12
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y python3.12-venv
 
       - name: Install dependencies
         run: |
@@ -28,4 +33,4 @@ jobs:
           python -m pip install -e .
 
       - name: Run tests
-        run: python tests/run_tests.py 
+        run: python tests/run_tests.py
