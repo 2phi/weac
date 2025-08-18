@@ -57,6 +57,7 @@ class TestFieldQuantitiesBasic(unittest.TestCase):
         w_mm = self.fq.w(self.Z, unit="mm")
         w_m = self.fq.w(self.Z, unit="m")
         w_cm = self.fq.w(self.Z, unit="cm")
+        self.assertRaises(ValueError, self.fq.w, self.Z, unit="inch")
 
         # Check unit conversions
         np.testing.assert_array_almost_equal(

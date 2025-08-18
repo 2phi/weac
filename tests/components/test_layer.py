@@ -6,6 +6,7 @@ Tests validation, automatic property calculations, and edge cases.
 
 import unittest
 
+import numpy as np
 from pydantic import ValidationError
 
 from weac.components.layer import (
@@ -15,6 +16,7 @@ from weac.components.layer import (
     _gerling_youngs_modulus,
     _scapozza_youngs_modulus,
 )
+from weac.constants import NU
 
 
 class TestLayerPropertyCalculations(unittest.TestCase):
@@ -25,7 +27,7 @@ class TestLayerPropertyCalculations(unittest.TestCase):
         # Test with standard ice density
         E = _bergfeld_youngs_modulus(rho=917.0)  # Ice density
         self.assertGreater(E, 0, "Young's modulus should be positive")
-        self.assertIsInstance(E, float, "Result should be a float")
+        self.assertTrue(np.isscalar(E), "Result should be a scalar")
 
         # Test with typical snow densities
         E_light = _bergfeld_youngs_modulus(rho=100.0)
@@ -61,7 +63,7 @@ class TestLayer(unittest.TestCase):
         self.assertGreater(layer.G, 0, "Shear modulus should be positive")
 
         # Check default Poisson's ratio
-        self.assertEqual(layer.nu, 0.25, "Default Poisson's ratio should be 0.25")
+        self.assertEqual(layer.nu, NU, "Default Poisson's ratio should be 0.25")
 
     def test_layer_creation_with_all_fields(self):
         """Test creating a layer with all fields specified."""
@@ -116,6 +118,10 @@ class TestWeakLayer(unittest.TestCase):
         self.assertIsNotNone(wl.G, "Shear modulus should be auto-calculated")
         self.assertIsNotNone(wl.kn, "Normal stiffness should be auto-calculated")
         self.assertIsNotNone(wl.kt, "Shear stiffness should be auto-calculated")
+        self.assertGreater(wl.E, 0, "Young's modulus should be positive")
+        self.assertGreater(wl.G, 0, "Shear modulus should be positive")
+        self.assertGreater(wl.kn, 0, "Normal stiffness should be positive")
+        self.assertGreater(wl.kt, 0, "Shear stiffness should be positive")
 
         # Check default fracture properties
         self.assertEqual(wl.G_c, 1.0)

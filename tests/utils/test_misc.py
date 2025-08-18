@@ -106,12 +106,12 @@ class TestForceDecomposition(unittest.TestCase):
 
         f_norm, f_tan = decompose_to_normal_tangential(f, phi)
 
-        # Normal component should still be positive (into slope)
-        # Tangential component should be positive (upslope for negative angle)
-        self.assertGreater(f_norm, 0, "Normal component should be positive")
-        self.assertGreater(
-            f_tan, 0, "Tangential component should be positive for negative angle"
-        )
+        # Normal component should still be positive and equal to f*cos(|phi|)
+        # Tangential should be positive (upslope for negative angle) with magnitude f*sin(|phi|)
+        expected_norm = f * np.cos(np.deg2rad(phi))
+        expected_tan = -f * np.sin(np.deg2rad(phi))
+        self.assertAlmostEqual(f_norm, expected_norm, places=10)
+        self.assertAlmostEqual(f_tan, expected_tan, places=10)
 
     def test_zero_force(self):
         """Test force decomposition with zero force."""
@@ -274,15 +274,11 @@ class TestUtilityFunctionConsistency(unittest.TestCase):
         try:
             loads = get_skier_point_load(masses)
             self.assertEqual(len(loads), len(masses), "Should handle array input")
-
-            # Check that each element is calculated correctly
             for i, m in enumerate(masses):
                 expected = get_skier_point_load(m)
                 self.assertAlmostEqual(loads[i], expected, places=10)
-
-        except (TypeError, AttributeError):
-            # If function doesn't support arrays, that's fine too
-            pass
+        except (TypeError, AttributeError) as exc:
+            self.skipTest(f"get_skier_point_load does not support array inputs: {exc}")
 
 
 class TestPhysicalReasonableness(unittest.TestCase):

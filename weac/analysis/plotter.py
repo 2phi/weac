@@ -1196,8 +1196,8 @@ class Plotter:
         ax.axhline(y=0, color="k", linewidth=0.5)
         ax.axvline(x=0, color="k", linewidth=0.5)
 
-        max_tau = max(max_tau, np.abs(tau))
-        max_sigma = max(max_sigma, np.abs(sigma))
+        max_tau = max(max_tau, float(np.max(np.abs(tau))))
+        max_sigma = max(max_sigma, float(np.max(np.abs(sigma))))
         ax.set_xlim(0, max_sigma * 1.1)
         ax.set_ylim(-max_tau * 1.1, max_tau * 1.1)
 
@@ -1416,7 +1416,7 @@ class Plotter:
         ax.plot(
             _outline(Xsl),
             _outline(Zsl),
-            "k--",
+            linestyle="--",
             color="yellow",
             alpha=0.3,
             linewidth=1,
@@ -1424,7 +1424,6 @@ class Plotter:
         ax.plot(
             _outline(Xsl + scale * Usl),
             _outline(Zsl + scale * Wsl),
-            "k",
             color="blue",
             linewidth=1,
         )

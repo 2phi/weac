@@ -10,11 +10,7 @@ field_name: type = Field(..., gt=0, description="Description")
 - typing, default value, constraints, description
 """
 
-import logging
-
 from pydantic import BaseModel, Field
-
-logger = logging.getLogger(__name__)
 
 
 class Config(BaseModel):

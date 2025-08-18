@@ -5,21 +5,21 @@ Mechanical properties of snow-pack layers.
 * `WeakLayer` - a slab layer that also acts as a Winkler-type foundation
 """
 
-import logging
 from typing import Literal
 
 import numpy as np
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import BaseModel, ConfigDict, Field, model_validator
 
 from weac.constants import CB0, CB1, CG0, CG1, NU, RHO_ICE
 from weac.utils.snow_types import GrainType, HandHardness
 
-logger = logging.getLogger(__name__)
-
 
 def _collapse_height(h: float) -> float:
     """
-    Based on data from Herwijnen (insert paper here)
+    Based on data from Herwijnen (van Herwijnen, 2016)
+    `Estimating the effective elastic modulus and specific fracture energy of
+    snowpack layers from field experiments`
+    Data collection 2005 - 2016.
 
     Arguments:
     ----------
@@ -71,7 +71,7 @@ def _gerling_youngs_modulus(rho: float, C_0: float = CG0, C_1: float = CG1) -> f
     return C_0 * 1e-10 * rho**C_1
 
 
-def _sigrist_tensile_strength(rho, unit="kPa"):
+def _sigrist_tensile_strength(rho, unit: Literal["kPa", "MPa"] = "kPa"):
     """
     Estimate the tensile strength of a slab layer from its density.
 
@@ -120,10 +120,10 @@ class Layer(BaseModel):
 
     # derived if not provided
     nu: float = Field(default=NU, ge=0, lt=0.5, description="Poisson's ratio [-]")
-    E: float = Field(default=0.0, gt=0, description="Young's modulus [MPa]")
-    G: float = Field(default=0.0, gt=0, description="Shear modulus [MPa]")
+    E: float = Field(default=0.0, ge=0, description="Young's modulus [MPa]")
+    G: float = Field(default=0.0, ge=0, description="Shear modulus [MPa]")
     tensile_strength: float = Field(
-        default=0.0, gt=0, description="Tensile strength [kPa]"
+        default=0.0, ge=0, description="Tensile strength [kPa]"
     )
     tensile_strength_method: Literal["sigrist"] = Field(
         default="sigrist",
@@ -161,6 +161,15 @@ class Layer(BaseModel):
                 f"Invalid tensile_strength_method: {self.tensile_strength_method}"
             )
 
+    @model_validator(mode="after")
+    def validate_positive_E_G(self):
+        """Validate that E and G are positive."""
+        if self.E <= 0:
+            raise ValueError("E must be positive")
+        if self.G <= 0:
+            raise ValueError("G must be positive")
+        return self
+
 
 class WeakLayer(BaseModel):
     """
@@ -195,12 +204,12 @@ class WeakLayer(BaseModel):
     rho: float = Field(default=125, gt=0, description="Density of the Slab  [kg m⁻³]")
     h: float = Field(default=20, gt=0, description="Height/Thickness of the slab  [mm]")
     collapse_height: float = Field(
-        default=0.0, gt=0, description="Collapse height [mm]"
+        default=0.0, ge=0, description="Collapse height [mm]"
     )
     nu: float = Field(default=NU, ge=0, lt=0.5, description="Poisson's ratio [-]")
 
-    E: float = Field(default=0.0, gt=0, description="Young's modulus [MPa]")
-    G: float = Field(default=0.0, gt=0, description="Shear modulus [MPa]")
+    E: float = Field(default=0.0, ge=0, description="Young's modulus [MPa]")
+    G: float = Field(default=0.0, ge=0, description="Shear modulus [MPa]")
     # Winkler springs (can be overridden by caller)
     kn: float = Field(default=0.0, description="Normal stiffness  [N mm⁻³]")
     kt: float = Field(default=0.0, description="Shear  stiffness  [N mm⁻³]")
@@ -256,6 +265,15 @@ class WeakLayer(BaseModel):
         E_plane = self.E / (1 - self.nu**2)  # plane-strain Young
         object.__setattr__(self, "kn", self.kn or E_plane / self.h)
         object.__setattr__(self, "kt", self.kt or self.G / self.h)
+
+    @model_validator(mode="after")
+    def validate_positive_E_G(self):
+        """Validate that E and G are positive."""
+        if self.E <= 0:
+            raise ValueError("E must be positive")
+        if self.G <= 0:
+            raise ValueError("G must be positive")
+        return self
 
 
 if __name__ == "__main__":

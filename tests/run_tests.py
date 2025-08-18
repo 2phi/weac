@@ -7,6 +7,7 @@ This script discovers and runs all tests in the tests directory.
 
 import os
 import unittest
+import sys
 
 from weac.logging_config import setup_logging  # noqa: E402
 
@@ -60,4 +61,5 @@ def run_tests():
 
 
 if __name__ == "__main__":
-    run_tests()
+    result = run_tests()
+    sys.exit(0 if result.wasSuccessful() else 1)

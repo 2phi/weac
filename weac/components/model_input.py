@@ -16,7 +16,7 @@ import json
 import logging
 from typing import List
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, ConfigDict, Field, model_validator
 
 from weac.components.layer import Layer, WeakLayer
 from weac.components.scenario_config import ScenarioConfig
@@ -41,6 +41,10 @@ class ModelInput(BaseModel):
         List of segments defining the slab geometry and loading.
     """
 
+    model_config = ConfigDict(
+        extra="forbid",
+    )
+
     weak_layer: WeakLayer = Field(
         default_factory=lambda: WeakLayer(rho=125, h=20, E=1.0),
         description="Weak layer",
@@ -59,15 +63,17 @@ class ModelInput(BaseModel):
         description="Segments",
     )
 
-    def model_post_init(self, _ctx):  # pylint: disable=arguments-differ
+    @model_validator(mode="after")
+    def _validate_non_empty_components(self):
         """Post-initialization checks."""
         # Check that the last segment does not have a mass
-        if len(self.segments) == 0:
+        if not self.segments:
             raise ValueError("At least one segment is required")
-        if len(self.layers) == 0:
+        if not self.layers:
             raise ValueError("At least one layer is required")
         if self.segments[-1].m != 0:
             raise ValueError("The last segment must have a mass of 0")
+        return self
 
 
 if __name__ == "__main__":

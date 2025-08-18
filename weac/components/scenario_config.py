@@ -59,7 +59,6 @@ class ScenarioConfig(BaseModel):
     surface_load: float = Field(
         default=0.0,
         ge=0.0,
-        lt=1.0,
         description="Surface line-load on slab [N/mm], e.g. evenly spaced weights, "
         "Adam et al. (2024)",
     )

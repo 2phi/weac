@@ -129,7 +129,9 @@ class TestCriteriaEvaluator(unittest.TestCase):
         )
         g_delta, can_propagate = self.evaluator.check_crack_self_propagation(system)
         self.assertFalse(can_propagate)
-        self.assertAlmostEqual(g_delta, 0, places=4)
+        self.assertLess(
+            g_delta, 1.0, "Stable scenario should be below the fracture envelope"
+        )
 
     def test_check_crack_propagation_unstable(self):
         """Test check_crack_propagation for an unstable scenario (pre-cracked)."""

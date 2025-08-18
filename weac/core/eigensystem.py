@@ -359,7 +359,7 @@ class Eigensystem:
 
     def get_load_vector(self, phi: float, qs: float = 0) -> NDArray:
         """
-        Compute sytem load vector q.
+        Compute system load vector q.
 
         Using the solution vector z = [u, u', w, w', psi, psi']
         the ODE system is written in the form Az' + Bz = d

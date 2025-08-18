@@ -17,8 +17,8 @@ from weac.components import (
     ScenarioConfig,
     Segment,
     WeakLayer,
+    Config,
 )
-from weac.components.config import Config
 from weac.core.system_model import SystemModel
 from weac.logging_config import setup_logging
 
@@ -32,7 +32,7 @@ logging.getLogger("matplotlib.font_manager").setLevel(logging.WARNING)
 config1 = Config(
     touchdown=True,
 )
-scenario_config1 = ScenarioConfig(phi=5, system_type="skier")  # Steeper slope
+scenario_config1 = ScenarioConfig(phi=5, system_type="skier")  # Gentle slope
 criteria_config1 = CriteriaConfig(fn=1, fm=1, gn=1, gm=1)
 
 weak_layer1 = WeakLayer(rho=80, h=25, E=0.25, G_Ic=1)
@@ -50,7 +50,6 @@ model_input1 = ModelInput(
     weak_layer=weak_layer1,
     layers=layers1,
     segments=segments1,
-    criteria_config=criteria_config1,
 )
 
 system1 = SystemModel(config=config1, model_input=model_input1)
@@ -69,14 +68,12 @@ segments2 = [
     Segment(length=3000, has_foundation=True, m=70),
     Segment(length=4000, has_foundation=True, m=0),
 ]
-criteria_config2 = CriteriaConfig(fn=1, fm=1, gn=1, gm=1)
 
 model_input2 = ModelInput(
     scenario_config=scenario_config2,
     weak_layer=weak_layer2,
     layers=layers2,
     segments=segments2,
-    criteria_config=criteria_config2,
 )
 
 system2 = SystemModel(config=config2, model_input=model_input2)
@@ -96,14 +93,12 @@ segments3 = [
     Segment(length=3500, has_foundation=True, m=60),  # Different skier mass
     Segment(length=3500, has_foundation=True, m=0),
 ]
-criteria_config3 = CriteriaConfig(fn=1, fm=1, gn=1, gm=1)
 
 model_input3 = ModelInput(
     scenario_config=scenario_config3,
     weak_layer=weak_layer3,
     layers=layers3,
     segments=segments3,
-    criteria_config=criteria_config3,
 )
 
 system3 = SystemModel(config=config3, model_input=model_input3)
@@ -136,7 +131,6 @@ model_input4 = ModelInput(
     weak_layer=weak_layer4,
     layers=layers4,
     segments=segments4,
-    criteria_config=criteria_config4,
 )
 
 system4 = SystemModel(config=config4, model_input=model_input4)
@@ -226,7 +220,6 @@ model_input_analysis = ModelInput(
     layers=layers_analysis,
     segments=segments_analysis,
     weak_layer=weak_layer_analysis,
-    criteria_config=criteria_config_analysis,
 )
 
 sys_model_analysis = SystemModel(
@@ -276,13 +269,13 @@ print(
 
 # Find minimum crack length for self-propagation
 initial_interval = (1, 3000)  # Interval for the crack length search (mm)
-min_crack_length = criteria_evaluator.find_minimum_crack_length(
+min_crack_length, new_segments = criteria_evaluator.find_minimum_crack_length(
     system, search_interval=initial_interval
 )
 
 print("\n--- Minimum Self-Propagation Crack Length ---")
 if min_crack_length is not None:
-    print(f"Minimum Crack Length for Self-Propagation: {min_crack_length[0]:.1f} mm")
+    print(f"Minimum Crack Length for Self-Propagation: {min_crack_length:.1f} mm")
 else:
     print("The search for the minimum crack length did not converge.")
 

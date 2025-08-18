@@ -22,7 +22,6 @@ jobs:
           python-version: '3.12'
 
       - name: Install dependencies
-        shell: bash -el {0}
         run: |
           # Setup pip
           python -m pip install --upgrade pip

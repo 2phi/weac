@@ -68,7 +68,6 @@ class TestIntegrationOldVsNew(unittest.TestCase):
         weak_layer = WeakLayer(
             rho=50, h=30, E=0.25, G_Ic=1
         )  # Default weak layer properties
-        criteria_config = CriteriaConfig(fn=1, fm=1, gn=1, gm=1)
         config = Config(touchdown=False)  # Use default configuration
 
         model_input = ModelInput(
@@ -76,7 +75,6 @@ class TestIntegrationOldVsNew(unittest.TestCase):
             weak_layer=weak_layer,
             layers=layers,
             segments=segments,
-            criteria_config=criteria_config,
         )
 
         new_system = SystemModel(config=config, model_input=model_input)
@@ -322,7 +320,6 @@ class TestIntegrationOldVsNew(unittest.TestCase):
         weak_layer = WeakLayer(
             rho=50, h=20, E=0.35, nu=0.1, G_Ic=1
         )  # Default weak layer properties
-        criteria_config = CriteriaConfig(fn=1, fm=1, gn=1, gm=1)
         config = Config(touchdown=True)  # Use default configuration
 
         model_input = ModelInput(
@@ -330,7 +327,6 @@ class TestIntegrationOldVsNew(unittest.TestCase):
             weak_layer=weak_layer,
             layers=layers,
             segments=segments,
-            criteria_config=criteria_config,
         )
 
         new_system = SystemModel(config=config, model_input=model_input)

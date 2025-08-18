@@ -134,17 +134,18 @@ class SystemModel:
             weak_layer=self.weak_layer,
             slab=self.slab,
         )
-        self.fq = FieldQuantities(eigensystem=self.eigensystem)
         logger.info("Scenario setup")
 
         # At this point only the system is initialized
         # The solution to the system (unknown_constants) are only computed
         # when required by the user (at runtime)
 
-        self.__dict__["_eigensystem_cache"] = None
-        self.__dict__["_unknown_constants_cache"] = None
-        self.__dict__["_slab_touchdown_cache"] = None
-        self.__dict__["_uncracked_unknown_constants_cache"] = None
+        # Cached properties are invalidated via __dict__.pop in the *invalidate_* helpers.
+
+    @cached_property
+    def fq(self) -> FieldQuantities:
+        """Compute the field quantities."""
+        return FieldQuantities(eigensystem=self.eigensystem)
 
     @cached_property
     def eigensystem(self) -> Eigensystem:  # heavy
@@ -154,7 +155,12 @@ class SystemModel:
 
     @cached_property
     def slab_touchdown(self) -> Optional[SlabTouchdown]:
-        """Solve for the slab touchdown."""
+        """
+        Solve for the slab touchdown.
+        Modifies the scenario object in place by replacing the undercut segment
+        with a new segment of length equal to the touchdown distance if the system is
+        a PST or VPST.
+        """
         if self.config.touchdown:
             logger.info("Solving for Slab Touchdown")
             slab_touchdown = SlabTouchdown(
@@ -342,6 +348,7 @@ class SystemModel:
         self.__dict__.pop("eigensystem", None)
         self.__dict__.pop("unknown_constants", None)
         self.__dict__.pop("slab_touchdown", None)
+        self.__dict__.pop("fq", None)
 
     def _invalidate_slab_touchdown(self):
         """Invalidate the slab touchdown."""

@@ -7,10 +7,16 @@
 # -- Project information -----------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#project-information
 
+from datetime import date
+from importlib.metadata import PackageNotFoundError, version
+
 project = "WEAC"
-copyright = "2024, 2phi GbR"
+copyright = f"{date.today().year}, 2phi GbR"
 author = "P.L. Rosendahl, P. Weissgraeber, F. Rheinschmidt, J. Schneider"
-release = "2.6.1"
+try:
+    release = version("weac")
+except PackageNotFoundError:
+    release = "unknown"
 github_url = "https://github.com/2phi/weac"
 
 

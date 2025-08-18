@@ -8,7 +8,7 @@ import unittest
 # Third party imports
 import numpy as np
 
-from weac.analysis.analyzer import Analyzer
+from weac.analysis import Analyzer
 from weac.components import (
     Config,
     Layer,
@@ -61,6 +61,8 @@ class TestAnalyzer(unittest.TestCase):
             self.assertIn(key, zmesh)
         # Non-empty mesh
         self.assertGreater(len(zmesh["z"]), 1)
+        z = np.asarray(zmesh["z"])
+        self.assertTrue(np.all(np.diff(z) > 0))
 
     def test_stress_fields_shapes_and_finite(self):
         """Test stress fields shapes and finite values."""

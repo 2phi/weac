@@ -47,11 +47,11 @@ class TestSlabBasicOperations(unittest.TestCase):
         self.assertEqual(slab.H, expected_H)
 
         # Check layer thicknesses
-        np.testing.assert_array_equal(slab.hi, [50, 80, 70])
+        np.testing.assert_array_almost_equal(slab.hi, [50, 80, 70])
 
         # Check densities (converted to t/mm³)
         expected_rho = np.array([150, 200, 300]) * 1e-12
-        np.testing.assert_array_equal(slab.rhoi, expected_rho)
+        np.testing.assert_array_almost_equal(slab.rhoi, expected_rho)
 
         # Check coordinate system
         # Layer midpoints calculated as: H/2 - sum(hi[j:n]) + hi[j]/2

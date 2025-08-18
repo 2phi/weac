@@ -17,7 +17,7 @@ class Slab:  # pylint: disable=too-many-instance-attributes,too-few-public-metho
 
     Coordinate frame:
     - z-axis points downward (first index: top layer, last index: bottom layer)
-    - z = 0 is set at the mid-point of the slabs thickness
+    - z = 0 is set at the mid-point of the slab's thickness
 
     Attributes
     ----------
@@ -80,7 +80,7 @@ class Slab:  # pylint: disable=too-many-instance-attributes,too-few-public-metho
             Horizontal coordinate of center of gravity [mm]
         z_cog : float
             Vertical coordinate of center of gravity [mm]
-        w : ndarray
+        w : float
             Weight of the slab segment that is cut off or added [t]
         """
         # Convert slope angle to radians
@@ -103,7 +103,7 @@ class Slab:  # pylint: disable=too-many-instance-attributes,too-few-public-metho
             # Center of gravity of all layers (top to bottom) derived from
             # triangular slab geometry
             zsi = zi + hi / 3 * (3 / 2 * H - zi - 2 * zii) / (H - zi - zii)
-            # Surface area of all layers (top to bottom), area = heigth * base/2
+            # Surface area of all layers (top to bottom), area = height * base / 2
             # where base varies with slop angle
             Ai = hi / 2 * (H - zi - zii) * np.tan(phi)
             # Center of gravity in vertical direction

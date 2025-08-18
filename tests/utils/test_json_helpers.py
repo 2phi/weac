@@ -15,7 +15,7 @@ class TestJsonHelpers(unittest.TestCase):
         """Verify numpy arrays are serialized to lists."""
         data = {"a": np.array([1, 2, 3])}
         result = json.dumps(data, default=json_default)
-        self.assertEqual(result, '{"a": [1, 2, 3]}')
+        self.assertEqual(json.loads(result), {"a": [1, 2, 3]})
 
     def test_json_default_numpy_scalars(self):
         """Verify numpy scalar types are serialized to Python primitives."""
@@ -26,10 +26,13 @@ class TestJsonHelpers(unittest.TestCase):
             "bool_false": np.bool_(False),
         }
         result = json.dumps(cases, default=json_default)
-        expected = (
-            '{"int64": 42, "float64": 3.14, "bool_true": true, "bool_false": false}'
-        )
-        self.assertEqual(result, expected)
+        expected = {
+            "int64": 42,
+            "float64": 3.14,
+            "bool_true": True,
+            "bool_false": False,
+        }
+        self.assertDictEqual(json.loads(result), expected)
 
     def test_json_default_mixed_types(self):
         """Verify mixed data including numpy and standard types serializes correctly."""
@@ -68,7 +71,7 @@ class TestJsonHelpers(unittest.TestCase):
 
         data = {"key": Unserializable()}
         result = json.dumps(data, default=json_default)
-        self.assertEqual(result, '{"key": "UnserializableObject"}')
+        self.assertEqual(json.loads(result), {"key": "UnserializableObject"})
 
     def test_various_inputs(self):
         """Test a variety of inputs for comprehensive coverage."""

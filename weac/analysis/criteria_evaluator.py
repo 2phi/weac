@@ -310,7 +310,7 @@ class CriteriaEvaluator:
         self,
         system: SystemModel,
         max_iterations: int = 25,
-        dampening_ERR: float = 0.0,
+        damping_ERR: float = 0.0,
         tolerance_ERR: float = 0.002,
         tolerance_stress: float = 0.005,
         print_call_stats: bool = False,
@@ -326,8 +326,8 @@ class CriteriaEvaluator:
             The system model.
         max_iterations: int
             Max iterations for the solver. Defaults to 25.
-        dampening_ERR: float
-            Dampening factor for the ERR criterion. Defaults to 0.0.
+        damping_ERR: float
+            damping factor for the ERR criterion. Defaults to 0.0.
         tolerance_ERR: float, optional
             Tolerance for g_delta convergence. Defaults to 0.002.
         tolerance_stress: float, optional
@@ -540,9 +540,9 @@ class CriteriaEvaluator:
             new_skier_weight = (min_skier_weight + max_skier_weight) / 2
 
             # Apply damping to avoid oscillation around goal
-            if np.abs(dist_ERR_envelope) < 0.5 and dampening_ERR > 0:
-                scaling = (dampening_ERR + 1 + (new_skier_weight / skier_weight)) / (
-                    dampening_ERR + 2
+            if np.abs(dist_ERR_envelope) < 0.5 and damping_ERR > 0:
+                scaling = (damping_ERR + 1 + (new_skier_weight / skier_weight)) / (
+                    damping_ERR + 2
                 )
             else:
                 scaling = 1
@@ -583,13 +583,13 @@ class CriteriaEvaluator:
                     min_dist_stress=min_dist_stress,
                 )
             if _recursion_depth < 5:
-                logger.info("Reached max dampening without converging.")
+                logger.info("Reached max damping without converging.")
                 analyzer.print_call_stats(
                     message="evaluate_coupled_criterion Call Statistics"
                 )
                 return self.evaluate_coupled_criterion(
                     system,
-                    dampening_ERR=dampening_ERR + 1,
+                    damping_ERR=damping_ERR + 1,
                     tolerance_ERR=tolerance_ERR,
                     tolerance_stress=tolerance_stress,
                     _recursion_depth=_recursion_depth + 1,
@@ -599,7 +599,7 @@ class CriteriaEvaluator:
             )
             return CoupledCriterionResult(
                 converged=False,
-                message="Reached max dampening without converging.",
+                message="Reached max damping without converging.",
                 self_collapse=False,
                 pure_stress_criteria=False,
                 critical_skier_weight=0,
@@ -636,7 +636,7 @@ class CriteriaEvaluator:
         analyzer.print_call_stats(message="evaluate_coupled_criterion Call Statistics")
         return self.evaluate_coupled_criterion(
             system,
-            dampening_ERR=dampening_ERR + 1,
+            damping_ERR=damping_ERR + 1,
             tolerance_ERR=tolerance_ERR,
             tolerance_stress=tolerance_stress,
             _recursion_depth=_recursion_depth + 1,

@@ -159,7 +159,7 @@ Create a WeakLayer instance that lies underneath the slab.
 ```python
 from weac.components import WeakLayer
 
-wweaklayer = WeakLayer(rho=125, h=20)
+weak_layer = WeakLayer(rho=125, h=20)
 ```
 
 Create a Scenario that defines the environment and setup that the slab and weaklayer will be evaluated in.
@@ -183,7 +183,7 @@ skier_segments = [
 pst_config = ScenarioConfig(
     system_type='pst-',  # Downslope cut
     phi=30,  # (counterclockwise positive)
-    crack_length=300,
+    cut_length=300,
 )
 pst_segments = [
     Segment(length=5000, has_foundation=True, m=0),
@@ -197,24 +197,26 @@ Create SystemModel instance that combines the inputs and handles system solving 
 from weac.components import Config, ModelInput
 from weac.core.system_model import SystemModel
 
+# Example: build a model for the skier scenario defined above 
 model_input = ModelInput(
-    scenario_config=scenario_config,
+    weak_layer=weak_layer,
+    scenario_config=skier_config,
     layers=custom_layers,
-    segments=segments,
+    segments=skier_segments,
 )
 system_config = Config(
     touchdown=True
 )
-system = SystemModel(
+skier_system = SystemModel(
     model_input=model_input,
     config=system_config,
 )
 ```
 
-Unknown constants are cached_properties; calling `system.unknown_constants` solves the system of linear equation + boundary-value problemfree and extracts the constants.
+Unknown constants are cached_properties; calling `skier_system.unknown_constants` solves the system of linear equations and extracts the constants.
 
 ```python
-C = system.unknown_constants
+C = skier_system.unknown_constants
 ```
 
 Analyzer handles rasterization + computation of involved slab and weak-layer properties `Sxx`, `Sxz`, etc.
@@ -223,11 +225,11 @@ Prepare the output by rasterizing the solution vector at all horizontal position
 ```python
 from weac.analysis.analyzer import Analyzer
 
-skier_analyzer = Analyzer(skier_model)
+skier_analyzer = Analyzer(skier_system)
 xsl_skier, z_skier, xwl_skier = skier_analyzer.rasterize_solution(mode="cracked")
 Gdif, GdifI, GdifII = skier_analyzer.differential_ERR()
 Ginc, GincI, GincII = skier_analyzer.incremental_ERR()
-# and Sxx, Sxz, Tzz, prinicpal stress, incremental_potential, ...
+# and Sxx, Sxz, Tzz, principal stress, incremental_potential, ...
 ```
 
 Visualize the results.
@@ -238,12 +240,14 @@ from weac.analysis.plotter import Plotter
 plotter = Plotter()
 # Visualize slab profile
 fig = plotter.plot_slab_profile(
-    weak_layers=weaklayer,
-    slabs=system.slab,
+    weak_layers=weak_layer,
+    slabs=skier_system.slab,
 )
 
 # Visualize deformations as a contour plot
-fig = plotter.plot_deformed(xsl_skier, xwl_skier, z_skier, skier_analyzer, scale=200, window=200, aspect=2, field="Sxx")
+fig = plotter.plot_deformed(
+  xsl_skier, xwl_skier, z_skier, skier_analyzer, scale=200, window=200, aspect=2, field="Sxx"
+)
 
 # Plot slab displacements (using x-coordinates of all segments, xsl)
 plotter.plot_displacements(skier_analyzer, x=xsl_skier, z=z_skier)
@@ -255,14 +259,15 @@ Compute output/field quantities for exporting or plotting.
 
 ```python
 # Compute stresses in kPa in the weaklayer
-tau = skier_model.fq.tau(Z=z_skier, unit='kPa')
-sig = skier_model.fq.sig(Z=z_skier, unit='kPa')
+tau = skier_system.fq.tau(Z=z_skier, unit='kPa')
+sig = skier_system.fq.sig(Z=z_skier, unit='kPa')
 
-w = skier_model.fq.w(Z=z_skier, unit='um')
-u_top = skier_model.fq.u(Z=z_skier, h0=top, unit='um')
-u_mid = skier_model.fq.u(Z=z_skier, h0=mid, unit='um')
-u_bot = skier_model.fq.u(Z=z_skier, h0=bot, unit='um')
-psi = skier_model.fq.psi(Z=z_skier, unit='deg')
+w = skier_system.fq.w(Z=z_skier, unit='um')
+# Example evaluation vertical displacement at top/mid/bottom of the slab
+u_top = skier_system.fq.u(Z=z_skier, h0=top, unit='um')
+u_mid = skier_system.fq.u(Z=z_skier, h0=mid, unit='um')
+u_bot = skier_system.fq.u(Z=z_skier, h0=bot, unit='um')
+psi = skier_system.fq.psi(Z=z_skier, unit='deg')
 ```
 
 <!-- ROADMAP -->
@@ -348,6 +353,7 @@ See the [open issues](https://github.com/2phi/weac/issues) for a list of propose
 
 1. Fork the project
 2. Initialize submodules
+
     ```bash  
     git submodule update --init --recursive
     ```

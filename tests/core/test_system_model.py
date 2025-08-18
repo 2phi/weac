@@ -138,9 +138,9 @@ class TestSystemModelCaching(unittest.TestCase):
         constants_before = system.unknown_constants
 
         # Update the scenario
-        scenario_config = system.scenario.scenario_config
-        scenario_config.phi = 45.0
-        system.update_scenario(scenario_config=scenario_config)
+        new_cfg = system.scenario.scenario_config.model_copy()
+        new_cfg.phi = 45.0
+        system.update_scenario(scenario_config=new_cfg)
 
         eigensystem_after = system.eigensystem
         constants_after = system.unknown_constants
@@ -403,15 +403,17 @@ class TestSystemModelBehavior(unittest.TestCase):
             )  # Broadcast to (6, 6)
             np.testing.assert_allclose(z_scalar, expected)
             # Array x of length 3 -> concatenation along axis=1
+            x = np.array([0.0, 50.0, 100.0])
             z_array = system.z(
-                x=[0.0, 50.0, 100.0],
+                x=x,
                 C=C,
                 length=1000.0,
                 phi=10.0,
                 has_foundation=True,
                 qs=0.0,
             )
-            self.assertEqual(z_array.shape, (6, 18))
+            expected_cols = z_scalar.shape[1] * len(x)
+            self.assertEqual(z_array.shape, (6, expected_cols))
 
 
 if __name__ == "__main__":

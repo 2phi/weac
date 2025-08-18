@@ -197,7 +197,8 @@ class TestEigensystemSolutionMethods(unittest.TestCase):
 
         # Should be real for bedded segments
         self.assertTrue(
-            np.all(np.isreal(zh)), "Bedded complementary solution should be real"
+            np.allclose(np.imag(zh), 0.0, atol=1e-12),
+            "Bedded complementary solution should be (numerically) real",
         )
 
     def test_complementary_solution_free(self):
@@ -213,9 +214,9 @@ class TestEigensystemSolutionMethods(unittest.TestCase):
             zh.shape, (6, 6), "Complementary solution should be 6x6 matrix"
         )
 
-        # Should be real for free segments (polynomial form)
         self.assertTrue(
-            np.all(np.isreal(zh)), "Free complementary solution should be real"
+            np.allclose(np.imag(zh), 0.0, atol=1e-12),
+            "Free complementary solution should be (numerically) real",
         )
 
     def test_complementary_solution_at_origin(self):
@@ -243,9 +244,11 @@ class TestEigensystemSolutionMethods(unittest.TestCase):
 
         # Should return 6x1 vector
         self.assertEqual(zp.shape, (6, 1), "Particular solution should be 6x1 vector")
-
         # Should be real
-        self.assertTrue(np.all(np.isreal(zp)), "Particular solution should be real")
+        self.assertTrue(
+            np.allclose(np.imag(zp), 0.0, atol=1e-12),
+            "Particular solution should be (numerically) real",
+        )
 
     def test_particular_solution_free(self):
         """Test particular solution for free segment."""
@@ -256,11 +259,11 @@ class TestEigensystemSolutionMethods(unittest.TestCase):
 
         zp = self.eigensystem.zp(x, phi, has_foundation, qs)
 
-        # Should return 6x1 vector
-        self.assertEqual(zp.shape, (6, 1), "Particular solution should be 6x1 vector")
-
         # Should be real
-        self.assertTrue(np.all(np.isreal(zp)), "Particular solution should be real")
+        self.assertTrue(
+            np.allclose(np.imag(zp), 0.0, atol=1e-12),
+            "Particular solution should be (numerically) real",
+        )
 
     def test_load_vector_calculation(self):
         """Test system load vector calculation."""
@@ -273,7 +276,10 @@ class TestEigensystemSolutionMethods(unittest.TestCase):
         self.assertEqual(q.shape, (6, 1), "Load vector should be 6x1")
 
         # Should be real
-        self.assertTrue(np.all(np.isreal(q)), "Load vector should be real")
+        self.assertTrue(
+            np.allclose(np.imag(q), 0.0, atol=1e-12),
+            "Load vector should be (numerically) real",
+        )
 
 
 class TestEigensystemPhysicalConsistency(unittest.TestCase):

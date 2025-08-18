@@ -347,13 +347,17 @@ class SlabTouchdown:  # pylint: disable=too-many-instance-attributes,too-few-pub
         # Calculate stiffness based on field quantities
         fq = FieldQuantities(eigensystem=eigensystem)
 
-        has_foundation = True
+        stiffness = None
         if dof in ["rot"]:
             # For rotational stiffness: has_foundation = M / psi
+            # Uses M = 1.0 for the moment of inertia.
             psi_val = fq.psi(z_at_x0)[0]  # Extract scalar value from the result
-            has_foundation = abs(1 / psi_val) if abs(psi_val) > 1e-12 else 1e12
+            stiffness = abs(1 / psi_val) if abs(psi_val) > 1e-12 else 1e12
         elif dof in ["trans"]:
             # For translational stiffness: has_foundation = V / w
+            # Uses w = 1.0 for the weight of the slab.
             w_val = fq.w(z_at_x0)[0]  # Extract scalar value from the result
-            has_foundation = abs(1 / w_val) if abs(w_val) > 1e-12 else 1e12
-        return has_foundation
+            stiffness = abs(1 / w_val) if abs(w_val) > 1e-12 else 1e12
+        if stiffness is None:
+            raise ValueError(f"Stiffness for {dof} is None")
+        return stiffness

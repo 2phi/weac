@@ -45,12 +45,12 @@ def get_skier_point_load(m: float) -> float:
     Arguments
     ---------
     m : float
-        Skier weight (kg).
+        Skier weight [kg].
 
     Returns
     -------
     f : float
-        Skier load (N).
+        Skier load [N/mm].
     """
     F = 1e-3 * m * G_MM_S2 / LSKI_MM  # Total skier
     return F

@@ -28,7 +28,7 @@ class TestConfig(unittest.TestCase):
         config = Config()
 
         # Check default values
-        self.assertEqual(config.touchdown, False)
+        self.assertFalse(config.touchdown)
 
 
 class TestScenarioConfig(unittest.TestCase):
