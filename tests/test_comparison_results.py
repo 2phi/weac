@@ -8,7 +8,6 @@ import numpy as np
 
 from weac.analysis.analyzer import Analyzer
 from weac.components import (
-    CriteriaConfig,
     Layer,
     ModelInput,
     ScenarioConfig,
@@ -48,7 +47,7 @@ class TestIntegrationOldVsNew(unittest.TestCase):
                 phi=inclination,
             )
         except RuntimeError as exc:
-            self.skipTest(f"Old weac environment unavailable: {exc}")
+            raise RuntimeError("Old weac environment unavailable") from exc
 
         # --- Setup for NEW implementation (main_weac2.py style) ---
         # Equivalent setup in new system
@@ -298,7 +297,7 @@ class TestIntegrationOldVsNew(unittest.TestCase):
                 set_foundation={"t": 20, "E": 0.35, "nu": 0.1},
             )
         except RuntimeError as exc:
-            self.skipTest(f"Old weac environment unavailable: {exc}")
+            raise RuntimeError("Old weac environment unavailable") from exc
 
         # --- Setup for NEW implementation (main_weac2.py style) ---
         # Equivalent setup in new system

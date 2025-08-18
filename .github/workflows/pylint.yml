@@ -30,8 +30,20 @@ jobs:
       - name: Run pylint analysis
         # Using .pylintrc with comprehensive configuration for scientific code
         run: |
-          python -m pylint --rcfile=pyproject.toml --output-format=parseable --output=pylint-report.txt weac/ tests/
+          exit_code=0
+          python -m pylint --rcfile=pyproject.toml --output-format=parseable --output=pylint-report.txt weac/ tests/ || exit_code=$?
+          echo "Pylint finished with exit code $exit_code."
           echo
+          echo "Pylint exit code meaning:"
+          if [ $exit_code -eq 0 ]; then echo "-> No issues found"; fi
+          if [ $((exit_code & 1)) -ne 0 ]; then echo "-> Fatal message issued"; fi
+          if [ $((exit_code & 2)) -ne 0 ]; then echo "-> Error message issued"; fi
+          if [ $((exit_code & 4)) -ne 0 ]; then echo "-> Warning message issued"; fi
+          if [ $((exit_code & 8)) -ne 0 ]; then echo "-> Refactor message issued"; fi
+          if [ $((exit_code & 16)) -ne 0 ]; then echo "-> Convention message issued"; fi
+          if [ $((exit_code & 32)) -ne 0 ]; then echo "-> Usage error"; fi
+          echo
+
           echo 'Error type counts:'
           grep -oP '[A-Z]\d+\([a-z\-]+\)' pylint-report.txt | sort | uniq -c | sort -nr
           echo
@@ -41,4 +53,15 @@ jobs:
           echo 'Total errors:'
           grep -oP '^[\w\-\/]+\.py' pylint-report.txt | wc -l
           echo
-          grep 'Your code' pylint-report.txt
+          grep 'Your code' pylint-report.txt || true
+
+          # Fail on fatal, error, and usage error.
+          # These are severe and should block PRs.
+          # Warnings (4), refactors (8), and conventions (16) will not cause a failure.
+          fail_on_codes=$((1 | 2 | 32))
+          if [ $((exit_code & fail_on_codes)) -ne 0 ]; then
+            echo "Failing CI due to fatal/error/usage messages from pylint."
+            exit 1
+          else
+            echo "Pylint check passed. No fatal/error/usage messages."
+          fi

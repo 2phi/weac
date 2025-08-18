@@ -61,5 +61,5 @@ def run_tests():
 
 
 if __name__ == "__main__":
-    result = run_tests()
-    sys.exit(0 if result.wasSuccessful() else 1)
+    unittest_result = run_tests()
+    sys.exit(0 if unittest_result.wasSuccessful() else 1)
