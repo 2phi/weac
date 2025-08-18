@@ -1,40 +1,44 @@
 name: Static code analysis 🔎
 
-on:
+"on":
+  # Run static code analysis on pull_request events
   pull_request:
     types: [opened, reopened, synchronize, ready_for_review]
+  # Allow this workflow to be called by other workflows
   workflow_call:
+  # Allow this workflow to be called manually (e.g. from the GitHub Actions UI)
+  workflow_dispatch:
 
 jobs:
   pylint:
     name: Static code analysis 🔎
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-    - name: Set up Python 3.12
-      uses: actions/setup-python@v5
-      with:
-        python-version: '3.12'
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
 
-    - name: Install dependencies
-      run: |
-        python -m pip install --upgrade pip
-        python -m pip install pylint
-        python -m pip install -e ".[dev]"
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install pylint
+          python -m pip install -e ".[dev]"
 
-    - name: Run pylint analysis
-      # Using .pylintrc with comprehensive configuration for scientific code
-      run: |
-        python -m pylint --output-format=parseable --output=pylint-report.txt weac/ tests/
-        echo
-        echo 'Error type counts:'
-        grep -oP '[A-Z]\d+\([a-z\-]+\)' pylint-report.txt | sort | uniq -c | sort -nr
-        echo
-        echo 'Errors per file:'
-        grep -oP '^[\w\-\/]+\.py' pylint-report.txt | sort | uniq -c | sort -nr
-        echo
-        echo 'Total errors:'
-        grep -oP '^[\w\-\/]+\.py' pylint-report.txt | wc -l
-        echo
-        grep 'Your code' pylint-report.txt 
+      - name: Run pylint analysis
+        # Using .pylintrc with comprehensive configuration for scientific code
+        run: |
+          python -m pylint --output-format=parseable --output=pylint-report.txt weac/ tests/
+          echo
+          echo 'Error type counts:'
+          grep -oP '[A-Z]\d+\([a-z\-]+\)' pylint-report.txt | sort | uniq -c | sort -nr
+          echo
+          echo 'Errors per file:'
+          grep -oP '^[\w\-\/]+\.py' pylint-report.txt | sort | uniq -c | sort -nr
+          echo
+          echo 'Total errors:'
+          grep -oP '^[\w\-\/]+\.py' pylint-report.txt | wc -l
+          echo
+          grep 'Your code' pylint-report.txt
