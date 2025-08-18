@@ -1,7 +1,7 @@
 name: Static code analysis 🔎
 
 on:
-  # Run tests on pull_request events
+  # Run static code analysis on pull_request events
   pull_request:
     types: [opened, reopened, synchronize, ready_for_review]
   # Allow this workflow to be called by other workflows
