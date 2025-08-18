@@ -2,7 +2,7 @@ name: Make sure code is ruff-formatted 🐶
 
 on:
   pull_request:
-    branches: [ main, develop ]
+    types: [opened, reopened, synchronize, ready_for_review]
   workflow_call:
 
 jobs:

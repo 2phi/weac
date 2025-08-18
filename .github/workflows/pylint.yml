@@ -2,7 +2,7 @@ name: Static code analysis 🔎
 
 on:
   pull_request:
-    branches: [ main, develop ]
+    types: [opened, reopened, synchronize, ready_for_review]
   workflow_call:
 
 jobs:
