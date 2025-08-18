@@ -147,7 +147,16 @@ def ensure_weac_reference_env(
             )
 
         return ReferenceEnv(python_exe=py_exe, venv_dir=venv_dir, version=version)
-    except subprocess.CalledProcessError:
+    except subprocess.CalledProcessError as e:
+        # Capture and log the output for easier debugging in CI
+        output = e.stdout.strip() if e.stdout else ""
+        error_msg = (
+            f"Failed to create reference environment for weac=={version}.\n"
+            f"Command: {' '.join(e.cmd)}\n"
+            f"Return code: {e.returncode}\n"
+            f"Output:\n{output}"
+        )
+        print(error_msg, file=sys.stderr)
         return None
 
 
