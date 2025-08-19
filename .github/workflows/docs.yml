@@ -66,6 +66,11 @@ jobs:
         if [ ! -f docs/sphinx/_build/html/index.html ]; then
           echo "Build output missing (docs/sphinx/_build/html/index.html not found). Aborting deploy."
           exit 1
+        fi
+        
+        # Copy files to deployment directory
+        cp -r docs/sphinx/_build/html/* docs-deploy/
+        
         pushd docs-deploy
         git add -A
         if git diff --cached --quiet; then
@@ -74,11 +79,6 @@ jobs:
         else
           git commit -m "Update documentation"
           git fetch origin documentation --quiet || true
-          git push --force-with-lease origin HEAD:documentation
-        fi
-        popd
-        popd
-
           git push --force-with-lease origin HEAD:documentation
         fi
         popd

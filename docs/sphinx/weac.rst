@@ -1,23 +1,30 @@
 weac package
 ============
 
+Subpackages
+-----------
+
+.. toctree::
+   :maxdepth: 4
+
+   weac.analysis
+   weac.components
+   weac.core
+   weac.utils
+
 Submodules
 ----------
 
 .. toctree::
    :maxdepth: 4
 
-   weac.eigensystem
-   weac.inverse
-   weac.layered
-   weac.mixins
-   weac.plot
-   weac.tools
+   weac.constants
+   weac.logging_config
 
 Module contents
 ---------------
 
 .. automodule:: weac
    :members:
-   :show-inheritance:
    :undoc-members:
+   :show-inheritance:
