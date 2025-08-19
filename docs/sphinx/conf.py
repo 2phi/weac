@@ -80,7 +80,7 @@ suppress_warnings = [
     "image.not_readable",
     "ref.ref",
     "ref.numref",
-    "ref.keyword", 
+    "ref.keyword",
     "ref.option",
     "misc.highlighting_failure",
 ]
