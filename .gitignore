@@ -1,0 +1,18 @@
+# MacOS file system
+.DS_Store
+
+# Python
+__pycache__/
+*.pyc
+
+# Testing
+.pytest_cache/
+
+# Module specific
+.weac-reference/
+
+# Ruff
+.ruff_cache/
+
+# Claude
+.claude/
