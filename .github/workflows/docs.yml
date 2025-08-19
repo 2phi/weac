@@ -39,29 +39,46 @@ jobs:
       run: |
         # Generate API docs
         sphinx-apidoc -o docs/sphinx/ weac --force --separate
-        
-        # Build HTML docs
-        cd docs/sphinx
-        make clean html
-        
-        # Copy to docs directory
-        cp -rf _build/html/* ../../docs/
+
+        # Build HTML docs (do not fail on warnings)
+        make -C docs/sphinx clean html SPHINXOPTS="--keep-going -n"
 
     - name: Deploy documentation
       if: github.event_name == 'push' && github.ref == 'refs/heads/main'
       run: |
+        set -euo pipefail
         git config --local user.email "action@github.com"
         git config --local user.name "GitHub Action"
-        
-        # Create orphan branch for docs
-        git checkout --orphan temp_docs
-        git rm -rf .
-        
-        # Copy docs and add nojekyll file
-        cp -rf docs/sphinx/_build/html/* .
-        touch .nojekyll
-        
-        # Commit and push
-        git add -A .
-        git commit -m "Update documentation"
-        git push -f origin temp_docs:documentation
+
+        # Prepare a clean worktree for the documentation branch
+        git worktree remove -f docs-deploy || true
+        git worktree prune
+        # Ensure we know about the remote branch if it exists
+        git fetch origin documentation || true
+        if git show-ref --verify --quiet refs/remotes/origin/documentation; then
+          # Attach worktree to the remote branch tip and create/point local branch 'documentation'
+          git worktree add --force -B documentation docs-deploy origin/documentation
+        else
+          # Create a new local 'documentation' branch starting from current HEAD (content will be replaced)
+          git worktree add --force -b documentation docs-deploy HEAD
+        fi
+        # Copy built HTML to the worktree root
+        if [ ! -f docs/sphinx/_build/html/index.html ]; then
+          echo "Build output missing (docs/sphinx/_build/html/index.html not found). Aborting deploy."
+          exit 1
+        pushd docs-deploy
+        git add -A
+        if git diff --cached --quiet; then
+          echo "No changes to publish"
+          exit 0
+        else
+          git commit -m "Update documentation"
+          git fetch origin documentation --quiet || true
+          git push --force-with-lease origin HEAD:documentation
+        fi
+        popd
+        popd
+
+          git push --force-with-lease origin HEAD:documentation
+        fi
+        popd
