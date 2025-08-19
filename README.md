@@ -294,15 +294,16 @@ See the [open issues](https://github.com/2phi/weac/issues) for a list of propose
 
 ### v3.0
 
-- Code Refactor
-- Input Validation
-- Modular + Object-Oriented
+- Refactored the codebase for improved structure and maintainability
+- Added property caching for improved efficiency
+- Added input validation
+- Adopted a new, modular, and object-oriented design
 
 ### v2.6
 
-- Finite fracture mechanics implementation for layered snow covers (?)
-- Implement anisotropic weak layer (?)
-- Add demo gif (?)
+- Introduced test suite
+- Mitraged from `setup.cfg` to `pyproject.toml`
+- Added parametrization for collaps heights
 
 ### v2.5
 
