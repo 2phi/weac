@@ -18,10 +18,32 @@ dist/
 # IDE setup
 .vscode/
 
+# Environments
+.venv/
+venv/
+.python-version
+.weac-reference/
+.venv*
+
+# Secrets
+.env
+.env.local
+.env.*
+
+# Caches
+.ruff_cache/
+.pytest_cache/
+.mypy_cache/
+
+# Coverage
+.coverage
+coverage.xml
 # misc
 *.stats
 plots/
 test/
 scratch/
+temp*
+old*
 
 .weac-reference/

@@ -34,7 +34,7 @@
   <a href="https://github.com/2phi/weac/issues">Report a bug</a> · 
   <a href="https://github.com/2phi/weac/issues">Request a feature</a> · 
   <a href="https://2phi.github.io/weac/">Read the docs</a> · 
-  <a href="https://github.com/2phi/weac/blob/main/CITATION.cff)">Cite the software</a>
+  <a href="https://github.com/2phi/weac/blob/main/CITATION.cff">Cite the software</a>
   <br>
   <br>
   <br>
@@ -65,6 +65,7 @@
 
 <!-- TABLE OF CONTENTS -->
 ## Contents
+
 1. [About the project](#about-the-project)
 2. [Installation](#installation)
 3. [Usage](#usage)
@@ -73,8 +74,6 @@
 6. [How to contribute](#how-to-contribute)
 7. [License](#license)
 8. [Contact](#contact)
-
-
 
 <!-- ABOUT THE PROJECT -->
 ## About the project
@@ -120,11 +119,15 @@ git clone https://github.com/2phi/weac
 ```
 for local use.
 
-Needs (see also [requirements.txt](https://github.com/2phi/weac/blob/main/weac/requirements.txt)):
-- [Python](https://www.python.org/downloads/release/python-3100/) &ge; 3.10
-- [Numpy](https://numpy.org/) &ge; 2.0.1
-- [Scipy](https://www.scipy.org/) &ge; 1.14.0
-- [Matplotlib](https://matplotlib.org/) &ge; 3.9.1
+Needs (runtime dependencies are declared in [pyproject.toml](https://github.com/2phi/weac/blob/main/pyproject.toml)):
+
+- [Python](https://www.python.org/downloads/release/python-3120/) ≥ 3.12
+- [Numpy](https://numpy.org/) ≥ 2.0.1
+- [Scipy](https://www.scipy.org/) ≥ 1.14.0
+- [Matplotlib](https://matplotlib.org/) ≥ 3.9.1
+- [Pydantic](https://docs.pydantic.dev/latest/) ≥ 2.11.7
+- [Snowpylot](https://github.com/connellymk/snowpylot) ≥ 1.1.3
+
 
 <!-- USAGE EXAMPLES -->
 ## Usage
@@ -132,55 +135,141 @@ Needs (see also [requirements.txt](https://github.com/2phi/weac/blob/main/weac/r
 The following describes the basic usage of WEAC. Please refer to the [demo](https://github.com/2phi/weac/blob/main/demo/demo.ipynb) for more examples and read the [documentation](https://2phi.github.io/weac/) for details.
 
 Load the module.
+
 ```python
 import weac
 ```
-Choose a snow profile from the database (see [demo](https://github.com/2phi/weac/blob/main/demo/demo.ipynb)) or create your own as a 2D array where the columns are density (kg/m^2) and layer thickness (mm). One row corresponds to one layer counted from top (below surface) to bottom (above weak layer). 
+
+Choose a snow profile from the preconfigured profiles (see `dummy_profiles` in [demo](https://github.com/2phi/weac/blob/main/demo/demo.ipynb)) or create your own using the `Layer` Pydantic class. One row corresponds to one layer counted from top (below surface) to bottom (above weak layer).
+
 ```python
-myprofile = [[170, 100],  # (1) surface layer
-             [190,  40],  # (2)
-             [230, 130],  #  :
-             [250,  20],  #  :
-             [210,  70],  # (i)
-             [380,  20],  #  :
-             [280, 100]]  # (N) last slab layer above weak layer
+from weac.components import Layer
+
+layers = [
+  Layer(rho=170, h=100),  # (1) surface layer
+  Layer(rho=190, h=40),   # (2)
+  Layer(rho=230, h=130),  #  :
+  Layer(rho=250, h=20),
+  Layer(rho=210, h=70),
+  Layer(rho=380, h=20),   #  :
+  Layer(rho=280, h=100)   # (N) last slab layer above weak layer
+]
 ```
-Create a model instance with optional custom layering.
+
+Create a WeakLayer instance that lies underneath the slab.
+
 ```python
-skier = weac.Layered(system='skier', layers=myprofile)
+from weac.components import WeakLayer
+
+weak_layer = WeakLayer(rho=125, h=20)
 ```
-Calculate lists of segment lengths, locations of foundations, and position and magnitude of skier loads from the inputs total length `L` (mm), crack length `a` (mm), and skier weight `m` (kg). We can choose to analyze the situtation before a crack appears even if a crack length > 0 is set by replacing the `'crack'` key thorugh the `'nocrack'` key.
+
+Create a Scenario that defines the environment and setup that the slab and weak layer will be evaluated in.
+
 ```python
-segments = skier.calc_segments(L=10000, a=300, m=80)['crack']
+from weac.components import ScenarioConfig, Segment
+
+# Example 1: SKIER
+skier_config = ScenarioConfig(
+    system_type='skier',
+    phi=30,
+)
+skier_segments = [
+    Segment(length=5000, has_foundation=True, m=0),
+    Segment(length=0, has_foundation=False, m=80),
+    Segment(length=0, has_foundation=False, m=0),
+    Segment(length=5000, has_foundation=True, m=0),
+]  # Scenario is a skier of 80 kg standing on a 10 meter long slab at a 30 degree angle
+
+# Exampel 2: PST
+pst_config = ScenarioConfig(
+    system_type='pst-',  # Downslope cut
+    phi=30,  # (counterclockwise positive)
+    cut_length=300,
+)
+pst_segments = [
+    Segment(length=5000, has_foundation=True, m=0),
+    Segment(length=300, has_foundation=False, m=0),  # Crack Segment
+]  # Scenario is Downslope PST with a 300mm cut
 ```
-Assemble the system of linear equations and solve the boundary-value problem for the free constants `C` providing the inclination `phi` (counterclockwise positive) in degrees.
+
+Create a SystemModel instance that combines the inputs and handles system solving and field-quantity extraction.
+
 ```python
-C = skier.assemble_and_solve(phi=38, **segments)
+from weac.components import Config, ModelInput
+from weac.core.system_model import SystemModel
+
+# Example: build a model for the skier scenario defined above 
+model_input = ModelInput(
+    weak_layer=weak_layer,
+    scenario_config=skier_config,
+    layers=custom_layers,
+    segments=skier_segments,
+)
+system_config = Config(
+    touchdown=True
+)
+skier_system = SystemModel(
+    model_input=model_input,
+    config=system_config,
+)
 ```
+
+Unknown constants are cached_properties; calling `skier_system.unknown_constants` solves the system of linear equations and extracts the constants.
+
+```python
+C = skier_system.unknown_constants
+```
+
+Analyzer handles rasterization + computation of involved slab and weak-layer properties `Sxx`, `Sxz`, etc.
 Prepare the output by rasterizing the solution vector at all horizontal positions `xsl` (slab). The result is returned in the form of the ndarray `z`. We also get `xwl` (weak layer) that only contains x-coordinates that are supported by a foundation.
+
 ```python
-xsl, z, xwl = skier.rasterize_solution(C=C, phi=38, **segments)
+from weac.analysis.analyzer import Analyzer
+
+skier_analyzer = Analyzer(skier_system)
+xsl_skier, z_skier, xwl_skier = skier_analyzer.rasterize_solution(mode="cracked")
+Gdif, GdifI, GdifII = skier_analyzer.differential_ERR()
+Ginc, GincI, GincII = skier_analyzer.incremental_ERR()
+# and Sxx, Sxz, Tzz, principal stress, incremental_potential, ...
 ```
+
 Visualize the results.
+
 ```python
+from weac.analysis.plotter import Plotter
+
+plotter = Plotter()
+# Visualize slab profile
+fig = plotter.plot_slab_profile(
+    weak_layers=weak_layer,
+    slabs=skier_system.slab,
+)
+
 # Visualize deformations as a contour plot
-weac.plot.deformed(skier, xsl=xsl_skier, xwl=xwl_skier, z=z_skier,
-                   phi=inclination, window=200, scale=200,
-                   field='principal')
+fig = plotter.plot_deformed(
+  xsl_skier, xwl_skier, z_skier, skier_analyzer, scale=200, window=200, aspect=2, field="Sxx"
+)
 
 # Plot slab displacements (using x-coordinates of all segments, xsl)
-weac.plot.displacements(skier, x=xsl, z=z, **segments)
-
+plotter.plot_displacements(skier_analyzer, x=xsl_skier, z=z_skier)
 # Plot weak-layer stresses (using only x-coordinates of bedded segments, xwl)
-weac.plot.stresses(skier, x=xwl, z=z, **segments)
+plotter.plot_stresses(skier_analyzer, x=xwl_skier, z=z_skier)
 ```
-Compute output quantities for exporting or plotting.
-```python
-# Slab deflections (using x-coordinates of all segments, xsl)
-x_cm, w_um = skier.get_slab_deflection(x=xsl, z=z, unit='um')
 
-# Weak-layer shear stress (using only x-coordinates of bedded segments, xwl)
-x_cm, tau_kPa = skier.get_weaklayer_shearstress(x=xwl, z=z, unit='kPa')
+Compute output/field quantities for exporting or plotting.
+
+```python
+# Compute stresses in kPa in the weaklayer
+tau = skier_system.fq.tau(Z=z_skier, unit='kPa')
+sig = skier_system.fq.sig(Z=z_skier, unit='kPa')
+
+w = skier_system.fq.w(Z=z_skier, unit='um')
+# Example evaluation vertical displacement at top/mid/bottom of the slab
+u_top = skier_system.fq.u(Z=z_skier, h0=top, unit='um')
+u_mid = skier_system.fq.u(Z=z_skier, h0=mid, unit='um')
+u_bot = skier_system.fq.u(Z=z_skier, h0=bot, unit='um')
+psi = skier_system.fq.psi(Z=z_skier, unit='deg')
 ```
 
 <!-- ROADMAP -->
@@ -188,33 +277,50 @@ x_cm, tau_kPa = skier.get_weaklayer_shearstress(x=xwl, z=z, unit='kPa')
 
 See the [open issues](https://github.com/2phi/weac/issues) for a list of proposed features and known issues.
 
-### v3.0
+### v4.0
 
-- [ ] New mathematical foundation to improve the weak-layer representation
+- [ ] Change to scenario & scenario_config: InfEnd/Cut/Segment/Weight
+
+### v3.2
+<!-- - [ ] New mathematical foundation to improve the weak-layer representation -->
 - [ ] Complex terrain through the addition of out-of-plane tilt
 - [ ] Up, down, and cross-slope cracks
 
-### v2.7
-- [ ] Finite fracture mechanics implementation for layered snow covers
+### v3.1
 
-### v2.6
-- [ ] Implement anistropic weak layer
-- [ ] Add demo gif
+- [ ] Improved CriteriaEvaluator Optimization (x2 time reduction)
 
 ## Release history
 
+### v3.0
+
+- Refactored the codebase for improved structure and maintainability
+- Added property caching for improved efficiency
+- Added input validation
+- Adopted a new, modular, and object-oriented design
+
+### v2.6
+
+- Introduced test suite
+- Mitraged from `setup.cfg` to `pyproject.toml`
+- Added parametrization for collaps heights
+
 ### v2.5
+
 - Analyze slab touchdown in PST experiments by setting `touchdown=True`
 - Completely redesigned and significantly improved API documentation
 
 ### v2.4
-- Choose between slope-normal (`'-pst'`, `'pst-'`) or vertial (`'-vpst'`, `'vpst-'`) PST boundary conditions
+
+- Choose between slope-normal (`'-pst'`, `'pst-'`) or vertical (`'-vpst'`, `'vpst-'`) PST boundary conditions
 
 ### v2.3
+
 - Stress plots on deformed contours
 - PSTs now account for slab touchdown
 
 ### v2.2
+
 - Sign of inclination `phi` consistent with the coordinate system (positive counterclockwise)
 - Dimension arguments to field-quantity methods added
 - Improved aspect ratio of profile views and contour plots
@@ -224,11 +330,13 @@ See the [open issues](https://github.com/2phi/weac/issues) for a list of propose
 - Now allows for distributed surface loads
 
 ### v2.1
+
 - Consistent use of coordinate system with downward pointing z-axis
 - Consitent top-to-bottom numbering of slab layers
 - Implementation of PSTs cut from either left or right side
 
 ### v2.0
+
 - Completely rewritten in 🐍 Python
 - Coupled bending-extension ODE solver implemented
 - Stress analysis of arbitrarily layered snow slabs
@@ -248,23 +356,25 @@ See the [open issues](https://github.com/2phi/weac/issues) for a list of propose
 - Finite fracture mechanics implementation
 - Prediction of anticrack nucleation
 
-
 <!-- CONTRIBUTING -->
 ## How to contribute
 
 1. Fork the project
-2. Create your feature branch (`git checkout -b feature/amazingfeature`)
-3. Commit your changes (`git commit -m 'Add some amazing feature'`)
-4. Push to the branch (`git push origin feature/amazingfeature`)
-5. Open a pull request
+2. Initialize submodules
 
+    ```bash  
+    git submodule update --init --recursive
+    ```
+
+3. Create your feature branch (`git checkout -b feature/amazingfeature`)
+4. Commit your changes (`git commit -m 'Add some amazing feature'`)
+5. Push to the branch (`git push origin feature/amazingfeature`)
+6. Open a pull request
 
 <!-- WORKFLOWS -->
 ## Workflows
 [![Publish Python 🐍 releases 📦 to PyPI ](https://github.com/2phi/weac/actions/workflows/release.yml/badge.svg)](https://github.com/2phi/weac/actions/workflows/release.yml)<br>
 [![Build and publish Sphinx 🪬 documentation ](https://github.com/2phi/weac/actions/workflows/docs.yml/badge.svg)](https://github.com/2phi/weac/actions/workflows/docs.yml)
-
-
 
 <!-- LICENSE -->
 ## License
