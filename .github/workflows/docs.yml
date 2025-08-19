@@ -55,7 +55,13 @@ jobs:
         git worktree add --force --detach docs-deploy
         pushd docs-deploy
         git checkout --orphan documentation || git checkout documentation
-        git rm -rf . || true
+        if git show-ref --verify --quiet refs/heads/documentation; then
+          git checkout documentation
+          git rm -rf .
+        else
+          git checkout --orphan documentation
+          # No files to remove on a new orphan branch
+        fi
         popd
 
         # Copy built HTML to the worktree root
@@ -67,6 +73,7 @@ jobs:
         git add -A
         if git diff --cached --quiet; then
           echo "No changes to publish"
+          exit 0
         else
           git commit -m "Update documentation"
           git push -f origin HEAD:documentation
