@@ -39,29 +39,36 @@ jobs:
       run: |
         # Generate API docs
         sphinx-apidoc -o docs/sphinx/ weac --force --separate
-        
+
         # Build HTML docs
-        cd docs/sphinx
-        make clean html
-        
-        # Copy to docs directory
-        cp -rf _build/html/* ../../docs/
+        make -C docs/sphinx clean html
 
     - name: Deploy documentation
       if: github.event_name == 'push' && github.ref == 'refs/heads/main'
       run: |
+        set -euo pipefail
         git config --local user.email "action@github.com"
         git config --local user.name "GitHub Action"
-        
-        # Create orphan branch for docs
-        git checkout --orphan temp_docs
-        git rm -rf .
-        
-        # Copy docs and add nojekyll file
-        cp -rf docs/sphinx/_build/html/* .
-        touch .nojekyll
-        
+
+        # Prepare a clean worktree for the documentation branch
+        rm -rf docs-deploy
+        git worktree add --force --detach docs-deploy
+        pushd docs-deploy
+        git checkout --orphan documentation || git checkout documentation
+        git rm -rf . || true
+        popd
+
+        # Copy built HTML to the worktree root
+        rsync -av --delete docs/sphinx/_build/html/ docs-deploy/
+        touch docs-deploy/.nojekyll
+
         # Commit and push
-        git add -A .
-        git commit -m "Update documentation"
-        git push -f origin temp_docs:documentation
+        pushd docs-deploy
+        git add -A
+        if git diff --cached --quiet; then
+          echo "No changes to publish"
+        else
+          git commit -m "Update documentation"
+          git push -f origin HEAD:documentation
+        fi
+        popd
