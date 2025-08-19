@@ -12,6 +12,7 @@
 <meta content="weac.components.scenario_config module | WEAC 2.6.4" name="twitter:title"/>
 <link href="_static/pygments.css?v=e72c8e07" rel="stylesheet" type="text/css"/>
 <link href="_static/theme.css?v=42baaae4" rel="stylesheet" type="text/css"/>
+<link href="_static/custom.css" rel="stylesheet" type="text/css"/>
 <link href="search.html" rel="search" title="Search"/>
 <link href="genindex.html" rel="index" title="Index"/>
 <link href="weac.components.segment.html" rel="next" title="weac.components.segment module"/>
@@ -68,7 +69,55 @@
 </a>
 <div class="relative overflow-hidden md:overflow-auto my-4 md:my-0 h-[calc(100vh-8rem)] md:h-auto">
 <div class="overflow-y-auto h-full w-full relative pr-6"><nav class="table w-full min-w-full my-6 lg:my-8">
-<p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<p class="caption" role="heading"><span class="caption-text">Getting Started</span></p>
+<ul class="current">
+<li class="toctree-l1 current" x-data="{ expanded: $el.classList.contains('current') ? true : false }"><a :class="{ 'expanded' : expanded }" @click="expanded = !expanded" class="reference internal expandable" href="weac.html">weac package<button @click.prevent.stop="expanded = !expanded" type="button"><span class="sr-only"></span><svg fill="currentColor" height="18px" stroke="none" viewbox="0 0 24 24" width="18px" xmlns="http://www.w3.org/2000/svg"><path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"></path></svg></button></a><ul class="current" x-show="expanded">
+<li class="toctree-l2"><a class="reference internal" href="weac.analysis.html">weac.analysis package</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="weac.components.html">weac.components package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="weac.core.html">weac.core package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="weac.utils.html">weac.utils package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="weac.constants.html">weac.constants module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="weac.logging_config.html">weac.logging_config module</a></li>
+</ul>
+</li>
+<li class="toctree-l1 current" x-data="{ expanded: $el.classList.contains('current') ? true : false }"><a :class="{ 'expanded' : expanded }" @click="expanded = !expanded" class="reference internal expandable" href="weac.components.html">weac.components package<button @click.prevent.stop="expanded = !expanded" type="button"><span class="sr-only"></span><svg fill="currentColor" height="18px" stroke="none" viewbox="0 0 24 24" width="18px" xmlns="http://www.w3.org/2000/svg"><path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"></path></svg></button></a><ul class="current" x-show="expanded">
+<li class="toctree-l2"><a class="reference internal" href="weac.components.config.html">weac.components.config module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="weac.components.criteria_config.html">weac.components.criteria_config module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="weac.components.layer.html">weac.components.layer module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="weac.components.model_input.html">weac.components.model_input module</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">weac.components.scenario_config module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="weac.components.segment.html">weac.components.segment module</a></li>
+</ul>
+</li>
+<li class="toctree-l1" x-data="{ expanded: $el.classList.contains('current') ? true : false }"><a :class="{ 'expanded' : expanded }" @click="expanded = !expanded" class="reference internal expandable" href="weac.core.html">weac.core package<button @click.prevent.stop="expanded = !expanded" type="button"><span class="sr-only"></span><svg fill="currentColor" height="18px" stroke="none" viewbox="0 0 24 24" width="18px" xmlns="http://www.w3.org/2000/svg"><path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"></path></svg></button></a><ul x-show="expanded">
+<li class="toctree-l2"><a class="reference internal" href="weac.core.eigensystem.html">weac.core.eigensystem module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="weac.core.field_quantities.html">weac.core.field_quantities module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="weac.core.scenario.html">weac.core.scenario module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="weac.core.slab.html">weac.core.slab module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="weac.core.slab_touchdown.html">weac.core.slab_touchdown module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="weac.core.system_model.html">weac.core.system_model module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="weac.core.unknown_constants_solver.html">weac.core.unknown_constants_solver module</a></li>
+</ul>
+</li>
+<li class="toctree-l1" x-data="{ expanded: $el.classList.contains('current') ? true : false }"><a :class="{ 'expanded' : expanded }" @click="expanded = !expanded" class="reference internal expandable" href="weac.analysis.html">weac.analysis package<button @click.prevent.stop="expanded = !expanded" type="button"><span class="sr-only"></span><svg fill="currentColor" height="18px" stroke="none" viewbox="0 0 24 24" width="18px" xmlns="http://www.w3.org/2000/svg"><path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"></path></svg></button></a><ul x-show="expanded">
+<li class="toctree-l2"><a class="reference internal" href="weac.analysis.analyzer.html">weac.analysis.analyzer module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="weac.analysis.criteria_evaluator.html">weac.analysis.criteria_evaluator module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="weac.analysis.plotter.html">weac.analysis.plotter module</a></li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Utilities &amp; Tools</span></p>
+<ul>
+<li class="toctree-l1" x-data="{ expanded: $el.classList.contains('current') ? true : false }"><a :class="{ 'expanded' : expanded }" @click="expanded = !expanded" class="reference internal expandable" href="weac.utils.html">weac.utils package<button @click.prevent.stop="expanded = !expanded" type="button"><span class="sr-only"></span><svg fill="currentColor" height="18px" stroke="none" viewbox="0 0 24 24" width="18px" xmlns="http://www.w3.org/2000/svg"><path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"></path></svg></button></a><ul x-show="expanded">
+<li class="toctree-l2"><a class="reference internal" href="weac.utils.geldsetzer.html">weac.utils.geldsetzer module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="weac.utils.misc.html">weac.utils.misc module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="weac.utils.snow_types.html">weac.utils.snow_types module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="weac.utils.snowpilot_parser.html">weac.utils.snowpilot_parser module</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="weac.logging_config.html">weac.logging_config module</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Examples &amp; Reference</span></p>
 <ul class="current">
 <li class="toctree-l1 current" x-data="{ expanded: $el.classList.contains('current') ? true : false }"><a :class="{ 'expanded' : expanded }" @click="expanded = !expanded" class="reference internal expandable" href="modules.html">weac<button @click.prevent.stop="expanded = !expanded" type="button"><span class="sr-only"></span><svg fill="currentColor" height="18px" stroke="none" viewbox="0 0 24 24" width="18px" xmlns="http://www.w3.org/2000/svg"><path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"></path></svg></button></a><ul class="current" x-show="expanded">
 <li class="toctree-l2 current"><a class="reference internal" href="weac.html">weac package</a></li>
@@ -93,7 +142,6 @@
 <path d="M240 856h120V616h240v240h120V496L480 316 240 496v360Zm-80 80V456l320-240 320 240v480H520V696h-80v240H160Zm320-350Z"></path>
 </svg>
 </a>
-<div class="mr-1">/</div><a class="hover:text-foreground overflow-hidden text-ellipsis whitespace-nowrap" href="modules.html">weac</a>
 <div class="mr-1">/</div><a class="hover:text-foreground overflow-hidden text-ellipsis whitespace-nowrap" href="weac.html">weac package</a>
 <div class="mr-1">/</div><a class="hover:text-foreground overflow-hidden text-ellipsis whitespace-nowrap" href="weac.components.html">weac.components package</a>
 <div class="mr-1">/</div><span aria-current="page" class="font-medium text-foreground overflow-hidden text-ellipsis whitespace-nowrap">weac.components.scenario_config module</span>

@@ -7,14 +7,15 @@
 <meta content="white" media="(prefers-color-scheme: light)" name="theme-color"/>
 <meta content="black" media="(prefers-color-scheme: dark)" name="theme-color"/>
 <meta content="width=device-width, initial-scale=1" name="viewport"/>
-<title>WEAC documentation | WEAC 2.6.4</title>
-<meta content="WEAC documentation | WEAC 2.6.4" property="og:title"/>
-<meta content="WEAC documentation | WEAC 2.6.4" name="twitter:title"/>
+<title>WEAC API Documentation | WEAC 2.6.4</title>
+<meta content="WEAC API Documentation | WEAC 2.6.4" property="og:title"/>
+<meta content="WEAC API Documentation | WEAC 2.6.4" name="twitter:title"/>
 <link href="_static/pygments.css?v=e72c8e07" rel="stylesheet" type="text/css"/>
 <link href="_static/theme.css?v=42baaae4" rel="stylesheet" type="text/css"/>
+<link href="_static/custom.css" rel="stylesheet" type="text/css"/>
 <link href="search.html" rel="search" title="Search"/>
 <link href="genindex.html" rel="index" title="Index"/>
-<link href="modules.html" rel="next" title="weac"/>
+<link href="weac.html" rel="next" title="weac package"/>
 <script>
     <!-- Prevent Flash of wrong theme -->
       const userPreference = localStorage.getItem('darkMode');
@@ -67,7 +68,55 @@
 </a>
 <div class="relative overflow-hidden md:overflow-auto my-4 md:my-0 h-[calc(100vh-8rem)] md:h-auto">
 <div class="overflow-y-auto h-full w-full relative pr-6"><nav class="table w-full min-w-full my-6 lg:my-8">
-<p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<p class="caption" role="heading"><span class="caption-text">Getting Started</span></p>
+<ul>
+<li class="toctree-l1" x-data="{ expanded: $el.classList.contains('current') ? true : false }"><a :class="{ 'expanded' : expanded }" @click="expanded = !expanded" class="reference internal expandable" href="weac.html">weac package<button @click.prevent.stop="expanded = !expanded" type="button"><span class="sr-only"></span><svg fill="currentColor" height="18px" stroke="none" viewbox="0 0 24 24" width="18px" xmlns="http://www.w3.org/2000/svg"><path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"></path></svg></button></a><ul x-show="expanded">
+<li class="toctree-l2"><a class="reference internal" href="weac.analysis.html">weac.analysis package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="weac.components.html">weac.components package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="weac.core.html">weac.core package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="weac.utils.html">weac.utils package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="weac.constants.html">weac.constants module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="weac.logging_config.html">weac.logging_config module</a></li>
+</ul>
+</li>
+<li class="toctree-l1" x-data="{ expanded: $el.classList.contains('current') ? true : false }"><a :class="{ 'expanded' : expanded }" @click="expanded = !expanded" class="reference internal expandable" href="weac.components.html">weac.components package<button @click.prevent.stop="expanded = !expanded" type="button"><span class="sr-only"></span><svg fill="currentColor" height="18px" stroke="none" viewbox="0 0 24 24" width="18px" xmlns="http://www.w3.org/2000/svg"><path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"></path></svg></button></a><ul x-show="expanded">
+<li class="toctree-l2"><a class="reference internal" href="weac.components.config.html">weac.components.config module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="weac.components.criteria_config.html">weac.components.criteria_config module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="weac.components.layer.html">weac.components.layer module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="weac.components.model_input.html">weac.components.model_input module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="weac.components.scenario_config.html">weac.components.scenario_config module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="weac.components.segment.html">weac.components.segment module</a></li>
+</ul>
+</li>
+<li class="toctree-l1" x-data="{ expanded: $el.classList.contains('current') ? true : false }"><a :class="{ 'expanded' : expanded }" @click="expanded = !expanded" class="reference internal expandable" href="weac.core.html">weac.core package<button @click.prevent.stop="expanded = !expanded" type="button"><span class="sr-only"></span><svg fill="currentColor" height="18px" stroke="none" viewbox="0 0 24 24" width="18px" xmlns="http://www.w3.org/2000/svg"><path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"></path></svg></button></a><ul x-show="expanded">
+<li class="toctree-l2"><a class="reference internal" href="weac.core.eigensystem.html">weac.core.eigensystem module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="weac.core.field_quantities.html">weac.core.field_quantities module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="weac.core.scenario.html">weac.core.scenario module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="weac.core.slab.html">weac.core.slab module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="weac.core.slab_touchdown.html">weac.core.slab_touchdown module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="weac.core.system_model.html">weac.core.system_model module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="weac.core.unknown_constants_solver.html">weac.core.unknown_constants_solver module</a></li>
+</ul>
+</li>
+<li class="toctree-l1" x-data="{ expanded: $el.classList.contains('current') ? true : false }"><a :class="{ 'expanded' : expanded }" @click="expanded = !expanded" class="reference internal expandable" href="weac.analysis.html">weac.analysis package<button @click.prevent.stop="expanded = !expanded" type="button"><span class="sr-only"></span><svg fill="currentColor" height="18px" stroke="none" viewbox="0 0 24 24" width="18px" xmlns="http://www.w3.org/2000/svg"><path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"></path></svg></button></a><ul x-show="expanded">
+<li class="toctree-l2"><a class="reference internal" href="weac.analysis.analyzer.html">weac.analysis.analyzer module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="weac.analysis.criteria_evaluator.html">weac.analysis.criteria_evaluator module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="weac.analysis.plotter.html">weac.analysis.plotter module</a></li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Utilities &amp; Tools</span></p>
+<ul>
+<li class="toctree-l1" x-data="{ expanded: $el.classList.contains('current') ? true : false }"><a :class="{ 'expanded' : expanded }" @click="expanded = !expanded" class="reference internal expandable" href="weac.utils.html">weac.utils package<button @click.prevent.stop="expanded = !expanded" type="button"><span class="sr-only"></span><svg fill="currentColor" height="18px" stroke="none" viewbox="0 0 24 24" width="18px" xmlns="http://www.w3.org/2000/svg"><path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"></path></svg></button></a><ul x-show="expanded">
+<li class="toctree-l2"><a class="reference internal" href="weac.utils.geldsetzer.html">weac.utils.geldsetzer module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="weac.utils.misc.html">weac.utils.misc module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="weac.utils.snow_types.html">weac.utils.snow_types module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="weac.utils.snowpilot_parser.html">weac.utils.snowpilot_parser module</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="weac.logging_config.html">weac.logging_config module</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Examples &amp; Reference</span></p>
 <ul>
 <li class="toctree-l1" x-data="{ expanded: $el.classList.contains('current') ? true : false }"><a :class="{ 'expanded' : expanded }" @click="expanded = !expanded" class="reference internal expandable" href="modules.html">weac<button @click.prevent.stop="expanded = !expanded" type="button"><span class="sr-only"></span><svg fill="currentColor" height="18px" stroke="none" viewbox="0 0 24 24" width="18px" xmlns="http://www.w3.org/2000/svg"><path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"></path></svg></button></a><ul x-show="expanded">
 <li class="toctree-l2"><a class="reference internal" href="weac.html">weac package</a></li>
@@ -86,10 +135,100 @@
 <main class="relative py-6 lg:gap-10 lg:py-8 xl:grid xl:grid-cols-[1fr_300px]">
 <div class="w-full min-w-0 mx-auto">
 <div id="content" role="main">
-<section id="weac-documentation">
-<h1>WEAC documentation<a class="headerlink" href="#weac-documentation" title="Link to this heading">¶</a></h1>
+<section id="weac-api-documentation">
+<h1>WEAC API Documentation<a class="headerlink" href="#weac-api-documentation" title="Link to this heading">¶</a></h1>
+<p><strong>WEAC</strong> (Weak Layer Anticrack Nucleation Model) is a Python implementation of closed-form analytical models for the analysis of dry-snow slab avalanche release.</p>
+<p align="center">
+<a href="https://github.com/2phi/weac/releases" style="display:inline-block; margin-right:4px;">
+<img alt="Release" src="https://img.shields.io/github/v/release/2phi/weac.svg?display_name=tag&amp;color=f99a44&amp;style=flat-square&amp;logo=data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADIAAAAtCAYAAADsvzj/AAAACXBIWXMAAAsSAAALEgHS3X78AAAClUlEQVRoge1Z0W2DMBC9Vv0vGzQblE5QugEjZISMwAZNN2AEOkEzAtmAbkAmuMrSWbKezmBsC9IoT7KU4OPw8707G/PAzHQLeLwJFnciV4g7kWvDnci14WaIPCXeXxDRnohq51pHRC0RjYm+l8Gs7JGtYeaRdfTMXCT4tm0vviwGZm6ZeYe2sQ9oPQRcdAkESiCAGMUmiUjjcXxSrsdGIQR9KpEBHtKIjMoMRKZIjBJl1X+KrAYIL8ptzEiid/LCRZlCpJKGmka0C3PCVzhOTuEockZEa1p+uGTNAA7MXHvu9yV2D3YHp2/ITURL/hPYuESxdGr324FiCXfz85iTiCYpLI2ofbdvNyGpcoZwcvmdG8R+YhYH6POtR83MhGHEo4kUHl0fwA6j0cJEaBhBUoVS8rHYRBHxkdCqFNZ9N1q+3GhmnnXUxhVDBAenhloplQyJjrNsYaOhbVO8e7ilkdA07XOuLXC2r/aQsFGtlPxDyS0mspNBaTPoI6Hp2k10X5LXsFa4JLCKBRPBLXQIiVIGqVUzV35T2//FJEzTXqwKeTl6D3ip6pz/c/YWFRE9e/pe4f9F7Ps5p0iklMG9BAzoJdAOUQfancV2CLKGEGl7ppw4TMgKZbjoDTP08OGXiN6I6IGIPuR/DD4nZGXxJXJa9M6Pp/GDIpdvOWBAx7W00tH2WXz0kkOVonsfTD4Yf6eoKZqo/Z22FYhoWjlFdKmHFWt9H6mkiGiyOktUk7DWAZ2Ry9HT1+R4wJpfrExUfrQx5HC+9ZHpdy5HWxOJq1AK1iSyU651yrUobEnkN3j7EYAtpZUtGrQxkWz5QSsTwUXv30akcH5nK7sWW0jrIl+0siL109sSmJwwu2KzJcn7WY6I/gB+kRV89venQwAAAABJRU5ErkJggg==" style="vertical-align:middle;"/>
+</a>
+<a href="https://pypi.org/project/weac/" style="display:inline-block; margin-right:4px;">
+<img alt="Release" src="https://img.shields.io/pypi/v/weac.svg?logo=python&amp;logoColor=white&amp;color=f46b58&amp;style=flat-square" style="vertical-align:middle;"/>
+</a>
+<a href="https://zenodo.org/badge/latestdoi/203163531" style="display:inline-block;">
+<img alt="Release" src="https://img.shields.io/badge/DOI-10.5281/zenodo.5773113-f03a6d.svg?style=flat-square" style="vertical-align:middle;"/>
+</a>
+</p><section id="what-is-weac">
+<h2>What is WEAC?<a class="headerlink" href="#what-is-weac" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#what-is-weac'">¶</a></h2>
+<p>WEAC implements closed-form analytical models for the <a class="reference external" href="https://doi.org/10.5194/tc-14-115-2020">mechanical analysis of dry-snow slabs on compliant weak layers</a>, the <a class="reference external" href="https://doi.org/10.5194/tc-14-131-2020">prediction of anticrack onset</a>, and allows for the <a class="reference external" href="https://doi.org/10.5194/tc-17-1475-2023">analysis of stratified snow covers</a>.</p>
+<p>The model covers:
+- <strong>Propagation saw tests</strong> (a)
+- <strong>Skier-loaded weak layers</strong> (b)
+- <strong>Weak-layer crack nucleation</strong> (c)</p>
+<a class="reference internal image-reference" href="_images/systems.png"><img alt="WEAC System Overview" class="align-center" src="_images/systems.png" style="width: 600px;"/>
+</a>
+</section>
+<section id="quick-start">
+<h2>Quick Start<a class="headerlink" href="#quick-start" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#quick-start'">¶</a></h2>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><code><span id="line-1">pip<span class="w"> </span>install<span class="w"> </span>weac
+</span></code></pre></div>
+</div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><code><span id="line-1"><span class="kn">import</span><span class="w"> </span><span class="nn">weac</span>
+</span><span id="line-2">
+</span><span id="line-3"><span class="c1"># Create a scenario configuration</span>
+</span><span id="line-4"><span class="n">scenario</span> <span class="o">=</span> <span class="n">weac</span><span class="o">.</span><span class="n">components</span><span class="o">.</span><span class="n">scenario_config</span><span class="o">.</span><span class="n">ScenarioConfig</span><span class="p">()</span>
+</span><span id="line-5">
+</span><span id="line-6"><span class="c1"># Run analysis</span>
+</span><span id="line-7"><span class="n">results</span> <span class="o">=</span> <span class="n">weac</span><span class="o">.</span><span class="n">analysis</span><span class="o">.</span><span class="n">analyzer</span><span class="o">.</span><span class="n">Analyzer</span><span class="o">.</span><span class="n">analyze</span><span class="p">(</span><span class="n">scenario</span><span class="p">)</span>
+</span></code></pre></div>
+</div>
+<p><strong>🐙 View on GitHub:</strong> <a class="reference external" href="https://github.com/2phi/weac">GitHub Repository</a></p>
+</section>
+<section id="key-features">
+<h2>Key Features<a class="headerlink" href="#key-features" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#key-features'">¶</a></h2>
+<ul class="simple">
+<li><p><strong>Closed-form analytical models</strong> for snow slab mechanics</p></li>
+<li><p><strong>Weak layer analysis</strong> with compliance and collapse modeling</p></li>
+<li><p><strong>Anticrack prediction</strong> using mixed-mode failure criteria</p></li>
+<li><p><strong>Stratified snow cover</strong> analysis capabilities</p></li>
+<li><p><strong>Python-native</strong> implementation with comprehensive documentation</p></li>
+<li><p><strong>Jupyter notebook</strong> support for interactive analysis</p></li>
+</ul>
+</section>
+<section id="documentation-structure">
+<h2>Documentation Structure<a class="headerlink" href="#documentation-structure" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#documentation-structure'">¶</a></h2>
 <div class="toctree-wrapper compound">
-<p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<p class="caption" role="heading"><span class="caption-text">Getting Started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="weac.html">weac package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="weac.html#subpackages">Subpackages</a></li>
+<li class="toctree-l2"><a class="reference internal" href="weac.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="weac.html#module-weac">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="weac.components.html">weac.components package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="weac.components.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="weac.components.html#module-weac.components">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="weac.core.html">weac.core package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="weac.core.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="weac.core.html#module-weac.core">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="weac.analysis.html">weac.analysis package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="weac.analysis.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="weac.analysis.html#module-weac.analysis">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</div>
+<div class="toctree-wrapper compound">
+<p class="caption" role="heading"><span class="caption-text">Utilities &amp; Tools</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="weac.utils.html">weac.utils package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="weac.utils.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="weac.utils.html#module-weac.utils">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="weac.logging_config.html">weac.logging_config module</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="weac.logging_config.html#weac.logging_config.setup_logging"><code class="docutils literal notranslate"><span class="pre">setup_logging()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</div>
+<div class="toctree-wrapper compound">
+<p class="caption" role="heading"><span class="caption-text">Examples &amp; Reference</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="modules.html">weac</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="weac.html">weac package</a></li>
@@ -98,18 +237,54 @@
 </ul>
 </div>
 </section>
+<section id="research-citations">
+<h2>Research &amp; Citations<a class="headerlink" href="#research-citations" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#research-citations'">¶</a></h2>
+<p><strong>Cite the software:</strong>
+Rosendahl, P. L., Schneider, J., &amp; Weissgraeber, P. (2022). Weak Layer Anticrack Nucleation Model (WEAC). Zenodo. <a class="reference external" href="https://doi.org/10.5281/zenodo.5773113">https://doi.org/10.5281/zenodo.5773113</a></p>
+<p><strong>Key publications:</strong>
+- <a class="reference external" href="https://doi.org/10.5194/tc-17-1475-2023">A closed-form model for layered snow slabs</a> (Weißgraeber &amp; Rosendahl, 2023)
+- <a class="reference external" href="https://doi.org/10.5194/tc-14-115-2020">Modeling snow slab avalanches caused by weak-layer failure</a> (Rosendahl &amp; Weißgraeber, 2020)</p>
+</section>
+<section id="support-community">
+<h2>Support &amp; Community<a class="headerlink" href="#support-community" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#support-community'">¶</a></h2>
+<ul class="simple">
+<li><p><a class="reference external" href="https://github.com/2phi/weac/issues">Report bugs</a></p></li>
+<li><p><a class="reference external" href="https://github.com/2phi/weac/issues">Request features</a></p></li>
+<li><p><a class="reference external" href="https://github.com/2phi/weac/releases">View releases</a></p></li>
+<li><p><a class="reference external" href="https://pypi.org/project/weac/">Download from PyPI</a></p></li>
+</ul>
+</section>
+<section id="getting-help">
+<h2>Getting Help<a class="headerlink" href="#getting-help" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#getting-help'">¶</a></h2>
+<ul class="simple">
+<li><p><strong>Documentation</strong>: This site provides comprehensive API documentation</p></li>
+<li><p><strong>Examples</strong>: Check the modules section for usage examples</p></li>
+<li><p><strong>Research Papers</strong>: Refer to the publications listed above for theoretical background</p></li>
+<li><p><strong>GitHub</strong>: Visit the repository for source code and issue tracking</p></li>
+</ul>
+<p><strong>Need help?</strong> Open an issue on GitHub or check the documentation structure below.</p>
+</section>
 <section id="indices-and-tables">
-<h1>Indices and tables<a class="headerlink" href="#indices-and-tables" title="Link to this heading">¶</a></h1>
+<h2>Indices and tables<a class="headerlink" href="#indices-and-tables" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#indices-and-tables'">¶</a></h2>
 <ul class="simple">
 <li><p><a class="reference internal" href="genindex.html"><span class="std std-ref">Index</span></a></p></li>
 <li><p><a class="reference internal" href="py-modindex.html"><span class="std std-ref">Module Index</span></a></p></li>
 <li><p><a class="reference internal" href="search.html"><span class="std std-ref">Search Page</span></a></p></li>
 </ul>
 </section>
+</section>
 </div></div><aside class="hidden text-sm xl:block" id="right-sidebar">
 <div class="sticky top-16 -mt-10 max-h-[calc(100vh-5rem)] overflow-y-auto pt-6 space-y-2"><p class="font-medium">On this page</p>
 <ul>
-<li></li>
+<li><a :data-current="activeSection === '#what-is-weac'" class="reference internal" href="#what-is-weac">What is WEAC?</a></li>
+<li><a :data-current="activeSection === '#quick-start'" class="reference internal" href="#quick-start">Quick Start</a></li>
+<li><a :data-current="activeSection === '#key-features'" class="reference internal" href="#key-features">Key Features</a></li>
+<li><a :data-current="activeSection === '#documentation-structure'" class="reference internal" href="#documentation-structure">Documentation Structure</a><ul>
+</ul>
+</li>
+<li><a :data-current="activeSection === '#research-citations'" class="reference internal" href="#research-citations">Research &amp; Citations</a></li>
+<li><a :data-current="activeSection === '#support-community'" class="reference internal" href="#support-community">Support &amp; Community</a></li>
+<li><a :data-current="activeSection === '#getting-help'" class="reference internal" href="#getting-help">Getting Help</a></li>
 <li><a :data-current="activeSection === '#indices-and-tables'" class="reference internal" href="#indices-and-tables">Indices and tables</a></li>
 </ul>
 </div>
