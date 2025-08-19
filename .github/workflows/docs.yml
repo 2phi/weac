@@ -52,18 +52,16 @@ jobs:
 
         # Prepare a clean worktree for the documentation branch
         rm -rf docs-deploy
-        git worktree add --force --detach docs-deploy
-        pushd docs-deploy
-        git checkout --orphan documentation || git checkout documentation
-        if git show-ref --verify --quiet refs/heads/documentation; then
-          git checkout documentation
-          git rm -rf .
+        # Ensure we know about the remote branch if it exists
+        git fetch origin documentation || true
+        if git show-ref --verify --quiet refs/remotes/origin/documentation; then
+          # Attach worktree to the remote branch tip and create/point local branch 'documentation'
+          git worktree add --force docs-deploy origin/documentation
+          (cd docs-deploy && git switch -C documentation)
         else
-          git checkout --orphan documentation
-          # No files to remove on a new orphan branch
+          # Create a new local 'documentation' branch starting from current HEAD (content will be replaced)
+          git worktree add --force -b documentation docs-deploy HEAD
         fi
-        popd
-
         # Copy built HTML to the worktree root
         rsync -av --delete docs/sphinx/_build/html/ docs-deploy/
         touch docs-deploy/.nojekyll
