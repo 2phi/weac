@@ -84,10 +84,19 @@ jobs:
           git worktree add --force -b documentation docs-deploy HEAD
         fi
         
-        # Clean the documentation branch completely
+        # Clean the documentation branch but preserve .gitignore if it exists
         pushd docs-deploy
+        # Preserve .gitignore if it exists
+        if [ -f .gitignore ]; then
+          cp .gitignore /tmp/preserve-gitignore
+        fi
         git rm -rf . || true
         git clean -fxd
+        # Restore .gitignore if it existed
+        if [ -f /tmp/preserve-gitignore ]; then
+          cp /tmp/preserve-gitignore .gitignore
+          rm /tmp/preserve-gitignore
+        fi
         popd
         
         # Create proper directory structure for GitHub Pages
@@ -96,8 +105,9 @@ jobs:
         # Copy built HTML to the docs directory (for GitHub Pages)
         cp -r docs/sphinx/_build/html/* docs-deploy/docs/
         
-        # Create .gitignore for documentation branch
-        cat > docs-deploy/.gitignore << 'EOF'
+        # Create .gitignore only if it doesn't exist (preserve manual customizations)
+        if [ ! -f docs-deploy/.gitignore ]; then
+          cat > docs-deploy/.gitignore << 'EOF'
 # Ignore all hidden files except .gitignore
 .*
 !.gitignore
@@ -112,6 +122,7 @@ _build/
 *.pyc
 __pycache__/
 EOF
+        fi
 
         # Create README for documentation branch
         cat > docs-deploy/README.md << 'EOF'
