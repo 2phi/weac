@@ -41,7 +41,7 @@ jobs:
         sphinx-apidoc -o docs/sphinx/ weac --force --separate
 
         # Build HTML docs
-        make -C docs/sphinx clean html
+        make -C docs/sphinx clean html SPHINXOPTS="-W --keep-going -n"
 
     - name: Deploy documentation
       if: github.event_name == 'push' && github.ref == 'refs/heads/main'
@@ -51,22 +51,22 @@ jobs:
         git config --local user.name "GitHub Action"
 
         # Prepare a clean worktree for the documentation branch
-        rm -rf docs-deploy
+        git worktree remove -f docs-deploy || true
+        git worktree prune
         # Ensure we know about the remote branch if it exists
         git fetch origin documentation || true
         if git show-ref --verify --quiet refs/remotes/origin/documentation; then
           # Attach worktree to the remote branch tip and create/point local branch 'documentation'
-          git worktree add --force docs-deploy origin/documentation
-          (cd docs-deploy && git switch -C documentation)
+          git worktree add --force -B documentation docs-deploy origin/documentation
         else
           # Create a new local 'documentation' branch starting from current HEAD (content will be replaced)
           git worktree add --force -b documentation docs-deploy HEAD
         fi
         # Copy built HTML to the worktree root
-        rsync -av --delete --exclude '.git' --exclude '.gitignore' docs/sphinx/_build/html/ docs-deploy/
+        rsync -av --delete --exclude '.git' --exclude '.gitignore' --exclude 'CNAME' --exclude '.gitattributes' docs/sphinx/_build/html/ docs-deploy/
         touch docs-deploy/.nojekyll
-
         # Commit and push
+        pushd docs-deploy
         pushd docs-deploy
         git add -A
         if git diff --cached --quiet; then
@@ -74,6 +74,7 @@ jobs:
           exit 0
         else
           git commit -m "Update documentation"
+          git fetch origin documentation --quiet || true
           git push --force-with-lease origin HEAD:documentation
         fi
         popd
