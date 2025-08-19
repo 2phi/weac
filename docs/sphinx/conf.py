@@ -9,7 +9,6 @@ from __future__ import annotations
 
 from importlib.metadata import version as get_version
 
-
 # -- Project information -----------------------------------------------------
 
 project = "WEAC"
@@ -23,11 +22,11 @@ version = ".".join(release.split(".")[:2])
 # -- General configuration ---------------------------------------------------
 
 extensions = [
-	"sphinx.ext.autodoc",
-	"sphinx.ext.autodoc.typehints",
-	"sphinx.ext.napoleon",
-	"sphinx.ext.viewcode",
-	"sphinx.ext.mathjax",
+    "sphinx.ext.autodoc",
+    "sphinx.ext.autodoc.typehints",
+    "sphinx.ext.napoleon",
+    "sphinx.ext.viewcode",
+    "sphinx.ext.mathjax",
 ]
 
 # Do NOT include 'sphinxawesome_theme.highlighting' (deprecated and unnecessary)
