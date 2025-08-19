@@ -28,7 +28,7 @@ jobs:
           python -m pip install -e ".[dev]"
 
       - name: Run pylint analysis
-        # Using .pylintrc with comprehensive configuration for scientific code
+        # Using repository pylint config (pyproject.toml) with comprehensive settings for scientific code
         run: |
           exit_code=0
           python -m pylint --rcfile=pyproject.toml --output-format=parseable --output=pylint-report.txt weac/ tests/ || exit_code=$?
