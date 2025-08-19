@@ -1,0 +1,496 @@
+Metadata-Version: 2.4
+Name: weac
+Version: 2.6.4
+Summary: Weak layer anticrack nucleation model
+Author-email: 2phi GbR <mail@2phi.de>
+License: Proprietary
+Project-URL: Homepage, https://github.com/2phi/weac
+Project-URL: Demo, https://github.com/2phi/weac/blob/main/demo/demo.ipynb
+Project-URL: Documentation, https://2phi.github.io/weac
+Project-URL: Issues and feature requests, https://github.com/2phi/weac/issues
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.12
+Classifier: Programming Language :: Python :: 3.13
+Classifier: License :: Other/Proprietary License
+Classifier: Operating System :: OS Independent
+Classifier: Topic :: Scientific/Engineering
+Requires-Python: >=3.12
+Description-Content-Type: text/markdown
+License-File: LICENSE
+Requires-Dist: matplotlib>=3.9.1
+Requires-Dist: numpy>=2.0.1
+Requires-Dist: scipy>=1.14.0
+Requires-Dist: pydantic>=2.11.7
+Requires-Dist: snowpylot>=1.1.3
+Provides-Extra: interactive
+Requires-Dist: jupyter; extra == "interactive"
+Requires-Dist: ipython>=8.37.0; extra == "interactive"
+Requires-Dist: ipykernel>=6.30.1; extra == "interactive"
+Requires-Dist: jupyter_client>=8.6.3; extra == "interactive"
+Requires-Dist: jupyter_core>=5.8.1; extra == "interactive"
+Requires-Dist: matplotlib-inline>=0.1.7; extra == "interactive"
+Requires-Dist: nest-asyncio>=1.6.0; extra == "interactive"
+Requires-Dist: pyzmq>=27.0.1; extra == "interactive"
+Requires-Dist: tornado>=6.5.2; extra == "interactive"
+Requires-Dist: traitlets>=5.14.3; extra == "interactive"
+Provides-Extra: docs
+Requires-Dist: sphinx; extra == "docs"
+Requires-Dist: sphinxawesome-theme; extra == "docs"
+Provides-Extra: dev
+Requires-Dist: nbclient>=0.10.0; extra == "dev"
+Requires-Dist: nbconvert>=7.16.4; extra == "dev"
+Requires-Dist: nbformat>=5.10.0; extra == "dev"
+Requires-Dist: jupyter; extra == "dev"
+Requires-Dist: ipython>=8.37.0; extra == "dev"
+Requires-Dist: ipykernel>=6.30.1; extra == "dev"
+Requires-Dist: jupyter_client>=8.6.3; extra == "dev"
+Requires-Dist: jupyter_core>=5.8.1; extra == "dev"
+Requires-Dist: matplotlib-inline>=0.1.7; extra == "dev"
+Requires-Dist: nest-asyncio>=1.6.0; extra == "dev"
+Requires-Dist: pyzmq>=27.0.1; extra == "dev"
+Requires-Dist: tornado>=6.5.2; extra == "dev"
+Requires-Dist: traitlets>=5.14.3; extra == "dev"
+Requires-Dist: ruff>=0.4.0; extra == "dev"
+Requires-Dist: pylint>=3.2.0; extra == "dev"
+Requires-Dist: pycodestyle>=2.11.1; extra == "dev"
+Requires-Dist: black>=24.4.0; extra == "dev"
+Requires-Dist: isort>=5.13.0; extra == "dev"
+Requires-Dist: bump2version>=1.0.1; extra == "dev"
+Dynamic: license-file
+
+<!-- LOGO AND TITLE-->
+<!-- <p align="right"><img src="https://github.com/2phi/weac/raw/main/img/logo.png" alt="Logo" width="80" height="80"></p> -->
+
+
+<h1 align="center">
+  <br>
+  <img src="https://github.com/2phi/weac/raw/main/img/logo.png" alt="WEAC" width="120">
+  <br>
+  <br>
+  <b>WEAC</b>
+  <br>
+  <sub><sup>Weak Layer Anticrack Nucleation Model</sup></sub>
+  <br>
+</h1>
+
+<p align="center">
+  Implementation of closed-form analytical models for the analysis of dry-snow slab avalanche release.
+</p>
+
+<p align="center">
+  <a href="https://github.com/2phi/weac/releases">
+    <img alt="Release" src="https://img.shields.io/github/v/release/2phi/weac.svg?display_name=tag&color=f99a44&style=flat-square&logo=data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADIAAAAtCAYAAADsvzj/AAAACXBIWXMAAAsSAAALEgHS3X78AAAClUlEQVRoge1Z0W2DMBC9Vv0vGzQblE5QugEjZISMwAZNN2AEOkEzAtmAbkAmuMrSWbKezmBsC9IoT7KU4OPw8707G/PAzHQLeLwJFnciV4g7kWvDnci14WaIPCXeXxDRnohq51pHRC0RjYm+l8Gs7JGtYeaRdfTMXCT4tm0vviwGZm6ZeYe2sQ9oPQRcdAkESiCAGMUmiUjjcXxSrsdGIQR9KpEBHtKIjMoMRKZIjBJl1X+KrAYIL8ptzEiid/LCRZlCpJKGmka0C3PCVzhOTuEockZEa1p+uGTNAA7MXHvu9yV2D3YHp2/ITURL/hPYuESxdGr324FiCXfz85iTiCYpLI2ofbdvNyGpcoZwcvmdG8R+YhYH6POtR83MhGHEo4kUHl0fwA6j0cJEaBhBUoVS8rHYRBHxkdCqFNZ9N1q+3GhmnnXUxhVDBAenhloplQyJjrNsYaOhbVO8e7ilkdA07XOuLXC2r/aQsFGtlPxDyS0mspNBaTPoI6Hp2k10X5LXsFa4JLCKBRPBLXQIiVIGqVUzV35T2//FJEzTXqwKeTl6D3ip6pz/c/YWFRE9e/pe4f9F7Ps5p0iklMG9BAzoJdAOUQfancV2CLKGEGl7ppw4TMgKZbjoDTP08OGXiN6I6IGIPuR/DD4nZGXxJXJa9M6Pp/GDIpdvOWBAx7W00tH2WXz0kkOVonsfTD4Yf6eoKZqo/Z22FYhoWjlFdKmHFWt9H6mkiGiyOktUk7DWAZ2Ry9HT1+R4wJpfrExUfrQx5HC+9ZHpdy5HWxOJq1AK1iSyU651yrUobEnkN3j7EYAtpZUtGrQxkWz5QSsTwUXv30akcH5nK7sWW0jrIl+0siL109sSmJwwu2KzJcn7WY6I/gB+kRV89venQwAAAABJRU5ErkJggg==" />
+  </a>
+  <a href="https://pypi.org/project/weac/">
+    <img alt="Release" src="https://img.shields.io/pypi/v/weac.svg?logo=python&logoColor=white&color=f46b58&style=flat-square" />
+  </a>
+  <a href="https://zenodo.org/badge/latestdoi/203163531">
+    <img alt="Release" src="https://img.shields.io/badge/DOI-10.5281/zenodo.5773113-f03a6d.svg?style=flat-square" />
+  </a>
+</p>
+
+<p align="center">
+  <a href="https://github.com/2phi/weac/blob/main/demo/demo.ipynb">View the demo</a> · 
+  <a href="https://github.com/2phi/weac/issues">Report a bug</a> · 
+  <a href="https://github.com/2phi/weac/issues">Request a feature</a> · 
+  <a href="https://2phi.github.io/weac/">Read the docs</a> · 
+  <a href="https://github.com/2phi/weac/blob/main/CITATION.cff">Cite the software</a>
+  <br>
+  <br>
+  <br>
+</p>
+
+<!-- # WEAC &nbsp;·&nbsp; Weak Layer Anticrack Nucleation Model -->
+
+<!-- BADGES -->
+<!-- [![Weac][weac-badge]][weac-url] -->
+<!-- [![Python][python-dist-badge]][pypi-url] -->
+<!-- [![Downloads][pypi-downloads-badge]][pypi-url] -->
+<!-- [![Stargazers][stars-badge]][stars-url] -->
+<!-- [![Contributors][contributors-badge]][contributors-url] -->
+<!-- [![Issues][issues-badge]][issues-url] -->
+<!-- [![Forks][forks-badge]][forks-url] -->
+<!-- [![DOI](https://zenodo.org/badge/203163531.svg)](https://zenodo.org/badge/latestdoi/203163531) -->
+
+<!-- [![Release][release-badge]][release-url] -->
+<!-- [![PyPI][pypi-badge]][pypi-url] -->
+<!-- [![DOI][doi-badge]][doi-url]\ -->
+<!-- Implementation of closed-form analytical models for the analysis of dry-snow slab avalanche release. -->
+
+<!-- [View the demo](https://github.com/2phi/weac/blob/main/demo/demo.ipynb) ·  -->
+<!-- [Report a bug](https://github.com/2phi/weac/issues) ·  -->
+<!-- [Request a feature](https://github.com/2phi/weac/issues) ·  -->
+<!-- [Read the docs](https://2phi.github.io/weac/) ·  -->
+<!-- [Cite the software](https://github.com/2phi/weac/blob/main/CITATION.cff) -->
+
+<!-- TABLE OF CONTENTS -->
+## Contents
+
+1. [About the project](#about-the-project)
+2. [Installation](#installation)
+3. [Usage](#usage)
+4. [Roadmap](#roadmap)
+5. [Release history](#release-history)
+6. [How to contribute](#how-to-contribute)
+7. [License](#license)
+8. [Contact](#contact)
+
+<!-- ABOUT THE PROJECT -->
+## About the project
+
+WEAC implements closed-form analytical models for the [mechanical analysis of dry-snow slabs on compliant weak layers](https://doi.org/10.5194/tc-14-115-2020), the [prediction of anticrack onset](https://doi.org/10.5194/tc-14-131-2020), and, in particular, allows for the [analysis of stratified snow covers](https://doi.org/10.5194/tc-17-1475-2023). The model covers propagation saw tests (a), and uncracked (b) or cracked (c) skier-loaded buried weak layers.
+
+<img src="https://github.com/2phi/weac/raw/main/img/systems.png" alt="Systems" width="500"/>
+
+Cite the repository as:
+```
+Rosendahl, P. L., Schneider, J., & Weissgraeber, P. (2022). Weak Layer Anticrack Nucleation Model (WEAC). Zenodo. https://doi.org/10.5281/zenodo.5773113
+```
+
+Read the [📄 white paper](https://doi.org/10.5194/tc-17-1475-2023) for model derivations, illustrations, dimensions, material properties, and kinematics:
+
+- Weißgraeber, P. & Rosendahl, P. L. (2023). A closed-form model for layered snow slabs. The Cryosphere, 17(4), 1475–1496. https://doi.org/10.5194/tc-17-1475-2023
+
+For more background info, please refer to the companion papers:
+
+- Rosendahl, P. L. & Weißgraeber, P. (2020). Modeling snow slab avalanches caused by weak-layer failure – Part 1: Slabs on compliant and collapsible weak layers. The Cryosphere, 14(1), 115–130. https://doi.org/10.5194/tc-14-115-2020
+- Rosendahl, P. L. & Weißgraeber, P. (2020). Modeling snow slab avalanches caused by weak-layer failure – Part 2: Coupled mixed-mode criterion for skier-triggered anticracks. The Cryosphere, 14(1), 131–145. https://doi.org/10.5194/tc-14-131-2020
+
+Written in [🐍 Python](https://www.python.org) and built with [💻 Visual Studio Code](https://code.visualstudio.com), [🐙 GitKraken](https://www.gitkraken.com), and [🪐 Jupyter](https://jupyter.org). Note that [release v1.0](https://github.com/2phi/weac/releases/tag/v1.0.0) was written and built in [🌋 MATLAB](https://www.mathworks.com/products/matlab.html).
+
+<!-- 
+[![Python](https://img.shields.io/badge/Python-306998.svg?style=flat-square&logo=python&logoColor=white&label&labelColor=gray)](https://www.python.org)
+[![Jupyter](https://img.shields.io/badge/Jupyter-e67124.svg?style=flat-square&logo=jupyter&logoColor=white&label&labelColor=gray)](https://jupyter.org)
+[![Atom](https://img.shields.io/badge/Atom-498b60.svg?style=flat-square&logo=atom&logoColor=white&label&labelColor=gray)](https://atom.io)
+[![GitKraken](https://img.shields.io/badge/GitKraken-179287.svg?style=flat-square&logo=gitkraken&logoColor=white&label&labelColor=gray)](https://www.gitkraken.com) -->
+
+
+
+<!-- INSTALLATION -->
+## Installation
+
+Install globally using the `pip` Package Installer for Python
+```sh
+pip install -U weac
+```
+or clone the repo
+```sh
+git clone https://github.com/2phi/weac
+```
+for local use.
+
+Needs (runtime dependencies are declared in [pyproject.toml](https://github.com/2phi/weac/blob/main/pyproject.toml)):
+
+- [Python](https://www.python.org/downloads/release/python-3120/) ≥ 3.12
+- [Numpy](https://numpy.org/) ≥ 2.0.1
+- [Scipy](https://www.scipy.org/) ≥ 1.14.0
+- [Matplotlib](https://matplotlib.org/) ≥ 3.9.1
+- [Pydantic](https://docs.pydantic.dev/latest/) ≥ 2.11.7
+- [Snowpylot](https://github.com/connellymk/snowpylot) ≥ 1.1.3
+
+
+<!-- USAGE EXAMPLES -->
+## Usage
+
+The following describes the basic usage of WEAC. Please refer to the [demo](https://github.com/2phi/weac/blob/main/demo/demo.ipynb) for more examples and read the [documentation](https://2phi.github.io/weac/) for details.
+
+Load the module.
+
+```python
+import weac
+```
+
+Choose a snow profile from the preconfigured profiles (see `dummy_profiles` in [demo](https://github.com/2phi/weac/blob/main/demo/demo.ipynb)) or create your own using the `Layer` Pydantic class. One row corresponds to one layer counted from top (below surface) to bottom (above weak layer).
+
+```python
+from weac.components import Layer
+
+layers = [
+  Layer(rho=170, h=100),  # (1) surface layer
+  Layer(rho=190, h=40),   # (2)
+  Layer(rho=230, h=130),  #  :
+  Layer(rho=250, h=20),
+  Layer(rho=210, h=70),
+  Layer(rho=380, h=20),   #  :
+  Layer(rho=280, h=100)   # (N) last slab layer above weak layer
+]
+```
+
+Create a WeakLayer instance that lies underneath the slab.
+
+```python
+from weac.components import WeakLayer
+
+weak_layer = WeakLayer(rho=125, h=20)
+```
+
+Create a Scenario that defines the environment and setup that the slab and weak layer will be evaluated in.
+
+```python
+from weac.components import ScenarioConfig, Segment
+
+# Example 1: SKIER
+skier_config = ScenarioConfig(
+    system_type='skier',
+    phi=30,
+)
+skier_segments = [
+    Segment(length=5000, has_foundation=True, m=0),
+    Segment(length=0, has_foundation=False, m=80),
+    Segment(length=0, has_foundation=False, m=0),
+    Segment(length=5000, has_foundation=True, m=0),
+]  # Scenario is a skier of 80 kg standing on a 10 meter long slab at a 30 degree angle
+
+# Exampel 2: PST
+pst_config = ScenarioConfig(
+    system_type='pst-',  # Downslope cut
+    phi=30,  # (counterclockwise positive)
+    cut_length=300,
+)
+pst_segments = [
+    Segment(length=5000, has_foundation=True, m=0),
+    Segment(length=300, has_foundation=False, m=0),  # Crack Segment
+]  # Scenario is Downslope PST with a 300mm cut
+```
+
+Create a SystemModel instance that combines the inputs and handles system solving and field-quantity extraction.
+
+```python
+from weac.components import Config, ModelInput
+from weac.core.system_model import SystemModel
+
+# Example: build a model for the skier scenario defined above 
+model_input = ModelInput(
+    weak_layer=weak_layer,
+    scenario_config=skier_config,
+    layers=custom_layers,
+    segments=skier_segments,
+)
+system_config = Config(
+    touchdown=True
+)
+skier_system = SystemModel(
+    model_input=model_input,
+    config=system_config,
+)
+```
+
+Unknown constants are cached_properties; calling `skier_system.unknown_constants` solves the system of linear equations and extracts the constants.
+
+```python
+C = skier_system.unknown_constants
+```
+
+Analyzer handles rasterization + computation of involved slab and weak-layer properties `Sxx`, `Sxz`, etc.
+Prepare the output by rasterizing the solution vector at all horizontal positions `xsl` (slab). The result is returned in the form of the ndarray `z`. We also get `xwl` (weak layer) that only contains x-coordinates that are supported by a foundation.
+
+```python
+from weac.analysis.analyzer import Analyzer
+
+skier_analyzer = Analyzer(skier_system)
+xsl_skier, z_skier, xwl_skier = skier_analyzer.rasterize_solution(mode="cracked")
+Gdif, GdifI, GdifII = skier_analyzer.differential_ERR()
+Ginc, GincI, GincII = skier_analyzer.incremental_ERR()
+# and Sxx, Sxz, Tzz, principal stress, incremental_potential, ...
+```
+
+Visualize the results.
+
+```python
+from weac.analysis.plotter import Plotter
+
+plotter = Plotter()
+# Visualize slab profile
+fig = plotter.plot_slab_profile(
+    weak_layers=weak_layer,
+    slabs=skier_system.slab,
+)
+
+# Visualize deformations as a contour plot
+fig = plotter.plot_deformed(
+  xsl_skier, xwl_skier, z_skier, skier_analyzer, scale=200, window=200, aspect=2, field="Sxx"
+)
+
+# Plot slab displacements (using x-coordinates of all segments, xsl)
+plotter.plot_displacements(skier_analyzer, x=xsl_skier, z=z_skier)
+# Plot weak-layer stresses (using only x-coordinates of bedded segments, xwl)
+plotter.plot_stresses(skier_analyzer, x=xwl_skier, z=z_skier)
+```
+
+Compute output/field quantities for exporting or plotting.
+
+```python
+# Compute stresses in kPa in the weaklayer
+tau = skier_system.fq.tau(Z=z_skier, unit='kPa')
+sig = skier_system.fq.sig(Z=z_skier, unit='kPa')
+
+w = skier_system.fq.w(Z=z_skier, unit='um')
+# Example evaluation vertical displacement at top/mid/bottom of the slab
+u_top = skier_system.fq.u(Z=z_skier, h0=top, unit='um')
+u_mid = skier_system.fq.u(Z=z_skier, h0=mid, unit='um')
+u_bot = skier_system.fq.u(Z=z_skier, h0=bot, unit='um')
+psi = skier_system.fq.psi(Z=z_skier, unit='deg')
+```
+
+<!-- ROADMAP -->
+## Roadmap
+
+See the [open issues](https://github.com/2phi/weac/issues) for a list of proposed features and known issues.
+
+### v4.0
+
+- [ ] Change to scenario & scenario_config: InfEnd/Cut/Segment/Weight
+
+### v3.2
+<!-- - [ ] New mathematical foundation to improve the weak-layer representation -->
+- [ ] Complex terrain through the addition of out-of-plane tilt
+- [ ] Up, down, and cross-slope cracks
+
+### v3.1
+
+- [ ] Improved CriteriaEvaluator Optimization (x2 time reduction)
+
+## Release history
+
+### v3.0
+
+- Refactored the codebase for improved structure and maintainability
+- Added property caching for improved efficiency
+- Added input validation
+- Adopted a new, modular, and object-oriented design
+
+### v2.6
+
+- Introduced test suite
+- Mitraged from `setup.cfg` to `pyproject.toml`
+- Added parametrization for collaps heights
+
+### v2.5
+
+- Analyze slab touchdown in PST experiments by setting `touchdown=True`
+- Completely redesigned and significantly improved API documentation
+
+### v2.4
+
+- Choose between slope-normal (`'-pst'`, `'pst-'`) or vertical (`'-vpst'`, `'vpst-'`) PST boundary conditions
+
+### v2.3
+
+- Stress plots on deformed contours
+- PSTs now account for slab touchdown
+
+### v2.2
+
+- Sign of inclination `phi` consistent with the coordinate system (positive counterclockwise)
+- Dimension arguments to field-quantity methods added
+- Improved aspect ratio of profile views and contour plots
+- Improved plot labels
+- Convenience methods for the export of weak-layer stresses and slab deformations provided
+- Wrapper for (re)calculation of the fundamental system added
+- Now allows for distributed surface loads
+
+### v2.1
+
+- Consistent use of coordinate system with downward pointing z-axis
+- Consitent top-to-bottom numbering of slab layers
+- Implementation of PSTs cut from either left or right side
+
+### v2.0
+
+- Completely rewritten in 🐍 Python
+- Coupled bending-extension ODE solver implemented
+- Stress analysis of arbitrarily layered snow slabs
+- FEM validation of
+  - displacements
+  - weak-layer stresses
+  - energy release rates in weak layers
+- Documentation
+- Demo and examples
+
+### v1.0
+
+- Written in 🌋 MATLAB
+- Deformation analysis of homogeneous snow labs
+- Weak-layer stress prediction
+- Energy release rates of cracks in weak layers
+- Finite fracture mechanics implementation
+- Prediction of anticrack nucleation
+
+<!-- CONTRIBUTING -->
+## How to contribute
+
+1. Fork the project
+2. Initialize submodules
+
+    ```bash  
+    git submodule update --init --recursive
+    ```
+
+3. Create your feature branch (`git checkout -b feature/amazingfeature`)
+4. Commit your changes (`git commit -m 'Add some amazing feature'`)
+5. Push to the branch (`git push origin feature/amazingfeature`)
+6. Open a pull request
+
+<!-- WORKFLOWS -->
+## Workflows
+[![Publish Python 🐍 releases 📦 to PyPI ](https://github.com/2phi/weac/actions/workflows/release.yml/badge.svg)](https://github.com/2phi/weac/actions/workflows/release.yml)<br>
+[![Build and publish Sphinx 🪬 documentation ](https://github.com/2phi/weac/actions/workflows/docs.yml/badge.svg)](https://github.com/2phi/weac/actions/workflows/docs.yml)
+
+<!-- LICENSE -->
+## License
+
+<p xmlns:cc="http://creativecommons.org/ns#" xmlns:dct="http://purl.org/dc/terms/">WEAC is licensed under <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank" rel="license noopener noreferrer" style="display:inline-block;">CC BY-NC-SA 4.0 <img style="height:22px!important;margin-left:3px;vertical-align:text-bottom;" src="https://mirrors.creativecommons.org/presskit/icons/cc.svg?ref=chooser-v1" alt=""><img style="height:22px!important;margin-left:3px;vertical-align:text-bottom;" src="https://mirrors.creativecommons.org/presskit/icons/by.svg?ref=chooser-v1" alt=""><img style="height:22px!important;margin-left:3px;vertical-align:text-bottom;" src="https://mirrors.creativecommons.org/presskit/icons/nc.svg?ref=chooser-v1" alt=""><img style="height:22px!important;margin-left:3px;vertical-align:text-bottom;" src="https://mirrors.creativecommons.org/presskit/icons/sa.svg?ref=chooser-v1" alt=""></a></p>
+
+You are free to:
+
+- **Share** — copy and redistribute the material in any medium or format
+- **Adapt** — remix, transform, and build upon the material for any purpose, even commercially.
+
+Under the following terms:
+
+- **Attribution** — You must give [appropriate credit](https://creativecommons.org/licenses/by-nc-sa/4.0/?ref=chooser-v1#ref-appropriate-credit), provide a link to the license, and [indicate if changes were made](https://creativecommons.org/licenses/by-nc-sa/4.0/?ref=chooser-v1#ref-indicate-changes). You may do so in any reasonable manner, but not in any way that suggests the licensor endorses you or your use.
+
+- **NonCommercial** — You may not use the material for [commercial purposes](https://creativecommons.org/licenses/by-nc-sa/4.0/?ref=chooser-v1#ref-commercial-purposes).
+
+- **ShareAlike** — If you remix, transform, or build upon the material, you must distribute your contributions under the [same license](https://creativecommons.org/licenses/by-nc-sa/4.0/?ref=chooser-v1#ref-same-license) as the original.
+
+
+
+<!-- CONTACT -->
+## Contact
+
+E-mail: mail@2phi.de · Web: https://2phi.de · Project Link: [https://github.com/2phi/weac](https://github.com/2phi/weac) · Project DOI: [http://dx.doi.org/10.5281/zenodo.5773113](http://dx.doi.org/10.5281/zenodo.5773113)
+
+
+
+<!-- MARKDOWN LINKS & IMAGES -->
+<!-- https://www.markdownguide.org/basic-syntax/#reference-style-links -->
+[contributors-badge]: https://img.shields.io/github/contributors/2phi/weac.svg?style=flat-square&logo=github&color=yellow
+
+[forks-badge]: https://img.shields.io/github/forks/2phi/weac.svg?&color=blueviolet&style=flat-square&logo=github
+
+[stars-badge]: https://img.shields.io/github/stars/2phi/weac.svg?style=flat-square&logo=github&color=orange
+
+[issues-badge]: https://img.shields.io/github/issues/2phi/weac.svg?style=flat-square&logo=github
+
+[pypi-badge]: https://img.shields.io/pypi/v/weac.svg?logo=python&logoColor=white&color=f46b58&style=flat-square
+
+[pypi-downloads-badge]: https://img.shields.io/pypi/dm/weac.svg?logo=python&logoColor=white&color=red&style=flat-square
+
+[python-dist-badge]: https://img.shields.io/pypi/pyversions/weac.svg?style=flat-square&logo=python&logoColor=white
+
+[doi-badge]: https://img.shields.io/badge/DOI-10.5281/zenodo.5773113-f03a6d.svg?style=flat-square
+<!-- &logo=zenodo&logoColor=white -->
+
+[release-badge]: https://img.shields.io/github/v/release/2phi/weac.svg?display_name=tag&color=f99a44&style=flat-square&logo=data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADIAAAAtCAYAAADsvzj/AAAACXBIWXMAAAsSAAALEgHS3X78AAAClUlEQVRoge1Z0W2DMBC9Vv0vGzQblE5QugEjZISMwAZNN2AEOkEzAtmAbkAmuMrSWbKezmBsC9IoT7KU4OPw8707G/PAzHQLeLwJFnciV4g7kWvDnci14WaIPCXeXxDRnohq51pHRC0RjYm+l8Gs7JGtYeaRdfTMXCT4tm0vviwGZm6ZeYe2sQ9oPQRcdAkESiCAGMUmiUjjcXxSrsdGIQR9KpEBHtKIjMoMRKZIjBJl1X+KrAYIL8ptzEiid/LCRZlCpJKGmka0C3PCVzhOTuEockZEa1p+uGTNAA7MXHvu9yV2D3YHp2/ITURL/hPYuESxdGr324FiCXfz85iTiCYpLI2ofbdvNyGpcoZwcvmdG8R+YhYH6POtR83MhGHEo4kUHl0fwA6j0cJEaBhBUoVS8rHYRBHxkdCqFNZ9N1q+3GhmnnXUxhVDBAenhloplQyJjrNsYaOhbVO8e7ilkdA07XOuLXC2r/aQsFGtlPxDyS0mspNBaTPoI6Hp2k10X5LXsFa4JLCKBRPBLXQIiVIGqVUzV35T2//FJEzTXqwKeTl6D3ip6pz/c/YWFRE9e/pe4f9F7Ps5p0iklMG9BAzoJdAOUQfancV2CLKGEGl7ppw4TMgKZbjoDTP08OGXiN6I6IGIPuR/DD4nZGXxJXJa9M6Pp/GDIpdvOWBAx7W00tH2WXz0kkOVonsfTD4Yf6eoKZqo/Z22FYhoWjlFdKmHFWt9H6mkiGiyOktUk7DWAZ2Ry9HT1+R4wJpfrExUfrQx5HC+9ZHpdy5HWxOJq1AK1iSyU651yrUobEnkN3j7EYAtpZUtGrQxkWz5QSsTwUXv30akcH5nK7sWW0jrIl+0siL109sSmJwwu2KzJcn7WY6I/gB+kRV89venQwAAAABJRU5ErkJggg==
+
+[weac-badge]: https://img.shields.io/badge/weac-2.1-orange.svg?style=flat-square&logo=data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADIAAAAtCAYAAADsvzj/AAAACXBIWXMAAAsSAAALEgHS3X78AAAClUlEQVRoge1Z0W2DMBC9Vv0vGzQblE5QugEjZISMwAZNN2AEOkEzAtmAbkAmuMrSWbKezmBsC9IoT7KU4OPw8707G/PAzHQLeLwJFnciV4g7kWvDnci14WaIPCXeXxDRnohq51pHRC0RjYm+l8Gs7JGtYeaRdfTMXCT4tm0vviwGZm6ZeYe2sQ9oPQRcdAkESiCAGMUmiUjjcXxSrsdGIQR9KpEBHtKIjMoMRKZIjBJl1X+KrAYIL8ptzEiid/LCRZlCpJKGmka0C3PCVzhOTuEockZEa1p+uGTNAA7MXHvu9yV2D3YHp2/ITURL/hPYuESxdGr324FiCXfz85iTiCYpLI2ofbdvNyGpcoZwcvmdG8R+YhYH6POtR83MhGHEo4kUHl0fwA6j0cJEaBhBUoVS8rHYRBHxkdCqFNZ9N1q+3GhmnnXUxhVDBAenhloplQyJjrNsYaOhbVO8e7ilkdA07XOuLXC2r/aQsFGtlPxDyS0mspNBaTPoI6Hp2k10X5LXsFa4JLCKBRPBLXQIiVIGqVUzV35T2//FJEzTXqwKeTl6D3ip6pz/c/YWFRE9e/pe4f9F7Ps5p0iklMG9BAzoJdAOUQfancV2CLKGEGl7ppw4TMgKZbjoDTP08OGXiN6I6IGIPuR/DD4nZGXxJXJa9M6Pp/GDIpdvOWBAx7W00tH2WXz0kkOVonsfTD4Yf6eoKZqo/Z22FYhoWjlFdKmHFWt9H6mkiGiyOktUk7DWAZ2Ry9HT1+R4wJpfrExUfrQx5HC+9ZHpdy5HWxOJq1AK1iSyU651yrUobEnkN3j7EYAtpZUtGrQxkWz5QSsTwUXv30akcH5nK7sWW0jrIl+0siL109sSmJwwu2KzJcn7WY6I/gB+kRV89venQwAAAABJRU5ErkJggg==
+
+[forks-url]: https://github.com/2phi/weac/network/members
+[stars-url]: https://github.com/2phi/weac/stargazers
+[contributors-url]: https://github.com/2phi/weac/graphs/contributors
+[issues-url]: https://github.com/2phi/weac/issues
+[pypi-url]: https://pypi.org/project/weac/
+[release-url]: https://github.com/2phi/weac/releases
+[weac-url]: https://github.com/2phi/weac/
+[doi-url]: https://zenodo.org/badge/latestdoi/203163531

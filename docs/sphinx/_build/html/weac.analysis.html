@@ -1,0 +1,1496 @@
+<!DOCTYPE html>
+
+<html :class="{'dark': darkMode === 'dark' || (darkMode === 'system' &amp;&amp; window.matchMedia('(prefers-color-scheme: dark)').matches)}" class="scroll-smooth" data-content_root="./" lang="en" x-data="{ darkMode: localStorage.getItem('darkMode') || localStorage.setItem('darkMode', 'system'), activeSection: '' }" x-init="$watch('darkMode', val =&gt; localStorage.setItem('darkMode', val))">
+<head>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<meta charset="utf-8"/>
+<meta content="white" media="(prefers-color-scheme: light)" name="theme-color"/>
+<meta content="black" media="(prefers-color-scheme: dark)" name="theme-color"/>
+<meta content="width=device-width, initial-scale=1" name="viewport"/>
+<title>weac.analysis package | WEAC 2.6.4</title>
+<meta content="weac.analysis package | WEAC 2.6.4" property="og:title"/>
+<meta content="weac.analysis package | WEAC 2.6.4" name="twitter:title"/>
+<link href="_static/pygments.css?v=e72c8e07" rel="stylesheet" type="text/css"/>
+<link href="_static/theme.css?v=42baaae4" rel="stylesheet" type="text/css"/>
+<link href="search.html" rel="search" title="Search"/>
+<link href="genindex.html" rel="index" title="Index"/>
+<link href="weac.analysis.analyzer.html" rel="next" title="weac.analysis.analyzer module"/>
+<link href="weac.html" rel="prev" title="weac package"/>
+<script>
+    <!-- Prevent Flash of wrong theme -->
+      const userPreference = localStorage.getItem('darkMode');
+      let mode;
+      if (userPreference === 'dark' || window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        mode = 'dark';
+        document.documentElement.classList.add('dark');
+      } else {
+        mode = 'light';
+      }
+      if (!userPreference) {localStorage.setItem('darkMode', mode)}
+    </script>
+</head>
+<body :class="{ 'overflow-hidden': showSidebar }" class="min-h-screen font-sans antialiased bg-background text-foreground" x-data="{ showSidebar: false, showScrollTop: false }">
+<div @click.self="showSidebar = false" class="fixed inset-0 z-50 overflow-hidden bg-background/80 backdrop-blur-sm md:hidden" x-cloak="" x-show="showSidebar"></div><div class="relative flex flex-col min-h-screen" id="page"><a class="absolute top-0 left-0 z-[100] block bg-background p-4 text-xl transition -translate-x-full opacity-0 focus:translate-x-0 focus:opacity-100" href="#content">
+      Skip to content
+    </a><header class="sticky top-0 z-40 w-full border-b shadow-sm border-border supports-backdrop-blur:bg-background/60 bg-background/95 backdrop-blur"><div class="container flex items-center h-14">
+<div class="hidden mr-4 md:flex">
+<a class="flex items-center mr-6" href="index.html"><span class="hidden font-bold sm:inline-block text-clip whitespace-nowrap">WEAC 2.6.4</span>
+</a></div><button @click="showSidebar = true" class="inline-flex items-center justify-center h-10 px-0 py-2 mr-2 text-base font-medium transition-colors rounded-md hover:text-accent-foreground hover:bg-transparent md:hidden" type="button">
+<svg aria-hidden="true" fill="currentColor" height="24" viewbox="0 96 960 960" width="24" xmlns="http://www.w3.org/2000/svg">
+<path d="M152.587 825.087q-19.152 0-32.326-13.174t-13.174-32.326q0-19.152 13.174-32.326t32.326-13.174h440q19.152 0 32.326 13.174t13.174 32.326q0 19.152-13.174 32.326t-32.326 13.174h-440Zm0-203.587q-19.152 0-32.326-13.174T107.087 576q0-19.152 13.174-32.326t32.326-13.174h320q19.152 0 32.326 13.174T518.087 576q0 19.152-13.174 32.326T472.587 621.5h-320Zm0-203.587q-19.152 0-32.326-13.174t-13.174-32.326q0-19.152 13.174-32.326t32.326-13.174h440q19.152 0 32.326 13.174t13.174 32.326q0 19.152-13.174 32.326t-32.326 13.174h-440ZM708.913 576l112.174 112.174q12.674 12.674 12.674 31.826t-12.674 31.826Q808.413 764.5 789.261 764.5t-31.826-12.674l-144-144Q600 594.391 600 576t13.435-31.826l144-144q12.674-12.674 31.826-12.674t31.826 12.674q12.674 12.674 12.674 31.826t-12.674 31.826L708.913 576Z"></path>
+</svg>
+<span class="sr-only">Toggle navigation menu</span>
+</button>
+<div class="flex items-center justify-between flex-1 space-x-2 sm:space-x-4 md:justify-end">
+<div class="flex-1 w-full md:w-auto md:flex-none"><form @keydown.k.window.meta="$refs.search.focus()" action="search.html" class="relative flex items-center group" id="searchbox" method="get">
+<input aria-label="Search the docs" class="inline-flex items-center font-medium transition-colors bg-transparent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 ring-offset-background border border-input hover:bg-accent focus:bg-accent hover:text-accent-foreground focus:text-accent-foreground hover:placeholder-accent-foreground py-2 px-4 relative h-9 w-full justify-start rounded-[0.5rem] text-sm text-muted-foreground sm:pr-12 md:w-40 lg:w-64" id="search-input" name="q" placeholder="Search ..." type="search" x-ref="search"/>
+<kbd class="pointer-events-none absolute right-1.5 top-2 hidden h-5 select-none text-muted-foreground items-center gap-1 rounded border border-border bg-muted px-1.5 font-mono text-[10px] font-medium opacity-100 sm:flex group-hover:bg-accent group-hover:text-accent-foreground">
+<span class="text-xs">⌘</span>
+    K
+  </kbd>
+</form>
+</div>
+<nav class="flex items-center space-x-1">
+<button @click="darkMode = darkMode === 'light' ? 'dark' : 'light'" aria-label="Color theme switcher" class="relative inline-flex items-center justify-center px-0 text-sm font-medium transition-colors rounded-md hover:bg-accent hover:text-accent-foreground h-9 w-9" type="button">
+<svg class="absolute transition-all scale-100 rotate-0 dark:-rotate-90 dark:scale-0" fill="currentColor" height="24" viewbox="0 96 960 960" width="24" xmlns="http://www.w3.org/2000/svg">
+<path d="M480 685q45.456 0 77.228-31.772Q589 621.456 589 576q0-45.456-31.772-77.228Q525.456 467 480 467q-45.456 0-77.228 31.772Q371 530.544 371 576q0 45.456 31.772 77.228Q434.544 685 480 685Zm0 91q-83 0-141.5-58.5T280 576q0-83 58.5-141.5T480 376q83 0 141.5 58.5T680 576q0 83-58.5 141.5T480 776ZM80 621.5q-19.152 0-32.326-13.174T34.5 576q0-19.152 13.174-32.326T80 530.5h80q19.152 0 32.326 13.174T205.5 576q0 19.152-13.174 32.326T160 621.5H80Zm720 0q-19.152 0-32.326-13.174T754.5 576q0-19.152 13.174-32.326T800 530.5h80q19.152 0 32.326 13.174T925.5 576q0 19.152-13.174 32.326T880 621.5h-80Zm-320-320q-19.152 0-32.326-13.174T434.5 256v-80q0-19.152 13.174-32.326T480 130.5q19.152 0 32.326 13.174T525.5 176v80q0 19.152-13.174 32.326T480 301.5Zm0 720q-19.152 0-32.326-13.17Q434.5 995.152 434.5 976v-80q0-19.152 13.174-32.326T480 850.5q19.152 0 32.326 13.174T525.5 896v80q0 19.152-13.174 32.33-13.174 13.17-32.326 13.17ZM222.174 382.065l-43-42Q165.5 327.391 166 308.239t13.174-33.065q13.435-13.674 32.587-13.674t32.065 13.674l42.239 43q12.674 13.435 12.555 31.706-.12 18.272-12.555 31.946-12.674 13.674-31.445 13.413-18.772-.261-32.446-13.174Zm494 494.761-42.239-43q-12.674-13.435-12.674-32.087t12.674-31.565Q686.609 756.5 705.38 757q18.772.5 32.446 13.174l43 41.761Q794.5 824.609 794 843.761t-13.174 33.065Q767.391 890.5 748.239 890.5t-32.065-13.674Zm-42-494.761Q660.5 369.391 661 350.62q.5-18.772 13.174-32.446l41.761-43Q728.609 261.5 747.761 262t33.065 13.174q13.674 13.435 13.674 32.587t-13.674 32.065l-43 42.239q-13.435 12.674-31.706 12.555-18.272-.12-31.946-12.555Zm-495 494.761Q165.5 863.391 165.5 844.239t13.674-32.065l43-42.239q13.435-12.674 32.087-12.674t31.565 12.674Q299.5 782.609 299 801.38q-.5 18.772-13.174 32.446l-41.761 43Q231.391 890.5 212.239 890t-33.065-13.174ZM480 576Z"></path>
+</svg>
+<svg class="absolute transition-all scale-0 rotate-90 dark:rotate-0 dark:scale-100" fill="currentColor" height="24" viewbox="0 96 960 960" width="24" xmlns="http://www.w3.org/2000/svg">
+<path d="M480 936q-151 0-255.5-104.5T120 576q0-138 90-239.5T440 218q25-3 39 18t-1 44q-17 26-25.5 55t-8.5 61q0 90 63 153t153 63q31 0 61.5-9t54.5-25q21-14 43-1.5t19 39.5q-14 138-117.5 229T480 936Zm0-80q88 0 158-48.5T740 681q-20 5-40 8t-40 3q-123 0-209.5-86.5T364 396q0-20 3-40t8-40q-78 32-126.5 102T200 576q0 116 82 198t198 82Zm-10-270Z"></path>
+</svg>
+</button>
+</nav>
+</div>
+</div>
+</header>
+<div class="flex-1"><div class="container flex-1 items-start md:grid md:grid-cols-[220px_minmax(0,1fr)] md:gap-6 lg:grid-cols-[240px_minmax(0,1fr)] lg:gap-10"><aside :aria-hidden="!showSidebar" :class="{ 'translate-x-0': showSidebar }" class="fixed inset-y-0 left-0 md:top-14 z-50 md:z-30 bg-background md:bg-transparent transition-all duration-100 -translate-x-full md:translate-x-0 ml-0 p-6 md:p-0 md:-ml-2 md:h-[calc(100vh-3.5rem)] w-5/6 md:w-full shrink-0 overflow-y-auto border-r border-border md:sticky" id="left-sidebar">
+<a class="!justify-start text-sm md:!hidden bg-background" href="index.html"><span class="font-bold text-clip whitespace-nowrap">WEAC 2.6.4</span>
+</a>
+<div class="relative overflow-hidden md:overflow-auto my-4 md:my-0 h-[calc(100vh-8rem)] md:h-auto">
+<div class="overflow-y-auto h-full w-full relative pr-6"><nav class="table w-full min-w-full my-6 lg:my-8">
+<p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1 current" x-data="{ expanded: $el.classList.contains('current') ? true : false }"><a :class="{ 'expanded' : expanded }" @click="expanded = !expanded" class="reference internal expandable" href="modules.html">weac<button @click.prevent.stop="expanded = !expanded" type="button"><span class="sr-only"></span><svg fill="currentColor" height="18px" stroke="none" viewbox="0 0 24 24" width="18px" xmlns="http://www.w3.org/2000/svg"><path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"></path></svg></button></a><ul class="current" x-show="expanded">
+<li class="toctree-l2 current"><a class="reference internal" href="weac.html">weac package</a></li>
+</ul>
+</li>
+</ul>
+</nav>
+</div>
+</div>
+<button @click="showSidebar = false" class="absolute md:hidden right-4 top-4 rounded-sm opacity-70 transition-opacity hover:opacity-100" type="button">
+<svg class="h-4 w-4" fill="currentColor" height="24" stroke="none" viewbox="0 96 960 960" width="24" xmlns="http://www.w3.org/2000/svg">
+<path d="M480 632 284 828q-11 11-28 11t-28-11q-11-11-11-28t11-28l196-196-196-196q-11-11-11-28t11-28q11-11 28-11t28 11l196 196 196-196q11-11 28-11t28 11q11 11 11 28t-11 28L536 576l196 196q11 11 11 28t-11 28q-11 11-28 11t-28-11L480 632Z"></path>
+</svg>
+</button>
+</aside>
+<main class="relative py-6 lg:gap-10 lg:py-8 xl:grid xl:grid-cols-[1fr_300px]">
+<div class="w-full min-w-0 mx-auto">
+<nav aria-label="breadcrumbs" class="flex items-center mb-4 space-x-1 text-sm text-muted-foreground">
+<a class="overflow-hidden text-ellipsis whitespace-nowrap hover:text-foreground" href="index.html">
+<span class="hidden md:inline">WEAC 2.6.4</span>
+<svg aria-label="Home" class="md:hidden" fill="currentColor" height="18" stroke="none" viewbox="0 96 960 960" width="18" xmlns="http://www.w3.org/2000/svg">
+<path d="M240 856h120V616h240v240h120V496L480 316 240 496v360Zm-80 80V456l320-240 320 240v480H520V696h-80v240H160Zm320-350Z"></path>
+</svg>
+</a>
+<div class="mr-1">/</div><a class="hover:text-foreground overflow-hidden text-ellipsis whitespace-nowrap" href="modules.html">weac</a>
+<div class="mr-1">/</div><a class="hover:text-foreground overflow-hidden text-ellipsis whitespace-nowrap" href="weac.html">weac package</a>
+<div class="mr-1">/</div><span aria-current="page" class="font-medium text-foreground overflow-hidden text-ellipsis whitespace-nowrap">weac.analysis package</span>
+</nav>
+<div id="content" role="main">
+<section id="weac-analysis-package">
+<h1>weac.analysis package<a class="headerlink" href="#weac-analysis-package" title="Link to this heading">¶</a></h1>
+<section id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#submodules'">¶</a></h2>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="weac.analysis.analyzer.html">weac.analysis.analyzer module</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="weac.analysis.analyzer.html#weac.analysis.analyzer.Analyzer"><code class="docutils literal notranslate"><span class="pre">Analyzer</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="weac.analysis.analyzer.html#weac.analysis.analyzer.Analyzer.Sxx"><code class="docutils literal notranslate"><span class="pre">Analyzer.Sxx()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="weac.analysis.analyzer.html#weac.analysis.analyzer.Analyzer.Szz"><code class="docutils literal notranslate"><span class="pre">Analyzer.Szz()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="weac.analysis.analyzer.html#weac.analysis.analyzer.Analyzer.Txz"><code class="docutils literal notranslate"><span class="pre">Analyzer.Txz()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="weac.analysis.analyzer.html#weac.analysis.analyzer.Analyzer.differential_ERR"><code class="docutils literal notranslate"><span class="pre">Analyzer.differential_ERR()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="weac.analysis.analyzer.html#weac.analysis.analyzer.Analyzer.get_call_stats"><code class="docutils literal notranslate"><span class="pre">Analyzer.get_call_stats()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="weac.analysis.analyzer.html#weac.analysis.analyzer.Analyzer.get_zmesh"><code class="docutils literal notranslate"><span class="pre">Analyzer.get_zmesh()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="weac.analysis.analyzer.html#weac.analysis.analyzer.Analyzer.incremental_ERR"><code class="docutils literal notranslate"><span class="pre">Analyzer.incremental_ERR()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="weac.analysis.analyzer.html#weac.analysis.analyzer.Analyzer.principal_stress_slab"><code class="docutils literal notranslate"><span class="pre">Analyzer.principal_stress_slab()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="weac.analysis.analyzer.html#weac.analysis.analyzer.Analyzer.principal_stress_weaklayer"><code class="docutils literal notranslate"><span class="pre">Analyzer.principal_stress_weaklayer()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="weac.analysis.analyzer.html#weac.analysis.analyzer.Analyzer.print_call_stats"><code class="docutils literal notranslate"><span class="pre">Analyzer.print_call_stats()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="weac.analysis.analyzer.html#weac.analysis.analyzer.Analyzer.printing_enabled"><code class="docutils literal notranslate"><span class="pre">Analyzer.printing_enabled</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="weac.analysis.analyzer.html#weac.analysis.analyzer.Analyzer.rasterize_solution"><code class="docutils literal notranslate"><span class="pre">Analyzer.rasterize_solution()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="weac.analysis.analyzer.html#weac.analysis.analyzer.Analyzer.sm"><code class="docutils literal notranslate"><span class="pre">Analyzer.sm</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="weac.analysis.analyzer.html#weac.analysis.analyzer.Analyzer.total_potential"><code class="docutils literal notranslate"><span class="pre">Analyzer.total_potential()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="weac.analysis.analyzer.html#weac.analysis.analyzer.track_analyzer_call"><code class="docutils literal notranslate"><span class="pre">track_analyzer_call()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="weac.analysis.criteria_evaluator.html">weac.analysis.criteria_evaluator module</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="weac.analysis.criteria_evaluator.html#weac.analysis.criteria_evaluator.CoupledCriterionHistory"><code class="docutils literal notranslate"><span class="pre">CoupledCriterionHistory</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="weac.analysis.criteria_evaluator.html#weac.analysis.criteria_evaluator.CoupledCriterionHistory.crack_lengths"><code class="docutils literal notranslate"><span class="pre">CoupledCriterionHistory.crack_lengths</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="weac.analysis.criteria_evaluator.html#weac.analysis.criteria_evaluator.CoupledCriterionHistory.dist_maxs"><code class="docutils literal notranslate"><span class="pre">CoupledCriterionHistory.dist_maxs</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="weac.analysis.criteria_evaluator.html#weac.analysis.criteria_evaluator.CoupledCriterionHistory.dist_mins"><code class="docutils literal notranslate"><span class="pre">CoupledCriterionHistory.dist_mins</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="weac.analysis.criteria_evaluator.html#weac.analysis.criteria_evaluator.CoupledCriterionHistory.g_deltas"><code class="docutils literal notranslate"><span class="pre">CoupledCriterionHistory.g_deltas</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="weac.analysis.criteria_evaluator.html#weac.analysis.criteria_evaluator.CoupledCriterionHistory.incr_energies"><code class="docutils literal notranslate"><span class="pre">CoupledCriterionHistory.incr_energies</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="weac.analysis.criteria_evaluator.html#weac.analysis.criteria_evaluator.CoupledCriterionHistory.skier_weights"><code class="docutils literal notranslate"><span class="pre">CoupledCriterionHistory.skier_weights</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="weac.analysis.criteria_evaluator.html#weac.analysis.criteria_evaluator.CoupledCriterionResult"><code class="docutils literal notranslate"><span class="pre">CoupledCriterionResult</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="weac.analysis.criteria_evaluator.html#weac.analysis.criteria_evaluator.CoupledCriterionResult.converged"><code class="docutils literal notranslate"><span class="pre">CoupledCriterionResult.converged</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="weac.analysis.criteria_evaluator.html#weac.analysis.criteria_evaluator.CoupledCriterionResult.crack_length"><code class="docutils literal notranslate"><span class="pre">CoupledCriterionResult.crack_length</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="weac.analysis.criteria_evaluator.html#weac.analysis.criteria_evaluator.CoupledCriterionResult.critical_skier_weight"><code class="docutils literal notranslate"><span class="pre">CoupledCriterionResult.critical_skier_weight</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="weac.analysis.criteria_evaluator.html#weac.analysis.criteria_evaluator.CoupledCriterionResult.dist_ERR_envelope"><code class="docutils literal notranslate"><span class="pre">CoupledCriterionResult.dist_ERR_envelope</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="weac.analysis.criteria_evaluator.html#weac.analysis.criteria_evaluator.CoupledCriterionResult.final_system"><code class="docutils literal notranslate"><span class="pre">CoupledCriterionResult.final_system</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="weac.analysis.criteria_evaluator.html#weac.analysis.criteria_evaluator.CoupledCriterionResult.g_delta"><code class="docutils literal notranslate"><span class="pre">CoupledCriterionResult.g_delta</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="weac.analysis.criteria_evaluator.html#weac.analysis.criteria_evaluator.CoupledCriterionResult.history"><code class="docutils literal notranslate"><span class="pre">CoupledCriterionResult.history</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="weac.analysis.criteria_evaluator.html#weac.analysis.criteria_evaluator.CoupledCriterionResult.initial_critical_skier_weight"><code class="docutils literal notranslate"><span class="pre">CoupledCriterionResult.initial_critical_skier_weight</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="weac.analysis.criteria_evaluator.html#weac.analysis.criteria_evaluator.CoupledCriterionResult.iterations"><code class="docutils literal notranslate"><span class="pre">CoupledCriterionResult.iterations</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="weac.analysis.criteria_evaluator.html#weac.analysis.criteria_evaluator.CoupledCriterionResult.max_dist_stress"><code class="docutils literal notranslate"><span class="pre">CoupledCriterionResult.max_dist_stress</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="weac.analysis.criteria_evaluator.html#weac.analysis.criteria_evaluator.CoupledCriterionResult.message"><code class="docutils literal notranslate"><span class="pre">CoupledCriterionResult.message</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="weac.analysis.criteria_evaluator.html#weac.analysis.criteria_evaluator.CoupledCriterionResult.min_dist_stress"><code class="docutils literal notranslate"><span class="pre">CoupledCriterionResult.min_dist_stress</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="weac.analysis.criteria_evaluator.html#weac.analysis.criteria_evaluator.CoupledCriterionResult.pure_stress_criteria"><code class="docutils literal notranslate"><span class="pre">CoupledCriterionResult.pure_stress_criteria</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="weac.analysis.criteria_evaluator.html#weac.analysis.criteria_evaluator.CoupledCriterionResult.self_collapse"><code class="docutils literal notranslate"><span class="pre">CoupledCriterionResult.self_collapse</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="weac.analysis.criteria_evaluator.html#weac.analysis.criteria_evaluator.CriteriaEvaluator"><code class="docutils literal notranslate"><span class="pre">CriteriaEvaluator</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="weac.analysis.criteria_evaluator.html#weac.analysis.criteria_evaluator.CriteriaEvaluator.check_crack_self_propagation"><code class="docutils literal notranslate"><span class="pre">CriteriaEvaluator.check_crack_self_propagation()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="weac.analysis.criteria_evaluator.html#weac.analysis.criteria_evaluator.CriteriaEvaluator.criteria_config"><code class="docutils literal notranslate"><span class="pre">CriteriaEvaluator.criteria_config</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="weac.analysis.criteria_evaluator.html#weac.analysis.criteria_evaluator.CriteriaEvaluator.evaluate_SSERR"><code class="docutils literal notranslate"><span class="pre">CriteriaEvaluator.evaluate_SSERR()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="weac.analysis.criteria_evaluator.html#weac.analysis.criteria_evaluator.CriteriaEvaluator.evaluate_coupled_criterion"><code class="docutils literal notranslate"><span class="pre">CriteriaEvaluator.evaluate_coupled_criterion()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="weac.analysis.criteria_evaluator.html#weac.analysis.criteria_evaluator.CriteriaEvaluator.find_crack_length_for_weight"><code class="docutils literal notranslate"><span class="pre">CriteriaEvaluator.find_crack_length_for_weight()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="weac.analysis.criteria_evaluator.html#weac.analysis.criteria_evaluator.CriteriaEvaluator.find_minimum_crack_length"><code class="docutils literal notranslate"><span class="pre">CriteriaEvaluator.find_minimum_crack_length()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="weac.analysis.criteria_evaluator.html#weac.analysis.criteria_evaluator.CriteriaEvaluator.find_minimum_force"><code class="docutils literal notranslate"><span class="pre">CriteriaEvaluator.find_minimum_force()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="weac.analysis.criteria_evaluator.html#weac.analysis.criteria_evaluator.CriteriaEvaluator.fracture_toughness_envelope"><code class="docutils literal notranslate"><span class="pre">CriteriaEvaluator.fracture_toughness_envelope()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="weac.analysis.criteria_evaluator.html#weac.analysis.criteria_evaluator.CriteriaEvaluator.stress_envelope"><code class="docutils literal notranslate"><span class="pre">CriteriaEvaluator.stress_envelope()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="weac.analysis.criteria_evaluator.html#weac.analysis.criteria_evaluator.FindMinimumForceResult"><code class="docutils literal notranslate"><span class="pre">FindMinimumForceResult</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="weac.analysis.criteria_evaluator.html#weac.analysis.criteria_evaluator.FindMinimumForceResult.critical_skier_weight"><code class="docutils literal notranslate"><span class="pre">FindMinimumForceResult.critical_skier_weight</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="weac.analysis.criteria_evaluator.html#weac.analysis.criteria_evaluator.FindMinimumForceResult.iterations"><code class="docutils literal notranslate"><span class="pre">FindMinimumForceResult.iterations</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="weac.analysis.criteria_evaluator.html#weac.analysis.criteria_evaluator.FindMinimumForceResult.max_dist_stress"><code class="docutils literal notranslate"><span class="pre">FindMinimumForceResult.max_dist_stress</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="weac.analysis.criteria_evaluator.html#weac.analysis.criteria_evaluator.FindMinimumForceResult.min_dist_stress"><code class="docutils literal notranslate"><span class="pre">FindMinimumForceResult.min_dist_stress</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="weac.analysis.criteria_evaluator.html#weac.analysis.criteria_evaluator.FindMinimumForceResult.new_segments"><code class="docutils literal notranslate"><span class="pre">FindMinimumForceResult.new_segments</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="weac.analysis.criteria_evaluator.html#weac.analysis.criteria_evaluator.FindMinimumForceResult.old_segments"><code class="docutils literal notranslate"><span class="pre">FindMinimumForceResult.old_segments</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="weac.analysis.criteria_evaluator.html#weac.analysis.criteria_evaluator.FindMinimumForceResult.success"><code class="docutils literal notranslate"><span class="pre">FindMinimumForceResult.success</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="weac.analysis.criteria_evaluator.html#weac.analysis.criteria_evaluator.SSERRResult"><code class="docutils literal notranslate"><span class="pre">SSERRResult</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="weac.analysis.criteria_evaluator.html#weac.analysis.criteria_evaluator.SSERRResult.SSERR"><code class="docutils literal notranslate"><span class="pre">SSERRResult.SSERR</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="weac.analysis.criteria_evaluator.html#weac.analysis.criteria_evaluator.SSERRResult.converged"><code class="docutils literal notranslate"><span class="pre">SSERRResult.converged</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="weac.analysis.criteria_evaluator.html#weac.analysis.criteria_evaluator.SSERRResult.message"><code class="docutils literal notranslate"><span class="pre">SSERRResult.message</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="weac.analysis.criteria_evaluator.html#weac.analysis.criteria_evaluator.SSERRResult.touchdown_distance"><code class="docutils literal notranslate"><span class="pre">SSERRResult.touchdown_distance</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="weac.analysis.plotter.html">weac.analysis.plotter module</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="weac.analysis.plotter.html#weac.analysis.plotter.MidpointNormalize"><code class="docutils literal notranslate"><span class="pre">MidpointNormalize</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="weac.analysis.plotter.html#weac.analysis.plotter.Plotter"><code class="docutils literal notranslate"><span class="pre">Plotter</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="weac.analysis.plotter.html#weac.analysis.plotter.Plotter.plot_ERR_comp"><code class="docutils literal notranslate"><span class="pre">Plotter.plot_ERR_comp()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="weac.analysis.plotter.html#weac.analysis.plotter.Plotter.plot_ERR_modes"><code class="docutils literal notranslate"><span class="pre">Plotter.plot_ERR_modes()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="weac.analysis.plotter.html#weac.analysis.plotter.Plotter.plot_analysis"><code class="docutils literal notranslate"><span class="pre">Plotter.plot_analysis()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="weac.analysis.plotter.html#weac.analysis.plotter.Plotter.plot_deformed"><code class="docutils literal notranslate"><span class="pre">Plotter.plot_deformed()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="weac.analysis.plotter.html#weac.analysis.plotter.Plotter.plot_displacements"><code class="docutils literal notranslate"><span class="pre">Plotter.plot_displacements()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="weac.analysis.plotter.html#weac.analysis.plotter.Plotter.plot_energy_release_rates"><code class="docutils literal notranslate"><span class="pre">Plotter.plot_energy_release_rates()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="weac.analysis.plotter.html#weac.analysis.plotter.Plotter.plot_err_envelope"><code class="docutils literal notranslate"><span class="pre">Plotter.plot_err_envelope()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="weac.analysis.plotter.html#weac.analysis.plotter.Plotter.plot_fea_disp"><code class="docutils literal notranslate"><span class="pre">Plotter.plot_fea_disp()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="weac.analysis.plotter.html#weac.analysis.plotter.Plotter.plot_fea_stress"><code class="docutils literal notranslate"><span class="pre">Plotter.plot_fea_stress()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="weac.analysis.plotter.html#weac.analysis.plotter.Plotter.plot_rotated_slab_profile"><code class="docutils literal notranslate"><span class="pre">Plotter.plot_rotated_slab_profile()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="weac.analysis.plotter.html#weac.analysis.plotter.Plotter.plot_section_forces"><code class="docutils literal notranslate"><span class="pre">Plotter.plot_section_forces()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="weac.analysis.plotter.html#weac.analysis.plotter.Plotter.plot_slab_profile"><code class="docutils literal notranslate"><span class="pre">Plotter.plot_slab_profile()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="weac.analysis.plotter.html#weac.analysis.plotter.Plotter.plot_stress_criteria"><code class="docutils literal notranslate"><span class="pre">Plotter.plot_stress_criteria()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="weac.analysis.plotter.html#weac.analysis.plotter.Plotter.plot_stress_envelope"><code class="docutils literal notranslate"><span class="pre">Plotter.plot_stress_envelope()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="weac.analysis.plotter.html#weac.analysis.plotter.Plotter.plot_stresses"><code class="docutils literal notranslate"><span class="pre">Plotter.plot_stresses()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</div>
+</section>
+<section id="module-weac.analysis">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-weac.analysis" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#module-weac.analysis'">¶</a></h2>
+<p>This package contains modules for analyzing the results of the WEAC model.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="weac.analysis.Analyzer">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">weac.analysis.</span></span><span class="sig-name descname"><span class="pre">Analyzer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">system_model</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">printing_enabled</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/weac/analysis/analyzer.html#Analyzer"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#weac.analysis.Analyzer" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#weac.analysis.Analyzer'">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Provides methods for the analysis of layered slabs on compliant
+elastic foundations.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>system_model</strong> (<a class="reference internal" href="weac.core.system_model.html#weac.core.system_model.SystemModel" title="weac.core.system_model.SystemModel"><em>SystemModel</em></a>)</p></li>
+<li><p><strong>printing_enabled</strong> (<em>bool</em>)</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="weac.analysis.Analyzer.Sxx">
+<span class="sig-name descname"><span class="pre">Sxx</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">Z</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">phi</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dz</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">unit</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'kPa'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/weac/analysis/analyzer.html#Analyzer.Sxx"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#weac.analysis.Analyzer.Sxx" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#weac.analysis.Analyzer.Sxx'">¶</a></dt>
+<dd><p>Compute axial normal stress in slab layers.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>Z</strong> (<em>ndarray</em>) – Solution vector [u(x) u’(x) w(x) w’(x) psi(x), psi’(x)]^T</p></li>
+<li><p><strong>phi</strong> (<em>float</em>) – Inclination (degrees). Counterclockwise positive.</p></li>
+<li><p><strong>dz</strong> (<em>float</em><em>, </em><em>optional</em>) – Element size along z-axis (mm). Default is 2 mm.</p></li>
+<li><p><strong>unit</strong> (<em>{'kPa'</em><em>, </em><em>'MPa'}</em><em>, </em><em>optional</em>) – Desired output unit. Default is ‘kPa’.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Axial slab normal stress in specified unit.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>ndarray, float</p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="weac.analysis.Analyzer.Szz">
+<span class="sig-name descname"><span class="pre">Szz</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">Z</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">phi</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dz</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">unit</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'kPa'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/weac/analysis/analyzer.html#Analyzer.Szz"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#weac.analysis.Analyzer.Szz" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#weac.analysis.Analyzer.Szz'">¶</a></dt>
+<dd><p>Compute transverse normal stress in slab layers.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>Z</strong> (<em>ndarray</em>) – Solution vector [u(x) u’(x) w(x) w’(x) psi(x), psi’(x)]^T</p></li>
+<li><p><strong>phi</strong> (<em>float</em>) – Inclination (degrees). Counterclockwise positive.</p></li>
+<li><p><strong>dz</strong> (<em>float</em><em>, </em><em>optional</em>) – Element size along z-axis (mm). Default is 2 mm.</p></li>
+<li><p><strong>unit</strong> (<em>{'kPa'</em><em>, </em><em>'MPa'}</em><em>, </em><em>optional</em>) – Desired output unit. Default is ‘kPa’.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Transverse normal stress at grid points in the slab in
+specified unit.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>ndarray, float</p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="weac.analysis.Analyzer.Txz">
+<span class="sig-name descname"><span class="pre">Txz</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">Z</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">phi</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dz</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">unit</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'kPa'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/weac/analysis/analyzer.html#Analyzer.Txz"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#weac.analysis.Analyzer.Txz" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#weac.analysis.Analyzer.Txz'">¶</a></dt>
+<dd><p>Compute shear stress in slab layers.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>Z</strong> (<em>ndarray</em>) – Solution vector [u(x) u’(x) w(x) w’(x) psi(x), psi’(x)]^T</p></li>
+<li><p><strong>phi</strong> (<em>float</em>) – Inclination (degrees). Counterclockwise positive.</p></li>
+<li><p><strong>dz</strong> (<em>float</em><em>, </em><em>optional</em>) – Element size along z-axis (mm). Default is 2 mm.</p></li>
+<li><p><strong>unit</strong> (<em>{'kPa'</em><em>, </em><em>'MPa'}</em><em>, </em><em>optional</em>) – Desired output unit. Default is ‘kPa’.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Shear stress at grid points in the slab in specified unit.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>ndarray</p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="weac.analysis.Analyzer.differential_ERR">
+<span class="sig-name descname"><span class="pre">differential_ERR</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">unit</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'kJ/m^2'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/weac/analysis/analyzer.html#Analyzer.differential_ERR"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#weac.analysis.Analyzer.differential_ERR" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#weac.analysis.Analyzer.differential_ERR'">¶</a></dt>
+<dd><p>Compute differential energy release rate of all crack tips.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>List of total, mode I, and mode II energy release rates.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>ndarray</p>
+</dd>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>unit</strong> (<em>Literal</em><em>[</em><em>'kJ/m^2'</em><em>, </em><em>'J/m^2'</em><em>]</em>)</p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="weac.analysis.Analyzer.get_call_stats">
+<span class="sig-name descname"><span class="pre">get_call_stats</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/weac/analysis/analyzer.html#Analyzer.get_call_stats"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#weac.analysis.Analyzer.get_call_stats" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#weac.analysis.Analyzer.get_call_stats'">¶</a></dt>
+<dd><p>Returns the call statistics.</p>
+</dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="weac.analysis.Analyzer.get_zmesh">
+<span class="sig-name descname"><span class="pre">get_zmesh</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dz</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/weac/analysis/analyzer.html#Analyzer.get_zmesh"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#weac.analysis.Analyzer.get_zmesh" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#weac.analysis.Analyzer.get_zmesh'">¶</a></dt>
+<dd><p>Get z-coordinates of grid points and corresponding elastic properties.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>dz</strong> (<em>float</em><em>, </em><em>optional</em>) – Element size along z-axis (mm). Default is 2 mm.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>mesh</strong> – Mesh along z-axis. Columns are a list of z-coordinates (mm) of
+grid points along z-axis with at least two grid points (top,
+bottom) per layer, Young’s modulus of each grid point, shear
+modulus of each grid point, and Poisson’s ratio of each grid
+point.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>ndarray</p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="weac.analysis.Analyzer.incremental_ERR">
+<span class="sig-name descname"><span class="pre">incremental_ERR</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tolerance</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1e-6</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">unit</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'kJ/m^2'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/weac/analysis/analyzer.html#Analyzer.incremental_ERR"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#weac.analysis.Analyzer.incremental_ERR" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#weac.analysis.Analyzer.incremental_ERR'">¶</a></dt>
+<dd><p>Compute incremental energy release rate (ERR) of all cracks.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>List of total, mode I, and mode II energy release rates.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>ndarray</p>
+</dd>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>tolerance</strong> (<em>float</em>)</p></li>
+<li><p><strong>unit</strong> (<em>Literal</em><em>[</em><em>'kJ/m^2'</em><em>, </em><em>'J/m^2'</em><em>]</em>)</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="weac.analysis.Analyzer.principal_stress_slab">
+<span class="sig-name descname"><span class="pre">principal_stress_slab</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">Z</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">phi</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dz</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">unit</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'kPa'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">val</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'max'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">normalize</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/weac/analysis/analyzer.html#Analyzer.principal_stress_slab"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#weac.analysis.Analyzer.principal_stress_slab" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#weac.analysis.Analyzer.principal_stress_slab'">¶</a></dt>
+<dd><p>Compute maximum or minimum principal stress in slab layers.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>Z</strong> (<em>ndarray</em>) – Solution vector [u(x) u’(x) w(x) w’(x) psi(x), psi’(x)]^T</p></li>
+<li><p><strong>phi</strong> (<em>float</em>) – Inclination (degrees). Counterclockwise positive.</p></li>
+<li><p><strong>dz</strong> (<em>float</em><em>, </em><em>optional</em>) – Element size along z-axis (mm). Default is 2 mm.</p></li>
+<li><p><strong>unit</strong> (<em>{'kPa'</em><em>, </em><em>'MPa'}</em><em>, </em><em>optional</em>) – Desired output unit. Default is ‘kPa’.</p></li>
+<li><p><strong>val</strong> (<em>str</em><em>, </em><em>optional</em>) – Maximum ‘max’ or minimum ‘min’ principal stress. Default is ‘max’.</p></li>
+<li><p><strong>normalize</strong> (<em>bool</em>) – Toggle layerwise normalization to strength.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Maximum or minimum principal stress in specified unit.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>ndarray</p>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>ValueError</strong> – If specified principal stress component is neither ‘max’ nor
+    ‘min’, or if normalization of compressive principal stress
+    is requested.</p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="weac.analysis.Analyzer.principal_stress_weaklayer">
+<span class="sig-name descname"><span class="pre">principal_stress_weaklayer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">Z</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sc</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2.6</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">unit</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'kPa'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">val</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'min'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">normalize</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/weac/analysis/analyzer.html#Analyzer.principal_stress_weaklayer"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#weac.analysis.Analyzer.principal_stress_weaklayer" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#weac.analysis.Analyzer.principal_stress_weaklayer'">¶</a></dt>
+<dd><p>Compute maximum or minimum principal stress in the weak layer.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>Z</strong> (<em>ndarray</em>) – Solution vector [u(x) u’(x) w(x) w’(x) psi(x), psi’(x)]^T</p></li>
+<li><p><strong>sc</strong> (<em>float</em>) – Weak-layer compressive strength. Default is 2.6 kPa.</p></li>
+<li><p><strong>unit</strong> (<em>{'kPa'</em><em>, </em><em>'MPa'}</em><em>, </em><em>optional</em>) – Desired output unit. Default is ‘kPa’.</p></li>
+<li><p><strong>val</strong> (<em>str</em><em>, </em><em>optional</em>) – Maximum ‘max’ or minimum ‘min’ principal stress. Default is ‘min’.</p></li>
+<li><p><strong>normalize</strong> (<em>bool</em>) – Toggle layerwise normalization to strength.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Maximum or minimum principal stress in specified unit.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>ndarray</p>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>ValueError</strong> – If specified principal stress component is neither ‘max’ nor
+    ‘min’, or if normalization of tensile principal stress
+    is requested.</p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="weac.analysis.Analyzer.print_call_stats">
+<span class="sig-name descname"><span class="pre">print_call_stats</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">message</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'Analyzer</span> <span class="pre">Call</span> <span class="pre">Statistics'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/weac/analysis/analyzer.html#Analyzer.print_call_stats"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#weac.analysis.Analyzer.print_call_stats" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#weac.analysis.Analyzer.print_call_stats'">¶</a></dt>
+<dd><p>Prints the call statistics in a readable format.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>message</strong> (<em>str</em>)</p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="weac.analysis.Analyzer.printing_enabled">
+<span class="sig-name descname"><span class="pre">printing_enabled</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">True</span></em><a class="headerlink" href="#weac.analysis.Analyzer.printing_enabled" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#weac.analysis.Analyzer.printing_enabled'">¶</a></dt>
+<dd></dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="weac.analysis.Analyzer.rasterize_solution">
+<span class="sig-name descname"><span class="pre">rasterize_solution</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mode</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'cracked'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">4000</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/weac/analysis/analyzer.html#Analyzer.rasterize_solution"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#weac.analysis.Analyzer.rasterize_solution" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#weac.analysis.Analyzer.rasterize_solution'">¶</a></dt>
+<dd><p>Compute rasterized solution vector.</p>
+<section id="parameters">
+<h3>Parameters:<a class="headerlink" href="#parameters" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#parameters'">¶</a></h3>
+<dl class="simple">
+<dt>mode<span class="classifier">Literal[“cracked”, “uncracked”]</span></dt><dd><p>Mode of the solution.</p>
+</dd>
+<dt>num<span class="classifier">int</span></dt><dd><p>Number of grid points.</p>
+</dd>
+</dl>
+<dl class="field-list simple">
+<dt class="field-odd">returns<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>xs</strong> (<em>ndarray</em>) – Grid point x-coordinates at which solution vector
+is discretized.</p></li>
+<li><p><strong>zs</strong> (<em>ndarray</em>) – Matrix with solution vectors as columns at grid
+points xs.</p></li>
+<li><p><strong>x_founded</strong> (<em>ndarray</em>) – Grid point x-coordinates that lie on a foundation.</p></li>
+</ul>
+</dd>
+</dl>
+</section>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>mode</strong> (<em>Literal</em><em>[</em><em>'cracked'</em><em>, </em><em>'uncracked'</em><em>]</em>)</p></li>
+<li><p><strong>num</strong> (<em>int</em>)</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="weac.analysis.Analyzer.sm">
+<span class="sig-name descname"><span class="pre">sm</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="weac.core.system_model.html#weac.core.system_model.SystemModel" title="weac.core.system_model.SystemModel"><span class="pre">SystemModel</span></a></em><a class="headerlink" href="#weac.analysis.Analyzer.sm" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#weac.analysis.Analyzer.sm'">¶</a></dt>
+<dd></dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="weac.analysis.Analyzer.total_potential">
+<span class="sig-name descname"><span class="pre">total_potential</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/weac/analysis/analyzer.html#Analyzer.total_potential"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#weac.analysis.Analyzer.total_potential" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#weac.analysis.Analyzer.total_potential'">¶</a></dt>
+<dd><p>Returns total differential potential.
+Currently only implemented for PST systems.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>Pi</strong> – Total differential potential (Nmm).</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+</dd></dl>
+<dl class="py class">
+<dt class="sig sig-object py" id="weac.analysis.CoupledCriterionHistory">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">weac.analysis.</span></span><span class="sig-name descname"><span class="pre">CoupledCriterionHistory</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">skier_weights</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">crack_lengths</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">incr_energies</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">g_deltas</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dist_maxs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dist_mins</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/weac/analysis/criteria_evaluator.html#CoupledCriterionHistory"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#weac.analysis.CoupledCriterionHistory" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#weac.analysis.CoupledCriterionHistory'">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Stores the history of the coupled criterion evaluation.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>skier_weights</strong> (<em>List</em><em>[</em><em>float</em><em>]</em>)</p></li>
+<li><p><strong>crack_lengths</strong> (<em>List</em><em>[</em><em>float</em><em>]</em>)</p></li>
+<li><p><strong>incr_energies</strong> (<em>List</em><em>[</em><em>ndarray</em><em>]</em>)</p></li>
+<li><p><strong>g_deltas</strong> (<em>List</em><em>[</em><em>float</em><em>]</em>)</p></li>
+<li><p><strong>dist_maxs</strong> (<em>List</em><em>[</em><em>float</em><em>]</em>)</p></li>
+<li><p><strong>dist_mins</strong> (<em>List</em><em>[</em><em>float</em><em>]</em>)</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="weac.analysis.CoupledCriterionHistory.crack_lengths">
+<span class="sig-name descname"><span class="pre">crack_lengths</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#weac.analysis.CoupledCriterionHistory.crack_lengths" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#weac.analysis.CoupledCriterionHistory.crack_lengths'">¶</a></dt>
+<dd></dd></dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="weac.analysis.CoupledCriterionHistory.dist_maxs">
+<span class="sig-name descname"><span class="pre">dist_maxs</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#weac.analysis.CoupledCriterionHistory.dist_maxs" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#weac.analysis.CoupledCriterionHistory.dist_maxs'">¶</a></dt>
+<dd></dd></dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="weac.analysis.CoupledCriterionHistory.dist_mins">
+<span class="sig-name descname"><span class="pre">dist_mins</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#weac.analysis.CoupledCriterionHistory.dist_mins" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#weac.analysis.CoupledCriterionHistory.dist_mins'">¶</a></dt>
+<dd></dd></dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="weac.analysis.CoupledCriterionHistory.g_deltas">
+<span class="sig-name descname"><span class="pre">g_deltas</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#weac.analysis.CoupledCriterionHistory.g_deltas" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#weac.analysis.CoupledCriterionHistory.g_deltas'">¶</a></dt>
+<dd></dd></dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="weac.analysis.CoupledCriterionHistory.incr_energies">
+<span class="sig-name descname"><span class="pre">incr_energies</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">ndarray</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#weac.analysis.CoupledCriterionHistory.incr_energies" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#weac.analysis.CoupledCriterionHistory.incr_energies'">¶</a></dt>
+<dd></dd></dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="weac.analysis.CoupledCriterionHistory.skier_weights">
+<span class="sig-name descname"><span class="pre">skier_weights</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#weac.analysis.CoupledCriterionHistory.skier_weights" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#weac.analysis.CoupledCriterionHistory.skier_weights'">¶</a></dt>
+<dd></dd></dl>
+</dd></dl>
+<dl class="py class">
+<dt class="sig sig-object py" id="weac.analysis.CoupledCriterionResult">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">weac.analysis.</span></span><span class="sig-name descname"><span class="pre">CoupledCriterionResult</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">converged</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">message</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">self_collapse</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pure_stress_criteria</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">critical_skier_weight</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">initial_critical_skier_weight</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">crack_length</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">g_delta</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dist_ERR_envelope</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">iterations</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">history</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">final_system</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_dist_stress</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">min_dist_stress</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/weac/analysis/criteria_evaluator.html#CoupledCriterionResult"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#weac.analysis.CoupledCriterionResult" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#weac.analysis.CoupledCriterionResult'">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Holds the results of the coupled criterion evaluation.</p>
+<section id="attributes">
+<h3>Attributes:<a class="headerlink" href="#attributes" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#attributes'">¶</a></h3>
+<dl class="simple">
+<dt>converged<span class="classifier">bool</span></dt><dd><p>Whether the algorithm converged.</p>
+</dd>
+<dt>message<span class="classifier">str</span></dt><dd><p>The message of the evaluation.</p>
+</dd>
+<dt>self_collapse<span class="classifier">bool</span></dt><dd><p>Whether the system collapsed.</p>
+</dd>
+<dt>pure_stress_criteria<span class="classifier">bool</span></dt><dd><p>Whether the pure stress criteria is satisfied.</p>
+</dd>
+<dt>critical_skier_weight<span class="classifier">float</span></dt><dd><p>The critical skier weight.</p>
+</dd>
+<dt>initial_critical_skier_weight<span class="classifier">float</span></dt><dd><p>The initial critical skier weight.</p>
+</dd>
+<dt>crack_length<span class="classifier">float</span></dt><dd><p>The crack length.</p>
+</dd>
+<dt>g_delta<span class="classifier">float</span></dt><dd><p>The g_delta value.</p>
+</dd>
+<dt>dist_ERR_envelope<span class="classifier">float</span></dt><dd><p>The distance to the ERR envelope.</p>
+</dd>
+<dt>iterations<span class="classifier">int</span></dt><dd><p>The number of iterations.</p>
+</dd>
+<dt>history<span class="classifier">CoupledCriterionHistory</span></dt><dd><p>The history of the evaluation.</p>
+</dd>
+<dt>final_system<span class="classifier">SystemModel</span></dt><dd><p>The final system model.</p>
+</dd>
+<dt>max_dist_stress<span class="classifier">float</span></dt><dd><p>The maximum distance to failure.</p>
+</dd>
+<dt>min_dist_stress<span class="classifier">float</span></dt><dd><p>The minimum distance to failure.</p>
+</dd>
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="weac.analysis.CoupledCriterionResult.converged">
+<span class="sig-name descname"><span class="pre">converged</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></em><a class="headerlink" href="#weac.analysis.CoupledCriterionResult.converged" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#weac.analysis.CoupledCriterionResult.converged'">¶</a></dt>
+<dd></dd></dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="weac.analysis.CoupledCriterionResult.crack_length">
+<span class="sig-name descname"><span class="pre">crack_length</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><a class="headerlink" href="#weac.analysis.CoupledCriterionResult.crack_length" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#weac.analysis.CoupledCriterionResult.crack_length'">¶</a></dt>
+<dd></dd></dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="weac.analysis.CoupledCriterionResult.critical_skier_weight">
+<span class="sig-name descname"><span class="pre">critical_skier_weight</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><a class="headerlink" href="#weac.analysis.CoupledCriterionResult.critical_skier_weight" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#weac.analysis.CoupledCriterionResult.critical_skier_weight'">¶</a></dt>
+<dd></dd></dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="weac.analysis.CoupledCriterionResult.dist_ERR_envelope">
+<span class="sig-name descname"><span class="pre">dist_ERR_envelope</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><a class="headerlink" href="#weac.analysis.CoupledCriterionResult.dist_ERR_envelope" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#weac.analysis.CoupledCriterionResult.dist_ERR_envelope'">¶</a></dt>
+<dd></dd></dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="weac.analysis.CoupledCriterionResult.final_system">
+<span class="sig-name descname"><span class="pre">final_system</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="weac.core.system_model.html#weac.core.system_model.SystemModel" title="weac.core.system_model.SystemModel"><span class="pre">SystemModel</span></a></em><a class="headerlink" href="#weac.analysis.CoupledCriterionResult.final_system" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#weac.analysis.CoupledCriterionResult.final_system'">¶</a></dt>
+<dd></dd></dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="weac.analysis.CoupledCriterionResult.g_delta">
+<span class="sig-name descname"><span class="pre">g_delta</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><a class="headerlink" href="#weac.analysis.CoupledCriterionResult.g_delta" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#weac.analysis.CoupledCriterionResult.g_delta'">¶</a></dt>
+<dd></dd></dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="weac.analysis.CoupledCriterionResult.history">
+<span class="sig-name descname"><span class="pre">history</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="weac.analysis.criteria_evaluator.html#weac.analysis.criteria_evaluator.CoupledCriterionHistory" title="weac.analysis.criteria_evaluator.CoupledCriterionHistory"><span class="pre">CoupledCriterionHistory</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#weac.analysis.CoupledCriterionResult.history" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#weac.analysis.CoupledCriterionResult.history'">¶</a></dt>
+<dd></dd></dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="weac.analysis.CoupledCriterionResult.initial_critical_skier_weight">
+<span class="sig-name descname"><span class="pre">initial_critical_skier_weight</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><a class="headerlink" href="#weac.analysis.CoupledCriterionResult.initial_critical_skier_weight" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#weac.analysis.CoupledCriterionResult.initial_critical_skier_weight'">¶</a></dt>
+<dd></dd></dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="weac.analysis.CoupledCriterionResult.iterations">
+<span class="sig-name descname"><span class="pre">iterations</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><a class="headerlink" href="#weac.analysis.CoupledCriterionResult.iterations" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#weac.analysis.CoupledCriterionResult.iterations'">¶</a></dt>
+<dd></dd></dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="weac.analysis.CoupledCriterionResult.max_dist_stress">
+<span class="sig-name descname"><span class="pre">max_dist_stress</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><a class="headerlink" href="#weac.analysis.CoupledCriterionResult.max_dist_stress" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#weac.analysis.CoupledCriterionResult.max_dist_stress'">¶</a></dt>
+<dd></dd></dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="weac.analysis.CoupledCriterionResult.message">
+<span class="sig-name descname"><span class="pre">message</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#weac.analysis.CoupledCriterionResult.message" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#weac.analysis.CoupledCriterionResult.message'">¶</a></dt>
+<dd></dd></dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="weac.analysis.CoupledCriterionResult.min_dist_stress">
+<span class="sig-name descname"><span class="pre">min_dist_stress</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><a class="headerlink" href="#weac.analysis.CoupledCriterionResult.min_dist_stress" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#weac.analysis.CoupledCriterionResult.min_dist_stress'">¶</a></dt>
+<dd></dd></dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="weac.analysis.CoupledCriterionResult.pure_stress_criteria">
+<span class="sig-name descname"><span class="pre">pure_stress_criteria</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></em><a class="headerlink" href="#weac.analysis.CoupledCriterionResult.pure_stress_criteria" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#weac.analysis.CoupledCriterionResult.pure_stress_criteria'">¶</a></dt>
+<dd></dd></dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="weac.analysis.CoupledCriterionResult.self_collapse">
+<span class="sig-name descname"><span class="pre">self_collapse</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></em><a class="headerlink" href="#weac.analysis.CoupledCriterionResult.self_collapse" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#weac.analysis.CoupledCriterionResult.self_collapse'">¶</a></dt>
+<dd></dd></dl>
+</section>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>converged</strong> (<em>bool</em>)</p></li>
+<li><p><strong>message</strong> (<em>str</em>)</p></li>
+<li><p><strong>self_collapse</strong> (<em>bool</em>)</p></li>
+<li><p><strong>pure_stress_criteria</strong> (<em>bool</em>)</p></li>
+<li><p><strong>critical_skier_weight</strong> (<em>float</em>)</p></li>
+<li><p><strong>initial_critical_skier_weight</strong> (<em>float</em>)</p></li>
+<li><p><strong>crack_length</strong> (<em>float</em>)</p></li>
+<li><p><strong>g_delta</strong> (<em>float</em>)</p></li>
+<li><p><strong>dist_ERR_envelope</strong> (<em>float</em>)</p></li>
+<li><p><strong>iterations</strong> (<em>int</em>)</p></li>
+<li><p><strong>history</strong> (<a class="reference internal" href="weac.analysis.criteria_evaluator.html#weac.analysis.criteria_evaluator.CoupledCriterionHistory" title="weac.analysis.criteria_evaluator.CoupledCriterionHistory"><em>CoupledCriterionHistory</em></a><em> | </em><em>None</em>)</p></li>
+<li><p><strong>final_system</strong> (<a class="reference internal" href="weac.core.system_model.html#weac.core.system_model.SystemModel" title="weac.core.system_model.SystemModel"><em>SystemModel</em></a>)</p></li>
+<li><p><strong>max_dist_stress</strong> (<em>float</em>)</p></li>
+<li><p><strong>min_dist_stress</strong> (<em>float</em>)</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+<dl class="py class">
+<dt class="sig sig-object py" id="weac.analysis.CriteriaEvaluator">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">weac.analysis.</span></span><span class="sig-name descname"><span class="pre">CriteriaEvaluator</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">criteria_config</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/weac/analysis/criteria_evaluator.html#CriteriaEvaluator"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#weac.analysis.CriteriaEvaluator" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#weac.analysis.CriteriaEvaluator'">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Provides methods for stability analysis of layered slabs on compliant
+elastic foundations, based on the logic from criterion_check.py.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>criteria_config</strong> (<a class="reference internal" href="weac.components.criteria_config.html#weac.components.criteria_config.CriteriaConfig" title="weac.components.criteria_config.CriteriaConfig"><em>CriteriaConfig</em></a>)</p>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="weac.analysis.CriteriaEvaluator.check_crack_self_propagation">
+<span class="sig-name descname"><span class="pre">check_crack_self_propagation</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">system</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rm_skier_weight</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/weac/analysis/criteria_evaluator.html#CriteriaEvaluator.check_crack_self_propagation"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#weac.analysis.CriteriaEvaluator.check_crack_self_propagation" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#weac.analysis.CriteriaEvaluator.check_crack_self_propagation'">¶</a></dt>
+<dd><p>Evaluates whether a crack will propagate without any additional load.
+This method determines if a pre-existing crack will propagate without any
+additional load.</p>
+<section id="id1">
+<h3>Parameters:<a class="headerlink" href="#id1" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id1'">¶</a></h3>
+<p>system: SystemModel</p>
+<dl class="field-list simple">
+<dt class="field-odd">returns<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>g_delta_diff</strong> (<em>float</em>) – The evaluation of the fracture toughness envelope.</p></li>
+<li><p><strong>can_propagate</strong> (<em>bool</em>) – True if the criterion is met (g_delta_diff &gt;= 1).</p></li>
+</ul>
+</dd>
+</dl>
+</section>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>system</strong> (<a class="reference internal" href="weac.core.system_model.html#weac.core.system_model.SystemModel" title="weac.core.system_model.SystemModel"><em>SystemModel</em></a>)</p></li>
+<li><p><strong>rm_skier_weight</strong> (<em>bool</em>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>tuple[float, bool]</p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="weac.analysis.CriteriaEvaluator.criteria_config">
+<span class="sig-name descname"><span class="pre">criteria_config</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="weac.components.criteria_config.html#weac.components.criteria_config.CriteriaConfig" title="weac.components.criteria_config.CriteriaConfig"><span class="pre">CriteriaConfig</span></a></em><a class="headerlink" href="#weac.analysis.CriteriaEvaluator.criteria_config" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#weac.analysis.CriteriaEvaluator.criteria_config'">¶</a></dt>
+<dd></dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="weac.analysis.CriteriaEvaluator.evaluate_SSERR">
+<span class="sig-name descname"><span class="pre">evaluate_SSERR</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">system</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vertical</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">print_call_stats</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/weac/analysis/criteria_evaluator.html#CriteriaEvaluator.evaluate_SSERR"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#weac.analysis.CriteriaEvaluator.evaluate_SSERR" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#weac.analysis.CriteriaEvaluator.evaluate_SSERR'">¶</a></dt>
+<dd><p>Evaluates the Touchdown Distance in the Steady State and the Steady State
+Energy Release Rate.</p>
+<section id="id2">
+<h3>Parameters:<a class="headerlink" href="#id2" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id2'">¶</a></h3>
+<dl class="simple">
+<dt>system: SystemModel</dt><dd><p>The system model.</p>
+</dd>
+<dt>vertical: bool, optional</dt><dd><p>Whether to evaluate the system in a vertical configuration.
+Defaults to False.</p>
+</dd>
+<dt>print_call_stats: bool, optional</dt><dd><p>Whether to print the call statistics. Defaults to False.</p>
+</dd>
+</dl>
+<p>IMPORTANT: There is a bug in vertical = True, so always slope normal,
+i.e. vertical=False should be used.</p>
+</section>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>system</strong> (<a class="reference internal" href="weac.core.system_model.html#weac.core.system_model.SystemModel" title="weac.core.system_model.SystemModel"><em>SystemModel</em></a>)</p></li>
+<li><p><strong>vertical</strong> (<em>bool</em>)</p></li>
+<li><p><strong>print_call_stats</strong> (<em>bool</em>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference internal" href="weac.analysis.criteria_evaluator.html#weac.analysis.criteria_evaluator.SSERRResult" title="weac.analysis.criteria_evaluator.SSERRResult"><em>SSERRResult</em></a></p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="weac.analysis.CriteriaEvaluator.evaluate_coupled_criterion">
+<span class="sig-name descname"><span class="pre">evaluate_coupled_criterion</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">system</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_iterations</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">25</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">damping_ERR</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tolerance_ERR</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.002</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tolerance_stress</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.005</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">print_call_stats</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">_recursion_depth</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/weac/analysis/criteria_evaluator.html#CriteriaEvaluator.evaluate_coupled_criterion"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#weac.analysis.CriteriaEvaluator.evaluate_coupled_criterion" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#weac.analysis.CriteriaEvaluator.evaluate_coupled_criterion'">¶</a></dt>
+<dd><p>Evaluates the coupled criterion for anticrack nucleation, finding the
+critical combination of skier weight and anticrack length.</p>
+<section id="id3">
+<h3>Parameters:<a class="headerlink" href="#id3" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id3'">¶</a></h3>
+<dl class="simple">
+<dt>system: SystemModel</dt><dd><p>The system model.</p>
+</dd>
+<dt>max_iterations: int</dt><dd><p>Max iterations for the solver. Defaults to 25.</p>
+</dd>
+<dt>damping_ERR: float</dt><dd><p>damping factor for the ERR criterion. Defaults to 0.0.</p>
+</dd>
+<dt>tolerance_ERR: float, optional</dt><dd><p>Tolerance for g_delta convergence. Defaults to 0.002.</p>
+</dd>
+<dt>tolerance_stress: float, optional</dt><dd><p>Tolerance for stress envelope convergence. Defaults to 0.005.</p>
+</dd>
+<dt>print_call_stats: bool</dt><dd><p>Whether to print the call statistics. Defaults to False.</p>
+</dd>
+<dt>_recursion_depth: int</dt><dd><p>The depth of the recursion. Defaults to 0.</p>
+</dd>
+</dl>
+<dl class="field-list simple">
+<dt class="field-odd">returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>results</strong> – An object containing the results of the analysis, including
+critical skier weight, crack length, and convergence details.</p>
+</dd>
+<dt class="field-even">rtype<span class="colon">:</span></dt>
+<dd class="field-even"><p>CoupledCriterionResult</p>
+</dd>
+</dl>
+</section>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>system</strong> (<a class="reference internal" href="weac.core.system_model.html#weac.core.system_model.SystemModel" title="weac.core.system_model.SystemModel"><em>SystemModel</em></a>)</p></li>
+<li><p><strong>max_iterations</strong> (<em>int</em>)</p></li>
+<li><p><strong>damping_ERR</strong> (<em>float</em>)</p></li>
+<li><p><strong>tolerance_ERR</strong> (<em>float</em>)</p></li>
+<li><p><strong>tolerance_stress</strong> (<em>float</em>)</p></li>
+<li><p><strong>print_call_stats</strong> (<em>bool</em>)</p></li>
+<li><p><strong>_recursion_depth</strong> (<em>int</em>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference internal" href="weac.analysis.criteria_evaluator.html#weac.analysis.criteria_evaluator.CoupledCriterionResult" title="weac.analysis.criteria_evaluator.CoupledCriterionResult"><em>CoupledCriterionResult</em></a></p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="weac.analysis.CriteriaEvaluator.find_crack_length_for_weight">
+<span class="sig-name descname"><span class="pre">find_crack_length_for_weight</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">system</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">skier_weight</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/weac/analysis/criteria_evaluator.html#CriteriaEvaluator.find_crack_length_for_weight"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#weac.analysis.CriteriaEvaluator.find_crack_length_for_weight" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#weac.analysis.CriteriaEvaluator.find_crack_length_for_weight'">¶</a></dt>
+<dd><p>Finds the resulting anticrack length and updated segment configurations
+for a given skier weight.</p>
+<section id="id4">
+<h3>Parameters:<a class="headerlink" href="#id4" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id4'">¶</a></h3>
+<dl class="simple">
+<dt>system: SystemModel</dt><dd><p>The system model.</p>
+</dd>
+<dt>skier_weight: float</dt><dd><p>The weight of the skier [kg]</p>
+</dd>
+</dl>
+<dl class="field-list simple">
+<dt class="field-odd">returns<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>new_crack_length</strong> (<em>float</em>) – The total length of the new cracked segments [mm]</p></li>
+<li><p><strong>new_segments</strong> (<em>List[Segment]</em>) – The updated list of segments</p></li>
+</ul>
+</dd>
+</dl>
+</section>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>system</strong> (<a class="reference internal" href="weac.core.system_model.html#weac.core.system_model.SystemModel" title="weac.core.system_model.SystemModel"><em>SystemModel</em></a>)</p></li>
+<li><p><strong>skier_weight</strong> (<em>float</em>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>tuple[float, <em>List</em>[<a class="reference internal" href="weac.components.segment.html#weac.components.segment.Segment" title="weac.components.segment.Segment"><em>Segment</em></a>]]</p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="weac.analysis.CriteriaEvaluator.find_minimum_crack_length">
+<span class="sig-name descname"><span class="pre">find_minimum_crack_length</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">system</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">search_interval</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">target</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/weac/analysis/criteria_evaluator.html#CriteriaEvaluator.find_minimum_crack_length"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#weac.analysis.CriteriaEvaluator.find_minimum_crack_length" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#weac.analysis.CriteriaEvaluator.find_minimum_crack_length'">¶</a></dt>
+<dd><p>Finds the minimum crack length required to surpass the energy release rate envelope.</p>
+<section id="id5">
+<h3>Parameters:<a class="headerlink" href="#id5" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id5'">¶</a></h3>
+<dl class="simple">
+<dt>system: SystemModel</dt><dd><p>The system model.</p>
+</dd>
+</dl>
+</section>
+<section id="returns">
+<h3>Returns:<a class="headerlink" href="#returns" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#returns'">¶</a></h3>
+<dl class="simple">
+<dt>minimum_crack_length: float</dt><dd><p>The minimum crack length required to surpass the energy release rate envelope [mm]</p>
+</dd>
+<dt>new_segments: List[Segment]</dt><dd><p>The updated list of segments</p>
+</dd>
+</dl>
+</section>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>system</strong> (<a class="reference internal" href="weac.core.system_model.html#weac.core.system_model.SystemModel" title="weac.core.system_model.SystemModel"><em>SystemModel</em></a>)</p></li>
+<li><p><strong>search_interval</strong> (<em>tuple</em><em>[</em><em>float</em><em>, </em><em>float</em><em>] </em><em>| </em><em>None</em>)</p></li>
+<li><p><strong>target</strong> (<em>float</em>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>tuple[float, <em>List</em>[<a class="reference internal" href="weac.components.segment.html#weac.components.segment.Segment" title="weac.components.segment.Segment"><em>Segment</em></a>]]</p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="weac.analysis.CriteriaEvaluator.find_minimum_force">
+<span class="sig-name descname"><span class="pre">find_minimum_force</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">system</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tolerance_stress</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0005</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">print_call_stats</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/weac/analysis/criteria_evaluator.html#CriteriaEvaluator.find_minimum_force"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#weac.analysis.CriteriaEvaluator.find_minimum_force" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#weac.analysis.CriteriaEvaluator.find_minimum_force'">¶</a></dt>
+<dd><p>Finds the minimum skier weight required to surpass the stress failure envelope.</p>
+<p>This method iteratively adjusts the skier weight until the maximum distance
+to the stress envelope converges to 1, indicating the critical state.</p>
+<section id="id6">
+<h3>Parameters:<a class="headerlink" href="#id6" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id6'">¶</a></h3>
+<dl class="simple">
+<dt>system: SystemModel</dt><dd><p>The system model.</p>
+</dd>
+<dt>tolerance_stress: float, optional</dt><dd><p>Tolerance for the stress envelope. Defaults to 0.005.</p>
+</dd>
+<dt>print_call_stats: bool, optional</dt><dd><p>Whether to print the call statistics. Defaults to False.</p>
+</dd>
+</dl>
+</section>
+<section id="id7">
+<h3>Returns:<a class="headerlink" href="#id7" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id7'">¶</a></h3>
+<dl class="simple">
+<dt>results: FindMinimumForceResult</dt><dd><p>An object containing the results of the analysis, including
+critical skier weight, and convergence details.</p>
+</dd>
+</dl>
+</section>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>system</strong> (<a class="reference internal" href="weac.core.system_model.html#weac.core.system_model.SystemModel" title="weac.core.system_model.SystemModel"><em>SystemModel</em></a>)</p></li>
+<li><p><strong>tolerance_stress</strong> (<em>float</em>)</p></li>
+<li><p><strong>print_call_stats</strong> (<em>bool</em>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference internal" href="weac.analysis.criteria_evaluator.html#weac.analysis.criteria_evaluator.FindMinimumForceResult" title="weac.analysis.criteria_evaluator.FindMinimumForceResult"><em>FindMinimumForceResult</em></a></p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="weac.analysis.CriteriaEvaluator.fracture_toughness_envelope">
+<span class="sig-name descname"><span class="pre">fracture_toughness_envelope</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">G_I</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">G_II</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">weak_layer</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/weac/analysis/criteria_evaluator.html#CriteriaEvaluator.fracture_toughness_envelope"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#weac.analysis.CriteriaEvaluator.fracture_toughness_envelope" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#weac.analysis.CriteriaEvaluator.fracture_toughness_envelope'">¶</a></dt>
+<dd><p>Evaluates the fracture toughness criterion for a given combination of
+Mode I (G_I) and Mode II (G_II) energy release rates.</p>
+<dl class="simple">
+<dt>The criterion is defined as:</dt><dd><p>g_delta = (<a href="#id12"><span class="problematic" id="id13">|G_I|</span></a> / G_Ic)^gn + (<a href="#id14"><span class="problematic" id="id15">|G_II|</span></a> / G_IIc)^gm</p>
+</dd>
+</dl>
+<p>A value of 1 indicates the boundary of the fracture toughness envelope is reached.</p>
+<section id="id8">
+<h3>Parameters:<a class="headerlink" href="#id8" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id8'">¶</a></h3>
+<dl class="simple">
+<dt>G_I<span class="classifier">float</span></dt><dd><p>Mode I energy release rate (ERR) in J/m².</p>
+</dd>
+<dt>G_II<span class="classifier">float</span></dt><dd><p>Mode II energy release rate (ERR) in J/m².</p>
+</dd>
+<dt>weak_layer<span class="classifier">WeakLayer</span></dt><dd><p>The weak layer object containing G_Ic and G_IIc.</p>
+</dd>
+</dl>
+</section>
+<section id="id9">
+<h3>Returns:<a class="headerlink" href="#id9" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id9'">¶</a></h3>
+<dl class="simple">
+<dt>g_delta<span class="classifier">float</span></dt><dd><p>Evaluation of the fracture toughness envelope.</p>
+</dd>
+</dl>
+</section>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>G_I</strong> (<em>float</em><em> | </em><em>ndarray</em>)</p></li>
+<li><p><strong>G_II</strong> (<em>float</em><em> | </em><em>ndarray</em>)</p></li>
+<li><p><strong>weak_layer</strong> (<a class="reference internal" href="weac.components.layer.html#weac.components.layer.WeakLayer" title="weac.components.layer.WeakLayer"><em>WeakLayer</em></a>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>float | <em>ndarray</em></p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="weac.analysis.CriteriaEvaluator.stress_envelope">
+<span class="sig-name descname"><span class="pre">stress_envelope</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sigma</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tau</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">weak_layer</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">method</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/weac/analysis/criteria_evaluator.html#CriteriaEvaluator.stress_envelope"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#weac.analysis.CriteriaEvaluator.stress_envelope" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#weac.analysis.CriteriaEvaluator.stress_envelope'">¶</a></dt>
+<dd><p>Evaluate the stress envelope for given stress components.
+Weak Layer failure is defined as the stress envelope crossing 1.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>sigma</strong> (<em>ndarray</em>) – Normal stress components (kPa).</p></li>
+<li><p><strong>tau</strong> (<em>ndarray</em>) – Shear stress components (kPa).</p></li>
+<li><p><strong>weak_layer</strong> (<a class="reference internal" href="weac.components.html#weac.components.WeakLayer" title="weac.components.WeakLayer"><em>WeakLayer</em></a>) – The weak layer object, used to get density.</p></li>
+<li><p><strong>method</strong> (<em>str</em><em>, </em><em>optional</em>) – Method to use for the stress envelope. Defaults to None.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>stress_envelope</strong> – Stress envelope evaluation values in [0, inf].
+Values &gt; 1 indicate failure.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>ndarray</p>
+</dd>
+</dl>
+<p class="rubric">Notes</p>
+<ul class="simple">
+<li><dl class="simple">
+<dt>Mede’s envelopes (‘mede_s-RG1’, ‘mede_s-RG2’, ‘mede_s-FCDH’) are derived</dt><dd><p>from the work of Mede et al. (2018), “Snow Failure Modes Under Mixed
+Loading,” published in Geophysical Research Letters.</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>Schöttner’s envelope (‘schottner’) is based on the preprint by Schöttner</dt><dd><p>et al. (2025), “On the Compressive Strength of Weak Snow Layers of
+Depth Hoar”.</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>The ‘adam_unpublished’ envelope scales with weak layer density linearly</dt><dd><p>(compared to density baseline) by a ‘scaling_factor’
+(weak layer density / density baseline), unless modified by
+‘order_of_magnitude’.</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>Mede’s criteria (‘mede_s-RG1’, ‘mede_s-RG2’, ‘mede_s-FCDH’) define</dt><dd><p>failure based on a piecewise function of stress ranges.</p>
+</dd>
+</dl>
+</li>
+</ul>
+</dd></dl>
+</dd></dl>
+<dl class="py class">
+<dt class="sig sig-object py" id="weac.analysis.FindMinimumForceResult">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">weac.analysis.</span></span><span class="sig-name descname"><span class="pre">FindMinimumForceResult</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">success</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">critical_skier_weight</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">new_segments</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">old_segments</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">iterations</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_dist_stress</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">min_dist_stress</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/weac/analysis/criteria_evaluator.html#FindMinimumForceResult"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#weac.analysis.FindMinimumForceResult" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#weac.analysis.FindMinimumForceResult'">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Holds the results of the find_minimum_force evaluation.</p>
+<section id="id10">
+<h3>Attributes:<a class="headerlink" href="#id10" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id10'">¶</a></h3>
+<dl class="simple">
+<dt>success<span class="classifier">bool</span></dt><dd><p>Whether the algorithm converged.</p>
+</dd>
+<dt>critical_skier_weight<span class="classifier">float</span></dt><dd><p>The critical skier weight.</p>
+</dd>
+<dt>new_segments<span class="classifier">List[Segment]</span></dt><dd><p>The new segments.</p>
+</dd>
+<dt>old_segments<span class="classifier">List[Segment]</span></dt><dd><p>The old segments.</p>
+</dd>
+<dt>iterations<span class="classifier">int</span></dt><dd><p>The number of iterations.</p>
+</dd>
+<dt>max_dist_stress<span class="classifier">float</span></dt><dd><p>The maximum distance to failure.</p>
+</dd>
+<dt>min_dist_stress<span class="classifier">float</span></dt><dd><p>The minimum distance to failure.</p>
+</dd>
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="weac.analysis.FindMinimumForceResult.critical_skier_weight">
+<span class="sig-name descname"><span class="pre">critical_skier_weight</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><a class="headerlink" href="#weac.analysis.FindMinimumForceResult.critical_skier_weight" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#weac.analysis.FindMinimumForceResult.critical_skier_weight'">¶</a></dt>
+<dd></dd></dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="weac.analysis.FindMinimumForceResult.iterations">
+<span class="sig-name descname"><span class="pre">iterations</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#weac.analysis.FindMinimumForceResult.iterations" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#weac.analysis.FindMinimumForceResult.iterations'">¶</a></dt>
+<dd></dd></dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="weac.analysis.FindMinimumForceResult.max_dist_stress">
+<span class="sig-name descname"><span class="pre">max_dist_stress</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><a class="headerlink" href="#weac.analysis.FindMinimumForceResult.max_dist_stress" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#weac.analysis.FindMinimumForceResult.max_dist_stress'">¶</a></dt>
+<dd></dd></dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="weac.analysis.FindMinimumForceResult.min_dist_stress">
+<span class="sig-name descname"><span class="pre">min_dist_stress</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><a class="headerlink" href="#weac.analysis.FindMinimumForceResult.min_dist_stress" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#weac.analysis.FindMinimumForceResult.min_dist_stress'">¶</a></dt>
+<dd></dd></dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="weac.analysis.FindMinimumForceResult.new_segments">
+<span class="sig-name descname"><span class="pre">new_segments</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="weac.components.segment.html#weac.components.segment.Segment" title="weac.components.segment.Segment"><span class="pre">Segment</span></a><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#weac.analysis.FindMinimumForceResult.new_segments" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#weac.analysis.FindMinimumForceResult.new_segments'">¶</a></dt>
+<dd></dd></dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="weac.analysis.FindMinimumForceResult.old_segments">
+<span class="sig-name descname"><span class="pre">old_segments</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="weac.components.segment.html#weac.components.segment.Segment" title="weac.components.segment.Segment"><span class="pre">Segment</span></a><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#weac.analysis.FindMinimumForceResult.old_segments" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#weac.analysis.FindMinimumForceResult.old_segments'">¶</a></dt>
+<dd></dd></dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="weac.analysis.FindMinimumForceResult.success">
+<span class="sig-name descname"><span class="pre">success</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></em><a class="headerlink" href="#weac.analysis.FindMinimumForceResult.success" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#weac.analysis.FindMinimumForceResult.success'">¶</a></dt>
+<dd></dd></dl>
+</section>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>success</strong> (<em>bool</em>)</p></li>
+<li><p><strong>critical_skier_weight</strong> (<em>float</em>)</p></li>
+<li><p><strong>new_segments</strong> (<em>List</em><em>[</em><a class="reference internal" href="weac.components.segment.html#weac.components.segment.Segment" title="weac.components.segment.Segment"><em>Segment</em></a><em>]</em>)</p></li>
+<li><p><strong>old_segments</strong> (<em>List</em><em>[</em><a class="reference internal" href="weac.components.segment.html#weac.components.segment.Segment" title="weac.components.segment.Segment"><em>Segment</em></a><em>]</em>)</p></li>
+<li><p><strong>iterations</strong> (<em>int</em><em> | </em><em>None</em>)</p></li>
+<li><p><strong>max_dist_stress</strong> (<em>float</em>)</p></li>
+<li><p><strong>min_dist_stress</strong> (<em>float</em>)</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+<dl class="py class">
+<dt class="sig sig-object py" id="weac.analysis.Plotter">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">weac.analysis.</span></span><span class="sig-name descname"><span class="pre">Plotter</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">plot_dir</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'plots'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/weac/analysis/plotter.html#Plotter"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#weac.analysis.Plotter" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#weac.analysis.Plotter'">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Modern plotting class for WEAC simulations with support for multiple system comparisons.</p>
+<p>This class provides comprehensive visualization capabilities for weak layer anticrack
+nucleation simulations, including single system analysis and multi-system comparisons.</p>
+<p>Features:
+- Single and multi-system plotting
+- System override functionality for selective plotting
+- Comprehensive dashboard creation
+- Modern matplotlib styling
+- Jupyter notebook integration
+- Automatic plot directory management</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>plot_dir</strong> (<em>str</em>)</p>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="weac.analysis.Plotter.plot_ERR_comp">
+<span class="sig-name descname"><span class="pre">plot_ERR_comp</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">analyzer</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">da</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Gdif</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Ginc</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mode</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/weac/analysis/plotter.html#Plotter.plot_ERR_comp"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#weac.analysis.Plotter.plot_ERR_comp" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#weac.analysis.Plotter.plot_ERR_comp'">¶</a></dt>
+<dd><p>Wrap energy release rate plot.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>analyzer</strong> (<a class="reference internal" href="weac.analysis.analyzer.html#weac.analysis.analyzer.Analyzer" title="weac.analysis.analyzer.Analyzer"><em>Analyzer</em></a>)</p></li>
+<li><p><strong>da</strong> (<em>ndarray</em>)</p></li>
+<li><p><strong>Gdif</strong> (<em>ndarray</em>)</p></li>
+<li><p><strong>Ginc</strong> (<em>ndarray</em>)</p></li>
+<li><p><strong>mode</strong> (<em>int</em>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><em>Figure</em></p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="weac.analysis.Plotter.plot_ERR_modes">
+<span class="sig-name descname"><span class="pre">plot_ERR_modes</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">analyzer</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">da</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">G</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">kind</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'inc'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/weac/analysis/plotter.html#Plotter.plot_ERR_modes"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#weac.analysis.Plotter.plot_ERR_modes" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#weac.analysis.Plotter.plot_ERR_modes'">¶</a></dt>
+<dd><p>Wrap energy release rate plot.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>analyzer</strong> (<a class="reference internal" href="weac.analysis.analyzer.html#weac.analysis.analyzer.Analyzer" title="weac.analysis.analyzer.Analyzer"><em>Analyzer</em></a>)</p></li>
+<li><p><strong>da</strong> (<em>ndarray</em>)</p></li>
+<li><p><strong>G</strong> (<em>ndarray</em>)</p></li>
+<li><p><strong>kind</strong> (<em>str</em>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><em>Figure</em></p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="weac.analysis.Plotter.plot_analysis">
+<span class="sig-name descname"><span class="pre">plot_analysis</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">system</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">criteria_evaluator</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">min_force_result</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">min_crack_length</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">coupled_criterion_result</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dz</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">deformation_scale</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">100.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">window</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">np.inf</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">levels</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">300</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filename</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'analysis'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/weac/analysis/plotter.html#Plotter.plot_analysis"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#weac.analysis.Plotter.plot_analysis" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#weac.analysis.Plotter.plot_analysis'">¶</a></dt>
+<dd><p>Plot deformed slab with field contours.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>field</strong> (<em>str</em><em>, </em><em>default 'w'</em>) – Field to plot (‘w’, ‘u’, ‘principal’, ‘sigma’, ‘tau’)</p></li>
+<li><p><strong>system_model</strong> (<a class="reference internal" href="weac.core.html#weac.core.SystemModel" title="weac.core.SystemModel"><em>SystemModel</em></a><em>, </em><em>optional</em>) – System to plot (uses first system if not specified)</p></li>
+<li><p><strong>filename</strong> (<em>str</em><em>, </em><em>optional</em>) – Filename for saving plot</p></li>
+<li><p><strong>system</strong> (<a class="reference internal" href="weac.core.system_model.html#weac.core.system_model.SystemModel" title="weac.core.system_model.SystemModel"><em>SystemModel</em></a>)</p></li>
+<li><p><strong>criteria_evaluator</strong> (<a class="reference internal" href="weac.analysis.criteria_evaluator.html#weac.analysis.criteria_evaluator.CriteriaEvaluator" title="weac.analysis.criteria_evaluator.CriteriaEvaluator"><em>CriteriaEvaluator</em></a>)</p></li>
+<li><p><strong>min_force_result</strong> (<a class="reference internal" href="weac.analysis.criteria_evaluator.html#weac.analysis.criteria_evaluator.FindMinimumForceResult" title="weac.analysis.criteria_evaluator.FindMinimumForceResult"><em>FindMinimumForceResult</em></a>)</p></li>
+<li><p><strong>min_crack_length</strong> (<em>float</em>)</p></li>
+<li><p><strong>coupled_criterion_result</strong> (<a class="reference internal" href="weac.analysis.criteria_evaluator.html#weac.analysis.criteria_evaluator.CoupledCriterionResult" title="weac.analysis.criteria_evaluator.CoupledCriterionResult"><em>CoupledCriterionResult</em></a>)</p></li>
+<li><p><strong>dz</strong> (<em>int</em>)</p></li>
+<li><p><strong>deformation_scale</strong> (<em>float</em>)</p></li>
+<li><p><strong>window</strong> (<em>int</em>)</p></li>
+<li><p><strong>levels</strong> (<em>int</em>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><em>Figure</em></p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="weac.analysis.Plotter.plot_deformed">
+<span class="sig-name descname"><span class="pre">plot_deformed</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">xsl</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">xwl</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">z</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">analyzer</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dz</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scale</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">100</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">window</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">np.inf</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pad</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">levels</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">300</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">aspect</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">field</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'w'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">normalize</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filename</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'deformed_slab'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/weac/analysis/plotter.html#Plotter.plot_deformed"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#weac.analysis.Plotter.plot_deformed" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#weac.analysis.Plotter.plot_deformed'">¶</a></dt>
+<dd><p>Plot deformed slab with field contours.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>xsl</strong> (<em>np.ndarray</em>) – Slab x-coordinates.</p></li>
+<li><p><strong>xwl</strong> (<em>np.ndarray</em>) – Weak layer x-coordinates.</p></li>
+<li><p><strong>z</strong> (<em>np.ndarray</em>) – Solution vector.</p></li>
+<li><p><strong>analyzer</strong> (<a class="reference internal" href="#weac.analysis.Analyzer" title="weac.analysis.Analyzer"><em>Analyzer</em></a>) – Analyzer instance.</p></li>
+<li><p><strong>dz</strong> (<em>int</em><em>, </em><em>optional</em>) – Element size along z-axis (mm). Default is 2 mm.</p></li>
+<li><p><strong>scale</strong> (<em>int</em><em>, </em><em>optional</em>) – Deformation scale factor. Default is 100.</p></li>
+<li><p><strong>window</strong> (<em>float</em><em>, </em><em>optional</em>) – Plot window width. Default is inf.</p></li>
+<li><p><strong>pad</strong> (<em>int</em><em>, </em><em>optional</em>) – Padding around plot. Default is 2.</p></li>
+<li><p><strong>levels</strong> (<em>int</em><em>, </em><em>optional</em>) – Number of contour levels. Default is 300.</p></li>
+<li><p><strong>aspect</strong> (<em>int</em><em>, </em><em>optional</em>) – Aspect ratio. Default is 2.</p></li>
+<li><p><strong>field</strong> (<em>str</em><em>, </em><em>optional</em>) – Field to plot (‘w’, ‘u’, ‘principal’, ‘Sxx’, ‘Txz’, ‘Szz’). Default is ‘w’.</p></li>
+<li><p><strong>normalize</strong> (<em>bool</em><em>, </em><em>optional</em>) – Toggle normalization. Default is True.</p></li>
+<li><p><strong>filename</strong> (<em>str</em><em>, </em><em>optional</em>) – Filename for saving plot. Default is “deformed_slab”.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The generated plot figure.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>matplotlib.figure.Figure</p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="weac.analysis.Plotter.plot_displacements">
+<span class="sig-name descname"><span class="pre">plot_displacements</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">analyzer</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">z</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filename</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'displacements'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/weac/analysis/plotter.html#Plotter.plot_displacements"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#weac.analysis.Plotter.plot_displacements" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#weac.analysis.Plotter.plot_displacements'">¶</a></dt>
+<dd><p>Wrap for displacements plot.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>analyzer</strong> (<a class="reference internal" href="weac.analysis.analyzer.html#weac.analysis.analyzer.Analyzer" title="weac.analysis.analyzer.Analyzer"><em>Analyzer</em></a>)</p></li>
+<li><p><strong>x</strong> (<em>ndarray</em>)</p></li>
+<li><p><strong>z</strong> (<em>ndarray</em>)</p></li>
+<li><p><strong>filename</strong> (<em>str</em>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><em>Figure</em></p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="weac.analysis.Plotter.plot_energy_release_rates">
+<span class="sig-name descname"><span class="pre">plot_energy_release_rates</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">system_model</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">system_models</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filename</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'ERR'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">labels</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">colors</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/weac/analysis/plotter.html#Plotter.plot_energy_release_rates"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#weac.analysis.Plotter.plot_energy_release_rates" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#weac.analysis.Plotter.plot_energy_release_rates'">¶</a></dt>
+<dd><p>Plot energy release rates (G_I, G_II) for comparison.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>system_model</strong> (<a class="reference internal" href="weac.core.html#weac.core.SystemModel" title="weac.core.SystemModel"><em>SystemModel</em></a><em>, </em><em>optional</em>) – Single system to plot (overrides default)</p></li>
+<li><p><strong>system_models</strong> (<em>List</em><em>[</em><a class="reference internal" href="weac.core.html#weac.core.SystemModel" title="weac.core.SystemModel"><em>SystemModel</em></a><em>]</em><em>, </em><em>optional</em>) – Multiple systems to plot (overrides default)</p></li>
+<li><p><strong>filename</strong> (<em>str</em><em>, </em><em>optional</em>) – Filename for saving plot</p></li>
+<li><p><strong>labels</strong> (<em>list</em><em> of </em><em>str</em><em>, </em><em>optional</em>) – Labels for each system.</p></li>
+<li><p><strong>colors</strong> (<em>list</em><em> of </em><em>str</em><em>, </em><em>optional</em>) – Colors for each system.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="weac.analysis.Plotter.plot_err_envelope">
+<span class="sig-name descname"><span class="pre">plot_err_envelope</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">system_model</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">criteria_evaluator</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filename</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'err_envelope'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/weac/analysis/plotter.html#Plotter.plot_err_envelope"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#weac.analysis.Plotter.plot_err_envelope" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#weac.analysis.Plotter.plot_err_envelope'">¶</a></dt>
+<dd><p>Plot the ERR envelope.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>system_model</strong> (<a class="reference internal" href="weac.core.system_model.html#weac.core.system_model.SystemModel" title="weac.core.system_model.SystemModel"><em>SystemModel</em></a>)</p></li>
+<li><p><strong>criteria_evaluator</strong> (<a class="reference internal" href="weac.analysis.criteria_evaluator.html#weac.analysis.criteria_evaluator.CriteriaEvaluator" title="weac.analysis.criteria_evaluator.CriteriaEvaluator"><em>CriteriaEvaluator</em></a>)</p></li>
+<li><p><strong>filename</strong> (<em>str</em>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><em>Figure</em></p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="weac.analysis.Plotter.plot_fea_disp">
+<span class="sig-name descname"><span class="pre">plot_fea_disp</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">analyzer</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">z</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fea</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/weac/analysis/plotter.html#Plotter.plot_fea_disp"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#weac.analysis.Plotter.plot_fea_disp" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#weac.analysis.Plotter.plot_fea_disp'">¶</a></dt>
+<dd><p>Wrap displacements plot.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>analyzer</strong> (<a class="reference internal" href="weac.analysis.analyzer.html#weac.analysis.analyzer.Analyzer" title="weac.analysis.analyzer.Analyzer"><em>Analyzer</em></a>)</p></li>
+<li><p><strong>x</strong> (<em>ndarray</em>)</p></li>
+<li><p><strong>z</strong> (<em>ndarray</em>)</p></li>
+<li><p><strong>fea</strong> (<em>ndarray</em>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><em>Figure</em></p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="weac.analysis.Plotter.plot_fea_stress">
+<span class="sig-name descname"><span class="pre">plot_fea_stress</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">analyzer</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">xb</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">zb</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fea</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/weac/analysis/plotter.html#Plotter.plot_fea_stress"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#weac.analysis.Plotter.plot_fea_stress" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#weac.analysis.Plotter.plot_fea_stress'">¶</a></dt>
+<dd><p>Wrap stress plot.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>analyzer</strong> (<a class="reference internal" href="weac.analysis.analyzer.html#weac.analysis.analyzer.Analyzer" title="weac.analysis.analyzer.Analyzer"><em>Analyzer</em></a>)</p></li>
+<li><p><strong>xb</strong> (<em>ndarray</em>)</p></li>
+<li><p><strong>zb</strong> (<em>ndarray</em>)</p></li>
+<li><p><strong>fea</strong> (<em>ndarray</em>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><em>Figure</em></p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="weac.analysis.Plotter.plot_rotated_slab_profile">
+<span class="sig-name descname"><span class="pre">plot_rotated_slab_profile</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">weak_layer</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">slab</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">angle</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">weight</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">slab_width</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">200</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filename</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'rotated_slab_profile'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">title</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'Rotated</span> <span class="pre">Slab</span> <span class="pre">Profile'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/weac/analysis/plotter.html#Plotter.plot_rotated_slab_profile"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#weac.analysis.Plotter.plot_rotated_slab_profile" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#weac.analysis.Plotter.plot_rotated_slab_profile'">¶</a></dt>
+<dd><p>Plot a rectangular slab profile with layers stacked vertically, colored by density,
+and rotated by the specified angle.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>weak_layer</strong> (<a class="reference internal" href="weac.components.html#weac.components.WeakLayer" title="weac.components.WeakLayer"><em>WeakLayer</em></a>) – The weak layer to plot at the bottom.</p></li>
+<li><p><strong>slab</strong> (<a class="reference internal" href="weac.core.html#weac.core.Slab" title="weac.core.Slab"><em>Slab</em></a>) – The slab with layers to plot.</p></li>
+<li><p><strong>angle</strong> (<em>float</em><em>, </em><em>optional</em>) – Rotation angle in degrees. Default is 0.</p></li>
+<li><p><strong>slab_width</strong> (<em>float</em><em>, </em><em>optional</em>) – Width of the slab rectangle in mm. Default is 200.</p></li>
+<li><p><strong>filename</strong> (<em>str</em><em>, </em><em>optional</em>) – Filename for saving plot. Default is “rotated_slab_profile”.</p></li>
+<li><p><strong>title</strong> (<em>str</em><em>, </em><em>optional</em>) – Plot title. Default is “Rotated Slab Profile”.</p></li>
+<li><p><strong>weight</strong> (<em>float</em>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The generated plot figure.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>matplotlib.figure.Figure</p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="weac.analysis.Plotter.plot_section_forces">
+<span class="sig-name descname"><span class="pre">plot_section_forces</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">system_model</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">system_models</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filename</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'section_forces'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">labels</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">colors</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/weac/analysis/plotter.html#Plotter.plot_section_forces"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#weac.analysis.Plotter.plot_section_forces" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#weac.analysis.Plotter.plot_section_forces'">¶</a></dt>
+<dd><p>Plot section forces (N, M, V) for comparison.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>system_model</strong> (<a class="reference internal" href="weac.core.html#weac.core.SystemModel" title="weac.core.SystemModel"><em>SystemModel</em></a><em>, </em><em>optional</em>) – Single system to plot (overrides default)</p></li>
+<li><p><strong>system_models</strong> (<em>List</em><em>[</em><a class="reference internal" href="weac.core.html#weac.core.SystemModel" title="weac.core.SystemModel"><em>SystemModel</em></a><em>]</em><em>, </em><em>optional</em>) – Multiple systems to plot (overrides default)</p></li>
+<li><p><strong>filename</strong> (<em>str</em><em>, </em><em>optional</em>) – Filename for saving plot</p></li>
+<li><p><strong>labels</strong> (<em>list</em><em> of </em><em>str</em><em>, </em><em>optional</em>) – Labels for each system.</p></li>
+<li><p><strong>colors</strong> (<em>list</em><em> of </em><em>str</em><em>, </em><em>optional</em>) – Colors for each system.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="weac.analysis.Plotter.plot_slab_profile">
+<span class="sig-name descname"><span class="pre">plot_slab_profile</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">weak_layers</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">slabs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filename</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'slab_profile'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">labels</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">colors</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/weac/analysis/plotter.html#Plotter.plot_slab_profile"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#weac.analysis.Plotter.plot_slab_profile" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#weac.analysis.Plotter.plot_slab_profile'">¶</a></dt>
+<dd><p>Plot slab layer profiles for comparison.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>weak_layers</strong> (<em>List</em><em>[</em><a class="reference internal" href="weac.components.html#weac.components.WeakLayer" title="weac.components.WeakLayer"><em>WeakLayer</em></a><em>] </em><em>| </em><a class="reference internal" href="weac.components.html#weac.components.WeakLayer" title="weac.components.WeakLayer"><em>WeakLayer</em></a>) – The weak layer or layers to plot.</p></li>
+<li><p><strong>slabs</strong> (<em>List</em><em>[</em><a class="reference internal" href="weac.core.html#weac.core.Slab" title="weac.core.Slab"><em>Slab</em></a><em>] </em><em>| </em><a class="reference internal" href="weac.core.html#weac.core.Slab" title="weac.core.Slab"><em>Slab</em></a>) – The slab or slabs to plot.</p></li>
+<li><p><strong>filename</strong> (<em>str</em><em>, </em><em>optional</em>) – Filename for saving plot</p></li>
+<li><p><strong>labels</strong> (<em>list</em><em> of </em><em>str</em><em>, </em><em>optional</em>) – Labels for each system.</p></li>
+<li><p><strong>colors</strong> (<em>list</em><em> of </em><em>str</em><em>, </em><em>optional</em>) – Colors for each system.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The generated plot figure.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>matplotlib.figure.Figure</p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="weac.analysis.Plotter.plot_stress_criteria">
+<span class="sig-name descname"><span class="pre">plot_stress_criteria</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">analyzer</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stress</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/weac/analysis/plotter.html#Plotter.plot_stress_criteria"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#weac.analysis.Plotter.plot_stress_criteria" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#weac.analysis.Plotter.plot_stress_criteria'">¶</a></dt>
+<dd><p>Wrap plot of stress and energy criteria.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>analyzer</strong> (<a class="reference internal" href="weac.analysis.analyzer.html#weac.analysis.analyzer.Analyzer" title="weac.analysis.analyzer.Analyzer"><em>Analyzer</em></a>)</p></li>
+<li><p><strong>x</strong> (<em>ndarray</em>)</p></li>
+<li><p><strong>stress</strong> (<em>ndarray</em>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><em>Figure</em></p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="weac.analysis.Plotter.plot_stress_envelope">
+<span class="sig-name descname"><span class="pre">plot_stress_envelope</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">system_model</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">criteria_evaluator</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">all_envelopes</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filename</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/weac/analysis/plotter.html#Plotter.plot_stress_envelope"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#weac.analysis.Plotter.plot_stress_envelope" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#weac.analysis.Plotter.plot_stress_envelope'">¶</a></dt>
+<dd><p>Plot stress envelope in τ-σ space.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>system_model</strong> (<a class="reference internal" href="weac.core.html#weac.core.SystemModel" title="weac.core.SystemModel"><em>SystemModel</em></a>) – System to plot</p></li>
+<li><p><strong>criteria_evaluator</strong> (<a class="reference internal" href="#weac.analysis.CriteriaEvaluator" title="weac.analysis.CriteriaEvaluator"><em>CriteriaEvaluator</em></a>) – Criteria evaluator to use for the stress envelope</p></li>
+<li><p><strong>all_envelopes</strong> (<em>bool</em><em>, </em><em>optional</em>) – Whether to plot all four quadrants of the envelope</p></li>
+<li><p><strong>filename</strong> (<em>str</em><em>, </em><em>optional</em>) – Filename for saving plot</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="weac.analysis.Plotter.plot_stresses">
+<span class="sig-name descname"><span class="pre">plot_stresses</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">analyzer</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">z</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filename</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'stresses'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/weac/analysis/plotter.html#Plotter.plot_stresses"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#weac.analysis.Plotter.plot_stresses" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#weac.analysis.Plotter.plot_stresses'">¶</a></dt>
+<dd><p>Wrap stress plot.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>analyzer</strong> (<a class="reference internal" href="weac.analysis.analyzer.html#weac.analysis.analyzer.Analyzer" title="weac.analysis.analyzer.Analyzer"><em>Analyzer</em></a>)</p></li>
+<li><p><strong>x</strong> (<em>ndarray</em>)</p></li>
+<li><p><strong>z</strong> (<em>ndarray</em>)</p></li>
+<li><p><strong>filename</strong> (<em>str</em>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><em>Figure</em></p>
+</dd>
+</dl>
+</dd></dl>
+</dd></dl>
+<dl class="py class">
+<dt class="sig sig-object py" id="weac.analysis.SSERRResult">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">weac.analysis.</span></span><span class="sig-name descname"><span class="pre">SSERRResult</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">converged</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">message</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">touchdown_distance</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">SSERR</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/weac/analysis/criteria_evaluator.html#SSERRResult"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#weac.analysis.SSERRResult" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#weac.analysis.SSERRResult'">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Holds the results of the SSERR evaluation.</p>
+<section id="id11">
+<h3>Attributes:<a class="headerlink" href="#id11" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id11'">¶</a></h3>
+<dl class="simple">
+<dt>converged<span class="classifier">bool</span></dt><dd><p>Whether the algorithm converged.</p>
+</dd>
+<dt>message<span class="classifier">str</span></dt><dd><p>The message of the evaluation.</p>
+</dd>
+<dt>touchdown_distance<span class="classifier">float</span></dt><dd><p>The touchdown distance.</p>
+</dd>
+<dt>SSERR<span class="classifier">float</span></dt><dd><p>The Steady-State Energy Release Rate calculated with the
+touchdown distance from G_I and G_II.</p>
+</dd>
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="weac.analysis.SSERRResult.SSERR">
+<span class="sig-name descname"><span class="pre">SSERR</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><a class="headerlink" href="#weac.analysis.SSERRResult.SSERR" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#weac.analysis.SSERRResult.SSERR'">¶</a></dt>
+<dd></dd></dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="weac.analysis.SSERRResult.converged">
+<span class="sig-name descname"><span class="pre">converged</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></em><a class="headerlink" href="#weac.analysis.SSERRResult.converged" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#weac.analysis.SSERRResult.converged'">¶</a></dt>
+<dd></dd></dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="weac.analysis.SSERRResult.message">
+<span class="sig-name descname"><span class="pre">message</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#weac.analysis.SSERRResult.message" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#weac.analysis.SSERRResult.message'">¶</a></dt>
+<dd></dd></dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="weac.analysis.SSERRResult.touchdown_distance">
+<span class="sig-name descname"><span class="pre">touchdown_distance</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><a class="headerlink" href="#weac.analysis.SSERRResult.touchdown_distance" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#weac.analysis.SSERRResult.touchdown_distance'">¶</a></dt>
+<dd></dd></dl>
+</section>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>converged</strong> (<em>bool</em>)</p></li>
+<li><p><strong>message</strong> (<em>str</em>)</p></li>
+<li><p><strong>touchdown_distance</strong> (<em>float</em>)</p></li>
+<li><p><strong>SSERR</strong> (<em>float</em>)</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+</section>
+</section>
+</div></div><aside class="hidden text-sm xl:block" id="right-sidebar">
+<div class="sticky top-16 -mt-10 max-h-[calc(100vh-5rem)] overflow-y-auto pt-6 space-y-2"><p class="font-medium">On this page</p>
+<ul>
+<li><a :data-current="activeSection === '#submodules'" class="reference internal" href="#submodules">Submodules</a></li>
+<li><a :data-current="activeSection === '#module-weac.analysis'" class="reference internal" href="#module-weac.analysis">Module contents</a><ul>
+<li><a :data-current="activeSection === '#weac.analysis.Analyzer'" class="reference internal" href="#weac.analysis.Analyzer"><code class="docutils literal notranslate"><span class="pre">Analyzer</span></code></a><ul>
+<li><a :data-current="activeSection === '#weac.analysis.Analyzer.Sxx'" class="reference internal" href="#weac.analysis.Analyzer.Sxx"><code class="docutils literal notranslate"><span class="pre">Analyzer.Sxx()</span></code></a></li>
+<li><a :data-current="activeSection === '#weac.analysis.Analyzer.Szz'" class="reference internal" href="#weac.analysis.Analyzer.Szz"><code class="docutils literal notranslate"><span class="pre">Analyzer.Szz()</span></code></a></li>
+<li><a :data-current="activeSection === '#weac.analysis.Analyzer.Txz'" class="reference internal" href="#weac.analysis.Analyzer.Txz"><code class="docutils literal notranslate"><span class="pre">Analyzer.Txz()</span></code></a></li>
+<li><a :data-current="activeSection === '#weac.analysis.Analyzer.differential_ERR'" class="reference internal" href="#weac.analysis.Analyzer.differential_ERR"><code class="docutils literal notranslate"><span class="pre">Analyzer.differential_ERR()</span></code></a></li>
+<li><a :data-current="activeSection === '#weac.analysis.Analyzer.get_call_stats'" class="reference internal" href="#weac.analysis.Analyzer.get_call_stats"><code class="docutils literal notranslate"><span class="pre">Analyzer.get_call_stats()</span></code></a></li>
+<li><a :data-current="activeSection === '#weac.analysis.Analyzer.get_zmesh'" class="reference internal" href="#weac.analysis.Analyzer.get_zmesh"><code class="docutils literal notranslate"><span class="pre">Analyzer.get_zmesh()</span></code></a></li>
+<li><a :data-current="activeSection === '#weac.analysis.Analyzer.incremental_ERR'" class="reference internal" href="#weac.analysis.Analyzer.incremental_ERR"><code class="docutils literal notranslate"><span class="pre">Analyzer.incremental_ERR()</span></code></a></li>
+<li><a :data-current="activeSection === '#weac.analysis.Analyzer.principal_stress_slab'" class="reference internal" href="#weac.analysis.Analyzer.principal_stress_slab"><code class="docutils literal notranslate"><span class="pre">Analyzer.principal_stress_slab()</span></code></a></li>
+<li><a :data-current="activeSection === '#weac.analysis.Analyzer.principal_stress_weaklayer'" class="reference internal" href="#weac.analysis.Analyzer.principal_stress_weaklayer"><code class="docutils literal notranslate"><span class="pre">Analyzer.principal_stress_weaklayer()</span></code></a></li>
+<li><a :data-current="activeSection === '#weac.analysis.Analyzer.print_call_stats'" class="reference internal" href="#weac.analysis.Analyzer.print_call_stats"><code class="docutils literal notranslate"><span class="pre">Analyzer.print_call_stats()</span></code></a></li>
+<li><a :data-current="activeSection === '#weac.analysis.Analyzer.printing_enabled'" class="reference internal" href="#weac.analysis.Analyzer.printing_enabled"><code class="docutils literal notranslate"><span class="pre">Analyzer.printing_enabled</span></code></a></li>
+<li><a :data-current="activeSection === '#weac.analysis.Analyzer.rasterize_solution'" class="reference internal" href="#weac.analysis.Analyzer.rasterize_solution"><code class="docutils literal notranslate"><span class="pre">Analyzer.rasterize_solution()</span></code></a></li>
+<li><a :data-current="activeSection === '#weac.analysis.Analyzer.sm'" class="reference internal" href="#weac.analysis.Analyzer.sm"><code class="docutils literal notranslate"><span class="pre">Analyzer.sm</span></code></a></li>
+<li><a :data-current="activeSection === '#weac.analysis.Analyzer.total_potential'" class="reference internal" href="#weac.analysis.Analyzer.total_potential"><code class="docutils literal notranslate"><span class="pre">Analyzer.total_potential()</span></code></a></li>
+</ul>
+</li>
+<li><a :data-current="activeSection === '#weac.analysis.CoupledCriterionHistory'" class="reference internal" href="#weac.analysis.CoupledCriterionHistory"><code class="docutils literal notranslate"><span class="pre">CoupledCriterionHistory</span></code></a><ul>
+<li><a :data-current="activeSection === '#weac.analysis.CoupledCriterionHistory.crack_lengths'" class="reference internal" href="#weac.analysis.CoupledCriterionHistory.crack_lengths"><code class="docutils literal notranslate"><span class="pre">CoupledCriterionHistory.crack_lengths</span></code></a></li>
+<li><a :data-current="activeSection === '#weac.analysis.CoupledCriterionHistory.dist_maxs'" class="reference internal" href="#weac.analysis.CoupledCriterionHistory.dist_maxs"><code class="docutils literal notranslate"><span class="pre">CoupledCriterionHistory.dist_maxs</span></code></a></li>
+<li><a :data-current="activeSection === '#weac.analysis.CoupledCriterionHistory.dist_mins'" class="reference internal" href="#weac.analysis.CoupledCriterionHistory.dist_mins"><code class="docutils literal notranslate"><span class="pre">CoupledCriterionHistory.dist_mins</span></code></a></li>
+<li><a :data-current="activeSection === '#weac.analysis.CoupledCriterionHistory.g_deltas'" class="reference internal" href="#weac.analysis.CoupledCriterionHistory.g_deltas"><code class="docutils literal notranslate"><span class="pre">CoupledCriterionHistory.g_deltas</span></code></a></li>
+<li><a :data-current="activeSection === '#weac.analysis.CoupledCriterionHistory.incr_energies'" class="reference internal" href="#weac.analysis.CoupledCriterionHistory.incr_energies"><code class="docutils literal notranslate"><span class="pre">CoupledCriterionHistory.incr_energies</span></code></a></li>
+<li><a :data-current="activeSection === '#weac.analysis.CoupledCriterionHistory.skier_weights'" class="reference internal" href="#weac.analysis.CoupledCriterionHistory.skier_weights"><code class="docutils literal notranslate"><span class="pre">CoupledCriterionHistory.skier_weights</span></code></a></li>
+</ul>
+</li>
+<li><a :data-current="activeSection === '#weac.analysis.CoupledCriterionResult'" class="reference internal" href="#weac.analysis.CoupledCriterionResult"><code class="docutils literal notranslate"><span class="pre">CoupledCriterionResult</span></code></a><ul>
+<li><a :data-current="activeSection === '#weac.analysis.CoupledCriterionResult.converged'" class="reference internal" href="#weac.analysis.CoupledCriterionResult.converged"><code class="docutils literal notranslate"><span class="pre">CoupledCriterionResult.converged</span></code></a></li>
+<li><a :data-current="activeSection === '#weac.analysis.CoupledCriterionResult.crack_length'" class="reference internal" href="#weac.analysis.CoupledCriterionResult.crack_length"><code class="docutils literal notranslate"><span class="pre">CoupledCriterionResult.crack_length</span></code></a></li>
+<li><a :data-current="activeSection === '#weac.analysis.CoupledCriterionResult.critical_skier_weight'" class="reference internal" href="#weac.analysis.CoupledCriterionResult.critical_skier_weight"><code class="docutils literal notranslate"><span class="pre">CoupledCriterionResult.critical_skier_weight</span></code></a></li>
+<li><a :data-current="activeSection === '#weac.analysis.CoupledCriterionResult.dist_ERR_envelope'" class="reference internal" href="#weac.analysis.CoupledCriterionResult.dist_ERR_envelope"><code class="docutils literal notranslate"><span class="pre">CoupledCriterionResult.dist_ERR_envelope</span></code></a></li>
+<li><a :data-current="activeSection === '#weac.analysis.CoupledCriterionResult.final_system'" class="reference internal" href="#weac.analysis.CoupledCriterionResult.final_system"><code class="docutils literal notranslate"><span class="pre">CoupledCriterionResult.final_system</span></code></a></li>
+<li><a :data-current="activeSection === '#weac.analysis.CoupledCriterionResult.g_delta'" class="reference internal" href="#weac.analysis.CoupledCriterionResult.g_delta"><code class="docutils literal notranslate"><span class="pre">CoupledCriterionResult.g_delta</span></code></a></li>
+<li><a :data-current="activeSection === '#weac.analysis.CoupledCriterionResult.history'" class="reference internal" href="#weac.analysis.CoupledCriterionResult.history"><code class="docutils literal notranslate"><span class="pre">CoupledCriterionResult.history</span></code></a></li>
+<li><a :data-current="activeSection === '#weac.analysis.CoupledCriterionResult.initial_critical_skier_weight'" class="reference internal" href="#weac.analysis.CoupledCriterionResult.initial_critical_skier_weight"><code class="docutils literal notranslate"><span class="pre">CoupledCriterionResult.initial_critical_skier_weight</span></code></a></li>
+<li><a :data-current="activeSection === '#weac.analysis.CoupledCriterionResult.iterations'" class="reference internal" href="#weac.analysis.CoupledCriterionResult.iterations"><code class="docutils literal notranslate"><span class="pre">CoupledCriterionResult.iterations</span></code></a></li>
+<li><a :data-current="activeSection === '#weac.analysis.CoupledCriterionResult.max_dist_stress'" class="reference internal" href="#weac.analysis.CoupledCriterionResult.max_dist_stress"><code class="docutils literal notranslate"><span class="pre">CoupledCriterionResult.max_dist_stress</span></code></a></li>
+<li><a :data-current="activeSection === '#weac.analysis.CoupledCriterionResult.message'" class="reference internal" href="#weac.analysis.CoupledCriterionResult.message"><code class="docutils literal notranslate"><span class="pre">CoupledCriterionResult.message</span></code></a></li>
+<li><a :data-current="activeSection === '#weac.analysis.CoupledCriterionResult.min_dist_stress'" class="reference internal" href="#weac.analysis.CoupledCriterionResult.min_dist_stress"><code class="docutils literal notranslate"><span class="pre">CoupledCriterionResult.min_dist_stress</span></code></a></li>
+<li><a :data-current="activeSection === '#weac.analysis.CoupledCriterionResult.pure_stress_criteria'" class="reference internal" href="#weac.analysis.CoupledCriterionResult.pure_stress_criteria"><code class="docutils literal notranslate"><span class="pre">CoupledCriterionResult.pure_stress_criteria</span></code></a></li>
+<li><a :data-current="activeSection === '#weac.analysis.CoupledCriterionResult.self_collapse'" class="reference internal" href="#weac.analysis.CoupledCriterionResult.self_collapse"><code class="docutils literal notranslate"><span class="pre">CoupledCriterionResult.self_collapse</span></code></a></li>
+</ul>
+</li>
+<li><a :data-current="activeSection === '#weac.analysis.CriteriaEvaluator'" class="reference internal" href="#weac.analysis.CriteriaEvaluator"><code class="docutils literal notranslate"><span class="pre">CriteriaEvaluator</span></code></a><ul>
+<li><a :data-current="activeSection === '#weac.analysis.CriteriaEvaluator.check_crack_self_propagation'" class="reference internal" href="#weac.analysis.CriteriaEvaluator.check_crack_self_propagation"><code class="docutils literal notranslate"><span class="pre">CriteriaEvaluator.check_crack_self_propagation()</span></code></a></li>
+<li><a :data-current="activeSection === '#weac.analysis.CriteriaEvaluator.criteria_config'" class="reference internal" href="#weac.analysis.CriteriaEvaluator.criteria_config"><code class="docutils literal notranslate"><span class="pre">CriteriaEvaluator.criteria_config</span></code></a></li>
+<li><a :data-current="activeSection === '#weac.analysis.CriteriaEvaluator.evaluate_SSERR'" class="reference internal" href="#weac.analysis.CriteriaEvaluator.evaluate_SSERR"><code class="docutils literal notranslate"><span class="pre">CriteriaEvaluator.evaluate_SSERR()</span></code></a></li>
+<li><a :data-current="activeSection === '#weac.analysis.CriteriaEvaluator.evaluate_coupled_criterion'" class="reference internal" href="#weac.analysis.CriteriaEvaluator.evaluate_coupled_criterion"><code class="docutils literal notranslate"><span class="pre">CriteriaEvaluator.evaluate_coupled_criterion()</span></code></a></li>
+<li><a :data-current="activeSection === '#weac.analysis.CriteriaEvaluator.find_crack_length_for_weight'" class="reference internal" href="#weac.analysis.CriteriaEvaluator.find_crack_length_for_weight"><code class="docutils literal notranslate"><span class="pre">CriteriaEvaluator.find_crack_length_for_weight()</span></code></a></li>
+<li><a :data-current="activeSection === '#weac.analysis.CriteriaEvaluator.find_minimum_crack_length'" class="reference internal" href="#weac.analysis.CriteriaEvaluator.find_minimum_crack_length"><code class="docutils literal notranslate"><span class="pre">CriteriaEvaluator.find_minimum_crack_length()</span></code></a></li>
+<li><a :data-current="activeSection === '#weac.analysis.CriteriaEvaluator.find_minimum_force'" class="reference internal" href="#weac.analysis.CriteriaEvaluator.find_minimum_force"><code class="docutils literal notranslate"><span class="pre">CriteriaEvaluator.find_minimum_force()</span></code></a></li>
+<li><a :data-current="activeSection === '#weac.analysis.CriteriaEvaluator.fracture_toughness_envelope'" class="reference internal" href="#weac.analysis.CriteriaEvaluator.fracture_toughness_envelope"><code class="docutils literal notranslate"><span class="pre">CriteriaEvaluator.fracture_toughness_envelope()</span></code></a></li>
+<li><a :data-current="activeSection === '#weac.analysis.CriteriaEvaluator.stress_envelope'" class="reference internal" href="#weac.analysis.CriteriaEvaluator.stress_envelope"><code class="docutils literal notranslate"><span class="pre">CriteriaEvaluator.stress_envelope()</span></code></a></li>
+</ul>
+</li>
+<li><a :data-current="activeSection === '#weac.analysis.FindMinimumForceResult'" class="reference internal" href="#weac.analysis.FindMinimumForceResult"><code class="docutils literal notranslate"><span class="pre">FindMinimumForceResult</span></code></a><ul>
+<li><a :data-current="activeSection === '#weac.analysis.FindMinimumForceResult.critical_skier_weight'" class="reference internal" href="#weac.analysis.FindMinimumForceResult.critical_skier_weight"><code class="docutils literal notranslate"><span class="pre">FindMinimumForceResult.critical_skier_weight</span></code></a></li>
+<li><a :data-current="activeSection === '#weac.analysis.FindMinimumForceResult.iterations'" class="reference internal" href="#weac.analysis.FindMinimumForceResult.iterations"><code class="docutils literal notranslate"><span class="pre">FindMinimumForceResult.iterations</span></code></a></li>
+<li><a :data-current="activeSection === '#weac.analysis.FindMinimumForceResult.max_dist_stress'" class="reference internal" href="#weac.analysis.FindMinimumForceResult.max_dist_stress"><code class="docutils literal notranslate"><span class="pre">FindMinimumForceResult.max_dist_stress</span></code></a></li>
+<li><a :data-current="activeSection === '#weac.analysis.FindMinimumForceResult.min_dist_stress'" class="reference internal" href="#weac.analysis.FindMinimumForceResult.min_dist_stress"><code class="docutils literal notranslate"><span class="pre">FindMinimumForceResult.min_dist_stress</span></code></a></li>
+<li><a :data-current="activeSection === '#weac.analysis.FindMinimumForceResult.new_segments'" class="reference internal" href="#weac.analysis.FindMinimumForceResult.new_segments"><code class="docutils literal notranslate"><span class="pre">FindMinimumForceResult.new_segments</span></code></a></li>
+<li><a :data-current="activeSection === '#weac.analysis.FindMinimumForceResult.old_segments'" class="reference internal" href="#weac.analysis.FindMinimumForceResult.old_segments"><code class="docutils literal notranslate"><span class="pre">FindMinimumForceResult.old_segments</span></code></a></li>
+<li><a :data-current="activeSection === '#weac.analysis.FindMinimumForceResult.success'" class="reference internal" href="#weac.analysis.FindMinimumForceResult.success"><code class="docutils literal notranslate"><span class="pre">FindMinimumForceResult.success</span></code></a></li>
+</ul>
+</li>
+<li><a :data-current="activeSection === '#weac.analysis.Plotter'" class="reference internal" href="#weac.analysis.Plotter"><code class="docutils literal notranslate"><span class="pre">Plotter</span></code></a><ul>
+<li><a :data-current="activeSection === '#weac.analysis.Plotter.plot_ERR_comp'" class="reference internal" href="#weac.analysis.Plotter.plot_ERR_comp"><code class="docutils literal notranslate"><span class="pre">Plotter.plot_ERR_comp()</span></code></a></li>
+<li><a :data-current="activeSection === '#weac.analysis.Plotter.plot_ERR_modes'" class="reference internal" href="#weac.analysis.Plotter.plot_ERR_modes"><code class="docutils literal notranslate"><span class="pre">Plotter.plot_ERR_modes()</span></code></a></li>
+<li><a :data-current="activeSection === '#weac.analysis.Plotter.plot_analysis'" class="reference internal" href="#weac.analysis.Plotter.plot_analysis"><code class="docutils literal notranslate"><span class="pre">Plotter.plot_analysis()</span></code></a></li>
+<li><a :data-current="activeSection === '#weac.analysis.Plotter.plot_deformed'" class="reference internal" href="#weac.analysis.Plotter.plot_deformed"><code class="docutils literal notranslate"><span class="pre">Plotter.plot_deformed()</span></code></a></li>
+<li><a :data-current="activeSection === '#weac.analysis.Plotter.plot_displacements'" class="reference internal" href="#weac.analysis.Plotter.plot_displacements"><code class="docutils literal notranslate"><span class="pre">Plotter.plot_displacements()</span></code></a></li>
+<li><a :data-current="activeSection === '#weac.analysis.Plotter.plot_energy_release_rates'" class="reference internal" href="#weac.analysis.Plotter.plot_energy_release_rates"><code class="docutils literal notranslate"><span class="pre">Plotter.plot_energy_release_rates()</span></code></a></li>
+<li><a :data-current="activeSection === '#weac.analysis.Plotter.plot_err_envelope'" class="reference internal" href="#weac.analysis.Plotter.plot_err_envelope"><code class="docutils literal notranslate"><span class="pre">Plotter.plot_err_envelope()</span></code></a></li>
+<li><a :data-current="activeSection === '#weac.analysis.Plotter.plot_fea_disp'" class="reference internal" href="#weac.analysis.Plotter.plot_fea_disp"><code class="docutils literal notranslate"><span class="pre">Plotter.plot_fea_disp()</span></code></a></li>
+<li><a :data-current="activeSection === '#weac.analysis.Plotter.plot_fea_stress'" class="reference internal" href="#weac.analysis.Plotter.plot_fea_stress"><code class="docutils literal notranslate"><span class="pre">Plotter.plot_fea_stress()</span></code></a></li>
+<li><a :data-current="activeSection === '#weac.analysis.Plotter.plot_rotated_slab_profile'" class="reference internal" href="#weac.analysis.Plotter.plot_rotated_slab_profile"><code class="docutils literal notranslate"><span class="pre">Plotter.plot_rotated_slab_profile()</span></code></a></li>
+<li><a :data-current="activeSection === '#weac.analysis.Plotter.plot_section_forces'" class="reference internal" href="#weac.analysis.Plotter.plot_section_forces"><code class="docutils literal notranslate"><span class="pre">Plotter.plot_section_forces()</span></code></a></li>
+<li><a :data-current="activeSection === '#weac.analysis.Plotter.plot_slab_profile'" class="reference internal" href="#weac.analysis.Plotter.plot_slab_profile"><code class="docutils literal notranslate"><span class="pre">Plotter.plot_slab_profile()</span></code></a></li>
+<li><a :data-current="activeSection === '#weac.analysis.Plotter.plot_stress_criteria'" class="reference internal" href="#weac.analysis.Plotter.plot_stress_criteria"><code class="docutils literal notranslate"><span class="pre">Plotter.plot_stress_criteria()</span></code></a></li>
+<li><a :data-current="activeSection === '#weac.analysis.Plotter.plot_stress_envelope'" class="reference internal" href="#weac.analysis.Plotter.plot_stress_envelope"><code class="docutils literal notranslate"><span class="pre">Plotter.plot_stress_envelope()</span></code></a></li>
+<li><a :data-current="activeSection === '#weac.analysis.Plotter.plot_stresses'" class="reference internal" href="#weac.analysis.Plotter.plot_stresses"><code class="docutils literal notranslate"><span class="pre">Plotter.plot_stresses()</span></code></a></li>
+</ul>
+</li>
+<li><a :data-current="activeSection === '#weac.analysis.SSERRResult'" class="reference internal" href="#weac.analysis.SSERRResult"><code class="docutils literal notranslate"><span class="pre">SSERRResult</span></code></a><ul>
+<li><a :data-current="activeSection === '#weac.analysis.SSERRResult.SSERR'" class="reference internal" href="#weac.analysis.SSERRResult.SSERR"><code class="docutils literal notranslate"><span class="pre">SSERRResult.SSERR</span></code></a></li>
+<li><a :data-current="activeSection === '#weac.analysis.SSERRResult.converged'" class="reference internal" href="#weac.analysis.SSERRResult.converged"><code class="docutils literal notranslate"><span class="pre">SSERRResult.converged</span></code></a></li>
+<li><a :data-current="activeSection === '#weac.analysis.SSERRResult.message'" class="reference internal" href="#weac.analysis.SSERRResult.message"><code class="docutils literal notranslate"><span class="pre">SSERRResult.message</span></code></a></li>
+<li><a :data-current="activeSection === '#weac.analysis.SSERRResult.touchdown_distance'" class="reference internal" href="#weac.analysis.SSERRResult.touchdown_distance"><code class="docutils literal notranslate"><span class="pre">SSERRResult.touchdown_distance</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</div>
+</aside>
+</main>
+</div>
+</div><footer class="py-6 border-t border-border md:py-0">
+<div class="container flex flex-col items-center justify-between gap-4 md:h-24 md:flex-row">
+<div class="flex flex-col items-center gap-4 px-8 md:flex-row md:gap-2 md:px-0">
+<p class="text-sm leading-loose text-center text-muted-foreground md:text-left">Built with <a class="font-medium underline underline-offset-4" href="https://www.sphinx-doc.org" rel="noreferrer">Sphinx 8.2.3</a></p>
+</div>
+</div>
+</footer>
+</div>
+<script src="_static/documentation_options.js?v=5248d183"></script>
+<script src="_static/doctools.js?v=9bcbadda"></script>
+<script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+<script defer="defer" src="_static/theme.js?v=073f68d9"></script>
+</body>
+</html>
