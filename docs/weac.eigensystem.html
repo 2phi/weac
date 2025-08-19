@@ -7,9 +7,9 @@
 <meta content="white" media="(prefers-color-scheme: light)" name="theme-color"/>
 <meta content="black" media="(prefers-color-scheme: dark)" name="theme-color"/>
 <meta content="width=device-width, initial-scale=1" name="viewport"/>
-<title>weac.eigensystem module | WEAC 2.6.0 documentation</title>
-<meta content="weac.eigensystem module | WEAC 2.6.0 documentation" property="og:title"/>
-<meta content="weac.eigensystem module | WEAC 2.6.0 documentation" name="twitter:title"/>
+<title>weac.eigensystem module | WEAC 2.6.1 documentation</title>
+<meta content="weac.eigensystem module | WEAC 2.6.1 documentation" property="og:title"/>
+<meta content="weac.eigensystem module | WEAC 2.6.1 documentation" name="twitter:title"/>
 <link href="_static/pygments.css?v=83348fa5" rel="stylesheet" type="text/css"/>
 <link href="_static/theme.css?v=42baaae4" rel="stylesheet" type="text/css"/>
 <link href="_static/favicon.ico" rel="icon"/>
@@ -37,7 +37,7 @@
 <div class="hidden mr-4 md:flex">
 <a class="flex items-center mr-6" href="index.html">
 <img alt="Logo" class="mr-2 hidden dark:block" height="24" src="_static/logo-dark.png" width="24"/>
-<img alt="Logo" class="mr-2 dark:hidden" height="24" src="_static/logo-light.png" width="24"/><span class="hidden font-bold sm:inline-block text-clip whitespace-nowrap">WEAC 2.6.0 documentation</span>
+<img alt="Logo" class="mr-2 dark:hidden" height="24" src="_static/logo-light.png" width="24"/><span class="hidden font-bold sm:inline-block text-clip whitespace-nowrap">WEAC 2.6.1 documentation</span>
 </a></div><button @click="showSidebar = true" class="inline-flex items-center justify-center h-10 px-0 py-2 mr-2 text-base font-medium transition-colors rounded-md hover:text-accent-foreground hover:bg-transparent md:hidden" type="button">
 <svg aria-hidden="true" fill="currentColor" height="24" viewbox="0 96 960 960" width="24" xmlns="http://www.w3.org/2000/svg">
 <path d="M152.587 825.087q-19.152 0-32.326-13.174t-13.174-32.326q0-19.152 13.174-32.326t32.326-13.174h440q19.152 0 32.326 13.174t13.174 32.326q0 19.152-13.174 32.326t-32.326 13.174h-440Zm0-203.587q-19.152 0-32.326-13.174T107.087 576q0-19.152 13.174-32.326t32.326-13.174h320q19.152 0 32.326 13.174T518.087 576q0 19.152-13.174 32.326T472.587 621.5h-320Zm0-203.587q-19.152 0-32.326-13.174t-13.174-32.326q0-19.152 13.174-32.326t32.326-13.174h440q19.152 0 32.326 13.174t13.174 32.326q0 19.152-13.174 32.326t-32.326 13.174h-440ZM708.913 576l112.174 112.174q12.674 12.674 12.674 31.826t-12.674 31.826Q808.413 764.5 789.261 764.5t-31.826-12.674l-144-144Q600 594.391 600 576t13.435-31.826l144-144q12.674-12.674 31.826-12.674t31.826 12.674q12.674 12.674 12.674 31.826t-12.674 31.826L708.913 576Z"></path>
@@ -69,7 +69,7 @@
 <div class="flex-1"><div class="container flex-1 items-start md:grid md:grid-cols-[220px_minmax(0,1fr)] md:gap-6 lg:grid-cols-[240px_minmax(0,1fr)] lg:gap-10"><aside :aria-hidden="!showSidebar" :class="{ 'translate-x-0': showSidebar }" class="fixed inset-y-0 left-0 md:top-14 z-50 md:z-30 bg-background md:bg-transparent transition-all duration-100 -translate-x-full md:translate-x-0 ml-0 p-6 md:p-0 md:-ml-2 md:h-[calc(100vh-3.5rem)] w-5/6 md:w-full shrink-0 overflow-y-auto border-r border-border md:sticky" id="left-sidebar">
 <a class="!justify-start text-sm md:!hidden bg-background" href="index.html">
 <img alt="Logo" class="mr-2 hidden dark:block" height="16" src="_static/logo-dark.png" width="16"/>
-<img alt="Logo" class="mr-2 dark:hidden" height="16" src="_static/logo-light.png" width="16"/><span class="font-bold text-clip whitespace-nowrap">WEAC 2.6.0 documentation</span>
+<img alt="Logo" class="mr-2 dark:hidden" height="16" src="_static/logo-light.png" width="16"/><span class="font-bold text-clip whitespace-nowrap">WEAC 2.6.1 documentation</span>
 </a>
 <div class="relative overflow-hidden md:overflow-auto my-4 md:my-0 h-[calc(100vh-8rem)] md:h-auto">
 <div class="overflow-y-auto h-full w-full relative pr-6"><nav class="table w-full min-w-full my-6 lg:my-8">
@@ -97,7 +97,7 @@
 <div class="w-full min-w-0 mx-auto">
 <nav aria-label="breadcrumbs" class="flex items-center mb-4 space-x-1 text-sm text-muted-foreground">
 <a class="overflow-hidden text-ellipsis whitespace-nowrap hover:text-foreground" href="index.html">
-<span class="hidden md:inline">WEAC 2.6.0 documentation</span>
+<span class="hidden md:inline">WEAC 2.6.1 documentation</span>
 <svg aria-label="Home" class="md:hidden" fill="currentColor" height="18" stroke="none" viewbox="0 96 960 960" width="18" xmlns="http://www.w3.org/2000/svg">
 <path d="M240 856h120V616h240v240h120V496L480 316 240 496v360Zm-80 80V456l320-240 320 240v480H520V696h-80v240H160Zm320-350Z"></path>
 </svg>
@@ -106,10 +106,618 @@
 <div class="mr-1">/</div><span aria-current="page" class="font-medium text-foreground overflow-hidden text-ellipsis whitespace-nowrap">weac.eigensystem module</span>
 </nav>
 <div id="content" role="main">
-<section id="weac-eigensystem-module">
-<h1>weac.eigensystem module<a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#weac-eigensystem-module">¶</a></h1>
+<section id="module-weac.eigensystem">
+<span id="weac-eigensystem-module"></span><h1>weac.eigensystem module<a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#module-weac.eigensystem">¶</a></h1>
+<p>Base class for the elastic analysis of layered snow slabs.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="weac.eigensystem.Eigensystem">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">weac.eigensystem.</span></span><span class="sig-name descname"><span class="pre">Eigensystem</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">system</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'pst-'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">touchdown</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/weac/eigensystem.html#Eigensystem"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#weac.eigensystem.Eigensystem" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#weac.eigensystem.Eigensystem'">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Base class for a layered beam on an elastic foundation.</p>
+<p>Provides geometry, material and loading attributes, and methods
+for the assembly of a fundamental system.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="weac.eigensystem.Eigensystem.g">
+<span class="sig-name descname"><span class="pre">g</span></span><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#weac.eigensystem.Eigensystem.g" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#weac.eigensystem.Eigensystem.g'">¶</a></dt>
+<dd><p>Gravitational constant (mm/s^2). Default is 9180.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="weac.eigensystem.Eigensystem.lski">
+<span class="sig-name descname"><span class="pre">lski</span></span><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#weac.eigensystem.Eigensystem.lski" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#weac.eigensystem.Eigensystem.lski'">¶</a></dt>
+<dd><p>Effective out-of-plance length of skis (mm). Default is 1000.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="weac.eigensystem.Eigensystem.tol">
+<span class="sig-name descname"><span class="pre">tol</span></span><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#weac.eigensystem.Eigensystem.tol" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#weac.eigensystem.Eigensystem.tol'">¶</a></dt>
+<dd><p>Relative Romberg integration toleranc. Default is 1e-3.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="weac.eigensystem.Eigensystem.system">
+<span class="sig-name descname"><span class="pre">system</span></span><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#weac.eigensystem.Eigensystem.system" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#weac.eigensystem.Eigensystem.system'">¶</a></dt>
+<dd><p>Type of boundary value problem. Default is ‘pst-‘.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="weac.eigensystem.Eigensystem.weak">
+<span class="sig-name descname"><span class="pre">weak</span></span><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#weac.eigensystem.Eigensystem.weak" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#weac.eigensystem.Eigensystem.weak'">¶</a></dt>
+<dd><p>Dictionary that holds the weak layer properties Young’s
+modulus (MPa) and Poisson’s ratio. Defaults are 0.25
+and 0.25, respectively.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>dict</p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="weac.eigensystem.Eigensystem.t">
+<span class="sig-name descname"><span class="pre">t</span></span><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#weac.eigensystem.Eigensystem.t" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#weac.eigensystem.Eigensystem.t'">¶</a></dt>
+<dd><p>Weak-layer thickness (mm). Default is 30.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="weac.eigensystem.Eigensystem.kn">
+<span class="sig-name descname"><span class="pre">kn</span></span><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#weac.eigensystem.Eigensystem.kn" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#weac.eigensystem.Eigensystem.kn'">¶</a></dt>
+<dd><p>Compressive foundation (weak-layer) stiffness (N/mm^3).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="weac.eigensystem.Eigensystem.kt">
+<span class="sig-name descname"><span class="pre">kt</span></span><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#weac.eigensystem.Eigensystem.kt" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#weac.eigensystem.Eigensystem.kt'">¶</a></dt>
+<dd><p>Shear foundation (weak-layer) stiffness (N/mm^3).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="weac.eigensystem.Eigensystem.tc">
+<span class="sig-name descname"><span class="pre">tc</span></span><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#weac.eigensystem.Eigensystem.tc" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#weac.eigensystem.Eigensystem.tc'">¶</a></dt>
+<dd><p>Weak-layer thickness after collapse (mm).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="weac.eigensystem.Eigensystem.slab">
+<span class="sig-name descname"><span class="pre">slab</span></span><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#weac.eigensystem.Eigensystem.slab" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#weac.eigensystem.Eigensystem.slab'">¶</a></dt>
+<dd><p>Matrix that holds the elastic properties of all slab layers.
+Columns are density (kg/m^3), layer heigth (mm), Young’s
+modulus (MPa), shear modulus (MPa), and Poisson’s ratio.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>ndarray</p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="weac.eigensystem.Eigensystem.k">
+<span class="sig-name descname"><span class="pre">k</span></span><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#weac.eigensystem.Eigensystem.k" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#weac.eigensystem.Eigensystem.k'">¶</a></dt>
+<dd><p>Shear correction factor of the slab. Default is 5/6.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="weac.eigensystem.Eigensystem.h">
+<span class="sig-name descname"><span class="pre">h</span></span><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#weac.eigensystem.Eigensystem.h" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#weac.eigensystem.Eigensystem.h'">¶</a></dt>
+<dd><p>Slab thickness (mm). Default is 300.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="weac.eigensystem.Eigensystem.zs">
+<span class="sig-name descname"><span class="pre">zs</span></span><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#weac.eigensystem.Eigensystem.zs" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#weac.eigensystem.Eigensystem.zs'">¶</a></dt>
+<dd><p>Z-coordinate of the center of gravity of the slab (mm).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="weac.eigensystem.Eigensystem.A11">
+<span class="sig-name descname"><span class="pre">A11</span></span><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#weac.eigensystem.Eigensystem.A11" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#weac.eigensystem.Eigensystem.A11'">¶</a></dt>
+<dd><p>Extensional stiffness of the slab (N/mm).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="weac.eigensystem.Eigensystem.B11">
+<span class="sig-name descname"><span class="pre">B11</span></span><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#weac.eigensystem.Eigensystem.B11" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#weac.eigensystem.Eigensystem.B11'">¶</a></dt>
+<dd><p>Bending-extension coupling stiffness of the slab (N).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="weac.eigensystem.Eigensystem.D11">
+<span class="sig-name descname"><span class="pre">D11</span></span><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#weac.eigensystem.Eigensystem.D11" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#weac.eigensystem.Eigensystem.D11'">¶</a></dt>
+<dd><p>Bending stiffness of the slab (Nmm).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="weac.eigensystem.Eigensystem.kA55">
+<span class="sig-name descname"><span class="pre">kA55</span></span><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#weac.eigensystem.Eigensystem.kA55" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#weac.eigensystem.Eigensystem.kA55'">¶</a></dt>
+<dd><p>Shear stiffness of the slab (N/mm).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="weac.eigensystem.Eigensystem.K0">
+<span class="sig-name descname"><span class="pre">K0</span></span><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#weac.eigensystem.Eigensystem.K0" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#weac.eigensystem.Eigensystem.K0'">¶</a></dt>
+<dd><p>Characteristic stiffness value (N).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="weac.eigensystem.Eigensystem.ewC">
+<span class="sig-name descname"><span class="pre">ewC</span></span><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#weac.eigensystem.Eigensystem.ewC" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#weac.eigensystem.Eigensystem.ewC'">¶</a></dt>
+<dd><p>List of complex eigenvalues.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>ndarray</p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="weac.eigensystem.Eigensystem.ewR">
+<span class="sig-name descname"><span class="pre">ewR</span></span><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#weac.eigensystem.Eigensystem.ewR" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#weac.eigensystem.Eigensystem.ewR'">¶</a></dt>
+<dd><p>List of real eigenvalues.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>ndarray</p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="weac.eigensystem.Eigensystem.evC">
+<span class="sig-name descname"><span class="pre">evC</span></span><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#weac.eigensystem.Eigensystem.evC" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#weac.eigensystem.Eigensystem.evC'">¶</a></dt>
+<dd><p>Matrix with eigenvectors corresponding to complex
+eigenvalues as columns.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>ndarray</p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="weac.eigensystem.Eigensystem.evR">
+<span class="sig-name descname"><span class="pre">evR</span></span><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#weac.eigensystem.Eigensystem.evR" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#weac.eigensystem.Eigensystem.evR'">¶</a></dt>
+<dd><p>Matrix with eigenvectors corresponding to real
+eigenvalues as columns.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>ndarray</p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="weac.eigensystem.Eigensystem.sC">
+<span class="sig-name descname"><span class="pre">sC</span></span><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#weac.eigensystem.Eigensystem.sC" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#weac.eigensystem.Eigensystem.sC'">¶</a></dt>
+<dd><p>X-coordinate shift (mm) of complex parts of the solution.
+Used for numerical stability.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="weac.eigensystem.Eigensystem.sR">
+<span class="sig-name descname"><span class="pre">sR</span></span><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#weac.eigensystem.Eigensystem.sR" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#weac.eigensystem.Eigensystem.sR'">¶</a></dt>
+<dd><p>X-coordinate shift (mm) of real parts of the solution.
+Used for numerical stability.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="weac.eigensystem.Eigensystem.sysmat">
+<span class="sig-name descname"><span class="pre">sysmat</span></span><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#weac.eigensystem.Eigensystem.sysmat" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#weac.eigensystem.Eigensystem.sysmat'">¶</a></dt>
+<dd><p>System matrix.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>ndarray</p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="weac.eigensystem.Eigensystem.lC">
+<span class="sig-name descname"><span class="pre">lC</span></span><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#weac.eigensystem.Eigensystem.lC" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#weac.eigensystem.Eigensystem.lC'">¶</a></dt>
+<dd><p>Cracklength whose maximum deflection equals the
+weak-layer thickness (mm).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="weac.eigensystem.Eigensystem.lS">
+<span class="sig-name descname"><span class="pre">lS</span></span><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#weac.eigensystem.Eigensystem.lS" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#weac.eigensystem.Eigensystem.lS'">¶</a></dt>
+<dd><p>Cracklength when touchdown exerts maximum support
+on the slab (mm). Corresponds to the longest possible
+unbedded length.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="weac.eigensystem.Eigensystem.ratio">
+<span class="sig-name descname"><span class="pre">ratio</span></span><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#weac.eigensystem.Eigensystem.ratio" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#weac.eigensystem.Eigensystem.ratio'">¶</a></dt>
+<dd><p>Increment factor for the weak-layer stiffness from intact
+to collapsed state.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="weac.eigensystem.Eigensystem.beta">
+<span class="sig-name descname"><span class="pre">beta</span></span><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#weac.eigensystem.Eigensystem.beta" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#weac.eigensystem.Eigensystem.beta'">¶</a></dt>
+<dd><p>Describes the stiffnesses of weak-layer and slab.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="weac.eigensystem.Eigensystem.calc_eigensystem">
+<span class="sig-name descname"><span class="pre">calc_eigensystem</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/weac/eigensystem.html#Eigensystem.calc_eigensystem"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#weac.eigensystem.Eigensystem.calc_eigensystem" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#weac.eigensystem.Eigensystem.calc_eigensystem'">¶</a></dt>
+<dd><p>Calculate eigenvalues and eigenvectors of the system matrix.</p>
+</dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="weac.eigensystem.Eigensystem.calc_foundation_stiffness">
+<span class="sig-name descname"><span class="pre">calc_foundation_stiffness</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/weac/eigensystem.html#Eigensystem.calc_foundation_stiffness"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#weac.eigensystem.Eigensystem.calc_foundation_stiffness" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#weac.eigensystem.Eigensystem.calc_foundation_stiffness'">¶</a></dt>
+<dd><p>Compute foundation normal and shear stiffness.</p>
+</dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="weac.eigensystem.Eigensystem.calc_fundamental_system">
+<span class="sig-name descname"><span class="pre">calc_fundamental_system</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/weac/eigensystem.html#Eigensystem.calc_fundamental_system"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#weac.eigensystem.Eigensystem.calc_fundamental_system" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#weac.eigensystem.Eigensystem.calc_fundamental_system'">¶</a></dt>
+<dd><p>Calculate the fundamental system of the problem.</p>
+</dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="weac.eigensystem.Eigensystem.calc_laminate_stiffness_matrix">
+<span class="sig-name descname"><span class="pre">calc_laminate_stiffness_matrix</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/weac/eigensystem.html#Eigensystem.calc_laminate_stiffness_matrix"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#weac.eigensystem.Eigensystem.calc_laminate_stiffness_matrix" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#weac.eigensystem.Eigensystem.calc_laminate_stiffness_matrix'">¶</a></dt>
+<dd><p>Provide ABD matrix.</p>
+<p>Return plane-strain laminate stiffness matrix (ABD matrix).</p>
+</dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="weac.eigensystem.Eigensystem.calc_system_matrix">
+<span class="sig-name descname"><span class="pre">calc_system_matrix</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/weac/eigensystem.html#Eigensystem.calc_system_matrix"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#weac.eigensystem.Eigensystem.calc_system_matrix" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#weac.eigensystem.Eigensystem.calc_system_matrix'">¶</a></dt>
+<dd><p>Assemble first-order ODE system matrix K.</p>
+<p>Using the solution vector z = [u, u’, w, w’, psi, psi’]
+the ODE system is written in the form Az’ + Bz = d
+and rearranged to z’ = -(A ^ -1)Bz + (A ^ -1)d = Kz + q</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>System matrix K (6x6).</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>ndarray</p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="weac.eigensystem.Eigensystem.get_load_vector">
+<span class="sig-name descname"><span class="pre">get_load_vector</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">phi</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/weac/eigensystem.html#Eigensystem.get_load_vector"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#weac.eigensystem.Eigensystem.get_load_vector" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#weac.eigensystem.Eigensystem.get_load_vector'">¶</a></dt>
+<dd><p>Compute sytem load vector q.</p>
+<p>Using the solution vector z = [u, u’, w, w’, psi, psi’]
+the ODE system is written in the form Az’ + Bz = d
+and rearranged to z’ = -(A ^ -1)Bz + (A ^ -1)d = Kz + q</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>phi</strong> (<em>float</em>) – Inclination (degrees). Counterclockwise positive.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>System load vector q (6x1).</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>ndarray</p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="weac.eigensystem.Eigensystem.get_ply_coordinates">
+<span class="sig-name descname"><span class="pre">get_ply_coordinates</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/weac/eigensystem.html#Eigensystem.get_ply_coordinates"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#weac.eigensystem.Eigensystem.get_ply_coordinates" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#weac.eigensystem.Eigensystem.get_ply_coordinates'">¶</a></dt>
+<dd><p>Calculate ply (layer) z-coordinates.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Ply (layer) z-coordinates (top to bottom) in coordinate system with
+downward pointing z-axis (z-list will be negative to positive).</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>ndarray</p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="weac.eigensystem.Eigensystem.get_skier_load">
+<span class="sig-name descname"><span class="pre">get_skier_load</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">m</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">phi</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/weac/eigensystem.html#Eigensystem.get_skier_load"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#weac.eigensystem.Eigensystem.get_skier_load" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#weac.eigensystem.Eigensystem.get_skier_load'">¶</a></dt>
+<dd><p>Calculate skier point load.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>m</strong> (<em>float</em>) – Skier weight (kg).</p></li>
+<li><p><strong>phi</strong> (<em>float</em>) – Inclination (degrees). Counterclockwise positive.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><ul class="simple">
+<li><p><strong>Fn</strong> (<em>float</em>) – Skier load (N) in normal direction.</p></li>
+<li><p><strong>Ft</strong> (<em>float</em>) – Skier load (N) in tangential direction.</p></li>
+</ul>
+</p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="weac.eigensystem.Eigensystem.get_surface_load">
+<span class="sig-name descname"><span class="pre">get_surface_load</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">phi</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/weac/eigensystem.html#Eigensystem.get_surface_load"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#weac.eigensystem.Eigensystem.get_surface_load" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#weac.eigensystem.Eigensystem.get_surface_load'">¶</a></dt>
+<dd><p>Calculate surface line loads.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>phi</strong> (<em>float</em>) – Inclination (degrees). Counterclockwise positive.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><ul class="simple">
+<li><p><strong>pn</strong> (<em>float</em>) – Surface line load (N/mm) in normal direction.</p></li>
+<li><p><strong>pt</strong> (<em>float</em>) – Surface line load (N/mm) in tangential direction.</p></li>
+</ul>
+</p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="weac.eigensystem.Eigensystem.get_weight_load">
+<span class="sig-name descname"><span class="pre">get_weight_load</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">phi</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/weac/eigensystem.html#Eigensystem.get_weight_load"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#weac.eigensystem.Eigensystem.get_weight_load" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#weac.eigensystem.Eigensystem.get_weight_load'">¶</a></dt>
+<dd><p>Calculate line loads from slab mass.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>phi</strong> (<em>float</em>) – Inclination (degrees). Counterclockwise positive.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><ul class="simple">
+<li><p><strong>qn</strong> (<em>float</em>) – Line load (N/mm) at center of gravity in normal direction.</p></li>
+<li><p><strong>qt</strong> (<em>float</em>) – Line load (N/mm) at center of gravity in tangential direction.</p></li>
+</ul>
+</p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="weac.eigensystem.Eigensystem.set_beam_properties">
+<span class="sig-name descname"><span class="pre">set_beam_properties</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">layers</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">C0</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">6.5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">C1</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">4.4</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nu</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.25</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">update</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/weac/eigensystem.html#Eigensystem.set_beam_properties"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#weac.eigensystem.Eigensystem.set_beam_properties" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#weac.eigensystem.Eigensystem.set_beam_properties'">¶</a></dt>
+<dd><p>Set material and properties geometry of beam (slab).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>layers</strong> (<em>list</em><em> or </em><em>str</em>) – 2D list of top-to-bottom layer densities and thicknesses.
+Columns are density (kg/m^3) and thickness (mm). One row
+corresponds to one layer. If entered as str, last split
+must be available in database.</p></li>
+<li><p><strong>C0</strong> (<em>float</em><em>, </em><em>optional</em>) – Multiplicative constant of Young modulus parametrization
+according to Bergfeld et al. (2023). Default is 6.5.</p></li>
+<li><p><strong>C1</strong> (<em>float</em><em>, </em><em>optional</em>) – Exponent of Young modulus parameterization according to
+Bergfeld et al. (2023). Default is 4.6.</p></li>
+<li><p><strong>nu</strong> (<em>float</em><em>, </em><em>optional</em>) – Possion’s ratio. Default is 0.25</p></li>
+<li><p><strong>update</strong> (<em>bool</em><em>, </em><em>optional</em>) – If true, recalculate the fundamental system after
+foundation properties have changed.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="weac.eigensystem.Eigensystem.set_foundation_properties">
+<span class="sig-name descname"><span class="pre">set_foundation_properties</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">t</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">30.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">E</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.25</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nu</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.25</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">update</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/weac/eigensystem.html#Eigensystem.set_foundation_properties"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#weac.eigensystem.Eigensystem.set_foundation_properties" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#weac.eigensystem.Eigensystem.set_foundation_properties'">¶</a></dt>
+<dd><p>Set material properties and geometry of foundation (weak layer).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>t</strong> (<em>float</em><em>, </em><em>optional</em>) – Weak-layer thickness (mm). Default is 30.</p></li>
+<li><p><strong>cf</strong> (<em>float</em>) – Fraction by which the weak-layer thickness is reduced
+due to collapse. Default is 0.5.</p></li>
+<li><p><strong>E</strong> (<em>float</em><em>, </em><em>optional</em>) – Weak-layer Young modulus (MPa). Default is 0.25.</p></li>
+<li><p><strong>nu</strong> (<em>float</em><em>, </em><em>optional</em>) – Weak-layer Poisson ratio. Default is 0.25.</p></li>
+<li><p><strong>update</strong> (<em>bool</em><em>, </em><em>optional</em>) – If true, recalculate the fundamental system after
+foundation properties have changed.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="weac.eigensystem.Eigensystem.set_surface_load">
+<span class="sig-name descname"><span class="pre">set_surface_load</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">p</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/weac/eigensystem.html#Eigensystem.set_surface_load"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#weac.eigensystem.Eigensystem.set_surface_load" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#weac.eigensystem.Eigensystem.set_surface_load'">¶</a></dt>
+<dd><p>Set surface line load.</p>
+<p>Define a distributed surface load (N/mm) that acts
+in vertical (gravity) direction on the top surface
+of the slab.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>p</strong> (<em>float</em>) – Surface line load (N/mm) that acts in vertical
+(gravity) direction onm the top surface of the
+slab.</p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="weac.eigensystem.Eigensystem.z">
+<span class="sig-name descname"><span class="pre">z</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">C</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">l</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">phi</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bed</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/weac/eigensystem.html#Eigensystem.z"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#weac.eigensystem.Eigensystem.z" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#weac.eigensystem.Eigensystem.z'">¶</a></dt>
+<dd><p>Assemble solution vector at positions x.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>x</strong> (<em>float</em><em> or </em><em>squence</em>) – Horizontal coordinate (mm). Can be sequence of length N.</p></li>
+<li><p><strong>C</strong> (<em>ndarray</em>) – Vector of constants (6xN) at positions x.</p></li>
+<li><p><strong>l</strong> (<em>float</em>) – Segment length (mm).</p></li>
+<li><p><strong>phi</strong> (<em>float</em>) – Inclination (degrees).</p></li>
+<li><p><strong>bed</strong> (<em>bool</em>) – Indicates whether segment has foundation (True) or not
+(False). Default is True.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>z</strong> – Solution vector (6xN) at position x.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>ndarray</p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="weac.eigensystem.Eigensystem.zh">
+<span class="sig-name descname"><span class="pre">zh</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">l</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bed</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/weac/eigensystem.html#Eigensystem.zh"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#weac.eigensystem.Eigensystem.zh" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#weac.eigensystem.Eigensystem.zh'">¶</a></dt>
+<dd><p>Compute bedded or free complementary solution at position x.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>x</strong> (<em>float</em>) – Horizontal coordinate (mm).</p></li>
+<li><p><strong>l</strong> (<em>float</em><em>, </em><em>optional</em>) – Segment length (mm). Default is 0.</p></li>
+<li><p><strong>bed</strong> (<em>bool</em>) – Indicates whether segment has foundation or not. Default
+is True.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>zh</strong> – Complementary solution matrix (6x6) at position x.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>ndarray</p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="weac.eigensystem.Eigensystem.zp">
+<span class="sig-name descname"><span class="pre">zp</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">phi</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bed</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/weac/eigensystem.html#Eigensystem.zp"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#weac.eigensystem.Eigensystem.zp" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#weac.eigensystem.Eigensystem.zp'">¶</a></dt>
+<dd><p>Compute bedded or free particular integrals at position x.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>x</strong> (<em>float</em>) – Horizontal coordinate (mm).</p></li>
+<li><p><strong>phi</strong> (<em>float</em>) – Inclination (degrees).</p></li>
+<li><p><strong>bed</strong> (<em>bool</em>) – Indicates whether segment has foundation (True) or not
+(False). Default is True.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>zp</strong> – Particular integral vector (6x1) at position x.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>ndarray</p>
+</dd>
+</dl>
+</dd></dl>
+</dd></dl>
 </section>
-</div></div>
+</div></div><aside class="hidden text-sm xl:block" id="right-sidebar">
+<div class="sticky top-16 -mt-10 max-h-[calc(100vh-5rem)] overflow-y-auto pt-6 space-y-2"><p class="font-medium">On this page</p>
+<ul>
+<li><a :data-current="activeSection === '#weac.eigensystem.Eigensystem'" class="reference internal" href="#weac.eigensystem.Eigensystem"><code class="docutils literal notranslate"><span class="pre">Eigensystem</span></code></a><ul>
+<li><a :data-current="activeSection === '#weac.eigensystem.Eigensystem.g'" class="reference internal" href="#weac.eigensystem.Eigensystem.g"><code class="docutils literal notranslate"><span class="pre">Eigensystem.g</span></code></a></li>
+<li><a :data-current="activeSection === '#weac.eigensystem.Eigensystem.lski'" class="reference internal" href="#weac.eigensystem.Eigensystem.lski"><code class="docutils literal notranslate"><span class="pre">Eigensystem.lski</span></code></a></li>
+<li><a :data-current="activeSection === '#weac.eigensystem.Eigensystem.tol'" class="reference internal" href="#weac.eigensystem.Eigensystem.tol"><code class="docutils literal notranslate"><span class="pre">Eigensystem.tol</span></code></a></li>
+<li><a :data-current="activeSection === '#weac.eigensystem.Eigensystem.system'" class="reference internal" href="#weac.eigensystem.Eigensystem.system"><code class="docutils literal notranslate"><span class="pre">Eigensystem.system</span></code></a></li>
+<li><a :data-current="activeSection === '#weac.eigensystem.Eigensystem.weak'" class="reference internal" href="#weac.eigensystem.Eigensystem.weak"><code class="docutils literal notranslate"><span class="pre">Eigensystem.weak</span></code></a></li>
+<li><a :data-current="activeSection === '#weac.eigensystem.Eigensystem.t'" class="reference internal" href="#weac.eigensystem.Eigensystem.t"><code class="docutils literal notranslate"><span class="pre">Eigensystem.t</span></code></a></li>
+<li><a :data-current="activeSection === '#weac.eigensystem.Eigensystem.kn'" class="reference internal" href="#weac.eigensystem.Eigensystem.kn"><code class="docutils literal notranslate"><span class="pre">Eigensystem.kn</span></code></a></li>
+<li><a :data-current="activeSection === '#weac.eigensystem.Eigensystem.kt'" class="reference internal" href="#weac.eigensystem.Eigensystem.kt"><code class="docutils literal notranslate"><span class="pre">Eigensystem.kt</span></code></a></li>
+<li><a :data-current="activeSection === '#weac.eigensystem.Eigensystem.tc'" class="reference internal" href="#weac.eigensystem.Eigensystem.tc"><code class="docutils literal notranslate"><span class="pre">Eigensystem.tc</span></code></a></li>
+<li><a :data-current="activeSection === '#weac.eigensystem.Eigensystem.slab'" class="reference internal" href="#weac.eigensystem.Eigensystem.slab"><code class="docutils literal notranslate"><span class="pre">Eigensystem.slab</span></code></a></li>
+<li><a :data-current="activeSection === '#weac.eigensystem.Eigensystem.k'" class="reference internal" href="#weac.eigensystem.Eigensystem.k"><code class="docutils literal notranslate"><span class="pre">Eigensystem.k</span></code></a></li>
+<li><a :data-current="activeSection === '#weac.eigensystem.Eigensystem.h'" class="reference internal" href="#weac.eigensystem.Eigensystem.h"><code class="docutils literal notranslate"><span class="pre">Eigensystem.h</span></code></a></li>
+<li><a :data-current="activeSection === '#weac.eigensystem.Eigensystem.zs'" class="reference internal" href="#weac.eigensystem.Eigensystem.zs"><code class="docutils literal notranslate"><span class="pre">Eigensystem.zs</span></code></a></li>
+<li><a :data-current="activeSection === '#weac.eigensystem.Eigensystem.A11'" class="reference internal" href="#weac.eigensystem.Eigensystem.A11"><code class="docutils literal notranslate"><span class="pre">Eigensystem.A11</span></code></a></li>
+<li><a :data-current="activeSection === '#weac.eigensystem.Eigensystem.B11'" class="reference internal" href="#weac.eigensystem.Eigensystem.B11"><code class="docutils literal notranslate"><span class="pre">Eigensystem.B11</span></code></a></li>
+<li><a :data-current="activeSection === '#weac.eigensystem.Eigensystem.D11'" class="reference internal" href="#weac.eigensystem.Eigensystem.D11"><code class="docutils literal notranslate"><span class="pre">Eigensystem.D11</span></code></a></li>
+<li><a :data-current="activeSection === '#weac.eigensystem.Eigensystem.kA55'" class="reference internal" href="#weac.eigensystem.Eigensystem.kA55"><code class="docutils literal notranslate"><span class="pre">Eigensystem.kA55</span></code></a></li>
+<li><a :data-current="activeSection === '#weac.eigensystem.Eigensystem.K0'" class="reference internal" href="#weac.eigensystem.Eigensystem.K0"><code class="docutils literal notranslate"><span class="pre">Eigensystem.K0</span></code></a></li>
+<li><a :data-current="activeSection === '#weac.eigensystem.Eigensystem.ewC'" class="reference internal" href="#weac.eigensystem.Eigensystem.ewC"><code class="docutils literal notranslate"><span class="pre">Eigensystem.ewC</span></code></a></li>
+<li><a :data-current="activeSection === '#weac.eigensystem.Eigensystem.ewR'" class="reference internal" href="#weac.eigensystem.Eigensystem.ewR"><code class="docutils literal notranslate"><span class="pre">Eigensystem.ewR</span></code></a></li>
+<li><a :data-current="activeSection === '#weac.eigensystem.Eigensystem.evC'" class="reference internal" href="#weac.eigensystem.Eigensystem.evC"><code class="docutils literal notranslate"><span class="pre">Eigensystem.evC</span></code></a></li>
+<li><a :data-current="activeSection === '#weac.eigensystem.Eigensystem.evR'" class="reference internal" href="#weac.eigensystem.Eigensystem.evR"><code class="docutils literal notranslate"><span class="pre">Eigensystem.evR</span></code></a></li>
+<li><a :data-current="activeSection === '#weac.eigensystem.Eigensystem.sC'" class="reference internal" href="#weac.eigensystem.Eigensystem.sC"><code class="docutils literal notranslate"><span class="pre">Eigensystem.sC</span></code></a></li>
+<li><a :data-current="activeSection === '#weac.eigensystem.Eigensystem.sR'" class="reference internal" href="#weac.eigensystem.Eigensystem.sR"><code class="docutils literal notranslate"><span class="pre">Eigensystem.sR</span></code></a></li>
+<li><a :data-current="activeSection === '#weac.eigensystem.Eigensystem.sysmat'" class="reference internal" href="#weac.eigensystem.Eigensystem.sysmat"><code class="docutils literal notranslate"><span class="pre">Eigensystem.sysmat</span></code></a></li>
+<li><a :data-current="activeSection === '#weac.eigensystem.Eigensystem.lC'" class="reference internal" href="#weac.eigensystem.Eigensystem.lC"><code class="docutils literal notranslate"><span class="pre">Eigensystem.lC</span></code></a></li>
+<li><a :data-current="activeSection === '#weac.eigensystem.Eigensystem.lS'" class="reference internal" href="#weac.eigensystem.Eigensystem.lS"><code class="docutils literal notranslate"><span class="pre">Eigensystem.lS</span></code></a></li>
+<li><a :data-current="activeSection === '#weac.eigensystem.Eigensystem.ratio'" class="reference internal" href="#weac.eigensystem.Eigensystem.ratio"><code class="docutils literal notranslate"><span class="pre">Eigensystem.ratio</span></code></a></li>
+<li><a :data-current="activeSection === '#weac.eigensystem.Eigensystem.beta'" class="reference internal" href="#weac.eigensystem.Eigensystem.beta"><code class="docutils literal notranslate"><span class="pre">Eigensystem.beta</span></code></a></li>
+<li><a :data-current="activeSection === '#weac.eigensystem.Eigensystem.calc_eigensystem'" class="reference internal" href="#weac.eigensystem.Eigensystem.calc_eigensystem"><code class="docutils literal notranslate"><span class="pre">Eigensystem.calc_eigensystem()</span></code></a></li>
+<li><a :data-current="activeSection === '#weac.eigensystem.Eigensystem.calc_foundation_stiffness'" class="reference internal" href="#weac.eigensystem.Eigensystem.calc_foundation_stiffness"><code class="docutils literal notranslate"><span class="pre">Eigensystem.calc_foundation_stiffness()</span></code></a></li>
+<li><a :data-current="activeSection === '#weac.eigensystem.Eigensystem.calc_fundamental_system'" class="reference internal" href="#weac.eigensystem.Eigensystem.calc_fundamental_system"><code class="docutils literal notranslate"><span class="pre">Eigensystem.calc_fundamental_system()</span></code></a></li>
+<li><a :data-current="activeSection === '#weac.eigensystem.Eigensystem.calc_laminate_stiffness_matrix'" class="reference internal" href="#weac.eigensystem.Eigensystem.calc_laminate_stiffness_matrix"><code class="docutils literal notranslate"><span class="pre">Eigensystem.calc_laminate_stiffness_matrix()</span></code></a></li>
+<li><a :data-current="activeSection === '#weac.eigensystem.Eigensystem.calc_system_matrix'" class="reference internal" href="#weac.eigensystem.Eigensystem.calc_system_matrix"><code class="docutils literal notranslate"><span class="pre">Eigensystem.calc_system_matrix()</span></code></a></li>
+<li><a :data-current="activeSection === '#weac.eigensystem.Eigensystem.get_load_vector'" class="reference internal" href="#weac.eigensystem.Eigensystem.get_load_vector"><code class="docutils literal notranslate"><span class="pre">Eigensystem.get_load_vector()</span></code></a></li>
+<li><a :data-current="activeSection === '#weac.eigensystem.Eigensystem.get_ply_coordinates'" class="reference internal" href="#weac.eigensystem.Eigensystem.get_ply_coordinates"><code class="docutils literal notranslate"><span class="pre">Eigensystem.get_ply_coordinates()</span></code></a></li>
+<li><a :data-current="activeSection === '#weac.eigensystem.Eigensystem.get_skier_load'" class="reference internal" href="#weac.eigensystem.Eigensystem.get_skier_load"><code class="docutils literal notranslate"><span class="pre">Eigensystem.get_skier_load()</span></code></a></li>
+<li><a :data-current="activeSection === '#weac.eigensystem.Eigensystem.get_surface_load'" class="reference internal" href="#weac.eigensystem.Eigensystem.get_surface_load"><code class="docutils literal notranslate"><span class="pre">Eigensystem.get_surface_load()</span></code></a></li>
+<li><a :data-current="activeSection === '#weac.eigensystem.Eigensystem.get_weight_load'" class="reference internal" href="#weac.eigensystem.Eigensystem.get_weight_load"><code class="docutils literal notranslate"><span class="pre">Eigensystem.get_weight_load()</span></code></a></li>
+<li><a :data-current="activeSection === '#weac.eigensystem.Eigensystem.set_beam_properties'" class="reference internal" href="#weac.eigensystem.Eigensystem.set_beam_properties"><code class="docutils literal notranslate"><span class="pre">Eigensystem.set_beam_properties()</span></code></a></li>
+<li><a :data-current="activeSection === '#weac.eigensystem.Eigensystem.set_foundation_properties'" class="reference internal" href="#weac.eigensystem.Eigensystem.set_foundation_properties"><code class="docutils literal notranslate"><span class="pre">Eigensystem.set_foundation_properties()</span></code></a></li>
+<li><a :data-current="activeSection === '#weac.eigensystem.Eigensystem.set_surface_load'" class="reference internal" href="#weac.eigensystem.Eigensystem.set_surface_load"><code class="docutils literal notranslate"><span class="pre">Eigensystem.set_surface_load()</span></code></a></li>
+<li><a :data-current="activeSection === '#weac.eigensystem.Eigensystem.z'" class="reference internal" href="#weac.eigensystem.Eigensystem.z"><code class="docutils literal notranslate"><span class="pre">Eigensystem.z()</span></code></a></li>
+<li><a :data-current="activeSection === '#weac.eigensystem.Eigensystem.zh'" class="reference internal" href="#weac.eigensystem.Eigensystem.zh"><code class="docutils literal notranslate"><span class="pre">Eigensystem.zh()</span></code></a></li>
+<li><a :data-current="activeSection === '#weac.eigensystem.Eigensystem.zp'" class="reference internal" href="#weac.eigensystem.Eigensystem.zp"><code class="docutils literal notranslate"><span class="pre">Eigensystem.zp()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</div>
+</aside>
 </main>
 </div>
 </div><footer class="py-6 border-t border-border md:py-0">
@@ -125,7 +733,7 @@
 </svg>
   Back to top
 </button>
-<script src="_static/documentation_options.js?v=ae39cb24"></script>
+<script src="_static/documentation_options.js?v=0a414f3d"></script>
 <script src="_static/doctools.js?v=9bcbadda"></script>
 <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
 <script defer="defer" src="_static/theme.js?v=073f68d9"></script>

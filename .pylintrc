@@ -1,0 +1,85 @@
+[MASTER]
+# Enable the required packages
+load-plugins=pylint.extensions.typing
+
+# Pickle collected data for later comparisons
+persistent=yes
+
+# Use multiple processes to speed up Pylint
+jobs=4
+
+# Allow loading of arbitrary C extensions
+unsafe-load-any-extension=no
+
+[MESSAGES CONTROL]
+# Disable the message, report, category or checker with the given id(s). 
+disable=
+    # Scientific code often has domain-specific naming
+    C0103,      # invalid-name
+    
+    # Scientific code often needs complex functions 
+    R0902,      # too-many-instance-attributes
+    R0904,      # too-many-public-methods
+    R0912,      # too-many-branches
+    R0913,      # too-many-arguments
+    R0914,      # too-many-locals
+    R0915,      # too-many-statements
+    R0917,      # too-many-positional-arguments
+    
+    # Disable useless pylint options warnings
+    R0022,      # useless-option-value
+    
+    # Scientific code often has large modules
+    C0302,      # too-many-lines
+    
+    # Cyclic imports are sometimes hard to avoid
+    R0401,      # cyclic-import
+    
+    # False positives on variable usage
+    E0606,      # possibly-used-before-assignment
+    E1101,      # no-member
+    
+    # Missing documentation
+    C0111,      # missing-docstring
+    
+    # Allow print statements
+    C0325,      # superfluous-parens
+    W1645,      # deprecated-pragma
+    
+    # Return statement warnings
+    R1705,      # no-else-return
+    R1711,      # useless-return
+    
+    # Line length
+    C0301,      # line-too-long
+
+[BASIC]
+# Good variable names which should always be accepted
+good-names=i,j,k,n,m,x,y,z,X,Y,Z,C,G,E,h,t,ex,Run,_,a,b,c,d,e,f,g,p,u,v,w,li,mi,bc,td,w,C0,C1,zs,zi,kt,kn
+
+[TYPECHECK]
+# List of members which are set dynamically and missed by pylint inference
+generated-members=matplotlib.cm.*,np.float64,assertIsInstance,assertEqual,assertTrue,assertIn,layered,stress,stress_slope,expected_ratio
+
+[FORMAT]
+# Maximum number of characters on a single line
+max-line-length=100
+
+[DESIGN]
+# Maximum number of arguments for function / method
+max-args=10
+
+# Maximum number of local variables
+max-locals=25
+
+# Maximum number of statements in function / method body
+max-statements=100
+
+# Maximum number of parents for a class (see R0901)
+max-parents=10
+
+# Maximum number of attributes for a class (see R0902)
+max-attributes=25
+
+# Maximum number of public methods for a class (see R0904)
+max-public-methods=30 

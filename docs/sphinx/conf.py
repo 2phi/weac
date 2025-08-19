@@ -19,7 +19,6 @@ except PackageNotFoundError:
     release = "unknown"
 github_url = "https://github.com/2phi/weac"
 
-
 # -- General configuration ---------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration
 

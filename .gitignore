@@ -45,3 +45,5 @@ test/
 scratch/
 temp*
 old*
+
+.weac-reference/

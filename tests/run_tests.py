@@ -3,8 +3,10 @@
 Test runner script for the WEAC package.
 
 This script discovers and runs all tests in the tests directory.
+Provides a pytest-like output with detailed reporting.
 """
 
+import io
 import os
 import unittest
 import sys
