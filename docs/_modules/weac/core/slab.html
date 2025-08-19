@@ -211,9 +211,12 @@
 </span><span id="line-60">    <span class="n">z_cog</span><span class="p">:</span> <span class="nb">float</span>  <span class="c1"># z-coordinate of Center of Gravity [mm]</span>
 </span><span id="line-61">    <span class="n">qw</span><span class="p">:</span> <span class="nb">float</span>  <span class="c1"># Weight Load of the slab [N/mm]</span>
 </span><span id="line-62">
+<div class="viewcode-block" id="Slab.__init__">
+<a class="viewcode-back" href="../../../weac.core.slab.html#weac.core.Slab.__init__">[docs]</a>
 </span><span id="line-63">    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">layers</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Layer</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 </span><span id="line-64">        <span class="bp">self</span><span class="o">.</span><span class="n">layers</span> <span class="o">=</span> <span class="n">layers</span>
-</span><span id="line-65">        <span class="bp">self</span><span class="o">.</span><span class="n">_calc_slab_params</span><span class="p">()</span>
+</span><span id="line-65">        <span class="bp">self</span><span class="o">.</span><span class="n">_calc_slab_params</span><span class="p">()</span></div>
+
 </span><span id="line-66">
 <div class="viewcode-block" id="Slab.calc_vertical_center_of_gravity">
 <a class="viewcode-back" href="../../../weac.core.slab.html#weac.core.Slab.calc_vertical_center_of_gravity">[docs]</a>

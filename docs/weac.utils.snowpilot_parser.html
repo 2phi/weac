@@ -125,29 +125,21 @@ The <cite>the column length</cite> is the column length of the PropSawTest.</p>
 </dd>
 </dl>
 <dl class="py method">
+<dt class="sig sig-object py" id="weac.utils.snowpilot_parser.SnowPilotParser.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">file_path</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/weac/utils/snowpilot_parser.html#SnowPilotParser.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#weac.utils.snowpilot_parser.SnowPilotParser.__init__" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#weac.utils.snowpilot_parser.SnowPilotParser.__init__'">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>file_path</strong> (<em>str</em>)</p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="py method">
 <dt class="sig sig-object py" id="weac.utils.snowpilot_parser.SnowPilotParser.extract_layers">
 <span class="sig-name descname"><span class="pre">extract_layers</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/weac/utils/snowpilot_parser.html#SnowPilotParser.extract_layers"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#weac.utils.snowpilot_parser.SnowPilotParser.extract_layers" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#weac.utils.snowpilot_parser.SnowPilotParser.extract_layers'">¶</a></dt>
 <dd><p>Extract layers from snowpit.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><em>Tuple</em>[<em>List</em>[<a class="reference internal" href="weac.components.layer.html#weac.components.layer.Layer" title="weac.components.layer.Layer"><em>Layer</em></a>], <em>List</em>[str]]</p>
-</dd>
-</dl>
-</dd></dl>
-<dl class="py method">
-<dt class="sig sig-object py" id="weac.utils.snowpilot_parser.SnowPilotParser.extract_weak_layer_and_layers_above">
-<span class="sig-name descname"><span class="pre">extract_weak_layer_and_layers_above</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">weak_layer_depth</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">layers</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/weac/utils/snowpilot_parser.html#SnowPilotParser.extract_weak_layer_and_layers_above"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#weac.utils.snowpilot_parser.SnowPilotParser.extract_weak_layer_and_layers_above" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#weac.utils.snowpilot_parser.SnowPilotParser.extract_weak_layer_and_layers_above'">¶</a></dt>
-<dd><p>Extract weak layer and layers above the weak layer for the given
-depth_top extracted from the stability test.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>weak_layer_depth</strong> (<em>float</em>)</p></li>
-<li><p><strong>layers</strong> (<em>List</em><em>[</em><a class="reference internal" href="weac.components.layer.html#weac.components.layer.Layer" title="weac.components.layer.Layer"><em>Layer</em></a><em>]</em>)</p></li>
-</ul>
-</dd>
-<dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p><em>Tuple</em>[<a class="reference internal" href="weac.components.layer.html#weac.components.layer.WeakLayer" title="weac.components.layer.WeakLayer"><em>WeakLayer</em></a>, <em>List</em>[<a class="reference internal" href="weac.components.layer.html#weac.components.layer.Layer" title="weac.components.layer.Layer"><em>Layer</em></a>]]</p>
 </dd>
 </dl>
 </dd></dl>
@@ -171,15 +163,33 @@ depth_top extracted from the stability test.</p>
 </dd>
 </dl>
 </dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="weac.utils.snowpilot_parser.SnowPilotParser.extract_weak_layer_and_layers_above">
+<span class="sig-name descname"><span class="pre">extract_weak_layer_and_layers_above</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">weak_layer_depth</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">layers</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/weac/utils/snowpilot_parser.html#SnowPilotParser.extract_weak_layer_and_layers_above"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#weac.utils.snowpilot_parser.SnowPilotParser.extract_weak_layer_and_layers_above" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#weac.utils.snowpilot_parser.SnowPilotParser.extract_weak_layer_and_layers_above'">¶</a></dt>
+<dd><p>Extract weak layer and layers above the weak layer for the given
+depth_top extracted from the stability test.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>weak_layer_depth</strong> (<em>float</em>)</p></li>
+<li><p><strong>layers</strong> (<em>List</em><em>[</em><a class="reference internal" href="weac.components.layer.html#weac.components.layer.Layer" title="weac.components.layer.Layer"><em>Layer</em></a><em>]</em>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><em>Tuple</em>[<a class="reference internal" href="weac.components.layer.html#weac.components.layer.WeakLayer" title="weac.components.layer.WeakLayer"><em>WeakLayer</em></a>, <em>List</em>[<a class="reference internal" href="weac.components.layer.html#weac.components.layer.Layer" title="weac.components.layer.Layer"><em>Layer</em></a>]]</p>
+</dd>
+</dl>
+</dd></dl>
 </dd></dl>
 </section>
 </div></div><aside class="hidden text-sm xl:block" id="right-sidebar">
 <div class="sticky top-16 -mt-10 max-h-[calc(100vh-5rem)] overflow-y-auto pt-6 space-y-2"><p class="font-medium">On this page</p>
 <ul>
 <li><a :data-current="activeSection === '#weac.utils.snowpilot_parser.SnowPilotParser'" class="reference internal" href="#weac.utils.snowpilot_parser.SnowPilotParser"><code class="docutils literal notranslate"><span class="pre">SnowPilotParser</span></code></a><ul>
+<li><a :data-current="activeSection === '#weac.utils.snowpilot_parser.SnowPilotParser.__init__'" class="reference internal" href="#weac.utils.snowpilot_parser.SnowPilotParser.__init__"><code class="docutils literal notranslate"><span class="pre">SnowPilotParser.__init__()</span></code></a></li>
 <li><a :data-current="activeSection === '#weac.utils.snowpilot_parser.SnowPilotParser.extract_layers'" class="reference internal" href="#weac.utils.snowpilot_parser.SnowPilotParser.extract_layers"><code class="docutils literal notranslate"><span class="pre">SnowPilotParser.extract_layers()</span></code></a></li>
-<li><a :data-current="activeSection === '#weac.utils.snowpilot_parser.SnowPilotParser.extract_weak_layer_and_layers_above'" class="reference internal" href="#weac.utils.snowpilot_parser.SnowPilotParser.extract_weak_layer_and_layers_above"><code class="docutils literal notranslate"><span class="pre">SnowPilotParser.extract_weak_layer_and_layers_above()</span></code></a></li>
 <li><a :data-current="activeSection === '#weac.utils.snowpilot_parser.SnowPilotParser.get_density_for_layer_range'" class="reference internal" href="#weac.utils.snowpilot_parser.SnowPilotParser.get_density_for_layer_range"><code class="docutils literal notranslate"><span class="pre">SnowPilotParser.get_density_for_layer_range()</span></code></a></li>
+<li><a :data-current="activeSection === '#weac.utils.snowpilot_parser.SnowPilotParser.extract_weak_layer_and_layers_above'" class="reference internal" href="#weac.utils.snowpilot_parser.SnowPilotParser.extract_weak_layer_and_layers_above"><code class="docutils literal notranslate"><span class="pre">SnowPilotParser.extract_weak_layer_and_layers_above()</span></code></a></li>
 </ul>
 </li>
 </ul>

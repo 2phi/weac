@@ -231,6 +231,8 @@
 </span><span id="line-80">    <span class="n">touchdown_distance</span><span class="p">:</span> <span class="nb">float</span>
 </span><span id="line-81">    <span class="n">collapsed_weak_layer_kR</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
 </span><span id="line-82">
+<div class="viewcode-block" id="SlabTouchdown.__init__">
+<a class="viewcode-back" href="../../../weac.core.slab_touchdown.html#weac.core.slab_touchdown.SlabTouchdown.__init__">[docs]</a>
 </span><span id="line-83">    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">scenario</span><span class="p">:</span> <span class="n">Scenario</span><span class="p">,</span> <span class="n">eigensystem</span><span class="p">:</span> <span class="n">Eigensystem</span><span class="p">):</span>
 </span><span id="line-84">        <span class="bp">self</span><span class="o">.</span><span class="n">scenario</span> <span class="o">=</span> <span class="n">scenario</span>
 </span><span id="line-85">        <span class="bp">self</span><span class="o">.</span><span class="n">eigensystem</span> <span class="o">=</span> <span class="n">eigensystem</span>
@@ -246,7 +248,8 @@
 </span><span id="line-95">
 </span><span id="line-96">        <span class="bp">self</span><span class="o">.</span><span class="n">collapsed_eigensystem</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_create_collapsed_eigensystem</span><span class="p">()</span>
 </span><span id="line-97">
-</span><span id="line-98">        <span class="bp">self</span><span class="o">.</span><span class="n">_setup_touchdown_system</span><span class="p">()</span>
+</span><span id="line-98">        <span class="bp">self</span><span class="o">.</span><span class="n">_setup_touchdown_system</span><span class="p">()</span></div>
+
 </span><span id="line-99">
 </span><span id="line-100">    <span class="k">def</span><span class="w"> </span><span class="nf">_setup_touchdown_system</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 </span><span id="line-101"><span class="w">        </span><span class="sd">&quot;&quot;&quot;Calculate touchdown&quot;&quot;&quot;</span>

@@ -116,6 +116,203 @@ axis (x-coordinate), so they return an <cite>ndarray</cite> of length N.</p>
 </dd>
 </dl>
 <dl class="py method">
+<dt class="sig sig-object py" id="weac.core.field_quantities.FieldQuantities.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">eigensystem</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/weac/core/field_quantities.html#FieldQuantities.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#weac.core.field_quantities.FieldQuantities.__init__" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#weac.core.field_quantities.FieldQuantities.__init__'">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>eigensystem</strong> (<a class="reference internal" href="weac.core.eigensystem.html#weac.core.eigensystem.Eigensystem" title="weac.core.eigensystem.Eigensystem"><em>Eigensystem</em></a>)</p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="weac.core.field_quantities.FieldQuantities.u">
+<span class="sig-name descname"><span class="pre">u</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">Z</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">h0</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">unit</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'mm'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/weac/core/field_quantities.html#FieldQuantities.u"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#weac.core.field_quantities.FieldQuantities.u" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#weac.core.field_quantities.FieldQuantities.u'">¶</a></dt>
+<dd><p>Horizontal displacement <em>u = u₀ + h₀ ψ</em> at depth h₀.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>Z</strong> (<em>ndarray</em>)</p></li>
+<li><p><strong>h0</strong> (<em>float</em>)</p></li>
+<li><p><strong>unit</strong> (<em>Literal</em><em>[</em><em>'m'</em><em>, </em><em>'cm'</em><em>, </em><em>'mm'</em><em>, </em><em>'um'</em><em>]</em>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>float | <em>ndarray</em></p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="weac.core.field_quantities.FieldQuantities.du_dx">
+<span class="sig-name descname"><span class="pre">du_dx</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">Z</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">h0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/weac/core/field_quantities.html#FieldQuantities.du_dx"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#weac.core.field_quantities.FieldQuantities.du_dx" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#weac.core.field_quantities.FieldQuantities.du_dx'">¶</a></dt>
+<dd><p>Derivative u’ = u₀’ + h₀ ψ’.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>Z</strong> (<em>ndarray</em>)</p></li>
+<li><p><strong>h0</strong> (<em>float</em>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>float | <em>ndarray</em></p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="weac.core.field_quantities.FieldQuantities.w">
+<span class="sig-name descname"><span class="pre">w</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">Z</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">unit</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'mm'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/weac/core/field_quantities.html#FieldQuantities.w"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#weac.core.field_quantities.FieldQuantities.w" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#weac.core.field_quantities.FieldQuantities.w'">¶</a></dt>
+<dd><p>Center-line deflection <em>w</em>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>Z</strong> (<em>ndarray</em>)</p></li>
+<li><p><strong>unit</strong> (<em>Literal</em><em>[</em><em>'m'</em><em>, </em><em>'cm'</em><em>, </em><em>'mm'</em><em>, </em><em>'um'</em><em>]</em>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>float | <em>ndarray</em></p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="weac.core.field_quantities.FieldQuantities.dw_dx">
+<span class="sig-name descname"><span class="pre">dw_dx</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">Z</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/weac/core/field_quantities.html#FieldQuantities.dw_dx"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#weac.core.field_quantities.FieldQuantities.dw_dx" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#weac.core.field_quantities.FieldQuantities.dw_dx'">¶</a></dt>
+<dd><p>First derivative w’.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>Z</strong> (<em>ndarray</em>)</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>float | <em>ndarray</em></p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="weac.core.field_quantities.FieldQuantities.psi">
+<span class="sig-name descname"><span class="pre">psi</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">Z</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">unit</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'rad'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/weac/core/field_quantities.html#FieldQuantities.psi"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#weac.core.field_quantities.FieldQuantities.psi" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#weac.core.field_quantities.FieldQuantities.psi'">¶</a></dt>
+<dd><p>Rotation ψ of the mid-plane.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>Z</strong> (<em>ndarray</em>)</p></li>
+<li><p><strong>unit</strong> (<em>Literal</em><em>[</em><em>'deg'</em><em>, </em><em>'rad'</em><em>]</em>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>float | <em>ndarray</em></p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="weac.core.field_quantities.FieldQuantities.dpsi_dx">
+<span class="sig-name descname"><span class="pre">dpsi_dx</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">Z</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/weac/core/field_quantities.html#FieldQuantities.dpsi_dx"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#weac.core.field_quantities.FieldQuantities.dpsi_dx" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#weac.core.field_quantities.FieldQuantities.dpsi_dx'">¶</a></dt>
+<dd><p>First derivative ψ′.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>Z</strong> (<em>ndarray</em>)</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>float | <em>ndarray</em></p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="weac.core.field_quantities.FieldQuantities.N">
+<span class="sig-name descname"><span class="pre">N</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">Z</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/weac/core/field_quantities.html#FieldQuantities.N"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#weac.core.field_quantities.FieldQuantities.N" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#weac.core.field_quantities.FieldQuantities.N'">¶</a></dt>
+<dd><p>Axial normal force N = A11 u’ + B11 psi’ in the slab [N]</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>Z</strong> (<em>ndarray</em>)</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>float | <em>ndarray</em></p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="weac.core.field_quantities.FieldQuantities.M">
+<span class="sig-name descname"><span class="pre">M</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">Z</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/weac/core/field_quantities.html#FieldQuantities.M"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#weac.core.field_quantities.FieldQuantities.M" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#weac.core.field_quantities.FieldQuantities.M'">¶</a></dt>
+<dd><p>Bending moment M = B11 u’ + D11 psi’ in the slab [Nmm]</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>Z</strong> (<em>ndarray</em>)</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>float | <em>ndarray</em></p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="weac.core.field_quantities.FieldQuantities.V">
+<span class="sig-name descname"><span class="pre">V</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">Z</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/weac/core/field_quantities.html#FieldQuantities.V"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#weac.core.field_quantities.FieldQuantities.V" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#weac.core.field_quantities.FieldQuantities.V'">¶</a></dt>
+<dd><p>Vertical shear force V = kA55(w’ + psi) [N]</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>Z</strong> (<em>ndarray</em>)</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>float | <em>ndarray</em></p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="weac.core.field_quantities.FieldQuantities.sig">
+<span class="sig-name descname"><span class="pre">sig</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">Z</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">unit</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'MPa'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/weac/core/field_quantities.html#FieldQuantities.sig"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#weac.core.field_quantities.FieldQuantities.sig" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#weac.core.field_quantities.FieldQuantities.sig'">¶</a></dt>
+<dd><p>Weak-layer normal stress</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>Z</strong> (<em>ndarray</em>)</p></li>
+<li><p><strong>unit</strong> (<em>Literal</em><em>[</em><em>'Pa'</em><em>, </em><em>'kPa'</em><em>, </em><em>'MPa'</em><em>, </em><em>'GPa'</em><em>]</em>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>float | <em>ndarray</em></p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="weac.core.field_quantities.FieldQuantities.tau">
+<span class="sig-name descname"><span class="pre">tau</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">Z</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">unit</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'MPa'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/weac/core/field_quantities.html#FieldQuantities.tau"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#weac.core.field_quantities.FieldQuantities.tau" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#weac.core.field_quantities.FieldQuantities.tau'">¶</a></dt>
+<dd><p>Weak-layer shear stress</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>Z</strong> (<em>ndarray</em>)</p></li>
+<li><p><strong>unit</strong> (<em>Literal</em><em>[</em><em>'Pa'</em><em>, </em><em>'kPa'</em><em>, </em><em>'MPa'</em><em>, </em><em>'GPa'</em><em>]</em>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>float | <em>ndarray</em></p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="weac.core.field_quantities.FieldQuantities.eps">
+<span class="sig-name descname"><span class="pre">eps</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">Z</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/weac/core/field_quantities.html#FieldQuantities.eps"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#weac.core.field_quantities.FieldQuantities.eps" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#weac.core.field_quantities.FieldQuantities.eps'">¶</a></dt>
+<dd><p>Weak-layer normal strain</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>Z</strong> (<em>ndarray</em>)</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>float | <em>ndarray</em></p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="weac.core.field_quantities.FieldQuantities.gamma">
+<span class="sig-name descname"><span class="pre">gamma</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">Z</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/weac/core/field_quantities.html#FieldQuantities.gamma"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#weac.core.field_quantities.FieldQuantities.gamma" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#weac.core.field_quantities.FieldQuantities.gamma'">¶</a></dt>
+<dd><p>Weak-layer shear strain.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>Z</strong> (<em>ndarray</em>)</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>float | <em>ndarray</em></p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="py method">
 <dt class="sig sig-object py" id="weac.core.field_quantities.FieldQuantities.Gi">
 <span class="sig-name descname"><span class="pre">Gi</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">Ztip</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">unit</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'kJ/m^2'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/weac/core/field_quantities.html#FieldQuantities.Gi"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#weac.core.field_quantities.FieldQuantities.Gi" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#weac.core.field_quantities.FieldQuantities.Gi'">¶</a></dt>
 <dd><p>Mode I differential energy release rate at crack tip.</p>
@@ -143,169 +340,6 @@ at the crack tip.</p></li>
 at the crack tip.</p></li>
 <li><p><strong>unit</strong> (<em>{'N/mm'</em><em>, </em><em>'kJ/m^2'</em><em>, </em><em>'J/m^2'}</em><em>, </em><em>optional</em>) – Desired output unit. Default is kJ/m^2 = N/mm.</p></li>
 </ul>
-</dd>
-<dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p>float | <em>ndarray</em></p>
-</dd>
-</dl>
-</dd></dl>
-<dl class="py method">
-<dt class="sig sig-object py" id="weac.core.field_quantities.FieldQuantities.M">
-<span class="sig-name descname"><span class="pre">M</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">Z</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/weac/core/field_quantities.html#FieldQuantities.M"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#weac.core.field_quantities.FieldQuantities.M" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#weac.core.field_quantities.FieldQuantities.M'">¶</a></dt>
-<dd><p>Bending moment M = B11 u’ + D11 psi’ in the slab [Nmm]</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>Z</strong> (<em>ndarray</em>)</p>
-</dd>
-<dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p>float | <em>ndarray</em></p>
-</dd>
-</dl>
-</dd></dl>
-<dl class="py method">
-<dt class="sig sig-object py" id="weac.core.field_quantities.FieldQuantities.N">
-<span class="sig-name descname"><span class="pre">N</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">Z</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/weac/core/field_quantities.html#FieldQuantities.N"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#weac.core.field_quantities.FieldQuantities.N" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#weac.core.field_quantities.FieldQuantities.N'">¶</a></dt>
-<dd><p>Axial normal force N = A11 u’ + B11 psi’ in the slab [N]</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>Z</strong> (<em>ndarray</em>)</p>
-</dd>
-<dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p>float | <em>ndarray</em></p>
-</dd>
-</dl>
-</dd></dl>
-<dl class="py method">
-<dt class="sig sig-object py" id="weac.core.field_quantities.FieldQuantities.V">
-<span class="sig-name descname"><span class="pre">V</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">Z</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/weac/core/field_quantities.html#FieldQuantities.V"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#weac.core.field_quantities.FieldQuantities.V" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#weac.core.field_quantities.FieldQuantities.V'">¶</a></dt>
-<dd><p>Vertical shear force V = kA55(w’ + psi) [N]</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>Z</strong> (<em>ndarray</em>)</p>
-</dd>
-<dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p>float | <em>ndarray</em></p>
-</dd>
-</dl>
-</dd></dl>
-<dl class="py method">
-<dt class="sig sig-object py" id="weac.core.field_quantities.FieldQuantities.dpsi_dx">
-<span class="sig-name descname"><span class="pre">dpsi_dx</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">Z</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/weac/core/field_quantities.html#FieldQuantities.dpsi_dx"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#weac.core.field_quantities.FieldQuantities.dpsi_dx" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#weac.core.field_quantities.FieldQuantities.dpsi_dx'">¶</a></dt>
-<dd><p>First derivative ψ′.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>Z</strong> (<em>ndarray</em>)</p>
-</dd>
-<dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p>float | <em>ndarray</em></p>
-</dd>
-</dl>
-</dd></dl>
-<dl class="py method">
-<dt class="sig sig-object py" id="weac.core.field_quantities.FieldQuantities.dpsi_dxdx">
-<span class="sig-name descname"><span class="pre">dpsi_dxdx</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">z</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">phi</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">qs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/weac/core/field_quantities.html#FieldQuantities.dpsi_dxdx"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#weac.core.field_quantities.FieldQuantities.dpsi_dxdx" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#weac.core.field_quantities.FieldQuantities.dpsi_dxdx'">¶</a></dt>
-<dd><p>Get second derivative of the cross-section rotation psi’’(x).</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>z</strong> (<em>ndarray</em>) – Solution vector [u(x) u’(x) w(x) w’(x) psi(x) psi’(x)]^T.</p></li>
-<li><p><strong>phi</strong> (<em>float</em>) – Inclination (degrees). Counterclockwise positive.</p></li>
-<li><p><strong>qs</strong> (<em>float</em>)</p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>Second derivative of the cross-section rotation psi’’(x) (1/mm^2).</p>
-</dd>
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>ndarray, float</p>
-</dd>
-</dl>
-</dd></dl>
-<dl class="py method">
-<dt class="sig sig-object py" id="weac.core.field_quantities.FieldQuantities.dpsi_dxdxdx">
-<span class="sig-name descname"><span class="pre">dpsi_dxdxdx</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">z</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">phi</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">qs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/weac/core/field_quantities.html#FieldQuantities.dpsi_dxdxdx"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#weac.core.field_quantities.FieldQuantities.dpsi_dxdxdx" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#weac.core.field_quantities.FieldQuantities.dpsi_dxdxdx'">¶</a></dt>
-<dd><p>Get third derivative of the cross-section rotation psi’’’(x).</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>z</strong> (<em>ndarray</em>) – Solution vector [u(x) u’(x) w(x) w’(x) psi(x) psi’(x)]^T.</p></li>
-<li><p><strong>phi</strong> (<em>float</em>) – Inclination (degrees). Counterclockwise positive.</p></li>
-<li><p><strong>qs</strong> (<em>float</em>)</p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>Third derivative of the cross-section rotation psi’’’(x) (1/mm^3).</p>
-</dd>
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>ndarray, float</p>
-</dd>
-</dl>
-</dd></dl>
-<dl class="py method">
-<dt class="sig sig-object py" id="weac.core.field_quantities.FieldQuantities.du0_dxdx">
-<span class="sig-name descname"><span class="pre">du0_dxdx</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">z</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">phi</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">qs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/weac/core/field_quantities.html#FieldQuantities.du0_dxdx"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#weac.core.field_quantities.FieldQuantities.du0_dxdx" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#weac.core.field_quantities.FieldQuantities.du0_dxdx'">¶</a></dt>
-<dd><p>Get second derivative of the horiz. centerline displacement u0’’(x).</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>z</strong> (<em>ndarray</em>) – Solution vector [u(x) u’(x) w(x) w’(x) psi(x) psi’(x)]^T.</p></li>
-<li><p><strong>phi</strong> (<em>float</em>) – Inclination (degrees). Counterclockwise positive.</p></li>
-<li><p><strong>qs</strong> (<em>float</em>)</p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>Second derivative of the horizontal centerline displacement
-u0’’(x) (1/mm).</p>
-</dd>
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>ndarray, float</p>
-</dd>
-</dl>
-</dd></dl>
-<dl class="py method">
-<dt class="sig sig-object py" id="weac.core.field_quantities.FieldQuantities.du0_dxdxdx">
-<span class="sig-name descname"><span class="pre">du0_dxdxdx</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">z</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">phi</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">qs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/weac/core/field_quantities.html#FieldQuantities.du0_dxdxdx"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#weac.core.field_quantities.FieldQuantities.du0_dxdxdx" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#weac.core.field_quantities.FieldQuantities.du0_dxdxdx'">¶</a></dt>
-<dd><p>Get third derivative of the horiz. centerline displacement u0’’’(x).</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>z</strong> (<em>ndarray</em>) – Solution vector [u(x) u’(x) w(x) w’(x) psi(x) psi’(x)]^T.</p></li>
-<li><p><strong>phi</strong> (<em>float</em>) – Inclination (degrees). Counterclockwise positive.</p></li>
-<li><p><strong>qs</strong> (<em>float</em>)</p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>Third derivative of the horizontal centerline displacement
-u0’’’(x) (1/mm^2).</p>
-</dd>
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>ndarray, float</p>
-</dd>
-</dl>
-</dd></dl>
-<dl class="py method">
-<dt class="sig sig-object py" id="weac.core.field_quantities.FieldQuantities.du_dx">
-<span class="sig-name descname"><span class="pre">du_dx</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">Z</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">h0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/weac/core/field_quantities.html#FieldQuantities.du_dx"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#weac.core.field_quantities.FieldQuantities.du_dx" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#weac.core.field_quantities.FieldQuantities.du_dx'">¶</a></dt>
-<dd><p>Derivative u’ = u₀’ + h₀ ψ’.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>Z</strong> (<em>ndarray</em>)</p></li>
-<li><p><strong>h0</strong> (<em>float</em>)</p></li>
-</ul>
-</dd>
-<dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p>float | <em>ndarray</em></p>
-</dd>
-</dl>
-</dd></dl>
-<dl class="py method">
-<dt class="sig sig-object py" id="weac.core.field_quantities.FieldQuantities.dw_dx">
-<span class="sig-name descname"><span class="pre">dw_dx</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">Z</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/weac/core/field_quantities.html#FieldQuantities.dw_dx"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#weac.core.field_quantities.FieldQuantities.dw_dx" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#weac.core.field_quantities.FieldQuantities.dw_dx'">¶</a></dt>
-<dd><p>First derivative w’.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>Z</strong> (<em>ndarray</em>)</p>
 </dd>
 <dt class="field-even">Return type<span class="colon">:</span></dt>
 <dd class="field-even"><p>float | <em>ndarray</em></p>
@@ -356,109 +390,84 @@ of the solution vector (6x1).</p>
 </dl>
 </dd></dl>
 <dl class="py method">
-<dt class="sig sig-object py" id="weac.core.field_quantities.FieldQuantities.eps">
-<span class="sig-name descname"><span class="pre">eps</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">Z</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/weac/core/field_quantities.html#FieldQuantities.eps"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#weac.core.field_quantities.FieldQuantities.eps" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#weac.core.field_quantities.FieldQuantities.eps'">¶</a></dt>
-<dd><p>Weak-layer normal strain</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>Z</strong> (<em>ndarray</em>)</p>
-</dd>
-<dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p>float | <em>ndarray</em></p>
-</dd>
-</dl>
-</dd></dl>
-<dl class="py method">
-<dt class="sig sig-object py" id="weac.core.field_quantities.FieldQuantities.gamma">
-<span class="sig-name descname"><span class="pre">gamma</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">Z</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/weac/core/field_quantities.html#FieldQuantities.gamma"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#weac.core.field_quantities.FieldQuantities.gamma" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#weac.core.field_quantities.FieldQuantities.gamma'">¶</a></dt>
-<dd><p>Weak-layer shear strain.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>Z</strong> (<em>ndarray</em>)</p>
-</dd>
-<dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p>float | <em>ndarray</em></p>
-</dd>
-</dl>
-</dd></dl>
-<dl class="py method">
-<dt class="sig sig-object py" id="weac.core.field_quantities.FieldQuantities.psi">
-<span class="sig-name descname"><span class="pre">psi</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">Z</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">unit</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'rad'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/weac/core/field_quantities.html#FieldQuantities.psi"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#weac.core.field_quantities.FieldQuantities.psi" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#weac.core.field_quantities.FieldQuantities.psi'">¶</a></dt>
-<dd><p>Rotation ψ of the mid-plane.</p>
+<dt class="sig sig-object py" id="weac.core.field_quantities.FieldQuantities.du0_dxdx">
+<span class="sig-name descname"><span class="pre">du0_dxdx</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">z</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">phi</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">qs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/weac/core/field_quantities.html#FieldQuantities.du0_dxdx"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#weac.core.field_quantities.FieldQuantities.du0_dxdx" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#weac.core.field_quantities.FieldQuantities.du0_dxdx'">¶</a></dt>
+<dd><p>Get second derivative of the horiz. centerline displacement u0’’(x).</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>Z</strong> (<em>ndarray</em>)</p></li>
-<li><p><strong>unit</strong> (<em>Literal</em><em>[</em><em>'deg'</em><em>, </em><em>'rad'</em><em>]</em>)</p></li>
+<li><p><strong>z</strong> (<em>ndarray</em>) – Solution vector [u(x) u’(x) w(x) w’(x) psi(x) psi’(x)]^T.</p></li>
+<li><p><strong>phi</strong> (<em>float</em>) – Inclination (degrees). Counterclockwise positive.</p></li>
+<li><p><strong>qs</strong> (<em>float</em>)</p></li>
 </ul>
 </dd>
-<dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p>float | <em>ndarray</em></p>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Second derivative of the horizontal centerline displacement
+u0’’(x) (1/mm).</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>ndarray, float</p>
 </dd>
 </dl>
 </dd></dl>
 <dl class="py method">
-<dt class="sig sig-object py" id="weac.core.field_quantities.FieldQuantities.sig">
-<span class="sig-name descname"><span class="pre">sig</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">Z</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">unit</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'MPa'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/weac/core/field_quantities.html#FieldQuantities.sig"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#weac.core.field_quantities.FieldQuantities.sig" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#weac.core.field_quantities.FieldQuantities.sig'">¶</a></dt>
-<dd><p>Weak-layer normal stress</p>
+<dt class="sig sig-object py" id="weac.core.field_quantities.FieldQuantities.dpsi_dxdx">
+<span class="sig-name descname"><span class="pre">dpsi_dxdx</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">z</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">phi</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">qs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/weac/core/field_quantities.html#FieldQuantities.dpsi_dxdx"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#weac.core.field_quantities.FieldQuantities.dpsi_dxdx" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#weac.core.field_quantities.FieldQuantities.dpsi_dxdx'">¶</a></dt>
+<dd><p>Get second derivative of the cross-section rotation psi’’(x).</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>Z</strong> (<em>ndarray</em>)</p></li>
-<li><p><strong>unit</strong> (<em>Literal</em><em>[</em><em>'Pa'</em><em>, </em><em>'kPa'</em><em>, </em><em>'MPa'</em><em>, </em><em>'GPa'</em><em>]</em>)</p></li>
+<li><p><strong>z</strong> (<em>ndarray</em>) – Solution vector [u(x) u’(x) w(x) w’(x) psi(x) psi’(x)]^T.</p></li>
+<li><p><strong>phi</strong> (<em>float</em>) – Inclination (degrees). Counterclockwise positive.</p></li>
+<li><p><strong>qs</strong> (<em>float</em>)</p></li>
 </ul>
 </dd>
-<dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p>float | <em>ndarray</em></p>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Second derivative of the cross-section rotation psi’’(x) (1/mm^2).</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>ndarray, float</p>
 </dd>
 </dl>
 </dd></dl>
 <dl class="py method">
-<dt class="sig sig-object py" id="weac.core.field_quantities.FieldQuantities.tau">
-<span class="sig-name descname"><span class="pre">tau</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">Z</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">unit</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'MPa'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/weac/core/field_quantities.html#FieldQuantities.tau"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#weac.core.field_quantities.FieldQuantities.tau" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#weac.core.field_quantities.FieldQuantities.tau'">¶</a></dt>
-<dd><p>Weak-layer shear stress</p>
+<dt class="sig sig-object py" id="weac.core.field_quantities.FieldQuantities.du0_dxdxdx">
+<span class="sig-name descname"><span class="pre">du0_dxdxdx</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">z</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">phi</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">qs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/weac/core/field_quantities.html#FieldQuantities.du0_dxdxdx"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#weac.core.field_quantities.FieldQuantities.du0_dxdxdx" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#weac.core.field_quantities.FieldQuantities.du0_dxdxdx'">¶</a></dt>
+<dd><p>Get third derivative of the horiz. centerline displacement u0’’’(x).</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>Z</strong> (<em>ndarray</em>)</p></li>
-<li><p><strong>unit</strong> (<em>Literal</em><em>[</em><em>'Pa'</em><em>, </em><em>'kPa'</em><em>, </em><em>'MPa'</em><em>, </em><em>'GPa'</em><em>]</em>)</p></li>
+<li><p><strong>z</strong> (<em>ndarray</em>) – Solution vector [u(x) u’(x) w(x) w’(x) psi(x) psi’(x)]^T.</p></li>
+<li><p><strong>phi</strong> (<em>float</em>) – Inclination (degrees). Counterclockwise positive.</p></li>
+<li><p><strong>qs</strong> (<em>float</em>)</p></li>
 </ul>
 </dd>
-<dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p>float | <em>ndarray</em></p>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Third derivative of the horizontal centerline displacement
+u0’’’(x) (1/mm^2).</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>ndarray, float</p>
 </dd>
 </dl>
 </dd></dl>
 <dl class="py method">
-<dt class="sig sig-object py" id="weac.core.field_quantities.FieldQuantities.u">
-<span class="sig-name descname"><span class="pre">u</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">Z</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">h0</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">unit</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'mm'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/weac/core/field_quantities.html#FieldQuantities.u"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#weac.core.field_quantities.FieldQuantities.u" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#weac.core.field_quantities.FieldQuantities.u'">¶</a></dt>
-<dd><p>Horizontal displacement <em>u = u₀ + h₀ ψ</em> at depth h₀.</p>
+<dt class="sig sig-object py" id="weac.core.field_quantities.FieldQuantities.dpsi_dxdxdx">
+<span class="sig-name descname"><span class="pre">dpsi_dxdxdx</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">z</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">phi</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">qs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/weac/core/field_quantities.html#FieldQuantities.dpsi_dxdxdx"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#weac.core.field_quantities.FieldQuantities.dpsi_dxdxdx" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#weac.core.field_quantities.FieldQuantities.dpsi_dxdxdx'">¶</a></dt>
+<dd><p>Get third derivative of the cross-section rotation psi’’’(x).</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>Z</strong> (<em>ndarray</em>)</p></li>
-<li><p><strong>h0</strong> (<em>float</em>)</p></li>
-<li><p><strong>unit</strong> (<em>Literal</em><em>[</em><em>'m'</em><em>, </em><em>'cm'</em><em>, </em><em>'mm'</em><em>, </em><em>'um'</em><em>]</em>)</p></li>
+<li><p><strong>z</strong> (<em>ndarray</em>) – Solution vector [u(x) u’(x) w(x) w’(x) psi(x) psi’(x)]^T.</p></li>
+<li><p><strong>phi</strong> (<em>float</em>) – Inclination (degrees). Counterclockwise positive.</p></li>
+<li><p><strong>qs</strong> (<em>float</em>)</p></li>
 </ul>
 </dd>
-<dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p>float | <em>ndarray</em></p>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Third derivative of the cross-section rotation psi’’’(x) (1/mm^3).</p>
 </dd>
-</dl>
-</dd></dl>
-<dl class="py method">
-<dt class="sig sig-object py" id="weac.core.field_quantities.FieldQuantities.w">
-<span class="sig-name descname"><span class="pre">w</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">Z</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">unit</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'mm'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/weac/core/field_quantities.html#FieldQuantities.w"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#weac.core.field_quantities.FieldQuantities.w" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#weac.core.field_quantities.FieldQuantities.w'">¶</a></dt>
-<dd><p>Center-line deflection <em>w</em>.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>Z</strong> (<em>ndarray</em>)</p></li>
-<li><p><strong>unit</strong> (<em>Literal</em><em>[</em><em>'m'</em><em>, </em><em>'cm'</em><em>, </em><em>'mm'</em><em>, </em><em>'um'</em><em>]</em>)</p></li>
-</ul>
-</dd>
-<dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p>float | <em>ndarray</em></p>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>ndarray, float</p>
 </dd>
 </dl>
 </dd></dl>
@@ -468,27 +477,28 @@ of the solution vector (6x1).</p>
 <div class="sticky top-16 -mt-10 max-h-[calc(100vh-5rem)] overflow-y-auto pt-6 space-y-2"><p class="font-medium">On this page</p>
 <ul>
 <li><a :data-current="activeSection === '#weac.core.field_quantities.FieldQuantities'" class="reference internal" href="#weac.core.field_quantities.FieldQuantities"><code class="docutils literal notranslate"><span class="pre">FieldQuantities</span></code></a><ul>
-<li><a :data-current="activeSection === '#weac.core.field_quantities.FieldQuantities.Gi'" class="reference internal" href="#weac.core.field_quantities.FieldQuantities.Gi"><code class="docutils literal notranslate"><span class="pre">FieldQuantities.Gi()</span></code></a></li>
-<li><a :data-current="activeSection === '#weac.core.field_quantities.FieldQuantities.Gii'" class="reference internal" href="#weac.core.field_quantities.FieldQuantities.Gii"><code class="docutils literal notranslate"><span class="pre">FieldQuantities.Gii()</span></code></a></li>
-<li><a :data-current="activeSection === '#weac.core.field_quantities.FieldQuantities.M'" class="reference internal" href="#weac.core.field_quantities.FieldQuantities.M"><code class="docutils literal notranslate"><span class="pre">FieldQuantities.M()</span></code></a></li>
-<li><a :data-current="activeSection === '#weac.core.field_quantities.FieldQuantities.N'" class="reference internal" href="#weac.core.field_quantities.FieldQuantities.N"><code class="docutils literal notranslate"><span class="pre">FieldQuantities.N()</span></code></a></li>
-<li><a :data-current="activeSection === '#weac.core.field_quantities.FieldQuantities.V'" class="reference internal" href="#weac.core.field_quantities.FieldQuantities.V"><code class="docutils literal notranslate"><span class="pre">FieldQuantities.V()</span></code></a></li>
-<li><a :data-current="activeSection === '#weac.core.field_quantities.FieldQuantities.dpsi_dx'" class="reference internal" href="#weac.core.field_quantities.FieldQuantities.dpsi_dx"><code class="docutils literal notranslate"><span class="pre">FieldQuantities.dpsi_dx()</span></code></a></li>
-<li><a :data-current="activeSection === '#weac.core.field_quantities.FieldQuantities.dpsi_dxdx'" class="reference internal" href="#weac.core.field_quantities.FieldQuantities.dpsi_dxdx"><code class="docutils literal notranslate"><span class="pre">FieldQuantities.dpsi_dxdx()</span></code></a></li>
-<li><a :data-current="activeSection === '#weac.core.field_quantities.FieldQuantities.dpsi_dxdxdx'" class="reference internal" href="#weac.core.field_quantities.FieldQuantities.dpsi_dxdxdx"><code class="docutils literal notranslate"><span class="pre">FieldQuantities.dpsi_dxdxdx()</span></code></a></li>
-<li><a :data-current="activeSection === '#weac.core.field_quantities.FieldQuantities.du0_dxdx'" class="reference internal" href="#weac.core.field_quantities.FieldQuantities.du0_dxdx"><code class="docutils literal notranslate"><span class="pre">FieldQuantities.du0_dxdx()</span></code></a></li>
-<li><a :data-current="activeSection === '#weac.core.field_quantities.FieldQuantities.du0_dxdxdx'" class="reference internal" href="#weac.core.field_quantities.FieldQuantities.du0_dxdxdx"><code class="docutils literal notranslate"><span class="pre">FieldQuantities.du0_dxdxdx()</span></code></a></li>
+<li><a :data-current="activeSection === '#weac.core.field_quantities.FieldQuantities.__init__'" class="reference internal" href="#weac.core.field_quantities.FieldQuantities.__init__"><code class="docutils literal notranslate"><span class="pre">FieldQuantities.__init__()</span></code></a></li>
+<li><a :data-current="activeSection === '#weac.core.field_quantities.FieldQuantities.u'" class="reference internal" href="#weac.core.field_quantities.FieldQuantities.u"><code class="docutils literal notranslate"><span class="pre">FieldQuantities.u()</span></code></a></li>
 <li><a :data-current="activeSection === '#weac.core.field_quantities.FieldQuantities.du_dx'" class="reference internal" href="#weac.core.field_quantities.FieldQuantities.du_dx"><code class="docutils literal notranslate"><span class="pre">FieldQuantities.du_dx()</span></code></a></li>
+<li><a :data-current="activeSection === '#weac.core.field_quantities.FieldQuantities.w'" class="reference internal" href="#weac.core.field_quantities.FieldQuantities.w"><code class="docutils literal notranslate"><span class="pre">FieldQuantities.w()</span></code></a></li>
 <li><a :data-current="activeSection === '#weac.core.field_quantities.FieldQuantities.dw_dx'" class="reference internal" href="#weac.core.field_quantities.FieldQuantities.dw_dx"><code class="docutils literal notranslate"><span class="pre">FieldQuantities.dw_dx()</span></code></a></li>
-<li><a :data-current="activeSection === '#weac.core.field_quantities.FieldQuantities.dz_dx'" class="reference internal" href="#weac.core.field_quantities.FieldQuantities.dz_dx"><code class="docutils literal notranslate"><span class="pre">FieldQuantities.dz_dx()</span></code></a></li>
-<li><a :data-current="activeSection === '#weac.core.field_quantities.FieldQuantities.dz_dxdx'" class="reference internal" href="#weac.core.field_quantities.FieldQuantities.dz_dxdx"><code class="docutils literal notranslate"><span class="pre">FieldQuantities.dz_dxdx()</span></code></a></li>
-<li><a :data-current="activeSection === '#weac.core.field_quantities.FieldQuantities.eps'" class="reference internal" href="#weac.core.field_quantities.FieldQuantities.eps"><code class="docutils literal notranslate"><span class="pre">FieldQuantities.eps()</span></code></a></li>
-<li><a :data-current="activeSection === '#weac.core.field_quantities.FieldQuantities.gamma'" class="reference internal" href="#weac.core.field_quantities.FieldQuantities.gamma"><code class="docutils literal notranslate"><span class="pre">FieldQuantities.gamma()</span></code></a></li>
 <li><a :data-current="activeSection === '#weac.core.field_quantities.FieldQuantities.psi'" class="reference internal" href="#weac.core.field_quantities.FieldQuantities.psi"><code class="docutils literal notranslate"><span class="pre">FieldQuantities.psi()</span></code></a></li>
+<li><a :data-current="activeSection === '#weac.core.field_quantities.FieldQuantities.dpsi_dx'" class="reference internal" href="#weac.core.field_quantities.FieldQuantities.dpsi_dx"><code class="docutils literal notranslate"><span class="pre">FieldQuantities.dpsi_dx()</span></code></a></li>
+<li><a :data-current="activeSection === '#weac.core.field_quantities.FieldQuantities.N'" class="reference internal" href="#weac.core.field_quantities.FieldQuantities.N"><code class="docutils literal notranslate"><span class="pre">FieldQuantities.N()</span></code></a></li>
+<li><a :data-current="activeSection === '#weac.core.field_quantities.FieldQuantities.M'" class="reference internal" href="#weac.core.field_quantities.FieldQuantities.M"><code class="docutils literal notranslate"><span class="pre">FieldQuantities.M()</span></code></a></li>
+<li><a :data-current="activeSection === '#weac.core.field_quantities.FieldQuantities.V'" class="reference internal" href="#weac.core.field_quantities.FieldQuantities.V"><code class="docutils literal notranslate"><span class="pre">FieldQuantities.V()</span></code></a></li>
 <li><a :data-current="activeSection === '#weac.core.field_quantities.FieldQuantities.sig'" class="reference internal" href="#weac.core.field_quantities.FieldQuantities.sig"><code class="docutils literal notranslate"><span class="pre">FieldQuantities.sig()</span></code></a></li>
 <li><a :data-current="activeSection === '#weac.core.field_quantities.FieldQuantities.tau'" class="reference internal" href="#weac.core.field_quantities.FieldQuantities.tau"><code class="docutils literal notranslate"><span class="pre">FieldQuantities.tau()</span></code></a></li>
-<li><a :data-current="activeSection === '#weac.core.field_quantities.FieldQuantities.u'" class="reference internal" href="#weac.core.field_quantities.FieldQuantities.u"><code class="docutils literal notranslate"><span class="pre">FieldQuantities.u()</span></code></a></li>
-<li><a :data-current="activeSection === '#weac.core.field_quantities.FieldQuantities.w'" class="reference internal" href="#weac.core.field_quantities.FieldQuantities.w"><code class="docutils literal notranslate"><span class="pre">FieldQuantities.w()</span></code></a></li>
+<li><a :data-current="activeSection === '#weac.core.field_quantities.FieldQuantities.eps'" class="reference internal" href="#weac.core.field_quantities.FieldQuantities.eps"><code class="docutils literal notranslate"><span class="pre">FieldQuantities.eps()</span></code></a></li>
+<li><a :data-current="activeSection === '#weac.core.field_quantities.FieldQuantities.gamma'" class="reference internal" href="#weac.core.field_quantities.FieldQuantities.gamma"><code class="docutils literal notranslate"><span class="pre">FieldQuantities.gamma()</span></code></a></li>
+<li><a :data-current="activeSection === '#weac.core.field_quantities.FieldQuantities.Gi'" class="reference internal" href="#weac.core.field_quantities.FieldQuantities.Gi"><code class="docutils literal notranslate"><span class="pre">FieldQuantities.Gi()</span></code></a></li>
+<li><a :data-current="activeSection === '#weac.core.field_quantities.FieldQuantities.Gii'" class="reference internal" href="#weac.core.field_quantities.FieldQuantities.Gii"><code class="docutils literal notranslate"><span class="pre">FieldQuantities.Gii()</span></code></a></li>
+<li><a :data-current="activeSection === '#weac.core.field_quantities.FieldQuantities.dz_dx'" class="reference internal" href="#weac.core.field_quantities.FieldQuantities.dz_dx"><code class="docutils literal notranslate"><span class="pre">FieldQuantities.dz_dx()</span></code></a></li>
+<li><a :data-current="activeSection === '#weac.core.field_quantities.FieldQuantities.dz_dxdx'" class="reference internal" href="#weac.core.field_quantities.FieldQuantities.dz_dxdx"><code class="docutils literal notranslate"><span class="pre">FieldQuantities.dz_dxdx()</span></code></a></li>
+<li><a :data-current="activeSection === '#weac.core.field_quantities.FieldQuantities.du0_dxdx'" class="reference internal" href="#weac.core.field_quantities.FieldQuantities.du0_dxdx"><code class="docutils literal notranslate"><span class="pre">FieldQuantities.du0_dxdx()</span></code></a></li>
+<li><a :data-current="activeSection === '#weac.core.field_quantities.FieldQuantities.dpsi_dxdx'" class="reference internal" href="#weac.core.field_quantities.FieldQuantities.dpsi_dxdx"><code class="docutils literal notranslate"><span class="pre">FieldQuantities.dpsi_dxdx()</span></code></a></li>
+<li><a :data-current="activeSection === '#weac.core.field_quantities.FieldQuantities.du0_dxdxdx'" class="reference internal" href="#weac.core.field_quantities.FieldQuantities.du0_dxdxdx"><code class="docutils literal notranslate"><span class="pre">FieldQuantities.du0_dxdxdx()</span></code></a></li>
+<li><a :data-current="activeSection === '#weac.core.field_quantities.FieldQuantities.dpsi_dxdxdx'" class="reference internal" href="#weac.core.field_quantities.FieldQuantities.dpsi_dxdxdx"><code class="docutils literal notranslate"><span class="pre">FieldQuantities.dpsi_dxdxdx()</span></code></a></li>
 </ul>
 </li>
 </ul>

@@ -102,6 +102,11 @@
 <section id="module-weac.analysis.analyzer">
 <span id="weac-analysis-analyzer-module"></span><h1>weac.analysis.analyzer module<a class="headerlink" href="#module-weac.analysis.analyzer" title="Link to this heading">¶</a></h1>
 <p>This module provides the Analyzer class, which is used to analyze the results of the WEAC model.</p>
+<dl class="py function">
+<dt class="sig sig-object py" id="weac.analysis.analyzer.track_analyzer_call">
+<span class="sig-prename descclassname"><span class="pre">weac.analysis.analyzer.</span></span><span class="sig-name descname"><span class="pre">track_analyzer_call</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">func</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/weac/analysis/analyzer.html#track_analyzer_call"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#weac.analysis.analyzer.track_analyzer_call" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#weac.analysis.analyzer.track_analyzer_call'">¶</a></dt>
+<dd><p>Decorator to track call count and execution time of Analyzer methods.</p>
+</dd></dl>
 <dl class="py class">
 <dt class="sig sig-object py" id="weac.analysis.analyzer.Analyzer">
 <em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">weac.analysis.analyzer.</span></span><span class="sig-name descname"><span class="pre">Analyzer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">system_model</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">printing_enabled</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/weac/analysis/analyzer.html#Analyzer"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#weac.analysis.analyzer.Analyzer" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#weac.analysis.analyzer.Analyzer'">¶</a></dt>
@@ -117,6 +122,94 @@ elastic foundations.</p>
 </dd>
 </dl>
 <dl class="py method">
+<dt class="sig sig-object py" id="weac.analysis.analyzer.Analyzer.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">system_model</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">printing_enabled</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/weac/analysis/analyzer.html#Analyzer.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#weac.analysis.analyzer.Analyzer.__init__" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#weac.analysis.analyzer.Analyzer.__init__'">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>system_model</strong> (<a class="reference internal" href="weac.core.system_model.html#weac.core.system_model.SystemModel" title="weac.core.system_model.SystemModel"><em>SystemModel</em></a>)</p></li>
+<li><p><strong>printing_enabled</strong> (<em>bool</em>)</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="weac.analysis.analyzer.Analyzer.sm">
+<span class="sig-name descname"><span class="pre">sm</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="weac.core.system_model.html#weac.core.system_model.SystemModel" title="weac.core.system_model.SystemModel"><span class="pre">SystemModel</span></a></em><a class="headerlink" href="#weac.analysis.analyzer.Analyzer.sm" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#weac.analysis.analyzer.Analyzer.sm'">¶</a></dt>
+<dd></dd></dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="weac.analysis.analyzer.Analyzer.printing_enabled">
+<span class="sig-name descname"><span class="pre">printing_enabled</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">True</span></em><a class="headerlink" href="#weac.analysis.analyzer.Analyzer.printing_enabled" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#weac.analysis.analyzer.Analyzer.printing_enabled'">¶</a></dt>
+<dd></dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="weac.analysis.analyzer.Analyzer.get_call_stats">
+<span class="sig-name descname"><span class="pre">get_call_stats</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/weac/analysis/analyzer.html#Analyzer.get_call_stats"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#weac.analysis.analyzer.Analyzer.get_call_stats" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#weac.analysis.analyzer.Analyzer.get_call_stats'">¶</a></dt>
+<dd><p>Returns the call statistics.</p>
+</dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="weac.analysis.analyzer.Analyzer.print_call_stats">
+<span class="sig-name descname"><span class="pre">print_call_stats</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">message</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'Analyzer</span> <span class="pre">Call</span> <span class="pre">Statistics'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/weac/analysis/analyzer.html#Analyzer.print_call_stats"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#weac.analysis.analyzer.Analyzer.print_call_stats" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#weac.analysis.analyzer.Analyzer.print_call_stats'">¶</a></dt>
+<dd><p>Prints the call statistics in a readable format.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>message</strong> (<em>str</em>)</p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="weac.analysis.analyzer.Analyzer.rasterize_solution">
+<span class="sig-name descname"><span class="pre">rasterize_solution</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mode</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'cracked'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">4000</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/weac/analysis/analyzer.html#Analyzer.rasterize_solution"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#weac.analysis.analyzer.Analyzer.rasterize_solution" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#weac.analysis.analyzer.Analyzer.rasterize_solution'">¶</a></dt>
+<dd><p>Compute rasterized solution vector.</p>
+<section id="parameters">
+<h2>Parameters:<a class="headerlink" href="#parameters" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#parameters'">¶</a></h2>
+<dl class="simple">
+<dt>mode<span class="classifier">Literal[“cracked”, “uncracked”]</span></dt><dd><p>Mode of the solution.</p>
+</dd>
+<dt>num<span class="classifier">int</span></dt><dd><p>Number of grid points.</p>
+</dd>
+</dl>
+<dl class="field-list simple">
+<dt class="field-odd">returns<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>xs</strong> (<em>ndarray</em>) – Grid point x-coordinates at which solution vector
+is discretized.</p></li>
+<li><p><strong>zs</strong> (<em>ndarray</em>) – Matrix with solution vectors as columns at grid
+points xs.</p></li>
+<li><p><strong>x_founded</strong> (<em>ndarray</em>) – Grid point x-coordinates that lie on a foundation.</p></li>
+</ul>
+</dd>
+</dl>
+</section>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>mode</strong> (<em>Literal</em><em>[</em><em>'cracked'</em><em>, </em><em>'uncracked'</em><em>]</em>)</p></li>
+<li><p><strong>num</strong> (<em>int</em>)</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="weac.analysis.analyzer.Analyzer.get_zmesh">
+<span class="sig-name descname"><span class="pre">get_zmesh</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dz</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/weac/analysis/analyzer.html#Analyzer.get_zmesh"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#weac.analysis.analyzer.Analyzer.get_zmesh" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#weac.analysis.analyzer.Analyzer.get_zmesh'">¶</a></dt>
+<dd><p>Get z-coordinates of grid points and corresponding elastic properties.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>dz</strong> (<em>float</em><em>, </em><em>optional</em>) – Element size along z-axis (mm). Default is 2 mm.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>mesh</strong> – Mesh along z-axis. Columns are a list of z-coordinates (mm) of
+grid points along z-axis with at least two grid points (top,
+bottom) per layer, Young’s modulus of each grid point, shear
+modulus of each grid point, and Poisson’s ratio of each grid
+point.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>ndarray</p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="py method">
 <dt class="sig sig-object py" id="weac.analysis.analyzer.Analyzer.Sxx">
 <span class="sig-name descname"><span class="pre">Sxx</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">Z</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">phi</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dz</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">unit</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'kPa'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/weac/analysis/analyzer.html#Analyzer.Sxx"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#weac.analysis.analyzer.Analyzer.Sxx" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#weac.analysis.analyzer.Analyzer.Sxx'">¶</a></dt>
 <dd><p>Compute axial normal stress in slab layers.</p>
@@ -131,28 +224,6 @@ elastic foundations.</p>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>Axial slab normal stress in specified unit.</p>
-</dd>
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>ndarray, float</p>
-</dd>
-</dl>
-</dd></dl>
-<dl class="py method">
-<dt class="sig sig-object py" id="weac.analysis.analyzer.Analyzer.Szz">
-<span class="sig-name descname"><span class="pre">Szz</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">Z</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">phi</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dz</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">unit</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'kPa'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/weac/analysis/analyzer.html#Analyzer.Szz"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#weac.analysis.analyzer.Analyzer.Szz" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#weac.analysis.analyzer.Analyzer.Szz'">¶</a></dt>
-<dd><p>Compute transverse normal stress in slab layers.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>Z</strong> (<em>ndarray</em>) – Solution vector [u(x) u’(x) w(x) w’(x) psi(x), psi’(x)]^T</p></li>
-<li><p><strong>phi</strong> (<em>float</em>) – Inclination (degrees). Counterclockwise positive.</p></li>
-<li><p><strong>dz</strong> (<em>float</em><em>, </em><em>optional</em>) – Element size along z-axis (mm). Default is 2 mm.</p></li>
-<li><p><strong>unit</strong> (<em>{'kPa'</em><em>, </em><em>'MPa'}</em><em>, </em><em>optional</em>) – Desired output unit. Default is ‘kPa’.</p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>Transverse normal stress at grid points in the slab in
-specified unit.</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>ndarray, float</p>
@@ -181,62 +252,24 @@ specified unit.</p>
 </dl>
 </dd></dl>
 <dl class="py method">
-<dt class="sig sig-object py" id="weac.analysis.analyzer.Analyzer.differential_ERR">
-<span class="sig-name descname"><span class="pre">differential_ERR</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">unit</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'kJ/m^2'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/weac/analysis/analyzer.html#Analyzer.differential_ERR"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#weac.analysis.analyzer.Analyzer.differential_ERR" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#weac.analysis.analyzer.Analyzer.differential_ERR'">¶</a></dt>
-<dd><p>Compute differential energy release rate of all crack tips.</p>
+<dt class="sig sig-object py" id="weac.analysis.analyzer.Analyzer.Szz">
+<span class="sig-name descname"><span class="pre">Szz</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">Z</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">phi</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dz</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">unit</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'kPa'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/weac/analysis/analyzer.html#Analyzer.Szz"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#weac.analysis.analyzer.Analyzer.Szz" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#weac.analysis.analyzer.Analyzer.Szz'">¶</a></dt>
+<dd><p>Compute transverse normal stress in slab layers.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Returns<span class="colon">:</span></dt>
-<dd class="field-odd"><p>List of total, mode I, and mode II energy release rates.</p>
-</dd>
-<dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p>ndarray</p>
-</dd>
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>unit</strong> (<em>Literal</em><em>[</em><em>'kJ/m^2'</em><em>, </em><em>'J/m^2'</em><em>]</em>)</p>
-</dd>
-</dl>
-</dd></dl>
-<dl class="py method">
-<dt class="sig sig-object py" id="weac.analysis.analyzer.Analyzer.get_call_stats">
-<span class="sig-name descname"><span class="pre">get_call_stats</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/weac/analysis/analyzer.html#Analyzer.get_call_stats"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#weac.analysis.analyzer.Analyzer.get_call_stats" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#weac.analysis.analyzer.Analyzer.get_call_stats'">¶</a></dt>
-<dd><p>Returns the call statistics.</p>
-</dd></dl>
-<dl class="py method">
-<dt class="sig sig-object py" id="weac.analysis.analyzer.Analyzer.get_zmesh">
-<span class="sig-name descname"><span class="pre">get_zmesh</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dz</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/weac/analysis/analyzer.html#Analyzer.get_zmesh"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#weac.analysis.analyzer.Analyzer.get_zmesh" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#weac.analysis.analyzer.Analyzer.get_zmesh'">¶</a></dt>
-<dd><p>Get z-coordinates of grid points and corresponding elastic properties.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>dz</strong> (<em>float</em><em>, </em><em>optional</em>) – Element size along z-axis (mm). Default is 2 mm.</p>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p><strong>mesh</strong> – Mesh along z-axis. Columns are a list of z-coordinates (mm) of
-grid points along z-axis with at least two grid points (top,
-bottom) per layer, Young’s modulus of each grid point, shear
-modulus of each grid point, and Poisson’s ratio of each grid
-point.</p>
-</dd>
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>ndarray</p>
-</dd>
-</dl>
-</dd></dl>
-<dl class="py method">
-<dt class="sig sig-object py" id="weac.analysis.analyzer.Analyzer.incremental_ERR">
-<span class="sig-name descname"><span class="pre">incremental_ERR</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tolerance</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1e-6</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">unit</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'kJ/m^2'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/weac/analysis/analyzer.html#Analyzer.incremental_ERR"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#weac.analysis.analyzer.Analyzer.incremental_ERR" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#weac.analysis.analyzer.Analyzer.incremental_ERR'">¶</a></dt>
-<dd><p>Compute incremental energy release rate (ERR) of all cracks.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Returns<span class="colon">:</span></dt>
-<dd class="field-odd"><p>List of total, mode I, and mode II energy release rates.</p>
-</dd>
-<dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p>ndarray</p>
-</dd>
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>tolerance</strong> (<em>float</em>)</p></li>
-<li><p><strong>unit</strong> (<em>Literal</em><em>[</em><em>'kJ/m^2'</em><em>, </em><em>'J/m^2'</em><em>]</em>)</p></li>
+<li><p><strong>Z</strong> (<em>ndarray</em>) – Solution vector [u(x) u’(x) w(x) w’(x) psi(x), psi’(x)]^T</p></li>
+<li><p><strong>phi</strong> (<em>float</em>) – Inclination (degrees). Counterclockwise positive.</p></li>
+<li><p><strong>dz</strong> (<em>float</em><em>, </em><em>optional</em>) – Element size along z-axis (mm). Default is 2 mm.</p></li>
+<li><p><strong>unit</strong> (<em>{'kPa'</em><em>, </em><em>'MPa'}</em><em>, </em><em>optional</em>) – Desired output unit. Default is ‘kPa’.</p></li>
 </ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Transverse normal stress at grid points in the slab in
+specified unit.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>ndarray, float</p>
 </dd>
 </dl>
 </dd></dl>
@@ -296,56 +329,40 @@ point.</p>
 </dl>
 </dd></dl>
 <dl class="py method">
-<dt class="sig sig-object py" id="weac.analysis.analyzer.Analyzer.print_call_stats">
-<span class="sig-name descname"><span class="pre">print_call_stats</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">message</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'Analyzer</span> <span class="pre">Call</span> <span class="pre">Statistics'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/weac/analysis/analyzer.html#Analyzer.print_call_stats"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#weac.analysis.analyzer.Analyzer.print_call_stats" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#weac.analysis.analyzer.Analyzer.print_call_stats'">¶</a></dt>
-<dd><p>Prints the call statistics in a readable format.</p>
+<dt class="sig sig-object py" id="weac.analysis.analyzer.Analyzer.incremental_ERR">
+<span class="sig-name descname"><span class="pre">incremental_ERR</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tolerance</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1e-6</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">unit</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'kJ/m^2'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/weac/analysis/analyzer.html#Analyzer.incremental_ERR"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#weac.analysis.analyzer.Analyzer.incremental_ERR" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#weac.analysis.analyzer.Analyzer.incremental_ERR'">¶</a></dt>
+<dd><p>Compute incremental energy release rate (ERR) of all cracks.</p>
 <dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>List of total, mode I, and mode II energy release rates.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>ndarray</p>
+</dd>
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>message</strong> (<em>str</em>)</p>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>tolerance</strong> (<em>float</em>)</p></li>
+<li><p><strong>unit</strong> (<em>Literal</em><em>[</em><em>'kJ/m^2'</em><em>, </em><em>'J/m^2'</em><em>]</em>)</p></li>
+</ul>
 </dd>
 </dl>
 </dd></dl>
-<dl class="py attribute">
-<dt class="sig sig-object py" id="weac.analysis.analyzer.Analyzer.printing_enabled">
-<span class="sig-name descname"><span class="pre">printing_enabled</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">True</span></em><a class="headerlink" href="#weac.analysis.analyzer.Analyzer.printing_enabled" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#weac.analysis.analyzer.Analyzer.printing_enabled'">¶</a></dt>
-<dd></dd></dl>
 <dl class="py method">
-<dt class="sig sig-object py" id="weac.analysis.analyzer.Analyzer.rasterize_solution">
-<span class="sig-name descname"><span class="pre">rasterize_solution</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mode</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'cracked'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">4000</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/weac/analysis/analyzer.html#Analyzer.rasterize_solution"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#weac.analysis.analyzer.Analyzer.rasterize_solution" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#weac.analysis.analyzer.Analyzer.rasterize_solution'">¶</a></dt>
-<dd><p>Compute rasterized solution vector.</p>
-<section id="parameters">
-<h2>Parameters:<a class="headerlink" href="#parameters" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#parameters'">¶</a></h2>
-<dl class="simple">
-<dt>mode<span class="classifier">Literal[“cracked”, “uncracked”]</span></dt><dd><p>Mode of the solution.</p>
-</dd>
-<dt>num<span class="classifier">int</span></dt><dd><p>Number of grid points.</p>
-</dd>
-</dl>
+<dt class="sig sig-object py" id="weac.analysis.analyzer.Analyzer.differential_ERR">
+<span class="sig-name descname"><span class="pre">differential_ERR</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">unit</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'kJ/m^2'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/weac/analysis/analyzer.html#Analyzer.differential_ERR"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#weac.analysis.analyzer.Analyzer.differential_ERR" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#weac.analysis.analyzer.Analyzer.differential_ERR'">¶</a></dt>
+<dd><p>Compute differential energy release rate of all crack tips.</p>
 <dl class="field-list simple">
-<dt class="field-odd">returns<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>xs</strong> (<em>ndarray</em>) – Grid point x-coordinates at which solution vector
-is discretized.</p></li>
-<li><p><strong>zs</strong> (<em>ndarray</em>) – Matrix with solution vectors as columns at grid
-points xs.</p></li>
-<li><p><strong>x_founded</strong> (<em>ndarray</em>) – Grid point x-coordinates that lie on a foundation.</p></li>
-</ul>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>List of total, mode I, and mode II energy release rates.</p>
 </dd>
-</dl>
-</section>
-<dl class="field-list simple">
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>ndarray</p>
+</dd>
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>mode</strong> (<em>Literal</em><em>[</em><em>'cracked'</em><em>, </em><em>'uncracked'</em><em>]</em>)</p></li>
-<li><p><strong>num</strong> (<em>int</em>)</p></li>
-</ul>
+<dd class="field-odd"><p><strong>unit</strong> (<em>Literal</em><em>[</em><em>'kJ/m^2'</em><em>, </em><em>'J/m^2'</em><em>]</em>)</p>
 </dd>
 </dl>
 </dd></dl>
-<dl class="py attribute">
-<dt class="sig sig-object py" id="weac.analysis.analyzer.Analyzer.sm">
-<span class="sig-name descname"><span class="pre">sm</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="weac.core.system_model.html#weac.core.system_model.SystemModel" title="weac.core.system_model.SystemModel"><span class="pre">SystemModel</span></a></em><a class="headerlink" href="#weac.analysis.analyzer.Analyzer.sm" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#weac.analysis.analyzer.Analyzer.sm'">¶</a></dt>
-<dd></dd></dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="weac.analysis.analyzer.Analyzer.total_potential">
 <span class="sig-name descname"><span class="pre">total_potential</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/weac/analysis/analyzer.html#Analyzer.total_potential"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#weac.analysis.analyzer.Analyzer.total_potential" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#weac.analysis.analyzer.Analyzer.total_potential'">¶</a></dt>
@@ -361,33 +378,29 @@ Currently only implemented for PST systems.</p>
 </dl>
 </dd></dl>
 </dd></dl>
-<dl class="py function">
-<dt class="sig sig-object py" id="weac.analysis.analyzer.track_analyzer_call">
-<span class="sig-prename descclassname"><span class="pre">weac.analysis.analyzer.</span></span><span class="sig-name descname"><span class="pre">track_analyzer_call</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">func</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/weac/analysis/analyzer.html#track_analyzer_call"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#weac.analysis.analyzer.track_analyzer_call" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#weac.analysis.analyzer.track_analyzer_call'">¶</a></dt>
-<dd><p>Decorator to track call count and execution time of Analyzer methods.</p>
-</dd></dl>
 </section>
 </div></div><aside class="hidden text-sm xl:block" id="right-sidebar">
 <div class="sticky top-16 -mt-10 max-h-[calc(100vh-5rem)] overflow-y-auto pt-6 space-y-2"><p class="font-medium">On this page</p>
 <ul>
+<li><a :data-current="activeSection === '#weac.analysis.analyzer.track_analyzer_call'" class="reference internal" href="#weac.analysis.analyzer.track_analyzer_call"><code class="docutils literal notranslate"><span class="pre">track_analyzer_call()</span></code></a></li>
 <li><a :data-current="activeSection === '#weac.analysis.analyzer.Analyzer'" class="reference internal" href="#weac.analysis.analyzer.Analyzer"><code class="docutils literal notranslate"><span class="pre">Analyzer</span></code></a><ul>
-<li><a :data-current="activeSection === '#weac.analysis.analyzer.Analyzer.Sxx'" class="reference internal" href="#weac.analysis.analyzer.Analyzer.Sxx"><code class="docutils literal notranslate"><span class="pre">Analyzer.Sxx()</span></code></a></li>
-<li><a :data-current="activeSection === '#weac.analysis.analyzer.Analyzer.Szz'" class="reference internal" href="#weac.analysis.analyzer.Analyzer.Szz"><code class="docutils literal notranslate"><span class="pre">Analyzer.Szz()</span></code></a></li>
-<li><a :data-current="activeSection === '#weac.analysis.analyzer.Analyzer.Txz'" class="reference internal" href="#weac.analysis.analyzer.Analyzer.Txz"><code class="docutils literal notranslate"><span class="pre">Analyzer.Txz()</span></code></a></li>
-<li><a :data-current="activeSection === '#weac.analysis.analyzer.Analyzer.differential_ERR'" class="reference internal" href="#weac.analysis.analyzer.Analyzer.differential_ERR"><code class="docutils literal notranslate"><span class="pre">Analyzer.differential_ERR()</span></code></a></li>
+<li><a :data-current="activeSection === '#weac.analysis.analyzer.Analyzer.__init__'" class="reference internal" href="#weac.analysis.analyzer.Analyzer.__init__"><code class="docutils literal notranslate"><span class="pre">Analyzer.__init__()</span></code></a></li>
+<li><a :data-current="activeSection === '#weac.analysis.analyzer.Analyzer.sm'" class="reference internal" href="#weac.analysis.analyzer.Analyzer.sm"><code class="docutils literal notranslate"><span class="pre">Analyzer.sm</span></code></a></li>
+<li><a :data-current="activeSection === '#weac.analysis.analyzer.Analyzer.printing_enabled'" class="reference internal" href="#weac.analysis.analyzer.Analyzer.printing_enabled"><code class="docutils literal notranslate"><span class="pre">Analyzer.printing_enabled</span></code></a></li>
 <li><a :data-current="activeSection === '#weac.analysis.analyzer.Analyzer.get_call_stats'" class="reference internal" href="#weac.analysis.analyzer.Analyzer.get_call_stats"><code class="docutils literal notranslate"><span class="pre">Analyzer.get_call_stats()</span></code></a></li>
+<li><a :data-current="activeSection === '#weac.analysis.analyzer.Analyzer.print_call_stats'" class="reference internal" href="#weac.analysis.analyzer.Analyzer.print_call_stats"><code class="docutils literal notranslate"><span class="pre">Analyzer.print_call_stats()</span></code></a></li>
+<li><a :data-current="activeSection === '#weac.analysis.analyzer.Analyzer.rasterize_solution'" class="reference internal" href="#weac.analysis.analyzer.Analyzer.rasterize_solution"><code class="docutils literal notranslate"><span class="pre">Analyzer.rasterize_solution()</span></code></a></li>
 <li><a :data-current="activeSection === '#weac.analysis.analyzer.Analyzer.get_zmesh'" class="reference internal" href="#weac.analysis.analyzer.Analyzer.get_zmesh"><code class="docutils literal notranslate"><span class="pre">Analyzer.get_zmesh()</span></code></a></li>
-<li><a :data-current="activeSection === '#weac.analysis.analyzer.Analyzer.incremental_ERR'" class="reference internal" href="#weac.analysis.analyzer.Analyzer.incremental_ERR"><code class="docutils literal notranslate"><span class="pre">Analyzer.incremental_ERR()</span></code></a></li>
+<li><a :data-current="activeSection === '#weac.analysis.analyzer.Analyzer.Sxx'" class="reference internal" href="#weac.analysis.analyzer.Analyzer.Sxx"><code class="docutils literal notranslate"><span class="pre">Analyzer.Sxx()</span></code></a></li>
+<li><a :data-current="activeSection === '#weac.analysis.analyzer.Analyzer.Txz'" class="reference internal" href="#weac.analysis.analyzer.Analyzer.Txz"><code class="docutils literal notranslate"><span class="pre">Analyzer.Txz()</span></code></a></li>
+<li><a :data-current="activeSection === '#weac.analysis.analyzer.Analyzer.Szz'" class="reference internal" href="#weac.analysis.analyzer.Analyzer.Szz"><code class="docutils literal notranslate"><span class="pre">Analyzer.Szz()</span></code></a></li>
 <li><a :data-current="activeSection === '#weac.analysis.analyzer.Analyzer.principal_stress_slab'" class="reference internal" href="#weac.analysis.analyzer.Analyzer.principal_stress_slab"><code class="docutils literal notranslate"><span class="pre">Analyzer.principal_stress_slab()</span></code></a></li>
 <li><a :data-current="activeSection === '#weac.analysis.analyzer.Analyzer.principal_stress_weaklayer'" class="reference internal" href="#weac.analysis.analyzer.Analyzer.principal_stress_weaklayer"><code class="docutils literal notranslate"><span class="pre">Analyzer.principal_stress_weaklayer()</span></code></a></li>
-<li><a :data-current="activeSection === '#weac.analysis.analyzer.Analyzer.print_call_stats'" class="reference internal" href="#weac.analysis.analyzer.Analyzer.print_call_stats"><code class="docutils literal notranslate"><span class="pre">Analyzer.print_call_stats()</span></code></a></li>
-<li><a :data-current="activeSection === '#weac.analysis.analyzer.Analyzer.printing_enabled'" class="reference internal" href="#weac.analysis.analyzer.Analyzer.printing_enabled"><code class="docutils literal notranslate"><span class="pre">Analyzer.printing_enabled</span></code></a></li>
-<li><a :data-current="activeSection === '#weac.analysis.analyzer.Analyzer.rasterize_solution'" class="reference internal" href="#weac.analysis.analyzer.Analyzer.rasterize_solution"><code class="docutils literal notranslate"><span class="pre">Analyzer.rasterize_solution()</span></code></a></li>
-<li><a :data-current="activeSection === '#weac.analysis.analyzer.Analyzer.sm'" class="reference internal" href="#weac.analysis.analyzer.Analyzer.sm"><code class="docutils literal notranslate"><span class="pre">Analyzer.sm</span></code></a></li>
+<li><a :data-current="activeSection === '#weac.analysis.analyzer.Analyzer.incremental_ERR'" class="reference internal" href="#weac.analysis.analyzer.Analyzer.incremental_ERR"><code class="docutils literal notranslate"><span class="pre">Analyzer.incremental_ERR()</span></code></a></li>
+<li><a :data-current="activeSection === '#weac.analysis.analyzer.Analyzer.differential_ERR'" class="reference internal" href="#weac.analysis.analyzer.Analyzer.differential_ERR"><code class="docutils literal notranslate"><span class="pre">Analyzer.differential_ERR()</span></code></a></li>
 <li><a :data-current="activeSection === '#weac.analysis.analyzer.Analyzer.total_potential'" class="reference internal" href="#weac.analysis.analyzer.Analyzer.total_potential"><code class="docutils literal notranslate"><span class="pre">Analyzer.total_potential()</span></code></a></li>
 </ul>
 </li>
-<li><a :data-current="activeSection === '#weac.analysis.analyzer.track_analyzer_call'" class="reference internal" href="#weac.analysis.analyzer.track_analyzer_call"><code class="docutils literal notranslate"><span class="pre">track_analyzer_call()</span></code></a></li>
 </ul>
 </div>
 </aside>

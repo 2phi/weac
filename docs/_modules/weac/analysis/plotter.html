@@ -279,15 +279,21 @@
 </span><span id="line-128"><span class="k">class</span><span class="w"> </span><span class="nc">MidpointNormalize</span><span class="p">(</span><span class="n">mc</span><span class="o">.</span><span class="n">Normalize</span><span class="p">):</span>
 </span><span id="line-129"><span class="w">    </span><span class="sd">&quot;&quot;&quot;Colormap normalization to a specified midpoint. Default is 0.&quot;&quot;&quot;</span>
 </span><span id="line-130">
+<div class="viewcode-block" id="MidpointNormalize.__init__">
+<a class="viewcode-back" href="../../../weac.analysis.plotter.html#weac.analysis.MidpointNormalize.__init__">[docs]</a>
 </span><span id="line-131">    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">vmin</span><span class="p">,</span> <span class="n">vmax</span><span class="p">,</span> <span class="n">midpoint</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">clip</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
 </span><span id="line-132"><span class="w">        </span><span class="sd">&quot;&quot;&quot;Initialize normalization.&quot;&quot;&quot;</span>
 </span><span id="line-133">        <span class="bp">self</span><span class="o">.</span><span class="n">midpoint</span> <span class="o">=</span> <span class="n">midpoint</span>
-</span><span id="line-134">        <span class="n">mc</span><span class="o">.</span><span class="n">Normalize</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">vmin</span><span class="p">,</span> <span class="n">vmax</span><span class="p">,</span> <span class="n">clip</span><span class="p">)</span>
+</span><span id="line-134">        <span class="n">mc</span><span class="o">.</span><span class="n">Normalize</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">vmin</span><span class="p">,</span> <span class="n">vmax</span><span class="p">,</span> <span class="n">clip</span><span class="p">)</span></div>
+
 </span><span id="line-135">
+<div class="viewcode-block" id="MidpointNormalize.__call__">
+<a class="viewcode-back" href="../../../weac.analysis.plotter.html#weac.analysis.MidpointNormalize.__call__">[docs]</a>
 </span><span id="line-136">    <span class="k">def</span><span class="w"> </span><span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">clip</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 </span><span id="line-137"><span class="w">        </span><span class="sd">&quot;&quot;&quot;Apply normalization.&quot;&quot;&quot;</span>
 </span><span id="line-138">        <span class="n">x</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">vmin</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">midpoint</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">vmax</span><span class="p">],</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span>
 </span><span id="line-139">        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">ma</span><span class="o">.</span><span class="n">masked_array</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">interp</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">))</span></div>
+</div>
 
 </span><span id="line-140">
 </span><span id="line-141">
@@ -309,6 +315,8 @@
 </span><span id="line-155"><span class="sd">    - Automatic plot directory management</span>
 </span><span id="line-156"><span class="sd">    &quot;&quot;&quot;</span>
 </span><span id="line-157">
+<div class="viewcode-block" id="Plotter.__init__">
+<a class="viewcode-back" href="../../../weac.analysis.plotter.html#weac.analysis.Plotter.__init__">[docs]</a>
 </span><span id="line-158">    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
 </span><span id="line-159">        <span class="bp">self</span><span class="p">,</span>
 </span><span id="line-160">        <span class="n">plot_dir</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;plots&quot;</span><span class="p">,</span>
@@ -340,7 +348,8 @@
 </span><span id="line-186">        <span class="bp">self</span><span class="o">.</span><span class="n">_setup_matplotlib_style</span><span class="p">()</span>
 </span><span id="line-187">
 </span><span id="line-188">        <span class="c1"># Cache analyzers for performance</span>
-</span><span id="line-189">        <span class="bp">self</span><span class="o">.</span><span class="n">_analyzers</span> <span class="o">=</span> <span class="p">{}</span>
+</span><span id="line-189">        <span class="bp">self</span><span class="o">.</span><span class="n">_analyzers</span> <span class="o">=</span> <span class="p">{}</span></div>
+
 </span><span id="line-190">
 </span><span id="line-191">    <span class="k">def</span><span class="w"> </span><span class="nf">_setup_matplotlib_style</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 </span><span id="line-192"><span class="w">        </span><span class="sd">&quot;&quot;&quot;Set up modern matplotlib styling.&quot;&quot;&quot;</span>
