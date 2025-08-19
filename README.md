@@ -120,12 +120,14 @@ git clone https://github.com/2phi/weac
 for local use.
 
 Needs (runtime dependencies are declared in [pyproject.toml](https://github.com/2phi/weac/blob/main/pyproject.toml)):
-- [Python](https://www.python.org/downloads/release/python-3100/) &ge; 3.10
-- [Numpy](https://numpy.org/) &ge; 2.0.1
-- [Scipy](https://www.scipy.org/) &ge; 1.14.0
-- [Matplotlib](https://matplotlib.org/) &ge; 3.9.1
-- [Pydantic](https://docs.pydantic.dev/latest/) &ge; 2.11.7
-- [Snowpylot](https://github.com/connellymk/snowpylot) &ge; 1.1.3
+
+- [Python](https://www.python.org/downloads/release/python-3120/) ≥ 3.12
+- [Numpy](https://numpy.org/) ≥ 2.0.1
+- [Scipy](https://www.scipy.org/) ≥ 1.14.0
+- [Matplotlib](https://matplotlib.org/) ≥ 3.9.1
+- [Pydantic](https://docs.pydantic.dev/latest/) ≥ 2.11.7
+- [Snowpylot](https://github.com/connellymk/snowpylot) ≥ 1.1.3
+
 
 <!-- USAGE EXAMPLES -->
 ## Usage
