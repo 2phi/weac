@@ -16,3 +16,9 @@ __pycache__/
 
 # Claude
 .claude/
+
+# Documentation
+docs/sphinx/_build/
+docs/sphinx/_static/
+docs/sphinx/_templates/
+docs/sphinx/_static/
