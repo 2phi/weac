@@ -166,25 +166,25 @@ field_name: type = Field(…, gt=0, description=”Description”)
 </dl>
 </dd></dl>
 <dl class="py attribute">
-<dt class="sig sig-object py" id="id0">
-<span class="sig-name descname"><span class="pre">layers</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="weac.components.layer.html#weac.components.layer.Layer" title="weac.components.layer.Layer"><span class="pre">Layer</span></a><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#id0" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id0'">¶</a></dt>
-<dd></dd></dl>
-<dl class="py attribute">
 <dt class="sig sig-object py" id="weac.components.model_input.ModelInput.model_config">
 <span class="sig-name descname"><span class="pre">model_config</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">ClassVar</span><span class="p"><span class="pre">[</span></span><span class="pre">ConfigDict</span><span class="p"><span class="pre">]</span></span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{'extra':</span> <span class="pre">'forbid'}</span></em><a class="headerlink" href="#weac.components.model_input.ModelInput.model_config" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#weac.components.model_input.ModelInput.model_config'">¶</a></dt>
 <dd><p>Configuration for the model, should be a dictionary conforming to [<cite>ConfigDict</cite>][pydantic.config.ConfigDict].</p>
 </dd></dl>
 <dl class="py attribute">
+<dt class="sig sig-object py" id="id0">
+<span class="sig-name descname"><span class="pre">weak_layer</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="weac.components.layer.html#weac.components.layer.WeakLayer" title="weac.components.layer.WeakLayer"><span class="pre">WeakLayer</span></a></em><a class="headerlink" href="#id0" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id0'">¶</a></dt>
+<dd></dd></dl>
+<dl class="py attribute">
 <dt class="sig sig-object py" id="id1">
-<span class="sig-name descname"><span class="pre">scenario_config</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="weac.components.scenario_config.html#weac.components.scenario_config.ScenarioConfig" title="weac.components.scenario_config.ScenarioConfig"><span class="pre">ScenarioConfig</span></a></em><a class="headerlink" href="#id1" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id1'">¶</a></dt>
+<span class="sig-name descname"><span class="pre">layers</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="weac.components.layer.html#weac.components.layer.Layer" title="weac.components.layer.Layer"><span class="pre">Layer</span></a><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#id1" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id1'">¶</a></dt>
 <dd></dd></dl>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="id2">
-<span class="sig-name descname"><span class="pre">segments</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="weac.components.segment.html#weac.components.segment.Segment" title="weac.components.segment.Segment"><span class="pre">Segment</span></a><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#id2" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id2'">¶</a></dt>
+<span class="sig-name descname"><span class="pre">scenario_config</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="weac.components.scenario_config.html#weac.components.scenario_config.ScenarioConfig" title="weac.components.scenario_config.ScenarioConfig"><span class="pre">ScenarioConfig</span></a></em><a class="headerlink" href="#id2" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id2'">¶</a></dt>
 <dd></dd></dl>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="id3">
-<span class="sig-name descname"><span class="pre">weak_layer</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="weac.components.layer.html#weac.components.layer.WeakLayer" title="weac.components.layer.WeakLayer"><span class="pre">WeakLayer</span></a></em><a class="headerlink" href="#id3" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id3'">¶</a></dt>
+<span class="sig-name descname"><span class="pre">segments</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="weac.components.segment.html#weac.components.segment.Segment" title="weac.components.segment.Segment"><span class="pre">Segment</span></a><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#id3" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id3'">¶</a></dt>
 <dd></dd></dl>
 </dd></dl>
 </section>
@@ -196,11 +196,11 @@ field_name: type = Field(…, gt=0, description=”Description”)
 <li><a :data-current="activeSection === '#weac.components.model_input.ModelInput.weak_layer'" class="reference internal" href="#weac.components.model_input.ModelInput.weak_layer"><code class="docutils literal notranslate"><span class="pre">ModelInput.weak_layer</span></code></a></li>
 <li><a :data-current="activeSection === '#weac.components.model_input.ModelInput.layers'" class="reference internal" href="#weac.components.model_input.ModelInput.layers"><code class="docutils literal notranslate"><span class="pre">ModelInput.layers</span></code></a></li>
 <li><a :data-current="activeSection === '#weac.components.model_input.ModelInput.segments'" class="reference internal" href="#weac.components.model_input.ModelInput.segments"><code class="docutils literal notranslate"><span class="pre">ModelInput.segments</span></code></a></li>
-<li><a :data-current="activeSection === '#id0'" class="reference internal" href="#id0"><code class="docutils literal notranslate"><span class="pre">ModelInput.layers</span></code></a></li>
 <li><a :data-current="activeSection === '#weac.components.model_input.ModelInput.model_config'" class="reference internal" href="#weac.components.model_input.ModelInput.model_config"><code class="docutils literal notranslate"><span class="pre">ModelInput.model_config</span></code></a></li>
-<li><a :data-current="activeSection === '#id1'" class="reference internal" href="#id1"><code class="docutils literal notranslate"><span class="pre">ModelInput.scenario_config</span></code></a></li>
-<li><a :data-current="activeSection === '#id2'" class="reference internal" href="#id2"><code class="docutils literal notranslate"><span class="pre">ModelInput.segments</span></code></a></li>
-<li><a :data-current="activeSection === '#id3'" class="reference internal" href="#id3"><code class="docutils literal notranslate"><span class="pre">ModelInput.weak_layer</span></code></a></li>
+<li><a :data-current="activeSection === '#id0'" class="reference internal" href="#id0"><code class="docutils literal notranslate"><span class="pre">ModelInput.weak_layer</span></code></a></li>
+<li><a :data-current="activeSection === '#id1'" class="reference internal" href="#id1"><code class="docutils literal notranslate"><span class="pre">ModelInput.layers</span></code></a></li>
+<li><a :data-current="activeSection === '#id2'" class="reference internal" href="#id2"><code class="docutils literal notranslate"><span class="pre">ModelInput.scenario_config</span></code></a></li>
+<li><a :data-current="activeSection === '#id3'" class="reference internal" href="#id3"><code class="docutils literal notranslate"><span class="pre">ModelInput.segments</span></code></a></li>
 </ul>
 </li>
 </ul>

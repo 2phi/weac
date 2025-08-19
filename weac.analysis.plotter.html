@@ -107,6 +107,16 @@
 <em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">weac.analysis.plotter.</span></span><span class="sig-name descname"><span class="pre">MidpointNormalize</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">vmin</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vmax</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">midpoint</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">clip</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/weac/analysis/plotter.html#MidpointNormalize"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#weac.analysis.plotter.MidpointNormalize" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#weac.analysis.plotter.MidpointNormalize'">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Normalize</span></code></p>
 <p>Colormap normalization to a specified midpoint. Default is 0.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="weac.analysis.plotter.MidpointNormalize.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">vmin</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vmax</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">midpoint</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">clip</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/weac/analysis/plotter.html#MidpointNormalize.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#weac.analysis.plotter.MidpointNormalize.__init__" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#weac.analysis.plotter.MidpointNormalize.__init__'">¶</a></dt>
+<dd><p>Initialize normalization.</p>
+</dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="weac.analysis.plotter.MidpointNormalize.__call__">
+<span class="sig-name descname"><span class="pre">__call__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">clip</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/weac/analysis/plotter.html#MidpointNormalize.__call__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#weac.analysis.plotter.MidpointNormalize.__call__" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#weac.analysis.plotter.MidpointNormalize.__call__'">¶</a></dt>
+<dd><p>Apply normalization.</p>
+</dd></dl>
 </dd></dl>
 <dl class="py class">
 <dt class="sig sig-object py" id="weac.analysis.plotter.Plotter">
@@ -128,88 +138,33 @@ nucleation simulations, including single system analysis and multi-system compar
 </dd>
 </dl>
 <dl class="py method">
-<dt class="sig sig-object py" id="weac.analysis.plotter.Plotter.plot_ERR_comp">
-<span class="sig-name descname"><span class="pre">plot_ERR_comp</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">analyzer</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">da</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Gdif</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Ginc</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mode</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/weac/analysis/plotter.html#Plotter.plot_ERR_comp"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#weac.analysis.plotter.Plotter.plot_ERR_comp" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#weac.analysis.plotter.Plotter.plot_ERR_comp'">¶</a></dt>
-<dd><p>Wrap energy release rate plot.</p>
+<dt class="sig sig-object py" id="weac.analysis.plotter.Plotter.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">plot_dir</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'plots'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/weac/analysis/plotter.html#Plotter.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#weac.analysis.plotter.Plotter.__init__" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#weac.analysis.plotter.Plotter.__init__'">¶</a></dt>
+<dd><p>Initialize the plotter.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>analyzer</strong> (<a class="reference internal" href="weac.analysis.analyzer.html#weac.analysis.analyzer.Analyzer" title="weac.analysis.analyzer.Analyzer"><em>Analyzer</em></a>)</p></li>
-<li><p><strong>da</strong> (<em>ndarray</em>)</p></li>
-<li><p><strong>Gdif</strong> (<em>ndarray</em>)</p></li>
-<li><p><strong>Ginc</strong> (<em>ndarray</em>)</p></li>
-<li><p><strong>mode</strong> (<em>int</em>)</p></li>
+<li><p><strong>system</strong> (<a class="reference internal" href="weac.core.html#weac.core.SystemModel" title="weac.core.SystemModel"><em>SystemModel</em></a><em>, </em><em>optional</em>) – Single system model for analysis</p></li>
+<li><p><strong>systems</strong> (<em>List</em><em>[</em><a class="reference internal" href="weac.core.html#weac.core.SystemModel" title="weac.core.SystemModel"><em>SystemModel</em></a><em>]</em><em>, </em><em>optional</em>) – List of system models for comparison</p></li>
+<li><p><strong>labels</strong> (<em>List</em><em>[</em><em>str</em><em>]</em><em>, </em><em>optional</em>) – Labels for each system in plots</p></li>
+<li><p><strong>colors</strong> (<em>List</em><em>[</em><em>str</em><em>]</em><em>, </em><em>optional</em>) – Colors for each system in plots</p></li>
+<li><p><strong>plot_dir</strong> (<em>str</em><em>, </em><em>default "plots"</em>) – Directory to save plots</p></li>
 </ul>
-</dd>
-<dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p><em>Figure</em></p>
 </dd>
 </dl>
 </dd></dl>
 <dl class="py method">
-<dt class="sig sig-object py" id="weac.analysis.plotter.Plotter.plot_ERR_modes">
-<span class="sig-name descname"><span class="pre">plot_ERR_modes</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">analyzer</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">da</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">G</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">kind</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'inc'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/weac/analysis/plotter.html#Plotter.plot_ERR_modes"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#weac.analysis.plotter.Plotter.plot_ERR_modes" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#weac.analysis.plotter.Plotter.plot_ERR_modes'">¶</a></dt>
-<dd><p>Wrap energy release rate plot.</p>
+<dt class="sig sig-object py" id="weac.analysis.plotter.Plotter.plot_slab_profile">
+<span class="sig-name descname"><span class="pre">plot_slab_profile</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">weak_layers</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">slabs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filename</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'slab_profile'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">labels</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">colors</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/weac/analysis/plotter.html#Plotter.plot_slab_profile"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#weac.analysis.plotter.Plotter.plot_slab_profile" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#weac.analysis.plotter.Plotter.plot_slab_profile'">¶</a></dt>
+<dd><p>Plot slab layer profiles for comparison.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>analyzer</strong> (<a class="reference internal" href="weac.analysis.analyzer.html#weac.analysis.analyzer.Analyzer" title="weac.analysis.analyzer.Analyzer"><em>Analyzer</em></a>)</p></li>
-<li><p><strong>da</strong> (<em>ndarray</em>)</p></li>
-<li><p><strong>G</strong> (<em>ndarray</em>)</p></li>
-<li><p><strong>kind</strong> (<em>str</em>)</p></li>
-</ul>
-</dd>
-<dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p><em>Figure</em></p>
-</dd>
-</dl>
-</dd></dl>
-<dl class="py method">
-<dt class="sig sig-object py" id="weac.analysis.plotter.Plotter.plot_analysis">
-<span class="sig-name descname"><span class="pre">plot_analysis</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">system</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">criteria_evaluator</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">min_force_result</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">min_crack_length</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">coupled_criterion_result</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dz</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">deformation_scale</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">100.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">window</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">np.inf</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">levels</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">300</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filename</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'analysis'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/weac/analysis/plotter.html#Plotter.plot_analysis"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#weac.analysis.plotter.Plotter.plot_analysis" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#weac.analysis.plotter.Plotter.plot_analysis'">¶</a></dt>
-<dd><p>Plot deformed slab with field contours.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>field</strong> (<em>str</em><em>, </em><em>default 'w'</em>) – Field to plot (‘w’, ‘u’, ‘principal’, ‘sigma’, ‘tau’)</p></li>
-<li><p><strong>system_model</strong> (<a class="reference internal" href="weac.core.html#weac.core.SystemModel" title="weac.core.SystemModel"><em>SystemModel</em></a><em>, </em><em>optional</em>) – System to plot (uses first system if not specified)</p></li>
+<li><p><strong>weak_layers</strong> (<em>List</em><em>[</em><a class="reference internal" href="weac.components.html#weac.components.WeakLayer" title="weac.components.WeakLayer"><em>WeakLayer</em></a><em>] </em><em>| </em><a class="reference internal" href="weac.components.html#weac.components.WeakLayer" title="weac.components.WeakLayer"><em>WeakLayer</em></a>) – The weak layer or layers to plot.</p></li>
+<li><p><strong>slabs</strong> (<em>List</em><em>[</em><a class="reference internal" href="weac.core.html#weac.core.Slab" title="weac.core.Slab"><em>Slab</em></a><em>] </em><em>| </em><a class="reference internal" href="weac.core.html#weac.core.Slab" title="weac.core.Slab"><em>Slab</em></a>) – The slab or slabs to plot.</p></li>
 <li><p><strong>filename</strong> (<em>str</em><em>, </em><em>optional</em>) – Filename for saving plot</p></li>
-<li><p><strong>system</strong> (<a class="reference internal" href="weac.core.system_model.html#weac.core.system_model.SystemModel" title="weac.core.system_model.SystemModel"><em>SystemModel</em></a>)</p></li>
-<li><p><strong>criteria_evaluator</strong> (<a class="reference internal" href="weac.analysis.criteria_evaluator.html#weac.analysis.criteria_evaluator.CriteriaEvaluator" title="weac.analysis.criteria_evaluator.CriteriaEvaluator"><em>CriteriaEvaluator</em></a>)</p></li>
-<li><p><strong>min_force_result</strong> (<a class="reference internal" href="weac.analysis.criteria_evaluator.html#weac.analysis.criteria_evaluator.FindMinimumForceResult" title="weac.analysis.criteria_evaluator.FindMinimumForceResult"><em>FindMinimumForceResult</em></a>)</p></li>
-<li><p><strong>min_crack_length</strong> (<em>float</em>)</p></li>
-<li><p><strong>coupled_criterion_result</strong> (<a class="reference internal" href="weac.analysis.criteria_evaluator.html#weac.analysis.criteria_evaluator.CoupledCriterionResult" title="weac.analysis.criteria_evaluator.CoupledCriterionResult"><em>CoupledCriterionResult</em></a>)</p></li>
-<li><p><strong>dz</strong> (<em>int</em>)</p></li>
-<li><p><strong>deformation_scale</strong> (<em>float</em>)</p></li>
-<li><p><strong>window</strong> (<em>int</em>)</p></li>
-<li><p><strong>levels</strong> (<em>int</em>)</p></li>
-</ul>
-</dd>
-<dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p><em>Figure</em></p>
-</dd>
-</dl>
-</dd></dl>
-<dl class="py method">
-<dt class="sig sig-object py" id="weac.analysis.plotter.Plotter.plot_deformed">
-<span class="sig-name descname"><span class="pre">plot_deformed</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">xsl</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">xwl</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">z</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">analyzer</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dz</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scale</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">100</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">window</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">np.inf</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pad</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">levels</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">300</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">aspect</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">field</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'w'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">normalize</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filename</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'deformed_slab'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/weac/analysis/plotter.html#Plotter.plot_deformed"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#weac.analysis.plotter.Plotter.plot_deformed" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#weac.analysis.plotter.Plotter.plot_deformed'">¶</a></dt>
-<dd><p>Plot deformed slab with field contours.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>xsl</strong> (<em>np.ndarray</em>) – Slab x-coordinates.</p></li>
-<li><p><strong>xwl</strong> (<em>np.ndarray</em>) – Weak layer x-coordinates.</p></li>
-<li><p><strong>z</strong> (<em>np.ndarray</em>) – Solution vector.</p></li>
-<li><p><strong>analyzer</strong> (<a class="reference internal" href="weac.analysis.html#weac.analysis.Analyzer" title="weac.analysis.Analyzer"><em>Analyzer</em></a>) – Analyzer instance.</p></li>
-<li><p><strong>dz</strong> (<em>int</em><em>, </em><em>optional</em>) – Element size along z-axis (mm). Default is 2 mm.</p></li>
-<li><p><strong>scale</strong> (<em>int</em><em>, </em><em>optional</em>) – Deformation scale factor. Default is 100.</p></li>
-<li><p><strong>window</strong> (<em>float</em><em>, </em><em>optional</em>) – Plot window width. Default is inf.</p></li>
-<li><p><strong>pad</strong> (<em>int</em><em>, </em><em>optional</em>) – Padding around plot. Default is 2.</p></li>
-<li><p><strong>levels</strong> (<em>int</em><em>, </em><em>optional</em>) – Number of contour levels. Default is 300.</p></li>
-<li><p><strong>aspect</strong> (<em>int</em><em>, </em><em>optional</em>) – Aspect ratio. Default is 2.</p></li>
-<li><p><strong>field</strong> (<em>str</em><em>, </em><em>optional</em>) – Field to plot (‘w’, ‘u’, ‘principal’, ‘Sxx’, ‘Txz’, ‘Szz’). Default is ‘w’.</p></li>
-<li><p><strong>normalize</strong> (<em>bool</em><em>, </em><em>optional</em>) – Toggle normalization. Default is True.</p></li>
-<li><p><strong>filename</strong> (<em>str</em><em>, </em><em>optional</em>) – Filename for saving plot. Default is “deformed_slab”.</p></li>
+<li><p><strong>labels</strong> (<em>list</em><em> of </em><em>str</em><em>, </em><em>optional</em>) – Labels for each system.</p></li>
+<li><p><strong>colors</strong> (<em>list</em><em> of </em><em>str</em><em>, </em><em>optional</em>) – Colors for each system.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
@@ -217,93 +172,6 @@ nucleation simulations, including single system analysis and multi-system compar
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>matplotlib.figure.Figure</p>
-</dd>
-</dl>
-</dd></dl>
-<dl class="py method">
-<dt class="sig sig-object py" id="weac.analysis.plotter.Plotter.plot_displacements">
-<span class="sig-name descname"><span class="pre">plot_displacements</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">analyzer</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">z</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filename</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'displacements'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/weac/analysis/plotter.html#Plotter.plot_displacements"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#weac.analysis.plotter.Plotter.plot_displacements" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#weac.analysis.plotter.Plotter.plot_displacements'">¶</a></dt>
-<dd><p>Wrap for displacements plot.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>analyzer</strong> (<a class="reference internal" href="weac.analysis.analyzer.html#weac.analysis.analyzer.Analyzer" title="weac.analysis.analyzer.Analyzer"><em>Analyzer</em></a>)</p></li>
-<li><p><strong>x</strong> (<em>ndarray</em>)</p></li>
-<li><p><strong>z</strong> (<em>ndarray</em>)</p></li>
-<li><p><strong>filename</strong> (<em>str</em>)</p></li>
-</ul>
-</dd>
-<dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p><em>Figure</em></p>
-</dd>
-</dl>
-</dd></dl>
-<dl class="py method">
-<dt class="sig sig-object py" id="weac.analysis.plotter.Plotter.plot_energy_release_rates">
-<span class="sig-name descname"><span class="pre">plot_energy_release_rates</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">system_model</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">system_models</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filename</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'ERR'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">labels</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">colors</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/weac/analysis/plotter.html#Plotter.plot_energy_release_rates"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#weac.analysis.plotter.Plotter.plot_energy_release_rates" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#weac.analysis.plotter.Plotter.plot_energy_release_rates'">¶</a></dt>
-<dd><p>Plot energy release rates (G_I, G_II) for comparison.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>system_model</strong> (<a class="reference internal" href="weac.core.html#weac.core.SystemModel" title="weac.core.SystemModel"><em>SystemModel</em></a><em>, </em><em>optional</em>) – Single system to plot (overrides default)</p></li>
-<li><p><strong>system_models</strong> (<em>List</em><em>[</em><a class="reference internal" href="weac.core.html#weac.core.SystemModel" title="weac.core.SystemModel"><em>SystemModel</em></a><em>]</em><em>, </em><em>optional</em>) – Multiple systems to plot (overrides default)</p></li>
-<li><p><strong>filename</strong> (<em>str</em><em>, </em><em>optional</em>) – Filename for saving plot</p></li>
-<li><p><strong>labels</strong> (<em>list</em><em> of </em><em>str</em><em>, </em><em>optional</em>) – Labels for each system.</p></li>
-<li><p><strong>colors</strong> (<em>list</em><em> of </em><em>str</em><em>, </em><em>optional</em>) – Colors for each system.</p></li>
-</ul>
-</dd>
-</dl>
-</dd></dl>
-<dl class="py method">
-<dt class="sig sig-object py" id="weac.analysis.plotter.Plotter.plot_err_envelope">
-<span class="sig-name descname"><span class="pre">plot_err_envelope</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">system_model</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">criteria_evaluator</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filename</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'err_envelope'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/weac/analysis/plotter.html#Plotter.plot_err_envelope"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#weac.analysis.plotter.Plotter.plot_err_envelope" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#weac.analysis.plotter.Plotter.plot_err_envelope'">¶</a></dt>
-<dd><p>Plot the ERR envelope.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>system_model</strong> (<a class="reference internal" href="weac.core.system_model.html#weac.core.system_model.SystemModel" title="weac.core.system_model.SystemModel"><em>SystemModel</em></a>)</p></li>
-<li><p><strong>criteria_evaluator</strong> (<a class="reference internal" href="weac.analysis.criteria_evaluator.html#weac.analysis.criteria_evaluator.CriteriaEvaluator" title="weac.analysis.criteria_evaluator.CriteriaEvaluator"><em>CriteriaEvaluator</em></a>)</p></li>
-<li><p><strong>filename</strong> (<em>str</em>)</p></li>
-</ul>
-</dd>
-<dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p><em>Figure</em></p>
-</dd>
-</dl>
-</dd></dl>
-<dl class="py method">
-<dt class="sig sig-object py" id="weac.analysis.plotter.Plotter.plot_fea_disp">
-<span class="sig-name descname"><span class="pre">plot_fea_disp</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">analyzer</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">z</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fea</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/weac/analysis/plotter.html#Plotter.plot_fea_disp"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#weac.analysis.plotter.Plotter.plot_fea_disp" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#weac.analysis.plotter.Plotter.plot_fea_disp'">¶</a></dt>
-<dd><p>Wrap displacements plot.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>analyzer</strong> (<a class="reference internal" href="weac.analysis.analyzer.html#weac.analysis.analyzer.Analyzer" title="weac.analysis.analyzer.Analyzer"><em>Analyzer</em></a>)</p></li>
-<li><p><strong>x</strong> (<em>ndarray</em>)</p></li>
-<li><p><strong>z</strong> (<em>ndarray</em>)</p></li>
-<li><p><strong>fea</strong> (<em>ndarray</em>)</p></li>
-</ul>
-</dd>
-<dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p><em>Figure</em></p>
-</dd>
-</dl>
-</dd></dl>
-<dl class="py method">
-<dt class="sig sig-object py" id="weac.analysis.plotter.Plotter.plot_fea_stress">
-<span class="sig-name descname"><span class="pre">plot_fea_stress</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">analyzer</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">xb</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">zb</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fea</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/weac/analysis/plotter.html#Plotter.plot_fea_stress"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#weac.analysis.plotter.Plotter.plot_fea_stress" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#weac.analysis.plotter.Plotter.plot_fea_stress'">¶</a></dt>
-<dd><p>Wrap stress plot.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>analyzer</strong> (<a class="reference internal" href="weac.analysis.analyzer.html#weac.analysis.analyzer.Analyzer" title="weac.analysis.analyzer.Analyzer"><em>Analyzer</em></a>)</p></li>
-<li><p><strong>xb</strong> (<em>ndarray</em>)</p></li>
-<li><p><strong>zb</strong> (<em>ndarray</em>)</p></li>
-<li><p><strong>fea</strong> (<em>ndarray</em>)</p></li>
-</ul>
-</dd>
-<dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p><em>Figure</em></p>
 </dd>
 </dl>
 </dd></dl>
@@ -349,17 +217,41 @@ and rotated by the specified angle.</p>
 </dl>
 </dd></dl>
 <dl class="py method">
-<dt class="sig sig-object py" id="weac.analysis.plotter.Plotter.plot_slab_profile">
-<span class="sig-name descname"><span class="pre">plot_slab_profile</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">weak_layers</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">slabs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filename</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'slab_profile'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">labels</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">colors</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/weac/analysis/plotter.html#Plotter.plot_slab_profile"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#weac.analysis.plotter.Plotter.plot_slab_profile" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#weac.analysis.plotter.Plotter.plot_slab_profile'">¶</a></dt>
-<dd><p>Plot slab layer profiles for comparison.</p>
+<dt class="sig sig-object py" id="weac.analysis.plotter.Plotter.plot_energy_release_rates">
+<span class="sig-name descname"><span class="pre">plot_energy_release_rates</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">system_model</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">system_models</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filename</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'ERR'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">labels</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">colors</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/weac/analysis/plotter.html#Plotter.plot_energy_release_rates"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#weac.analysis.plotter.Plotter.plot_energy_release_rates" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#weac.analysis.plotter.Plotter.plot_energy_release_rates'">¶</a></dt>
+<dd><p>Plot energy release rates (G_I, G_II) for comparison.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>weak_layers</strong> (<em>List</em><em>[</em><a class="reference internal" href="weac.components.html#weac.components.WeakLayer" title="weac.components.WeakLayer"><em>WeakLayer</em></a><em>] </em><em>| </em><a class="reference internal" href="weac.components.html#weac.components.WeakLayer" title="weac.components.WeakLayer"><em>WeakLayer</em></a>) – The weak layer or layers to plot.</p></li>
-<li><p><strong>slabs</strong> (<em>List</em><em>[</em><a class="reference internal" href="weac.core.html#weac.core.Slab" title="weac.core.Slab"><em>Slab</em></a><em>] </em><em>| </em><a class="reference internal" href="weac.core.html#weac.core.Slab" title="weac.core.Slab"><em>Slab</em></a>) – The slab or slabs to plot.</p></li>
+<li><p><strong>system_model</strong> (<a class="reference internal" href="weac.core.html#weac.core.SystemModel" title="weac.core.SystemModel"><em>SystemModel</em></a><em>, </em><em>optional</em>) – Single system to plot (overrides default)</p></li>
+<li><p><strong>system_models</strong> (<em>List</em><em>[</em><a class="reference internal" href="weac.core.html#weac.core.SystemModel" title="weac.core.SystemModel"><em>SystemModel</em></a><em>]</em><em>, </em><em>optional</em>) – Multiple systems to plot (overrides default)</p></li>
 <li><p><strong>filename</strong> (<em>str</em><em>, </em><em>optional</em>) – Filename for saving plot</p></li>
 <li><p><strong>labels</strong> (<em>list</em><em> of </em><em>str</em><em>, </em><em>optional</em>) – Labels for each system.</p></li>
 <li><p><strong>colors</strong> (<em>list</em><em> of </em><em>str</em><em>, </em><em>optional</em>) – Colors for each system.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="weac.analysis.plotter.Plotter.plot_deformed">
+<span class="sig-name descname"><span class="pre">plot_deformed</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">xsl</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">xwl</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">z</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">analyzer</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dz</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scale</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">100</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">window</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">np.inf</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pad</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">levels</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">300</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">aspect</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">field</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'w'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">normalize</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filename</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'deformed_slab'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/weac/analysis/plotter.html#Plotter.plot_deformed"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#weac.analysis.plotter.Plotter.plot_deformed" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#weac.analysis.plotter.Plotter.plot_deformed'">¶</a></dt>
+<dd><p>Plot deformed slab with field contours.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>xsl</strong> (<em>np.ndarray</em>) – Slab x-coordinates.</p></li>
+<li><p><strong>xwl</strong> (<em>np.ndarray</em>) – Weak layer x-coordinates.</p></li>
+<li><p><strong>z</strong> (<em>np.ndarray</em>) – Solution vector.</p></li>
+<li><p><strong>analyzer</strong> (<a class="reference internal" href="weac.analysis.html#weac.analysis.Analyzer" title="weac.analysis.Analyzer"><em>Analyzer</em></a>) – Analyzer instance.</p></li>
+<li><p><strong>dz</strong> (<em>int</em><em>, </em><em>optional</em>) – Element size along z-axis (mm). Default is 2 mm.</p></li>
+<li><p><strong>scale</strong> (<em>int</em><em>, </em><em>optional</em>) – Deformation scale factor. Default is 100.</p></li>
+<li><p><strong>window</strong> (<em>float</em><em>, </em><em>optional</em>) – Plot window width. Default is inf.</p></li>
+<li><p><strong>pad</strong> (<em>int</em><em>, </em><em>optional</em>) – Padding around plot. Default is 2.</p></li>
+<li><p><strong>levels</strong> (<em>int</em><em>, </em><em>optional</em>) – Number of contour levels. Default is 300.</p></li>
+<li><p><strong>aspect</strong> (<em>int</em><em>, </em><em>optional</em>) – Aspect ratio. Default is 2.</p></li>
+<li><p><strong>field</strong> (<em>str</em><em>, </em><em>optional</em>) – Field to plot (‘w’, ‘u’, ‘principal’, ‘Sxx’, ‘Txz’, ‘Szz’). Default is ‘w’.</p></li>
+<li><p><strong>normalize</strong> (<em>bool</em><em>, </em><em>optional</em>) – Toggle normalization. Default is True.</p></li>
+<li><p><strong>filename</strong> (<em>str</em><em>, </em><em>optional</em>) – Filename for saving plot. Default is “deformed_slab”.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
@@ -367,23 +259,6 @@ and rotated by the specified angle.</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>matplotlib.figure.Figure</p>
-</dd>
-</dl>
-</dd></dl>
-<dl class="py method">
-<dt class="sig sig-object py" id="weac.analysis.plotter.Plotter.plot_stress_criteria">
-<span class="sig-name descname"><span class="pre">plot_stress_criteria</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">analyzer</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stress</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/weac/analysis/plotter.html#Plotter.plot_stress_criteria"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#weac.analysis.plotter.Plotter.plot_stress_criteria" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#weac.analysis.plotter.Plotter.plot_stress_criteria'">¶</a></dt>
-<dd><p>Wrap plot of stress and energy criteria.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>analyzer</strong> (<a class="reference internal" href="weac.analysis.analyzer.html#weac.analysis.analyzer.Analyzer" title="weac.analysis.analyzer.Analyzer"><em>Analyzer</em></a>)</p></li>
-<li><p><strong>x</strong> (<em>ndarray</em>)</p></li>
-<li><p><strong>stress</strong> (<em>ndarray</em>)</p></li>
-</ul>
-</dd>
-<dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p><em>Figure</em></p>
 </dd>
 </dl>
 </dd></dl>
@@ -399,6 +274,67 @@ and rotated by the specified angle.</p>
 <li><p><strong>all_envelopes</strong> (<em>bool</em><em>, </em><em>optional</em>) – Whether to plot all four quadrants of the envelope</p></li>
 <li><p><strong>filename</strong> (<em>str</em><em>, </em><em>optional</em>) – Filename for saving plot</p></li>
 </ul>
+</dd>
+</dl>
+</dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="weac.analysis.plotter.Plotter.plot_err_envelope">
+<span class="sig-name descname"><span class="pre">plot_err_envelope</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">system_model</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">criteria_evaluator</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filename</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'err_envelope'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/weac/analysis/plotter.html#Plotter.plot_err_envelope"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#weac.analysis.plotter.Plotter.plot_err_envelope" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#weac.analysis.plotter.Plotter.plot_err_envelope'">¶</a></dt>
+<dd><p>Plot the ERR envelope.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>system_model</strong> (<a class="reference internal" href="weac.core.system_model.html#weac.core.system_model.SystemModel" title="weac.core.system_model.SystemModel"><em>SystemModel</em></a>)</p></li>
+<li><p><strong>criteria_evaluator</strong> (<a class="reference internal" href="weac.analysis.criteria_evaluator.html#weac.analysis.criteria_evaluator.CriteriaEvaluator" title="weac.analysis.criteria_evaluator.CriteriaEvaluator"><em>CriteriaEvaluator</em></a>)</p></li>
+<li><p><strong>filename</strong> (<em>str</em>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><em>Figure</em></p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="weac.analysis.plotter.Plotter.plot_analysis">
+<span class="sig-name descname"><span class="pre">plot_analysis</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">system</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">criteria_evaluator</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">min_force_result</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">min_crack_length</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">coupled_criterion_result</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dz</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">deformation_scale</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">100.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">window</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">np.inf</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">levels</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">300</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filename</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'analysis'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/weac/analysis/plotter.html#Plotter.plot_analysis"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#weac.analysis.plotter.Plotter.plot_analysis" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#weac.analysis.plotter.Plotter.plot_analysis'">¶</a></dt>
+<dd><p>Plot deformed slab with field contours.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>field</strong> (<em>str</em><em>, </em><em>default 'w'</em>) – Field to plot (‘w’, ‘u’, ‘principal’, ‘sigma’, ‘tau’)</p></li>
+<li><p><strong>system_model</strong> (<a class="reference internal" href="weac.core.html#weac.core.SystemModel" title="weac.core.SystemModel"><em>SystemModel</em></a><em>, </em><em>optional</em>) – System to plot (uses first system if not specified)</p></li>
+<li><p><strong>filename</strong> (<em>str</em><em>, </em><em>optional</em>) – Filename for saving plot</p></li>
+<li><p><strong>system</strong> (<a class="reference internal" href="weac.core.system_model.html#weac.core.system_model.SystemModel" title="weac.core.system_model.SystemModel"><em>SystemModel</em></a>)</p></li>
+<li><p><strong>criteria_evaluator</strong> (<a class="reference internal" href="weac.analysis.criteria_evaluator.html#weac.analysis.criteria_evaluator.CriteriaEvaluator" title="weac.analysis.criteria_evaluator.CriteriaEvaluator"><em>CriteriaEvaluator</em></a>)</p></li>
+<li><p><strong>min_force_result</strong> (<a class="reference internal" href="weac.analysis.criteria_evaluator.html#weac.analysis.criteria_evaluator.FindMinimumForceResult" title="weac.analysis.criteria_evaluator.FindMinimumForceResult"><em>FindMinimumForceResult</em></a>)</p></li>
+<li><p><strong>min_crack_length</strong> (<em>float</em>)</p></li>
+<li><p><strong>coupled_criterion_result</strong> (<a class="reference internal" href="weac.analysis.criteria_evaluator.html#weac.analysis.criteria_evaluator.CoupledCriterionResult" title="weac.analysis.criteria_evaluator.CoupledCriterionResult"><em>CoupledCriterionResult</em></a>)</p></li>
+<li><p><strong>dz</strong> (<em>int</em>)</p></li>
+<li><p><strong>deformation_scale</strong> (<em>float</em>)</p></li>
+<li><p><strong>window</strong> (<em>int</em>)</p></li>
+<li><p><strong>levels</strong> (<em>int</em>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><em>Figure</em></p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="weac.analysis.plotter.Plotter.plot_displacements">
+<span class="sig-name descname"><span class="pre">plot_displacements</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">analyzer</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">z</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filename</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'displacements'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/weac/analysis/plotter.html#Plotter.plot_displacements"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#weac.analysis.plotter.Plotter.plot_displacements" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#weac.analysis.plotter.Plotter.plot_displacements'">¶</a></dt>
+<dd><p>Wrap for displacements plot.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>analyzer</strong> (<a class="reference internal" href="weac.analysis.analyzer.html#weac.analysis.analyzer.Analyzer" title="weac.analysis.analyzer.Analyzer"><em>Analyzer</em></a>)</p></li>
+<li><p><strong>x</strong> (<em>ndarray</em>)</p></li>
+<li><p><strong>z</strong> (<em>ndarray</em>)</p></li>
+<li><p><strong>filename</strong> (<em>str</em>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><em>Figure</em></p>
 </dd>
 </dl>
 </dd></dl>
@@ -420,28 +356,123 @@ and rotated by the specified angle.</p>
 </dd>
 </dl>
 </dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="weac.analysis.plotter.Plotter.plot_stress_criteria">
+<span class="sig-name descname"><span class="pre">plot_stress_criteria</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">analyzer</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stress</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/weac/analysis/plotter.html#Plotter.plot_stress_criteria"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#weac.analysis.plotter.Plotter.plot_stress_criteria" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#weac.analysis.plotter.Plotter.plot_stress_criteria'">¶</a></dt>
+<dd><p>Wrap plot of stress and energy criteria.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>analyzer</strong> (<a class="reference internal" href="weac.analysis.analyzer.html#weac.analysis.analyzer.Analyzer" title="weac.analysis.analyzer.Analyzer"><em>Analyzer</em></a>)</p></li>
+<li><p><strong>x</strong> (<em>ndarray</em>)</p></li>
+<li><p><strong>stress</strong> (<em>ndarray</em>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><em>Figure</em></p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="weac.analysis.plotter.Plotter.plot_ERR_comp">
+<span class="sig-name descname"><span class="pre">plot_ERR_comp</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">analyzer</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">da</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Gdif</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Ginc</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mode</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/weac/analysis/plotter.html#Plotter.plot_ERR_comp"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#weac.analysis.plotter.Plotter.plot_ERR_comp" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#weac.analysis.plotter.Plotter.plot_ERR_comp'">¶</a></dt>
+<dd><p>Wrap energy release rate plot.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>analyzer</strong> (<a class="reference internal" href="weac.analysis.analyzer.html#weac.analysis.analyzer.Analyzer" title="weac.analysis.analyzer.Analyzer"><em>Analyzer</em></a>)</p></li>
+<li><p><strong>da</strong> (<em>ndarray</em>)</p></li>
+<li><p><strong>Gdif</strong> (<em>ndarray</em>)</p></li>
+<li><p><strong>Ginc</strong> (<em>ndarray</em>)</p></li>
+<li><p><strong>mode</strong> (<em>int</em>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><em>Figure</em></p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="weac.analysis.plotter.Plotter.plot_ERR_modes">
+<span class="sig-name descname"><span class="pre">plot_ERR_modes</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">analyzer</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">da</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">G</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">kind</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'inc'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/weac/analysis/plotter.html#Plotter.plot_ERR_modes"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#weac.analysis.plotter.Plotter.plot_ERR_modes" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#weac.analysis.plotter.Plotter.plot_ERR_modes'">¶</a></dt>
+<dd><p>Wrap energy release rate plot.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>analyzer</strong> (<a class="reference internal" href="weac.analysis.analyzer.html#weac.analysis.analyzer.Analyzer" title="weac.analysis.analyzer.Analyzer"><em>Analyzer</em></a>)</p></li>
+<li><p><strong>da</strong> (<em>ndarray</em>)</p></li>
+<li><p><strong>G</strong> (<em>ndarray</em>)</p></li>
+<li><p><strong>kind</strong> (<em>str</em>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><em>Figure</em></p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="weac.analysis.plotter.Plotter.plot_fea_disp">
+<span class="sig-name descname"><span class="pre">plot_fea_disp</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">analyzer</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">z</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fea</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/weac/analysis/plotter.html#Plotter.plot_fea_disp"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#weac.analysis.plotter.Plotter.plot_fea_disp" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#weac.analysis.plotter.Plotter.plot_fea_disp'">¶</a></dt>
+<dd><p>Wrap displacements plot.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>analyzer</strong> (<a class="reference internal" href="weac.analysis.analyzer.html#weac.analysis.analyzer.Analyzer" title="weac.analysis.analyzer.Analyzer"><em>Analyzer</em></a>)</p></li>
+<li><p><strong>x</strong> (<em>ndarray</em>)</p></li>
+<li><p><strong>z</strong> (<em>ndarray</em>)</p></li>
+<li><p><strong>fea</strong> (<em>ndarray</em>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><em>Figure</em></p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="weac.analysis.plotter.Plotter.plot_fea_stress">
+<span class="sig-name descname"><span class="pre">plot_fea_stress</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">analyzer</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">xb</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">zb</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fea</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/weac/analysis/plotter.html#Plotter.plot_fea_stress"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#weac.analysis.plotter.Plotter.plot_fea_stress" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#weac.analysis.plotter.Plotter.plot_fea_stress'">¶</a></dt>
+<dd><p>Wrap stress plot.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>analyzer</strong> (<a class="reference internal" href="weac.analysis.analyzer.html#weac.analysis.analyzer.Analyzer" title="weac.analysis.analyzer.Analyzer"><em>Analyzer</em></a>)</p></li>
+<li><p><strong>xb</strong> (<em>ndarray</em>)</p></li>
+<li><p><strong>zb</strong> (<em>ndarray</em>)</p></li>
+<li><p><strong>fea</strong> (<em>ndarray</em>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><em>Figure</em></p>
+</dd>
+</dl>
+</dd></dl>
 </dd></dl>
 </section>
 </div></div><aside class="hidden text-sm xl:block" id="right-sidebar">
 <div class="sticky top-16 -mt-10 max-h-[calc(100vh-5rem)] overflow-y-auto pt-6 space-y-2"><p class="font-medium">On this page</p>
 <ul>
-<li><a :data-current="activeSection === '#weac.analysis.plotter.MidpointNormalize'" class="reference internal" href="#weac.analysis.plotter.MidpointNormalize"><code class="docutils literal notranslate"><span class="pre">MidpointNormalize</span></code></a></li>
+<li><a :data-current="activeSection === '#weac.analysis.plotter.MidpointNormalize'" class="reference internal" href="#weac.analysis.plotter.MidpointNormalize"><code class="docutils literal notranslate"><span class="pre">MidpointNormalize</span></code></a><ul>
+<li><a :data-current="activeSection === '#weac.analysis.plotter.MidpointNormalize.__init__'" class="reference internal" href="#weac.analysis.plotter.MidpointNormalize.__init__"><code class="docutils literal notranslate"><span class="pre">MidpointNormalize.__init__()</span></code></a></li>
+<li><a :data-current="activeSection === '#weac.analysis.plotter.MidpointNormalize.__call__'" class="reference internal" href="#weac.analysis.plotter.MidpointNormalize.__call__"><code class="docutils literal notranslate"><span class="pre">MidpointNormalize.__call__()</span></code></a></li>
+</ul>
+</li>
 <li><a :data-current="activeSection === '#weac.analysis.plotter.Plotter'" class="reference internal" href="#weac.analysis.plotter.Plotter"><code class="docutils literal notranslate"><span class="pre">Plotter</span></code></a><ul>
-<li><a :data-current="activeSection === '#weac.analysis.plotter.Plotter.plot_ERR_comp'" class="reference internal" href="#weac.analysis.plotter.Plotter.plot_ERR_comp"><code class="docutils literal notranslate"><span class="pre">Plotter.plot_ERR_comp()</span></code></a></li>
-<li><a :data-current="activeSection === '#weac.analysis.plotter.Plotter.plot_ERR_modes'" class="reference internal" href="#weac.analysis.plotter.Plotter.plot_ERR_modes"><code class="docutils literal notranslate"><span class="pre">Plotter.plot_ERR_modes()</span></code></a></li>
-<li><a :data-current="activeSection === '#weac.analysis.plotter.Plotter.plot_analysis'" class="reference internal" href="#weac.analysis.plotter.Plotter.plot_analysis"><code class="docutils literal notranslate"><span class="pre">Plotter.plot_analysis()</span></code></a></li>
-<li><a :data-current="activeSection === '#weac.analysis.plotter.Plotter.plot_deformed'" class="reference internal" href="#weac.analysis.plotter.Plotter.plot_deformed"><code class="docutils literal notranslate"><span class="pre">Plotter.plot_deformed()</span></code></a></li>
-<li><a :data-current="activeSection === '#weac.analysis.plotter.Plotter.plot_displacements'" class="reference internal" href="#weac.analysis.plotter.Plotter.plot_displacements"><code class="docutils literal notranslate"><span class="pre">Plotter.plot_displacements()</span></code></a></li>
-<li><a :data-current="activeSection === '#weac.analysis.plotter.Plotter.plot_energy_release_rates'" class="reference internal" href="#weac.analysis.plotter.Plotter.plot_energy_release_rates"><code class="docutils literal notranslate"><span class="pre">Plotter.plot_energy_release_rates()</span></code></a></li>
-<li><a :data-current="activeSection === '#weac.analysis.plotter.Plotter.plot_err_envelope'" class="reference internal" href="#weac.analysis.plotter.Plotter.plot_err_envelope"><code class="docutils literal notranslate"><span class="pre">Plotter.plot_err_envelope()</span></code></a></li>
-<li><a :data-current="activeSection === '#weac.analysis.plotter.Plotter.plot_fea_disp'" class="reference internal" href="#weac.analysis.plotter.Plotter.plot_fea_disp"><code class="docutils literal notranslate"><span class="pre">Plotter.plot_fea_disp()</span></code></a></li>
-<li><a :data-current="activeSection === '#weac.analysis.plotter.Plotter.plot_fea_stress'" class="reference internal" href="#weac.analysis.plotter.Plotter.plot_fea_stress"><code class="docutils literal notranslate"><span class="pre">Plotter.plot_fea_stress()</span></code></a></li>
+<li><a :data-current="activeSection === '#weac.analysis.plotter.Plotter.__init__'" class="reference internal" href="#weac.analysis.plotter.Plotter.__init__"><code class="docutils literal notranslate"><span class="pre">Plotter.__init__()</span></code></a></li>
+<li><a :data-current="activeSection === '#weac.analysis.plotter.Plotter.plot_slab_profile'" class="reference internal" href="#weac.analysis.plotter.Plotter.plot_slab_profile"><code class="docutils literal notranslate"><span class="pre">Plotter.plot_slab_profile()</span></code></a></li>
 <li><a :data-current="activeSection === '#weac.analysis.plotter.Plotter.plot_rotated_slab_profile'" class="reference internal" href="#weac.analysis.plotter.Plotter.plot_rotated_slab_profile"><code class="docutils literal notranslate"><span class="pre">Plotter.plot_rotated_slab_profile()</span></code></a></li>
 <li><a :data-current="activeSection === '#weac.analysis.plotter.Plotter.plot_section_forces'" class="reference internal" href="#weac.analysis.plotter.Plotter.plot_section_forces"><code class="docutils literal notranslate"><span class="pre">Plotter.plot_section_forces()</span></code></a></li>
-<li><a :data-current="activeSection === '#weac.analysis.plotter.Plotter.plot_slab_profile'" class="reference internal" href="#weac.analysis.plotter.Plotter.plot_slab_profile"><code class="docutils literal notranslate"><span class="pre">Plotter.plot_slab_profile()</span></code></a></li>
-<li><a :data-current="activeSection === '#weac.analysis.plotter.Plotter.plot_stress_criteria'" class="reference internal" href="#weac.analysis.plotter.Plotter.plot_stress_criteria"><code class="docutils literal notranslate"><span class="pre">Plotter.plot_stress_criteria()</span></code></a></li>
+<li><a :data-current="activeSection === '#weac.analysis.plotter.Plotter.plot_energy_release_rates'" class="reference internal" href="#weac.analysis.plotter.Plotter.plot_energy_release_rates"><code class="docutils literal notranslate"><span class="pre">Plotter.plot_energy_release_rates()</span></code></a></li>
+<li><a :data-current="activeSection === '#weac.analysis.plotter.Plotter.plot_deformed'" class="reference internal" href="#weac.analysis.plotter.Plotter.plot_deformed"><code class="docutils literal notranslate"><span class="pre">Plotter.plot_deformed()</span></code></a></li>
 <li><a :data-current="activeSection === '#weac.analysis.plotter.Plotter.plot_stress_envelope'" class="reference internal" href="#weac.analysis.plotter.Plotter.plot_stress_envelope"><code class="docutils literal notranslate"><span class="pre">Plotter.plot_stress_envelope()</span></code></a></li>
+<li><a :data-current="activeSection === '#weac.analysis.plotter.Plotter.plot_err_envelope'" class="reference internal" href="#weac.analysis.plotter.Plotter.plot_err_envelope"><code class="docutils literal notranslate"><span class="pre">Plotter.plot_err_envelope()</span></code></a></li>
+<li><a :data-current="activeSection === '#weac.analysis.plotter.Plotter.plot_analysis'" class="reference internal" href="#weac.analysis.plotter.Plotter.plot_analysis"><code class="docutils literal notranslate"><span class="pre">Plotter.plot_analysis()</span></code></a></li>
+<li><a :data-current="activeSection === '#weac.analysis.plotter.Plotter.plot_displacements'" class="reference internal" href="#weac.analysis.plotter.Plotter.plot_displacements"><code class="docutils literal notranslate"><span class="pre">Plotter.plot_displacements()</span></code></a></li>
 <li><a :data-current="activeSection === '#weac.analysis.plotter.Plotter.plot_stresses'" class="reference internal" href="#weac.analysis.plotter.Plotter.plot_stresses"><code class="docutils literal notranslate"><span class="pre">Plotter.plot_stresses()</span></code></a></li>
+<li><a :data-current="activeSection === '#weac.analysis.plotter.Plotter.plot_stress_criteria'" class="reference internal" href="#weac.analysis.plotter.Plotter.plot_stress_criteria"><code class="docutils literal notranslate"><span class="pre">Plotter.plot_stress_criteria()</span></code></a></li>
+<li><a :data-current="activeSection === '#weac.analysis.plotter.Plotter.plot_ERR_comp'" class="reference internal" href="#weac.analysis.plotter.Plotter.plot_ERR_comp"><code class="docutils literal notranslate"><span class="pre">Plotter.plot_ERR_comp()</span></code></a></li>
+<li><a :data-current="activeSection === '#weac.analysis.plotter.Plotter.plot_ERR_modes'" class="reference internal" href="#weac.analysis.plotter.Plotter.plot_ERR_modes"><code class="docutils literal notranslate"><span class="pre">Plotter.plot_ERR_modes()</span></code></a></li>
+<li><a :data-current="activeSection === '#weac.analysis.plotter.Plotter.plot_fea_disp'" class="reference internal" href="#weac.analysis.plotter.Plotter.plot_fea_disp"><code class="docutils literal notranslate"><span class="pre">Plotter.plot_fea_disp()</span></code></a></li>
+<li><a :data-current="activeSection === '#weac.analysis.plotter.Plotter.plot_fea_stress'" class="reference internal" href="#weac.analysis.plotter.Plotter.plot_fea_stress"><code class="docutils literal notranslate"><span class="pre">Plotter.plot_fea_stress()</span></code></a></li>
 </ul>
 </li>
 </ul>

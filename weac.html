@@ -1,0 +1,606 @@
+<!DOCTYPE html>
+
+<html :class="{'dark': darkMode === 'dark' || (darkMode === 'system' &amp;&amp; window.matchMedia('(prefers-color-scheme: dark)').matches)}" class="scroll-smooth" data-content_root="./" lang="en" x-data="{ darkMode: localStorage.getItem('darkMode') || localStorage.setItem('darkMode', 'system'), activeSection: '' }" x-init="$watch('darkMode', val =&gt; localStorage.setItem('darkMode', val))">
+<head>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<meta charset="utf-8"/>
+<meta content="white" media="(prefers-color-scheme: light)" name="theme-color"/>
+<meta content="black" media="(prefers-color-scheme: dark)" name="theme-color"/>
+<meta content="width=device-width, initial-scale=1" name="viewport"/>
+<title>weac package | WEAC 2.6.4</title>
+<meta content="weac package | WEAC 2.6.4" property="og:title"/>
+<meta content="weac package | WEAC 2.6.4" name="twitter:title"/>
+<link href="_static/pygments.css?v=e72c8e07" rel="stylesheet" type="text/css"/>
+<link href="_static/theme.css?v=42baaae4" rel="stylesheet" type="text/css"/>
+<link href="search.html" rel="search" title="Search"/>
+<link href="genindex.html" rel="index" title="Index"/>
+<link href="weac.analysis.html" rel="next" title="weac.analysis package"/>
+<link href="modules.html" rel="prev" title="weac"/>
+<script>
+    <!-- Prevent Flash of wrong theme -->
+      const userPreference = localStorage.getItem('darkMode');
+      let mode;
+      if (userPreference === 'dark' || window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        mode = 'dark';
+        document.documentElement.classList.add('dark');
+      } else {
+        mode = 'light';
+      }
+      if (!userPreference) {localStorage.setItem('darkMode', mode)}
+    </script>
+</head>
+<body :class="{ 'overflow-hidden': showSidebar }" class="min-h-screen font-sans antialiased bg-background text-foreground" x-data="{ showSidebar: false, showScrollTop: false }">
+<div @click.self="showSidebar = false" class="fixed inset-0 z-50 overflow-hidden bg-background/80 backdrop-blur-sm md:hidden" x-cloak="" x-show="showSidebar"></div><div class="relative flex flex-col min-h-screen" id="page"><a class="absolute top-0 left-0 z-[100] block bg-background p-4 text-xl transition -translate-x-full opacity-0 focus:translate-x-0 focus:opacity-100" href="#content">
+      Skip to content
+    </a><header class="sticky top-0 z-40 w-full border-b shadow-sm border-border supports-backdrop-blur:bg-background/60 bg-background/95 backdrop-blur"><div class="container flex items-center h-14">
+<div class="hidden mr-4 md:flex">
+<a class="flex items-center mr-6" href="index.html"><span class="hidden font-bold sm:inline-block text-clip whitespace-nowrap">WEAC 2.6.4</span>
+</a></div><button @click="showSidebar = true" class="inline-flex items-center justify-center h-10 px-0 py-2 mr-2 text-base font-medium transition-colors rounded-md hover:text-accent-foreground hover:bg-transparent md:hidden" type="button">
+<svg aria-hidden="true" fill="currentColor" height="24" viewbox="0 96 960 960" width="24" xmlns="http://www.w3.org/2000/svg">
+<path d="M152.587 825.087q-19.152 0-32.326-13.174t-13.174-32.326q0-19.152 13.174-32.326t32.326-13.174h440q19.152 0 32.326 13.174t13.174 32.326q0 19.152-13.174 32.326t-32.326 13.174h-440Zm0-203.587q-19.152 0-32.326-13.174T107.087 576q0-19.152 13.174-32.326t32.326-13.174h320q19.152 0 32.326 13.174T518.087 576q0 19.152-13.174 32.326T472.587 621.5h-320Zm0-203.587q-19.152 0-32.326-13.174t-13.174-32.326q0-19.152 13.174-32.326t32.326-13.174h440q19.152 0 32.326 13.174t13.174 32.326q0 19.152-13.174 32.326t-32.326 13.174h-440ZM708.913 576l112.174 112.174q12.674 12.674 12.674 31.826t-12.674 31.826Q808.413 764.5 789.261 764.5t-31.826-12.674l-144-144Q600 594.391 600 576t13.435-31.826l144-144q12.674-12.674 31.826-12.674t31.826 12.674q12.674 12.674 12.674 31.826t-12.674 31.826L708.913 576Z"></path>
+</svg>
+<span class="sr-only">Toggle navigation menu</span>
+</button>
+<div class="flex items-center justify-between flex-1 space-x-2 sm:space-x-4 md:justify-end">
+<div class="flex-1 w-full md:w-auto md:flex-none"><form @keydown.k.window.meta="$refs.search.focus()" action="search.html" class="relative flex items-center group" id="searchbox" method="get">
+<input aria-label="Search the docs" class="inline-flex items-center font-medium transition-colors bg-transparent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 ring-offset-background border border-input hover:bg-accent focus:bg-accent hover:text-accent-foreground focus:text-accent-foreground hover:placeholder-accent-foreground py-2 px-4 relative h-9 w-full justify-start rounded-[0.5rem] text-sm text-muted-foreground sm:pr-12 md:w-40 lg:w-64" id="search-input" name="q" placeholder="Search ..." type="search" x-ref="search"/>
+<kbd class="pointer-events-none absolute right-1.5 top-2 hidden h-5 select-none text-muted-foreground items-center gap-1 rounded border border-border bg-muted px-1.5 font-mono text-[10px] font-medium opacity-100 sm:flex group-hover:bg-accent group-hover:text-accent-foreground">
+<span class="text-xs">⌘</span>
+    K
+  </kbd>
+</form>
+</div>
+<nav class="flex items-center space-x-1">
+<button @click="darkMode = darkMode === 'light' ? 'dark' : 'light'" aria-label="Color theme switcher" class="relative inline-flex items-center justify-center px-0 text-sm font-medium transition-colors rounded-md hover:bg-accent hover:text-accent-foreground h-9 w-9" type="button">
+<svg class="absolute transition-all scale-100 rotate-0 dark:-rotate-90 dark:scale-0" fill="currentColor" height="24" viewbox="0 96 960 960" width="24" xmlns="http://www.w3.org/2000/svg">
+<path d="M480 685q45.456 0 77.228-31.772Q589 621.456 589 576q0-45.456-31.772-77.228Q525.456 467 480 467q-45.456 0-77.228 31.772Q371 530.544 371 576q0 45.456 31.772 77.228Q434.544 685 480 685Zm0 91q-83 0-141.5-58.5T280 576q0-83 58.5-141.5T480 376q83 0 141.5 58.5T680 576q0 83-58.5 141.5T480 776ZM80 621.5q-19.152 0-32.326-13.174T34.5 576q0-19.152 13.174-32.326T80 530.5h80q19.152 0 32.326 13.174T205.5 576q0 19.152-13.174 32.326T160 621.5H80Zm720 0q-19.152 0-32.326-13.174T754.5 576q0-19.152 13.174-32.326T800 530.5h80q19.152 0 32.326 13.174T925.5 576q0 19.152-13.174 32.326T880 621.5h-80Zm-320-320q-19.152 0-32.326-13.174T434.5 256v-80q0-19.152 13.174-32.326T480 130.5q19.152 0 32.326 13.174T525.5 176v80q0 19.152-13.174 32.326T480 301.5Zm0 720q-19.152 0-32.326-13.17Q434.5 995.152 434.5 976v-80q0-19.152 13.174-32.326T480 850.5q19.152 0 32.326 13.174T525.5 896v80q0 19.152-13.174 32.33-13.174 13.17-32.326 13.17ZM222.174 382.065l-43-42Q165.5 327.391 166 308.239t13.174-33.065q13.435-13.674 32.587-13.674t32.065 13.674l42.239 43q12.674 13.435 12.555 31.706-.12 18.272-12.555 31.946-12.674 13.674-31.445 13.413-18.772-.261-32.446-13.174Zm494 494.761-42.239-43q-12.674-13.435-12.674-32.087t12.674-31.565Q686.609 756.5 705.38 757q18.772.5 32.446 13.174l43 41.761Q794.5 824.609 794 843.761t-13.174 33.065Q767.391 890.5 748.239 890.5t-32.065-13.674Zm-42-494.761Q660.5 369.391 661 350.62q.5-18.772 13.174-32.446l41.761-43Q728.609 261.5 747.761 262t33.065 13.174q13.674 13.435 13.674 32.587t-13.674 32.065l-43 42.239q-13.435 12.674-31.706 12.555-18.272-.12-31.946-12.555Zm-495 494.761Q165.5 863.391 165.5 844.239t13.674-32.065l43-42.239q13.435-12.674 32.087-12.674t31.565 12.674Q299.5 782.609 299 801.38q-.5 18.772-13.174 32.446l-41.761 43Q231.391 890.5 212.239 890t-33.065-13.174ZM480 576Z"></path>
+</svg>
+<svg class="absolute transition-all scale-0 rotate-90 dark:rotate-0 dark:scale-100" fill="currentColor" height="24" viewbox="0 96 960 960" width="24" xmlns="http://www.w3.org/2000/svg">
+<path d="M480 936q-151 0-255.5-104.5T120 576q0-138 90-239.5T440 218q25-3 39 18t-1 44q-17 26-25.5 55t-8.5 61q0 90 63 153t153 63q31 0 61.5-9t54.5-25q21-14 43-1.5t19 39.5q-14 138-117.5 229T480 936Zm0-80q88 0 158-48.5T740 681q-20 5-40 8t-40 3q-123 0-209.5-86.5T364 396q0-20 3-40t8-40q-78 32-126.5 102T200 576q0 116 82 198t198 82Zm-10-270Z"></path>
+</svg>
+</button>
+</nav>
+</div>
+</div>
+</header>
+<div class="flex-1"><div class="container flex-1 items-start md:grid md:grid-cols-[220px_minmax(0,1fr)] md:gap-6 lg:grid-cols-[240px_minmax(0,1fr)] lg:gap-10"><aside :aria-hidden="!showSidebar" :class="{ 'translate-x-0': showSidebar }" class="fixed inset-y-0 left-0 md:top-14 z-50 md:z-30 bg-background md:bg-transparent transition-all duration-100 -translate-x-full md:translate-x-0 ml-0 p-6 md:p-0 md:-ml-2 md:h-[calc(100vh-3.5rem)] w-5/6 md:w-full shrink-0 overflow-y-auto border-r border-border md:sticky" id="left-sidebar">
+<a class="!justify-start text-sm md:!hidden bg-background" href="index.html"><span class="font-bold text-clip whitespace-nowrap">WEAC 2.6.4</span>
+</a>
+<div class="relative overflow-hidden md:overflow-auto my-4 md:my-0 h-[calc(100vh-8rem)] md:h-auto">
+<div class="overflow-y-auto h-full w-full relative pr-6"><nav class="table w-full min-w-full my-6 lg:my-8">
+<p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1 current" x-data="{ expanded: $el.classList.contains('current') ? true : false }"><a :class="{ 'expanded' : expanded }" @click="expanded = !expanded" class="reference internal expandable" href="modules.html">weac<button @click.prevent.stop="expanded = !expanded" type="button"><span class="sr-only"></span><svg fill="currentColor" height="18px" stroke="none" viewbox="0 0 24 24" width="18px" xmlns="http://www.w3.org/2000/svg"><path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"></path></svg></button></a><ul class="current" x-show="expanded">
+<li class="toctree-l2 current"><a class="current reference internal" href="#">weac package</a></li>
+</ul>
+</li>
+</ul>
+</nav>
+</div>
+</div>
+<button @click="showSidebar = false" class="absolute md:hidden right-4 top-4 rounded-sm opacity-70 transition-opacity hover:opacity-100" type="button">
+<svg class="h-4 w-4" fill="currentColor" height="24" stroke="none" viewbox="0 96 960 960" width="24" xmlns="http://www.w3.org/2000/svg">
+<path d="M480 632 284 828q-11 11-28 11t-28-11q-11-11-11-28t11-28l196-196-196-196q-11-11-11-28t11-28q11-11 28-11t28 11l196 196 196-196q11-11 28-11t28 11q11 11 11 28t-11 28L536 576l196 196q11 11 11 28t-11 28q-11 11-28 11t-28-11L480 632Z"></path>
+</svg>
+</button>
+</aside>
+<main class="relative py-6 lg:gap-10 lg:py-8 xl:grid xl:grid-cols-[1fr_300px]">
+<div class="w-full min-w-0 mx-auto">
+<nav aria-label="breadcrumbs" class="flex items-center mb-4 space-x-1 text-sm text-muted-foreground">
+<a class="overflow-hidden text-ellipsis whitespace-nowrap hover:text-foreground" href="index.html">
+<span class="hidden md:inline">WEAC 2.6.4</span>
+<svg aria-label="Home" class="md:hidden" fill="currentColor" height="18" stroke="none" viewbox="0 96 960 960" width="18" xmlns="http://www.w3.org/2000/svg">
+<path d="M240 856h120V616h240v240h120V496L480 316 240 496v360Zm-80 80V456l320-240 320 240v480H520V696h-80v240H160Zm320-350Z"></path>
+</svg>
+</a>
+<div class="mr-1">/</div><a class="hover:text-foreground overflow-hidden text-ellipsis whitespace-nowrap" href="modules.html">weac</a>
+<div class="mr-1">/</div><span aria-current="page" class="font-medium text-foreground overflow-hidden text-ellipsis whitespace-nowrap">weac package</span>
+</nav>
+<div id="content" role="main">
+<section id="weac-package">
+<h1>weac package<a class="headerlink" href="#weac-package" title="Link to this heading">¶</a></h1>
+<section id="subpackages">
+<h2>Subpackages<a class="headerlink" href="#subpackages" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#subpackages'">¶</a></h2>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="weac.analysis.html">weac.analysis package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="weac.analysis.html#submodules">Submodules</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="weac.analysis.analyzer.html">weac.analysis.analyzer module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="weac.analysis.analyzer.html#weac.analysis.analyzer.track_analyzer_call"><code class="docutils literal notranslate"><span class="pre">track_analyzer_call()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="weac.analysis.analyzer.html#weac.analysis.analyzer.Analyzer"><code class="docutils literal notranslate"><span class="pre">Analyzer</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="weac.analysis.criteria_evaluator.html">weac.analysis.criteria_evaluator module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="weac.analysis.criteria_evaluator.html#weac.analysis.criteria_evaluator.CoupledCriterionHistory"><code class="docutils literal notranslate"><span class="pre">CoupledCriterionHistory</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="weac.analysis.criteria_evaluator.html#weac.analysis.criteria_evaluator.CoupledCriterionResult"><code class="docutils literal notranslate"><span class="pre">CoupledCriterionResult</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="weac.analysis.criteria_evaluator.html#weac.analysis.criteria_evaluator.SSERRResult"><code class="docutils literal notranslate"><span class="pre">SSERRResult</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="weac.analysis.criteria_evaluator.html#weac.analysis.criteria_evaluator.FindMinimumForceResult"><code class="docutils literal notranslate"><span class="pre">FindMinimumForceResult</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="weac.analysis.criteria_evaluator.html#weac.analysis.criteria_evaluator.CriteriaEvaluator"><code class="docutils literal notranslate"><span class="pre">CriteriaEvaluator</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="weac.analysis.plotter.html">weac.analysis.plotter module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="weac.analysis.plotter.html#weac.analysis.plotter.MidpointNormalize"><code class="docutils literal notranslate"><span class="pre">MidpointNormalize</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="weac.analysis.plotter.html#weac.analysis.plotter.Plotter"><code class="docutils literal notranslate"><span class="pre">Plotter</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="weac.analysis.html#module-weac.analysis">Module contents</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="weac.analysis.html#weac.analysis.Analyzer"><code class="docutils literal notranslate"><span class="pre">Analyzer</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="weac.analysis.html#weac.analysis.Analyzer.Sxx"><code class="docutils literal notranslate"><span class="pre">Analyzer.Sxx()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="weac.analysis.html#weac.analysis.Analyzer.Szz"><code class="docutils literal notranslate"><span class="pre">Analyzer.Szz()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="weac.analysis.html#weac.analysis.Analyzer.Txz"><code class="docutils literal notranslate"><span class="pre">Analyzer.Txz()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="weac.analysis.html#weac.analysis.Analyzer.__init__"><code class="docutils literal notranslate"><span class="pre">Analyzer.__init__()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="weac.analysis.html#weac.analysis.Analyzer.differential_ERR"><code class="docutils literal notranslate"><span class="pre">Analyzer.differential_ERR()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="weac.analysis.html#weac.analysis.Analyzer.get_call_stats"><code class="docutils literal notranslate"><span class="pre">Analyzer.get_call_stats()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="weac.analysis.html#weac.analysis.Analyzer.get_zmesh"><code class="docutils literal notranslate"><span class="pre">Analyzer.get_zmesh()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="weac.analysis.html#weac.analysis.Analyzer.incremental_ERR"><code class="docutils literal notranslate"><span class="pre">Analyzer.incremental_ERR()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="weac.analysis.html#weac.analysis.Analyzer.principal_stress_slab"><code class="docutils literal notranslate"><span class="pre">Analyzer.principal_stress_slab()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="weac.analysis.html#weac.analysis.Analyzer.principal_stress_weaklayer"><code class="docutils literal notranslate"><span class="pre">Analyzer.principal_stress_weaklayer()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="weac.analysis.html#weac.analysis.Analyzer.print_call_stats"><code class="docutils literal notranslate"><span class="pre">Analyzer.print_call_stats()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="weac.analysis.html#weac.analysis.Analyzer.printing_enabled"><code class="docutils literal notranslate"><span class="pre">Analyzer.printing_enabled</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="weac.analysis.html#weac.analysis.Analyzer.rasterize_solution"><code class="docutils literal notranslate"><span class="pre">Analyzer.rasterize_solution()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="weac.analysis.html#weac.analysis.Analyzer.total_potential"><code class="docutils literal notranslate"><span class="pre">Analyzer.total_potential()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="weac.analysis.html#weac.analysis.Analyzer.sm"><code class="docutils literal notranslate"><span class="pre">Analyzer.sm</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="weac.analysis.html#weac.analysis.CriteriaEvaluator"><code class="docutils literal notranslate"><span class="pre">CriteriaEvaluator</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="weac.analysis.html#weac.analysis.CriteriaEvaluator.__init__"><code class="docutils literal notranslate"><span class="pre">CriteriaEvaluator.__init__()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="weac.analysis.html#weac.analysis.CriteriaEvaluator.check_crack_self_propagation"><code class="docutils literal notranslate"><span class="pre">CriteriaEvaluator.check_crack_self_propagation()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="weac.analysis.html#weac.analysis.CriteriaEvaluator.evaluate_SSERR"><code class="docutils literal notranslate"><span class="pre">CriteriaEvaluator.evaluate_SSERR()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="weac.analysis.html#weac.analysis.CriteriaEvaluator.evaluate_coupled_criterion"><code class="docutils literal notranslate"><span class="pre">CriteriaEvaluator.evaluate_coupled_criterion()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="weac.analysis.html#weac.analysis.CriteriaEvaluator.find_crack_length_for_weight"><code class="docutils literal notranslate"><span class="pre">CriteriaEvaluator.find_crack_length_for_weight()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="weac.analysis.html#weac.analysis.CriteriaEvaluator.find_minimum_crack_length"><code class="docutils literal notranslate"><span class="pre">CriteriaEvaluator.find_minimum_crack_length()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="weac.analysis.html#weac.analysis.CriteriaEvaluator.find_minimum_force"><code class="docutils literal notranslate"><span class="pre">CriteriaEvaluator.find_minimum_force()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="weac.analysis.html#weac.analysis.CriteriaEvaluator.fracture_toughness_envelope"><code class="docutils literal notranslate"><span class="pre">CriteriaEvaluator.fracture_toughness_envelope()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="weac.analysis.html#weac.analysis.CriteriaEvaluator.stress_envelope"><code class="docutils literal notranslate"><span class="pre">CriteriaEvaluator.stress_envelope()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="weac.analysis.html#weac.analysis.CriteriaEvaluator.criteria_config"><code class="docutils literal notranslate"><span class="pre">CriteriaEvaluator.criteria_config</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="weac.analysis.html#weac.analysis.CoupledCriterionHistory"><code class="docutils literal notranslate"><span class="pre">CoupledCriterionHistory</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="weac.analysis.html#weac.analysis.CoupledCriterionHistory.__init__"><code class="docutils literal notranslate"><span class="pre">CoupledCriterionHistory.__init__()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="weac.analysis.html#weac.analysis.CoupledCriterionHistory.skier_weights"><code class="docutils literal notranslate"><span class="pre">CoupledCriterionHistory.skier_weights</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="weac.analysis.html#weac.analysis.CoupledCriterionHistory.crack_lengths"><code class="docutils literal notranslate"><span class="pre">CoupledCriterionHistory.crack_lengths</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="weac.analysis.html#weac.analysis.CoupledCriterionHistory.incr_energies"><code class="docutils literal notranslate"><span class="pre">CoupledCriterionHistory.incr_energies</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="weac.analysis.html#weac.analysis.CoupledCriterionHistory.g_deltas"><code class="docutils literal notranslate"><span class="pre">CoupledCriterionHistory.g_deltas</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="weac.analysis.html#weac.analysis.CoupledCriterionHistory.dist_maxs"><code class="docutils literal notranslate"><span class="pre">CoupledCriterionHistory.dist_maxs</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="weac.analysis.html#weac.analysis.CoupledCriterionHistory.dist_mins"><code class="docutils literal notranslate"><span class="pre">CoupledCriterionHistory.dist_mins</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="weac.analysis.html#weac.analysis.CoupledCriterionResult"><code class="docutils literal notranslate"><span class="pre">CoupledCriterionResult</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="weac.analysis.html#weac.analysis.CoupledCriterionResult.__init__"><code class="docutils literal notranslate"><span class="pre">CoupledCriterionResult.__init__()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="weac.analysis.html#weac.analysis.CoupledCriterionResult.converged"><code class="docutils literal notranslate"><span class="pre">CoupledCriterionResult.converged</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="weac.analysis.html#weac.analysis.CoupledCriterionResult.message"><code class="docutils literal notranslate"><span class="pre">CoupledCriterionResult.message</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="weac.analysis.html#weac.analysis.CoupledCriterionResult.self_collapse"><code class="docutils literal notranslate"><span class="pre">CoupledCriterionResult.self_collapse</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="weac.analysis.html#weac.analysis.CoupledCriterionResult.pure_stress_criteria"><code class="docutils literal notranslate"><span class="pre">CoupledCriterionResult.pure_stress_criteria</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="weac.analysis.html#weac.analysis.CoupledCriterionResult.critical_skier_weight"><code class="docutils literal notranslate"><span class="pre">CoupledCriterionResult.critical_skier_weight</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="weac.analysis.html#weac.analysis.CoupledCriterionResult.initial_critical_skier_weight"><code class="docutils literal notranslate"><span class="pre">CoupledCriterionResult.initial_critical_skier_weight</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="weac.analysis.html#weac.analysis.CoupledCriterionResult.crack_length"><code class="docutils literal notranslate"><span class="pre">CoupledCriterionResult.crack_length</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="weac.analysis.html#weac.analysis.CoupledCriterionResult.g_delta"><code class="docutils literal notranslate"><span class="pre">CoupledCriterionResult.g_delta</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="weac.analysis.html#weac.analysis.CoupledCriterionResult.dist_ERR_envelope"><code class="docutils literal notranslate"><span class="pre">CoupledCriterionResult.dist_ERR_envelope</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="weac.analysis.html#weac.analysis.CoupledCriterionResult.iterations"><code class="docutils literal notranslate"><span class="pre">CoupledCriterionResult.iterations</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="weac.analysis.html#weac.analysis.CoupledCriterionResult.history"><code class="docutils literal notranslate"><span class="pre">CoupledCriterionResult.history</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="weac.analysis.html#weac.analysis.CoupledCriterionResult.final_system"><code class="docutils literal notranslate"><span class="pre">CoupledCriterionResult.final_system</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="weac.analysis.html#weac.analysis.CoupledCriterionResult.max_dist_stress"><code class="docutils literal notranslate"><span class="pre">CoupledCriterionResult.max_dist_stress</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="weac.analysis.html#weac.analysis.CoupledCriterionResult.min_dist_stress"><code class="docutils literal notranslate"><span class="pre">CoupledCriterionResult.min_dist_stress</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="weac.analysis.html#weac.analysis.FindMinimumForceResult"><code class="docutils literal notranslate"><span class="pre">FindMinimumForceResult</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="weac.analysis.html#weac.analysis.FindMinimumForceResult.__init__"><code class="docutils literal notranslate"><span class="pre">FindMinimumForceResult.__init__()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="weac.analysis.html#weac.analysis.FindMinimumForceResult.success"><code class="docutils literal notranslate"><span class="pre">FindMinimumForceResult.success</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="weac.analysis.html#weac.analysis.FindMinimumForceResult.critical_skier_weight"><code class="docutils literal notranslate"><span class="pre">FindMinimumForceResult.critical_skier_weight</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="weac.analysis.html#weac.analysis.FindMinimumForceResult.new_segments"><code class="docutils literal notranslate"><span class="pre">FindMinimumForceResult.new_segments</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="weac.analysis.html#weac.analysis.FindMinimumForceResult.old_segments"><code class="docutils literal notranslate"><span class="pre">FindMinimumForceResult.old_segments</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="weac.analysis.html#weac.analysis.FindMinimumForceResult.iterations"><code class="docutils literal notranslate"><span class="pre">FindMinimumForceResult.iterations</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="weac.analysis.html#weac.analysis.FindMinimumForceResult.max_dist_stress"><code class="docutils literal notranslate"><span class="pre">FindMinimumForceResult.max_dist_stress</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="weac.analysis.html#weac.analysis.FindMinimumForceResult.min_dist_stress"><code class="docutils literal notranslate"><span class="pre">FindMinimumForceResult.min_dist_stress</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="weac.analysis.html#weac.analysis.SSERRResult"><code class="docutils literal notranslate"><span class="pre">SSERRResult</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="weac.analysis.html#weac.analysis.SSERRResult.__init__"><code class="docutils literal notranslate"><span class="pre">SSERRResult.__init__()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="weac.analysis.html#weac.analysis.SSERRResult.converged"><code class="docutils literal notranslate"><span class="pre">SSERRResult.converged</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="weac.analysis.html#weac.analysis.SSERRResult.message"><code class="docutils literal notranslate"><span class="pre">SSERRResult.message</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="weac.analysis.html#weac.analysis.SSERRResult.touchdown_distance"><code class="docutils literal notranslate"><span class="pre">SSERRResult.touchdown_distance</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="weac.analysis.html#weac.analysis.SSERRResult.SSERR"><code class="docutils literal notranslate"><span class="pre">SSERRResult.SSERR</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="weac.analysis.html#weac.analysis.Plotter"><code class="docutils literal notranslate"><span class="pre">Plotter</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="weac.analysis.html#weac.analysis.Plotter.__init__"><code class="docutils literal notranslate"><span class="pre">Plotter.__init__()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="weac.analysis.html#weac.analysis.Plotter.plot_ERR_comp"><code class="docutils literal notranslate"><span class="pre">Plotter.plot_ERR_comp()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="weac.analysis.html#weac.analysis.Plotter.plot_ERR_modes"><code class="docutils literal notranslate"><span class="pre">Plotter.plot_ERR_modes()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="weac.analysis.html#weac.analysis.Plotter.plot_analysis"><code class="docutils literal notranslate"><span class="pre">Plotter.plot_analysis()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="weac.analysis.html#weac.analysis.Plotter.plot_deformed"><code class="docutils literal notranslate"><span class="pre">Plotter.plot_deformed()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="weac.analysis.html#weac.analysis.Plotter.plot_displacements"><code class="docutils literal notranslate"><span class="pre">Plotter.plot_displacements()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="weac.analysis.html#weac.analysis.Plotter.plot_energy_release_rates"><code class="docutils literal notranslate"><span class="pre">Plotter.plot_energy_release_rates()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="weac.analysis.html#weac.analysis.Plotter.plot_err_envelope"><code class="docutils literal notranslate"><span class="pre">Plotter.plot_err_envelope()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="weac.analysis.html#weac.analysis.Plotter.plot_fea_disp"><code class="docutils literal notranslate"><span class="pre">Plotter.plot_fea_disp()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="weac.analysis.html#weac.analysis.Plotter.plot_fea_stress"><code class="docutils literal notranslate"><span class="pre">Plotter.plot_fea_stress()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="weac.analysis.html#weac.analysis.Plotter.plot_rotated_slab_profile"><code class="docutils literal notranslate"><span class="pre">Plotter.plot_rotated_slab_profile()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="weac.analysis.html#weac.analysis.Plotter.plot_section_forces"><code class="docutils literal notranslate"><span class="pre">Plotter.plot_section_forces()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="weac.analysis.html#weac.analysis.Plotter.plot_slab_profile"><code class="docutils literal notranslate"><span class="pre">Plotter.plot_slab_profile()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="weac.analysis.html#weac.analysis.Plotter.plot_stress_criteria"><code class="docutils literal notranslate"><span class="pre">Plotter.plot_stress_criteria()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="weac.analysis.html#weac.analysis.Plotter.plot_stress_envelope"><code class="docutils literal notranslate"><span class="pre">Plotter.plot_stress_envelope()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="weac.analysis.html#weac.analysis.Plotter.plot_stresses"><code class="docutils literal notranslate"><span class="pre">Plotter.plot_stresses()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="weac.components.html">weac.components package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="weac.components.html#submodules">Submodules</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="weac.components.config.html">weac.components.config module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="weac.components.config.html#weac.components.config.Config"><code class="docutils literal notranslate"><span class="pre">Config</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="weac.components.criteria_config.html">weac.components.criteria_config module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="weac.components.criteria_config.html#weac.components.criteria_config.CriteriaConfig"><code class="docutils literal notranslate"><span class="pre">CriteriaConfig</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="weac.components.layer.html">weac.components.layer module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="weac.components.layer.html#weac.components.layer.Layer"><code class="docutils literal notranslate"><span class="pre">Layer</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="weac.components.layer.html#weac.components.layer.WeakLayer"><code class="docutils literal notranslate"><span class="pre">WeakLayer</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="weac.components.model_input.html">weac.components.model_input module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="weac.components.model_input.html#weac.components.model_input.ModelInput"><code class="docutils literal notranslate"><span class="pre">ModelInput</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="weac.components.scenario_config.html">weac.components.scenario_config module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="weac.components.scenario_config.html#weac.components.scenario_config.ScenarioConfig"><code class="docutils literal notranslate"><span class="pre">ScenarioConfig</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="weac.components.segment.html">weac.components.segment module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="weac.components.segment.html#weac.components.segment.Segment"><code class="docutils literal notranslate"><span class="pre">Segment</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="weac.components.html#module-weac.components">Module contents</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="weac.components.html#weac.components.Config"><code class="docutils literal notranslate"><span class="pre">Config</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="weac.components.html#weac.components.Config.touchdown"><code class="docutils literal notranslate"><span class="pre">Config.touchdown</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="weac.components.html#weac.components.Config.model_config"><code class="docutils literal notranslate"><span class="pre">Config.model_config</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="weac.components.html#id0"><code class="docutils literal notranslate"><span class="pre">Config.touchdown</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="weac.components.html#weac.components.WeakLayer"><code class="docutils literal notranslate"><span class="pre">WeakLayer</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="weac.components.html#weac.components.WeakLayer.rho"><code class="docutils literal notranslate"><span class="pre">WeakLayer.rho</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="weac.components.html#weac.components.WeakLayer.h"><code class="docutils literal notranslate"><span class="pre">WeakLayer.h</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="weac.components.html#weac.components.WeakLayer.nu"><code class="docutils literal notranslate"><span class="pre">WeakLayer.nu</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="weac.components.html#weac.components.WeakLayer.E"><code class="docutils literal notranslate"><span class="pre">WeakLayer.E</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="weac.components.html#weac.components.WeakLayer.G"><code class="docutils literal notranslate"><span class="pre">WeakLayer.G</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="weac.components.html#weac.components.WeakLayer.kn"><code class="docutils literal notranslate"><span class="pre">WeakLayer.kn</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="weac.components.html#weac.components.WeakLayer.kt"><code class="docutils literal notranslate"><span class="pre">WeakLayer.kt</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="weac.components.html#weac.components.WeakLayer.G_c"><code class="docutils literal notranslate"><span class="pre">WeakLayer.G_c</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="weac.components.html#weac.components.WeakLayer.G_Ic"><code class="docutils literal notranslate"><span class="pre">WeakLayer.G_Ic</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="weac.components.html#weac.components.WeakLayer.G_IIc"><code class="docutils literal notranslate"><span class="pre">WeakLayer.G_IIc</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="weac.components.html#weac.components.WeakLayer.model_config"><code class="docutils literal notranslate"><span class="pre">WeakLayer.model_config</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="weac.components.html#weac.components.WeakLayer.model_post_init"><code class="docutils literal notranslate"><span class="pre">WeakLayer.model_post_init()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="weac.components.html#weac.components.WeakLayer.validate_positive_E_G"><code class="docutils literal notranslate"><span class="pre">WeakLayer.validate_positive_E_G()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="weac.components.html#id1"><code class="docutils literal notranslate"><span class="pre">WeakLayer.rho</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="weac.components.html#id2"><code class="docutils literal notranslate"><span class="pre">WeakLayer.h</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="weac.components.html#weac.components.WeakLayer.collapse_height"><code class="docutils literal notranslate"><span class="pre">WeakLayer.collapse_height</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="weac.components.html#id3"><code class="docutils literal notranslate"><span class="pre">WeakLayer.nu</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="weac.components.html#id4"><code class="docutils literal notranslate"><span class="pre">WeakLayer.E</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="weac.components.html#id5"><code class="docutils literal notranslate"><span class="pre">WeakLayer.G</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="weac.components.html#id6"><code class="docutils literal notranslate"><span class="pre">WeakLayer.kn</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="weac.components.html#id7"><code class="docutils literal notranslate"><span class="pre">WeakLayer.kt</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="weac.components.html#id8"><code class="docutils literal notranslate"><span class="pre">WeakLayer.G_c</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="weac.components.html#id9"><code class="docutils literal notranslate"><span class="pre">WeakLayer.G_Ic</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="weac.components.html#id10"><code class="docutils literal notranslate"><span class="pre">WeakLayer.G_IIc</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="weac.components.html#weac.components.WeakLayer.sigma_c"><code class="docutils literal notranslate"><span class="pre">WeakLayer.sigma_c</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="weac.components.html#weac.components.WeakLayer.tau_c"><code class="docutils literal notranslate"><span class="pre">WeakLayer.tau_c</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="weac.components.html#weac.components.WeakLayer.E_method"><code class="docutils literal notranslate"><span class="pre">WeakLayer.E_method</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="weac.components.html#weac.components.WeakLayer.grain_type"><code class="docutils literal notranslate"><span class="pre">WeakLayer.grain_type</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="weac.components.html#weac.components.WeakLayer.grain_size"><code class="docutils literal notranslate"><span class="pre">WeakLayer.grain_size</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="weac.components.html#weac.components.WeakLayer.hand_hardness"><code class="docutils literal notranslate"><span class="pre">WeakLayer.hand_hardness</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="weac.components.html#weac.components.Layer"><code class="docutils literal notranslate"><span class="pre">Layer</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="weac.components.html#weac.components.Layer.rho"><code class="docutils literal notranslate"><span class="pre">Layer.rho</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="weac.components.html#weac.components.Layer.h"><code class="docutils literal notranslate"><span class="pre">Layer.h</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="weac.components.html#weac.components.Layer.nu"><code class="docutils literal notranslate"><span class="pre">Layer.nu</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="weac.components.html#weac.components.Layer.E"><code class="docutils literal notranslate"><span class="pre">Layer.E</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="weac.components.html#weac.components.Layer.G"><code class="docutils literal notranslate"><span class="pre">Layer.G</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="weac.components.html#weac.components.Layer.model_config"><code class="docutils literal notranslate"><span class="pre">Layer.model_config</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="weac.components.html#weac.components.Layer.model_post_init"><code class="docutils literal notranslate"><span class="pre">Layer.model_post_init()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="weac.components.html#weac.components.Layer.validate_positive_E_G"><code class="docutils literal notranslate"><span class="pre">Layer.validate_positive_E_G()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="weac.components.html#id11"><code class="docutils literal notranslate"><span class="pre">Layer.rho</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="weac.components.html#id12"><code class="docutils literal notranslate"><span class="pre">Layer.h</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="weac.components.html#id13"><code class="docutils literal notranslate"><span class="pre">Layer.nu</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="weac.components.html#id14"><code class="docutils literal notranslate"><span class="pre">Layer.E</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="weac.components.html#id15"><code class="docutils literal notranslate"><span class="pre">Layer.G</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="weac.components.html#weac.components.Layer.tensile_strength"><code class="docutils literal notranslate"><span class="pre">Layer.tensile_strength</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="weac.components.html#weac.components.Layer.tensile_strength_method"><code class="docutils literal notranslate"><span class="pre">Layer.tensile_strength_method</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="weac.components.html#weac.components.Layer.E_method"><code class="docutils literal notranslate"><span class="pre">Layer.E_method</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="weac.components.html#weac.components.Layer.grain_type"><code class="docutils literal notranslate"><span class="pre">Layer.grain_type</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="weac.components.html#weac.components.Layer.grain_size"><code class="docutils literal notranslate"><span class="pre">Layer.grain_size</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="weac.components.html#weac.components.Layer.hand_hardness"><code class="docutils literal notranslate"><span class="pre">Layer.hand_hardness</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="weac.components.html#weac.components.Segment"><code class="docutils literal notranslate"><span class="pre">Segment</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="weac.components.html#weac.components.Segment.length"><code class="docutils literal notranslate"><span class="pre">Segment.length</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="weac.components.html#weac.components.Segment.has_foundation"><code class="docutils literal notranslate"><span class="pre">Segment.has_foundation</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="weac.components.html#weac.components.Segment.m"><code class="docutils literal notranslate"><span class="pre">Segment.m</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="weac.components.html#weac.components.Segment.model_config"><code class="docutils literal notranslate"><span class="pre">Segment.model_config</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="weac.components.html#id16"><code class="docutils literal notranslate"><span class="pre">Segment.length</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="weac.components.html#id17"><code class="docutils literal notranslate"><span class="pre">Segment.has_foundation</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="weac.components.html#id18"><code class="docutils literal notranslate"><span class="pre">Segment.m</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="weac.components.html#weac.components.CriteriaConfig"><code class="docutils literal notranslate"><span class="pre">CriteriaConfig</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="weac.components.html#weac.components.CriteriaConfig.fn"><code class="docutils literal notranslate"><span class="pre">CriteriaConfig.fn</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="weac.components.html#weac.components.CriteriaConfig.fm"><code class="docutils literal notranslate"><span class="pre">CriteriaConfig.fm</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="weac.components.html#weac.components.CriteriaConfig.gn"><code class="docutils literal notranslate"><span class="pre">CriteriaConfig.gn</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="weac.components.html#weac.components.CriteriaConfig.gm"><code class="docutils literal notranslate"><span class="pre">CriteriaConfig.gm</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="weac.components.html#weac.components.CriteriaConfig.stress_envelope_method"><code class="docutils literal notranslate"><span class="pre">CriteriaConfig.stress_envelope_method</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="weac.components.html#weac.components.CriteriaConfig.scaling_factor"><code class="docutils literal notranslate"><span class="pre">CriteriaConfig.scaling_factor</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="weac.components.html#weac.components.CriteriaConfig.order_of_magnitude"><code class="docutils literal notranslate"><span class="pre">CriteriaConfig.order_of_magnitude</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="weac.components.html#weac.components.CriteriaConfig.model_config"><code class="docutils literal notranslate"><span class="pre">CriteriaConfig.model_config</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="weac.components.html#id19"><code class="docutils literal notranslate"><span class="pre">CriteriaConfig.fn</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="weac.components.html#id20"><code class="docutils literal notranslate"><span class="pre">CriteriaConfig.fm</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="weac.components.html#id21"><code class="docutils literal notranslate"><span class="pre">CriteriaConfig.gn</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="weac.components.html#id22"><code class="docutils literal notranslate"><span class="pre">CriteriaConfig.gm</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="weac.components.html#id23"><code class="docutils literal notranslate"><span class="pre">CriteriaConfig.stress_envelope_method</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="weac.components.html#id24"><code class="docutils literal notranslate"><span class="pre">CriteriaConfig.scaling_factor</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="weac.components.html#id25"><code class="docutils literal notranslate"><span class="pre">CriteriaConfig.order_of_magnitude</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="weac.components.html#weac.components.ScenarioConfig"><code class="docutils literal notranslate"><span class="pre">ScenarioConfig</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="weac.components.html#weac.components.ScenarioConfig.phi"><code class="docutils literal notranslate"><span class="pre">ScenarioConfig.phi</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="weac.components.html#weac.components.ScenarioConfig.system_type"><code class="docutils literal notranslate"><span class="pre">ScenarioConfig.system_type</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="weac.components.html#weac.components.ScenarioConfig.cut_length"><code class="docutils literal notranslate"><span class="pre">ScenarioConfig.cut_length</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="weac.components.html#weac.components.ScenarioConfig.stiffness_ratio"><code class="docutils literal notranslate"><span class="pre">ScenarioConfig.stiffness_ratio</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="weac.components.html#weac.components.ScenarioConfig.surface_load"><code class="docutils literal notranslate"><span class="pre">ScenarioConfig.surface_load</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="weac.components.html#weac.components.ScenarioConfig.model_config"><code class="docutils literal notranslate"><span class="pre">ScenarioConfig.model_config</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="weac.components.html#id26"><code class="docutils literal notranslate"><span class="pre">ScenarioConfig.system_type</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="weac.components.html#id27"><code class="docutils literal notranslate"><span class="pre">ScenarioConfig.phi</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="weac.components.html#id28"><code class="docutils literal notranslate"><span class="pre">ScenarioConfig.cut_length</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="weac.components.html#id29"><code class="docutils literal notranslate"><span class="pre">ScenarioConfig.stiffness_ratio</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="weac.components.html#id30"><code class="docutils literal notranslate"><span class="pre">ScenarioConfig.surface_load</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="weac.components.html#weac.components.ModelInput"><code class="docutils literal notranslate"><span class="pre">ModelInput</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="weac.components.html#weac.components.ModelInput.scenario_config"><code class="docutils literal notranslate"><span class="pre">ModelInput.scenario_config</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="weac.components.html#weac.components.ModelInput.weak_layer"><code class="docutils literal notranslate"><span class="pre">ModelInput.weak_layer</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="weac.components.html#weac.components.ModelInput.layers"><code class="docutils literal notranslate"><span class="pre">ModelInput.layers</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="weac.components.html#weac.components.ModelInput.segments"><code class="docutils literal notranslate"><span class="pre">ModelInput.segments</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="weac.components.html#weac.components.ModelInput.model_config"><code class="docutils literal notranslate"><span class="pre">ModelInput.model_config</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="weac.components.html#id31"><code class="docutils literal notranslate"><span class="pre">ModelInput.weak_layer</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="weac.components.html#id32"><code class="docutils literal notranslate"><span class="pre">ModelInput.layers</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="weac.components.html#id33"><code class="docutils literal notranslate"><span class="pre">ModelInput.scenario_config</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="weac.components.html#id34"><code class="docutils literal notranslate"><span class="pre">ModelInput.segments</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="weac.core.html">weac.core package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="weac.core.html#submodules">Submodules</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="weac.core.eigensystem.html">weac.core.eigensystem module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="weac.core.eigensystem.html#weac.core.eigensystem.Eigensystem"><code class="docutils literal notranslate"><span class="pre">Eigensystem</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="weac.core.field_quantities.html">weac.core.field_quantities module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="weac.core.field_quantities.html#weac.core.field_quantities.FieldQuantities"><code class="docutils literal notranslate"><span class="pre">FieldQuantities</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="weac.core.scenario.html">weac.core.scenario module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="weac.core.scenario.html#weac.core.scenario.Scenario"><code class="docutils literal notranslate"><span class="pre">Scenario</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="weac.core.slab.html">weac.core.slab module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="weac.core.slab.html#weac.core.slab.Slab"><code class="docutils literal notranslate"><span class="pre">Slab</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="weac.core.slab_touchdown.html">weac.core.slab_touchdown module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="weac.core.slab_touchdown.html#weac.core.slab_touchdown.SlabTouchdown"><code class="docutils literal notranslate"><span class="pre">SlabTouchdown</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="weac.core.system_model.html">weac.core.system_model module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="weac.core.system_model.html#weac.core.system_model.SystemModel"><code class="docutils literal notranslate"><span class="pre">SystemModel</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="weac.core.unknown_constants_solver.html">weac.core.unknown_constants_solver module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="weac.core.unknown_constants_solver.html#weac.core.unknown_constants_solver.UnknownConstantsSolver"><code class="docutils literal notranslate"><span class="pre">UnknownConstantsSolver</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="weac.core.html#module-weac.core">Module contents</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="weac.core.html#weac.core.Eigensystem"><code class="docutils literal notranslate"><span class="pre">Eigensystem</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="weac.core.html#weac.core.Eigensystem.weak_layer"><code class="docutils literal notranslate"><span class="pre">Eigensystem.weak_layer</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="weac.core.html#weac.core.Eigensystem.slab"><code class="docutils literal notranslate"><span class="pre">Eigensystem.slab</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="weac.core.html#weac.core.Eigensystem.A11"><code class="docutils literal notranslate"><span class="pre">Eigensystem.A11</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="weac.core.html#weac.core.Eigensystem.B11"><code class="docutils literal notranslate"><span class="pre">Eigensystem.B11</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="weac.core.html#weac.core.Eigensystem.D11"><code class="docutils literal notranslate"><span class="pre">Eigensystem.D11</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="weac.core.html#weac.core.Eigensystem.kA55"><code class="docutils literal notranslate"><span class="pre">Eigensystem.kA55</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="weac.core.html#weac.core.Eigensystem.K0"><code class="docutils literal notranslate"><span class="pre">Eigensystem.K0</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="weac.core.html#weac.core.Eigensystem.ewC"><code class="docutils literal notranslate"><span class="pre">Eigensystem.ewC</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="weac.core.html#weac.core.Eigensystem.ewR"><code class="docutils literal notranslate"><span class="pre">Eigensystem.ewR</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="weac.core.html#weac.core.Eigensystem.evC"><code class="docutils literal notranslate"><span class="pre">Eigensystem.evC</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="weac.core.html#weac.core.Eigensystem.evR"><code class="docutils literal notranslate"><span class="pre">Eigensystem.evR</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="weac.core.html#weac.core.Eigensystem.sR"><code class="docutils literal notranslate"><span class="pre">Eigensystem.sR</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="weac.core.html#weac.core.Eigensystem.sC"><code class="docutils literal notranslate"><span class="pre">Eigensystem.sC</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="weac.core.html#weac.core.Eigensystem.__init__"><code class="docutils literal notranslate"><span class="pre">Eigensystem.__init__()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="weac.core.html#weac.core.Eigensystem.assemble_system_matrix"><code class="docutils literal notranslate"><span class="pre">Eigensystem.assemble_system_matrix()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="weac.core.html#weac.core.Eigensystem.calc_eigensystem"><code class="docutils literal notranslate"><span class="pre">Eigensystem.calc_eigensystem()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="weac.core.html#weac.core.Eigensystem.calc_eigenvalues_and_eigenvectors"><code class="docutils literal notranslate"><span class="pre">Eigensystem.calc_eigenvalues_and_eigenvectors()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="weac.core.html#weac.core.Eigensystem.get_load_vector"><code class="docutils literal notranslate"><span class="pre">Eigensystem.get_load_vector()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="weac.core.html#weac.core.Eigensystem.zh"><code class="docutils literal notranslate"><span class="pre">Eigensystem.zh()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="weac.core.html#weac.core.Eigensystem.zp"><code class="docutils literal notranslate"><span class="pre">Eigensystem.zp()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="weac.core.html#id0"><code class="docutils literal notranslate"><span class="pre">Eigensystem.weak_layer</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="weac.core.html#id1"><code class="docutils literal notranslate"><span class="pre">Eigensystem.slab</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="weac.core.html#id2"><code class="docutils literal notranslate"><span class="pre">Eigensystem.A11</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="weac.core.html#id3"><code class="docutils literal notranslate"><span class="pre">Eigensystem.B11</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="weac.core.html#id4"><code class="docutils literal notranslate"><span class="pre">Eigensystem.D11</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="weac.core.html#id5"><code class="docutils literal notranslate"><span class="pre">Eigensystem.kA55</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="weac.core.html#id6"><code class="docutils literal notranslate"><span class="pre">Eigensystem.K0</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="weac.core.html#weac.core.Eigensystem.K"><code class="docutils literal notranslate"><span class="pre">Eigensystem.K</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="weac.core.html#id7"><code class="docutils literal notranslate"><span class="pre">Eigensystem.ewC</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="weac.core.html#id8"><code class="docutils literal notranslate"><span class="pre">Eigensystem.ewR</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="weac.core.html#id9"><code class="docutils literal notranslate"><span class="pre">Eigensystem.evC</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="weac.core.html#id10"><code class="docutils literal notranslate"><span class="pre">Eigensystem.evR</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="weac.core.html#id11"><code class="docutils literal notranslate"><span class="pre">Eigensystem.sR</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="weac.core.html#id12"><code class="docutils literal notranslate"><span class="pre">Eigensystem.sC</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="weac.core.html#weac.core.Scenario"><code class="docutils literal notranslate"><span class="pre">Scenario</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="weac.core.html#weac.core.Scenario.li"><code class="docutils literal notranslate"><span class="pre">Scenario.li</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="weac.core.html#weac.core.Scenario.ki"><code class="docutils literal notranslate"><span class="pre">Scenario.ki</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="weac.core.html#weac.core.Scenario.mi"><code class="docutils literal notranslate"><span class="pre">Scenario.mi</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="weac.core.html#weac.core.Scenario.system_type"><code class="docutils literal notranslate"><span class="pre">Scenario.system_type</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="weac.core.html#weac.core.Scenario.phi"><code class="docutils literal notranslate"><span class="pre">Scenario.phi</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="weac.core.html#weac.core.Scenario.L"><code class="docutils literal notranslate"><span class="pre">Scenario.L</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="weac.core.html#weac.core.Scenario.crack_h"><code class="docutils literal notranslate"><span class="pre">Scenario.crack_h</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="weac.core.html#weac.core.Scenario.__init__"><code class="docutils literal notranslate"><span class="pre">Scenario.__init__()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="weac.core.html#weac.core.Scenario.get_segment_idx"><code class="docutils literal notranslate"><span class="pre">Scenario.get_segment_idx()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="weac.core.html#weac.core.Scenario.refresh_from_config"><code class="docutils literal notranslate"><span class="pre">Scenario.refresh_from_config()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="weac.core.html#weac.core.Scenario.scenario_config"><code class="docutils literal notranslate"><span class="pre">Scenario.scenario_config</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="weac.core.html#weac.core.Scenario.segments"><code class="docutils literal notranslate"><span class="pre">Scenario.segments</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="weac.core.html#weac.core.Scenario.weak_layer"><code class="docutils literal notranslate"><span class="pre">Scenario.weak_layer</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="weac.core.html#weac.core.Scenario.slab"><code class="docutils literal notranslate"><span class="pre">Scenario.slab</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="weac.core.html#id13"><code class="docutils literal notranslate"><span class="pre">Scenario.li</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="weac.core.html#id14"><code class="docutils literal notranslate"><span class="pre">Scenario.ki</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="weac.core.html#id15"><code class="docutils literal notranslate"><span class="pre">Scenario.mi</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="weac.core.html#weac.core.Scenario.cum_sum_li"><code class="docutils literal notranslate"><span class="pre">Scenario.cum_sum_li</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="weac.core.html#id16"><code class="docutils literal notranslate"><span class="pre">Scenario.system_type</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="weac.core.html#id17"><code class="docutils literal notranslate"><span class="pre">Scenario.phi</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="weac.core.html#weac.core.Scenario.surface_load"><code class="docutils literal notranslate"><span class="pre">Scenario.surface_load</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="weac.core.html#weac.core.Scenario.qw"><code class="docutils literal notranslate"><span class="pre">Scenario.qw</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="weac.core.html#weac.core.Scenario.qn"><code class="docutils literal notranslate"><span class="pre">Scenario.qn</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="weac.core.html#weac.core.Scenario.qt"><code class="docutils literal notranslate"><span class="pre">Scenario.qt</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="weac.core.html#id18"><code class="docutils literal notranslate"><span class="pre">Scenario.L</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="weac.core.html#id19"><code class="docutils literal notranslate"><span class="pre">Scenario.crack_h</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="weac.core.html#weac.core.Scenario.cut_length"><code class="docutils literal notranslate"><span class="pre">Scenario.cut_length</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="weac.core.html#weac.core.Slab"><code class="docutils literal notranslate"><span class="pre">Slab</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="weac.core.html#weac.core.Slab.zi_mid"><code class="docutils literal notranslate"><span class="pre">Slab.zi_mid</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="weac.core.html#weac.core.Slab.zi_bottom"><code class="docutils literal notranslate"><span class="pre">Slab.zi_bottom</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="weac.core.html#weac.core.Slab.rhoi"><code class="docutils literal notranslate"><span class="pre">Slab.rhoi</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="weac.core.html#weac.core.Slab.hi"><code class="docutils literal notranslate"><span class="pre">Slab.hi</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="weac.core.html#weac.core.Slab.Ei"><code class="docutils literal notranslate"><span class="pre">Slab.Ei</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="weac.core.html#weac.core.Slab.Gi"><code class="docutils literal notranslate"><span class="pre">Slab.Gi</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="weac.core.html#weac.core.Slab.nui"><code class="docutils literal notranslate"><span class="pre">Slab.nui</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="weac.core.html#weac.core.Slab.H"><code class="docutils literal notranslate"><span class="pre">Slab.H</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="weac.core.html#weac.core.Slab.z_cog"><code class="docutils literal notranslate"><span class="pre">Slab.z_cog</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="weac.core.html#weac.core.Slab.qw"><code class="docutils literal notranslate"><span class="pre">Slab.qw</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="weac.core.html#weac.core.Slab.__init__"><code class="docutils literal notranslate"><span class="pre">Slab.__init__()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="weac.core.html#weac.core.Slab.calc_vertical_center_of_gravity"><code class="docutils literal notranslate"><span class="pre">Slab.calc_vertical_center_of_gravity()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="weac.core.html#weac.core.Slab.layers"><code class="docutils literal notranslate"><span class="pre">Slab.layers</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="weac.core.html#id20"><code class="docutils literal notranslate"><span class="pre">Slab.rhoi</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="weac.core.html#id21"><code class="docutils literal notranslate"><span class="pre">Slab.hi</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="weac.core.html#id22"><code class="docutils literal notranslate"><span class="pre">Slab.Ei</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="weac.core.html#id23"><code class="docutils literal notranslate"><span class="pre">Slab.Gi</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="weac.core.html#id24"><code class="docutils literal notranslate"><span class="pre">Slab.nui</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="weac.core.html#weac.core.Slab.z0"><code class="docutils literal notranslate"><span class="pre">Slab.z0</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="weac.core.html#id25"><code class="docutils literal notranslate"><span class="pre">Slab.zi_mid</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="weac.core.html#id26"><code class="docutils literal notranslate"><span class="pre">Slab.zi_bottom</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="weac.core.html#id27"><code class="docutils literal notranslate"><span class="pre">Slab.H</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="weac.core.html#id28"><code class="docutils literal notranslate"><span class="pre">Slab.z_cog</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="weac.core.html#id29"><code class="docutils literal notranslate"><span class="pre">Slab.qw</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="weac.core.html#weac.core.SystemModel"><code class="docutils literal notranslate"><span class="pre">SystemModel</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="weac.core.html#weac.core.SystemModel.config"><code class="docutils literal notranslate"><span class="pre">SystemModel.config</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="weac.core.html#weac.core.SystemModel.slab"><code class="docutils literal notranslate"><span class="pre">SystemModel.slab</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="weac.core.html#weac.core.SystemModel.weak_layer"><code class="docutils literal notranslate"><span class="pre">SystemModel.weak_layer</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="weac.core.html#weac.core.SystemModel.scenario"><code class="docutils literal notranslate"><span class="pre">SystemModel.scenario</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="weac.core.html#weac.core.SystemModel.eigensystem"><code class="docutils literal notranslate"><span class="pre">SystemModel.eigensystem</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="weac.core.html#weac.core.SystemModel.slab_touchdown"><code class="docutils literal notranslate"><span class="pre">SystemModel.slab_touchdown</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="weac.core.html#weac.core.SystemModel.unknown_constants"><code class="docutils literal notranslate"><span class="pre">SystemModel.unknown_constants</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="weac.core.html#weac.core.SystemModel.__init__"><code class="docutils literal notranslate"><span class="pre">SystemModel.__init__()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="weac.core.html#id46"><code class="docutils literal notranslate"><span class="pre">SystemModel.eigensystem</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="weac.core.html#weac.core.SystemModel.fq"><code class="docutils literal notranslate"><span class="pre">SystemModel.fq</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="weac.core.html#id47"><code class="docutils literal notranslate"><span class="pre">SystemModel.slab_touchdown</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="weac.core.html#weac.core.SystemModel.toggle_touchdown"><code class="docutils literal notranslate"><span class="pre">SystemModel.toggle_touchdown()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="weac.core.html#weac.core.SystemModel.uncracked_unknown_constants"><code class="docutils literal notranslate"><span class="pre">SystemModel.uncracked_unknown_constants</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="weac.core.html#id48"><code class="docutils literal notranslate"><span class="pre">SystemModel.unknown_constants</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="weac.core.html#weac.core.SystemModel.update_layers"><code class="docutils literal notranslate"><span class="pre">SystemModel.update_layers()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="weac.core.html#weac.core.SystemModel.update_scenario"><code class="docutils literal notranslate"><span class="pre">SystemModel.update_scenario()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="weac.core.html#weac.core.SystemModel.update_weak_layer"><code class="docutils literal notranslate"><span class="pre">SystemModel.update_weak_layer()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="weac.core.html#weac.core.SystemModel.z"><code class="docutils literal notranslate"><span class="pre">SystemModel.z()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="weac.core.html#id57"><code class="docutils literal notranslate"><span class="pre">SystemModel.config</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="weac.core.html#id58"><code class="docutils literal notranslate"><span class="pre">SystemModel.slab</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="weac.core.html#id59"><code class="docutils literal notranslate"><span class="pre">SystemModel.weak_layer</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="weac.core.html#id60"><code class="docutils literal notranslate"><span class="pre">SystemModel.scenario</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="weac.utils.html">weac.utils package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="weac.utils.html#submodules">Submodules</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="weac.utils.geldsetzer.html">weac.utils.geldsetzer module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="weac.utils.geldsetzer.html#weac.utils.geldsetzer.compute_density"><code class="docutils literal notranslate"><span class="pre">compute_density()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="weac.utils.misc.html">weac.utils.misc module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="weac.utils.misc.html#weac.utils.misc.decompose_to_normal_tangential"><code class="docutils literal notranslate"><span class="pre">decompose_to_normal_tangential()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="weac.utils.misc.html#weac.utils.misc.get_skier_point_load"><code class="docutils literal notranslate"><span class="pre">get_skier_point_load()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="weac.utils.misc.html#weac.utils.misc.load_dummy_profile"><code class="docutils literal notranslate"><span class="pre">load_dummy_profile()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="weac.utils.misc.html#weac.utils.misc.isnotebook"><code class="docutils literal notranslate"><span class="pre">isnotebook()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="weac.utils.snow_types.html">weac.utils.snow_types module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="weac.utils.snow_types.html#weac.utils.snow_types.GrainType"><code class="docutils literal notranslate"><span class="pre">GrainType</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="weac.utils.snow_types.html#weac.utils.snow_types.HandHardness"><code class="docutils literal notranslate"><span class="pre">HandHardness</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="weac.utils.snowpilot_parser.html">weac.utils.snowpilot_parser module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="weac.utils.snowpilot_parser.html#weac.utils.snowpilot_parser.SnowPilotParser"><code class="docutils literal notranslate"><span class="pre">SnowPilotParser</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="weac.utils.html#module-weac.utils">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</section>
+<section id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#submodules'">¶</a></h2>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="weac.constants.html">weac.constants module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="weac.logging_config.html">weac.logging_config module</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="weac.logging_config.html#weac.logging_config.setup_logging"><code class="docutils literal notranslate"><span class="pre">setup_logging()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</div>
+</section>
+<section id="module-weac">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-weac" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#module-weac'">¶</a></h2>
+<p>WEAC - Weak Layer Anticrack Nucleation Model</p>
+</section>
+</section>
+</div></div><aside class="hidden text-sm xl:block" id="right-sidebar">
+<div class="sticky top-16 -mt-10 max-h-[calc(100vh-5rem)] overflow-y-auto pt-6 space-y-2"><p class="font-medium">On this page</p>
+<ul>
+<li><a :data-current="activeSection === '#subpackages'" class="reference internal" href="#subpackages">Subpackages</a></li>
+<li><a :data-current="activeSection === '#submodules'" class="reference internal" href="#submodules">Submodules</a></li>
+<li><a :data-current="activeSection === '#module-weac'" class="reference internal" href="#module-weac">Module contents</a></li>
+</ul>
+</div>
+</aside>
+</main>
+</div>
+</div><footer class="py-6 border-t border-border md:py-0">
+<div class="container flex flex-col items-center justify-between gap-4 md:h-24 md:flex-row">
+<div class="flex flex-col items-center gap-4 px-8 md:flex-row md:gap-2 md:px-0">
+<p class="text-sm leading-loose text-center text-muted-foreground md:text-left">Built with <a class="font-medium underline underline-offset-4" href="https://www.sphinx-doc.org" rel="noreferrer">Sphinx 8.2.3</a></p>
+</div>
+</div>
+</footer>
+</div>
+<script src="_static/documentation_options.js?v=5248d183"></script>
+<script src="_static/doctools.js?v=9bcbadda"></script>
+<script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+<script defer="defer" src="_static/theme.js?v=073f68d9"></script>
+</body>
+</html>

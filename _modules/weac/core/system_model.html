@@ -274,6 +274,8 @@
 </span><span id="line-123">    <span class="n">unknown_constants</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span>
 </span><span id="line-124">    <span class="n">uncracked_unknown_constants</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span>
 </span><span id="line-125">
+<div class="viewcode-block" id="SystemModel.__init__">
+<a class="viewcode-back" href="../../../weac.core.system_model.html#weac.core.SystemModel.__init__">[docs]</a>
 </span><span id="line-126">    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">model_input</span><span class="p">:</span> <span class="n">ModelInput</span><span class="p">,</span> <span class="n">config</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Config</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
 </span><span id="line-127">        <span class="k">if</span> <span class="n">config</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
 </span><span id="line-128">            <span class="n">config</span> <span class="o">=</span> <span class="n">Config</span><span class="p">()</span>
@@ -286,7 +288,8 @@
 </span><span id="line-135">            <span class="n">weak_layer</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">weak_layer</span><span class="p">,</span>
 </span><span id="line-136">            <span class="n">slab</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">slab</span><span class="p">,</span>
 </span><span id="line-137">        <span class="p">)</span>
-</span><span id="line-138">        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Scenario setup&quot;</span><span class="p">)</span>
+</span><span id="line-138">        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Scenario setup&quot;</span><span class="p">)</span></div>
+
 </span><span id="line-139">
 </span><span id="line-140">        <span class="c1"># At this point only the system is initialized</span>
 </span><span id="line-141">        <span class="c1"># The solution to the system (unknown_constants) are only computed</span>
