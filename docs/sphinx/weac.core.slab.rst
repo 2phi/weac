@@ -1,7 +1,7 @@
-weac.constants module
+weac.core.slab module
 =====================
 
-.. automodule:: weac.constants
+.. automodule:: weac.core.slab
    :members:
    :show-inheritance:
    :undoc-members:
