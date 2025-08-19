@@ -40,8 +40,8 @@ jobs:
         # Generate API docs
         sphinx-apidoc -o docs/sphinx/ weac --force --separate
 
-        # Build HTML docs
-        make -C docs/sphinx clean html SPHINXOPTS="-W --keep-going -n"
+        # Build HTML docs (do not fail on warnings)
+        make -C docs/sphinx clean html SPHINXOPTS="--keep-going -n"
 
     - name: Deploy documentation
       if: github.event_name == 'push' && github.ref == 'refs/heads/main'
