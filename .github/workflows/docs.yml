@@ -63,10 +63,9 @@ jobs:
           git worktree add --force -b documentation docs-deploy HEAD
         fi
         # Copy built HTML to the worktree root
-        rsync -av --delete --exclude '.git' --exclude '.gitignore' --exclude 'CNAME' --exclude '.gitattributes' docs/sphinx/_build/html/ docs-deploy/
-        touch docs-deploy/.nojekyll
-        # Commit and push
-        pushd docs-deploy
+        if [ ! -f docs/sphinx/_build/html/index.html ]; then
+          echo "Build output missing (docs/sphinx/_build/html/index.html not found). Aborting deploy."
+          exit 1
         pushd docs-deploy
         git add -A
         if git diff --cached --quiet; then
@@ -75,6 +74,11 @@ jobs:
         else
           git commit -m "Update documentation"
           git fetch origin documentation --quiet || true
+          git push --force-with-lease origin HEAD:documentation
+        fi
+        popd
+        popd
+
           git push --force-with-lease origin HEAD:documentation
         fi
         popd
