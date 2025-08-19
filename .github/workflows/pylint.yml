@@ -31,7 +31,7 @@ jobs:
         # Using repository pylint config (pyproject.toml) with comprehensive settings for scientific code
         run: |
           exit_code=0
-          python -m pylint --rcfile=pyproject.toml --output-format=parseable --output=pylint-report.txt weac/ tests/ || exit_code=$?
+          python -m pylint --output-format=parseable --output=pylint-report.txt weac/ tests/ || exit_code=$?
           echo "Pylint finished with exit code $exit_code."
           echo
           echo "Pylint exit code meaning:"
