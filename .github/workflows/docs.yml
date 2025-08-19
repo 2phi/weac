@@ -63,7 +63,7 @@ jobs:
           git worktree add --force -b documentation docs-deploy HEAD
         fi
         # Copy built HTML to the worktree root
-        rsync -av --delete docs/sphinx/_build/html/ docs-deploy/
+        rsync -av --delete --exclude '.git' --exclude '.gitignore' docs/sphinx/_build/html/ docs-deploy/
         touch docs-deploy/.nojekyll
 
         # Commit and push
@@ -74,6 +74,6 @@ jobs:
           exit 0
         else
           git commit -m "Update documentation"
-          git push -f origin HEAD:documentation
+          git push --force-with-lease origin HEAD:documentation
         fi
         popd
