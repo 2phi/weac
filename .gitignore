@@ -38,6 +38,17 @@ venv/
 # Coverage
 .coverage
 coverage.xml
+
+# Documentation build artifacts
+docs/_build/
+docs/_modules/
+docs/_sources/
+docs/_static/
+docs/*.html
+docs/objects.inv
+docs/searchindex.js
+docs/sphinx/_build/
+
 # misc
 *.stats
 plots/

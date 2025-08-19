@@ -47,5 +47,40 @@ html_title = f"{project} {release}"
 autodoc_typehints = "description"
 autodoc_typehints_format = "short"
 autodoc_preserve_defaults = True
+autodoc_mock_imports = []
+autodoc_member_order = "bysource"
+autodoc_default_options = {
+    "members": True,
+    "undoc-members": True,
+    "show-inheritance": True,
+    "special-members": "__init__",
+}
+
+# Napoleon settings
 napoleon_google_docstring = True
 napoleon_numpy_docstring = True
+napoleon_include_init_with_doc = False
+napoleon_include_private_with_doc = False
+napoleon_include_special_with_doc = True
+napoleon_use_admonition_for_examples = False
+napoleon_use_admonition_for_notes = False
+napoleon_use_admonition_for_references = False
+napoleon_use_ivar = False
+napoleon_use_param = True
+napoleon_use_rtype = True
+
+# Suppress warnings
+suppress_warnings = [
+    "app.add_node",
+    "app.add_directive",
+    "app.add_role",
+    "app.add_generic_role",
+    "app.add_source_parser",
+    "download.not_readable",
+    "image.not_readable",
+    "ref.ref",
+    "ref.numref",
+    "ref.keyword",
+    "ref.option",
+    "misc.highlighting_failure",
+]
