@@ -7,8 +7,17 @@ on:
     paths:
       - 'weac/**'
       - 'docs/sphinx/**'
+      - 'pyproject.toml'
+      - 'README.md'
+      - '.github/workflows/docs.yml'
   pull_request:
     branches: [ main, develop ]
+    paths:
+      - 'weac/**'
+      - 'docs/sphinx/**'
+      - 'pyproject.toml'
+      - 'README.md'
+      - '.github/workflows/docs.yml'
   workflow_dispatch:
 
 permissions:
@@ -37,14 +46,14 @@ jobs:
 
     - name: Build documentation
       run: |
+        # Clean any previous build artifacts
+        make -C docs/sphinx clean
+        
         # Generate API docs
         sphinx-apidoc -o docs/sphinx/ weac --force --separate
 
         # Build HTML docs (do not fail on warnings)
-        make -C docs/sphinx clean html SPHINXOPTS="--keep-going -n"
-
-        # Build HTML docs (do not fail on warnings)
-        make -C docs/sphinx clean html SPHINXOPTS="--keep-going -n"
+        make -C docs/sphinx html SPHINXOPTS="--keep-going -n"
 
     - name: Deploy documentation
       if: github.event_name == 'push' && github.ref == 'refs/heads/main'
@@ -53,9 +62,18 @@ jobs:
         git config --local user.email "action@github.com"
         git config --local user.name "GitHub Action"
 
+        # Build verification - ensure required files exist
+        if [ ! -f docs/sphinx/_build/html/index.html ]; then
+          echo "Build output missing (docs/sphinx/_build/html/index.html not found). Aborting deploy."
+          exit 1
+        fi
+        
+        echo "Build verification passed - index.html found"
+
         # Prepare a clean worktree for the documentation branch
         git worktree remove -f docs-deploy || true
         git worktree prune
+        
         # Ensure we know about the remote branch if it exists
         git fetch origin documentation || true
         if git show-ref --verify --quiet refs/remotes/origin/documentation; then
@@ -65,14 +83,48 @@ jobs:
           # Create a new local 'documentation' branch starting from current HEAD (content will be replaced)
           git worktree add --force -b documentation docs-deploy HEAD
         fi
-        # Copy built HTML to the worktree root
-        if [ ! -f docs/sphinx/_build/html/index.html ]; then
-          echo "Build output missing (docs/sphinx/_build/html/index.html not found). Aborting deploy."
-          exit 1
-        fi
         
-        # Copy files to deployment directory
-        cp -r docs/sphinx/_build/html/* docs-deploy/
+        # Clean the documentation branch completely
+        pushd docs-deploy
+        git rm -rf . || true
+        git clean -fxd
+        popd
+        
+        # Create proper directory structure for GitHub Pages
+        mkdir -p docs-deploy/docs
+        
+        # Copy built HTML to the docs directory (for GitHub Pages)
+        cp -r docs/sphinx/_build/html/* docs-deploy/docs/
+        
+        # Create .gitignore for documentation branch
+        cat > docs-deploy/.gitignore << 'EOF'
+# Ignore all hidden files except .gitignore
+.*
+!.gitignore
+
+# Ignore temporary files
+*.tmp
+*.temp
+*~
+
+# Ignore build artifacts (should not be committed)
+_build/
+*.pyc
+__pycache__/
+EOF
+
+        # Create README for documentation branch
+        cat > docs-deploy/README.md << 'EOF'
+# Documentation Branch
+
+This branch contains the built static HTML documentation for GitHub Pages.
+
+- **GitHub Pages Source**: `/docs/` directory
+- **Auto-generated**: Do not edit manually
+- **Updated by**: GitHub Actions workflow
+
+The documentation is automatically built from the `main` branch and deployed here.
+EOF
         
         pushd docs-deploy
         git add -A
@@ -80,7 +132,9 @@ jobs:
           echo "No changes to publish"
           exit 0
         else
-          git commit -m "Update documentation"
+          git commit -m "Update documentation
+
+🪬 Generated with Sphinx from main branch"
           git fetch origin documentation --quiet || true
           git push --force-with-lease origin HEAD:documentation
         fi
