@@ -1,45 +1,21 @@
 weac.utils package
-===================
+==================
 
 Submodules
 ----------
 
-weac.utils.geldsetzer module
-----------------------------
+.. toctree::
+   :maxdepth: 4
 
-.. automodule:: weac.utils.geldsetzer
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
-weac.utils.misc module
-----------------------
-
-.. automodule:: weac.utils.misc
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
-weac.utils.snow_types module
-----------------------------
-
-.. automodule:: weac.utils.snow_types
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
-weac.utils.snowpilot_parser module
------------------------------------
-
-.. automodule:: weac.utils.snowpilot_parser
-   :members:
-   :undoc-members:
-   :show-inheritance:
+   weac.utils.geldsetzer
+   weac.utils.misc
+   weac.utils.snow_types
+   weac.utils.snowpilot_parser
 
 Module contents
 ---------------
 
 .. automodule:: weac.utils
    :members:
-   :undoc-members:
    :show-inheritance:
+   :undoc-members:
