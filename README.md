@@ -164,7 +164,7 @@ from weac.components import WeakLayer
 weak_layer = WeakLayer(rho=125, h=20)
 ```
 
-Create a Scenario that defines the environment and setup that the slab and weaklayer will be evaluated in.
+Create a Scenario that defines the environment and setup that the slab and weak layer will be evaluated in.
 
 ```python
 from weac.components import ScenarioConfig, Segment
@@ -193,7 +193,7 @@ pst_segments = [
 ]  # Scenario is Downslope PST with a 300mm cut
 ```
 
-Create SystemModel instance that combines the inputs and handles system solving and field quantity extraction.
+Create a SystemModel instance that combines the inputs and handles system solving and field-quantity extraction.
 
 ```python
 from weac.components import Config, ModelInput
@@ -279,7 +279,7 @@ See the [open issues](https://github.com/2phi/weac/issues) for a list of propose
 
 ### v4.0
 
-- [] Change to scenario & scenario_config: InfEnd/Cut/Segment/Weight
+- [ ] Change to scenario & scenario_config: InfEnd/Cut/Segment/Weight
 
 ### v3.2
 <!-- - [ ] New mathematical foundation to improve the weak-layer representation -->
