@@ -22,11 +22,6 @@ jobs:
         with:
           python-version: "3.12"
 
-      - name: Install venv for Python 3.12
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y python3.12-venv
-
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
