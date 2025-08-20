@@ -10,14 +10,6 @@ on:
       - "pyproject.toml"
       - "README.md"
       - ".github/workflows/docs.yml"
-  pull_request:
-    branches: [main, develop]
-    paths:
-      - "src/weac/**"
-      - "docs/sphinx/**"
-      - "pyproject.toml"
-      - "README.md"
-      - ".github/workflows/docs.yml"
   workflow_dispatch:
 
 permissions:
