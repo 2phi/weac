@@ -1,4 +1,4 @@
-weac.logging_config module
+weac.logging\_config module
 ===========================
 
 .. automodule:: weac.logging_config

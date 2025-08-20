@@ -83,7 +83,6 @@ package-dir = { "" = "src" }
 
 [tool.setuptools.packages.find]
 where = ["src"]
-exclude = ["tests", "docs"]
 
 [tool.ruff.lint]
 ignore = ["E741"]
@@ -137,7 +136,7 @@ filename = "pyproject.toml"
 filename = "CITATION.cff"
 
 [[tool.bumpversion.files]]
-filename = "weac/__init__.py"
+filename = "src/weac/__init__.py"
 search = "__version__ = \"{current_version}\""
 replace = "__version__ = \"{new_version}\""
 

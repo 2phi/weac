@@ -7,7 +7,13 @@ This configuration avoids deprecated extensions and ensures that
 
 from __future__ import annotations
 
+import os
+import sys
 from importlib.metadata import version as get_version
+
+# Add the project's 'src' directory to the path
+sys.path.insert(0, os.path.abspath("../../src"))
+
 
 # -- Project information -----------------------------------------------------
 
