@@ -9,12 +9,12 @@ authors = [{ name = "2phi GbR", email = "mail@2phi.de" }]
 description = "Weak layer anticrack nucleation model"
 readme = "README.md"
 requires-python = ">=3.12"
-license = { text = "Proprietary" }
+license = { text = "CC BY-NC-SA 4.0" }
 classifiers = [
     "Programming Language :: Python :: 3",
     "Programming Language :: Python :: 3.12",
     "Programming Language :: Python :: 3.13",
-    "License :: Other/Proprietary License",
+    "License :: Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International",
     "Operating System :: OS Independent",
     "Topic :: Scientific/Engineering",
 ]

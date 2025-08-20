@@ -89,7 +89,7 @@ Basic usage involves creating snow layers, weak layers, and scenario configurati
 
 .. code-block:: python
 
-   from weac.components import Layer, WeakLayer, ScenarioConfig, Segment
+   from weac.components import Layer, WeakLayer, ScenarioConfig, Segment, ModelInput, Config
    from weac.core.system_model import SystemModel
    from weac.analysis.analyzer import Analyzer
    
