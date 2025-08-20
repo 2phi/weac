@@ -13,7 +13,6 @@ from importlib.metadata import version as get_version
 
 project = "WEAC"
 author = "2phi"
-author = "2phi"
 
 # Ensure these are strings. Do not shadow the imported function name.
 release = get_version("weac")
@@ -45,7 +44,6 @@ html_title = f"{project} {release}"
 # GitHub Pages configuration
 html_baseurl = "https://2phi.github.io/weac/"
 html_use_index = True
-html_use_relative_urls = False
 
 # Theme options for sphinxawesome_theme
 html_theme_options = {
