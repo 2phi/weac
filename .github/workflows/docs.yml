@@ -5,6 +5,9 @@ on:
     branches:
       - main
       - develop
+  pull_request:
+    types: [opened, reopened, ready_for_review]
+    branches: [main, develop]
     paths:
       - "src/weac/**"
       - "docs/sphinx/**"
