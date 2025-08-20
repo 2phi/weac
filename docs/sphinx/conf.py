@@ -12,7 +12,7 @@ from importlib.metadata import version as get_version
 # -- Project information -----------------------------------------------------
 
 project = "WEAC"
-author = "2phi GbR"
+author = "2phi"
 
 # Ensure these are strings. Do not shadow the imported function name.
 release = get_version("weac")
@@ -40,7 +40,6 @@ exclude_patterns = ["_build", "Thumbs.db", ".DS_Store"]
 html_theme = "sphinxawesome_theme"
 html_static_path = ["_static"]
 html_title = f"{project} {release}"
-html_css_files = ["custom.css"]
 
 
 # -- Autodoc options ---------------------------------------------------------
