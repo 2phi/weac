@@ -72,7 +72,7 @@ dev = [
     "isort>=5.13.0",
 
     # Versioning helper matching [tool.bumpversion]
-    "bump2version>=1.0.1",
+    "bump-my-version", # e.g. bump-my-version bump patch
 
     # Building for Testing
     "build",
@@ -126,8 +126,6 @@ ignore = [
 
 [tool.bumpversion]
 current_version = "3.0.1"
-tag = true
-commit = true
 
 [[tool.bumpversion.files]]
 filename = "pyproject.toml"
