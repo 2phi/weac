@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "weac"
-version = "3.0.0"
+version = "3.0.1"
 authors = [{ name = "2phi GbR", email = "mail@2phi.de" }]
 description = "Weak layer anticrack nucleation model"
 readme = "README.md"
@@ -125,7 +125,7 @@ ignore = [
 ]
 
 [tool.bumpversion]
-current_version = "3.0.0"
+current_version = "3.0.1"
 tag = true
 commit = true
 
