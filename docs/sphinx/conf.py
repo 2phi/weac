@@ -13,6 +13,7 @@ from importlib.metadata import version as get_version
 
 project = "WEAC"
 author = "2phi"
+author = "2phi"
 
 # Ensure these are strings. Do not shadow the imported function name.
 release = get_version("weac")
@@ -40,6 +41,16 @@ exclude_patterns = ["_build", "Thumbs.db", ".DS_Store"]
 html_theme = "sphinxawesome_theme"
 html_static_path = ["_static"]
 html_title = f"{project} {release}"
+
+# GitHub Pages configuration
+html_baseurl = "https://2phi.github.io/weac/"
+html_use_index = True
+
+# Theme options for sphinxawesome_theme
+html_theme_options = {
+    "show_breadcrumbs": True,
+    "breadcrumbs_separator": " > ",
+}
 
 
 # -- Autodoc options ---------------------------------------------------------
