@@ -108,6 +108,9 @@ jobs:
         # Copy built HTML to the docs directory (for GitHub Pages)
         cp -r docs/sphinx/_build/html/* docs-deploy/docs/
         
+        # Ensure .nojekyll file exists in the docs directory for GitHub Pages
+        touch docs-deploy/docs/.nojekyll
+        
         pushd docs-deploy
         git add -A
         if git diff --cached --quiet; then
