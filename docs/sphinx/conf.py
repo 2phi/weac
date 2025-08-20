@@ -41,6 +41,16 @@ html_theme = "sphinxawesome_theme"
 html_static_path = ["_static"]
 html_title = f"{project} {release}"
 
+# GitHub Pages configuration
+html_baseurl = "https://2phi.github.io/weac/"
+html_use_index = True
+
+# Theme options for sphinxawesome_theme
+html_theme_options = {
+    "show_breadcrumbs": True,
+    "breadcrumbs_separator": " > ",
+}
+
 
 # -- Autodoc options ---------------------------------------------------------
 
