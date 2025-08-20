@@ -13,6 +13,7 @@ from importlib.metadata import version as get_version
 
 project = "WEAC"
 author = "2phi"
+author = "2phi"
 
 # Ensure these are strings. Do not shadow the imported function name.
 release = get_version("weac")
