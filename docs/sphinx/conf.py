@@ -7,10 +7,13 @@ This configuration avoids deprecated extensions and ensures that
 
 from __future__ import annotations
 
+import os
+import sys
 from importlib.metadata import version as get_version
 
-# No need to manually add paths - Sphinx will handle imports automatically
-
+# Add the src directory to the Python path to allow Sphinx
+# to import the weac package for local development.
+sys.path.insert(0, os.path.abspath("../../src"))
 
 # -- Project information -----------------------------------------------------
 
@@ -31,12 +34,6 @@ extensions = [
     "sphinx.ext.viewcode",
     "sphinx.ext.mathjax",
 ]
-
-# Configure autodoc to find packages in src/
-autodoc_mock_imports = []
-autodoc_package_dir = {"weac": "../../src/weac"}
-
-# Do NOT include 'sphinxawesome_theme.highlighting' (deprecated and unnecessary)
 
 templates_path = ["_templates"]
 exclude_patterns = ["_build", "Thumbs.db", ".DS_Store"]
