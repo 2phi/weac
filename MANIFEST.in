@@ -1,2 +1,7 @@
+# Include the CITATION.cff / img / test suite in the sdist
 include CITATION.cff
 include img/*.png
+recursive-include tests *.py
+
+# Exclude the docs directory from the sdist
+prune docs

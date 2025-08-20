@@ -4,19 +4,17 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "weac"
-version = "3.0.0"
-authors = [
-    {name = "2phi GbR", email = "mail@2phi.de"},
-]
+version = "3.0.1"
+authors = [{ name = "2phi GbR", email = "mail@2phi.de" }]
 description = "Weak layer anticrack nucleation model"
 readme = "README.md"
 requires-python = ">=3.12"
-license = { text = "Proprietary" }
+license = { text = "CC BY-NC-SA 4.0" }
 classifiers = [
     "Programming Language :: Python :: 3",
     "Programming Language :: Python :: 3.12",
     "Programming Language :: Python :: 3.13",
-    "License :: Other/Proprietary License",
+    "License :: Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International",
     "Operating System :: OS Independent",
     "Topic :: Scientific/Engineering",
 ]
@@ -74,12 +72,17 @@ dev = [
     "isort>=5.13.0",
 
     # Versioning helper matching [tool.bumpversion]
-    "bump2version>=1.0.1",
+    "bump-my-version", # e.g. bump-my-version bump patch
+
+    # Building for Testing
+    "build",
 ]
 
 [tool.setuptools]
-packages = ["weac"]
-package-data = { "*" = ["CITATION.cff"], "img" = ["*.png"] }
+package-dir = { "" = "src" }
+
+[tool.setuptools.packages.find]
+where = ["src"]
 
 [tool.ruff.lint]
 ignore = ["E741"]
@@ -122,9 +125,7 @@ ignore = [
 ]
 
 [tool.bumpversion]
-current_version = "3.0.0"
-tag = true
-commit = true
+current_version = "3.0.1"
 
 [[tool.bumpversion.files]]
 filename = "pyproject.toml"
@@ -133,7 +134,7 @@ filename = "pyproject.toml"
 filename = "CITATION.cff"
 
 [[tool.bumpversion.files]]
-filename = "weac/__init__.py"
+filename = "src/weac/__init__.py"
 search = "__version__ = \"{current_version}\""
 replace = "__version__ = \"{new_version}\""
 

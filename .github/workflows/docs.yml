@@ -4,20 +4,16 @@ on:
   push:
     branches:
       - main
-    paths:
-      - 'weac/**'
-      - 'docs/sphinx/**'
-      - 'pyproject.toml'
-      - 'README.md'
-      - '.github/workflows/docs.yml'
+      - develop
   pull_request:
-    branches: [ main, develop ]
+    types: [opened, reopened, ready_for_review]
+    branches: [main, develop]
     paths:
-      - 'weac/**'
-      - 'docs/sphinx/**'
-      - 'pyproject.toml'
-      - 'README.md'
-      - '.github/workflows/docs.yml'
+      - "src/weac/**"
+      - "docs/sphinx/**"
+      - "pyproject.toml"
+      - "README.md"
+      - ".github/workflows/docs.yml"
   workflow_dispatch:
 
 permissions:
@@ -30,95 +26,95 @@ jobs:
     environment: docs-deploy
 
     steps:
-    - name: Check out the repository
-      uses: actions/checkout@v4
+      - name: Check out the repository
+        uses: actions/checkout@v4
 
-    - name: Set up Python 3.12
-      uses: actions/setup-python@v5
-      with:
-        python-version: '3.12'
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
 
-    - name: Install dependencies
-      run: |
-        python -m pip install --upgrade pip
-        pip install sphinx sphinxawesome_theme IPython
-        pip install -e .
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install sphinx sphinxawesome_theme IPython
+          pip install -e .
 
-    - name: Build documentation
-      run: |
-        # Clean any previous build artifacts
-        make -C docs/sphinx clean
-        
-        # Generate API docs
-        sphinx-apidoc -o docs/sphinx/ weac --force --separate
+      - name: Build documentation
+        run: |
+          # Clean any previous build artifacts
+          make -C docs/sphinx clean
 
-        # Build HTML docs (do not fail on warnings)
-        make -C docs/sphinx html SPHINXOPTS="--keep-going -n"
-        
-        # Ensure .nojekyll file exists for GitHub Pages
-        touch docs/sphinx/_build/html/.nojekyll
+          # Generate API docs
+          sphinx-apidoc -o docs/sphinx/ src/weac --force --separate
 
-    - name: Deploy documentation
-      if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-      run: |
-        set -euo pipefail
-        git config --local user.email "action@github.com"
-        git config --local user.name "GitHub Action"
+          # Build HTML docs (do not fail on warnings)
+          make -C docs/sphinx html SPHINXOPTS="--keep-going -n"
 
-        # Build verification - ensure required files exist
-        if [ ! -f docs/sphinx/_build/html/index.html ]; then
-          echo "Build output missing (docs/sphinx/_build/html/index.html not found). Aborting deploy."
-          exit 1
-        fi
-        
-        echo "Build verification passed - index.html found"
+          # Ensure .nojekyll file exists for GitHub Pages
+          touch docs/sphinx/_build/html/.nojekyll
 
-        # Prepare a clean worktree for the documentation branch
-        git worktree remove -f docs-deploy || true
-        git worktree prune
-        
-        # Ensure we know about the remote branch if it exists
-        git fetch origin documentation || true
-        if git show-ref --verify --quiet refs/remotes/origin/documentation; then
-          # Attach worktree to the remote branch tip and create/point local branch 'documentation'
-          git worktree add --force -B documentation docs-deploy origin/documentation
-        else
-          # Create a new local 'documentation' branch starting from current HEAD (content will be replaced)
-          git worktree add --force -b documentation docs-deploy HEAD
-        fi
-        
-        # Clean the documentation branch but preserve .gitignore if it exists
-        pushd docs-deploy
-        # Preserve .gitignore if it exists
-        if [ -f .gitignore ]; then
-          cp .gitignore /tmp/preserve-gitignore
-        fi
-        git rm -rf . || true
-        git clean -fxd
-        # Restore .gitignore if it existed
-        if [ -f /tmp/preserve-gitignore ]; then
-          cp /tmp/preserve-gitignore .gitignore
-          rm /tmp/preserve-gitignore
-        fi
-        popd
-        
-        # Create proper directory structure for GitHub Pages
-        mkdir -p docs-deploy/docs
-        
-        # Copy built HTML to the docs directory (for GitHub Pages)
-        cp -r docs/sphinx/_build/html/* docs-deploy/docs/
-        
-        # Ensure .nojekyll file exists in the docs directory for GitHub Pages
-        touch docs-deploy/docs/.nojekyll
-        
-        pushd docs-deploy
-        git add -A
-        if git diff --cached --quiet; then
-          echo "No changes to publish"
-          exit 0
-        else
-          git commit -m "Update documentation" -m "🪬 Generated with Sphinx from main branch"
-          git fetch origin documentation --quiet || true
-          git push --force-with-lease origin HEAD:documentation
-        fi
-        popd
+      - name: Deploy documentation
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        run: |
+          set -euo pipefail
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+
+          # Build verification - ensure required files exist
+          if [ ! -f docs/sphinx/_build/html/index.html ]; then
+            echo "Build output missing (docs/sphinx/_build/html/index.html not found). Aborting deploy."
+            exit 1
+          fi
+
+          echo "Build verification passed - index.html found"
+
+          # Prepare a clean worktree for the documentation branch
+          git worktree remove -f docs-deploy || true
+          git worktree prune
+
+          # Ensure we know about the remote branch if it exists
+          git fetch origin documentation || true
+          if git show-ref --verify --quiet refs/remotes/origin/documentation; then
+            # Attach worktree to the remote branch tip and create/point local branch 'documentation'
+            git worktree add --force -B documentation docs-deploy origin/documentation
+          else
+            # Create a new local 'documentation' branch starting from current HEAD (content will be replaced)
+            git worktree add --force -b documentation docs-deploy HEAD
+          fi
+
+          # Clean the documentation branch but preserve .gitignore if it exists
+          pushd docs-deploy
+          # Preserve .gitignore if it exists
+          if [ -f .gitignore ]; then
+            cp .gitignore /tmp/preserve-gitignore
+          fi
+          git rm -rf . || true
+          git clean -fxd
+          # Restore .gitignore if it existed
+          if [ -f /tmp/preserve-gitignore ]; then
+            cp /tmp/preserve-gitignore .gitignore
+            rm /tmp/preserve-gitignore
+          fi
+          popd
+
+          # Create proper directory structure for GitHub Pages
+          mkdir -p docs-deploy/docs
+
+          # Copy built HTML to the docs directory (for GitHub Pages)
+          cp -r docs/sphinx/_build/html/* docs-deploy/docs/
+
+          # Ensure .nojekyll file exists in the docs directory for GitHub Pages
+          touch docs-deploy/docs/.nojekyll
+
+          pushd docs-deploy
+          git add -A
+          if git diff --cached --quiet; then
+            echo "No changes to publish"
+            exit 0
+          else
+            git commit -m "Update documentation" -m "🪬 Generated with Sphinx from main branch"
+            git fetch origin documentation --quiet || true
+            git push --force-with-lease origin HEAD:documentation
+          fi
+          popd
