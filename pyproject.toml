@@ -5,9 +5,7 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "weac"
 version = "3.0.0"
-authors = [
-    {name = "2phi GbR", email = "mail@2phi.de"},
-]
+authors = [{ name = "2phi GbR", email = "mail@2phi.de" }]
 description = "Weak layer anticrack nucleation model"
 readme = "README.md"
 requires-python = ">=3.12"
@@ -75,11 +73,17 @@ dev = [
 
     # Versioning helper matching [tool.bumpversion]
     "bump2version>=1.0.1",
+
+    # Building for Testing
+    "build",
 ]
 
 [tool.setuptools]
-packages = ["weac"]
-package-data = { "*" = ["CITATION.cff"], "img" = ["*.png"] }
+package-dir = { "" = "src" }
+
+[tool.setuptools.packages.find]
+where = ["src"]
+exclude = ["tests", "docs"]
 
 [tool.ruff.lint]
 ignore = ["E741"]
