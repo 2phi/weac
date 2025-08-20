@@ -139,8 +139,3 @@ replace = "__version__ = \"{new_version}\""
 
 [[tool.bumpversion.files]]
 filename = "demo/demo.ipynb"
-
-[[tool.bumpversion.files]]
-filename = "docs/sphinx/conf.py"
-search = "release = \"{current_version}\""
-replace = "release = \"{new_version}\""
