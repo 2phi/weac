@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "weac"
-version = "2.6.4"
+version = "3.0.0"
 authors = [
     {name = "2phi GbR", email = "mail@2phi.de"},
 ]
@@ -122,7 +122,7 @@ ignore = [
 ]
 
 [tool.bumpversion]
-current_version = "2.6.4"
+current_version = "3.0.0"
 tag = true
 commit = true
 
