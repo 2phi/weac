@@ -45,6 +45,7 @@ html_title = f"{project} {release}"
 # GitHub Pages configuration
 html_baseurl = "https://2phi.github.io/weac/"
 html_use_index = True
+html_use_relative_urls = False
 
 # Theme options for sphinxawesome_theme
 html_theme_options = {
