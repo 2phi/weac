@@ -45,7 +45,7 @@ jobs:
           make -C docs/sphinx clean
 
           # Generate API docs
-          sphinx-apidoc -o docs/sphinx/ src/weac --force --separate
+          uv run sphinx-apidoc -o docs/sphinx/ src/weac --force --separate
 
           # Build HTML docs (do not fail on warnings)
           make -C docs/sphinx html SPHINXOPTS="--keep-going -n"
