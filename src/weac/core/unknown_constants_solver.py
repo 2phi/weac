@@ -8,7 +8,7 @@ We utilize the pydantic library to define the system model.
 """
 
 import logging
-from typing import Literal, Optional
+from typing import Literal
 
 import numpy as np
 from numpy.linalg import LinAlgError
@@ -36,11 +36,10 @@ class UnknownConstantsSolver:
         scenario: Scenario,
         eigensystem: Eigensystem,
         system_type: SystemType,
-        touchdown_distance: Optional[float] = None,
-        touchdown_mode: Optional[
-            Literal["A_free_hanging", "B_point_contact", "C_in_contact"]
-        ] = None,
-        collapsed_weak_layer_kR: Optional[float] = None,
+        touchdown_distance: float | None = None,
+        touchdown_mode: Literal["A_free_hanging", "B_point_contact", "C_in_contact"]
+        | None = None,
+        collapsed_weak_layer_kR: float | None = None,
     ) -> np.ndarray:
         """
         Compute free constants *C* for system. \\
@@ -264,10 +263,9 @@ class UnknownConstantsSolver:
         has_foundation: bool,
         pos: Literal["l", "r", "m", "left", "right", "mid"],
         system_type: SystemType,
-        touchdown_mode: Optional[
-            Literal["A_free_hanging", "B_point_contact", "C_in_contact"]
-        ] = None,
-        collapsed_weak_layer_kR: Optional[float] = None,
+        touchdown_mode: Literal["A_free_hanging", "B_point_contact", "C_in_contact"]
+        | None = None,
+        collapsed_weak_layer_kR: float | None = None,
     ) -> np.ndarray:
         """
         Provide boundary or transmission conditions for beam segments.
@@ -369,10 +367,9 @@ class UnknownConstantsSolver:
         has_foundation: bool,
         pos: Literal["l", "r", "m", "left", "right", "mid"],
         system_type: SystemType,
-        touchdown_mode: Optional[
-            Literal["A_free_hanging", "B_point_contact", "C_in_contact"]
-        ] = None,
-        collapsed_weak_layer_kR: Optional[float] = None,
+        touchdown_mode: Literal["A_free_hanging", "B_point_contact", "C_in_contact"]
+        | None = None,
+        collapsed_weak_layer_kR: float | None = None,
     ):
         """
         Provide equations for free (pst) or infinite (skiers) ends.

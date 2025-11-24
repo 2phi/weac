@@ -6,7 +6,7 @@ This module provides plotting functions for visualizing the results of the WEAC 
 import colorsys
 import logging
 import os
-from typing import Literal, Optional
+from typing import Literal
 
 # Third party imports
 import matplotlib.colors as mc
@@ -219,8 +219,8 @@ class Plotter:
 
     def _get_systems_to_plot(
         self,
-        system_model: Optional[SystemModel] = None,
-        system_models: Optional[list[SystemModel]] = None,
+        system_model: SystemModel | None = None,
+        system_models: list[SystemModel] | None = None,
     ) -> list[SystemModel]:
         """Determine which systems to plot based on override parameters."""
         if system_model is not None and system_models is not None:
@@ -236,7 +236,7 @@ class Plotter:
             "SystemModel or list of SystemModels"
         )
 
-    def _save_figure(self, filename: str, fig: Optional[Figure] = None):
+    def _save_figure(self, filename: str, fig: Figure | None = None):
         """Save figure with proper formatting."""
         if fig is None:
             fig = plt.gcf()
@@ -252,8 +252,8 @@ class Plotter:
         weak_layers: list[WeakLayer] | WeakLayer,
         slabs: list[Slab] | Slab,
         filename: str = "slab_profile",
-        labels: Optional[list[str] | str] = None,
-        colors: Optional[list[str]] = None,
+        labels: list[str] | str | None = None,
+        colors: list[str] | None = None,
     ):
         """
         Plot slab layer profiles for comparison.
@@ -642,11 +642,11 @@ class Plotter:
 
     def plot_section_forces(
         self,
-        system_model: Optional[SystemModel] = None,
-        system_models: Optional[list[SystemModel]] = None,
+        system_model: SystemModel | None = None,
+        system_models: list[SystemModel] | None = None,
         filename: str = "section_forces",
-        labels: Optional[list[str]] = None,
-        colors: Optional[list[str]] = None,
+        labels: list[str] | None = None,
+        colors: list[str] | None = None,
     ):
         """
         Plot section forces (N, M, V) for comparison.
@@ -721,11 +721,11 @@ class Plotter:
 
     def plot_energy_release_rates(
         self,
-        system_model: Optional[SystemModel] = None,
-        system_models: Optional[list[SystemModel]] = None,
+        system_model: SystemModel | None = None,
+        system_models: list[SystemModel] | None = None,
         filename: str = "ERR",
-        labels: Optional[list[str]] = None,
-        colors: Optional[list[str]] = None,
+        labels: list[str] | None = None,
+        colors: list[str] | None = None,
     ):
         """
         Plot energy release rates (G_I, G_II) for comparison.
@@ -1035,7 +1035,7 @@ class Plotter:
         system_model: SystemModel,
         criteria_evaluator: CriteriaEvaluator,
         all_envelopes: bool = False,
-        filename: Optional[str] = None,
+        filename: str | None = None,
     ):
         """
         Plot stress envelope in τ-σ space.
@@ -1074,7 +1074,7 @@ class Plotter:
         weak_layer = system_model.weak_layer
 
         # Define a function to find the root for a given tau
-        def find_sigma_for_tau(tau_val, sigma_c, method: Optional[str] = None):
+        def find_sigma_for_tau(tau_val, sigma_c, method: str | None = None):
             # Target function to find the root of: envelope(sigma, tau) - 1 = 0
             def envelope_root_func(sigma_val):
                 return (

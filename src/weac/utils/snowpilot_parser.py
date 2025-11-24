@@ -20,7 +20,6 @@ The `the column length` is the column length of the PropSawTest.
 """
 
 import logging
-from typing import Tuple
 
 import numpy as np
 from snowpylot import caaml_parser
@@ -47,7 +46,7 @@ class SnowPilotParser:
     def __init__(self, file_path: str):
         self.snowpit: SnowPit = caaml_parser(file_path)
 
-    def extract_layers(self) -> Tuple[list[Layer], list[str]]:
+    def extract_layers(self) -> tuple[list[Layer], list[str]]:
         """Extract layers from snowpit."""
         snowpit = self.snowpit
         # Extract layers from snowpit: list[SnowpylotLayer]
@@ -274,7 +273,7 @@ class SnowPilotParser:
 
     def extract_weak_layer_and_layers_above(
         self, weak_layer_depth: float, layers: list[Layer]
-    ) -> Tuple[WeakLayer, list[Layer]]:
+    ) -> tuple[WeakLayer, list[Layer]]:
         """Extract weak layer and layers above the weak layer for the given
         depth_top extracted from the stability test."""
         depth = 0

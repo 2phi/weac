@@ -9,7 +9,6 @@ import logging
 import time
 import warnings
 from dataclasses import dataclass
-from typing import Optional, Union
 
 # Third party imports
 import numpy as np
@@ -89,7 +88,7 @@ class CoupledCriterionResult:
     g_delta: float
     dist_ERR_envelope: float
     iterations: int
-    history: Optional[CoupledCriterionHistory]
+    history: CoupledCriterionHistory | None
     final_system: SystemModel
     max_dist_stress: float
     min_dist_stress: float
@@ -146,7 +145,7 @@ class FindMinimumForceResult:
     critical_skier_weight: float
     new_segments: list[Segment]
     old_segments: list[Segment]
-    iterations: Optional[int]
+    iterations: int | None
     max_dist_stress: float
     min_dist_stress: float
 
@@ -203,10 +202,10 @@ class CriteriaEvaluator:
 
     def stress_envelope(
         self,
-        sigma: Union[float, np.ndarray],
-        tau: Union[float, np.ndarray],
+        sigma: float | np.ndarray,
+        tau: float | np.ndarray,
         weak_layer: WeakLayer,
-        method: Optional[str] = None,
+        method: str | None = None,
     ) -> np.ndarray:
         """
         Evaluate the stress envelope for given stress components.
