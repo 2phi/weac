@@ -46,6 +46,7 @@ interactive = [
     "traitlets>=5.14.3",
 ]
 docs = ["sphinx", "sphinxawesome-theme"]
+build = ["build", "twine"]
 dev = [
     # Notebook execution (to run demo.ipynb non-interactively)
     "nbclient>=0.10.0",
@@ -75,7 +76,7 @@ dev = [
     "bump-my-version", # e.g. bump-my-version bump patch
 
     # Building for Testing
-    "build",
+    # build moved to build optional dependencies
 ]
 
 [tool.setuptools]

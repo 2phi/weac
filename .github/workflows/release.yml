@@ -19,7 +19,7 @@ jobs:
           version: "latest"
 
       - name: Install dependencies
-        run: uv pip install build twine
+        run: uv sync --extra build
 
       - name: Build package
         run: uv build
