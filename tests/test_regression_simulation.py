@@ -421,7 +421,7 @@ class TestRegressionSimulation(unittest.TestCase):
         self.assertTrue(ss.converged)
         self.assertGreater(ss.touchdown_distance, 0)
         # Baseline values recorded
-        self.assertAlmostEqual(ss.touchdown_distance, 1265.55192469, places=6)
+        self.assertAlmostEqual(ss.touchdown_distance, 1265.551924690803, places=6)
         np.testing.assert_allclose(ss.SSERR, 2.123992, rtol=1e-6, atol=0)
 
         # evaluate_coupled_criterion baseline
