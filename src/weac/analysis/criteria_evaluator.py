@@ -9,7 +9,7 @@ import logging
 import time
 import warnings
 from dataclasses import dataclass
-from typing import List, Optional, Union
+from typing import Optional, Union
 
 # Third party imports
 import numpy as np
@@ -34,12 +34,12 @@ logger = logging.getLogger(__name__)
 class CoupledCriterionHistory:
     """Stores the history of the coupled criterion evaluation."""
 
-    skier_weights: List[float]
-    crack_lengths: List[float]
-    incr_energies: List[np.ndarray]
-    g_deltas: List[float]
-    dist_maxs: List[float]
-    dist_mins: List[float]
+    skier_weights: list[float]
+    crack_lengths: list[float]
+    incr_energies: list[np.ndarray]
+    g_deltas: list[float]
+    dist_maxs: list[float]
+    dist_mins: list[float]
 
 
 @dataclass
@@ -130,9 +130,9 @@ class FindMinimumForceResult:
         Whether the algorithm converged.
     critical_skier_weight : float
         The critical skier weight.
-    new_segments : List[Segment]
+    new_segments : list[Segment]
         The new segments.
-    old_segments : List[Segment]
+    old_segments : list[Segment]
         The old segments.
     iterations : int
         The number of iterations.
@@ -144,8 +144,8 @@ class FindMinimumForceResult:
 
     success: bool
     critical_skier_weight: float
-    new_segments: List[Segment]
-    old_segments: List[Segment]
+    new_segments: list[Segment]
+    old_segments: list[Segment]
     iterations: Optional[int]
     max_dist_stress: float
     min_dist_stress: float
@@ -672,6 +672,8 @@ class CriteriaEvaluator:
                 UserWarning,
             )
         system_copy = copy.deepcopy(system)
+        l_BC = system.slab_touchdown.l_BC
+
         segments = [
             Segment(length=5e3, has_foundation=True, m=0.0),
             Segment(length=2 * l_BC, has_foundation=False, m=0.0),
@@ -825,7 +827,7 @@ class CriteriaEvaluator:
         system: SystemModel,
         search_interval: tuple[float, float] | None = None,
         target: float = 1,
-    ) -> tuple[float, List[Segment]]:
+    ) -> tuple[float, list[Segment]]:
         """
         Finds the minimum crack length required to surpass the energy release rate envelope.
 
@@ -838,7 +840,7 @@ class CriteriaEvaluator:
         --------
         minimum_crack_length: float
             The minimum crack length required to surpass the energy release rate envelope [mm]
-        new_segments: List[Segment]
+        new_segments: list[Segment]
             The updated list of segments
         """
         old_segments = copy.deepcopy(system.scenario.segments)
@@ -928,7 +930,7 @@ class CriteriaEvaluator:
         self,
         system: SystemModel,
         skier_weight: float,
-    ) -> tuple[float, List[Segment]]:
+    ) -> tuple[float, list[Segment]]:
         """
         Finds the resulting anticrack length and updated segment configurations
         for a given skier weight.
@@ -944,7 +946,7 @@ class CriteriaEvaluator:
         -------
         new_crack_length: float
             The total length of the new cracked segments [mm]
-        new_segments: List[Segment]
+        new_segments: list[Segment]
             The updated list of segments
         """
         logger.info(
@@ -1086,7 +1088,7 @@ class CriteriaEvaluator:
 
     def _find_stress_envelope_crossings(
         self, system: SystemModel, weak_layer: WeakLayer
-    ) -> List[float]:
+    ) -> list[float]:
         """
         Finds the exact x-coordinates where the stress envelope is crossed.
         """
