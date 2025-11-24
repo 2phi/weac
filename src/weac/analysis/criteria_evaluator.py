@@ -674,12 +674,12 @@ class CriteriaEvaluator:
         system_copy = copy.deepcopy(system)
         segments = [
             Segment(length=5e3, has_foundation=True, m=0.0),
-            Segment(length=5e3, has_foundation=False, m=0.0),
+            Segment(length=2 * l_BC, has_foundation=False, m=0.0),
         ]
         scenario_config = ScenarioConfig(
             system_type="vpst-" if vertical else "pst-",
-            phi=system.scenario.phi,
-            cut_length=5e3,
+            phi=0.0,  # Slab Touchdown works only for flat slab
+            cut_length=2 * l_BC,
         )
         system_copy.config.touchdown = True
         system_copy.update_scenario(segments=segments, scenario_config=scenario_config)
