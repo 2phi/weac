@@ -671,8 +671,8 @@ class CriteriaEvaluator:
                 UserWarning,
             )
         system_copy = copy.deepcopy(system)
-        system_copy.update_scenario(scenario_config=ScenarioConfig(phi=0.0))
         system_copy.config.touchdown = True
+        system_copy.update_scenario(scenario_config=ScenarioConfig(phi=0.0))
         l_BC = system.slab_touchdown.l_BC
 
         segments = [

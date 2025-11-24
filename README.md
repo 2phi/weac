@@ -158,14 +158,14 @@ cd weac
 # Install Python 3.12+ if not already available
 # uv will automatically use the version specified in .python-version
 
-# Install dependencies and create virtual environment
+# For basic setup (if only running the package):
 uv sync
+
+# For development (recommended for contributors):
+uv sync --extra dev
 
 # Activate the virtual environment
 source .venv/bin/activate  # On Windows: .venv\Scripts\activate
-
-# For development dependencies (includes testing and formatting tools)
-uv sync --extra dev
 ```
 
 ### Running tests

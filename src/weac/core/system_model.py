@@ -395,7 +395,7 @@ class SystemModel:
         z : ndarray
             Solution vector (6xN) at position x.
         """
-        if isinstance(x, (list, tuple, np.ndarray)):
+        if isinstance(x, (np.ndarray, Sequence)):
             z = np.concatenate(
                 [
                     np.dot(self.eigensystem.zh(xi, length, has_foundation), C)

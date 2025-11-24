@@ -281,6 +281,9 @@ class Plotter:
         if isinstance(slabs, Slab):
             slabs = [slabs]
 
+        if len(weak_layers) != len(slabs):
+            raise ValueError("Number of weak layers must match number of slabs")
+
         if labels is None:
             labels = [f"System {i + 1}" for i in range(len(weak_layers))]
         elif isinstance(labels, str):

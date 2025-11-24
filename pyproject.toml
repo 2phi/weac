@@ -74,9 +74,6 @@ dev = [
 
     # Versioning helper matching [tool.bumpversion]
     "bump-my-version", # e.g. bump-my-version bump patch
-
-    # Building for Testing
-    # build moved to build optional dependencies
 ]
 
 [tool.setuptools]
