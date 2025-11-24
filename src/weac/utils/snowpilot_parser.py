@@ -20,7 +20,7 @@ The `the column length` is the column length of the PropSawTest.
 """
 
 import logging
-from typing import List, Tuple
+from typing import Tuple
 
 import numpy as np
 from snowpylot import caaml_parser
@@ -47,28 +47,28 @@ class SnowPilotParser:
     def __init__(self, file_path: str):
         self.snowpit: SnowPit = caaml_parser(file_path)
 
-    def extract_layers(self) -> Tuple[List[Layer], List[str]]:
+    def extract_layers(self) -> Tuple[list[Layer], list[str]]:
         """Extract layers from snowpit."""
         snowpit = self.snowpit
-        # Extract layers from snowpit: List[SnowpylotLayer]
-        sp_layers: List[SnowpylotLayer] = [
+        # Extract layers from snowpit: list[SnowpylotLayer]
+        sp_layers: list[SnowpylotLayer] = [
             layer
             for layer in snowpit.snow_profile.layers
             if layer.depth_top is not None
         ]
         sp_layers = sorted(sp_layers, key=lambda x: x.depth_top[0])  # type: ignore
 
-        # Extract density layers from snowpit: List[DensityObs]
-        sp_density_layers: List[DensityObs] = [
+        # Extract density layers from snowpit: list[DensityObs]
+        sp_density_layers: list[DensityObs] = [
             layer
             for layer in snowpit.snow_profile.density_profile
             if layer.depth_top is not None
         ]
         sp_density_layers = sorted(sp_density_layers, key=lambda x: x.depth_top[0])  # type: ignore
 
-        # Populate WEAC layers: List[Layer]
-        layers: List[Layer] = []
-        density_methods: List[str] = []
+        # Populate WEAC layers: list[Layer]
+        layers: list[Layer] = []
+        density_methods: list[str] = []
         for _i, layer in enumerate(sp_layers):
             # Parameters
             grain_type = None
@@ -213,14 +213,14 @@ class SnowPilotParser:
         self,
         layer_top_mm: float,
         layer_bottom_mm: float,
-        sp_density_layers: List[DensityObs],
+        sp_density_layers: list[DensityObs],
     ) -> float | None:
         """Find density measurements that overlap with the given layer depth range.
 
         Args:
             layer_top_mm: Top depth of layer in mm
             layer_bottom_mm: Bottom depth of layer in mm
-            sp_density_layers: List of density observations
+            sp_density_layers: list of density observations
 
         Returns:
             Average density from overlapping measurements, or None if no overlap
@@ -273,8 +273,8 @@ class SnowPilotParser:
         return None
 
     def extract_weak_layer_and_layers_above(
-        self, weak_layer_depth: float, layers: List[Layer]
-    ) -> Tuple[WeakLayer, List[Layer]]:
+        self, weak_layer_depth: float, layers: list[Layer]
+    ) -> Tuple[WeakLayer, list[Layer]]:
         """Extract weak layer and layers above the weak layer for the given
         depth_top extracted from the stability test."""
         depth = 0

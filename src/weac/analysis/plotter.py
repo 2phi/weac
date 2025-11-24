@@ -6,7 +6,7 @@ This module provides plotting functions for visualizing the results of the WEAC 
 import colorsys
 import logging
 import os
-from typing import List, Literal, Optional
+from typing import Literal, Optional
 
 # Third party imports
 import matplotlib.colors as mc
@@ -220,8 +220,8 @@ class Plotter:
     def _get_systems_to_plot(
         self,
         system_model: Optional[SystemModel] = None,
-        system_models: Optional[List[SystemModel]] = None,
-    ) -> List[SystemModel]:
+        system_models: Optional[list[SystemModel]] = None,
+    ) -> list[SystemModel]:
         """Determine which systems to plot based on override parameters."""
         if system_model is not None and system_models is not None:
             raise ValueError(
@@ -249,20 +249,20 @@ class Plotter:
 
     def plot_slab_profile(
         self,
-        weak_layers: List[WeakLayer] | WeakLayer,
-        slabs: List[Slab] | Slab,
+        weak_layers: list[WeakLayer] | WeakLayer,
+        slabs: list[Slab] | Slab,
         filename: str = "slab_profile",
-        labels: Optional[List[str] | str] = None,
-        colors: Optional[List[str]] = None,
+        labels: Optional[list[str] | str] = None,
+        colors: Optional[list[str]] = None,
     ):
         """
         Plot slab layer profiles for comparison.
 
         Parameters
         ----------
-        weak_layers : List[WeakLayer] | WeakLayer
+        weak_layers : list[WeakLayer] | WeakLayer
             The weak layer or layers to plot.
-        slabs : List[Slab] | Slab
+        slabs : list[Slab] | Slab
             The slab or slabs to plot.
         filename : str, optional
             Filename for saving plot
@@ -643,10 +643,10 @@ class Plotter:
     def plot_section_forces(
         self,
         system_model: Optional[SystemModel] = None,
-        system_models: Optional[List[SystemModel]] = None,
+        system_models: Optional[list[SystemModel]] = None,
         filename: str = "section_forces",
-        labels: Optional[List[str]] = None,
-        colors: Optional[List[str]] = None,
+        labels: Optional[list[str]] = None,
+        colors: Optional[list[str]] = None,
     ):
         """
         Plot section forces (N, M, V) for comparison.
@@ -655,7 +655,7 @@ class Plotter:
         ----------
         system_model : SystemModel, optional
             Single system to plot (overrides default)
-        system_models : List[SystemModel], optional
+        system_models : list[SystemModel], optional
             Multiple systems to plot (overrides default)
         filename : str, optional
             Filename for saving plot
@@ -722,10 +722,10 @@ class Plotter:
     def plot_energy_release_rates(
         self,
         system_model: Optional[SystemModel] = None,
-        system_models: Optional[List[SystemModel]] = None,
+        system_models: Optional[list[SystemModel]] = None,
         filename: str = "ERR",
-        labels: Optional[List[str]] = None,
-        colors: Optional[List[str]] = None,
+        labels: Optional[list[str]] = None,
+        colors: Optional[list[str]] = None,
     ):
         """
         Plot energy release rates (G_I, G_II) for comparison.
@@ -734,7 +734,7 @@ class Plotter:
         ----------
         system_model : SystemModel, optional
             Single system to plot (overrides default)
-        system_models : List[SystemModel], optional
+        system_models : list[SystemModel], optional
             Multiple systems to plot (overrides default)
         filename : str, optional
             Filename for saving plot

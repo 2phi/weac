@@ -12,7 +12,7 @@ import copy
 import logging
 from collections.abc import Sequence
 from functools import cached_property
-from typing import List, Optional, Union
+from typing import Optional, Union
 
 import numpy as np
 
@@ -303,7 +303,7 @@ class SystemModel:
         self._invalidate_eigensystem()
 
     # Changes that affect the *slab*  -> rebuild everything
-    def update_layers(self, new_layers: List[Layer]):
+    def update_layers(self, new_layers: list[Layer]):
         """Update the layers."""
         slab = Slab(layers=new_layers)
         self.slab = slab
@@ -318,7 +318,7 @@ class SystemModel:
     # Changes that affect the *scenario*  -> only rebuild C constants
     def update_scenario(
         self,
-        segments: Optional[List[Segment]] = None,
+        segments: Optional[list[Segment]] = None,
         scenario_config: Optional[ScenarioConfig] = None,
     ):
         """

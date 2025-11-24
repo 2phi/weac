@@ -3,7 +3,7 @@ This module defines the Scenario class, which encapsulates the physical setup of
 """
 
 import logging
-from typing import List, Sequence, Union
+from typing import Sequence, Union
 
 import numpy as np
 
@@ -45,7 +45,7 @@ class Scenario:
 
     # Inputs
     scenario_config: ScenarioConfig
-    segments: List[Segment]
+    segments: list[Segment]
     weak_layer: WeakLayer
     slab: Slab
 
@@ -69,7 +69,7 @@ class Scenario:
     def __init__(
         self,
         scenario_config: ScenarioConfig,
-        segments: List[Segment],
+        segments: list[Segment],
         weak_layer: WeakLayer,
         slab: Slab,
     ):
