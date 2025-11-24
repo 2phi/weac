@@ -21,7 +21,6 @@ dist/
 # Environments
 .venv/
 venv/
-.python-version
 .weac-reference/
 .venv*
 
