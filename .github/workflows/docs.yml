@@ -42,13 +42,13 @@ jobs:
       - name: Build documentation
         run: |
           # Clean any previous build artifacts
-          make -C docs/sphinx clean
+          uv run make -C docs/sphinx clean
 
           # Generate API docs
           uv run sphinx-apidoc -o docs/sphinx/ src/weac --force --separate
 
           # Build HTML docs (do not fail on warnings)
-          make -C docs/sphinx html SPHINXOPTS="--keep-going -n"
+          uv run make -C docs/sphinx html SPHINXOPTS="--keep-going -n"
 
           # Ensure .nojekyll file exists for GitHub Pages
           touch docs/sphinx/_build/html/.nojekyll
