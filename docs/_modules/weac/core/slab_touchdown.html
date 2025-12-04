@@ -202,7 +202,7 @@
 </span><span id="line-4"><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="line-5">
 </span><span id="line-6"><span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
-</span><span id="line-7"><span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Literal</span><span class="p">,</span> <span class="n">Optional</span>
+</span><span id="line-7"><span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Literal</span>
 </span><span id="line-8">
 </span><span id="line-9"><span class="kn">from</span><span class="w"> </span><span class="nn">scipy.optimize</span><span class="w"> </span><span class="kn">import</span> <span class="n">brentq</span>
 </span><span id="line-10">
@@ -260,7 +260,7 @@
 </span><span id="line-60"><span class="sd">        Type of touchdown mode</span>
 </span><span id="line-61"><span class="sd">    touchdown_distance : float</span>
 </span><span id="line-62"><span class="sd">        Length of the touchdown segment [mm]</span>
-</span><span id="line-63"><span class="sd">    collapsed_weak_layer_kR : Optional[float]</span>
+</span><span id="line-63"><span class="sd">    collapsed_weak_layer_kR : float | None</span>
 </span><span id="line-64"><span class="sd">        Rotational spring stiffness of the collapsed weak layer segment</span>
 </span><span id="line-65"><span class="sd">    &quot;&quot;&quot;</span>
 </span><span id="line-66">
@@ -278,7 +278,7 @@
 </span><span id="line-78">        <span class="s2">&quot;A_free_hanging&quot;</span><span class="p">,</span> <span class="s2">&quot;B_point_contact&quot;</span><span class="p">,</span> <span class="s2">&quot;C_in_contact&quot;</span>
 </span><span id="line-79">    <span class="p">]</span>  <span class="c1"># Three types of contact with collapsed weak layer</span>
 </span><span id="line-80">    <span class="n">touchdown_distance</span><span class="p">:</span> <span class="nb">float</span>
-</span><span id="line-81">    <span class="n">collapsed_weak_layer_kR</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+</span><span id="line-81">    <span class="n">collapsed_weak_layer_kR</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
 </span><span id="line-82">
 <div class="viewcode-block" id="SlabTouchdown.__init__">
 <a class="viewcode-back" href="../../../weac.core.slab_touchdown.html#weac.core.slab_touchdown.SlabTouchdown.__init__">[docs]</a>

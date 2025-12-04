@@ -212,96 +212,95 @@
 </span><span id="line-14">
 </span><span id="line-15"><span class="kn">import</span><span class="w"> </span><span class="nn">json</span>
 </span><span id="line-16"><span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
-</span><span id="line-17"><span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">List</span>
-</span><span id="line-18">
-</span><span id="line-19"><span class="kn">from</span><span class="w"> </span><span class="nn">pydantic</span><span class="w"> </span><span class="kn">import</span> <span class="n">BaseModel</span><span class="p">,</span> <span class="n">ConfigDict</span><span class="p">,</span> <span class="n">Field</span><span class="p">,</span> <span class="n">model_validator</span>
-</span><span id="line-20">
-</span><span id="line-21"><span class="kn">from</span><span class="w"> </span><span class="nn">weac.components.layer</span><span class="w"> </span><span class="kn">import</span> <span class="n">Layer</span><span class="p">,</span> <span class="n">WeakLayer</span>
-</span><span id="line-22"><span class="kn">from</span><span class="w"> </span><span class="nn">weac.components.scenario_config</span><span class="w"> </span><span class="kn">import</span> <span class="n">ScenarioConfig</span>
-</span><span id="line-23"><span class="kn">from</span><span class="w"> </span><span class="nn">weac.components.segment</span><span class="w"> </span><span class="kn">import</span> <span class="n">Segment</span>
-</span><span id="line-24">
-</span><span id="line-25"><span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
+</span><span id="line-17">
+</span><span id="line-18"><span class="kn">from</span><span class="w"> </span><span class="nn">pydantic</span><span class="w"> </span><span class="kn">import</span> <span class="n">BaseModel</span><span class="p">,</span> <span class="n">ConfigDict</span><span class="p">,</span> <span class="n">Field</span><span class="p">,</span> <span class="n">model_validator</span>
+</span><span id="line-19">
+</span><span id="line-20"><span class="kn">from</span><span class="w"> </span><span class="nn">weac.components.layer</span><span class="w"> </span><span class="kn">import</span> <span class="n">Layer</span><span class="p">,</span> <span class="n">WeakLayer</span>
+</span><span id="line-21"><span class="kn">from</span><span class="w"> </span><span class="nn">weac.components.scenario_config</span><span class="w"> </span><span class="kn">import</span> <span class="n">ScenarioConfig</span>
+</span><span id="line-22"><span class="kn">from</span><span class="w"> </span><span class="nn">weac.components.segment</span><span class="w"> </span><span class="kn">import</span> <span class="n">Segment</span>
+</span><span id="line-23">
+</span><span id="line-24"><span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
+</span><span id="line-25">
 </span><span id="line-26">
-</span><span id="line-27">
 <div class="viewcode-block" id="ModelInput">
 <a class="viewcode-back" href="../../../weac.components.model_input.html#weac.components.ModelInput">[docs]</a>
-</span><span id="line-28"><span class="k">class</span><span class="w"> </span><span class="nc">ModelInput</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
-</span><span id="line-29"><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-</span><span id="line-30"><span class="sd">    Comprehensive input data model for a WEAC simulation.</span>
-</span><span id="line-31">
-</span><span id="line-32"><span class="sd">    Attributes</span>
-</span><span id="line-33"><span class="sd">    ----------</span>
-</span><span id="line-34"><span class="sd">    scenario_config : ScenarioConfig</span>
-</span><span id="line-35"><span class="sd">        Scenario configuration.</span>
-</span><span id="line-36"><span class="sd">    weak_layer : WeakLayer</span>
-</span><span id="line-37"><span class="sd">        Weak layer properties.</span>
-</span><span id="line-38"><span class="sd">    layers : List[Layer]</span>
-</span><span id="line-39"><span class="sd">        List of snow slab layers.</span>
-</span><span id="line-40"><span class="sd">    segments : List[Segment]</span>
-</span><span id="line-41"><span class="sd">        List of segments defining the slab geometry and loading.</span>
-</span><span id="line-42"><span class="sd">    &quot;&quot;&quot;</span>
-</span><span id="line-43">
-</span><span id="line-44">    <span class="n">model_config</span> <span class="o">=</span> <span class="n">ConfigDict</span><span class="p">(</span>
-</span><span id="line-45">        <span class="n">extra</span><span class="o">=</span><span class="s2">&quot;forbid&quot;</span><span class="p">,</span>
-</span><span id="line-46">    <span class="p">)</span>
-</span><span id="line-47">
-</span><span id="line-48">    <span class="n">weak_layer</span><span class="p">:</span> <span class="n">WeakLayer</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
-</span><span id="line-49">        <span class="n">default_factory</span><span class="o">=</span><span class="k">lambda</span><span class="p">:</span> <span class="n">WeakLayer</span><span class="p">(</span><span class="n">rho</span><span class="o">=</span><span class="mi">125</span><span class="p">,</span> <span class="n">h</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span> <span class="n">E</span><span class="o">=</span><span class="mf">1.0</span><span class="p">),</span>
-</span><span id="line-50">        <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Weak layer&quot;</span><span class="p">,</span>
-</span><span id="line-51">    <span class="p">)</span>
-</span><span id="line-52">    <span class="n">layers</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Layer</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
-</span><span id="line-53">        <span class="n">default_factory</span><span class="o">=</span><span class="k">lambda</span><span class="p">:</span> <span class="p">[</span><span class="n">Layer</span><span class="p">(</span><span class="n">rho</span><span class="o">=</span><span class="mi">250</span><span class="p">,</span> <span class="n">h</span><span class="o">=</span><span class="mi">100</span><span class="p">)],</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;List of layers&quot;</span>
-</span><span id="line-54">    <span class="p">)</span>
-</span><span id="line-55">    <span class="n">scenario_config</span><span class="p">:</span> <span class="n">ScenarioConfig</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
-</span><span id="line-56">        <span class="n">default_factory</span><span class="o">=</span><span class="n">ScenarioConfig</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Scenario configuration&quot;</span>
-</span><span id="line-57">    <span class="p">)</span>
-</span><span id="line-58">    <span class="n">segments</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Segment</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
-</span><span id="line-59">        <span class="n">default_factory</span><span class="o">=</span><span class="k">lambda</span><span class="p">:</span> <span class="p">[</span>
-</span><span id="line-60">            <span class="n">Segment</span><span class="p">(</span><span class="n">length</span><span class="o">=</span><span class="mi">5000</span><span class="p">,</span> <span class="n">has_foundation</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">m</span><span class="o">=</span><span class="mi">100</span><span class="p">),</span>
-</span><span id="line-61">            <span class="n">Segment</span><span class="p">(</span><span class="n">length</span><span class="o">=</span><span class="mi">5000</span><span class="p">,</span> <span class="n">has_foundation</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">m</span><span class="o">=</span><span class="mi">0</span><span class="p">),</span>
-</span><span id="line-62">        <span class="p">],</span>
-</span><span id="line-63">        <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Segments&quot;</span><span class="p">,</span>
-</span><span id="line-64">    <span class="p">)</span>
-</span><span id="line-65">
-</span><span id="line-66">    <span class="nd">@model_validator</span><span class="p">(</span><span class="n">mode</span><span class="o">=</span><span class="s2">&quot;after&quot;</span><span class="p">)</span>
-</span><span id="line-67">    <span class="k">def</span><span class="w"> </span><span class="nf">_validate_non_empty_components</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-</span><span id="line-68"><span class="w">        </span><span class="sd">&quot;&quot;&quot;Post-initialization checks.&quot;&quot;&quot;</span>
-</span><span id="line-69">        <span class="c1"># Check that the last segment does not have a mass</span>
-</span><span id="line-70">        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">segments</span><span class="p">:</span>
-</span><span id="line-71">            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;At least one segment is required&quot;</span><span class="p">)</span>
-</span><span id="line-72">        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">layers</span><span class="p">:</span>
-</span><span id="line-73">            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;At least one layer is required&quot;</span><span class="p">)</span>
-</span><span id="line-74">        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">segments</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">m</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
-</span><span id="line-75">            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;The last segment must have a mass of 0&quot;</span><span class="p">)</span>
-</span><span id="line-76">        <span class="k">return</span> <span class="bp">self</span></div>
+</span><span id="line-27"><span class="k">class</span><span class="w"> </span><span class="nc">ModelInput</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
+</span><span id="line-28"><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+</span><span id="line-29"><span class="sd">    Comprehensive input data model for a WEAC simulation.</span>
+</span><span id="line-30">
+</span><span id="line-31"><span class="sd">    Attributes</span>
+</span><span id="line-32"><span class="sd">    ----------</span>
+</span><span id="line-33"><span class="sd">    scenario_config : ScenarioConfig</span>
+</span><span id="line-34"><span class="sd">        Scenario configuration.</span>
+</span><span id="line-35"><span class="sd">    weak_layer : WeakLayer</span>
+</span><span id="line-36"><span class="sd">        Weak layer properties.</span>
+</span><span id="line-37"><span class="sd">    layers : List[Layer]</span>
+</span><span id="line-38"><span class="sd">        List of snow slab layers.</span>
+</span><span id="line-39"><span class="sd">    segments : List[Segment]</span>
+</span><span id="line-40"><span class="sd">        List of segments defining the slab geometry and loading.</span>
+</span><span id="line-41"><span class="sd">    &quot;&quot;&quot;</span>
+</span><span id="line-42">
+</span><span id="line-43">    <span class="n">model_config</span> <span class="o">=</span> <span class="n">ConfigDict</span><span class="p">(</span>
+</span><span id="line-44">        <span class="n">extra</span><span class="o">=</span><span class="s2">&quot;forbid&quot;</span><span class="p">,</span>
+</span><span id="line-45">    <span class="p">)</span>
+</span><span id="line-46">
+</span><span id="line-47">    <span class="n">weak_layer</span><span class="p">:</span> <span class="n">WeakLayer</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
+</span><span id="line-48">        <span class="n">default_factory</span><span class="o">=</span><span class="k">lambda</span><span class="p">:</span> <span class="n">WeakLayer</span><span class="p">(</span><span class="n">rho</span><span class="o">=</span><span class="mi">125</span><span class="p">,</span> <span class="n">h</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span> <span class="n">E</span><span class="o">=</span><span class="mf">1.0</span><span class="p">),</span>
+</span><span id="line-49">        <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Weak layer&quot;</span><span class="p">,</span>
+</span><span id="line-50">    <span class="p">)</span>
+</span><span id="line-51">    <span class="n">layers</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">Layer</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
+</span><span id="line-52">        <span class="n">default_factory</span><span class="o">=</span><span class="k">lambda</span><span class="p">:</span> <span class="p">[</span><span class="n">Layer</span><span class="p">(</span><span class="n">rho</span><span class="o">=</span><span class="mi">250</span><span class="p">,</span> <span class="n">h</span><span class="o">=</span><span class="mi">100</span><span class="p">)],</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;list of layers&quot;</span>
+</span><span id="line-53">    <span class="p">)</span>
+</span><span id="line-54">    <span class="n">scenario_config</span><span class="p">:</span> <span class="n">ScenarioConfig</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
+</span><span id="line-55">        <span class="n">default_factory</span><span class="o">=</span><span class="n">ScenarioConfig</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Scenario configuration&quot;</span>
+</span><span id="line-56">    <span class="p">)</span>
+</span><span id="line-57">    <span class="n">segments</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">Segment</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
+</span><span id="line-58">        <span class="n">default_factory</span><span class="o">=</span><span class="k">lambda</span><span class="p">:</span> <span class="p">[</span>
+</span><span id="line-59">            <span class="n">Segment</span><span class="p">(</span><span class="n">length</span><span class="o">=</span><span class="mi">5000</span><span class="p">,</span> <span class="n">has_foundation</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">m</span><span class="o">=</span><span class="mi">100</span><span class="p">),</span>
+</span><span id="line-60">            <span class="n">Segment</span><span class="p">(</span><span class="n">length</span><span class="o">=</span><span class="mi">5000</span><span class="p">,</span> <span class="n">has_foundation</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">m</span><span class="o">=</span><span class="mi">0</span><span class="p">),</span>
+</span><span id="line-61">        <span class="p">],</span>
+</span><span id="line-62">        <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Segments&quot;</span><span class="p">,</span>
+</span><span id="line-63">    <span class="p">)</span>
+</span><span id="line-64">
+</span><span id="line-65">    <span class="nd">@model_validator</span><span class="p">(</span><span class="n">mode</span><span class="o">=</span><span class="s2">&quot;after&quot;</span><span class="p">)</span>
+</span><span id="line-66">    <span class="k">def</span><span class="w"> </span><span class="nf">_validate_non_empty_components</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+</span><span id="line-67"><span class="w">        </span><span class="sd">&quot;&quot;&quot;Post-initialization checks.&quot;&quot;&quot;</span>
+</span><span id="line-68">        <span class="c1"># Check that the last segment does not have a mass</span>
+</span><span id="line-69">        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">segments</span><span class="p">:</span>
+</span><span id="line-70">            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;At least one segment is required&quot;</span><span class="p">)</span>
+</span><span id="line-71">        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">layers</span><span class="p">:</span>
+</span><span id="line-72">            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;At least one layer is required&quot;</span><span class="p">)</span>
+</span><span id="line-73">        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">segments</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">m</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+</span><span id="line-74">            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;The last segment must have a mass of 0&quot;</span><span class="p">)</span>
+</span><span id="line-75">        <span class="k">return</span> <span class="bp">self</span></div>
 
+</span><span id="line-76">
 </span><span id="line-77">
-</span><span id="line-78">
-</span><span id="line-79"><span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
-</span><span id="line-80">    <span class="c1"># Example usage requiring all mandatory fields for proper instantiation</span>
-</span><span id="line-81">    <span class="n">example_scenario_config</span> <span class="o">=</span> <span class="n">ScenarioConfig</span><span class="p">(</span><span class="n">phi</span><span class="o">=</span><span class="mi">30</span><span class="p">,</span> <span class="n">system_type</span><span class="o">=</span><span class="s2">&quot;skiers&quot;</span><span class="p">)</span>
-</span><span id="line-82">    <span class="c1"># example_weak_layer = WeakLayer(</span>
-</span><span id="line-83">    <span class="c1">#     rho=200, h=10</span>
-</span><span id="line-84">    <span class="c1"># )  # grain_size, temp, E, G_I have defaults</span>
-</span><span id="line-85">
-</span><span id="line-86">    <span class="n">example_layers</span> <span class="o">=</span> <span class="p">[</span>
-</span><span id="line-87">        <span class="n">Layer</span><span class="p">(</span><span class="n">rho</span><span class="o">=</span><span class="mi">250</span><span class="p">,</span> <span class="n">h</span><span class="o">=</span><span class="mi">100</span><span class="p">),</span>  <span class="c1"># grain_size, temp have defaults</span>
-</span><span id="line-88">        <span class="n">Layer</span><span class="p">(</span><span class="n">rho</span><span class="o">=</span><span class="mi">280</span><span class="p">,</span> <span class="n">h</span><span class="o">=</span><span class="mi">150</span><span class="p">),</span>
-</span><span id="line-89">    <span class="p">]</span>
-</span><span id="line-90">    <span class="n">example_segments</span> <span class="o">=</span> <span class="p">[</span>
-</span><span id="line-91">        <span class="n">Segment</span><span class="p">(</span><span class="n">length</span><span class="o">=</span><span class="mi">5000</span><span class="p">,</span> <span class="n">has_foundation</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">m</span><span class="o">=</span><span class="mi">80</span><span class="p">),</span>
-</span><span id="line-92">        <span class="n">Segment</span><span class="p">(</span><span class="n">length</span><span class="o">=</span><span class="mi">3000</span><span class="p">,</span> <span class="n">has_foundation</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">m</span><span class="o">=</span><span class="mi">0</span><span class="p">),</span>
-</span><span id="line-93">    <span class="p">]</span>
-</span><span id="line-94">
-</span><span id="line-95">    <span class="n">model_input</span> <span class="o">=</span> <span class="n">ModelInput</span><span class="p">(</span>
-</span><span id="line-96">        <span class="n">scenario_config</span><span class="o">=</span><span class="n">example_scenario_config</span><span class="p">,</span>
-</span><span id="line-97">        <span class="n">layers</span><span class="o">=</span><span class="n">example_layers</span><span class="p">,</span>
-</span><span id="line-98">        <span class="n">segments</span><span class="o">=</span><span class="n">example_segments</span><span class="p">,</span>
-</span><span id="line-99">    <span class="p">)</span>
-</span><span id="line-100">    <span class="nb">print</span><span class="p">(</span><span class="n">model_input</span><span class="o">.</span><span class="n">model_dump_json</span><span class="p">(</span><span class="n">indent</span><span class="o">=</span><span class="mi">2</span><span class="p">))</span>
-</span><span id="line-101">    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n\n</span><span class="s2">&quot;</span><span class="p">)</span>
-</span><span id="line-102">    <span class="n">schema_json</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">ModelInput</span><span class="o">.</span><span class="n">model_json_schema</span><span class="p">(),</span> <span class="n">indent</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
-</span><span id="line-103">    <span class="nb">print</span><span class="p">(</span><span class="n">schema_json</span><span class="p">)</span>
+</span><span id="line-78"><span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+</span><span id="line-79">    <span class="c1"># Example usage requiring all mandatory fields for proper instantiation</span>
+</span><span id="line-80">    <span class="n">example_scenario_config</span> <span class="o">=</span> <span class="n">ScenarioConfig</span><span class="p">(</span><span class="n">phi</span><span class="o">=</span><span class="mi">30</span><span class="p">,</span> <span class="n">system_type</span><span class="o">=</span><span class="s2">&quot;skiers&quot;</span><span class="p">)</span>
+</span><span id="line-81">    <span class="c1"># example_weak_layer = WeakLayer(</span>
+</span><span id="line-82">    <span class="c1">#     rho=200, h=10</span>
+</span><span id="line-83">    <span class="c1"># )  # grain_size, temp, E, G_I have defaults</span>
+</span><span id="line-84">
+</span><span id="line-85">    <span class="n">example_layers</span> <span class="o">=</span> <span class="p">[</span>
+</span><span id="line-86">        <span class="n">Layer</span><span class="p">(</span><span class="n">rho</span><span class="o">=</span><span class="mi">250</span><span class="p">,</span> <span class="n">h</span><span class="o">=</span><span class="mi">100</span><span class="p">),</span>  <span class="c1"># grain_size, temp have defaults</span>
+</span><span id="line-87">        <span class="n">Layer</span><span class="p">(</span><span class="n">rho</span><span class="o">=</span><span class="mi">280</span><span class="p">,</span> <span class="n">h</span><span class="o">=</span><span class="mi">150</span><span class="p">),</span>
+</span><span id="line-88">    <span class="p">]</span>
+</span><span id="line-89">    <span class="n">example_segments</span> <span class="o">=</span> <span class="p">[</span>
+</span><span id="line-90">        <span class="n">Segment</span><span class="p">(</span><span class="n">length</span><span class="o">=</span><span class="mi">5000</span><span class="p">,</span> <span class="n">has_foundation</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">m</span><span class="o">=</span><span class="mi">80</span><span class="p">),</span>
+</span><span id="line-91">        <span class="n">Segment</span><span class="p">(</span><span class="n">length</span><span class="o">=</span><span class="mi">3000</span><span class="p">,</span> <span class="n">has_foundation</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">m</span><span class="o">=</span><span class="mi">0</span><span class="p">),</span>
+</span><span id="line-92">    <span class="p">]</span>
+</span><span id="line-93">
+</span><span id="line-94">    <span class="n">model_input</span> <span class="o">=</span> <span class="n">ModelInput</span><span class="p">(</span>
+</span><span id="line-95">        <span class="n">scenario_config</span><span class="o">=</span><span class="n">example_scenario_config</span><span class="p">,</span>
+</span><span id="line-96">        <span class="n">layers</span><span class="o">=</span><span class="n">example_layers</span><span class="p">,</span>
+</span><span id="line-97">        <span class="n">segments</span><span class="o">=</span><span class="n">example_segments</span><span class="p">,</span>
+</span><span id="line-98">    <span class="p">)</span>
+</span><span id="line-99">    <span class="nb">print</span><span class="p">(</span><span class="n">model_input</span><span class="o">.</span><span class="n">model_dump_json</span><span class="p">(</span><span class="n">indent</span><span class="o">=</span><span class="mi">2</span><span class="p">))</span>
+</span><span id="line-100">    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n\n</span><span class="s2">&quot;</span><span class="p">)</span>
+</span><span id="line-101">    <span class="n">schema_json</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">ModelInput</span><span class="o">.</span><span class="n">model_json_schema</span><span class="p">(),</span> <span class="n">indent</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+</span><span id="line-102">    <span class="nb">print</span><span class="p">(</span><span class="n">schema_json</span><span class="p">)</span>
 </span></code></pre></div>
     </div></div>
         </main>

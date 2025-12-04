@@ -277,7 +277,7 @@
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>scenario_config</strong> (<a class="reference internal" href="weac.components.scenario_config.html#weac.components.scenario_config.ScenarioConfig" title="weac.components.scenario_config.ScenarioConfig"><em>ScenarioConfig</em></a>)</p></li>
-<li><p><strong>segments</strong> (<em>List</em><em>[</em><a class="reference internal" href="weac.components.segment.html#weac.components.segment.Segment" title="weac.components.segment.Segment"><em>Segment</em></a><em>]</em>)</p></li>
+<li><p><strong>segments</strong> (<em>list</em><em>[</em><a class="reference internal" href="weac.components.segment.html#weac.components.segment.Segment" title="weac.components.segment.Segment"><em>Segment</em></a><em>]</em>)</p></li>
 <li><p><strong>weak_layer</strong> (<a class="reference internal" href="weac.components.layer.html#weac.components.layer.WeakLayer" title="weac.components.layer.WeakLayer"><em>WeakLayer</em></a>)</p></li>
 <li><p><strong>slab</strong> (<a class="reference internal" href="weac.core.slab.html#weac.core.slab.Slab" title="weac.core.slab.Slab"><em>Slab</em></a>)</p></li>
 </ul>
@@ -290,7 +290,7 @@
 <dd></dd></dl>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="weac.core.scenario.Scenario.segments">
-<span class="sig-name descname"><span class="pre">segments</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="weac.components.segment.html#weac.components.segment.Segment" title="weac.components.segment.Segment"><span class="pre">Segment</span></a><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#weac.core.scenario.Scenario.segments" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#weac.core.scenario.Scenario.segments'">¶</a></dt>
+<span class="sig-name descname"><span class="pre">segments</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="weac.components.segment.html#weac.components.segment.Segment" title="weac.components.segment.Segment"><span class="pre">Segment</span></a><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#weac.core.scenario.Scenario.segments" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#weac.core.scenario.Scenario.segments'">¶</a></dt>
 <dd></dd></dl>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="weac.core.scenario.Scenario.weak_layer">
@@ -328,13 +328,13 @@ and recompute derived attributes.</p>
 <dd><p>Get the segment index for a given x-coordinate or coordinates.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>x</strong> (<em>Union</em><em>[</em><em>float</em><em>, </em><em>Sequence</em><em>[</em><em>float</em><em>]</em><em>, </em><em>np.ndarray</em><em>]</em>) – A single x-coordinate or a sequence of x-coordinates.</p>
+<dd class="field-odd"><p><strong>x</strong> (<em>float</em><em> | </em><em>Sequence</em><em>[</em><em>float</em><em>] </em><em>| </em><em>np.ndarray</em>) – A single x-coordinate or a sequence of x-coordinates.</p>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>The segment index or an array of indices.</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>Union[int, np.ndarray]</p>
+<dd class="field-odd"><p>int | np.ndarray</p>
 </dd>
 </dl>
 </dd></dl>

@@ -554,10 +554,10 @@ sR: NDArray[np.float64]         # shape (k): Real positive eigenvalue shifts</p>
 </section>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>system_matrix</strong> (<em>ndarray</em><em>[</em><em>tuple</em><em>[</em><em>Any</em><em>, </em><em>...</em><em>]</em><em>, </em><em>dtype</em><em>[</em><em>float64</em><em>]</em><em>]</em>)</p>
+<dd class="field-odd"><p><strong>system_matrix</strong> (<em>ndarray</em><em>[</em><em>float64</em><em>]</em>)</p>
 </dd>
 <dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p>tuple[<em>ndarray</em>[tuple[<em>Any</em>, …], <em>dtype</em>[<em>complex128</em>]], <em>ndarray</em>[tuple[<em>Any</em>, …], <em>dtype</em>[<em>float64</em>]], <em>ndarray</em>[tuple[<em>Any</em>, …], <em>dtype</em>[<em>complex128</em>]], <em>ndarray</em>[tuple[<em>Any</em>, …], <em>dtype</em>[<em>float64</em>]], <em>ndarray</em>[tuple[<em>Any</em>, …], <em>dtype</em>[<em>float64</em>]], <em>ndarray</em>[tuple[<em>Any</em>, …], <em>dtype</em>[<em>float64</em>]]]</p>
+<dd class="field-even"><p>tuple[<em>ndarray</em>[<em>complex128</em>], <em>ndarray</em>[<em>float64</em>], <em>ndarray</em>[<em>complex128</em>], <em>ndarray</em>[<em>float64</em>], <em>ndarray</em>[<em>float64</em>], <em>ndarray</em>[<em>float64</em>]]</p>
 </dd>
 </dl>
 </dd></dl>
@@ -656,31 +656,31 @@ is True.</p></li>
 <dd></dd></dl>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="weac.core.Eigensystem.K">
-<span class="sig-name descname"><span class="pre">K</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">ndarray</span><span class="p"><span class="pre">[</span></span><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dtype</span><span class="p"><span class="pre">[</span></span><span class="pre">_ScalarT</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#weac.core.Eigensystem.K" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#weac.core.Eigensystem.K'">¶</a></dt>
+<span class="sig-name descname"><span class="pre">K</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">ndarray</span></em><a class="headerlink" href="#weac.core.Eigensystem.K" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#weac.core.Eigensystem.K'">¶</a></dt>
 <dd></dd></dl>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="id7">
-<span class="sig-name descname"><span class="pre">ewC</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">ndarray</span><span class="p"><span class="pre">[</span></span><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dtype</span><span class="p"><span class="pre">[</span></span><span class="pre">complex128</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#id7" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id7'">¶</a></dt>
+<span class="sig-name descname"><span class="pre">ewC</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">ndarray</span><span class="p"><span class="pre">[</span></span><span class="pre">complex128</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#id7" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id7'">¶</a></dt>
 <dd></dd></dl>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="id8">
-<span class="sig-name descname"><span class="pre">ewR</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">ndarray</span><span class="p"><span class="pre">[</span></span><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dtype</span><span class="p"><span class="pre">[</span></span><span class="pre">float64</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#id8" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id8'">¶</a></dt>
+<span class="sig-name descname"><span class="pre">ewR</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">ndarray</span><span class="p"><span class="pre">[</span></span><span class="pre">float64</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#id8" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id8'">¶</a></dt>
 <dd></dd></dl>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="id9">
-<span class="sig-name descname"><span class="pre">evC</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">ndarray</span><span class="p"><span class="pre">[</span></span><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dtype</span><span class="p"><span class="pre">[</span></span><span class="pre">complex128</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#id9" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id9'">¶</a></dt>
+<span class="sig-name descname"><span class="pre">evC</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">ndarray</span><span class="p"><span class="pre">[</span></span><span class="pre">complex128</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#id9" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id9'">¶</a></dt>
 <dd></dd></dl>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="id10">
-<span class="sig-name descname"><span class="pre">evR</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">ndarray</span><span class="p"><span class="pre">[</span></span><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dtype</span><span class="p"><span class="pre">[</span></span><span class="pre">float64</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#id10" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id10'">¶</a></dt>
+<span class="sig-name descname"><span class="pre">evR</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">ndarray</span><span class="p"><span class="pre">[</span></span><span class="pre">float64</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#id10" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id10'">¶</a></dt>
 <dd></dd></dl>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="id11">
-<span class="sig-name descname"><span class="pre">sR</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">ndarray</span><span class="p"><span class="pre">[</span></span><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dtype</span><span class="p"><span class="pre">[</span></span><span class="pre">float64</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#id11" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id11'">¶</a></dt>
+<span class="sig-name descname"><span class="pre">sR</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">ndarray</span><span class="p"><span class="pre">[</span></span><span class="pre">float64</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#id11" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id11'">¶</a></dt>
 <dd></dd></dl>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="id12">
-<span class="sig-name descname"><span class="pre">sC</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">ndarray</span><span class="p"><span class="pre">[</span></span><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dtype</span><span class="p"><span class="pre">[</span></span><span class="pre">float64</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#id12" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id12'">¶</a></dt>
+<span class="sig-name descname"><span class="pre">sC</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">ndarray</span><span class="p"><span class="pre">[</span></span><span class="pre">float64</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#id12" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id12'">¶</a></dt>
 <dd></dd></dl>
 </dd></dl>
 <dl class="py class">
@@ -774,7 +774,7 @@ is True.</p></li>
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>scenario_config</strong> (<a class="reference internal" href="weac.components.scenario_config.html#weac.components.scenario_config.ScenarioConfig" title="weac.components.scenario_config.ScenarioConfig"><em>ScenarioConfig</em></a>)</p></li>
-<li><p><strong>segments</strong> (<em>List</em><em>[</em><a class="reference internal" href="weac.components.segment.html#weac.components.segment.Segment" title="weac.components.segment.Segment"><em>Segment</em></a><em>]</em>)</p></li>
+<li><p><strong>segments</strong> (<em>list</em><em>[</em><a class="reference internal" href="weac.components.segment.html#weac.components.segment.Segment" title="weac.components.segment.Segment"><em>Segment</em></a><em>]</em>)</p></li>
 <li><p><strong>weak_layer</strong> (<a class="reference internal" href="weac.components.layer.html#weac.components.layer.WeakLayer" title="weac.components.layer.WeakLayer"><em>WeakLayer</em></a>)</p></li>
 <li><p><strong>slab</strong> (<a class="reference internal" href="weac.core.slab.html#weac.core.slab.Slab" title="weac.core.slab.Slab"><em>Slab</em></a>)</p></li>
 </ul>
@@ -787,13 +787,13 @@ is True.</p></li>
 <dd><p>Get the segment index for a given x-coordinate or coordinates.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>x</strong> (<em>Union</em><em>[</em><em>float</em><em>, </em><em>Sequence</em><em>[</em><em>float</em><em>]</em><em>, </em><em>np.ndarray</em><em>]</em>) – A single x-coordinate or a sequence of x-coordinates.</p>
+<dd class="field-odd"><p><strong>x</strong> (<em>float</em><em> | </em><em>Sequence</em><em>[</em><em>float</em><em>] </em><em>| </em><em>np.ndarray</em>) – A single x-coordinate or a sequence of x-coordinates.</p>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>The segment index or an array of indices.</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>Union[int, np.ndarray]</p>
+<dd class="field-odd"><p>int | np.ndarray</p>
 </dd>
 </dl>
 </dd></dl>
@@ -809,7 +809,7 @@ and recompute derived attributes.</p>
 <dd></dd></dl>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="weac.core.Scenario.segments">
-<span class="sig-name descname"><span class="pre">segments</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="weac.components.segment.html#weac.components.segment.Segment" title="weac.components.segment.Segment"><span class="pre">Segment</span></a><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#weac.core.Scenario.segments" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#weac.core.Scenario.segments'">¶</a></dt>
+<span class="sig-name descname"><span class="pre">segments</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="weac.components.segment.html#weac.components.segment.Segment" title="weac.components.segment.Segment"><span class="pre">Segment</span></a><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#weac.core.Scenario.segments" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#weac.core.Scenario.segments'">¶</a></dt>
 <dd></dd></dl>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="weac.core.Scenario.weak_layer">
@@ -883,7 +883,7 @@ provided as np.ndarray for easier access.</p>
 - z = 0 is set at the mid-point of the slab’s thickness</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>layers</strong> (<em>List</em><em>[</em><a class="reference internal" href="weac.components.layer.html#weac.components.layer.Layer" title="weac.components.layer.Layer"><em>Layer</em></a><em>]</em>)</p>
+<dd class="field-odd"><p><strong>layers</strong> (<em>list</em><em>[</em><a class="reference internal" href="weac.components.layer.html#weac.components.layer.Layer" title="weac.components.layer.Layer"><em>Layer</em></a><em>]</em>)</p>
 </dd>
 </dl>
 <dl class="py attribute">
@@ -991,7 +991,7 @@ provided as np.ndarray for easier access.</p>
 <span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">layers</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/weac/core/slab.html#Slab.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#weac.core.Slab.__init__" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#weac.core.Slab.__init__'">¶</a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>layers</strong> (<em>List</em><em>[</em><a class="reference internal" href="weac.components.layer.html#weac.components.layer.Layer" title="weac.components.layer.Layer"><em>Layer</em></a><em>]</em>)</p>
+<dd class="field-odd"><p><strong>layers</strong> (<em>list</em><em>[</em><a class="reference internal" href="weac.components.layer.html#weac.components.layer.Layer" title="weac.components.layer.Layer"><em>Layer</em></a><em>]</em>)</p>
 </dd>
 <dt class="field-even">Return type<span class="colon">:</span></dt>
 <dd class="field-even"><p>None</p>
@@ -1019,7 +1019,7 @@ Calculate center of gravity of triangular slab segments for vertical PSTs.</p>
 </dd></dl>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="weac.core.Slab.layers">
-<span class="sig-name descname"><span class="pre">layers</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="weac.components.layer.html#weac.components.layer.Layer" title="weac.components.layer.Layer"><span class="pre">Layer</span></a><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#weac.core.Slab.layers" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#weac.core.Slab.layers'">¶</a></dt>
+<span class="sig-name descname"><span class="pre">layers</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="weac.components.layer.html#weac.components.layer.Layer" title="weac.components.layer.Layer"><span class="pre">Layer</span></a><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#weac.core.Slab.layers" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#weac.core.Slab.layers'">¶</a></dt>
 <dd></dd></dl>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="id20">
@@ -1291,7 +1291,7 @@ segment_length = system.scenario.li[0]
 <dd><p>Update the layers.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>new_layers</strong> (<em>List</em><em>[</em><a class="reference internal" href="weac.components.layer.html#weac.components.layer.Layer" title="weac.components.layer.Layer"><em>Layer</em></a><em>]</em>)</p>
+<dd class="field-odd"><p><strong>new_layers</strong> (<em>list</em><em>[</em><a class="reference internal" href="weac.components.layer.html#weac.components.layer.Layer" title="weac.components.layer.Layer"><em>Layer</em></a><em>]</em>)</p>
 </dd>
 </dl>
 </dd></dl>
@@ -1303,7 +1303,7 @@ Scenario object itself, then refresh and invalidate constants.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>segments</strong> (<em>List</em><em>[</em><a class="reference internal" href="weac.components.segment.html#weac.components.segment.Segment" title="weac.components.segment.Segment"><em>Segment</em></a><em>] </em><em>| </em><em>None</em>)</p></li>
+<li><p><strong>segments</strong> (<em>list</em><em>[</em><a class="reference internal" href="weac.components.segment.html#weac.components.segment.Segment" title="weac.components.segment.Segment"><em>Segment</em></a><em>] </em><em>| </em><em>None</em>)</p></li>
 <li><p><strong>scenario_config</strong> (<a class="reference internal" href="weac.components.scenario_config.html#weac.components.scenario_config.ScenarioConfig" title="weac.components.scenario_config.ScenarioConfig"><em>ScenarioConfig</em></a><em> | </em><em>None</em>)</p></li>
 </ul>
 </dd>
