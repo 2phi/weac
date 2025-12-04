@@ -2,8 +2,6 @@
 This module defines the Slab class, which represents the snow slab and its properties.
 """
 
-from typing import List
-
 import numpy as np
 
 from weac.components import Layer
@@ -44,7 +42,7 @@ class Slab:  # pylint: disable=too-many-instance-attributes,too-few-public-metho
     """
 
     # Input data
-    layers: List[Layer]
+    layers: list[Layer]
 
     rhoi: np.ndarray  # densities of the layer i [t/mm^3]
     hi: np.ndarray  # thickness of the layer i [mm]
@@ -60,7 +58,7 @@ class Slab:  # pylint: disable=too-many-instance-attributes,too-few-public-metho
     z_cog: float  # z-coordinate of Center of Gravity [mm]
     qw: float  # Weight Load of the slab [N/mm]
 
-    def __init__(self, layers: List[Layer]) -> None:
+    def __init__(self, layers: list[Layer]) -> None:
         self.layers = layers
         self._calc_slab_params()
 

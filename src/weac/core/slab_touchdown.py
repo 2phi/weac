@@ -4,7 +4,7 @@ Handling the touchdown situation in a PST.
 """
 
 import logging
-from typing import Literal, Optional
+from typing import Literal
 
 from scipy.optimize import brentq
 
@@ -60,7 +60,7 @@ class SlabTouchdown:  # pylint: disable=too-many-instance-attributes,too-few-pub
         Type of touchdown mode
     touchdown_distance : float
         Length of the touchdown segment [mm]
-    collapsed_weak_layer_kR : Optional[float]
+    collapsed_weak_layer_kR : float | None
         Rotational spring stiffness of the collapsed weak layer segment
     """
 
@@ -78,7 +78,7 @@ class SlabTouchdown:  # pylint: disable=too-many-instance-attributes,too-few-pub
         "A_free_hanging", "B_point_contact", "C_in_contact"
     ]  # Three types of contact with collapsed weak layer
     touchdown_distance: float
-    collapsed_weak_layer_kR: Optional[float] = None
+    collapsed_weak_layer_kR: float | None = None
 
     def __init__(self, scenario: Scenario, eigensystem: Eigensystem):
         self.scenario = scenario

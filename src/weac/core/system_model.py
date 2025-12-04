@@ -12,7 +12,6 @@ import copy
 import logging
 from collections.abc import Sequence
 from functools import cached_property
-from typing import List, Optional, Union
 
 import numpy as np
 
@@ -119,11 +118,11 @@ class SystemModel:
     fq: FieldQuantities
 
     scenario: Scenario
-    slab_touchdown: Optional[SlabTouchdown]
+    slab_touchdown: SlabTouchdown | None
     unknown_constants: np.ndarray
     uncracked_unknown_constants: np.ndarray
 
-    def __init__(self, model_input: ModelInput, config: Optional[Config] = None):
+    def __init__(self, model_input: ModelInput, config: Config | None = None):
         if config is None:
             config = Config()
         self.config = config
@@ -155,7 +154,7 @@ class SystemModel:
         return Eigensystem(weak_layer=self.weak_layer, slab=self.slab)
 
     @cached_property
-    def slab_touchdown(self) -> Optional[SlabTouchdown]:
+    def slab_touchdown(self) -> SlabTouchdown | None:
         """
         Solve for the slab touchdown.
         Modifies the scenario object in place by replacing the undercut segment
@@ -303,7 +302,7 @@ class SystemModel:
         self._invalidate_eigensystem()
 
     # Changes that affect the *slab*  -> rebuild everything
-    def update_layers(self, new_layers: List[Layer]):
+    def update_layers(self, new_layers: list[Layer]):
         """Update the layers."""
         slab = Slab(layers=new_layers)
         self.slab = slab
@@ -318,8 +317,8 @@ class SystemModel:
     # Changes that affect the *scenario*  -> only rebuild C constants
     def update_scenario(
         self,
-        segments: Optional[List[Segment]] = None,
-        scenario_config: Optional[ScenarioConfig] = None,
+        segments: list[Segment] | None = None,
+        scenario_config: ScenarioConfig | None = None,
     ):
         """
         Update fields on `scenario_config` (if present) or on the
@@ -365,7 +364,7 @@ class SystemModel:
 
     def z(
         self,
-        x: Union[float, Sequence[float], np.ndarray],
+        x: float | Sequence[float] | np.ndarray,
         C: np.ndarray,
         length: float,
         phi: float,
@@ -396,7 +395,7 @@ class SystemModel:
         z : ndarray
             Solution vector (6xN) at position x.
         """
-        if isinstance(x, (list, tuple, np.ndarray)):
+        if isinstance(x, (np.ndarray, Sequence)):
             z = np.concatenate(
                 [
                     np.dot(self.eigensystem.zh(xi, length, has_foundation), C)

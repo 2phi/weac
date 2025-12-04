@@ -14,7 +14,6 @@ field_name: type = Field(..., gt=0, description="Description")
 
 import json
 import logging
-from typing import List
 
 from pydantic import BaseModel, ConfigDict, Field, model_validator
 
@@ -49,13 +48,13 @@ class ModelInput(BaseModel):
         default_factory=lambda: WeakLayer(rho=125, h=20, E=1.0),
         description="Weak layer",
     )
-    layers: List[Layer] = Field(
-        default_factory=lambda: [Layer(rho=250, h=100)], description="List of layers"
+    layers: list[Layer] = Field(
+        default_factory=lambda: [Layer(rho=250, h=100)], description="list of layers"
     )
     scenario_config: ScenarioConfig = Field(
         default_factory=ScenarioConfig, description="Scenario configuration"
     )
-    segments: List[Segment] = Field(
+    segments: list[Segment] = Field(
         default_factory=lambda: [
             Segment(length=5000, has_foundation=True, m=100),
             Segment(length=5000, has_foundation=True, m=0),

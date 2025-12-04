@@ -68,12 +68,13 @@
 
 1. [About the project](#about-the-project)
 2. [Installation](#installation)
-3. [Usage](#usage)
-4. [Roadmap](#roadmap)
-5. [Release history](#release-history)
-6. [How to contribute](#how-to-contribute)
-7. [License](#license)
-8. [Contact](#contact)
+3. [Development Setup](#development-setup)
+4. [Usage](#usage)
+5. [Roadmap](#roadmap)
+6. [Release history](#release-history)
+7. [How to contribute](#how-to-contribute)
+8. [License](#license)
+9. [Contact](#contact)
 
 <!-- ABOUT THE PROJECT -->
 ## About the project
@@ -128,6 +129,100 @@ Needs (runtime dependencies are declared in [pyproject.toml](https://github.com/
 - [Pydantic](https://docs.pydantic.dev/latest/) ≥ 2.11.7
 - [Snowpylot](https://github.com/connellymk/snowpylot) ≥ 1.1.3
 
+
+<!-- DEVELOPMENT SETUP -->
+## Development Setup
+
+This project uses [uv](https://github.com/astral-sh/uv) for fast Python package management and project handling.
+
+### Installing uv
+
+Install uv following the [official installation guide](https://github.com/astral-sh/uv#installation):
+
+```bash
+# On macOS and Linux
+curl -LsSf https://astral.sh/uv/install.sh | sh
+
+# Using pip (alternative)
+pip install uv
+```
+
+### Setting up the development environment
+
+Clone the repository and set up the development environment:
+
+```bash
+git clone https://github.com/2phi/weac
+cd weac
+
+# Install Python 3.12+ if not already available
+# uv will automatically use the version specified in .python-version
+
+# For basic setup (if only running the package):
+uv sync
+
+# For development (recommended for contributors):
+uv sync --extra dev
+
+# Activate the virtual environment
+source .venv/bin/activate  # On Windows: .venv\Scripts\activate
+```
+
+### Running tests
+
+Run the test suite using uv:
+
+```bash
+# Run all tests
+uv run python tests/run_tests.py
+
+# Or use pytest directly (if installed)
+uv run pytest
+```
+
+### Code formatting and linting
+
+This project uses [ruff](https://github.com/astral-sh/ruff) for fast Python linting and formatting:
+
+```bash
+# Format code
+uv run ruff format .
+
+# Check for linting issues
+uv run ruff check .
+
+# Fix auto-fixable linting issues
+uv run ruff check . --fix
+```
+
+### Building the package
+
+Build the package for distribution:
+
+```bash
+# Build wheel and source distribution
+uv build
+
+# Install in editable mode for development
+uv pip install -e .
+```
+
+### Additional uv commands
+
+```bash
+# Update dependencies
+uv sync --upgrade
+
+# Add a new dependency
+uv add package-name
+
+# Add a development dependency
+uv add --dev package-name
+
+# Show environment info
+uv run python --version
+uv run pip list
+```
 
 <!-- USAGE EXAMPLES -->
 ## Usage

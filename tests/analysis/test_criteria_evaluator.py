@@ -196,7 +196,7 @@ class TestCriteriaEvaluator(unittest.TestCase):
                 segments=segments,
                 scenario_config=ScenarioConfig(phi=self.phi),
             ),
-            config=self.config,
+            config=Config(touchdown=True),
         )
         results: SSERRResult = self.evaluator.evaluate_SSERR(system)
         self.assertTrue(results.converged)
