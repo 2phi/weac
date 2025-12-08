@@ -8,7 +8,7 @@ from .criteria_evaluator import (
     CoupledCriterionResult,
     CriteriaEvaluator,
     FindMinimumForceResult,
-    SSERRResult,
+    SteadyStateResult,
 )
 from .plotter import Plotter
 
@@ -18,6 +18,6 @@ __all__ = [
     "CoupledCriterionHistory",
     "CoupledCriterionResult",
     "FindMinimumForceResult",
-    "SSERRResult",
+    "SteadyStateResult",
     "Plotter",
 ]

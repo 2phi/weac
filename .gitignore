@@ -57,3 +57,6 @@ temp*
 old*
 
 .weac-reference/
+
+# Folder for development and local testing
+dev/

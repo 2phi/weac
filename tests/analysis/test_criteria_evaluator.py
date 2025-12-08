@@ -13,7 +13,7 @@ from weac.analysis.criteria_evaluator import (
     CoupledCriterionResult,
     CriteriaEvaluator,
     FindMinimumForceResult,
-    SSERRResult,
+    SteadyStateResult,
 )
 from weac.components import (
     Config,
@@ -183,8 +183,8 @@ class TestCriteriaEvaluator(unittest.TestCase):
         self.assertIsInstance(results, CoupledCriterionResult)
         self.assertGreater(results.critical_skier_weight, 0)
 
-    def test_evaluate_SSERR(self):
-        """Test the evaluate_SSERR method."""
+    def test_evaluate_SteadyState(self):
+        """Test the evaluate_SteadyState method."""
         segments = [
             Segment(length=self.segments_length, has_foundation=True, m=0),
             Segment(length=self.segments_length, has_foundation=True, m=0),
@@ -198,11 +198,17 @@ class TestCriteriaEvaluator(unittest.TestCase):
             ),
             config=Config(touchdown=True),
         )
-        results: SSERRResult = self.evaluator.evaluate_SSERR(system)
+        results: SteadyStateResult = self.evaluator.evaluate_SteadyState(system)
         self.assertTrue(results.converged)
-        self.assertGreater(results.SSERR, 0)
+        self.assertGreater(results.energy_release_rate, 0)
         self.assertGreater(results.touchdown_distance, 0)
         self.assertLess(results.touchdown_distance, system.scenario.L)
+        max_principal_stress_norm = (
+            results.maximal_stress_result.max_principal_stress_norm
+        )
+        max_Sxx_norm = results.maximal_stress_result.max_Sxx_norm
+        self.assertGreater(max_principal_stress_norm, 0)
+        self.assertGreater(max_Sxx_norm, 0)
 
     def test_find_minimum_crack_length(self):
         """Test the find_minimum_crack_length method."""
