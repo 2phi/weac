@@ -291,7 +291,7 @@ class Analyzer:
         return convert[unit] * Sxx_MPa
 
     @track_analyzer_call
-    def Txz(self, Z, phi, dz=2, unit="kPa"):
+    def Txz(self, Z, phi, dz=2, unit="kPa", normalize: bool = False):
         """
         Compute shear stress in slab layers.
 
@@ -305,6 +305,8 @@ class Analyzer:
             Element size along z-axis (mm). Default is 2 mm.
         unit : {'kPa', 'MPa'}, optional
             Desired output unit. Default is 'kPa'.
+        normalize : bool, optional
+            Toggle normalization. Default is False.
 
         Returns
         -------
@@ -342,14 +344,22 @@ class Analyzer:
 
         # Integrate -dsxx_dx along z and add cumulative weight load
         # to obtain shear stress Txz in MPa
-        Txz = cumulative_trapezoid(dsxx_dx, zi, axis=0, initial=0)
-        Txz += cumulative_trapezoid(qt, zi, initial=0)[:, None]
+        Txz_MPa = cumulative_trapezoid(dsxx_dx, zi, axis=0, initial=0)
+        Txz_MPa += cumulative_trapezoid(qt, zi, initial=0)[:, None]
+
+        # Normalize shear stresses to tensile strength
+        if normalize:
+            tensile_strength_kPa = zmesh["tensile_strength"]
+            tensile_strength_MPa = tensile_strength_kPa / 1e3
+            # Normalize shear stress to layers' tensile strength
+            normalized_Txz = Txz_MPa / tensile_strength_MPa[:, None]
+            return normalized_Txz
 
         # Return shear stress Txz in specified unit
-        return convert[unit] * Txz
+        return convert[unit] * Txz_MPa
 
     @track_analyzer_call
-    def Szz(self, Z, phi, dz=2, unit="kPa"):
+    def Szz(self, Z, phi, dz=2, unit="kPa", normalize: bool = False):
         """
         Compute transverse normal stress in slab layers.
 
@@ -363,6 +373,8 @@ class Analyzer:
             Element size along z-axis (mm). Default is 2 mm.
         unit : {'kPa', 'MPa'}, optional
             Desired output unit. Default is 'kPa'.
+        normalize : bool, optional
+            Toggle normalization. Default is False.
 
         Returns
         -------
@@ -402,11 +414,19 @@ class Analyzer:
         # Integrate dsxx_dxdx twice along z to obtain transverse
         # normal stress Szz in MPa
         integrand = cumulative_trapezoid(dsxx_dxdx, zi, axis=0, initial=0)
-        Szz = cumulative_trapezoid(integrand, zi, axis=0, initial=0)
-        Szz += cumulative_trapezoid(-qn, zi, initial=0)[:, None]
+        Szz_MPa = cumulative_trapezoid(integrand, zi, axis=0, initial=0)
+        Szz_MPa += cumulative_trapezoid(-qn, zi, initial=0)[:, None]
 
-        # Return shear stress txz in specified unit
-        return convert[unit] * Szz
+        # Normalize tensile stresses to tensile strength
+        if normalize:
+            tensile_strength_kPa = zmesh["tensile_strength"]
+            tensile_strength_MPa = tensile_strength_kPa / 1e3
+            # Normalize transverse normal stress to layers' tensile strength
+            normalized_Szz = Szz_MPa / tensile_strength_MPa[:, None]
+            return normalized_Szz
+
+        # Return transverse normal stress Szz in specified unit
+        return convert[unit] * Szz_MPa
 
     @track_analyzer_call
     def principal_stress_slab(
