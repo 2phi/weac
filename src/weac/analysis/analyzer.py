@@ -240,7 +240,9 @@ class Analyzer:
         unit : {'kPa', 'MPa'}, optional
             Desired output unit. Default is 'kPa'.
         normalize : bool, optional
-            Toggle normalization. Default is False.
+            Toggle normalization. If True, normalize stress values to the tensile strength of each layer (dimensionless).
+            When normalized, the `unit` parameter is ignored and values are returned as ratios.
+            Default is False.
 
         Returns
         -------
@@ -306,7 +308,8 @@ class Analyzer:
         unit : {'kPa', 'MPa'}, optional
             Desired output unit. Default is 'kPa'.
         normalize : bool, optional
-            Toggle normalization. Default is False.
+            Toggle normalization.  If True, normalize shear stress values to the tensile strength of each layer (dimensionless).
+            When normalized, the `unit` parameter is ignored and values are returned as ratios. Default is False.
 
         Returns
         -------
@@ -374,7 +377,9 @@ class Analyzer:
         unit : {'kPa', 'MPa'}, optional
             Desired output unit. Default is 'kPa'.
         normalize : bool, optional
-            Toggle normalization. Default is False.
+            Toggle normalization. If True, normalize stress values to the tensile strength of each layer (dimensionless).
+            When normalized, the `unit` parameter is ignored and values are returned as ratios.
+            Default is False.
 
         Returns
         -------

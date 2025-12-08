@@ -1215,7 +1215,20 @@ class CriteriaEvaluator:
         print_call_stats: bool = False,
     ) -> MaximalStressResult:
         """
-        Calculates the maximal stresses in the system.
+        Calculate the maximal stresses in the system.
+
+        Parameters
+        ----------
+        system : SystemModel
+            The system model to analyze.
+        print_call_stats : bool, optional
+            Whether to print analyzer call statistics. Default is False.
+
+        Returns
+        -------
+        MaximalStressResult
+            Object containing both absolute (in kPa) and normalized stress fields,
+            along with maximum normalized stress values.
         """
         analyzer = Analyzer(system, printing_enabled=print_call_stats)
         _, Z, _ = analyzer.rasterize_solution(num=4000)

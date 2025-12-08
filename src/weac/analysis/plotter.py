@@ -1183,17 +1183,21 @@ class Plotter:
             case "Sxx":
                 slab = analyzer.Sxx(z, phi, dz=dz, unit="kPa", normalize=normalize)
                 weak = np.zeros(xwl_finite.shape[0])
-                label = r"$\sigma_{xx}$ (kPa)"
+                label = (
+                    r"$\sigma_{xx}/\sigma_+$" if normalize else r"$\sigma_{xx}$ (kPa)"
+                )
             # Shear stresses (kPa)
             case "Txz":
                 slab = analyzer.Txz(z, phi, dz=dz, unit="kPa", normalize=normalize)
                 weak = Tauwl[nanmask]
-                label = r"$\tau_{xz}$ (kPa)"
+                label = r"$\tau_{xz}/\sigma_+$" if normalize else r"$\tau_{xz}$ (kPa)"
             # Transverse normal stresses (kPa)
             case "Szz":
                 slab = analyzer.Szz(z, phi, dz=dz, unit="kPa", normalize=normalize)
                 weak = Sigmawl[nanmask]
-                label = r"$\sigma_{zz}$ (kPa)"
+                label = (
+                    r"$\sigma_{zz}/\sigma_+$" if normalize else r"$\sigma_{zz}$ (kPa)"
+                )
             # Principal stresses
             case "principal":
                 slab = analyzer.principal_stress_slab(
