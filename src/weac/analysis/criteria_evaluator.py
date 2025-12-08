@@ -1244,6 +1244,10 @@ class CriteriaEvaluator:
         )
         max_principal_stress_norm = np.max(principal_stress_norm)
         max_Sxx_norm = np.max(Sxx_norm)
+        if print_call_stats:
+            analyzer.print_call_stats(
+                message="_calculate_maximal_stresses Call Statistics"
+            )
         return MaximalStressResult(
             principal_stress_kPa=principal_stress_kPa,
             Sxx_kPa=Sxx_kPa,
