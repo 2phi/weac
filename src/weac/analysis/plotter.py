@@ -1174,17 +1174,17 @@ class Plotter:
                 label = r"$w$ ($\mu$m)"
             # Axial normal stresses (kPa)
             case "Sxx":
-                slab = analyzer.Sxx(z, phi, dz=dz, unit="kPa")
+                slab = analyzer.Sxx(z, phi, dz=dz, unit="kPa", normalize=normalize)
                 weak = np.zeros(xwl_finite.shape[0])
                 label = r"$\sigma_{xx}$ (kPa)"
             # Shear stresses (kPa)
             case "Txz":
-                slab = analyzer.Txz(z, phi, dz=dz, unit="kPa")
+                slab = analyzer.Txz(z, phi, dz=dz, unit="kPa", normalize=normalize)
                 weak = Tauwl[nanmask]
                 label = r"$\tau_{xz}$ (kPa)"
             # Transverse normal stresses (kPa)
             case "Szz":
-                slab = analyzer.Szz(z, phi, dz=dz, unit="kPa")
+                slab = analyzer.Szz(z, phi, dz=dz, unit="kPa", normalize=normalize)
                 weak = Sigmawl[nanmask]
                 label = r"$\sigma_{zz}$ (kPa)"
             # Principal stresses
