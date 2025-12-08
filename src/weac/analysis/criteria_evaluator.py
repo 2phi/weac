@@ -724,7 +724,11 @@ class CriteriaEvaluator:
         touchdown_distance = system_copy.slab_touchdown.touchdown_distance
         analyzer = Analyzer(system_copy, printing_enabled=print_call_stats)
         energy_release_rate, _, _ = analyzer.differential_ERR(unit="J/m^2")
-        maximal_stress_result = self._calculate_maximal_stresses(system_copy)
+        maximal_stress_result = self._calculate_maximal_stresses(
+            system_copy, print_call_stats=print_call_stats
+        )
+        if print_call_stats:
+            analyzer.print_call_stats(message="evaluate_SteadyState Call Statistics")
         return SteadyStateResult(
             converged=True,
             message="Steady State evaluation successful.",
@@ -1231,7 +1235,7 @@ class CriteriaEvaluator:
             along with maximum normalized stress values.
         """
         analyzer = Analyzer(system, printing_enabled=print_call_stats)
-        _, Z, _ = analyzer.rasterize_solution(num=4000)
+        _, Z, _ = analyzer.rasterize_solution(num=4000, mode="cracked")
         Sxx_kPa = analyzer.Sxx(Z=Z, phi=system.scenario.phi, dz=5, unit="kPa")
         principal_stress_kPa = analyzer.principal_stress_slab(
             Z=Z, phi=system.scenario.phi, dz=5, unit="kPa"

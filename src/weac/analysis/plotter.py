@@ -1061,10 +1061,12 @@ class Plotter:
             Solution vector.
         analyzer : Analyzer
             Analyzer instance.
-        dz : int, optional
-            Element size along z-axis (mm). Default is 2 mm.
         weaklayer_proportion: float | None, optional
             Proportion of the plot to allocate to the weak layer. Default is None.
+        dz : int, optional
+            Element size along z-axis (mm). Default is 2 mm.
+        levels : int, optional
+            Number of levels for the colormap. Default is 300.
         field : str, optional
             Field to plot ('w', 'u', 'principal', 'Sxx', 'Txz', 'Szz'). Default is 'w'.
         normalize : bool, optional
