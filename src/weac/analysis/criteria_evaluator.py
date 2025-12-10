@@ -95,9 +95,38 @@ class CoupledCriterionResult:
 
 
 @dataclass
-class SSERRResult:
+class MaximalStressResult:
     """
-    Holds the results of the SSERR evaluation.
+    Holds the results of the maximal stress evaluation.
+
+    Attributes:
+    -----------
+    principal_stress_kPa: np.ndarray
+        The principal stress in kPa.
+    Sxx_kPa: np.ndarray
+        The axial normal stress in kPa.
+    principal_stress_norm: np.ndarray
+        The normalized principal stress to the tensile strength of the layers.
+    Sxx_norm: np.ndarray
+        The normalized axial normal stress to the tensile strength of the layers.
+    max_principal_stress_norm: float
+        The normalized maximum principal stress to the tensile strength of the layers.
+    max_Sxx_norm: float
+        The normalized maximum axial normal stress to the tensile strength of the layers.
+    """
+
+    principal_stress_kPa: np.ndarray
+    Sxx_kPa: np.ndarray
+    principal_stress_norm: np.ndarray
+    Sxx_norm: np.ndarray
+    max_principal_stress_norm: float
+    max_Sxx_norm: float
+
+
+@dataclass
+class SteadyStateResult:
+    """
+    Holds the results of the Steady State evaluation.
 
     Attributes:
     -----------
@@ -107,15 +136,21 @@ class SSERRResult:
         The message of the evaluation.
     touchdown_distance : float
         The touchdown distance.
-    SSERR : float
-        The Steady-State Energy Release Rate calculated with the
-        touchdown distance from G_I and G_II.
+    energy_release_rate : float
+        The steady-state energy release rate calculated with the
+        touchdown distance from the differential energy release rate.
+    maximal_stress_result: MaximalStressResult
+        The maximal stresses in the system at the touchdown distance.
+    system: SystemModel
+        The modified system model used for the steady state evaluation.
     """
 
     converged: bool
     message: str
     touchdown_distance: float
-    SSERR: float
+    energy_release_rate: float
+    maximal_stress_result: MaximalStressResult
+    system: SystemModel
 
 
 @dataclass
@@ -641,12 +676,12 @@ class CriteriaEvaluator:
             _recursion_depth=_recursion_depth + 1,
         )
 
-    def evaluate_SSERR(
+    def evaluate_SteadyState(
         self,
         system: SystemModel,
         vertical: bool = False,
         print_call_stats: bool = False,
-    ) -> SSERRResult:
+    ) -> SteadyStateResult:
         """
         Evaluates the Touchdown Distance in the Steady State and the Steady State
         Energy Release Rate.
@@ -688,12 +723,19 @@ class CriteriaEvaluator:
         system_copy.update_scenario(segments=segments, scenario_config=scenario_config)
         touchdown_distance = system_copy.slab_touchdown.touchdown_distance
         analyzer = Analyzer(system_copy, printing_enabled=print_call_stats)
-        G, _, _ = analyzer.differential_ERR(unit="J/m^2")
-        return SSERRResult(
+        energy_release_rate, _, _ = analyzer.differential_ERR(unit="J/m^2")
+        maximal_stress_result = self._calculate_maximal_stresses(
+            system_copy, print_call_stats=print_call_stats
+        )
+        if print_call_stats:
+            analyzer.print_call_stats(message="evaluate_SteadyState Call Statistics")
+        return SteadyStateResult(
             converged=True,
-            message="SSERR evaluation successful.",
+            message="Steady State evaluation successful.",
             touchdown_distance=touchdown_distance,
-            SSERR=G,
+            energy_release_rate=energy_release_rate,
+            maximal_stress_result=maximal_stress_result,
+            system=system_copy,
         )
 
     def find_minimum_force(
@@ -1170,3 +1212,51 @@ class CriteriaEvaluator:
 
         # Return the difference from the target
         return g_delta_diff - target
+
+    def _calculate_maximal_stresses(
+        self,
+        system: SystemModel,
+        print_call_stats: bool = False,
+    ) -> MaximalStressResult:
+        """
+        Calculate the maximal stresses in the system.
+
+        Parameters
+        ----------
+        system : SystemModel
+            The system model to analyze.
+        print_call_stats : bool, optional
+            Whether to print analyzer call statistics. Default is False.
+
+        Returns
+        -------
+        MaximalStressResult
+            Object containing both absolute (in kPa) and normalized stress fields,
+            along with maximum normalized stress values.
+        """
+        analyzer = Analyzer(system, printing_enabled=print_call_stats)
+        _, Z, _ = analyzer.rasterize_solution(num=4000, mode="cracked")
+        Sxx_kPa = analyzer.Sxx(Z=Z, phi=system.scenario.phi, dz=5, unit="kPa")
+        principal_stress_kPa = analyzer.principal_stress_slab(
+            Z=Z, phi=system.scenario.phi, dz=5, unit="kPa"
+        )
+        Sxx_norm = analyzer.Sxx(
+            Z=Z, phi=system.scenario.phi, dz=5, unit="kPa", normalize=True
+        )
+        principal_stress_norm = analyzer.principal_stress_slab(
+            Z=Z, phi=system.scenario.phi, dz=5, unit="kPa", normalize=True
+        )
+        max_principal_stress_norm = np.max(principal_stress_norm)
+        max_Sxx_norm = np.max(Sxx_norm)
+        if print_call_stats:
+            analyzer.print_call_stats(
+                message="_calculate_maximal_stresses Call Statistics"
+            )
+        return MaximalStressResult(
+            principal_stress_kPa=principal_stress_kPa,
+            Sxx_kPa=Sxx_kPa,
+            principal_stress_norm=principal_stress_norm,
+            Sxx_norm=Sxx_norm,
+            max_principal_stress_norm=max_principal_stress_norm,
+            max_Sxx_norm=max_Sxx_norm,
+        )

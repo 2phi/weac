@@ -416,13 +416,13 @@ class TestRegressionSimulation(unittest.TestCase):
         self.assertAlmostEqual(fm.max_dist_stress, 1.0000189267255666, places=6)
         self.assertLess(fm.min_dist_stress, 1.0)
 
-        # evaluate_SSERR baseline
-        ss = evaluator.evaluate_SSERR(system=sm, vertical=False)
+        # evaluate_SteadyState baseline
+        ss = evaluator.evaluate_SteadyState(system=sm, vertical=False)
         self.assertTrue(ss.converged)
         self.assertGreater(ss.touchdown_distance, 0)
         # Baseline values recorded
         self.assertAlmostEqual(ss.touchdown_distance, 1265.551924690803, places=6)
-        np.testing.assert_allclose(ss.SSERR, 2.123992, rtol=1e-6, atol=0)
+        np.testing.assert_allclose(ss.energy_release_rate, 2.123992, rtol=1e-6, atol=0)
 
         # evaluate_coupled_criterion baseline
         cc = evaluator.evaluate_coupled_criterion(system=sm, max_iterations=10)

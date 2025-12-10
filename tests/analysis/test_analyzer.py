@@ -79,6 +79,42 @@ class TestAnalyzer(unittest.TestCase):
         self.assertTrue(np.isfinite(Txz).all())
         self.assertTrue(np.isfinite(Szz).all())
 
+    def test_stress_fields_unit_conversion(self):
+        """Test stress fields unit conversion."""
+        _, Z, _ = self.an_ski.rasterize_solution(num=150)
+        phi = self.sm_ski.scenario.phi
+        Sxx_kPa = self.an_ski.Sxx(Z=Z, phi=phi, dz=5, unit="kPa")
+        Sxx_MPa = self.an_ski.Sxx(Z=Z, phi=phi, dz=5, unit="MPa")
+        self.assertEqual(Sxx_kPa.shape, Sxx_MPa.shape)
+        np.testing.assert_array_almost_equal(Sxx_kPa, Sxx_MPa * 1e3, decimal=8)
+        principal_stress_MPa = self.an_ski.principal_stress_slab(
+            Z=Z, phi=phi, dz=5, unit="MPa"
+        )
+        principal_stress_kPa = self.an_ski.principal_stress_slab(
+            Z=Z, phi=phi, dz=5, unit="kPa"
+        )
+        self.assertEqual(principal_stress_MPa.shape, principal_stress_kPa.shape)
+        np.testing.assert_array_almost_equal(
+            principal_stress_MPa * 1e3, principal_stress_kPa, decimal=8
+        )
+        # Test normalized is the same irrespective of unit
+        Sxx_kPa_norm = self.an_ski.Sxx(Z=Z, phi=phi, dz=5, unit="kPa", normalize=True)
+        Sxx_MPa_norm = self.an_ski.Sxx(Z=Z, phi=phi, dz=5, unit="MPa", normalize=True)
+        self.assertEqual(Sxx_kPa_norm.shape, Sxx_MPa_norm.shape)
+        np.testing.assert_array_almost_equal(Sxx_kPa_norm, Sxx_MPa_norm, decimal=8)
+        principal_stress_MPa_norm = self.an_ski.principal_stress_slab(
+            Z=Z, phi=phi, dz=5, unit="MPa", normalize=True
+        )
+        principal_stress_kPa_norm = self.an_ski.principal_stress_slab(
+            Z=Z, phi=phi, dz=5, unit="kPa", normalize=True
+        )
+        self.assertEqual(
+            principal_stress_MPa_norm.shape, principal_stress_kPa_norm.shape
+        )
+        np.testing.assert_array_almost_equal(
+            principal_stress_MPa_norm, principal_stress_kPa_norm, decimal=8
+        )
+
     def test_principal_stress_slab_variants(self):
         """Test principal stress slab variants."""
         _, Z, _ = self.an_ski.rasterize_solution(num=120)
