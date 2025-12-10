@@ -266,9 +266,9 @@ class Analyzer:
 
         # Compute axial normal stress Sxx at grid points in MPa
         for i, z in enumerate(zi):
-            E = zmesh["E"][i]
+            E_MPa = zmesh["E"][i]
             nu = zmesh["nu"][i]
-            Sxx_MPa[i, :] = E / (1 - nu**2) * self.sm.fq.du_dx(Z, z)
+            Sxx_MPa[i, :] = E_MPa / (1 - nu**2) * self.sm.fq.du_dx(Z, z)
 
         # Calculate weight load at grid points and superimpose on stress field
         qt = -rho * G_MM_S2 * np.sin(np.deg2rad(phi))

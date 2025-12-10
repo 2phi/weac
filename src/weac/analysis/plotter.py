@@ -1293,7 +1293,7 @@ class Plotter:
             np.zeros((2, xwl_cracked.shape[0])),
             levels=levels,
             cmap=cmap,
-            extend="max",
+            extend="both",
         )
 
         # Plot setup
