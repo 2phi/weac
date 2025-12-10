@@ -259,7 +259,7 @@ point.</p>
 </dd></dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="weac.analysis.analyzer.Analyzer.Sxx">
-<span class="sig-name descname"><span class="pre">Sxx</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">Z</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">phi</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dz</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">unit</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'kPa'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/weac/analysis/analyzer.html#Analyzer.Sxx"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#weac.analysis.analyzer.Analyzer.Sxx" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#weac.analysis.analyzer.Analyzer.Sxx'">¶</a></dt>
+<span class="sig-name descname"><span class="pre">Sxx</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">Z</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">phi</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dz</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">unit</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'kPa'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">normalize</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/weac/analysis/analyzer.html#Analyzer.Sxx"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#weac.analysis.analyzer.Analyzer.Sxx" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#weac.analysis.analyzer.Analyzer.Sxx'">¶</a></dt>
 <dd><p>Compute axial normal stress in slab layers.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -268,6 +268,9 @@ point.</p>
 <li><p><strong>phi</strong> (<em>float</em>) – Inclination (degrees). Counterclockwise positive.</p></li>
 <li><p><strong>dz</strong> (<em>float</em><em>, </em><em>optional</em>) – Element size along z-axis (mm). Default is 2 mm.</p></li>
 <li><p><strong>unit</strong> (<em>{'kPa'</em><em>, </em><em>'MPa'}</em><em>, </em><em>optional</em>) – Desired output unit. Default is ‘kPa’.</p></li>
+<li><p><strong>normalize</strong> (<em>bool</em><em>, </em><em>optional</em>) – Toggle normalization. If True, normalize stress values to the tensile strength of each layer (dimensionless).
+When normalized, the <cite>unit</cite> parameter is ignored and values are returned as ratios.
+Default is False.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
@@ -280,7 +283,7 @@ point.</p>
 </dd></dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="weac.analysis.analyzer.Analyzer.Txz">
-<span class="sig-name descname"><span class="pre">Txz</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">Z</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">phi</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dz</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">unit</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'kPa'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/weac/analysis/analyzer.html#Analyzer.Txz"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#weac.analysis.analyzer.Analyzer.Txz" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#weac.analysis.analyzer.Analyzer.Txz'">¶</a></dt>
+<span class="sig-name descname"><span class="pre">Txz</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">Z</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">phi</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dz</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">unit</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'kPa'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">normalize</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/weac/analysis/analyzer.html#Analyzer.Txz"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#weac.analysis.analyzer.Analyzer.Txz" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#weac.analysis.analyzer.Analyzer.Txz'">¶</a></dt>
 <dd><p>Compute shear stress in slab layers.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -289,6 +292,8 @@ point.</p>
 <li><p><strong>phi</strong> (<em>float</em>) – Inclination (degrees). Counterclockwise positive.</p></li>
 <li><p><strong>dz</strong> (<em>float</em><em>, </em><em>optional</em>) – Element size along z-axis (mm). Default is 2 mm.</p></li>
 <li><p><strong>unit</strong> (<em>{'kPa'</em><em>, </em><em>'MPa'}</em><em>, </em><em>optional</em>) – Desired output unit. Default is ‘kPa’.</p></li>
+<li><p><strong>normalize</strong> (<em>bool</em><em>, </em><em>optional</em>) – Toggle normalization.  If True, normalize shear stress values to the tensile strength of each layer (dimensionless).
+When normalized, the <cite>unit</cite> parameter is ignored and values are returned as ratios. Default is False.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
@@ -301,7 +306,7 @@ point.</p>
 </dd></dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="weac.analysis.analyzer.Analyzer.Szz">
-<span class="sig-name descname"><span class="pre">Szz</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">Z</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">phi</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dz</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">unit</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'kPa'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/weac/analysis/analyzer.html#Analyzer.Szz"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#weac.analysis.analyzer.Analyzer.Szz" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#weac.analysis.analyzer.Analyzer.Szz'">¶</a></dt>
+<span class="sig-name descname"><span class="pre">Szz</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">Z</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">phi</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dz</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">unit</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'kPa'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">normalize</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/weac/analysis/analyzer.html#Analyzer.Szz"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#weac.analysis.analyzer.Analyzer.Szz" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#weac.analysis.analyzer.Analyzer.Szz'">¶</a></dt>
 <dd><p>Compute transverse normal stress in slab layers.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -310,6 +315,9 @@ point.</p>
 <li><p><strong>phi</strong> (<em>float</em>) – Inclination (degrees). Counterclockwise positive.</p></li>
 <li><p><strong>dz</strong> (<em>float</em><em>, </em><em>optional</em>) – Element size along z-axis (mm). Default is 2 mm.</p></li>
 <li><p><strong>unit</strong> (<em>{'kPa'</em><em>, </em><em>'MPa'}</em><em>, </em><em>optional</em>) – Desired output unit. Default is ‘kPa’.</p></li>
+<li><p><strong>normalize</strong> (<em>bool</em><em>, </em><em>optional</em>) – Toggle normalization. If True, normalize stress values to the tensile strength of each layer (dimensionless).
+When normalized, the <cite>unit</cite> parameter is ignored and values are returned as ratios.
+Default is False.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>

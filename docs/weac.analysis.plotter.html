@@ -311,6 +311,33 @@ and rotated by the specified angle.</p>
 </dl>
 </dd></dl>
 <dl class="py method">
+<dt class="sig sig-object py" id="weac.analysis.plotter.Plotter.plot_visualize_deformation">
+<span class="sig-name descname"><span class="pre">plot_visualize_deformation</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">xsl</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">xwl</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">z</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">analyzer</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">weaklayer_proportion</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dz</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">levels</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">300</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">field</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'w'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">normalize</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filename</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'visualize_deformation'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/weac/analysis/plotter.html#Plotter.plot_visualize_deformation"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#weac.analysis.plotter.Plotter.plot_visualize_deformation" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#weac.analysis.plotter.Plotter.plot_visualize_deformation'">¶</a></dt>
+<dd><p>Plot visualize deformation of the slab and weak layer.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>xsl</strong> (<em>np.ndarray</em>) – Slab x-coordinates.</p></li>
+<li><p><strong>xwl</strong> (<em>np.ndarray</em>) – Weak layer x-coordinates.</p></li>
+<li><p><strong>z</strong> (<em>np.ndarray</em>) – Solution vector.</p></li>
+<li><p><strong>analyzer</strong> (<a class="reference internal" href="weac.analysis.html#weac.analysis.Analyzer" title="weac.analysis.Analyzer"><em>Analyzer</em></a>) – Analyzer instance.</p></li>
+<li><p><strong>weaklayer_proportion</strong> (<em>float</em><em> | </em><em>None</em><em>, </em><em>optional</em>) – Proportion of the plot to allocate to the weak layer. Default is None.</p></li>
+<li><p><strong>dz</strong> (<em>int</em><em>, </em><em>optional</em>) – Element size along z-axis (mm). Default is 2 mm.</p></li>
+<li><p><strong>levels</strong> (<em>int</em><em>, </em><em>optional</em>) – Number of levels for the colormap. Default is 300.</p></li>
+<li><p><strong>field</strong> (<em>str</em><em>, </em><em>optional</em>) – Field to plot (‘w’, ‘u’, ‘principal’, ‘Sxx’, ‘Txz’, ‘Szz’). Default is ‘w’.</p></li>
+<li><p><strong>normalize</strong> (<em>bool</em><em>, </em><em>optional</em>) – Toggle normalization. Default is True.</p></li>
+<li><p><strong>filename</strong> (<em>str</em><em>, </em><em>optional</em>) – Filename for saving plot. Default is “visualize_deformation”.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The generated plot figure.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>matplotlib.figure.Figure</p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="py method">
 <dt class="sig sig-object py" id="weac.analysis.plotter.Plotter.plot_stress_envelope">
 <span class="sig-name descname"><span class="pre">plot_stress_envelope</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">system_model</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">criteria_evaluator</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">all_envelopes</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filename</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/weac/analysis/plotter.html#Plotter.plot_stress_envelope"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#weac.analysis.plotter.Plotter.plot_stress_envelope" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#weac.analysis.plotter.Plotter.plot_stress_envelope'">¶</a></dt>
 <dd><p>Plot stress envelope in τ-σ space.</p>
@@ -511,6 +538,7 @@ and rotated by the specified angle.</p>
 <li><a :data-current="activeSection === '#weac.analysis.plotter.Plotter.plot_section_forces'" class="reference internal" href="#weac.analysis.plotter.Plotter.plot_section_forces"><code class="docutils literal notranslate"><span class="pre">Plotter.plot_section_forces()</span></code></a></li>
 <li><a :data-current="activeSection === '#weac.analysis.plotter.Plotter.plot_energy_release_rates'" class="reference internal" href="#weac.analysis.plotter.Plotter.plot_energy_release_rates"><code class="docutils literal notranslate"><span class="pre">Plotter.plot_energy_release_rates()</span></code></a></li>
 <li><a :data-current="activeSection === '#weac.analysis.plotter.Plotter.plot_deformed'" class="reference internal" href="#weac.analysis.plotter.Plotter.plot_deformed"><code class="docutils literal notranslate"><span class="pre">Plotter.plot_deformed()</span></code></a></li>
+<li><a :data-current="activeSection === '#weac.analysis.plotter.Plotter.plot_visualize_deformation'" class="reference internal" href="#weac.analysis.plotter.Plotter.plot_visualize_deformation"><code class="docutils literal notranslate"><span class="pre">Plotter.plot_visualize_deformation()</span></code></a></li>
 <li><a :data-current="activeSection === '#weac.analysis.plotter.Plotter.plot_stress_envelope'" class="reference internal" href="#weac.analysis.plotter.Plotter.plot_stress_envelope"><code class="docutils literal notranslate"><span class="pre">Plotter.plot_stress_envelope()</span></code></a></li>
 <li><a :data-current="activeSection === '#weac.analysis.plotter.Plotter.plot_err_envelope'" class="reference internal" href="#weac.analysis.plotter.Plotter.plot_err_envelope"><code class="docutils literal notranslate"><span class="pre">Plotter.plot_err_envelope()</span></code></a></li>
 <li><a :data-current="activeSection === '#weac.analysis.plotter.Plotter.plot_analysis'" class="reference internal" href="#weac.analysis.plotter.Plotter.plot_analysis"><code class="docutils literal notranslate"><span class="pre">Plotter.plot_analysis()</span></code></a></li>

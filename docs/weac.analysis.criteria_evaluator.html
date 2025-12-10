@@ -355,12 +355,90 @@ fracture criteria based on the model results.</p>
 </dl>
 </dd></dl>
 <dl class="py class">
-<dt class="sig sig-object py" id="weac.analysis.criteria_evaluator.SSERRResult">
-<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">weac.analysis.criteria_evaluator.</span></span><span class="sig-name descname"><span class="pre">SSERRResult</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">converged</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">message</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">touchdown_distance</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">SSERR</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/weac/analysis/criteria_evaluator.html#SSERRResult"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#weac.analysis.criteria_evaluator.SSERRResult" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#weac.analysis.criteria_evaluator.SSERRResult'">¶</a></dt>
+<dt class="sig sig-object py" id="weac.analysis.criteria_evaluator.MaximalStressResult">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">weac.analysis.criteria_evaluator.</span></span><span class="sig-name descname"><span class="pre">MaximalStressResult</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">principal_stress_kPa</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Sxx_kPa</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">principal_stress_norm</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Sxx_norm</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_principal_stress_norm</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_Sxx_norm</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/weac/analysis/criteria_evaluator.html#MaximalStressResult"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#weac.analysis.criteria_evaluator.MaximalStressResult" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#weac.analysis.criteria_evaluator.MaximalStressResult'">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
-<p>Holds the results of the SSERR evaluation.</p>
+<p>Holds the results of the maximal stress evaluation.</p>
 <section id="id1">
 <h2>Attributes:<a class="headerlink" href="#id1" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id1'">¶</a></h2>
+<dl class="simple">
+<dt>principal_stress_kPa: np.ndarray</dt><dd><p>The principal stress in kPa.</p>
+</dd>
+<dt>Sxx_kPa: np.ndarray</dt><dd><p>The axial normal stress in kPa.</p>
+</dd>
+<dt>principal_stress_norm: np.ndarray</dt><dd><p>The normalized principal stress to the tensile strength of the layers.</p>
+</dd>
+<dt>Sxx_norm: np.ndarray</dt><dd><p>The normalized axial normal stress to the tensile strength of the layers.</p>
+</dd>
+<dt>max_principal_stress_norm: float</dt><dd><p>The normalized maximum principal stress to the tensile strength of the layers.</p>
+</dd>
+<dt>max_Sxx_norm: float</dt><dd><p>The normalized maximum axial normal stress to the tensile strength of the layers.</p>
+</dd>
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="weac.analysis.criteria_evaluator.MaximalStressResult.principal_stress_kPa">
+<span class="sig-name descname"><span class="pre">principal_stress_kPa</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">ndarray</span></em><a class="headerlink" href="#weac.analysis.criteria_evaluator.MaximalStressResult.principal_stress_kPa" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#weac.analysis.criteria_evaluator.MaximalStressResult.principal_stress_kPa'">¶</a></dt>
+<dd></dd></dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="weac.analysis.criteria_evaluator.MaximalStressResult.Sxx_kPa">
+<span class="sig-name descname"><span class="pre">Sxx_kPa</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">ndarray</span></em><a class="headerlink" href="#weac.analysis.criteria_evaluator.MaximalStressResult.Sxx_kPa" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#weac.analysis.criteria_evaluator.MaximalStressResult.Sxx_kPa'">¶</a></dt>
+<dd></dd></dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="weac.analysis.criteria_evaluator.MaximalStressResult.principal_stress_norm">
+<span class="sig-name descname"><span class="pre">principal_stress_norm</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">ndarray</span></em><a class="headerlink" href="#weac.analysis.criteria_evaluator.MaximalStressResult.principal_stress_norm" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#weac.analysis.criteria_evaluator.MaximalStressResult.principal_stress_norm'">¶</a></dt>
+<dd></dd></dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="weac.analysis.criteria_evaluator.MaximalStressResult.Sxx_norm">
+<span class="sig-name descname"><span class="pre">Sxx_norm</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">ndarray</span></em><a class="headerlink" href="#weac.analysis.criteria_evaluator.MaximalStressResult.Sxx_norm" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#weac.analysis.criteria_evaluator.MaximalStressResult.Sxx_norm'">¶</a></dt>
+<dd></dd></dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="weac.analysis.criteria_evaluator.MaximalStressResult.max_principal_stress_norm">
+<span class="sig-name descname"><span class="pre">max_principal_stress_norm</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><a class="headerlink" href="#weac.analysis.criteria_evaluator.MaximalStressResult.max_principal_stress_norm" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#weac.analysis.criteria_evaluator.MaximalStressResult.max_principal_stress_norm'">¶</a></dt>
+<dd></dd></dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="weac.analysis.criteria_evaluator.MaximalStressResult.max_Sxx_norm">
+<span class="sig-name descname"><span class="pre">max_Sxx_norm</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><a class="headerlink" href="#weac.analysis.criteria_evaluator.MaximalStressResult.max_Sxx_norm" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#weac.analysis.criteria_evaluator.MaximalStressResult.max_Sxx_norm'">¶</a></dt>
+<dd></dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="weac.analysis.criteria_evaluator.MaximalStressResult.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">principal_stress_kPa</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Sxx_kPa</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">principal_stress_norm</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Sxx_norm</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_principal_stress_norm</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_Sxx_norm</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#weac.analysis.criteria_evaluator.MaximalStressResult.__init__" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#weac.analysis.criteria_evaluator.MaximalStressResult.__init__'">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>principal_stress_kPa</strong> (<em>ndarray</em>)</p></li>
+<li><p><strong>Sxx_kPa</strong> (<em>ndarray</em>)</p></li>
+<li><p><strong>principal_stress_norm</strong> (<em>ndarray</em>)</p></li>
+<li><p><strong>Sxx_norm</strong> (<em>ndarray</em>)</p></li>
+<li><p><strong>max_principal_stress_norm</strong> (<em>float</em>)</p></li>
+<li><p><strong>max_Sxx_norm</strong> (<em>float</em>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+</section>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>principal_stress_kPa</strong> (<em>ndarray</em>)</p></li>
+<li><p><strong>Sxx_kPa</strong> (<em>ndarray</em>)</p></li>
+<li><p><strong>principal_stress_norm</strong> (<em>ndarray</em>)</p></li>
+<li><p><strong>Sxx_norm</strong> (<em>ndarray</em>)</p></li>
+<li><p><strong>max_principal_stress_norm</strong> (<em>float</em>)</p></li>
+<li><p><strong>max_Sxx_norm</strong> (<em>float</em>)</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+<dl class="py class">
+<dt class="sig sig-object py" id="weac.analysis.criteria_evaluator.SteadyStateResult">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">weac.analysis.criteria_evaluator.</span></span><span class="sig-name descname"><span class="pre">SteadyStateResult</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">converged</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">message</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">touchdown_distance</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">energy_release_rate</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">maximal_stress_result</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">system</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/weac/analysis/criteria_evaluator.html#SteadyStateResult"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#weac.analysis.criteria_evaluator.SteadyStateResult" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#weac.analysis.criteria_evaluator.SteadyStateResult'">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Holds the results of the Steady State evaluation.</p>
+<section id="id2">
+<h2>Attributes:<a class="headerlink" href="#id2" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id2'">¶</a></h2>
 <dl class="simple">
 <dt>converged<span class="classifier">bool</span></dt><dd><p>Whether the algorithm converged.</p>
 </dd>
@@ -368,36 +446,50 @@ fracture criteria based on the model results.</p>
 </dd>
 <dt>touchdown_distance<span class="classifier">float</span></dt><dd><p>The touchdown distance.</p>
 </dd>
-<dt>SSERR<span class="classifier">float</span></dt><dd><p>The Steady-State Energy Release Rate calculated with the
-touchdown distance from G_I and G_II.</p>
+<dt>energy_release_rate<span class="classifier">float</span></dt><dd><p>The steady-state energy release rate calculated with the
+touchdown distance from the differential energy release rate.</p>
+</dd>
+<dt>maximal_stress_result: MaximalStressResult</dt><dd><p>The maximal stresses in the system at the touchdown distance.</p>
+</dd>
+<dt>system: SystemModel</dt><dd><p>The modified system model used for the steady state evaluation.</p>
 </dd>
 </dl>
 <dl class="py attribute">
-<dt class="sig sig-object py" id="weac.analysis.criteria_evaluator.SSERRResult.converged">
-<span class="sig-name descname"><span class="pre">converged</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></em><a class="headerlink" href="#weac.analysis.criteria_evaluator.SSERRResult.converged" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#weac.analysis.criteria_evaluator.SSERRResult.converged'">¶</a></dt>
+<dt class="sig sig-object py" id="weac.analysis.criteria_evaluator.SteadyStateResult.converged">
+<span class="sig-name descname"><span class="pre">converged</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></em><a class="headerlink" href="#weac.analysis.criteria_evaluator.SteadyStateResult.converged" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#weac.analysis.criteria_evaluator.SteadyStateResult.converged'">¶</a></dt>
 <dd></dd></dl>
 <dl class="py attribute">
-<dt class="sig sig-object py" id="weac.analysis.criteria_evaluator.SSERRResult.message">
-<span class="sig-name descname"><span class="pre">message</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#weac.analysis.criteria_evaluator.SSERRResult.message" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#weac.analysis.criteria_evaluator.SSERRResult.message'">¶</a></dt>
+<dt class="sig sig-object py" id="weac.analysis.criteria_evaluator.SteadyStateResult.message">
+<span class="sig-name descname"><span class="pre">message</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#weac.analysis.criteria_evaluator.SteadyStateResult.message" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#weac.analysis.criteria_evaluator.SteadyStateResult.message'">¶</a></dt>
 <dd></dd></dl>
 <dl class="py attribute">
-<dt class="sig sig-object py" id="weac.analysis.criteria_evaluator.SSERRResult.touchdown_distance">
-<span class="sig-name descname"><span class="pre">touchdown_distance</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><a class="headerlink" href="#weac.analysis.criteria_evaluator.SSERRResult.touchdown_distance" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#weac.analysis.criteria_evaluator.SSERRResult.touchdown_distance'">¶</a></dt>
+<dt class="sig sig-object py" id="weac.analysis.criteria_evaluator.SteadyStateResult.touchdown_distance">
+<span class="sig-name descname"><span class="pre">touchdown_distance</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><a class="headerlink" href="#weac.analysis.criteria_evaluator.SteadyStateResult.touchdown_distance" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#weac.analysis.criteria_evaluator.SteadyStateResult.touchdown_distance'">¶</a></dt>
 <dd></dd></dl>
 <dl class="py attribute">
-<dt class="sig sig-object py" id="weac.analysis.criteria_evaluator.SSERRResult.SSERR">
-<span class="sig-name descname"><span class="pre">SSERR</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><a class="headerlink" href="#weac.analysis.criteria_evaluator.SSERRResult.SSERR" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#weac.analysis.criteria_evaluator.SSERRResult.SSERR'">¶</a></dt>
+<dt class="sig sig-object py" id="weac.analysis.criteria_evaluator.SteadyStateResult.energy_release_rate">
+<span class="sig-name descname"><span class="pre">energy_release_rate</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><a class="headerlink" href="#weac.analysis.criteria_evaluator.SteadyStateResult.energy_release_rate" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#weac.analysis.criteria_evaluator.SteadyStateResult.energy_release_rate'">¶</a></dt>
+<dd></dd></dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="weac.analysis.criteria_evaluator.SteadyStateResult.maximal_stress_result">
+<span class="sig-name descname"><span class="pre">maximal_stress_result</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="#weac.analysis.criteria_evaluator.MaximalStressResult" title="weac.analysis.criteria_evaluator.MaximalStressResult"><span class="pre">MaximalStressResult</span></a></em><a class="headerlink" href="#weac.analysis.criteria_evaluator.SteadyStateResult.maximal_stress_result" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#weac.analysis.criteria_evaluator.SteadyStateResult.maximal_stress_result'">¶</a></dt>
+<dd></dd></dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="weac.analysis.criteria_evaluator.SteadyStateResult.system">
+<span class="sig-name descname"><span class="pre">system</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="weac.core.system_model.html#weac.core.system_model.SystemModel" title="weac.core.system_model.SystemModel"><span class="pre">SystemModel</span></a></em><a class="headerlink" href="#weac.analysis.criteria_evaluator.SteadyStateResult.system" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#weac.analysis.criteria_evaluator.SteadyStateResult.system'">¶</a></dt>
 <dd></dd></dl>
 <dl class="py method">
-<dt class="sig sig-object py" id="weac.analysis.criteria_evaluator.SSERRResult.__init__">
-<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">converged</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">message</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">touchdown_distance</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">SSERR</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#weac.analysis.criteria_evaluator.SSERRResult.__init__" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#weac.analysis.criteria_evaluator.SSERRResult.__init__'">¶</a></dt>
+<dt class="sig sig-object py" id="weac.analysis.criteria_evaluator.SteadyStateResult.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">converged</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">message</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">touchdown_distance</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">energy_release_rate</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">maximal_stress_result</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">system</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#weac.analysis.criteria_evaluator.SteadyStateResult.__init__" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#weac.analysis.criteria_evaluator.SteadyStateResult.__init__'">¶</a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>converged</strong> (<em>bool</em>)</p></li>
 <li><p><strong>message</strong> (<em>str</em>)</p></li>
 <li><p><strong>touchdown_distance</strong> (<em>float</em>)</p></li>
-<li><p><strong>SSERR</strong> (<em>float</em>)</p></li>
+<li><p><strong>energy_release_rate</strong> (<em>float</em>)</p></li>
+<li><p><strong>maximal_stress_result</strong> (<a class="reference internal" href="#weac.analysis.criteria_evaluator.MaximalStressResult" title="weac.analysis.criteria_evaluator.MaximalStressResult"><em>MaximalStressResult</em></a>)</p></li>
+<li><p><strong>system</strong> (<a class="reference internal" href="weac.core.system_model.html#weac.core.system_model.SystemModel" title="weac.core.system_model.SystemModel"><em>SystemModel</em></a>)</p></li>
 </ul>
 </dd>
 <dt class="field-even">Return type<span class="colon">:</span></dt>
@@ -412,7 +504,9 @@ touchdown distance from G_I and G_II.</p>
 <li><p><strong>converged</strong> (<em>bool</em>)</p></li>
 <li><p><strong>message</strong> (<em>str</em>)</p></li>
 <li><p><strong>touchdown_distance</strong> (<em>float</em>)</p></li>
-<li><p><strong>SSERR</strong> (<em>float</em>)</p></li>
+<li><p><strong>energy_release_rate</strong> (<em>float</em>)</p></li>
+<li><p><strong>maximal_stress_result</strong> (<a class="reference internal" href="#weac.analysis.criteria_evaluator.MaximalStressResult" title="weac.analysis.criteria_evaluator.MaximalStressResult"><em>MaximalStressResult</em></a>)</p></li>
+<li><p><strong>system</strong> (<a class="reference internal" href="weac.core.system_model.html#weac.core.system_model.SystemModel" title="weac.core.system_model.SystemModel"><em>SystemModel</em></a>)</p></li>
 </ul>
 </dd>
 </dl>
@@ -422,8 +516,8 @@ touchdown distance from G_I and G_II.</p>
 <em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">weac.analysis.criteria_evaluator.</span></span><span class="sig-name descname"><span class="pre">FindMinimumForceResult</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">success</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">critical_skier_weight</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">new_segments</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">old_segments</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">iterations</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_dist_stress</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">min_dist_stress</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/weac/analysis/criteria_evaluator.html#FindMinimumForceResult"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#weac.analysis.criteria_evaluator.FindMinimumForceResult" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#weac.analysis.criteria_evaluator.FindMinimumForceResult'">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <p>Holds the results of the find_minimum_force evaluation.</p>
-<section id="id2">
-<h2>Attributes:<a class="headerlink" href="#id2" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id2'">¶</a></h2>
+<section id="id3">
+<h2>Attributes:<a class="headerlink" href="#id3" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id3'">¶</a></h2>
 <dl class="simple">
 <dt>success<span class="classifier">bool</span></dt><dd><p>Whether the algorithm converged.</p>
 </dd>
@@ -538,12 +632,12 @@ elastic foundations, based on the logic from criterion_check.py.</p>
 <dd><p>Evaluates the fracture toughness criterion for a given combination of
 Mode I (G_I) and Mode II (G_II) energy release rates.</p>
 <dl class="simple">
-<dt>The criterion is defined as:</dt><dd><p>g_delta = (<a href="#id12"><span class="problematic" id="id13">|G_I|</span></a> / G_Ic)^gn + (<a href="#id14"><span class="problematic" id="id15">|G_II|</span></a> / G_IIc)^gm</p>
+<dt>The criterion is defined as:</dt><dd><p>g_delta = (<a href="#id13"><span class="problematic" id="id14">|G_I|</span></a> / G_Ic)^gn + (<a href="#id15"><span class="problematic" id="id16">|G_II|</span></a> / G_IIc)^gm</p>
 </dd>
 </dl>
 <p>A value of 1 indicates the boundary of the fracture toughness envelope is reached.</p>
-<section id="id3">
-<h2>Parameters:<a class="headerlink" href="#id3" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id3'">¶</a></h2>
+<section id="id4">
+<h2>Parameters:<a class="headerlink" href="#id4" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id4'">¶</a></h2>
 <dl class="simple">
 <dt>G_I<span class="classifier">float</span></dt><dd><p>Mode I energy release rate (ERR) in J/m².</p>
 </dd>
@@ -628,8 +722,8 @@ Depth Hoar”.</p>
 <span class="sig-name descname"><span class="pre">evaluate_coupled_criterion</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">system</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_iterations</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">25</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">damping_ERR</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tolerance_ERR</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.002</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tolerance_stress</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.005</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">print_call_stats</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">_recursion_depth</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/weac/analysis/criteria_evaluator.html#CriteriaEvaluator.evaluate_coupled_criterion"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#weac.analysis.criteria_evaluator.CriteriaEvaluator.evaluate_coupled_criterion" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#weac.analysis.criteria_evaluator.CriteriaEvaluator.evaluate_coupled_criterion'">¶</a></dt>
 <dd><p>Evaluates the coupled criterion for anticrack nucleation, finding the
 critical combination of skier weight and anticrack length.</p>
-<section id="id4">
-<h2>Parameters:<a class="headerlink" href="#id4" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id4'">¶</a></h2>
+<section id="id5">
+<h2>Parameters:<a class="headerlink" href="#id5" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id5'">¶</a></h2>
 <dl class="simple">
 <dt>system: SystemModel</dt><dd><p>The system model.</p>
 </dd>
@@ -674,12 +768,12 @@ critical skier weight, crack length, and convergence details.</p>
 </dl>
 </dd></dl>
 <dl class="py method">
-<dt class="sig sig-object py" id="weac.analysis.criteria_evaluator.CriteriaEvaluator.evaluate_SSERR">
-<span class="sig-name descname"><span class="pre">evaluate_SSERR</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">system</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vertical</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">print_call_stats</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/weac/analysis/criteria_evaluator.html#CriteriaEvaluator.evaluate_SSERR"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#weac.analysis.criteria_evaluator.CriteriaEvaluator.evaluate_SSERR" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#weac.analysis.criteria_evaluator.CriteriaEvaluator.evaluate_SSERR'">¶</a></dt>
+<dt class="sig sig-object py" id="weac.analysis.criteria_evaluator.CriteriaEvaluator.evaluate_SteadyState">
+<span class="sig-name descname"><span class="pre">evaluate_SteadyState</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">system</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vertical</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">print_call_stats</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/weac/analysis/criteria_evaluator.html#CriteriaEvaluator.evaluate_SteadyState"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#weac.analysis.criteria_evaluator.CriteriaEvaluator.evaluate_SteadyState" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#weac.analysis.criteria_evaluator.CriteriaEvaluator.evaluate_SteadyState'">¶</a></dt>
 <dd><p>Evaluates the Touchdown Distance in the Steady State and the Steady State
 Energy Release Rate.</p>
-<section id="id5">
-<h2>Parameters:<a class="headerlink" href="#id5" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id5'">¶</a></h2>
+<section id="id6">
+<h2>Parameters:<a class="headerlink" href="#id6" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id6'">¶</a></h2>
 <dl class="simple">
 <dt>system: SystemModel</dt><dd><p>The system model.</p>
 </dd>
@@ -701,7 +795,7 @@ i.e. vertical=False should be used.</p>
 </ul>
 </dd>
 <dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p><a class="reference internal" href="#weac.analysis.criteria_evaluator.SSERRResult" title="weac.analysis.criteria_evaluator.SSERRResult"><em>SSERRResult</em></a></p>
+<dd class="field-even"><p><a class="reference internal" href="#weac.analysis.criteria_evaluator.SteadyStateResult" title="weac.analysis.criteria_evaluator.SteadyStateResult"><em>SteadyStateResult</em></a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -711,8 +805,8 @@ i.e. vertical=False should be used.</p>
 <dd><p>Finds the minimum skier weight required to surpass the stress failure envelope.</p>
 <p>This method iteratively adjusts the skier weight until the maximum distance
 to the stress envelope converges to 1, indicating the critical state.</p>
-<section id="id6">
-<h2>Parameters:<a class="headerlink" href="#id6" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id6'">¶</a></h2>
+<section id="id7">
+<h2>Parameters:<a class="headerlink" href="#id7" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id7'">¶</a></h2>
 <dl class="simple">
 <dt>system: SystemModel</dt><dd><p>The system model.</p>
 </dd>
@@ -722,8 +816,8 @@ to the stress envelope converges to 1, indicating the critical state.</p>
 </dd>
 </dl>
 </section>
-<section id="id7">
-<h2>Returns:<a class="headerlink" href="#id7" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id7'">¶</a></h2>
+<section id="id8">
+<h2>Returns:<a class="headerlink" href="#id8" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id8'">¶</a></h2>
 <dl class="simple">
 <dt>results: FindMinimumForceResult</dt><dd><p>An object containing the results of the analysis, including
 critical skier weight, and convergence details.</p>
@@ -747,15 +841,15 @@ critical skier weight, and convergence details.</p>
 <dt class="sig sig-object py" id="weac.analysis.criteria_evaluator.CriteriaEvaluator.find_minimum_crack_length">
 <span class="sig-name descname"><span class="pre">find_minimum_crack_length</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">system</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">search_interval</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">target</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/weac/analysis/criteria_evaluator.html#CriteriaEvaluator.find_minimum_crack_length"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#weac.analysis.criteria_evaluator.CriteriaEvaluator.find_minimum_crack_length" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#weac.analysis.criteria_evaluator.CriteriaEvaluator.find_minimum_crack_length'">¶</a></dt>
 <dd><p>Finds the minimum crack length required to surpass the energy release rate envelope.</p>
-<section id="id8">
-<h2>Parameters:<a class="headerlink" href="#id8" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id8'">¶</a></h2>
+<section id="id9">
+<h2>Parameters:<a class="headerlink" href="#id9" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id9'">¶</a></h2>
 <dl class="simple">
 <dt>system: SystemModel</dt><dd><p>The system model.</p>
 </dd>
 </dl>
 </section>
-<section id="id9">
-<h2>Returns:<a class="headerlink" href="#id9" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id9'">¶</a></h2>
+<section id="id10">
+<h2>Returns:<a class="headerlink" href="#id10" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id10'">¶</a></h2>
 <dl class="simple">
 <dt>minimum_crack_length: float</dt><dd><p>The minimum crack length required to surpass the energy release rate envelope [mm]</p>
 </dd>
@@ -782,8 +876,8 @@ critical skier weight, and convergence details.</p>
 <dd><p>Evaluates whether a crack will propagate without any additional load.
 This method determines if a pre-existing crack will propagate without any
 additional load.</p>
-<section id="id10">
-<h2>Parameters:<a class="headerlink" href="#id10" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id10'">¶</a></h2>
+<section id="id11">
+<h2>Parameters:<a class="headerlink" href="#id11" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id11'">¶</a></h2>
 <p>system: SystemModel</p>
 <dl class="field-list simple">
 <dt class="field-odd">returns<span class="colon">:</span></dt>
@@ -811,8 +905,8 @@ additional load.</p>
 <span class="sig-name descname"><span class="pre">find_crack_length_for_weight</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">system</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">skier_weight</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/weac/analysis/criteria_evaluator.html#CriteriaEvaluator.find_crack_length_for_weight"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#weac.analysis.criteria_evaluator.CriteriaEvaluator.find_crack_length_for_weight" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#weac.analysis.criteria_evaluator.CriteriaEvaluator.find_crack_length_for_weight'">¶</a></dt>
 <dd><p>Finds the resulting anticrack length and updated segment configurations
 for a given skier weight.</p>
-<section id="id11">
-<h2>Parameters:<a class="headerlink" href="#id11" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id11'">¶</a></h2>
+<section id="id12">
+<h2>Parameters:<a class="headerlink" href="#id12" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id12'">¶</a></h2>
 <dl class="simple">
 <dt>system: SystemModel</dt><dd><p>The system model.</p>
 </dd>
@@ -873,12 +967,24 @@ for a given skier weight.</p>
 <li><a :data-current="activeSection === '#weac.analysis.criteria_evaluator.CoupledCriterionResult.__init__'" class="reference internal" href="#weac.analysis.criteria_evaluator.CoupledCriterionResult.__init__"><code class="docutils literal notranslate"><span class="pre">CoupledCriterionResult.__init__()</span></code></a></li>
 </ul>
 </li>
-<li><a :data-current="activeSection === '#weac.analysis.criteria_evaluator.SSERRResult'" class="reference internal" href="#weac.analysis.criteria_evaluator.SSERRResult"><code class="docutils literal notranslate"><span class="pre">SSERRResult</span></code></a><ul>
-<li><a :data-current="activeSection === '#weac.analysis.criteria_evaluator.SSERRResult.converged'" class="reference internal" href="#weac.analysis.criteria_evaluator.SSERRResult.converged"><code class="docutils literal notranslate"><span class="pre">SSERRResult.converged</span></code></a></li>
-<li><a :data-current="activeSection === '#weac.analysis.criteria_evaluator.SSERRResult.message'" class="reference internal" href="#weac.analysis.criteria_evaluator.SSERRResult.message"><code class="docutils literal notranslate"><span class="pre">SSERRResult.message</span></code></a></li>
-<li><a :data-current="activeSection === '#weac.analysis.criteria_evaluator.SSERRResult.touchdown_distance'" class="reference internal" href="#weac.analysis.criteria_evaluator.SSERRResult.touchdown_distance"><code class="docutils literal notranslate"><span class="pre">SSERRResult.touchdown_distance</span></code></a></li>
-<li><a :data-current="activeSection === '#weac.analysis.criteria_evaluator.SSERRResult.SSERR'" class="reference internal" href="#weac.analysis.criteria_evaluator.SSERRResult.SSERR"><code class="docutils literal notranslate"><span class="pre">SSERRResult.SSERR</span></code></a></li>
-<li><a :data-current="activeSection === '#weac.analysis.criteria_evaluator.SSERRResult.__init__'" class="reference internal" href="#weac.analysis.criteria_evaluator.SSERRResult.__init__"><code class="docutils literal notranslate"><span class="pre">SSERRResult.__init__()</span></code></a></li>
+<li><a :data-current="activeSection === '#weac.analysis.criteria_evaluator.MaximalStressResult'" class="reference internal" href="#weac.analysis.criteria_evaluator.MaximalStressResult"><code class="docutils literal notranslate"><span class="pre">MaximalStressResult</span></code></a><ul>
+<li><a :data-current="activeSection === '#weac.analysis.criteria_evaluator.MaximalStressResult.principal_stress_kPa'" class="reference internal" href="#weac.analysis.criteria_evaluator.MaximalStressResult.principal_stress_kPa"><code class="docutils literal notranslate"><span class="pre">MaximalStressResult.principal_stress_kPa</span></code></a></li>
+<li><a :data-current="activeSection === '#weac.analysis.criteria_evaluator.MaximalStressResult.Sxx_kPa'" class="reference internal" href="#weac.analysis.criteria_evaluator.MaximalStressResult.Sxx_kPa"><code class="docutils literal notranslate"><span class="pre">MaximalStressResult.Sxx_kPa</span></code></a></li>
+<li><a :data-current="activeSection === '#weac.analysis.criteria_evaluator.MaximalStressResult.principal_stress_norm'" class="reference internal" href="#weac.analysis.criteria_evaluator.MaximalStressResult.principal_stress_norm"><code class="docutils literal notranslate"><span class="pre">MaximalStressResult.principal_stress_norm</span></code></a></li>
+<li><a :data-current="activeSection === '#weac.analysis.criteria_evaluator.MaximalStressResult.Sxx_norm'" class="reference internal" href="#weac.analysis.criteria_evaluator.MaximalStressResult.Sxx_norm"><code class="docutils literal notranslate"><span class="pre">MaximalStressResult.Sxx_norm</span></code></a></li>
+<li><a :data-current="activeSection === '#weac.analysis.criteria_evaluator.MaximalStressResult.max_principal_stress_norm'" class="reference internal" href="#weac.analysis.criteria_evaluator.MaximalStressResult.max_principal_stress_norm"><code class="docutils literal notranslate"><span class="pre">MaximalStressResult.max_principal_stress_norm</span></code></a></li>
+<li><a :data-current="activeSection === '#weac.analysis.criteria_evaluator.MaximalStressResult.max_Sxx_norm'" class="reference internal" href="#weac.analysis.criteria_evaluator.MaximalStressResult.max_Sxx_norm"><code class="docutils literal notranslate"><span class="pre">MaximalStressResult.max_Sxx_norm</span></code></a></li>
+<li><a :data-current="activeSection === '#weac.analysis.criteria_evaluator.MaximalStressResult.__init__'" class="reference internal" href="#weac.analysis.criteria_evaluator.MaximalStressResult.__init__"><code class="docutils literal notranslate"><span class="pre">MaximalStressResult.__init__()</span></code></a></li>
+</ul>
+</li>
+<li><a :data-current="activeSection === '#weac.analysis.criteria_evaluator.SteadyStateResult'" class="reference internal" href="#weac.analysis.criteria_evaluator.SteadyStateResult"><code class="docutils literal notranslate"><span class="pre">SteadyStateResult</span></code></a><ul>
+<li><a :data-current="activeSection === '#weac.analysis.criteria_evaluator.SteadyStateResult.converged'" class="reference internal" href="#weac.analysis.criteria_evaluator.SteadyStateResult.converged"><code class="docutils literal notranslate"><span class="pre">SteadyStateResult.converged</span></code></a></li>
+<li><a :data-current="activeSection === '#weac.analysis.criteria_evaluator.SteadyStateResult.message'" class="reference internal" href="#weac.analysis.criteria_evaluator.SteadyStateResult.message"><code class="docutils literal notranslate"><span class="pre">SteadyStateResult.message</span></code></a></li>
+<li><a :data-current="activeSection === '#weac.analysis.criteria_evaluator.SteadyStateResult.touchdown_distance'" class="reference internal" href="#weac.analysis.criteria_evaluator.SteadyStateResult.touchdown_distance"><code class="docutils literal notranslate"><span class="pre">SteadyStateResult.touchdown_distance</span></code></a></li>
+<li><a :data-current="activeSection === '#weac.analysis.criteria_evaluator.SteadyStateResult.energy_release_rate'" class="reference internal" href="#weac.analysis.criteria_evaluator.SteadyStateResult.energy_release_rate"><code class="docutils literal notranslate"><span class="pre">SteadyStateResult.energy_release_rate</span></code></a></li>
+<li><a :data-current="activeSection === '#weac.analysis.criteria_evaluator.SteadyStateResult.maximal_stress_result'" class="reference internal" href="#weac.analysis.criteria_evaluator.SteadyStateResult.maximal_stress_result"><code class="docutils literal notranslate"><span class="pre">SteadyStateResult.maximal_stress_result</span></code></a></li>
+<li><a :data-current="activeSection === '#weac.analysis.criteria_evaluator.SteadyStateResult.system'" class="reference internal" href="#weac.analysis.criteria_evaluator.SteadyStateResult.system"><code class="docutils literal notranslate"><span class="pre">SteadyStateResult.system</span></code></a></li>
+<li><a :data-current="activeSection === '#weac.analysis.criteria_evaluator.SteadyStateResult.__init__'" class="reference internal" href="#weac.analysis.criteria_evaluator.SteadyStateResult.__init__"><code class="docutils literal notranslate"><span class="pre">SteadyStateResult.__init__()</span></code></a></li>
 </ul>
 </li>
 <li><a :data-current="activeSection === '#weac.analysis.criteria_evaluator.FindMinimumForceResult'" class="reference internal" href="#weac.analysis.criteria_evaluator.FindMinimumForceResult"><code class="docutils literal notranslate"><span class="pre">FindMinimumForceResult</span></code></a><ul>
@@ -898,7 +1004,7 @@ for a given skier weight.</p>
 <li><a :data-current="activeSection === '#weac.analysis.criteria_evaluator.CriteriaEvaluator.fracture_toughness_envelope'" class="reference internal" href="#weac.analysis.criteria_evaluator.CriteriaEvaluator.fracture_toughness_envelope"><code class="docutils literal notranslate"><span class="pre">CriteriaEvaluator.fracture_toughness_envelope()</span></code></a></li>
 <li><a :data-current="activeSection === '#weac.analysis.criteria_evaluator.CriteriaEvaluator.stress_envelope'" class="reference internal" href="#weac.analysis.criteria_evaluator.CriteriaEvaluator.stress_envelope"><code class="docutils literal notranslate"><span class="pre">CriteriaEvaluator.stress_envelope()</span></code></a></li>
 <li><a :data-current="activeSection === '#weac.analysis.criteria_evaluator.CriteriaEvaluator.evaluate_coupled_criterion'" class="reference internal" href="#weac.analysis.criteria_evaluator.CriteriaEvaluator.evaluate_coupled_criterion"><code class="docutils literal notranslate"><span class="pre">CriteriaEvaluator.evaluate_coupled_criterion()</span></code></a></li>
-<li><a :data-current="activeSection === '#weac.analysis.criteria_evaluator.CriteriaEvaluator.evaluate_SSERR'" class="reference internal" href="#weac.analysis.criteria_evaluator.CriteriaEvaluator.evaluate_SSERR"><code class="docutils literal notranslate"><span class="pre">CriteriaEvaluator.evaluate_SSERR()</span></code></a></li>
+<li><a :data-current="activeSection === '#weac.analysis.criteria_evaluator.CriteriaEvaluator.evaluate_SteadyState'" class="reference internal" href="#weac.analysis.criteria_evaluator.CriteriaEvaluator.evaluate_SteadyState"><code class="docutils literal notranslate"><span class="pre">CriteriaEvaluator.evaluate_SteadyState()</span></code></a></li>
 <li><a :data-current="activeSection === '#weac.analysis.criteria_evaluator.CriteriaEvaluator.find_minimum_force'" class="reference internal" href="#weac.analysis.criteria_evaluator.CriteriaEvaluator.find_minimum_force"><code class="docutils literal notranslate"><span class="pre">CriteriaEvaluator.find_minimum_force()</span></code></a></li>
 <li><a :data-current="activeSection === '#weac.analysis.criteria_evaluator.CriteriaEvaluator.find_minimum_crack_length'" class="reference internal" href="#weac.analysis.criteria_evaluator.CriteriaEvaluator.find_minimum_crack_length"><code class="docutils literal notranslate"><span class="pre">CriteriaEvaluator.find_minimum_crack_length()</span></code></a></li>
 <li><a :data-current="activeSection === '#weac.analysis.criteria_evaluator.CriteriaEvaluator.check_crack_self_propagation'" class="reference internal" href="#weac.analysis.criteria_evaluator.CriteriaEvaluator.check_crack_self_propagation"><code class="docutils literal notranslate"><span class="pre">CriteriaEvaluator.check_crack_self_propagation()</span></code></a></li>

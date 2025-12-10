@@ -161,7 +161,8 @@
 <li class="toctree-l3"><a class="reference internal" href="weac.analysis.criteria_evaluator.html">weac.analysis.criteria_evaluator module</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="weac.analysis.criteria_evaluator.html#weac.analysis.criteria_evaluator.CoupledCriterionHistory"><code class="docutils literal notranslate"><span class="pre">CoupledCriterionHistory</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="weac.analysis.criteria_evaluator.html#weac.analysis.criteria_evaluator.CoupledCriterionResult"><code class="docutils literal notranslate"><span class="pre">CoupledCriterionResult</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="weac.analysis.criteria_evaluator.html#weac.analysis.criteria_evaluator.SSERRResult"><code class="docutils literal notranslate"><span class="pre">SSERRResult</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="weac.analysis.criteria_evaluator.html#weac.analysis.criteria_evaluator.MaximalStressResult"><code class="docutils literal notranslate"><span class="pre">MaximalStressResult</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="weac.analysis.criteria_evaluator.html#weac.analysis.criteria_evaluator.SteadyStateResult"><code class="docutils literal notranslate"><span class="pre">SteadyStateResult</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="weac.analysis.criteria_evaluator.html#weac.analysis.criteria_evaluator.FindMinimumForceResult"><code class="docutils literal notranslate"><span class="pre">FindMinimumForceResult</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="weac.analysis.criteria_evaluator.html#weac.analysis.criteria_evaluator.CriteriaEvaluator"><code class="docutils literal notranslate"><span class="pre">CriteriaEvaluator</span></code></a></li>
 </ul>
@@ -195,7 +196,7 @@
 <li class="toctree-l3"><a class="reference internal" href="weac.analysis.html#weac.analysis.CriteriaEvaluator"><code class="docutils literal notranslate"><span class="pre">CriteriaEvaluator</span></code></a><ul>
 <li class="toctree-l4"><a class="reference internal" href="weac.analysis.html#weac.analysis.CriteriaEvaluator.__init__"><code class="docutils literal notranslate"><span class="pre">CriteriaEvaluator.__init__()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="weac.analysis.html#weac.analysis.CriteriaEvaluator.check_crack_self_propagation"><code class="docutils literal notranslate"><span class="pre">CriteriaEvaluator.check_crack_self_propagation()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="weac.analysis.html#weac.analysis.CriteriaEvaluator.evaluate_SSERR"><code class="docutils literal notranslate"><span class="pre">CriteriaEvaluator.evaluate_SSERR()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="weac.analysis.html#weac.analysis.CriteriaEvaluator.evaluate_SteadyState"><code class="docutils literal notranslate"><span class="pre">CriteriaEvaluator.evaluate_SteadyState()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="weac.analysis.html#weac.analysis.CriteriaEvaluator.evaluate_coupled_criterion"><code class="docutils literal notranslate"><span class="pre">CriteriaEvaluator.evaluate_coupled_criterion()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="weac.analysis.html#weac.analysis.CriteriaEvaluator.find_crack_length_for_weight"><code class="docutils literal notranslate"><span class="pre">CriteriaEvaluator.find_crack_length_for_weight()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="weac.analysis.html#weac.analysis.CriteriaEvaluator.find_minimum_crack_length"><code class="docutils literal notranslate"><span class="pre">CriteriaEvaluator.find_minimum_crack_length()</span></code></a></li>
@@ -244,12 +245,14 @@
 <li class="toctree-l4"><a class="reference internal" href="weac.analysis.html#weac.analysis.FindMinimumForceResult.min_dist_stress"><code class="docutils literal notranslate"><span class="pre">FindMinimumForceResult.min_dist_stress</span></code></a></li>
 </ul>
 </li>
-<li class="toctree-l3"><a class="reference internal" href="weac.analysis.html#weac.analysis.SSERRResult"><code class="docutils literal notranslate"><span class="pre">SSERRResult</span></code></a><ul>
-<li class="toctree-l4"><a class="reference internal" href="weac.analysis.html#weac.analysis.SSERRResult.__init__"><code class="docutils literal notranslate"><span class="pre">SSERRResult.__init__()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="weac.analysis.html#weac.analysis.SSERRResult.converged"><code class="docutils literal notranslate"><span class="pre">SSERRResult.converged</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="weac.analysis.html#weac.analysis.SSERRResult.message"><code class="docutils literal notranslate"><span class="pre">SSERRResult.message</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="weac.analysis.html#weac.analysis.SSERRResult.touchdown_distance"><code class="docutils literal notranslate"><span class="pre">SSERRResult.touchdown_distance</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="weac.analysis.html#weac.analysis.SSERRResult.SSERR"><code class="docutils literal notranslate"><span class="pre">SSERRResult.SSERR</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="weac.analysis.html#weac.analysis.SteadyStateResult"><code class="docutils literal notranslate"><span class="pre">SteadyStateResult</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="weac.analysis.html#weac.analysis.SteadyStateResult.__init__"><code class="docutils literal notranslate"><span class="pre">SteadyStateResult.__init__()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="weac.analysis.html#weac.analysis.SteadyStateResult.converged"><code class="docutils literal notranslate"><span class="pre">SteadyStateResult.converged</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="weac.analysis.html#weac.analysis.SteadyStateResult.message"><code class="docutils literal notranslate"><span class="pre">SteadyStateResult.message</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="weac.analysis.html#weac.analysis.SteadyStateResult.touchdown_distance"><code class="docutils literal notranslate"><span class="pre">SteadyStateResult.touchdown_distance</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="weac.analysis.html#weac.analysis.SteadyStateResult.energy_release_rate"><code class="docutils literal notranslate"><span class="pre">SteadyStateResult.energy_release_rate</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="weac.analysis.html#weac.analysis.SteadyStateResult.maximal_stress_result"><code class="docutils literal notranslate"><span class="pre">SteadyStateResult.maximal_stress_result</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="weac.analysis.html#weac.analysis.SteadyStateResult.system"><code class="docutils literal notranslate"><span class="pre">SteadyStateResult.system</span></code></a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="weac.analysis.html#weac.analysis.Plotter"><code class="docutils literal notranslate"><span class="pre">Plotter</span></code></a><ul>
@@ -269,6 +272,7 @@
 <li class="toctree-l4"><a class="reference internal" href="weac.analysis.html#weac.analysis.Plotter.plot_stress_criteria"><code class="docutils literal notranslate"><span class="pre">Plotter.plot_stress_criteria()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="weac.analysis.html#weac.analysis.Plotter.plot_stress_envelope"><code class="docutils literal notranslate"><span class="pre">Plotter.plot_stress_envelope()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="weac.analysis.html#weac.analysis.Plotter.plot_stresses"><code class="docutils literal notranslate"><span class="pre">Plotter.plot_stresses()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="weac.analysis.html#weac.analysis.Plotter.plot_visualize_deformation"><code class="docutils literal notranslate"><span class="pre">Plotter.plot_visualize_deformation()</span></code></a></li>
 </ul>
 </li>
 </ul>
