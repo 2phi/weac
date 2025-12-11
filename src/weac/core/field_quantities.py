@@ -204,7 +204,7 @@ class FieldQuantities:  # pylint: disable=too-many-instance-attributes, too-many
 
     def du0_dxdx(self, z: np.ndarray, phi: float, qs: float) -> float | np.ndarray:
         """
-        Get second derivative of the horiz. centerline displacement u0''(x).
+        Get second derivative of the horiz. centerline displacement `u0''(x)` (mm⁻¹).
 
         Parameters
         ----------
@@ -217,13 +217,13 @@ class FieldQuantities:  # pylint: disable=too-many-instance-attributes, too-many
         -------
         ndarray, float
             Second derivative of the horizontal centerline displacement
-            u0''(x) (1/mm).
+            `u0''(x)`.
         """
         return self.dz_dx(z, phi, qs)[1, :]
 
     def dpsi_dxdx(self, z: np.ndarray, phi: float, qs: float) -> float | np.ndarray:
         """
-        Get second derivative of the cross-section rotation psi''(x).
+        Get second derivative of the cross-section rotation `psi''(x)` (mm⁻²).
 
         Parameters
         ----------
@@ -235,13 +235,13 @@ class FieldQuantities:  # pylint: disable=too-many-instance-attributes, too-many
         Returns
         -------
         ndarray, float
-            Second derivative of the cross-section rotation psi''(x) (1/mm^2).
+            Second derivative of the cross-section rotation psi''(x).
         """
         return self.dz_dx(z, phi, qs)[5, :]
 
     def du0_dxdxdx(self, z: np.ndarray, phi: float, qs: float) -> float | np.ndarray:
         """
-        Get third derivative of the horiz. centerline displacement u0'''(x).
+        Get third derivative of the horiz. centerline displacement `u0'''(x)` (mm⁻²).
 
         Parameters
         ----------
@@ -254,13 +254,13 @@ class FieldQuantities:  # pylint: disable=too-many-instance-attributes, too-many
         -------
         ndarray, float
             Third derivative of the horizontal centerline displacement
-            u0'''(x) (1/mm^2).
+            u0'''(x).
         """
         return self.dz_dxdx(z, phi, qs)[1, :]
 
     def dpsi_dxdxdx(self, z: np.ndarray, phi: float, qs: float) -> float | np.ndarray:
         """
-        Get third derivative of the cross-section rotation psi'''(x).
+        Get third derivative of the cross-section rotation `psi'''(x)` (mm⁻³).
 
         Parameters
         ----------
@@ -272,6 +272,6 @@ class FieldQuantities:  # pylint: disable=too-many-instance-attributes, too-many
         Returns
         -------
         ndarray, float
-            Third derivative of the cross-section rotation psi'''(x) (1/mm^3).
+            Third derivative of the cross-section rotation psi'''(x).
         """
         return self.dz_dxdx(z, phi, qs)[5, :]
