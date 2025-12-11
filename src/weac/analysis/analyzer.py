@@ -393,7 +393,7 @@ class Analyzer:
         # Get mesh along z-axis
         zmesh = self.get_zmesh(dz=dz)
         zi = zmesh["z"]
-        rho = zmesh["rho"]
+        rho_t_mm3 = zmesh["rho"]
         qs = self.sm.scenario.surface_load
         # Get dimensions of stress field (n rows, m columns)
         n = len(zi)
@@ -414,13 +414,13 @@ class Analyzer:
             dsxx_dxdx[i, :] = E / (1 - nu**2) * (du0_dxdxdx + z * dpsi_dxdxdx)
 
         # Calculate weight load at grid points
-        qn = rho * G_MM_S2 * np.cos(np.deg2rad(phi))
+        qn = -rho_t_mm3 * G_MM_S2 * np.cos(np.deg2rad(phi))
 
         # Integrate dsxx_dxdx twice along z to obtain transverse
         # normal stress Szz in MPa
         integrand = cumulative_trapezoid(dsxx_dxdx, zi, axis=0, initial=0)
         Szz_MPa = cumulative_trapezoid(integrand, zi, axis=0, initial=0)
-        Szz_MPa += cumulative_trapezoid(-qn, zi, initial=0)[:, None]
+        Szz_MPa += cumulative_trapezoid(qn, zi, initial=0)[:, None]
 
         # Normalize tensile stresses to tensile strength
         if normalize:
