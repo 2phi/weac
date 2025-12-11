@@ -1087,6 +1087,9 @@ class Plotter:
         phi = analyzer.sm.scenario.phi
         system_type = analyzer.sm.scenario.system_type
         fq = analyzer.sm.fq
+        sigma_comp = (
+            analyzer.sm.weak_layer.sigma_comp
+        )  # Compressive strength of the weak layer [kPa]
 
         # Compute slab displacements on grid (cm)
         Usl = np.vstack([fq.u(z, h0=h0, unit="cm") for h0 in zi])
@@ -1204,7 +1207,7 @@ class Plotter:
                     z, phi, dz=dz, val="max", unit="kPa", normalize=normalize
                 )
                 weak_full = analyzer.principal_stress_weaklayer(
-                    z, val="min", unit="kPa", normalize=normalize
+                    z, sc=sigma_comp, val="min", unit="kPa", normalize=normalize
                 )
                 weak = weak_full[nanmask]
                 if normalize:
@@ -1249,13 +1252,14 @@ class Plotter:
             [slab_proportion + cracked_proportion, total_height_plot],
         )
         # No displacements for the cracked weak layer outline (undeformed)
-        ax.plot(
-            _outline(Xwl_cracked),
-            _outline(Zwl_cracked_plot),
-            "k-",
-            alpha=0.3,
-            linewidth=1,
-        )
+        if xwl_cracked.shape[0] > 0:
+            ax.plot(
+                _outline(Xwl_cracked),
+                _outline(Zwl_cracked_plot),
+                "k-",
+                alpha=0.3,
+                linewidth=1,
+            )
 
         # Then plot the deformed weak-layer outline where it exists
         if system_type in ["-pst", "pst-", "-vpst", "vpst-"]:
@@ -1287,14 +1291,15 @@ class Plotter:
             cmap=cmap,
             extend="both",
         )
-        ax.contourf(
-            Xwl_cracked,
-            Zwl_cracked_plot,
-            np.zeros((2, xwl_cracked.shape[0])),
-            levels=levels,
-            cmap=cmap,
-            extend="both",
-        )
+        if xwl_cracked.shape[0] > 0:
+            ax.contourf(
+                Xwl_cracked,
+                Zwl_cracked_plot,
+                np.zeros((2, xwl_cracked.shape[0])),
+                levels=levels,
+                cmap=cmap,
+                extend="both",
+            )
 
         # Plot setup
         # Set y-limits to match plot coordinate system (0 to total_height_plot = 1.0)
@@ -1360,6 +1365,10 @@ class Plotter:
 
         # Plot labels
         ax.set_xlabel(r"lateral position $x$ (cm) $\longrightarrow$")
+        ax.set_title(
+            f"{field}{' (normalized to tensile strength)' if normalize else ''}",
+            size=10,
+        )
 
         # Show colorbar
         ticks = np.linspace(levels[0], levels[-1], num=11, endpoint=True)

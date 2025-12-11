@@ -225,6 +225,9 @@ class WeakLayer(BaseModel):
     )
     sigma_c: float = Field(default=6.16, gt=0, description="Tensile strength [kPa]")
     tau_c: float = Field(default=5.09, gt=0, description="Shear strength [kPa]")
+    sigma_comp: float = Field(
+        default=2.6, gt=0, description="Compressive strength [kPa]"
+    )
     E_method: Literal["bergfeld", "scapazzo", "gerling"] = Field(
         default="bergfeld",
         description="Method to calculate the Young's modulus",
