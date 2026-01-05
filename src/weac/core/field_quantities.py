@@ -64,7 +64,7 @@ class FieldQuantities:  # pylint: disable=too-many-instance-attributes, too-many
         return self._unit_factor(unit) * (Z[0, :] + h0 * self.psi(Z))
 
     def du_dx(self, Z: np.ndarray, h0: float) -> float | np.ndarray:
-        """Derivative u' = u₀' + h₀ ψ'."""
+        """Derivative u' = u₀' + h₀ ψ' (-)."""
         return Z[1, :] + h0 * self.dpsi_dx(Z)
 
     def w(self, Z: np.ndarray, unit: LengthUnit = "mm") -> float | np.ndarray:
@@ -74,7 +74,7 @@ class FieldQuantities:  # pylint: disable=too-many-instance-attributes, too-many
         return self._unit_factor(unit) * Z[2, :]
 
     def dw_dx(self, Z: np.ndarray) -> float | np.ndarray:
-        """First derivative `w'`."""
+        """First derivative `w'` (-)."""
         return Z[3, :]
 
     def psi(
@@ -82,16 +82,16 @@ class FieldQuantities:  # pylint: disable=too-many-instance-attributes, too-many
         Z: np.ndarray,
         unit: AngleUnit = "rad",
     ) -> float | np.ndarray:
-        """Rotation `ψ` of the mid-plane."""
+        """Rotation `ψ` of the mid-plane (rad)."""
         factor = self._unit_factor(unit)
         return factor * Z[4, :]
 
     def dpsi_dx(self, Z: np.ndarray) -> float | np.ndarray:
-        """First derivative `ψ'`."""
+        """First derivative `ψ'` (rad/mm)."""
         return Z[5, :]
 
     def N(self, Z: np.ndarray) -> float | np.ndarray:
-        """Axial normal force `N = A11 u' + B11 ψ'` in the slab [N]"""
+        """Axial normal force `N = A11 u' + B11 ψ'` in the slab (N)"""
         return self.es.A11 * Z[1, :] + self.es.B11 * Z[5, :]
 
     def M(self, Z: np.ndarray) -> float | np.ndarray:

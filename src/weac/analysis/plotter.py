@@ -1041,6 +1041,7 @@ class Plotter:
         xwl: np.ndarray,
         z: np.ndarray,
         analyzer: Analyzer,
+        window: float | None = None,
         weaklayer_proportion: float | None = None,
         dz: int = 2,
         levels: int = 300,
@@ -1061,6 +1062,8 @@ class Plotter:
             Solution vector.
         analyzer : Analyzer
             Analyzer instance.
+        window: float | None, optional
+            Window size for the plot. Default is None.
         weaklayer_proportion: float | None, optional
             Proportion of the plot to allocate to the weak layer. Default is None.
         dz : int, optional
@@ -1309,7 +1312,10 @@ class Plotter:
         )
 
         # Set limits first, then aspect ratio to avoid matplotlib adjusting limits
-        ax.set_xlim([xmin, xmax])
+        if window is None:
+            ax.set_xlim([xmin, xmax])
+        else:
+            ax.set_xlim([xmax - window, xmax])
         ax.set_ylim([plot_ymin, plot_ymax])
         ax.invert_yaxis()
         ax.use_sticky_edges = False

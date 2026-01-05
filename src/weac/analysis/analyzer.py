@@ -272,11 +272,7 @@ class Analyzer:
 
         # Calculate weight load at grid points and superimpose on stress field
         qt = -rho * G_MM_S2 * np.sin(np.deg2rad(phi))
-        # Old Implementation: Changed for numerical stability
-        # for i, qi in enumerate(qt[:-1]):
-        #     Sxx[i, :] += qi * (zi[i + 1] - zi[i])
-        # Sxx[-1, :] += qt[-1] * (zi[-1] - zi[-2])
-        # New Implementation: Changed for numerical stability
+
         dz = np.diff(zi)
         Sxx_MPa[:-1, :] += qt[:-1, np.newaxis] * dz[:, np.newaxis]
         Sxx_MPa[-1, :] += qt[-1] * dz[-1]

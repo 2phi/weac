@@ -94,6 +94,10 @@ def _sigrist_tensile_strength(rho, unit: Literal["kPa", "MPa"] = "kPa"):
     return convert[unit] * 240 * (rho / RHO_ICE) ** 2.44
 
 
+# TODO: Compressive Strength from Schöttner
+# (11 +/- 7) * (rho/rho_0) ^ (5.4 +/- 0.5)
+
+
 class Layer(BaseModel):
     """
     Regular slab layer (no foundation springs).
