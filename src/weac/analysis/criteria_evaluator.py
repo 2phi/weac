@@ -113,6 +113,9 @@ class MaximalStressResult:
         The normalized maximum principal stress to the tensile strength of the layers.
     max_Sxx_norm: float
         The normalized maximum axial normal stress to the tensile strength of the layers.
+    slab_tensile_criterion: float
+        The slab tensile criterion, i.e. the portion of the slab thickness that is prone
+        to fail under tensile stresses in the steady state (between 0 and 1).
     """
 
     principal_stress_kPa: np.ndarray
@@ -121,6 +124,7 @@ class MaximalStressResult:
     Sxx_norm: np.ndarray
     max_principal_stress_norm: float
     max_Sxx_norm: float
+    slab_tensile_criterion: float
 
 
 @dataclass
@@ -1248,6 +1252,10 @@ class CriteriaEvaluator:
         )
         max_principal_stress_norm = np.max(principal_stress_norm)
         max_Sxx_norm = np.max(Sxx_norm)
+        # evaluate for each height level if the slab is prone to fail under tensile stresses
+        height_level_prone_to_fail = np.max(Sxx_norm, axis=1)
+        print(len(height_level_prone_to_fail))
+        slab_tensile_criterion = np.mean(height_level_prone_to_fail)
         if print_call_stats:
             analyzer.print_call_stats(
                 message="_calculate_maximal_stresses Call Statistics"
@@ -1259,4 +1267,5 @@ class CriteriaEvaluator:
             Sxx_norm=Sxx_norm,
             max_principal_stress_norm=max_principal_stress_norm,
             max_Sxx_norm=max_Sxx_norm,
+            slab_tensile_criterion=slab_tensile_criterion,
         )
