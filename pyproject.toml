@@ -20,7 +20,7 @@ classifiers = [
 ]
 dependencies = [
     "matplotlib>=3.9.1",
-    "numpy>=2.0.1",
+    "numpy==2.3.5",
     "scipy>=1.14.0",
     "pydantic>=2.11.7",
     "snowpylot>=1.1.3",
