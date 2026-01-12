@@ -268,29 +268,35 @@ class UnknownConstantsSolver:
         collapsed_weak_layer_kR: float | None = None,
     ) -> np.ndarray:
         """
-        Provide boundary or transmission conditions for beam segments.
-
-        Arguments
-        ---------
-        zl : ndarray
-            Solution vector (6x1) or (6x6) at left end of beam segment.
-        zr : ndarray
-            Solution vector (6x1) or (6x6) at right end of beam segment.
-        has_foundation : boolean
-            Indicates whether segment has foundation(True) or not (False).
-            Default is False.
-        pos: {'left', 'mid', 'right', 'l', 'm', 'r'}, optional
-            Determines whether the segment under consideration
-            is a left boundary segment (left, l), one of the
-            center segment (mid, m), or a right boundary
-            segment (right, r). Default is 'mid'.
-
-        Returns
-        -------
-        conditions : ndarray
-            `zh`: Matrix of Size one of: (`l: [9,6], m: [12,6], r: [9,6]`)
-
-            `zp`: Vector of Size one of: (`l: [9,1], m: [12,1], r: [9,1]`)
+        Construct the boundary or transmission condition vector for a beam segment.
+        
+        Parameters:
+            zl (np.ndarray): Solution vector at the left end of the segment (6 elements).
+            zr (np.ndarray): Solution vector at the right end of the segment (6 elements).
+            eigensystem (Eigensystem): Eigensystem used to compute field quantities.
+            has_foundation (bool): Whether the segment has a foundation.
+            pos (Literal["l","r","m","left","right","mid"]): Position of the segment:
+                "l"/"left" for a left boundary segment, "m"/"mid" for an interior (transmission)
+                segment, "r"/"right" for a right boundary segment.
+            system_type (SystemType): System variant controlling which boundary quantities apply.
+            touchdown_mode (Literal["A_free_hanging","B_point_contact","C_in_contact"] | None):
+                Interaction mode used by boundary condition logic (only affects certain system types).
+            collapsed_weak_layer_kR (float | None): Stiffness parameter used when in-contact
+                boundary modes require a spring-like moment contribution.
+        
+        Returns:
+            np.ndarray: 1-D array of condition values. For a left or right boundary segment
+            the array has length 9 and contains the three boundary-condition entries followed
+            by the six field quantities at the opposite end (order shown below). For a mid
+            (interior) segment the array has length 12 and contains the six (negated) left-end
+            field quantities followed by the six right-end field quantities.
+        
+            Ordering (examples):
+              - left ("l"/"left"): [bc0, bc1, bc2, u_right, w_right, psi_right, N_right, M_right, V_right]
+              - mid ("m"/"mid"): [-u_left, -w_left, -psi_left, -N_left, -M_left, -V_left,
+                                  u_right, w_right, psi_right, N_right, M_right, V_right]
+              - right ("r"/"right"): [-u_left, -w_left, -psi_left, -N_left, -M_left, -V_left,
+                                      bc0, bc1, bc2]
         """
         fq = FieldQuantities(eigensystem=eigensystem)
         if pos in ("l", "left"):
@@ -372,27 +378,37 @@ class UnknownConstantsSolver:
         collapsed_weak_layer_kR: float | None = None,
     ):
         """
-        Provide equations for free (pst) or infinite (skiers) ends.
-
-        Arguments
-        ---------
-        z : ndarray
-            Solution vector (6x1) at a certain position x.
-        l : float, optional
-            Length of the segment in consideration. Default is zero.
-        has_foundation : boolean
-            Indicates whether segment has foundation(True) or not (False).
-            Default is False.
-        pos : {'left', 'mid', 'right', 'l', 'm', 'r'}, optional
-            Determines whether the segement under consideration
-            is a left boundary segment (left, l), one of the
-            center segment (mid, m), or a right boundary
-            segment (right, r). Default is 'mid'.
-
-        Returns
-        -------
-        bc : ndarray
-            Boundary condition vector (lenght 3) at position x.
+        Construct the boundary-condition vector for a segment end according to the system type and touchdown mode.
+        
+        The returned array has length 3 and encodes mechanical boundary quantities at the given end:
+        - For most system types (including "pst-", "-pst", "-vpst", "vpst-", "rot", "trans"): [N, M, V].
+        - For "skier" / "skiers": [u(h0=0), w, psi].
+        - For "pst-" / "-pst" when touchdown_mode == "C_in_contact": the bending moment M is adjusted by ±kR * psi:
+          - pos in {"r", "right"} -> M + kR * psi
+          - pos in {"l", "left"}  -> M - kR * psi
+        
+        Parameters:
+            z: ndarray
+                Solution vector (6,) at the evaluation position.
+            eigensystem: Eigensystem
+                Eigensystem used to compute field quantities.
+            has_foundation: bool
+                True if the segment has a foundation; affects free-end handling for PST systems.
+            pos: Literal["l","r","m","left","right","mid"]
+                Position label for the segment end; used to choose sign/side for contact adjustments.
+            system_type: SystemType
+                Identifier of the system variant (e.g., "pst-", "-pst", "skier", "vpst-", etc.).
+            touchdown_mode: Literal["A_free_hanging","B_point_contact","C_in_contact"] | None, optional
+                Touchdown interaction mode that alters which boundary quantities are enforced.
+            collapsed_weak_layer_kR: float | None, optional
+                Spring stiffness kR used to modify M in "C_in_contact" mode.
+        
+        Returns:
+            bc: ndarray
+                Boundary condition vector (length 3) as described above.
+        
+        Raises:
+            ValueError: If system_type is not recognized.
         """
         fq = FieldQuantities(eigensystem=eigensystem)
         # Set boundary conditions for PST-systems

@@ -73,21 +73,14 @@ def _gerling_youngs_modulus(rho: float, C_0: float = CG0, C_1: float = CG1) -> f
 
 def _sigrist_tensile_strength(rho, unit: Literal["kPa", "MPa"] = "kPa"):
     """
-    Estimate the tensile strength of a slab layer from its density.
-
-    Uses the density parametrization of Sigrist (2006).
-
-    Arguments
-    ---------
-    rho : ndarray, float
-        Layer density (kg/m^3).
-    unit : str, optional
-        Desired output unit of the layer strength. Default is 'kPa'.
-
-    Returns
-    -------
-    ndarray
-        Tensile strength in specified unit.
+    Estimate the tensile strength of a slab layer from its density using the Sigrist (2006) relation.
+    
+    Parameters:
+        rho (float | ndarray): Layer density in kilograms per cubic meter (kg/m^3).
+        unit (Literal["kPa", "MPa"], optional): Output unit for tensile strength; either "kPa" or "MPa". Defaults to "kPa".
+    
+    Returns:
+        float | ndarray: Tensile strength in the requested unit (`kPa` or `MPa`).
     """
     convert = {"kPa": 1, "MPa": 1e-3}
     # Sigrist's equation is given in kPa

@@ -184,7 +184,16 @@ class TestCriteriaEvaluator(unittest.TestCase):
         self.assertGreater(results.critical_skier_weight, 0)
 
     def test_evaluate_SteadyState(self):
-        """Test the evaluate_SteadyState method."""
+        """
+        Verify evaluate_SteadyState produces a converged steady-state with valid touchdown and stress metrics.
+        
+        Constructs a two-segment foundation system with touchdown enabled and asserts that the result:
+        - converged is True,
+        - energy_release_rate > 0,
+        - 0 < touchdown_distance < total system length,
+        - maximal_stress_result.max_principal_stress_norm > 0,
+        - maximal_stress_result.max_Sxx_norm > 0.
+        """
         segments = [
             Segment(length=self.segments_length, has_foundation=True, m=0),
             Segment(length=self.segments_length, has_foundation=True, m=0),
@@ -212,12 +221,9 @@ class TestCriteriaEvaluator(unittest.TestCase):
 
     def test_evaluate_SteadyState_without_touchdown_in_config(self):
         """
-        Test evaluate_SteadyState when SystemModel is initialized without touchdown=True.
-
-        This is a regression test for bug #37: SteadyState evaluation should work
-        even if the SystemModel is not initialized with touchdown=True in Config.
-        The evaluate_SteadyState method should internally enable touchdown mode
-        using toggle_touchdown() to properly invalidate cached properties.
+        Regression test verifying evaluate_SteadyState correctly handles a SystemModel initialized with Config.touchdown == False.
+        
+        Calls evaluate_SteadyState on a system whose Config does not enable touchdown and asserts the solver converges, energy_release_rate and touchdown_distance are positive, touchdown_distance is less than the total scenario length, maximal stress norms are positive, and the original system.config.touchdown value remains unchanged.
         """
         segments = [
             Segment(length=self.segments_length, has_foundation=True, m=0),

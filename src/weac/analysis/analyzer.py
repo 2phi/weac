@@ -227,27 +227,17 @@ class Analyzer:
     @track_analyzer_call
     def Sxx(self, Z, phi, dz=2, unit="kPa", normalize: bool = False):
         """
-        Compute axial normal stress in slab layers.
-
-        Arguments
-        ----------
-        Z : ndarray
-            Solution vector [u(x) u'(x) w(x) w'(x) psi(x), psi'(x)]^T
-        phi : float
-            Inclination (degrees). Counterclockwise positive.
-        dz : float, optional
-            Element size along z-axis (mm). Default is 2 mm.
-        unit : {'kPa', 'MPa'}, optional
-            Desired output unit. Default is 'kPa'.
-        normalize : bool, optional
-            Toggle normalization. If True, normalize stress values to the tensile strength of each layer (dimensionless).
-            When normalized, the `unit` parameter is ignored and values are returned as ratios.
-            Default is False.
-
-        Returns
-        -------
-        ndarray, float
-            Axial slab normal stress in specified unit.
+        Compute axial normal stress through the slab thickness for a given solution and inclination.
+        
+        Parameters:
+            Z (ndarray): Solution matrix with columns corresponding to evaluation points along x.
+            phi (float): Inclination in degrees; counterclockwise positive.
+            dz (float, optional): Vertical grid spacing in millimeters. Default 2.
+            unit ({"kPa", "MPa"}, optional): Output stress unit. Ignored if `normalize` is True. Default "kPa".
+            normalize (bool, optional): If True, return stresses normalized by each layer's tensile strength (dimensionless). Default False.
+        
+        Returns:
+            ndarray: Array of shape (n_z, n_x) with axial normal stress per z-grid point and x-evaluation in the requested unit, or dimensionless values if `normalize` is True.
         """
         # Unit conversion dict
         convert = {"kPa": 1e3, "MPa": 1}
@@ -360,28 +350,17 @@ class Analyzer:
     @track_analyzer_call
     def Szz(self, Z, phi, dz=2, unit="kPa", normalize: bool = False):
         """
-        Compute transverse normal stress in slab layers.
-
-        Arguments
-        ----------
-        Z : ndarray
-            Solution vector [u(x) u'(x) w(x) w'(x) psi(x), psi'(x)]^T
-        phi : float
-            Inclination (degrees). Counterclockwise positive.
-        dz : float, optional
-            Element size along z-axis (mm). Default is 2 mm.
-        unit : {'kPa', 'MPa'}, optional
-            Desired output unit. Default is 'kPa'.
-        normalize : bool, optional
-            Toggle normalization. If True, normalize stress values to the tensile strength of each layer (dimensionless).
-            When normalized, the `unit` parameter is ignored and values are returned as ratios.
-            Default is False.
-
-        Returns
-        -------
-        ndarray, float
-            Transverse normal stress at grid points in the slab in
-            specified unit.
+        Compute the transverse (through-thickness) normal stress Szz across slab layers.
+        
+        Parameters:
+            Z (ndarray): Solution matrix of field quantities along x.
+            phi (float): Inclination angle in degrees; counterclockwise positive.
+            dz (float): z-axis grid spacing in millimeters.
+            unit (str): Output unit, either 'kPa' or 'MPa'.
+            normalize (bool): If True, return Szz divided by each layer's tensile strength (unitless). When True, the `unit` argument is ignored.
+        
+        Returns:
+            ndarray: Array of Szz values at each z-grid point and x position (shape: [n_z, n_x]) in the requested unit, or unitless when `normalize` is True.
         """
         # Unit conversion dict
         convert = {"kPa": 1e3, "MPa": 1}

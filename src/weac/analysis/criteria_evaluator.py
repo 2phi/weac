@@ -687,21 +687,22 @@ class CriteriaEvaluator:
         print_call_stats: bool = False,
     ) -> SteadyStateResult:
         """
-        Evaluates the Touchdown Distance in the Steady State and the Steady State
-        Energy Release Rate.
-
+        Compute the steady-state touchdown distance and associated energy release rate for the given system.
+        
+        Evaluates the system in a steady-state (touchdown) configuration, computes the touchdown distance, the differential energy release rate, and maximal-stress metrics for the constructed steady-state system. The function returns a system copy configured for the steady-state scenario.
+        
         Parameters:
-        -----------
-        system: SystemModel
-            The system model.
-        vertical: bool, optional
-            Whether to evaluate the system in a vertical configuration.
-            Defaults to False.
-        print_call_stats: bool, optional
-            Whether to print the call statistics. Defaults to False.
-
-        IMPORTANT: There is a bug in vertical = True, so always slope normal,
-        i.e. vertical=False should be used.
+            system (SystemModel): System model to evaluate; the function operates on a deep copy and does not mutate the caller's instance.
+            vertical (bool): If True, evaluate in a vertical configuration. This mode is known to be buggy; prefer the default (vertical=False).
+            print_call_stats (bool): If True, print analyzer call statistics for debugging.
+        
+        Returns:
+            SteadyStateResult: Result object containing:
+                - touchdown_distance: steady-state touchdown distance determined by the slab_touchdown routine.
+                - energy_release_rate: differential energy release rate for the steady-state configuration.
+                - maximal_stress_result: MaximalStressResult with computed stress metrics for the steady-state system.
+                - system: the deep-copied SystemModel configured and used for the steady-state evaluation.
+                - converged and message indicating successful completion.
         """
         if vertical:
             warnings.warn(
@@ -1222,20 +1223,17 @@ class CriteriaEvaluator:
         print_call_stats: bool = False,
     ) -> MaximalStressResult:
         """
-        Calculate the maximal stresses in the system.
-
-        Parameters
-        ----------
-        system : SystemModel
-            The system model to analyze.
-        print_call_stats : bool, optional
-            Whether to print analyzer call statistics. Default is False.
-
-        Returns
-        -------
-        MaximalStressResult
-            Object containing both absolute (in kPa) and normalized stress fields,
-            along with maximum normalized stress values.
+        Compute absolute and normalized slab stress fields and derive maximal normalized stress metrics.
+        
+        Parameters:
+            system (SystemModel): System model to analyze.
+            print_call_stats (bool): If True, print analyzer call statistics.
+        
+        Returns:
+            MaximalStressResult: Contains `principal_stress_kPa` and `Sxx_kPa` (absolute stresses in kPa),
+            `principal_stress_norm` and `Sxx_norm` (normalized stress fields), `max_principal_stress_norm`
+            and `max_Sxx_norm` (maximum values of the normalized fields), and `slab_tensile_criterion`
+            (mean fraction of slab height prone to tensile failure).
         """
         analyzer = Analyzer(system, printing_enabled=print_call_stats)
         _, Z, _ = analyzer.rasterize_solution(num=4000, mode="cracked")

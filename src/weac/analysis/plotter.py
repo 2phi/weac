@@ -1050,37 +1050,29 @@ class Plotter:
         filename: str = "visualize_deformation",
     ) -> Figure:
         """
-        Plot visualize deformation of the slab and weak layer.
-
-        Parameters
-        ----------
-        xsl : np.ndarray
-            Slab x-coordinates.
-        xwl : np.ndarray
-            Weak layer x-coordinates.
-        z : np.ndarray
-            Solution vector.
-        analyzer : Analyzer
-            Analyzer instance.
-        window: float | None, optional
-            Window size for the plot. Default is None.
-        weaklayer_proportion: float | None, optional
-            Proportion of the plot to allocate to the weak layer. Default is None.
-        dz : int, optional
-            Element size along z-axis (mm). Default is 2 mm.
-        levels : int, optional
-            Number of levels for the colormap. Default is 300.
-        field : str, optional
-            Field to plot ('w', 'u', 'principal', 'Sxx', 'Txz', 'Szz'). Default is 'w'.
-        normalize : bool, optional
-            Toggle normalization. Default is True.
-        filename : str, optional
-            Filename for saving plot. Default is "visualize_deformation".
-
-        Returns
-        -------
-        matplotlib.figure.Figure
-            The generated plot figure.
+        Visualize slab and weak-layer deformation together with a scalar field as a dual-axis, contour-filled plot.
+        
+        Parameters:
+            xsl (np.ndarray): Slab horizontal coordinates.
+            xwl (np.ndarray): Weak-layer horizontal coordinates (NaN or non-finite entries indicate cracks).
+            z (np.ndarray): Solution vector or state used by the analyzer to compute fields.
+            analyzer (Analyzer): Analyzer providing displacement and stress evaluation routines and model metadata.
+            window (float | None, optional): If provided, restrict the x-axis to [xmax - window, xmax]; otherwise use full extent.
+            weaklayer_proportion (float | None, optional): Fraction of the plot height allocated to the weak layer; if None a dynamic value is computed.
+            dz (int, optional): Vertical discretization step used when sampling slab fields.
+            levels (int, optional): Number of contour levels for filled colormaps.
+            field (Literal["w","u","principal","Sxx","Txz","Szz"], optional): Field to display:
+                - "w": vertical deflection
+                - "u": horizontal displacement
+                - "Sxx": axial normal stress
+                - "Txz": shear stress
+                - "Szz": transverse normal stress
+                - "principal": principal stress (slab and weak layer)
+            normalize (bool, optional): If True, normalize stress fields to the model's tensile strength where applicable.
+            filename (str, optional): Base filename used to save the generated figure (saved in the plot directory).
+        
+        Returns:
+            matplotlib.figure.Figure: The created figure containing the deformation and field visualization.
         """
         fig = plt.figure(figsize=(10, 8))
         ax = fig.add_subplot(111)
