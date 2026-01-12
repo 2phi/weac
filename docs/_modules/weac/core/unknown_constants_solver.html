@@ -12,9 +12,9 @@
   <meta name="theme-color" media="(prefers-color-scheme: light)" content="white" />
   <meta name="theme-color" media="(prefers-color-scheme: dark)" content="black" />
   
-    <title>weac.core.unknown_constants_solver | WEAC 3.1.0</title>
-    <meta property="og:title" content="weac.core.unknown_constants_solver | WEAC 3.1.0" />
-    <meta name="twitter:title" content="weac.core.unknown_constants_solver | WEAC 3.1.0" />
+    <title>weac.core.unknown_constants_solver | WEAC 3.1.1</title>
+    <meta property="og:title" content="weac.core.unknown_constants_solver | WEAC 3.1.1" />
+    <meta name="twitter:title" content="weac.core.unknown_constants_solver | WEAC 3.1.1" />
       <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=e72c8e07" />
       <link rel="stylesheet" type="text/css" href="../../../_static/theme.css?v=42baaae4" />
     <link rel="canonical" href="https://2phi.github.io/weac/_modules/weac/core/unknown_constants_solver.html" />
@@ -40,7 +40,7 @@
     </a><header
   class="sticky top-0 z-40 w-full border-b shadow-sm border-border supports-backdrop-blur:bg-background/60 bg-background/95 backdrop-blur"><div class="container flex items-center h-14">
     <div class="hidden mr-4 md:flex">
-      <a href="../../../index.html" class="flex items-center mr-6"><span class="hidden font-bold sm:inline-block text-clip whitespace-nowrap">WEAC 3.1.0</span>
+      <a href="../../../index.html" class="flex items-center mr-6"><span class="hidden font-bold sm:inline-block text-clip whitespace-nowrap">WEAC 3.1.1</span>
       </a></div><button
       class="inline-flex items-center justify-center h-10 px-0 py-2 mr-2 text-base font-medium transition-colors rounded-md hover:text-accent-foreground hover:bg-transparent md:hidden"
       type="button" @click="showSidebar = true">
@@ -95,7 +95,7 @@
   class="fixed inset-y-0 left-0 md:top-14 z-50 md:z-30 bg-background md:bg-transparent transition-all duration-100 -translate-x-full md:translate-x-0 ml-0 p-6 md:p-0 md:-ml-2 md:h-[calc(100vh-3.5rem)] w-5/6 md:w-full shrink-0 overflow-y-auto border-r border-border md:sticky"
   :aria-hidden="!showSidebar" :class="{ 'translate-x-0': showSidebar }">
 
-    <a href="../../../index.html" class="!justify-start text-sm md:!hidden bg-background"><span class="font-bold text-clip whitespace-nowrap">WEAC 3.1.0</span>
+    <a href="../../../index.html" class="!justify-start text-sm md:!hidden bg-background"><span class="font-bold text-clip whitespace-nowrap">WEAC 3.1.1</span>
     </a>
 
     <div class="relative overflow-hidden md:overflow-auto my-4 md:my-0 h-[calc(100vh-8rem)] md:h-auto">
@@ -174,7 +174,7 @@
      class="flex items-center mb-4 space-x-1 text-sm text-muted-foreground">
   <a class="overflow-hidden text-ellipsis whitespace-nowrap hover:text-foreground"
      href="../../../index.html">
-    <span class="hidden md:inline">WEAC 3.1.0</span>
+    <span class="hidden md:inline">WEAC 3.1.1</span>
     <svg xmlns="http://www.w3.org/2000/svg"
          height="18"
          width="18"
@@ -476,17 +476,17 @@
 </span><span id="line-273"><span class="sd">        Arguments</span>
 </span><span id="line-274"><span class="sd">        ---------</span>
 </span><span id="line-275"><span class="sd">        zl : ndarray</span>
-</span><span id="line-276"><span class="sd">            Solution vector (6x1) or (6x6) at left end of beam segement.</span>
+</span><span id="line-276"><span class="sd">            Solution vector (6x1) or (6x6) at left end of beam segment.</span>
 </span><span id="line-277"><span class="sd">        zr : ndarray</span>
-</span><span id="line-278"><span class="sd">            Solution vector (6x1) or (6x6) at right end of beam segement.</span>
+</span><span id="line-278"><span class="sd">            Solution vector (6x1) or (6x6) at right end of beam segment.</span>
 </span><span id="line-279"><span class="sd">        has_foundation : boolean</span>
 </span><span id="line-280"><span class="sd">            Indicates whether segment has foundation(True) or not (False).</span>
 </span><span id="line-281"><span class="sd">            Default is False.</span>
 </span><span id="line-282"><span class="sd">        pos: {&#39;left&#39;, &#39;mid&#39;, &#39;right&#39;, &#39;l&#39;, &#39;m&#39;, &#39;r&#39;}, optional</span>
-</span><span id="line-283"><span class="sd">            Determines whether the segement under consideration</span>
-</span><span id="line-284"><span class="sd">            is a left boundary segement (left, l), one of the</span>
-</span><span id="line-285"><span class="sd">            center segement (mid, m), or a right boundary</span>
-</span><span id="line-286"><span class="sd">            segement (right, r). Default is &#39;mid&#39;.</span>
+</span><span id="line-283"><span class="sd">            Determines whether the segment under consideration</span>
+</span><span id="line-284"><span class="sd">            is a left boundary segment (left, l), one of the</span>
+</span><span id="line-285"><span class="sd">            center segment (mid, m), or a right boundary</span>
+</span><span id="line-286"><span class="sd">            segment (right, r). Default is &#39;mid&#39;.</span>
 </span><span id="line-287">
 </span><span id="line-288"><span class="sd">        Returns</span>
 </span><span id="line-289"><span class="sd">        -------</span>
@@ -513,7 +513,7 @@
 </span><span id="line-310">                    <span class="n">bcs</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span>
 </span><span id="line-311">                    <span class="n">fq</span><span class="o">.</span><span class="n">u</span><span class="p">(</span><span class="n">zr</span><span class="p">,</span> <span class="n">h0</span><span class="o">=</span><span class="mi">0</span><span class="p">),</span>  <span class="c1"># ui(xi = li)</span>
 </span><span id="line-312">                    <span class="n">fq</span><span class="o">.</span><span class="n">w</span><span class="p">(</span><span class="n">zr</span><span class="p">),</span>  <span class="c1"># wi(xi = li)</span>
-</span><span id="line-313">                    <span class="n">fq</span><span class="o">.</span><span class="n">psi</span><span class="p">(</span><span class="n">zr</span><span class="p">),</span>  <span class="c1"># psii(xi = li)</span>
+</span><span id="line-313">                    <span class="n">fq</span><span class="o">.</span><span class="n">psi</span><span class="p">(</span><span class="n">zr</span><span class="p">),</span>  <span class="c1"># psi(xi = li)</span>
 </span><span id="line-314">                    <span class="n">fq</span><span class="o">.</span><span class="n">N</span><span class="p">(</span><span class="n">zr</span><span class="p">),</span>  <span class="c1"># Ni(xi = li)</span>
 </span><span id="line-315">                    <span class="n">fq</span><span class="o">.</span><span class="n">M</span><span class="p">(</span><span class="n">zr</span><span class="p">),</span>  <span class="c1"># Mi(xi = li)</span>
 </span><span id="line-316">                    <span class="n">fq</span><span class="o">.</span><span class="n">V</span><span class="p">(</span><span class="n">zr</span><span class="p">),</span>  <span class="c1"># Vi(xi = li)</span>
@@ -524,13 +524,13 @@
 </span><span id="line-321">                <span class="p">[</span>
 </span><span id="line-322">                    <span class="o">-</span><span class="n">fq</span><span class="o">.</span><span class="n">u</span><span class="p">(</span><span class="n">zl</span><span class="p">,</span> <span class="n">h0</span><span class="o">=</span><span class="mi">0</span><span class="p">),</span>  <span class="c1"># -ui(xi = 0)</span>
 </span><span id="line-323">                    <span class="o">-</span><span class="n">fq</span><span class="o">.</span><span class="n">w</span><span class="p">(</span><span class="n">zl</span><span class="p">),</span>  <span class="c1"># -wi(xi = 0)</span>
-</span><span id="line-324">                    <span class="o">-</span><span class="n">fq</span><span class="o">.</span><span class="n">psi</span><span class="p">(</span><span class="n">zl</span><span class="p">),</span>  <span class="c1"># -psii(xi = 0)</span>
+</span><span id="line-324">                    <span class="o">-</span><span class="n">fq</span><span class="o">.</span><span class="n">psi</span><span class="p">(</span><span class="n">zl</span><span class="p">),</span>  <span class="c1"># -psi(xi = 0)</span>
 </span><span id="line-325">                    <span class="o">-</span><span class="n">fq</span><span class="o">.</span><span class="n">N</span><span class="p">(</span><span class="n">zl</span><span class="p">),</span>  <span class="c1"># -Ni(xi = 0)</span>
 </span><span id="line-326">                    <span class="o">-</span><span class="n">fq</span><span class="o">.</span><span class="n">M</span><span class="p">(</span><span class="n">zl</span><span class="p">),</span>  <span class="c1"># -Mi(xi = 0)</span>
 </span><span id="line-327">                    <span class="o">-</span><span class="n">fq</span><span class="o">.</span><span class="n">V</span><span class="p">(</span><span class="n">zl</span><span class="p">),</span>  <span class="c1"># -Vi(xi = 0)</span>
 </span><span id="line-328">                    <span class="n">fq</span><span class="o">.</span><span class="n">u</span><span class="p">(</span><span class="n">zr</span><span class="p">,</span> <span class="n">h0</span><span class="o">=</span><span class="mi">0</span><span class="p">),</span>  <span class="c1"># ui(xi = li)</span>
 </span><span id="line-329">                    <span class="n">fq</span><span class="o">.</span><span class="n">w</span><span class="p">(</span><span class="n">zr</span><span class="p">),</span>  <span class="c1"># wi(xi = li)</span>
-</span><span id="line-330">                    <span class="n">fq</span><span class="o">.</span><span class="n">psi</span><span class="p">(</span><span class="n">zr</span><span class="p">),</span>  <span class="c1"># psii(xi = li)</span>
+</span><span id="line-330">                    <span class="n">fq</span><span class="o">.</span><span class="n">psi</span><span class="p">(</span><span class="n">zr</span><span class="p">),</span>  <span class="c1"># psi(xi = li)</span>
 </span><span id="line-331">                    <span class="n">fq</span><span class="o">.</span><span class="n">N</span><span class="p">(</span><span class="n">zr</span><span class="p">),</span>  <span class="c1"># Ni(xi = li)</span>
 </span><span id="line-332">                    <span class="n">fq</span><span class="o">.</span><span class="n">M</span><span class="p">(</span><span class="n">zr</span><span class="p">),</span>  <span class="c1"># Mi(xi = li)</span>
 </span><span id="line-333">                    <span class="n">fq</span><span class="o">.</span><span class="n">V</span><span class="p">(</span><span class="n">zr</span><span class="p">),</span>  <span class="c1"># Vi(xi = li)</span>
@@ -550,7 +550,7 @@
 </span><span id="line-347">                <span class="p">[</span>
 </span><span id="line-348">                    <span class="o">-</span><span class="n">fq</span><span class="o">.</span><span class="n">u</span><span class="p">(</span><span class="n">zl</span><span class="p">,</span> <span class="n">h0</span><span class="o">=</span><span class="mi">0</span><span class="p">),</span>  <span class="c1"># -ui(xi = 0)</span>
 </span><span id="line-349">                    <span class="o">-</span><span class="n">fq</span><span class="o">.</span><span class="n">w</span><span class="p">(</span><span class="n">zl</span><span class="p">),</span>  <span class="c1"># -wi(xi = 0)</span>
-</span><span id="line-350">                    <span class="o">-</span><span class="n">fq</span><span class="o">.</span><span class="n">psi</span><span class="p">(</span><span class="n">zl</span><span class="p">),</span>  <span class="c1"># -psii(xi = 0)</span>
+</span><span id="line-350">                    <span class="o">-</span><span class="n">fq</span><span class="o">.</span><span class="n">psi</span><span class="p">(</span><span class="n">zl</span><span class="p">),</span>  <span class="c1"># -psi(xi = 0)</span>
 </span><span id="line-351">                    <span class="o">-</span><span class="n">fq</span><span class="o">.</span><span class="n">N</span><span class="p">(</span><span class="n">zl</span><span class="p">),</span>  <span class="c1"># -Ni(xi = 0)</span>
 </span><span id="line-352">                    <span class="o">-</span><span class="n">fq</span><span class="o">.</span><span class="n">M</span><span class="p">(</span><span class="n">zl</span><span class="p">),</span>  <span class="c1"># -Mi(xi = 0)</span>
 </span><span id="line-353">                    <span class="o">-</span><span class="n">fq</span><span class="o">.</span><span class="n">V</span><span class="p">(</span><span class="n">zl</span><span class="p">),</span>  <span class="c1"># -Vi(xi = 0)</span>
@@ -588,9 +588,9 @@
 </span><span id="line-385"><span class="sd">            Default is False.</span>
 </span><span id="line-386"><span class="sd">        pos : {&#39;left&#39;, &#39;mid&#39;, &#39;right&#39;, &#39;l&#39;, &#39;m&#39;, &#39;r&#39;}, optional</span>
 </span><span id="line-387"><span class="sd">            Determines whether the segement under consideration</span>
-</span><span id="line-388"><span class="sd">            is a left boundary segement (left, l), one of the</span>
-</span><span id="line-389"><span class="sd">            center segement (mid, m), or a right boundary</span>
-</span><span id="line-390"><span class="sd">            segement (right, r). Default is &#39;mid&#39;.</span>
+</span><span id="line-388"><span class="sd">            is a left boundary segment (left, l), one of the</span>
+</span><span id="line-389"><span class="sd">            center segment (mid, m), or a right boundary</span>
+</span><span id="line-390"><span class="sd">            segment (right, r). Default is &#39;mid&#39;.</span>
 </span><span id="line-391">
 </span><span id="line-392"><span class="sd">        Returns</span>
 </span><span id="line-393"><span class="sd">        -------</span>
@@ -658,7 +658,7 @@
 </footer>
   </div>
   
-    <script src="../../../_static/documentation_options.js?v=dd1205ac"></script>
+    <script src="../../../_static/documentation_options.js?v=796a81b5"></script>
     <script src="../../../_static/doctools.js?v=9bcbadda"></script>
     <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script defer="defer" src="../../../_static/theme.js?v=073f68d9"></script>
