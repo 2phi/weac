@@ -272,11 +272,7 @@ class Analyzer:
 
         # Calculate weight load at grid points and superimpose on stress field
         qt = -rho * G_MM_S2 * np.sin(np.deg2rad(phi))
-        # Old Implementation: Changed for numerical stability
-        # for i, qi in enumerate(qt[:-1]):
-        #     Sxx[i, :] += qi * (zi[i + 1] - zi[i])
-        # Sxx[-1, :] += qt[-1] * (zi[-1] - zi[-2])
-        # New Implementation: Changed for numerical stability
+
         dz = np.diff(zi)
         Sxx_MPa[:-1, :] += qt[:-1, np.newaxis] * dz[:, np.newaxis]
         Sxx_MPa[-1, :] += qt[-1] * dz[-1]
@@ -393,7 +389,7 @@ class Analyzer:
         # Get mesh along z-axis
         zmesh = self.get_zmesh(dz=dz)
         zi = zmesh["z"]
-        rho = zmesh["rho"]
+        rho_t_mm3 = zmesh["rho"]
         qs = self.sm.scenario.surface_load
         # Get dimensions of stress field (n rows, m columns)
         n = len(zi)
@@ -414,13 +410,13 @@ class Analyzer:
             dsxx_dxdx[i, :] = E / (1 - nu**2) * (du0_dxdxdx + z * dpsi_dxdxdx)
 
         # Calculate weight load at grid points
-        qn = rho * G_MM_S2 * np.cos(np.deg2rad(phi))
+        qn = -rho_t_mm3 * G_MM_S2 * np.cos(np.deg2rad(phi))
 
         # Integrate dsxx_dxdx twice along z to obtain transverse
         # normal stress Szz in MPa
         integrand = cumulative_trapezoid(dsxx_dxdx, zi, axis=0, initial=0)
         Szz_MPa = cumulative_trapezoid(integrand, zi, axis=0, initial=0)
-        Szz_MPa += cumulative_trapezoid(-qn, zi, initial=0)[:, None]
+        Szz_MPa += cumulative_trapezoid(qn, zi, initial=0)[:, None]
 
         # Normalize tensile stresses to tensile strength
         if normalize:

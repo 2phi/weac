@@ -94,6 +94,10 @@ def _sigrist_tensile_strength(rho, unit: Literal["kPa", "MPa"] = "kPa"):
     return convert[unit] * 240 * (rho / RHO_ICE) ** 2.44
 
 
+# TODO: Compressive Strength from Schöttner
+# (11 +/- 7) * (rho/rho_0) ^ (5.4 +/- 0.5)
+
+
 class Layer(BaseModel):
     """
     Regular slab layer (no foundation springs).
@@ -225,6 +229,9 @@ class WeakLayer(BaseModel):
     )
     sigma_c: float = Field(default=6.16, gt=0, description="Tensile strength [kPa]")
     tau_c: float = Field(default=5.09, gt=0, description="Shear strength [kPa]")
+    sigma_comp: float = Field(
+        default=2.6, gt=0, description="Compressive strength [kPa]"
+    )
     E_method: Literal["bergfeld", "scapazzo", "gerling"] = Field(
         default="bergfeld",
         description="Method to calculate the Young's modulus",
