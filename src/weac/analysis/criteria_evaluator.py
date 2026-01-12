@@ -710,9 +710,9 @@ class CriteriaEvaluator:
                 UserWarning,
             )
         system_copy = copy.deepcopy(system)
-        system_copy.config.touchdown = True
+        system_copy.toggle_touchdown(True)
         system_copy.update_scenario(scenario_config=ScenarioConfig(phi=0.0))
-        l_BC = system.slab_touchdown.l_BC
+        l_BC = system_copy.slab_touchdown.l_BC
 
         segments = [
             Segment(length=5e3, has_foundation=True, m=0.0),
@@ -723,7 +723,6 @@ class CriteriaEvaluator:
             phi=0.0,  # Slab Touchdown works only for flat slab
             cut_length=2 * l_BC,
         )
-        # system_copy.config.touchdown = True
         system_copy.update_scenario(segments=segments, scenario_config=scenario_config)
         touchdown_distance = system_copy.slab_touchdown.touchdown_distance
         analyzer = Analyzer(system_copy, printing_enabled=print_call_stats)

@@ -210,6 +210,48 @@ class TestCriteriaEvaluator(unittest.TestCase):
         self.assertGreater(max_principal_stress_norm, 0)
         self.assertGreater(max_Sxx_norm, 0)
 
+    def test_evaluate_SteadyState_without_touchdown_in_config(self):
+        """
+        Test evaluate_SteadyState when SystemModel is initialized without touchdown=True.
+
+        This is a regression test for bug #37: SteadyState evaluation should work
+        even if the SystemModel is not initialized with touchdown=True in Config.
+        The evaluate_SteadyState method should internally enable touchdown mode
+        using toggle_touchdown() to properly invalidate cached properties.
+        """
+        segments = [
+            Segment(length=self.segments_length, has_foundation=True, m=0),
+            Segment(length=self.segments_length, has_foundation=True, m=0),
+        ]
+        # Initialize system WITHOUT touchdown=True (default is False)
+        system = SystemModel(
+            model_input=ModelInput(
+                layers=self.layers,
+                weak_layer=self.weak_layer,
+                segments=segments,
+                scenario_config=ScenarioConfig(phi=self.phi),
+            ),
+            config=Config(),  # touchdown defaults to False
+        )
+
+        # This should not raise AttributeError: 'NoneType' object has no attribute 'l_BC'
+        results: SteadyStateResult = self.evaluator.evaluate_SteadyState(system)
+
+        # Verify results are valid
+        self.assertTrue(results.converged)
+        self.assertGreater(results.energy_release_rate, 0)
+        self.assertGreater(results.touchdown_distance, 0)
+        self.assertLess(results.touchdown_distance, results.system.scenario.L)
+        max_principal_stress_norm = (
+            results.maximal_stress_result.max_principal_stress_norm
+        )
+        max_Sxx_norm = results.maximal_stress_result.max_Sxx_norm
+        self.assertGreater(max_principal_stress_norm, 0)
+        self.assertGreater(max_Sxx_norm, 0)
+
+        # Verify the original system's touchdown state was not modified
+        self.assertFalse(system.config.touchdown)
+
     def test_find_minimum_crack_length(self):
         """Test the find_minimum_crack_length method."""
         segments = [
