@@ -2886,7 +2886,7 @@ requires-dist = [
     { name = "nbformat", marker = "extra == 'dev'", specifier = ">=5.10.0" },
     { name = "nest-asyncio", marker = "extra == 'dev'", specifier = ">=1.6.0" },
     { name = "nest-asyncio", marker = "extra == 'interactive'", specifier = ">=1.6.0" },
-    { name = "numpy", specifier = "==2.3.5" },
+    { name = "numpy", specifier = ">=2.3.5" },
     { name = "pycodestyle", marker = "extra == 'dev'", specifier = ">=2.11.1" },
     { name = "pydantic", specifier = ">=2.11.7" },
     { name = "pylint", marker = "extra == 'dev'", specifier = ">=3.2.0" },
