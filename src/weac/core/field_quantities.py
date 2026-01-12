@@ -91,7 +91,7 @@ class FieldQuantities:  # pylint: disable=too-many-instance-attributes, too-many
         return Z[5, :]
 
     def N(self, Z: np.ndarray) -> float | np.ndarray:
-        """Axial normal force `N = A11 u' + B11 ψ'` in the slab (N)"""
+        """Axial normal force `N = A11 u' + B11 ψ'` in the slab [N]"""
         return self.es.A11 * Z[1, :] + self.es.B11 * Z[5, :]
 
     def M(self, Z: np.ndarray) -> float | np.ndarray:

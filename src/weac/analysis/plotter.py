@@ -1063,7 +1063,7 @@ class Plotter:
         analyzer : Analyzer
             Analyzer instance.
         window: float | None, optional
-            Window size for the plot. Default is None.
+            Window size for the plot. Shows the right edge of the slab, where the slab is deformed. Default is None.
         weaklayer_proportion: float | None, optional
             Proportion of the plot to allocate to the weak layer. Default is None.
         dz : int, optional
