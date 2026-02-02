@@ -272,6 +272,46 @@ class TestCriteriaEvaluator(unittest.TestCase):
         self.assertIsInstance(new_segments, list)
         self.assertTrue(all(isinstance(s, Segment) for s in new_segments))
 
+    def test_evaluate_SteadyState_modes(self):
+        """Test evaluate_SteadyState with various modes."""
+        test_cases = [
+            ("C_in_contact", "C_in_contact"),
+            ("B_point_contact", "B_point_contact"),
+            ("A_free_hanging", "A_free_hanging"),
+            (None, "C_in_contact"),  # default mode
+        ]
+
+        for mode_param, expected_mode in test_cases:
+            with self.subTest(mode=mode_param):
+                segments = [
+                    Segment(length=self.segments_length, has_foundation=True, m=0),
+                    Segment(length=self.segments_length, has_foundation=True, m=0),
+                ]
+                system = SystemModel(
+                    model_input=ModelInput(
+                        layers=self.layers,
+                        weak_layer=self.weak_layer,
+                        segments=segments,
+                        scenario_config=ScenarioConfig(phi=self.phi),
+                    ),
+                    config=Config(touchdown=True),
+                )
+
+                if mode_param is None:
+                    results: SteadyStateResult = self.evaluator.evaluate_SteadyState(
+                        system
+                    )
+                else:
+                    results: SteadyStateResult = self.evaluator.evaluate_SteadyState(
+                        system, mode=mode_param
+                    )
+
+                self.assertTrue(results.converged)
+                self.assertEqual(
+                    results.system.slab_touchdown.touchdown_mode,
+                    expected_mode,
+                )
+
 
 if __name__ == "__main__":
     unittest.main()
