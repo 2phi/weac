@@ -7,7 +7,7 @@ from .criteria_config import CriteriaConfig
 from .layer import Layer, WeakLayer
 from .model_input import ModelInput
 from .segment import Segment
-from .scenario_config import ScenarioConfig, SystemType
+from .scenario_config import ScenarioConfig, SystemType, TouchdownMode
 
 __all__ = [
     "Config",
@@ -18,4 +18,5 @@ __all__ = [
     "ScenarioConfig",
     "ModelInput",
     "SystemType",
+    "TouchdownMode",
 ]

@@ -10,12 +10,9 @@ field_name: type = Field(..., gt=0, description="Description")
 - typing, default value, constraints, description
 """
 
-from typing import Literal
-
 from pydantic import BaseModel, Field
 
-# Touchdown mode type - must match the one in slab_touchdown.py
-TouchdownMode = Literal["A_free_hanging", "B_point_contact", "C_in_contact"]
+from weac.components.scenario_config import TouchdownMode
 
 
 class Config(BaseModel):

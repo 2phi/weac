@@ -28,7 +28,8 @@ from weac.core.eigensystem import Eigensystem
 from weac.core.field_quantities import FieldQuantities
 from weac.core.scenario import Scenario
 from weac.core.slab import Slab
-from weac.core.slab_touchdown import SlabTouchdown, TouchdownMode
+from weac.components.scenario_config import TouchdownMode
+from weac.core.slab_touchdown import SlabTouchdown
 from weac.core.unknown_constants_solver import UnknownConstantsSolver
 
 logger = logging.getLogger(__name__)

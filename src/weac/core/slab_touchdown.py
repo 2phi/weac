@@ -9,7 +9,7 @@ from typing import Literal
 from scipy.optimize import brentq
 
 from weac.components.layer import WeakLayer
-from weac.components.scenario_config import ScenarioConfig
+from weac.components.scenario_config import ScenarioConfig, TouchdownMode
 from weac.components.segment import Segment
 from weac.constants import STIFFNESS_COLLAPSE_FACTOR
 from weac.core.eigensystem import Eigensystem
@@ -18,9 +18,6 @@ from weac.core.scenario import Scenario
 from weac.core.unknown_constants_solver import UnknownConstantsSolver
 
 logger = logging.getLogger(__name__)
-
-
-TouchdownMode = Literal["A_free_hanging", "B_point_contact", "C_in_contact"]
 
 
 class SlabTouchdown:  # pylint: disable=too-many-instance-attributes,too-few-public-methods

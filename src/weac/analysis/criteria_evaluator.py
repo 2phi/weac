@@ -24,7 +24,7 @@ from weac.components import (
     WeakLayer,
 )
 from weac.constants import RHO_ICE
-from weac.core.slab_touchdown import TouchdownMode
+from weac.components.scenario_config import TouchdownMode
 from weac.core.system_model import SystemModel
 
 logger = logging.getLogger(__name__)
