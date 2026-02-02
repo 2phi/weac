@@ -335,8 +335,7 @@ class SystemModel:
             weak_layer=self.weak_layer,
             slab=self.slab,
         )
-        if self.config.touchdown:
-            self._invalidate_slab_touchdown()
+        self._invalidate_slab_touchdown()
         self._invalidate_constants()
 
     def toggle_touchdown(self, touchdown: bool):

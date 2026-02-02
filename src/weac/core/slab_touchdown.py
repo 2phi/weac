@@ -20,6 +20,9 @@ from weac.core.unknown_constants_solver import UnknownConstantsSolver
 logger = logging.getLogger(__name__)
 
 
+TouchdownMode = Literal["A_free_hanging", "B_point_contact", "C_in_contact"]
+
+
 class SlabTouchdown:  # pylint: disable=too-many-instance-attributes,too-few-public-methods
     """
     Handling the touchdown situation in a PST.
@@ -56,7 +59,7 @@ class SlabTouchdown:  # pylint: disable=too-many-instance-attributes,too-few-pub
         Length of the crack for transition of stage A to stage B [mm]
     l_BC : float
         Length of the crack for transition of stage B to stage C [mm]
-    touchdown_mode : Literal["A_free_hanging", "B_point_contact", "C_in_contact"]
+    touchdown_mode : TouchdownMode
         Type of touchdown mode
     touchdown_distance : float
         Length of the touchdown segment [mm]
@@ -74,9 +77,7 @@ class SlabTouchdown:  # pylint: disable=too-many-instance-attributes,too-few-pub
     straight_scenario: Scenario
     l_AB: float
     l_BC: float
-    touchdown_mode: Literal[
-        "A_free_hanging", "B_point_contact", "C_in_contact"
-    ]  # Three types of contact with collapsed weak layer
+    touchdown_mode: TouchdownMode  # Three types of contact with collapsed weak layer
     touchdown_distance: float
     collapsed_weak_layer_kR: float | None = None
 

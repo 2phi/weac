@@ -97,6 +97,9 @@ def _sigrist_tensile_strength(rho, unit: Literal["kPa", "MPa"] = "kPa"):
 # TODO: Compressive Strength from Schöttner
 # (11 +/- 7) * (rho/rho_0) ^ (5.4 +/- 0.5)
 
+# TODO: tensile strength from Valle
+# Extrapolated for higher densities (see Teams Chat)
+
 
 class Layer(BaseModel):
     """

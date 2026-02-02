@@ -24,6 +24,7 @@ from weac.components import (
     WeakLayer,
 )
 from weac.constants import RHO_ICE
+from weac.core.slab_touchdown import TouchdownMode
 from weac.core.system_model import SystemModel
 
 logger = logging.getLogger(__name__)
@@ -683,6 +684,7 @@ class CriteriaEvaluator:
     def evaluate_SteadyState(
         self,
         system: SystemModel,
+        mode: TouchdownMode = "C_in_contact",
         vertical: bool = False,
         print_call_stats: bool = False,
     ) -> SteadyStateResult:
@@ -710,18 +712,33 @@ class CriteriaEvaluator:
                 UserWarning,
             )
         system_copy = copy.deepcopy(system)
+        # Evaluate touchdown distance for flat slab
         system_copy.toggle_touchdown(True)
-        system_copy.update_scenario(scenario_config=ScenarioConfig(phi=0.0))
-        l_BC = system_copy.slab_touchdown.l_BC
+        segments = [
+            Segment(length=5e3, has_foundation=True, m=0.0),
+            Segment(length=5e3, has_foundation=False, m=0.0),
+        ]
+        system_copy.update_scenario(
+            segments=segments, scenario_config=ScenarioConfig(phi=0.0)
+        )
+
+        cut_distance = 0
+        match mode:
+            case "C_in_contact":
+                cut_distance = 2 * system_copy.slab_touchdown.l_BC
+            case "B_point_contact":
+                cut_distance = system_copy.slab_touchdown.l_BC - 1e-3
+            case "A_free_hanging":
+                cut_distance = system_copy.slab_touchdown.l_AB - 1e-3
 
         segments = [
             Segment(length=5e3, has_foundation=True, m=0.0),
-            Segment(length=2 * l_BC, has_foundation=False, m=0.0),
+            Segment(length=cut_distance, has_foundation=False, m=0.0),
         ]
         scenario_config = ScenarioConfig(
             system_type="vpst-" if vertical else "pst-",
             phi=0.0,  # Slab Touchdown works only for flat slab
-            cut_length=2 * l_BC,
+            cut_length=cut_distance,
         )
         system_copy.update_scenario(segments=segments, scenario_config=scenario_config)
         touchdown_distance = system_copy.slab_touchdown.touchdown_distance
