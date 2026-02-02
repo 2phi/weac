@@ -272,104 +272,45 @@ class TestCriteriaEvaluator(unittest.TestCase):
         self.assertIsInstance(new_segments, list)
         self.assertTrue(all(isinstance(s, Segment) for s in new_segments))
 
-    def test_evaluate_SteadyState_mode_C_in_contact(self):
-        """Test evaluate_SteadyState with mode='C_in_contact'."""
-        segments = [
-            Segment(length=self.segments_length, has_foundation=True, m=0),
-            Segment(length=self.segments_length, has_foundation=True, m=0),
+    def test_evaluate_SteadyState_modes(self):
+        """Test evaluate_SteadyState with various modes."""
+        test_cases = [
+            ("C_in_contact", "C_in_contact"),
+            ("B_point_contact", "B_point_contact"),
+            ("A_free_hanging", "A_free_hanging"),
+            (None, "C_in_contact"),  # default mode
         ]
-        system = SystemModel(
-            model_input=ModelInput(
-                layers=self.layers,
-                weak_layer=self.weak_layer,
-                segments=segments,
-                scenario_config=ScenarioConfig(phi=self.phi),
-            ),
-            config=Config(touchdown=True),
-        )
-        results: SteadyStateResult = self.evaluator.evaluate_SteadyState(
-            system, mode="C_in_contact"
-        )
-        self.assertTrue(results.converged)
-        self.assertEqual(
-            results.system.slab_touchdown.touchdown_mode,
-            "C_in_contact",
-            "Touchdown mode should match the mode parameter passed to evaluate_SteadyState",
-        )
 
-    def test_evaluate_SteadyState_mode_B_point_contact(self):
-        """Test evaluate_SteadyState with mode='B_point_contact'."""
-        segments = [
-            Segment(length=self.segments_length, has_foundation=True, m=0),
-            Segment(length=self.segments_length, has_foundation=True, m=0),
-        ]
-        system = SystemModel(
-            model_input=ModelInput(
-                layers=self.layers,
-                weak_layer=self.weak_layer,
-                segments=segments,
-                scenario_config=ScenarioConfig(phi=self.phi),
-            ),
-            config=Config(touchdown=True),
-        )
-        results: SteadyStateResult = self.evaluator.evaluate_SteadyState(
-            system, mode="B_point_contact"
-        )
-        self.assertTrue(results.converged)
-        self.assertEqual(
-            results.system.slab_touchdown.touchdown_mode,
-            "B_point_contact",
-            "Touchdown mode should match the mode parameter passed to evaluate_SteadyState",
-        )
+        for mode_param, expected_mode in test_cases:
+            with self.subTest(mode=mode_param):
+                segments = [
+                    Segment(length=self.segments_length, has_foundation=True, m=0),
+                    Segment(length=self.segments_length, has_foundation=True, m=0),
+                ]
+                system = SystemModel(
+                    model_input=ModelInput(
+                        layers=self.layers,
+                        weak_layer=self.weak_layer,
+                        segments=segments,
+                        scenario_config=ScenarioConfig(phi=self.phi),
+                    ),
+                    config=Config(touchdown=True),
+                )
 
-    def test_evaluate_SteadyState_mode_A_free_hanging(self):
-        """Test evaluate_SteadyState with mode='A_free_hanging'."""
-        segments = [
-            Segment(length=self.segments_length, has_foundation=True, m=0),
-            Segment(length=self.segments_length, has_foundation=True, m=0),
-        ]
-        system = SystemModel(
-            model_input=ModelInput(
-                layers=self.layers,
-                weak_layer=self.weak_layer,
-                segments=segments,
-                scenario_config=ScenarioConfig(phi=self.phi),
-            ),
-            config=Config(touchdown=True),
-        )
-        results: SteadyStateResult = self.evaluator.evaluate_SteadyState(
-            system, mode="A_free_hanging"
-        )
-        self.assertTrue(results.converged)
-        self.assertEqual(
-            results.system.slab_touchdown.touchdown_mode,
-            "A_free_hanging",
-            "Touchdown mode should match the mode parameter passed to evaluate_SteadyState",
-        )
+                if mode_param is None:
+                    results: SteadyStateResult = self.evaluator.evaluate_SteadyState(
+                        system
+                    )
+                else:
+                    results: SteadyStateResult = self.evaluator.evaluate_SteadyState(
+                        system, mode=mode_param
+                    )
 
-    def test_evaluate_SteadyState_default_mode(self):
-        """Test evaluate_SteadyState with default mode (should be 'C_in_contact')."""
-        segments = [
-            Segment(length=self.segments_length, has_foundation=True, m=0),
-            Segment(length=self.segments_length, has_foundation=True, m=0),
-        ]
-        system = SystemModel(
-            model_input=ModelInput(
-                layers=self.layers,
-                weak_layer=self.weak_layer,
-                segments=segments,
-                scenario_config=ScenarioConfig(phi=self.phi),
-            ),
-            config=Config(touchdown=True),
-        )
-        # Call without specifying mode - should default to 'C_in_contact'
-        results: SteadyStateResult = self.evaluator.evaluate_SteadyState(system)
-        self.assertTrue(results.converged)
-        self.assertEqual(
-            results.system.slab_touchdown.touchdown_mode,
-            "C_in_contact",
-            "Default touchdown mode should be 'C_in_contact'",
-        )
+                self.assertTrue(results.converged)
+                self.assertEqual(
+                    results.system.slab_touchdown.touchdown_mode,
+                    expected_mode,
+                )
 
 
 if __name__ == "__main__":
