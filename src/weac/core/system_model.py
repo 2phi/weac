@@ -28,7 +28,7 @@ from weac.core.eigensystem import Eigensystem
 from weac.core.field_quantities import FieldQuantities
 from weac.core.scenario import Scenario
 from weac.core.slab import Slab
-from weac.core.slab_touchdown import SlabTouchdown
+from weac.core.slab_touchdown import SlabTouchdown, TouchdownMode
 from weac.core.unknown_constants_solver import UnknownConstantsSolver
 
 logger = logging.getLogger(__name__)
@@ -164,7 +164,9 @@ class SystemModel:
         if self.config.touchdown:
             logger.info("Solving for Slab Touchdown")
             slab_touchdown = SlabTouchdown(
-                scenario=self.scenario, eigensystem=self.eigensystem
+                scenario=self.scenario,
+                eigensystem=self.eigensystem,
+                forced_mode=self.config.forced_touchdown_mode,
             )
             logger.info(
                 "Original cut_length: %s, touchdown_distance: %s",
@@ -342,6 +344,26 @@ class SystemModel:
         """Toggle the touchdown."""
         if self.config.touchdown != touchdown:
             self.config.touchdown = touchdown
+            self._invalidate_slab_touchdown()
+            self._invalidate_constants()
+
+    def set_forced_touchdown_mode(self, mode: TouchdownMode | None):
+        """
+        Set the forced touchdown mode.
+
+        When set, the touchdown mode calculation will use this mode instead of
+        calculating it from l_AB/l_BC thresholds. This avoids floating-point
+        precision issues when the mode boundaries are recalculated with different
+        scenario parameters.
+
+        Parameters
+        ----------
+        mode : TouchdownMode | None
+            The mode to force ("A_free_hanging", "B_point_contact", "C_in_contact"),
+            or None to use automatic calculation.
+        """
+        if self.config.forced_touchdown_mode != mode:
+            self.config.forced_touchdown_mode = mode
             self._invalidate_slab_touchdown()
             self._invalidate_constants()
 

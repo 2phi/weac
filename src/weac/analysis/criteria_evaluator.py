@@ -741,6 +741,9 @@ class CriteriaEvaluator:
             cut_length=cut_distance,
         )
         system_copy.update_scenario(segments=segments, scenario_config=scenario_config)
+        # Force the requested mode to avoid floating-point precision issues
+        # when l_AB/l_BC are recalculated with different scenario parameters
+        system_copy.set_forced_touchdown_mode(mode)
         touchdown_distance = system_copy.slab_touchdown.touchdown_distance
         analyzer = Analyzer(system_copy, printing_enabled=print_call_stats)
         energy_release_rate, _, _ = analyzer.differential_ERR(unit="J/m^2")
