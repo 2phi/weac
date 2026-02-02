@@ -12,9 +12,11 @@ from pydantic import ValidationError
 from weac.components.layer import (
     Layer,
     WeakLayer,
+    _adam_tensile_strength,
     _bergfeld_youngs_modulus,
     _gerling_youngs_modulus,
     _scapozza_youngs_modulus,
+    _sigrist_tensile_strength,
 )
 from weac.constants import NU
 
@@ -43,6 +45,224 @@ class TestLayerPropertyCalculations(unittest.TestCase):
         """Test Gerling Young's modulus calculation."""
         E = _gerling_youngs_modulus(rho=250.0)
         self.assertGreater(E, 0, "Young's modulus should be positive")
+
+
+class TestTensileStrengthCalculations(unittest.TestCase):
+    """Test tensile strength calculation functions."""
+
+    def test_sigrist_calculation_kPa(self):
+        """Test Sigrist tensile strength calculation in kPa."""
+        # Test with typical snow density
+        ts = _sigrist_tensile_strength(rho=200.0, unit="kPa")
+        self.assertGreater(ts, 0, "Tensile strength should be positive")
+        self.assertTrue(np.isscalar(ts), "Result should be a scalar")
+
+        # Test with different densities
+        ts_light = _sigrist_tensile_strength(rho=100.0, unit="kPa")
+        ts_heavy = _sigrist_tensile_strength(rho=400.0, unit="kPa")
+        self.assertLess(ts_light, ts_heavy, "Heavier snow should have higher strength")
+
+    def test_sigrist_calculation_MPa(self):
+        """Test Sigrist tensile strength calculation in MPa."""
+        ts_kPa = _sigrist_tensile_strength(rho=200.0, unit="kPa")
+        ts_MPa = _sigrist_tensile_strength(rho=200.0, unit="MPa")
+        self.assertAlmostEqual(
+            ts_kPa, ts_MPa * 1000, places=5, msg="Unit conversion should be correct"
+        )
+
+    def test_adam_calculation_kPa(self):
+        """Test Adam tensile strength calculation in kPa."""
+        # Test with typical snow density
+        ts = _adam_tensile_strength(rho=300.0, unit="kPa")
+        self.assertGreater(ts, 0, "Tensile strength should be positive")
+        self.assertTrue(np.isscalar(ts), "Result should be a scalar")
+
+        # Test with different densities
+        ts_light = _adam_tensile_strength(rho=150.0, unit="kPa")
+        ts_heavy = _adam_tensile_strength(rho=450.0, unit="kPa")
+        self.assertLess(ts_light, ts_heavy, "Heavier snow should have higher strength")
+
+    def test_adam_calculation_MPa(self):
+        """Test Adam tensile strength calculation in MPa."""
+        ts_kPa = _adam_tensile_strength(rho=300.0, unit="kPa")
+        ts_MPa = _adam_tensile_strength(rho=300.0, unit="MPa")
+        self.assertAlmostEqual(
+            ts_kPa, ts_MPa * 1000, places=5, msg="Unit conversion should be correct"
+        )
+
+    def test_sigrist_vs_adam_comparison(self):
+        """Compare Sigrist and Adam formulations at different densities."""
+        # At low densities, compare the formulations
+        rho_low = 150.0
+        ts_sigrist = _sigrist_tensile_strength(rho=rho_low, unit="kPa")
+        ts_adam = _adam_tensile_strength(rho=rho_low, unit="kPa")
+        # Both should give positive values
+        self.assertGreater(ts_sigrist, 0)
+        self.assertGreater(ts_adam, 0)
+
+        # At high densities
+        rho_high = 400.0
+        ts_sigrist_high = _sigrist_tensile_strength(rho=rho_high, unit="kPa")
+        ts_adam_high = _adam_tensile_strength(rho=rho_high, unit="kPa")
+        self.assertGreater(ts_sigrist_high, 0)
+        self.assertGreater(ts_adam_high, 0)
+
+
+class TestLayerTensileStrength(unittest.TestCase):
+    """Test Layer class tensile strength functionality."""
+
+    def test_layer_default_tensile_strength_method(self):
+        """Test that default method is 'hybrid'."""
+        layer = Layer(rho=200.0, h=100.0)
+        self.assertEqual(
+            layer.tensile_strength_method,
+            "hybrid",
+            "Default method should be 'hybrid'",
+        )
+        self.assertGreater(
+            layer.tensile_strength, 0, "Tensile strength should be calculated"
+        )
+
+    def test_layer_sigrist_method(self):
+        """Test Layer with explicit Sigrist method."""
+        layer = Layer(rho=200.0, h=100.0, tensile_strength_method="sigrist")
+        expected_ts = _sigrist_tensile_strength(rho=200.0, unit="kPa")
+        self.assertAlmostEqual(
+            layer.tensile_strength,
+            expected_ts,
+            places=5,
+            msg="Tensile strength should match Sigrist calculation",
+        )
+
+    def test_layer_adam_method(self):
+        """Test Layer with explicit Adam method."""
+        layer = Layer(rho=300.0, h=100.0, tensile_strength_method="adam")
+        expected_ts = _adam_tensile_strength(rho=300.0, unit="kPa")
+        self.assertAlmostEqual(
+            layer.tensile_strength,
+            expected_ts,
+            places=5,
+            msg="Tensile strength should match Adam calculation",
+        )
+
+    def test_layer_hybrid_method_low_density(self):
+        """Test hybrid method uses Sigrist for density < 250."""
+        rho = 200.0  # Below 250 threshold
+        layer = Layer(rho=rho, h=100.0, tensile_strength_method="hybrid")
+        expected_ts = _sigrist_tensile_strength(rho=rho, unit="kPa")
+        self.assertAlmostEqual(
+            layer.tensile_strength,
+            expected_ts,
+            places=5,
+            msg="Hybrid should use Sigrist for rho < 250",
+        )
+
+    def test_layer_hybrid_method_high_density(self):
+        """Test hybrid method uses Adam for density >= 250."""
+        rho = 300.0  # Above 250 threshold
+        layer = Layer(rho=rho, h=100.0, tensile_strength_method="hybrid")
+        expected_ts = _adam_tensile_strength(rho=rho, unit="kPa")
+        self.assertAlmostEqual(
+            layer.tensile_strength,
+            expected_ts,
+            places=5,
+            msg="Hybrid should use Adam for rho >= 250",
+        )
+
+    def test_layer_hybrid_method_at_threshold(self):
+        """Test hybrid method behavior exactly at 250 kg/m³."""
+        rho = 250.0  # Exactly at threshold
+        layer = Layer(rho=rho, h=100.0, tensile_strength_method="hybrid")
+        expected_ts = _adam_tensile_strength(rho=rho, unit="kPa")
+        self.assertAlmostEqual(
+            layer.tensile_strength,
+            expected_ts,
+            places=5,
+            msg="Hybrid should use Adam for rho = 250",
+        )
+
+    def test_layer_custom_tensile_strength(self):
+        """Test that custom tensile strength overrides calculation."""
+        custom_ts = 50.0
+        layer = Layer(
+            rho=200.0,
+            h=100.0,
+            tensile_strength=custom_ts,
+            tensile_strength_method="sigrist",
+        )
+        self.assertEqual(
+            layer.tensile_strength,
+            custom_ts,
+            "Custom tensile strength should override calculation",
+        )
+
+
+class TestTensileStrengthPhysicalConsistency(unittest.TestCase):
+    """Test physical consistency of tensile strength calculations."""
+
+    def test_density_strength_relationship(self):
+        """Test that higher density leads to higher tensile strength."""
+        layer_light = Layer(rho=150.0, h=100.0)
+        layer_heavy = Layer(rho=350.0, h=100.0)
+
+        self.assertLess(
+            layer_light.tensile_strength,
+            layer_heavy.tensile_strength,
+            "Heavier snow should have higher tensile strength",
+        )
+
+    def test_hybrid_continuity_around_threshold(self):
+        """Test continuity of hybrid method around 250 kg/m³ threshold."""
+        # Test just below threshold
+        layer_below = Layer(rho=249.0, h=100.0, tensile_strength_method="hybrid")
+        # Test just above threshold
+        layer_above = Layer(rho=251.0, h=100.0, tensile_strength_method="hybrid")
+
+        # Both should have positive strength
+        self.assertGreater(layer_below.tensile_strength, 0)
+        self.assertGreater(layer_above.tensile_strength, 0)
+
+        # Values should be reasonably close (within an order of magnitude)
+        # This is a loose check since the formulations differ
+        ratio = layer_above.tensile_strength / layer_below.tensile_strength
+        self.assertLess(
+            ratio, 10.0, "Strength shouldn't jump by more than 10x at threshold"
+        )
+        self.assertGreater(
+            ratio, 0.1, "Strength shouldn't drop by more than 10x at threshold"
+        )
+
+    def test_all_methods_give_positive_strength(self):
+        """Test that all methods produce positive tensile strength."""
+        rho_values = [100.0, 200.0, 300.0, 400.0]
+        methods = ["sigrist", "adam", "hybrid"]
+
+        for rho in rho_values:
+            for method in methods:
+                layer = Layer(rho=rho, h=100.0, tensile_strength_method=method)
+                self.assertGreater(
+                    layer.tensile_strength,
+                    0,
+                    f"Method {method} with rho={rho} should give positive strength",
+                )
+
+    def test_tensile_strength_density_monotonicity(self):
+        """Test that tensile strength increases monotonically with density."""
+        densities = [100.0, 150.0, 200.0, 250.0, 300.0, 350.0, 400.0]
+        methods = ["sigrist", "adam", "hybrid"]
+
+        for method in methods:
+            strengths = [
+                Layer(rho=rho, h=100.0, tensile_strength_method=method).tensile_strength
+                for rho in densities
+            ]
+            # Check that each strength is greater than the previous
+            for i in range(1, len(strengths)):
+                self.assertGreater(
+                    strengths[i],
+                    strengths[i - 1],
+                    f"Strength should increase with density for {method} method",
+                )
 
 
 class TestLayer(unittest.TestCase):
