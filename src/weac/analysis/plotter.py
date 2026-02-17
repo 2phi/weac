@@ -2068,8 +2068,8 @@ class Plotter:
                 [x / 10, analyzer.sm.fq.u(z, unit="mm"), r"$u_0\ (\mathrm{mm})$"],
                 [x / 10, analyzer.sm.fq.v(z, unit="mm"), r"$v_0\ (\mathrm{mm})$"],
                 [x / 10, -analyzer.sm.fq.w(z, unit="mm"), r"$-w\ (\mathrm{mm})$"],
-                [x / 10, analyzer.sm.fq.psiy(z, unit="deg"), r"$\psi\ (^\circ)$ "],
-                [x / 10, analyzer.sm.fq.psiz(z, unit="deg"), r"$\psi\ (^\circ)$ "],
+                [x / 10, analyzer.sm.fq.psiy(z, unit="deg"), r"$\psi_y\ (^\circ)$ "],
+                [x / 10, analyzer.sm.fq.psiz(z, unit="deg"), r"$\psi_z\ (^\circ)$ "],
                 ]
         self._plot_data(
             scenario=analyzer.sm.scenario,
