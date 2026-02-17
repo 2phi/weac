@@ -1689,11 +1689,20 @@ class Plotter:
         filename: str = "displacements",
     ) -> Figure:
         """Wrap for displacements plot."""
-        data = [
-            [x / 10, analyzer.sm.fq.u(z, unit="mm"), r"$u_0\ (\mathrm{mm})$"],
-            [x / 10, -analyzer.sm.fq.w(z, unit="mm"), r"$-w\ (\mathrm{mm})$"],
-            [x / 10, analyzer.sm.fq.psi(z, unit="deg"), r"$\psi\ (^\circ)$ "],
-        ]
+        if analyzer.sm.config.backend =="classic":
+            data = [
+                [x / 10, analyzer.sm.fq.u(z, unit="mm"), r"$u_0\ (\mathrm{mm})$"],
+                [x / 10, -analyzer.sm.fq.w(z, unit="mm"), r"$-w\ (\mathrm{mm})$"],
+                [x / 10, analyzer.sm.fq.psi(z, unit="deg"), r"$\psi\ (^\circ)$ "],
+                ]
+        else:
+            data = [
+                [x / 10, analyzer.sm.fq.u(z, unit="mm"), r"$u_0\ (\mathrm{mm})$"],
+                [x / 10, analyzer.sm.fq.v(z, unit="mm"), r"$v_0\ (\mathrm{mm})$"],
+                [x / 10, -analyzer.sm.fq.w(z, unit="mm"), r"$-w\ (\mathrm{mm})$"],
+                [x / 10, analyzer.sm.fq.psiy(z, unit="deg"), r"$\psi\ (^\circ)$ "],
+                [x / 10, analyzer.sm.fq.psiz(z, unit="deg"), r"$\psi\ (^\circ)$ "],
+                ]
         self._plot_data(
             scenario=analyzer.sm.scenario,
             ax1label=r"Displacements",
@@ -1709,10 +1718,17 @@ class Plotter:
         filename: str = "stresses",
     ) -> Figure:
         """Wrap stress plot."""
-        data = [
-            [x / 10, analyzer.sm.fq.tau(z, unit="kPa"), r"$\tau$"],
-            [x / 10, analyzer.sm.fq.sig(z, unit="kPa"), r"$\sigma$"],
-        ]
+        if analyzer.sm.config.backend =="classic":
+            data = [
+                [x / 10, analyzer.sm.fq.tau(z, unit="kPa"), r"$\tau$"],
+                [x / 10, analyzer.sm.fq.sig(z, unit="kPa"), r"$\sigma$"],
+            ]
+        else:
+            data = [
+                [x / 10, -analyzer.sm.fq.tau_xz(z, unit="kPa"), r"$\tau_{xz}$"],
+                [x / 10, analyzer.sm.fq.tau_yz(z, unit="kPa"), r"$\tau_{yz}$"],
+                [x / 10, analyzer.sm.fq.sig_zz(z, unit="kPa"), r"$\sigma_{zz}$"],
+            ]
         self._plot_data(
             scenario=analyzer.sm.scenario,
             ax1label=r"Stress (kPa)",
@@ -1760,9 +1776,10 @@ class Plotter:
         """Wrap energy release rate plot."""
         label = r"$\bar{\mathcal{G}}$" if kind == "inc" else r"$\mathcal{G}$"
         data = [
+            [da / 10, 1e3 * G[3, :], label + r"$_\mathrm{I\!I\!I}$"],
             [da / 10, 1e3 * G[2, :], label + r"$_\mathrm{I\!I}$"],
             [da / 10, 1e3 * G[1, :], label + r"$_\mathrm{I}$"],
-            [da / 10, 1e3 * G[0, :], label + r"$_\mathrm{I+I\!I}$"],
+            [da / 10, 1e3 * G[0, :], label + r"$_\mathrm{I+I\!I+I\!I\!I}$"],
         ]
         self._plot_data(
             scenario=analyzer.sm.scenario,
@@ -1872,7 +1889,7 @@ class Plotter:
         # Calculate labelposition
         if not labelpos:
             x = ax1data[0][0]
-            labelpos = int(0.95 * len(x[~np.isnan(x)]))
+            labelpos = int(0.5 * len(x[~np.isnan(x)]))
 
         # Fill left y-axis
         i = 0
