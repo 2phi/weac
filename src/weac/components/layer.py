@@ -10,7 +10,7 @@ from typing import Literal
 import numpy as np
 from pydantic import BaseModel, ConfigDict, Field, model_validator
 
-from weac.constants import CB0, CB1, CG0, CG1, NU, RHO_ICE
+from weac.constants import CB0, CB1, CG0, CG1, NU, RHO_ICE, G_MM_S2
 from weac.utils.snow_types import GrainType, HandHardness
 
 
@@ -181,6 +181,8 @@ class WeakLayer(BaseModel):
         Density of the layer [kg m⁻³].
     h : float
         Height/Thickness of the layer [mm].
+    f : float
+        Resultant force of the layer [N/mm]
     nu : float
         Poisson's ratio [-] Defaults to `weac.constants.NU`).
     E : float, optional
@@ -203,6 +205,7 @@ class WeakLayer(BaseModel):
 
     rho: float = Field(default=125, gt=0, description="Density of the Slab  [kg m⁻³]")
     h: float = Field(default=20, gt=0, description="Height/Thickness of the slab  [mm]")
+    f: float = Field(default=0.0, description="Weight density of the weak layer [N/mm^3]")
     collapse_height: float = Field(
         default=0.0, ge=0, description="Collapse height [mm]"
     )
@@ -229,6 +232,7 @@ class WeakLayer(BaseModel):
         default="bergfeld",
         description="Method to calculate the Young's modulus",
     )
+    constitutive_model: Literal["PlaneStrain", "PlaneStress","Uniaxial"] = Field(default = "PlaneStrain", description="Marks how interlniked the weak layer is in out-of-plane direction.")
     grain_type: GrainType | None = Field(default=None, description="Grain type")
     grain_size: float | None = Field(default=None, description="Grain size [mm]")
     hand_hardness: HandHardness | None = Field(
@@ -252,6 +256,7 @@ class WeakLayer(BaseModel):
         object.__setattr__(
             self, "collapse_height", self.collapse_height or _collapse_height(self.h)
         )
+        
 
         # Validate that collapse height is smaller than layer height
         if self.collapse_height >= self.h:
@@ -261,10 +266,23 @@ class WeakLayer(BaseModel):
                 f"increasing layer thickness."
             )
 
+
+        if self.constitutive_model =='PlaneStrain':
+            nuUpdate = self.nu
+            EUpdate = self.E
+        elif self.constitutive_model == 'PlaneStress':
+            nuUpdate = self.nu/(1+self.nu)
+            EUpdate = self.E*(1+2*self.nu)/((1+self.nu)**2)
+        elif self.constitutive_model == 'Uniaxial':
+            nuUpdate = 0
+            EUpdate = self.E
+        object.__setattr__(self, "nu", nuUpdate)
+        object.__setattr__(self, "E", EUpdate)
         object.__setattr__(self, "G", self.G or self.E / (2 * (1 + self.nu)))
         E_plane = self.E / (1 - self.nu**2)  # plane-strain Young
         object.__setattr__(self, "kn", self.kn or E_plane / self.h)
         object.__setattr__(self, "kt", self.kt or self.G / self.h)
+        object.__setattr__(self, "f", self.f or self.rho*1e-12*G_MM_S2)
 
     @model_validator(mode="after")
     def validate_positive_E_G(self):
