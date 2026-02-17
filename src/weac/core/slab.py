@@ -62,6 +62,8 @@ class Slab:  # pylint: disable=too-many-instance-attributes,too-few-public-metho
     b: float # Total width of the slab [mm]
 
     def __init__(self, layers: List[Layer], b: float = 300) -> None:
+        if b <= 0:  
+            raise ValueError("Slab width b must be positive")  
         self.layers = layers
         self.b = b
         self._calc_slab_params()

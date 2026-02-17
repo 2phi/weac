@@ -631,6 +631,7 @@ class Analyzer:
                 self._integrand_GII, z_uncracked=z_uncracked, z_cracked=z_cracked
             )
 
+
             # Segment contributions to total crack opening integral
             Ginc1 += quad(intGI, 0, length, epsabs=tolerance, epsrel=tolerance)[0] / (
                 2 * da
@@ -640,7 +641,7 @@ class Analyzer:
             )
 
         convert = {"kJ/m^2": 1, "J/m^2": 1e3}
-        return np.array([Ginc1 + Ginc2, Ginc1, Ginc2]).flatten() * convert[unit]
+        return np.array([Ginc1 + Ginc2, Ginc1, Ginc2, 0]).flatten() * convert[unit]
 
     @track_analyzer_call
     def differential_ERR(

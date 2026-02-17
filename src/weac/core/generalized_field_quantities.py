@@ -88,7 +88,7 @@ class GeneralizedFieldQuantities:
         return self._unit_factor(unit) * (Z[4, :] + b0 *self.psix(Z))
 
     def dw_dx(self, Z: np.ndarray, b0: float = 0) -> float | np.ndarray:
-        """First derivative *w' = w₀' + b₀ ψx' (*."""
+        """First derivative *w' = w₀' + b₀ ψx' *."""
         return Z[5, :] + b0 * self.dpsix_dx(Z)
 
     def psix(
@@ -255,7 +255,7 @@ class GeneralizedFieldQuantities:
 
     def sig_zz(self, Z: np.ndarray, h0: bool | float = False, b0: float = 0,unit: StressUnit = "MPa") -> float | np.ndarray:
         """Weak-layer normal stress"""
-        if not h0:
+        if  h0 is not None:
             h0 = self.es.slab.H/2+ self.es.weak_layer.h/2
         return self._unit_factor(unit) * (self.es.weak_layer.E*(2*self.es.weak_layer.h*self.es.weak_layer.nu*np.cos((np.pi*(self.es.slab.H + self.es.weak_layer.h - 2*h0))/(2*self.es.weak_layer.h))*self.theta_vl(Z) - (1 - self.es.weak_layer.nu)*(-(np.pi*np.cos((np.pi*(self.es.slab.H - 2*h0))/(2*self.es.weak_layer.h))*(self.es.slab.b*self.theta_wc(Z) + 2*b0*self.theta_wl(Z))) + self.es.slab.b*(Z[4,:] + b0*self.psix(Z))) + self.es.weak_layer.nu*(self.es.weak_layer.h*np.cos((np.pi*(self.es.slab.H + self.es.weak_layer.h - 2*h0))/(2*self.es.weak_layer.h))*(self.es.slab.b*self.dtheta_uc_dx(Z) + 2*b0*self.dtheta_ul_dx(Z)) + (self.es.slab.b*(self.es.slab.H + 2*self.es.weak_layer.h - 2*h0)*(2*Z[1,:] + self.es.slab.H*self.dpsiy_dx(Z) - 2*b0*self.dpsiz_dx(Z)))/4)))/(self.es.slab.b*self.es.weak_layer.h*(1 - 2*self.es.weak_layer.nu)*(1 + self.es.weak_layer.nu))
 

@@ -158,7 +158,7 @@ class SystemModel:
         return FieldQuantities(eigensystem=self.eigensystem)
 
     @cached_property
-    def eigensystem(self) -> Eigensystem:  # heavy
+    def eigensystem(self) -> Eigensystem | GeneralizedEigensystem:  # heavy
         """Solve for the eigensystem."""
         logger.info("Solving for Eigensystem")
         if getattr(self.config, "backend", "classic") == "generalized":

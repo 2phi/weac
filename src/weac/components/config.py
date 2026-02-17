@@ -44,7 +44,7 @@ class Config(BaseModel):
         ),
     )
     b: float = Field(
-        default = 300, ge=1, description= f"Out-of-plane width of the model in [mm]"
+        default = 300, ge=1, description= f"Out-of-plane width of the model in [mm]")
     forced_touchdown_mode: TouchdownMode | None = Field(
         default=None,
         description="Force a specific touchdown mode instead of auto-calculating",

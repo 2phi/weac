@@ -340,7 +340,7 @@ class GeneralizedEigensystem:
 
         Parameters:
         -----------
-        system_matrix: NDArray          # system_matrix size (6x6) of the eigenvalue problem
+        system_matrix: NDArray          # system_matrix size (24x24) of the eigenvalue problem
 
         Return:
         -------
@@ -671,7 +671,7 @@ class GeneralizedEigensystem:
 
         q24=(-36*np.pi*(1 + self.weak_layer.nu)*((-6 + np.pi**2)*(2*mx - self.slab.H*(qs_y + qw_y))*self.weak_layer.h*self.weak_layer.E + 3*self.kA55*(4*mx*np.pi**2 + self.slab.b*f_y*self.slab.H*(-8 + np.pi**2)*self.weak_layer.h)*(1 + self.weak_layer.nu) - 6*self.kB55*(-8*self.slab.b*f_y*self.weak_layer.h + np.pi**2*(2*qs_y + 2*qw_y + self.slab.b*f_y*self.weak_layer.h))*(1 + self.weak_layer.nu)))/(self.slab.b**2*((-6 + np.pi**2)*self.weak_layer.h*self.weak_layer.E + 6*self.kA55*np.pi**2*(1 + self.weak_layer.nu))**2 - 18*np.pi**2*(1 + self.weak_layer.nu)*(4*self.slab.H*self.kB55*(-6 + np.pi**2)*self.weak_layer.h*self.weak_layer.E - 4*self.kD55*(-6 + np.pi**2)*self.weak_layer.h*self.weak_layer.E + 24*self.kB55**2*np.pi**2*(1 + self.weak_layer.nu) - self.kA55*(self.slab.H**2*(-6 + np.pi**2)*self.weak_layer.h*self.weak_layer.E + 24*self.kD55*np.pi**2*(1 + self.weak_layer.nu))))
         q = np.array([
-            [q01],[q02],[q03][q04],[q05],[q06],[q07],[q08],[q09],[q10],[q11],[q12],[q13],[q14],[q15],[q16],[q17][q18],[q19],[q20],[q21],[q22],[q23],[q24]],dtype=np.double),
+            [q01],[q02],[q03],[q04],[q05],[q06],[q07],[q08],[q09],[q10],[q11],[q12],[q13],[q14],[q15],[q16],[q17],[q18],[q19],[q20],[q21],[q22],[q23],[q24]],dtype=np.double),
         # TODO: Determine the load vector for unsupported structures
         return q
 

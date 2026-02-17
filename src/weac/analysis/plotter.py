@@ -2093,7 +2093,7 @@ class Plotter:
             ]
         else:
             data = [
-                [x / 10, -analyzer.sm.fq.tau_xz(z, unit="kPa"), r"$\tau_{xz}$"],
+                [x / 10, analyzer.sm.fq.tau_xz(z, unit="kPa"), r"$\tau_{xz}$"],
                 [x / 10, analyzer.sm.fq.tau_yz(z, unit="kPa"), r"$\tau_{yz}$"],
                 [x / 10, analyzer.sm.fq.sig_zz(z, unit="kPa"), r"$\sigma_{zz}$"],
             ]

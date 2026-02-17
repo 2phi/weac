@@ -115,7 +115,7 @@ class Scenario:
         self.surface_load = self.scenario_config.surface_load
         self.cut_length = self.scenario_config.cut_length
         self.load_vector_left = self.scenario_config.load_vector_left
-        self.load_vector_right = self.scenario_config.load_vector_left
+        self.load_vector_right = self.scenario_config.load_vector_right
 
         self._setup_scenario()
         self._calc_normal_load()
@@ -173,7 +173,7 @@ class Scenario:
             self.li = np.append(self.li, 0)
             self.ki = np.append(self.ki, True)
             self.mi = np.append(self.mi, 0)
-            self.fi = np.append(self.fi, np.zeros((6,1)))
+            self.fi = np.vstack([self.fi, np.zeros((1,6))])
 
         # Calculate the total slab length
         self.L = np.sum(self.li)

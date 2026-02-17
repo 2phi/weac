@@ -13,7 +13,7 @@ from typing import Literal, Optional
 import numpy as np
 from numpy.linalg import LinAlgError
 
-from scipy.sparse.linalg import eigen
+
 from weac.components import SystemType
 from weac.constants import G_MM_S2
 from weac.core.generalized_eigensystem import GeneralizedEigensystem

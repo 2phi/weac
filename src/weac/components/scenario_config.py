@@ -22,7 +22,7 @@ class ScenarioConfig(BaseModel):
     ----------
     phi : float, optional
         Slope angle in degrees (counterclockwise positive).
-    theta float, optional
+    theta : float, optional
         Rotation of the slab around its axis (counterclockwise positive)
     system_type : SystemType
         Type of system. Allowed values are:
@@ -92,14 +92,14 @@ class ScenarioConfig(BaseModel):
         description="Load vector on the right side of the configuration to model external loading in mode III experiments.")
 
 
-    # @field_validator("load_vector_left", "load_vector_right", mode="after")
-    # def check_load_vector_shape(cls, value: Any) -> Any:
-    #     # Convert to numpy array if needed
-    #     arr = np.asarray(value, dtype=np.float64)
-    #     # Ensure correct shape (6, 1)
-    #     if arr.shape != (6, 1):
-    #         # Try to reshape if possible
-    #         arr = arr.reshape(-1, 1)
-    #         if arr.shape[0] != 6:
-    #             raise ValueError(f"load vectors must have shape (6, 1), got {arr.shape}")
-    #     return arr 
+    @field_validator("load_vector_left", "load_vector_right", mode="after")
+    def check_load_vector_shape(cls, value: Any) -> Any:
+        # Convert to numpy array if needed
+        arr = np.asarray(value, dtype=np.float64)
+        # Ensure correct shape (6, 1)
+        if arr.shape != (6, 1):
+            # Try to reshape if possible
+            arr = arr.reshape(-1, 1)
+            if arr.shape[0] != 6:
+                raise ValueError(f"load vectors must have shape (6, 1), got {arr.shape}")
+        return arr 
