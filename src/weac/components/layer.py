@@ -94,6 +94,45 @@ def _sigrist_tensile_strength(rho, unit: Literal["kPa", "MPa"] = "kPa"):
     return convert[unit] * 240 * (rho / RHO_ICE) ** 2.44
 
 
+def _adam_tensile_strength(rho, unit: Literal["kPa", "MPa"] = "kPa"):
+    """
+    Estimate the tensile strength of a slab layer from its density.
+
+    Uses the density parametrization of Adam (2025).
+
+    Arguments
+    ---------
+    rho : ndarray, float
+        Layer density (kg/m^3).
+    unit : str, optional
+        Desired output unit of the layer strength. Default is 'kPa'.
+
+    Returns
+    -------
+    ndarray
+        Tensile strength in specified unit.
+    """
+    convert = {"kPa": 1e3, "MPa": 1}
+    TS_0 = 1.0  # [MPa]
+    kappa = 3.45  # [-]
+    # Adam's equation is given in MPa
+    return TS_0 * (rho / RHO_ICE) ** kappa * convert[unit]
+
+
+# # TODO: Compressive Strength from Schöttner
+# def _schotter_compressive_strength(rho, unit: Literal["kPa", "MPa"] = "kPa"):
+#     """
+#     Estimate the compressive strength of a slab layer from its density.
+#     On the compressive strength of weak snow layers of depth hoar - Schöttner (2025).
+
+#     Uses the density parametrization of Schöttner (2025).
+#     """
+#     convert = {"kPa": 1e3, "MPa": 1}
+#     CS_0 = 11.0  # [MPa]
+#     CS_1 = 5.4  # [-]
+#     return CS_0 * (rho / RHO_ICE) ** CS_1 * convert[unit]
+
+
 class Layer(BaseModel):
     """
     Regular slab layer (no foundation springs).
@@ -110,6 +149,10 @@ class Layer(BaseModel):
         Young's modulus E [MPa].  If omitted it is derived from ``rho``.
     G : float, optional
         Shear modulus G [MPa].  If omitted it is derived from ``E`` and ``nu``.
+    tensile_strength: float
+        Tensile strength [kPa].
+    tensile_strength_method: Literal["sigrist", "adam", "hybrid"]
+        Method to calculate the tensile strength.
     """
 
     # has to be provided
@@ -125,8 +168,8 @@ class Layer(BaseModel):
     tensile_strength: float = Field(
         default=0.0, ge=0, description="Tensile strength [kPa]"
     )
-    tensile_strength_method: Literal["sigrist"] = Field(
-        default="sigrist",
+    tensile_strength_method: Literal["sigrist", "adam", "hybrid"] = Field(
+        default="hybrid",
         description="Method to calculate the tensile strength",
     )
     E_method: Literal["bergfeld", "scapazzo", "gerling"] = Field(
@@ -149,17 +192,23 @@ class Layer(BaseModel):
         else:
             raise ValueError(f"Invalid E_method: {self.E_method}")
         object.__setattr__(self, "G", self.G or self.E / (2 * (1 + self.nu)))
-        if self.tensile_strength_method == "sigrist":
-            object.__setattr__(
-                self,
-                "tensile_strength",
-                self.tensile_strength
-                or _sigrist_tensile_strength(self.rho, unit="kPa"),
-            )
-        else:
-            raise ValueError(
-                f"Invalid tensile_strength_method: {self.tensile_strength_method}"
-            )
+
+        if not self.tensile_strength:
+            if self.tensile_strength_method == "sigrist":
+                ts_value = _sigrist_tensile_strength(self.rho, unit="kPa")
+            elif self.tensile_strength_method == "adam":
+                ts_value = _adam_tensile_strength(self.rho, unit="kPa")
+            elif self.tensile_strength_method == "hybrid":
+                # Use Sigrist for rho < 250, Adam for rho >= 250
+                if self.rho < 250:
+                    ts_value = _sigrist_tensile_strength(self.rho, unit="kPa")
+                else:
+                    ts_value = _adam_tensile_strength(self.rho, unit="kPa")
+            else:
+                raise ValueError(
+                    f"Invalid tensile_strength_method: {self.tensile_strength_method}"
+                )
+            object.__setattr__(self, "tensile_strength", ts_value)
 
     @model_validator(mode="after")
     def validate_positive_E_G(self):
@@ -228,6 +277,9 @@ class WeakLayer(BaseModel):
     )
     sigma_c: float = Field(default=6.16, gt=0, description="Tensile strength [kPa]")
     tau_c: float = Field(default=5.09, gt=0, description="Shear strength [kPa]")
+    sigma_comp: float = Field(
+        default=2.6, gt=0, description="Compressive strength [kPa]"
+    )
     E_method: Literal["bergfeld", "scapazzo", "gerling"] = Field(
         default="bergfeld",
         description="Method to calculate the Young's modulus",

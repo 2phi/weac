@@ -18,7 +18,7 @@ import subprocess
 import sys
 import tempfile
 from dataclasses import dataclass
-from typing import Any, Dict, Optional, Tuple
+from typing import Any
 
 # For type hints without importing numpy at module import time
 try:
@@ -46,7 +46,7 @@ class ReferenceEnv:
 
 
 # New: ensure subprocesses don't see local project on sys.path or user site
-def _clean_env() -> Dict[str, str]:
+def _clean_env() -> dict[str, str]:
     env = os.environ.copy()
     env.pop("PYTHONPATH", None)
     env["PYTHONNOUSERSITE"] = "1"
@@ -73,7 +73,7 @@ def _venv_python(venv_dir: str) -> str:
 
 def ensure_weac_reference_env(
     version: str = DEFAULT_REFERENCE_VERSION,
-) -> Optional[ReferenceEnv]:
+) -> ReferenceEnv | None:
     """Create a dedicated venv with weac==version installed if missing.
 
     Returns ReferenceEnv on success, or None on failure (e.g., no network).
@@ -293,9 +293,9 @@ def compute_reference_model_results(
     a: float,
     m: float,
     phi: float,
-    set_foundation: Optional[Dict[str, Any]] = None,
+    set_foundation: dict[str, Any] | None = None,
     version: str = DEFAULT_REFERENCE_VERSION,
-) -> Tuple["_np.ndarray", Dict[str, Any], "_np.ndarray", Dict[str, Any]]:
+) -> tuple["_np.ndarray", dict[str, Any], "_np.ndarray", dict[str, Any]]:
     """Run the reference published weac implementation and return (constants, state, z).
 
     The return constants is a numpy array; state is a JSON-serializable dict

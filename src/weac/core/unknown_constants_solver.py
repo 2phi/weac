@@ -8,7 +8,7 @@ We utilize the pydantic library to define the system model.
 """
 
 import logging
-from typing import Literal, Optional
+from typing import Literal
 
 import numpy as np
 from numpy.linalg import LinAlgError
@@ -36,11 +36,10 @@ class UnknownConstantsSolver:
         scenario: Scenario,
         eigensystem: Eigensystem,
         system_type: SystemType,
-        touchdown_distance: Optional[float] = None,
-        touchdown_mode: Optional[
-            Literal["A_free_hanging", "B_point_contact", "C_in_contact"]
-        ] = None,
-        collapsed_weak_layer_kR: Optional[float] = None,
+        touchdown_distance: float | None = None,
+        touchdown_mode: Literal["A_free_hanging", "B_point_contact", "C_in_contact"]
+        | None = None,
+        collapsed_weak_layer_kR: float | None = None,
     ) -> np.ndarray:
         """
         Compute free constants *C* for system. \\
@@ -264,10 +263,9 @@ class UnknownConstantsSolver:
         has_foundation: bool,
         pos: Literal["l", "r", "m", "left", "right", "mid"],
         system_type: SystemType,
-        touchdown_mode: Optional[
-            Literal["A_free_hanging", "B_point_contact", "C_in_contact"]
-        ] = None,
-        collapsed_weak_layer_kR: Optional[float] = None,
+        touchdown_mode: Literal["A_free_hanging", "B_point_contact", "C_in_contact"]
+        | None = None,
+        collapsed_weak_layer_kR: float | None = None,
     ) -> np.ndarray:
         """
         Provide boundary or transmission conditions for beam segments.
@@ -275,17 +273,17 @@ class UnknownConstantsSolver:
         Arguments
         ---------
         zl : ndarray
-            Solution vector (6x1) or (6x6) at left end of beam segement.
+            Solution vector (6x1) or (6x6) at left end of beam segment.
         zr : ndarray
-            Solution vector (6x1) or (6x6) at right end of beam segement.
+            Solution vector (6x1) or (6x6) at right end of beam segment.
         has_foundation : boolean
             Indicates whether segment has foundation(True) or not (False).
             Default is False.
         pos: {'left', 'mid', 'right', 'l', 'm', 'r'}, optional
-            Determines whether the segement under consideration
-            is a left boundary segement (left, l), one of the
-            center segement (mid, m), or a right boundary
-            segement (right, r). Default is 'mid'.
+            Determines whether the segment under consideration
+            is a left boundary segment (left, l), one of the
+            center segment (mid, m), or a right boundary
+            segment (right, r). Default is 'mid'.
 
         Returns
         -------
@@ -312,7 +310,7 @@ class UnknownConstantsSolver:
                     bcs[2],
                     fq.u(zr, h0=0),  # ui(xi = li)
                     fq.w(zr),  # wi(xi = li)
-                    fq.psi(zr),  # psii(xi = li)
+                    fq.psi(zr),  # psi(xi = li)
                     fq.N(zr),  # Ni(xi = li)
                     fq.M(zr),  # Mi(xi = li)
                     fq.V(zr),  # Vi(xi = li)
@@ -323,13 +321,13 @@ class UnknownConstantsSolver:
                 [
                     -fq.u(zl, h0=0),  # -ui(xi = 0)
                     -fq.w(zl),  # -wi(xi = 0)
-                    -fq.psi(zl),  # -psii(xi = 0)
+                    -fq.psi(zl),  # -psi(xi = 0)
                     -fq.N(zl),  # -Ni(xi = 0)
                     -fq.M(zl),  # -Mi(xi = 0)
                     -fq.V(zl),  # -Vi(xi = 0)
                     fq.u(zr, h0=0),  # ui(xi = li)
                     fq.w(zr),  # wi(xi = li)
-                    fq.psi(zr),  # psii(xi = li)
+                    fq.psi(zr),  # psi(xi = li)
                     fq.N(zr),  # Ni(xi = li)
                     fq.M(zr),  # Mi(xi = li)
                     fq.V(zr),  # Vi(xi = li)
@@ -349,7 +347,7 @@ class UnknownConstantsSolver:
                 [
                     -fq.u(zl, h0=0),  # -ui(xi = 0)
                     -fq.w(zl),  # -wi(xi = 0)
-                    -fq.psi(zl),  # -psii(xi = 0)
+                    -fq.psi(zl),  # -psi(xi = 0)
                     -fq.N(zl),  # -Ni(xi = 0)
                     -fq.M(zl),  # -Mi(xi = 0)
                     -fq.V(zl),  # -Vi(xi = 0)
@@ -369,10 +367,9 @@ class UnknownConstantsSolver:
         has_foundation: bool,
         pos: Literal["l", "r", "m", "left", "right", "mid"],
         system_type: SystemType,
-        touchdown_mode: Optional[
-            Literal["A_free_hanging", "B_point_contact", "C_in_contact"]
-        ] = None,
-        collapsed_weak_layer_kR: Optional[float] = None,
+        touchdown_mode: Literal["A_free_hanging", "B_point_contact", "C_in_contact"]
+        | None = None,
+        collapsed_weak_layer_kR: float | None = None,
     ):
         """
         Provide equations for free (pst) or infinite (skiers) ends.
@@ -388,9 +385,9 @@ class UnknownConstantsSolver:
             Default is False.
         pos : {'left', 'mid', 'right', 'l', 'm', 'r'}, optional
             Determines whether the segement under consideration
-            is a left boundary segement (left, l), one of the
-            center segement (mid, m), or a right boundary
-            segement (right, r). Default is 'mid'.
+            is a left boundary segment (left, l), one of the
+            center segment (mid, m), or a right boundary
+            segment (right, r). Default is 'mid'.
 
         Returns
         -------

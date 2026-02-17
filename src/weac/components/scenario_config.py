@@ -11,6 +11,8 @@ SystemType = Literal[
     "skier", "skiers", "pst-", "-pst", "rot", "trans", "vpst-", "-vpst"
 ]
 
+TouchdownMode = Literal["A_free_hanging", "B_point_contact", "C_in_contact"]
+
 
 class ScenarioConfig(BaseModel):
     """

@@ -14,6 +14,8 @@ from typing import Literal
 
 from pydantic import BaseModel, Field
 
+from weac.components.scenario_config import TouchdownMode
+
 
 class Config(BaseModel):
     """
@@ -25,6 +27,10 @@ class Config(BaseModel):
         Whether slab touchdown on the collapsed weak layer is considered.
     backend : Literal["classic", "generalized"]
         Selects which eigensystem implementation to use under the hood.
+    forced_touchdown_mode : TouchdownMode | None
+        If set, forces the touchdown mode instead of calculating it from l_AB/l_BC.
+        This avoids floating-point precision issues when the mode boundary values
+        are recalculated with different scenario parameters.
     """
 
     touchdown: bool = Field(
@@ -39,6 +45,9 @@ class Config(BaseModel):
     )
     b: float = Field(
         default = 300, ge=1, description= f"Out-of-plane width of the model in [mm]"
+    forced_touchdown_mode: TouchdownMode | None = Field(
+        default=None,
+        description="Force a specific touchdown mode instead of auto-calculating",
     )
 
 

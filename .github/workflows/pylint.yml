@@ -14,24 +14,21 @@ jobs:
     name: Static code analysis 🔎
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
 
-      - name: Set up Python 3.12
-        uses: actions/setup-python@v5
+      - name: Set up uv
+        uses: astral-sh/setup-uv@v7
         with:
-          python-version: "3.12"
-          cache: "pip"
+          version: "latest"
 
       - name: Install dependencies
-        run: |
-          python -m pip install --upgrade pip
-          python -m pip install -e ".[dev]"
+        run: uv sync --extra dev
 
       - name: Run pylint analysis
         # Using repository pylint config (pyproject.toml) with comprehensive settings for scientific code
         run: |
           exit_code=0
-          python -m pylint --output-format=parseable --output=pylint-report.txt weac/ tests/ || exit_code=$?
+          uv run pylint --output-format=parseable --output=pylint-report.txt weac/ tests/ || exit_code=$?
           echo "Pylint finished with exit code $exit_code."
           echo
           echo "Pylint exit code meaning:"

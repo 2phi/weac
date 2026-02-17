@@ -9,7 +9,6 @@ import logging
 import time
 import warnings
 from dataclasses import dataclass
-from typing import List, Optional, Union
 
 # Third party imports
 import numpy as np
@@ -25,6 +24,7 @@ from weac.components import (
     WeakLayer,
 )
 from weac.constants import RHO_ICE
+from weac.components.scenario_config import TouchdownMode
 from weac.core.system_model import SystemModel
 
 logger = logging.getLogger(__name__)
@@ -34,12 +34,12 @@ logger = logging.getLogger(__name__)
 class CoupledCriterionHistory:
     """Stores the history of the coupled criterion evaluation."""
 
-    skier_weights: List[float]
-    crack_lengths: List[float]
-    incr_energies: List[np.ndarray]
-    g_deltas: List[float]
-    dist_maxs: List[float]
-    dist_mins: List[float]
+    skier_weights: list[float]
+    crack_lengths: list[float]
+    incr_energies: list[np.ndarray]
+    g_deltas: list[float]
+    dist_maxs: list[float]
+    dist_mins: list[float]
 
 
 @dataclass
@@ -89,16 +89,49 @@ class CoupledCriterionResult:
     g_delta: float
     dist_ERR_envelope: float
     iterations: int
-    history: Optional[CoupledCriterionHistory]
+    history: CoupledCriterionHistory | None
     final_system: SystemModel
     max_dist_stress: float
     min_dist_stress: float
 
 
 @dataclass
-class SSERRResult:
+class MaximalStressResult:
     """
-    Holds the results of the SSERR evaluation.
+    Holds the results of the maximal stress evaluation.
+
+    Attributes:
+    -----------
+    principal_stress_kPa: np.ndarray
+        The principal stress in kPa.
+    Sxx_kPa: np.ndarray
+        The axial normal stress in kPa.
+    principal_stress_norm: np.ndarray
+        The normalized principal stress to the tensile strength of the layers.
+    Sxx_norm: np.ndarray
+        The normalized axial normal stress to the tensile strength of the layers.
+    max_principal_stress_norm: float
+        The normalized maximum principal stress to the tensile strength of the layers.
+    max_Sxx_norm: float
+        The normalized maximum axial normal stress to the tensile strength of the layers.
+    slab_tensile_criterion: float
+        The slab tensile criterion, i.e. the portion of the slab thickness that is prone
+        to fail under tensile stresses in the steady state (between 0 and 1).
+    """
+
+    principal_stress_kPa: np.ndarray
+    Sxx_kPa: np.ndarray
+    principal_stress_norm: np.ndarray
+    Sxx_norm: np.ndarray
+    max_principal_stress_norm: float
+    max_Sxx_norm: float
+    slab_tensile_criterion: float
+
+
+@dataclass
+class SteadyStateResult:
+    """
+    Holds the results of the Steady State evaluation.
 
     Attributes:
     -----------
@@ -108,15 +141,21 @@ class SSERRResult:
         The message of the evaluation.
     touchdown_distance : float
         The touchdown distance.
-    SSERR : float
-        The Steady-State Energy Release Rate calculated with the
-        touchdown distance from G_I and G_II.
+    energy_release_rate : float
+        The steady-state energy release rate calculated with the
+        touchdown distance from the differential energy release rate.
+    maximal_stress_result: MaximalStressResult
+        The maximal stresses in the system at the touchdown distance.
+    system: SystemModel
+        The modified system model used for the steady state evaluation.
     """
 
     converged: bool
     message: str
     touchdown_distance: float
-    SSERR: float
+    energy_release_rate: float
+    maximal_stress_result: MaximalStressResult
+    system: SystemModel
 
 
 @dataclass
@@ -130,9 +169,9 @@ class FindMinimumForceResult:
         Whether the algorithm converged.
     critical_skier_weight : float
         The critical skier weight.
-    new_segments : List[Segment]
+    new_segments : list[Segment]
         The new segments.
-    old_segments : List[Segment]
+    old_segments : list[Segment]
         The old segments.
     iterations : int
         The number of iterations.
@@ -144,9 +183,9 @@ class FindMinimumForceResult:
 
     success: bool
     critical_skier_weight: float
-    new_segments: List[Segment]
-    old_segments: List[Segment]
-    iterations: Optional[int]
+    new_segments: list[Segment]
+    old_segments: list[Segment]
+    iterations: int | None
     max_dist_stress: float
     min_dist_stress: float
 
@@ -203,10 +242,10 @@ class CriteriaEvaluator:
 
     def stress_envelope(
         self,
-        sigma: Union[float, np.ndarray],
-        tau: Union[float, np.ndarray],
+        sigma: float | np.ndarray,
+        tau: float | np.ndarray,
         weak_layer: WeakLayer,
-        method: Optional[str] = None,
+        method: str | None = None,
     ) -> np.ndarray:
         """
         Evaluate the stress envelope for given stress components.
@@ -642,12 +681,13 @@ class CriteriaEvaluator:
             _recursion_depth=_recursion_depth + 1,
         )
 
-    def evaluate_SSERR(
+    def evaluate_SteadyState(
         self,
         system: SystemModel,
+        mode: TouchdownMode = "C_in_contact",
         vertical: bool = False,
         print_call_stats: bool = False,
-    ) -> SSERRResult:
+    ) -> SteadyStateResult:
         """
         Evaluates the Touchdown Distance in the Steady State and the Steady State
         Energy Release Rate.
@@ -672,25 +712,53 @@ class CriteriaEvaluator:
                 UserWarning,
             )
         system_copy = copy.deepcopy(system)
+        # Evaluate touchdown distance for flat slab
+        system_copy.toggle_touchdown(True)
         segments = [
             Segment(length=5e3, has_foundation=True, m=0.0),
             Segment(length=5e3, has_foundation=False, m=0.0),
         ]
+        system_copy.update_scenario(
+            segments=segments, scenario_config=ScenarioConfig(phi=0.0)
+        )
+
+        cut_distance = 0
+        match mode:
+            case "C_in_contact":
+                cut_distance = 2 * system_copy.slab_touchdown.l_BC
+            case "B_point_contact":
+                cut_distance = system_copy.slab_touchdown.l_BC - 1e-3
+            case "A_free_hanging":
+                cut_distance = system_copy.slab_touchdown.l_AB - 1e-3
+
+        segments = [
+            Segment(length=5e3, has_foundation=True, m=0.0),
+            Segment(length=cut_distance, has_foundation=False, m=0.0),
+        ]
         scenario_config = ScenarioConfig(
             system_type="vpst-" if vertical else "pst-",
-            phi=system.scenario.phi,
-            cut_length=5e3,
+            phi=0.0,  # Slab Touchdown works only for flat slab
+            cut_length=cut_distance,
         )
-        system_copy.config.touchdown = True
         system_copy.update_scenario(segments=segments, scenario_config=scenario_config)
+        # Force the requested mode to avoid floating-point precision issues
+        # when l_AB/l_BC are recalculated with different scenario parameters
+        system_copy.set_forced_touchdown_mode(mode)
         touchdown_distance = system_copy.slab_touchdown.touchdown_distance
         analyzer = Analyzer(system_copy, printing_enabled=print_call_stats)
-        G, _, _ = analyzer.differential_ERR(unit="J/m^2")
-        return SSERRResult(
+        energy_release_rate, _, _ = analyzer.differential_ERR(unit="J/m^2")
+        maximal_stress_result = self._calculate_maximal_stresses(
+            system_copy, print_call_stats=print_call_stats
+        )
+        if print_call_stats:
+            analyzer.print_call_stats(message="evaluate_SteadyState Call Statistics")
+        return SteadyStateResult(
             converged=True,
-            message="SSERR evaluation successful.",
+            message="Steady State evaluation successful.",
             touchdown_distance=touchdown_distance,
-            SSERR=G,
+            energy_release_rate=energy_release_rate,
+            maximal_stress_result=maximal_stress_result,
+            system=system_copy,
         )
 
     def find_minimum_force(
@@ -825,7 +893,7 @@ class CriteriaEvaluator:
         system: SystemModel,
         search_interval: tuple[float, float] | None = None,
         target: float = 1,
-    ) -> tuple[float, List[Segment]]:
+    ) -> tuple[float, list[Segment]]:
         """
         Finds the minimum crack length required to surpass the energy release rate envelope.
 
@@ -838,7 +906,7 @@ class CriteriaEvaluator:
         --------
         minimum_crack_length: float
             The minimum crack length required to surpass the energy release rate envelope [mm]
-        new_segments: List[Segment]
+        new_segments: list[Segment]
             The updated list of segments
         """
         old_segments = copy.deepcopy(system.scenario.segments)
@@ -928,7 +996,7 @@ class CriteriaEvaluator:
         self,
         system: SystemModel,
         skier_weight: float,
-    ) -> tuple[float, List[Segment]]:
+    ) -> tuple[float, list[Segment]]:
         """
         Finds the resulting anticrack length and updated segment configurations
         for a given skier weight.
@@ -944,7 +1012,7 @@ class CriteriaEvaluator:
         -------
         new_crack_length: float
             The total length of the new cracked segments [mm]
-        new_segments: List[Segment]
+        new_segments: list[Segment]
             The updated list of segments
         """
         logger.info(
@@ -1086,7 +1154,7 @@ class CriteriaEvaluator:
 
     def _find_stress_envelope_crossings(
         self, system: SystemModel, weak_layer: WeakLayer
-    ) -> List[float]:
+    ) -> list[float]:
         """
         Finds the exact x-coordinates where the stress envelope is crossed.
         """
@@ -1167,3 +1235,55 @@ class CriteriaEvaluator:
 
         # Return the difference from the target
         return g_delta_diff - target
+
+    def _calculate_maximal_stresses(
+        self,
+        system: SystemModel,
+        print_call_stats: bool = False,
+    ) -> MaximalStressResult:
+        """
+        Calculate the maximal stresses in the system.
+
+        Parameters
+        ----------
+        system : SystemModel
+            The system model to analyze.
+        print_call_stats : bool, optional
+            Whether to print analyzer call statistics. Default is False.
+
+        Returns
+        -------
+        MaximalStressResult
+            Object containing both absolute (in kPa) and normalized stress fields,
+            along with maximum normalized stress values.
+        """
+        analyzer = Analyzer(system, printing_enabled=print_call_stats)
+        _, Z, _ = analyzer.rasterize_solution(num=4000, mode="cracked")
+        Sxx_kPa = analyzer.Sxx(Z=Z, phi=system.scenario.phi, dz=5, unit="kPa")
+        principal_stress_kPa = analyzer.principal_stress_slab(
+            Z=Z, phi=system.scenario.phi, dz=5, unit="kPa"
+        )
+        Sxx_norm = analyzer.Sxx(
+            Z=Z, phi=system.scenario.phi, dz=5, unit="kPa", normalize=True
+        )
+        principal_stress_norm = analyzer.principal_stress_slab(
+            Z=Z, phi=system.scenario.phi, dz=5, unit="kPa", normalize=True
+        )
+        max_principal_stress_norm = np.max(principal_stress_norm)
+        max_Sxx_norm = np.max(Sxx_norm)
+        # evaluate for each height level if the slab is prone to fail under tensile stresses
+        height_level_prone_to_fail = np.max(Sxx_norm, axis=1)
+        slab_tensile_criterion = np.mean(height_level_prone_to_fail)
+        if print_call_stats:
+            analyzer.print_call_stats(
+                message="_calculate_maximal_stresses Call Statistics"
+            )
+        return MaximalStressResult(
+            principal_stress_kPa=principal_stress_kPa,
+            Sxx_kPa=Sxx_kPa,
+            principal_stress_norm=principal_stress_norm,
+            Sxx_norm=Sxx_norm,
+            max_principal_stress_norm=max_principal_stress_norm,
+            max_Sxx_norm=max_Sxx_norm,
+            slab_tensile_criterion=slab_tensile_criterion,
+        )

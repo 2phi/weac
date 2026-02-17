@@ -4,10 +4,9 @@ Logging configuration for weak layer anticrack nucleation model.
 
 import os
 from logging.config import dictConfig
-from typing import Optional
 
 
-def setup_logging(level: Optional[str] = None) -> None:
+def setup_logging(level: str | None = None) -> None:
     """
     Initialise the global logging configuration exactly once.
     The level is taken from the env var WEAC_LOG_LEVEL (default WARNING).

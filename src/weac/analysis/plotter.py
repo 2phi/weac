@@ -6,7 +6,7 @@ This module provides plotting functions for visualizing the results of the WEAC 
 import colorsys
 import logging
 import os
-from typing import List, Literal, Optional
+from typing import Literal
 
 # Third party imports
 import matplotlib.colors as mc
@@ -219,9 +219,9 @@ class Plotter:
 
     def _get_systems_to_plot(
         self,
-        system_model: Optional[SystemModel] = None,
-        system_models: Optional[List[SystemModel]] = None,
-    ) -> List[SystemModel]:
+        system_model: SystemModel | None = None,
+        system_models: list[SystemModel] | None = None,
+    ) -> list[SystemModel]:
         """Determine which systems to plot based on override parameters."""
         if system_model is not None and system_models is not None:
             raise ValueError(
@@ -236,7 +236,7 @@ class Plotter:
             "SystemModel or list of SystemModels"
         )
 
-    def _save_figure(self, filename: str, fig: Optional[Figure] = None):
+    def _save_figure(self, filename: str, fig: Figure | None = None):
         """Save figure with proper formatting."""
         if fig is None:
             fig = plt.gcf()
@@ -249,20 +249,20 @@ class Plotter:
 
     def plot_slab_profile(
         self,
-        weak_layers: List[WeakLayer] | WeakLayer,
-        slabs: List[Slab] | Slab,
+        weak_layers: list[WeakLayer] | WeakLayer,
+        slabs: list[Slab] | Slab,
         filename: str = "slab_profile",
-        labels: Optional[List[str] | str] = None,
-        colors: Optional[List[str]] = None,
+        labels: list[str] | str | None = None,
+        colors: list[str] | None = None,
     ):
         """
         Plot slab layer profiles for comparison.
 
         Parameters
         ----------
-        weak_layers : List[WeakLayer] | WeakLayer
+        weak_layers : list[WeakLayer] | WeakLayer
             The weak layer or layers to plot.
-        slabs : List[Slab] | Slab
+        slabs : list[Slab] | Slab
             The slab or slabs to plot.
         filename : str, optional
             Filename for saving plot
@@ -280,6 +280,9 @@ class Plotter:
             weak_layers = [weak_layers]
         if isinstance(slabs, Slab):
             slabs = [slabs]
+
+        if len(weak_layers) != len(slabs):
+            raise ValueError("Number of weak layers must match number of slabs")
 
         if labels is None:
             labels = [f"System {i + 1}" for i in range(len(weak_layers))]
@@ -642,11 +645,11 @@ class Plotter:
 
     def plot_section_forces(
         self,
-        system_model: Optional[SystemModel] = None,
-        system_models: Optional[List[SystemModel]] = None,
+        system_model: SystemModel | None = None,
+        system_models: list[SystemModel] | None = None,
         filename: str = "section_forces",
-        labels: Optional[List[str]] = None,
-        colors: Optional[List[str]] = None,
+        labels: list[str] | None = None,
+        colors: list[str] | None = None,
     ):
         """
         Plot section forces (N, M, V) for comparison.
@@ -655,7 +658,7 @@ class Plotter:
         ----------
         system_model : SystemModel, optional
             Single system to plot (overrides default)
-        system_models : List[SystemModel], optional
+        system_models : list[SystemModel], optional
             Multiple systems to plot (overrides default)
         filename : str, optional
             Filename for saving plot
@@ -721,11 +724,11 @@ class Plotter:
 
     def plot_energy_release_rates(
         self,
-        system_model: Optional[SystemModel] = None,
-        system_models: Optional[List[SystemModel]] = None,
+        system_model: SystemModel | None = None,
+        system_models: list[SystemModel] | None = None,
         filename: str = "ERR",
-        labels: Optional[List[str]] = None,
-        colors: Optional[List[str]] = None,
+        labels: list[str] | None = None,
+        colors: list[str] | None = None,
     ):
         """
         Plot energy release rates (G_I, G_II) for comparison.
@@ -734,7 +737,7 @@ class Plotter:
         ----------
         system_model : SystemModel, optional
             Single system to plot (overrides default)
-        system_models : List[SystemModel], optional
+        system_models : list[SystemModel], optional
             Multiple systems to plot (overrides default)
         filename : str, optional
             Filename for saving plot
@@ -882,48 +885,56 @@ class Plotter:
             zmax = np.max(Zsl + scale * Wsl) + pad
         zmin = np.min(Zsl) - pad
 
-        # Compute weak-layer grid coordinates (cm)
-        Xwl, Zwl = np.meshgrid(1e-1 * xwl, [1e-1 * (zi[-1] + H / 2), zmax])
+        # Filter out NaN values from weak layer coordinates
+        nanmask = np.isfinite(xwl)
+        xwl_finite = xwl[nanmask]
 
-        # Assemble weak-layer displacement field (top and bottom)
-        Uwl = np.vstack([Usl[-1, :], np.zeros(xwl.shape[0])])
-        Wwl = np.vstack([Wsl[-1, :], np.zeros(xwl.shape[0])])
+        # Compute weak-layer grid coordinates (cm) - only for finite xwl
+        Xwl, Zwl = np.meshgrid(1e-1 * xwl_finite, [1e-1 * (zi[-1] + H / 2), zmax])
+
+        # Assemble weak-layer displacement field (top and bottom) - only for finite xwl
+        Uwl = np.vstack([Usl[-1, nanmask], np.zeros(xwl_finite.shape[0])])
+        Wwl = np.vstack([Wsl[-1, nanmask], np.zeros(xwl_finite.shape[0])])
 
         # Compute stress or displacement fields
         match field:
             # Horizontal displacements (um)
             case "u":
                 slab = 1e4 * Usl
-                weak = 1e4 * Usl[-1, :]
+                weak = 1e4 * Usl[-1, nanmask]
                 label = r"$u$ ($\mu$m)"
             # Vertical deflection (um)
             case "w":
                 slab = 1e4 * Wsl
-                weak = 1e4 * Wsl[-1, :]
+                weak = 1e4 * Wsl[-1, nanmask]
                 label = r"$w$ ($\mu$m)"
-            # Axial normal stresses (kPa)
             case "Sxx":
-                slab = analyzer.Sxx(z, phi, dz=dz, unit="kPa")
-                weak = np.zeros(xwl.shape[0])
-                label = r"$\sigma_{xx}$ (kPa)"
+                slab = analyzer.Sxx(z, phi, dz=dz, unit="kPa", normalize=normalize)
+                weak = np.zeros(xwl_finite.shape[0])
+                label = (
+                    r"$\sigma_{xx}/\sigma_+$" if normalize else r"$\sigma_{xx}$ (kPa)"
+                )
             # Shear stresses (kPa)
             case "Txz":
-                slab = analyzer.Txz(z, phi, dz=dz, unit="kPa")
-                weak = Tauwl
-                label = r"$\tau_{xz}$ (kPa)"
+                slab = analyzer.Txz(z, phi, dz=dz, unit="kPa", normalize=normalize)
+                weak = Tauwl[nanmask]
+                label = r"$\tau_{xz}/\sigma_+$" if normalize else r"$\tau_{xz}$ (kPa)"
             # Transverse normal stresses (kPa)
             case "Szz":
-                slab = analyzer.Szz(z, phi, dz=dz, unit="kPa")
-                weak = Sigmawl
-                label = r"$\sigma_{zz}$ (kPa)"
+                slab = analyzer.Szz(z, phi, dz=dz, unit="kPa", normalize=normalize)
+                weak = Sigmawl[nanmask]
+                label = (
+                    r"$\sigma_{zz}/\sigma_+$" if normalize else r"$\sigma_{zz}$ (kPa)"
+                )
             # Principal stresses
             case "principal":
                 slab = analyzer.principal_stress_slab(
                     z, phi, dz=dz, val="max", unit="kPa", normalize=normalize
                 )
-                weak = analyzer.principal_stress_weaklayer(
+                weak_full = analyzer.principal_stress_weaklayer(
                     z, val="min", unit="kPa", normalize=normalize
                 )
+                weak = weak_full[nanmask]
                 if normalize:
                     label = (
                         r"$\sigma_\mathrm{I}/\sigma_+$ (slab),  "
@@ -934,11 +945,6 @@ class Plotter:
                         r"$\sigma_\mathrm{I}$ (kPa, slab),  "
                         r"$\sigma_\mathrm{I\!I\!I}$ (kPa, weak layer)"
                     )
-            case _:
-                raise ValueError(
-                    f"Invalid input '{field}' for field. Valid options are "
-                    "'u', 'w', 'Sxx', 'Txz', 'Szz', or 'principal'"
-                )
 
         # Complement label
         label += r"  $\longrightarrow$"
@@ -965,10 +971,9 @@ class Plotter:
 
         # Plot deformed weak-layer _outline
         if system_type in ["-pst", "pst-", "-vpst", "vpst-"]:
-            nanmask = np.isfinite(xwl)
             ax.plot(
-                _outline(Xwl[:, nanmask] + scale * Uwl[:, nanmask]),
-                _outline(Zwl[:, nanmask] + scale * Wwl[:, nanmask]),
+                _outline(Xwl + scale * Uwl),
+                _outline(Zwl + scale * Wwl),
                 "k",
                 linewidth=1,
             )
@@ -1030,12 +1035,375 @@ class Plotter:
 
         return fig
 
+    def plot_visualize_deformation(
+        self,
+        xsl: np.ndarray,
+        xwl: np.ndarray,
+        z: np.ndarray,
+        analyzer: Analyzer,
+        window: float | None = None,
+        weaklayer_proportion: float | None = None,
+        dz: int = 2,
+        levels: int = 300,
+        field: Literal["w", "u", "principal", "Sxx", "Txz", "Szz"] = "w",
+        normalize: bool = True,
+        filename: str = "visualize_deformation",
+    ) -> Figure:
+        """
+        Plot visualize deformation of the slab and weak layer.
+
+        Parameters
+        ----------
+        xsl : np.ndarray
+            Slab x-coordinates.
+        xwl : np.ndarray
+            Weak layer x-coordinates.
+        z : np.ndarray
+            Solution vector.
+        analyzer : Analyzer
+            Analyzer instance.
+        window: float | None, optional
+            Window size for the plot. Shows the right edge of the slab, where the slab is deformed. Default is None.
+        weaklayer_proportion: float | None, optional
+            Proportion of the plot to allocate to the weak layer. Default is None.
+        dz : int, optional
+            Element size along z-axis (mm). Default is 2 mm.
+        levels : int, optional
+            Number of levels for the colormap. Default is 300.
+        field : str, optional
+            Field to plot ('w', 'u', 'principal', 'Sxx', 'Txz', 'Szz'). Default is 'w'.
+        normalize : bool, optional
+            Toggle normalization. Default is True.
+        filename : str, optional
+            Filename for saving plot. Default is "visualize_deformation".
+
+        Returns
+        -------
+        matplotlib.figure.Figure
+            The generated plot figure.
+        """
+        fig = plt.figure(figsize=(10, 8))
+        ax = fig.add_subplot(111)
+
+        zi = analyzer.get_zmesh(dz=dz)["z"]
+        H = analyzer.sm.slab.H
+        phi = analyzer.sm.scenario.phi
+        system_type = analyzer.sm.scenario.system_type
+        fq = analyzer.sm.fq
+        sigma_comp = (
+            analyzer.sm.weak_layer.sigma_comp
+        )  # Compressive strength of the weak layer [kPa]
+
+        # Compute slab displacements on grid (cm)
+        Usl = np.vstack([fq.u(z, h0=h0, unit="cm") for h0 in zi])
+        Wsl = np.vstack([fq.w(z, unit="cm") for _ in zi])
+        Sigmawl = np.where(np.isfinite(xwl), fq.sig(z, unit="kPa"), np.nan)
+        Tauwl = np.where(np.isfinite(xwl), fq.tau(z, unit="kPa"), np.nan)
+
+        # Put coordinate origin at horizontal center
+        if system_type in ["skier", "skiers"]:
+            xsl = xsl - max(xsl) / 2
+            xwl = xwl - max(xwl) / 2
+
+        # Physical dimensions in cm
+        H_cm = H * 1e-1  # Slab height in cm
+        h_cm = analyzer.sm.weak_layer.h * 1e-1  # Weak layer height in cm
+        crack_h_cm = analyzer.sm.scenario.crack_h * 1e-1  # Crack height in cm
+
+        # Compute slab grid coordinates with vertical origin at top surface (cm)
+        Xsl, Zsl = np.meshgrid(1e-1 * (xsl), 1e-1 * (zi + H / 2))
+
+        # Calculate maximum displacement first (needed for proportion calculation)
+        max_w_displacement = np.nanmax(np.abs(Wsl))
+
+        # Calculate dynamic proportions based on displacement
+        # Weak layer percentage = weak_layer_height / max_displacement (as ratio)
+        # But capped at 40% maximum
+        if weaklayer_proportion is None:
+            if max_w_displacement > 0:
+                weaklayer_proportion = min(0.3, (h_cm / max_w_displacement) * 0.1)
+            else:
+                weaklayer_proportion = 0.3
+
+        # Slab takes the remaining space
+        slab_proportion = 1.0 - weaklayer_proportion
+        cracked_ratio = crack_h_cm / h_cm
+        cracked_proportion = weaklayer_proportion * cracked_ratio
+
+        # Set up plot coordinate system
+        # Plot height is normalized: slab (0 to slab_proportion), weak layer (slab_proportion to slab_proportion+weaklayer_proportion)
+        total_height_plot = (
+            slab_proportion + weaklayer_proportion
+        )  # Total height without displacement
+        # Map physical dimensions to plot coordinates
+        deformation_scale = weaklayer_proportion / h_cm
+
+        # Get x-axis limits spanning all provided x values (deformed and undeformed)
+        xmax = np.max([np.max(Xsl), np.max(Xsl + deformation_scale * Usl)]) + 10.0
+        xmin = np.min([np.min(Xsl), np.min(Xsl + deformation_scale * Usl)]) - 10.0
+
+        # Calculate zmax including maximum deformation
+        zmax = total_height_plot
+
+        # Convert physical coordinates to plot coordinates for slab
+        # Zsl is in cm, we need to map it to plot coordinates (0 to slab_proportion)
+        Zsl_plot = (Zsl / H_cm) * slab_proportion
+
+        # Filter out NaN values from weak layer coordinates
+        nanmask = np.isfinite(xwl)
+        xwl_finite = xwl[nanmask]
+
+        # Compute weak-layer grid coordinates in plot units
+        # Weak layer extends from bottom of slab (slab_proportion) to total height (1.0)
+        Xwl, Zwl_plot = np.meshgrid(
+            1e-1 * xwl_finite, [slab_proportion, total_height_plot]
+        )
+
+        # Assemble weak-layer displacement field (top and bottom) - only for finite xwl
+        Uwl = np.vstack([Usl[-1, nanmask], np.zeros(xwl_finite.shape[0])])
+        Wwl = np.vstack([Wsl[-1, nanmask], np.zeros(xwl_finite.shape[0])])
+
+        # Convert slab displacements to plot coordinates
+        # Scale factor for displacements:
+        # So scaled displacement in plot units = scale * Wsl
+        Wsl_plot = (
+            deformation_scale * Wsl
+        )  # Already in plot units (proportion of total height)
+        Usl_plot = deformation_scale * Usl  # Horizontal displacements also scaled
+        Wwl_plot = deformation_scale * Wwl  # Weak layer displacements
+        Uwl_plot = deformation_scale * Uwl  # Weak layer horizontal displacements
+
+        # Compute stress or displacement fields
+        match field:
+            # Horizontal displacements (um)
+            case "u":
+                slab = 1e4 * Usl
+                weak = 1e4 * Usl[-1, nanmask]
+                label = r"$u$ ($\mu$m)"
+            # Vertical deflection (um)
+            case "w":
+                slab = 1e4 * Wsl
+                weak = 1e4 * Wsl[-1, nanmask]
+                label = r"$w$ ($\mu$m)"
+            # Axial normal stresses (kPa)
+            case "Sxx":
+                slab = analyzer.Sxx(z, phi, dz=dz, unit="kPa", normalize=normalize)
+                weak = np.zeros(xwl_finite.shape[0])
+                label = (
+                    r"$\sigma_{xx}/\sigma_+$" if normalize else r"$\sigma_{xx}$ (kPa)"
+                )
+            # Shear stresses (kPa)
+            case "Txz":
+                slab = analyzer.Txz(z, phi, dz=dz, unit="kPa", normalize=normalize)
+                weak = Tauwl[nanmask]
+                label = r"$\tau_{xz}/\sigma_+$" if normalize else r"$\tau_{xz}$ (kPa)"
+            # Transverse normal stresses (kPa)
+            case "Szz":
+                slab = analyzer.Szz(z, phi, dz=dz, unit="kPa", normalize=normalize)
+                weak = Sigmawl[nanmask]
+                label = (
+                    r"$\sigma_{zz}/\sigma_+$" if normalize else r"$\sigma_{zz}$ (kPa)"
+                )
+            # Principal stresses
+            case "principal":
+                slab = analyzer.principal_stress_slab(
+                    z, phi, dz=dz, val="max", unit="kPa", normalize=normalize
+                )
+                weak_full = analyzer.principal_stress_weaklayer(
+                    z, sc=sigma_comp, val="min", unit="kPa", normalize=normalize
+                )
+                weak = weak_full[nanmask]
+                if normalize:
+                    label = (
+                        r"$\sigma_\mathrm{I}/\sigma_+$ (slab),  "
+                        r"$\sigma_\mathrm{I\!I\!I}/\sigma_-$ (weak layer)"
+                    )
+                else:
+                    label = (
+                        r"$\sigma_\mathrm{I}$ (kPa, slab),  "
+                        r"$\sigma_\mathrm{I\!I\!I}$ (kPa, weak layer)"
+                    )
+
+        # Complement label
+        label += r"  $\longrightarrow$"
+
+        # Assemble weak-layer output on grid
+        weak = np.vstack([weak, weak])
+
+        # Normalize colormap
+        absmax = np.nanmax(np.abs([slab.min(), slab.max(), weak.min(), weak.max()]))
+        clim = np.round(absmax, _significant_digits(absmax))
+        levels = np.linspace(-clim, clim, num=levels + 1, endpoint=True)
+
+        # Plot baseline
+        ax.axhline(zmax, color="k", linewidth=1)
+
+        # Plot outlines of the undeformed and deformed slab (using plot coordinates)
+        ax.plot(_outline(Xsl), _outline(Zsl_plot), "--", alpha=0.3, linewidth=1)
+        ax.plot(
+            _outline(Xsl + Usl_plot),
+            _outline(Zsl_plot + Wsl_plot),
+            "-",
+            linewidth=1,
+            color="k",
+        )
+
+        # Plot cracked weak-layer outline (where there is no weak layer)
+        xwl_cracked = xsl[~nanmask]
+        Xwl_cracked, Zwl_cracked_plot = np.meshgrid(
+            1e-1 * xwl_cracked,
+            [slab_proportion + cracked_proportion, total_height_plot],
+        )
+        # No displacements for the cracked weak layer outline (undeformed)
+        if xwl_cracked.shape[0] > 0:
+            ax.plot(
+                _outline(Xwl_cracked),
+                _outline(Zwl_cracked_plot),
+                "k-",
+                alpha=0.3,
+                linewidth=1,
+            )
+
+        # Then plot the deformed weak-layer outline where it exists
+        if system_type in ["-pst", "pst-", "-vpst", "vpst-"]:
+            ax.plot(
+                _outline(Xwl + Uwl_plot),
+                _outline(Zwl_plot + Wwl_plot),
+                "k",
+                linewidth=1,
+            )
+
+        cmap = plt.get_cmap("RdBu_r")
+        cmap.set_over(_adjust_lightness(cmap(1.0), 0.9))
+        cmap.set_under(_adjust_lightness(cmap(0.0), 0.9))
+
+        # Plot fields (using plot coordinates)
+        ax.contourf(
+            Xsl + Usl_plot,
+            Zsl_plot + Wsl_plot,
+            slab,
+            levels=levels,
+            cmap=cmap,
+            extend="both",
+        )
+        ax.contourf(
+            Xwl + Uwl_plot,
+            Zwl_plot + Wwl_plot,
+            weak,
+            levels=levels,
+            cmap=cmap,
+            extend="both",
+        )
+        if xwl_cracked.shape[0] > 0:
+            ax.contourf(
+                Xwl_cracked,
+                Zwl_cracked_plot,
+                np.zeros((2, xwl_cracked.shape[0])),
+                levels=levels,
+                cmap=cmap,
+                extend="both",
+            )
+
+        # Plot setup
+        # Set y-limits to match plot coordinate system (0 to total_height_plot = 1.0)
+        plot_ymin = -0.1
+        plot_ymax = (
+            total_height_plot  # Should be 1.0 (slab_proportion + weaklayer_proportion)
+        )
+
+        # Set limits first, then aspect ratio to avoid matplotlib adjusting limits
+        if window is None:
+            ax.set_xlim([xmin, xmax])
+        else:
+            ax.set_xlim([xmax - window, xmax])
+        ax.set_ylim([plot_ymin, plot_ymax])
+        ax.invert_yaxis()
+        ax.use_sticky_edges = False
+
+        # Hide the default y-axis on main axis (we'll use custom axes)
+        ax.yaxis.set_visible(False)
+
+        # Set up dual y-axes
+        # Right axis: slab height in cm (0 at top, H_cm at bottom of slab)
+        ax_right = ax.twinx()
+        slab_height_max = H_cm
+        # Map plot coordinates to physical slab height values
+        # Plot: 0 to slab_proportion (0.6) maps to physical: 0 to H_cm
+        slab_height_ticks = np.linspace(0, slab_height_max, num=5)
+        slab_height_positions_plot = (
+            slab_height_ticks / slab_height_max
+        ) * slab_proportion
+        ax_right.set_yticks(slab_height_positions_plot)
+        ax_right.set_yticklabels([f"{tick:.1f}" for tick in slab_height_ticks])
+        # Ensure right axis ticks and label are on the right side
+        ax_right.yaxis.tick_right()
+        ax_right.yaxis.set_label_position("right")
+        ax_right.set_ylim([plot_ymin, plot_ymax])
+        ax_right.invert_yaxis()
+        ax_right.set_ylabel(
+            r"slab depth [cm] $\longleftarrow$", rotation=90, labelpad=5, loc="top"
+        )
+
+        # Left axis: weak layer height in mm (0 at bottom of slab, h at bottom of weak layer)
+        ax_left = ax.twinx()
+        weak_layer_h_mm = analyzer.sm.weak_layer.h
+        # Map plot coordinates to physical weak layer height values
+        # Plot: slab_proportion (0.6) to total_height_plot (1.0) maps to physical: 0 to h_mm
+        weaklayer_height_ticks = np.linspace(0, weak_layer_h_mm, num=3)
+        # Map from plot coordinates (slab_proportion to 1.0) to physical (0 to h_mm)
+        weaklayer_height_positions_plot = (
+            slab_proportion
+            + (weaklayer_height_ticks / weak_layer_h_mm) * weaklayer_proportion
+        )
+        ax_left.set_yticks(weaklayer_height_positions_plot)
+        ax_left.set_yticklabels([f"{tick:.1f}" for tick in weaklayer_height_ticks])
+        # Move left axis to the left side
+        ax_left.yaxis.tick_left()
+        ax_left.yaxis.set_label_position("left")
+        ax_left.set_ylim([plot_ymin, plot_ymax])
+        ax_left.invert_yaxis()
+        ax_left.set_ylabel(
+            r"weaklayer depth [mm] $\longleftarrow$",
+            rotation=90,
+            labelpad=5,
+            loc="bottom",
+        )
+
+        # Plot labels
+        ax.set_xlabel(r"lateral position $x$ (cm) $\longrightarrow$")
+        ax.set_title(
+            f"{field}{' (normalized to tensile strength)' if normalize else ''}",
+            size=10,
+        )
+
+        # Show colorbar
+        ticks = np.linspace(levels[0], levels[-1], num=11, endpoint=True)
+        fig.colorbar(
+            ax.contourf(
+                Xsl + Usl_plot,
+                Zsl_plot + Wsl_plot,
+                slab,
+                levels=levels,
+                cmap=cmap,
+                extend="both",
+            ),
+            orientation="horizontal",
+            ticks=ticks,
+            label=label,
+            aspect=35,
+        )
+
+        # Save figure
+        self._save_figure(filename, fig)
+
+        return fig
+
     def plot_stress_envelope(
         self,
         system_model: SystemModel,
         criteria_evaluator: CriteriaEvaluator,
         all_envelopes: bool = False,
-        filename: Optional[str] = None,
+        filename: str | None = None,
     ):
         """
         Plot stress envelope in τ-σ space.
@@ -1074,7 +1442,7 @@ class Plotter:
         weak_layer = system_model.weak_layer
 
         # Define a function to find the root for a given tau
-        def find_sigma_for_tau(tau_val, sigma_c, method: Optional[str] = None):
+        def find_sigma_for_tau(tau_val, sigma_c, method: str | None = None):
             # Target function to find the root of: envelope(sigma, tau) - 1 = 0
             def envelope_root_func(sigma_val):
                 return (

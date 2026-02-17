@@ -4,12 +4,12 @@ Handling the touchdown situation in a PST.
 """
 
 import logging
-from typing import Literal, Optional
+from typing import Literal
 
 from scipy.optimize import brentq
 
 from weac.components.layer import WeakLayer
-from weac.components.scenario_config import ScenarioConfig
+from weac.components.scenario_config import ScenarioConfig, TouchdownMode
 from weac.components.segment import Segment
 from weac.constants import STIFFNESS_COLLAPSE_FACTOR
 from weac.core.eigensystem import Eigensystem
@@ -49,6 +49,9 @@ class SlabTouchdown:  # pylint: disable=too-many-instance-attributes,too-few-pub
     -----------
     scenario: `Scenario`
     eigensystem: `Eigensystem`
+    forced_mode: `TouchdownMode | None`
+        If provided, forces this touchdown mode instead of calculating from l_AB/l_BC.
+        This avoids floating-point precision issues when scenario parameters change.
 
     Attributes:
     -----------
@@ -56,11 +59,11 @@ class SlabTouchdown:  # pylint: disable=too-many-instance-attributes,too-few-pub
         Length of the crack for transition of stage A to stage B [mm]
     l_BC : float
         Length of the crack for transition of stage B to stage C [mm]
-    touchdown_mode : Literal["A_free_hanging", "B_point_contact", "C_in_contact"]
+    touchdown_mode : TouchdownMode
         Type of touchdown mode
     touchdown_distance : float
         Length of the touchdown segment [mm]
-    collapsed_weak_layer_kR : Optional[float]
+    collapsed_weak_layer_kR : float | None
         Rotational spring stiffness of the collapsed weak layer segment
     """
 
@@ -74,15 +77,19 @@ class SlabTouchdown:  # pylint: disable=too-many-instance-attributes,too-few-pub
     straight_scenario: Scenario
     l_AB: float
     l_BC: float
-    touchdown_mode: Literal[
-        "A_free_hanging", "B_point_contact", "C_in_contact"
-    ]  # Three types of contact with collapsed weak layer
+    touchdown_mode: TouchdownMode  # Three types of contact with collapsed weak layer
     touchdown_distance: float
-    collapsed_weak_layer_kR: Optional[float] = None
+    collapsed_weak_layer_kR: float | None = None
 
-    def __init__(self, scenario: Scenario, eigensystem: Eigensystem):
+    def __init__(
+        self,
+        scenario: Scenario,
+        eigensystem: Eigensystem,
+        forced_mode: TouchdownMode | None = None,
+    ):
         self.scenario = scenario
         self.eigensystem = eigensystem
+        self._forced_mode = forced_mode
 
         # Create a new scenario config with phi=0 (flat slab) while preserving other settings
         self.flat_config = ScenarioConfig(
@@ -113,14 +120,25 @@ class SlabTouchdown:  # pylint: disable=too-many-instance-attributes,too-few-pub
             self.l_BC = self._calc_l_BC()
         except ValueError:
             self.l_BC = self.scenario.L
-        # Assign stage
-        touchdown_mode = "A_free_hanging"
-        if self.scenario.cut_length <= self.l_AB:
+
+        # Assign stage - use forced mode if provided, otherwise calculate from thresholds
+        if self._forced_mode is not None:
+            touchdown_mode = self._forced_mode
+            logger.debug(
+                "Using forced touchdown mode: %s (l_AB=%.2f, l_BC=%.2f, cut_length=%.2f)",
+                touchdown_mode,
+                self.l_AB,
+                self.l_BC,
+                self.scenario.cut_length,
+            )
+        else:
             touchdown_mode = "A_free_hanging"
-        elif self.l_AB < self.scenario.cut_length <= self.l_BC:
-            touchdown_mode = "B_point_contact"
-        elif self.l_BC < self.scenario.cut_length:
-            touchdown_mode = "C_in_contact"
+            if self.scenario.cut_length <= self.l_AB:
+                touchdown_mode = "A_free_hanging"
+            elif self.l_AB < self.scenario.cut_length <= self.l_BC:
+                touchdown_mode = "B_point_contact"
+            elif self.l_BC < self.scenario.cut_length:
+                touchdown_mode = "C_in_contact"
         self.touchdown_mode = touchdown_mode
 
     def _calc_touchdown_distance(self):

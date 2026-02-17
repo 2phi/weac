@@ -14,21 +14,17 @@ jobs:
     name: Make sure code is ruff-formatted 🐶
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
 
-      - name: Set up Python 3.12
-        uses: actions/setup-python@v5
+      - name: Set up uv
+        uses: astral-sh/setup-uv@v7
         with:
-          python-version: '3.12'
+          version: "latest"
 
       - name: Install dependencies
-        run: |
-          # Setup pip
-          python -m pip install --upgrade pip
-          # Install dependencies including ruff
-          python -m pip install -e ".[dev]"
+        run: uv sync --extra dev
 
       - name: Check formatting with ruff
         run: |
-          ruff format . --check
-          ruff check .
+          uv run ruff format . --check
+          uv run ruff check .

@@ -21,7 +21,6 @@ dist/
 # Environments
 .venv/
 venv/
-.python-version
 .weac-reference/
 .venv*
 
@@ -58,3 +57,6 @@ temp*
 old*
 
 .weac-reference/
+
+# Folder for development and local testing
+dev/

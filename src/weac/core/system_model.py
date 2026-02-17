@@ -12,7 +12,6 @@ import copy
 import logging
 from collections.abc import Sequence
 from functools import cached_property
-from typing import List, Optional, Union
 
 import numpy as np
 
@@ -35,6 +34,7 @@ from weac.core.generalized_unknown_constants_solver import (
 )
 from weac.core.scenario import Scenario
 from weac.core.slab import Slab
+from weac.components.scenario_config import TouchdownMode
 from weac.core.slab_touchdown import SlabTouchdown
 from weac.core.unknown_constants_solver import UnknownConstantsSolver
 
@@ -126,11 +126,11 @@ class SystemModel:
     fq: FieldQuantities
 
     scenario: Scenario
-    slab_touchdown: Optional[SlabTouchdown]
+    slab_touchdown: SlabTouchdown | None
     unknown_constants: np.ndarray
     uncracked_unknown_constants: np.ndarray
 
-    def __init__(self, model_input: ModelInput, config: Optional[Config] = None):
+    def __init__(self, model_input: ModelInput, config: Config | None = None):
         if config is None:
             config = Config()
         self.config = config
@@ -168,7 +168,7 @@ class SystemModel:
         return Eigensystem(weak_layer=self.weak_layer, slab=self.slab)
 
     @cached_property
-    def slab_touchdown(self) -> Optional[SlabTouchdown]:
+    def slab_touchdown(self) -> SlabTouchdown | None:
         """
         Solve for the slab touchdown.
         Modifies the scenario object in place by replacing the undercut segment
@@ -178,7 +178,9 @@ class SystemModel:
         if self.config.touchdown:
             logger.info("Solving for Slab Touchdown")
             slab_touchdown = SlabTouchdown(
-                scenario=self.scenario, eigensystem=self.eigensystem
+                scenario=self.scenario,
+                eigensystem=self.eigensystem,
+                forced_mode=self.config.forced_touchdown_mode,
             )
             logger.info(
                 "Original cut_length: %s, touchdown_distance: %s",
@@ -328,7 +330,7 @@ class SystemModel:
         self._invalidate_eigensystem()
 
     # Changes that affect the *slab*  -> rebuild everything
-    def update_layers(self, new_layers: List[Layer]):
+    def update_layers(self, new_layers: list[Layer]):
         """Update the layers."""
         slab = Slab(layers=new_layers)
         self.slab = slab
@@ -343,8 +345,8 @@ class SystemModel:
     # Changes that affect the *scenario*  -> only rebuild C constants
     def update_scenario(
         self,
-        segments: Optional[List[Segment]] = None,
-        scenario_config: Optional[ScenarioConfig] = None,
+        segments: list[Segment] | None = None,
+        scenario_config: ScenarioConfig | None = None,
     ):
         """
         Update fields on `scenario_config` (if present) or on the
@@ -361,14 +363,33 @@ class SystemModel:
             weak_layer=self.weak_layer,
             slab=self.slab,
         )
-        if self.config.touchdown:
-            self._invalidate_slab_touchdown()
+        self._invalidate_slab_touchdown()
         self._invalidate_constants()
 
     def toggle_touchdown(self, touchdown: bool):
         """Toggle the touchdown."""
         if self.config.touchdown != touchdown:
             self.config.touchdown = touchdown
+            self._invalidate_slab_touchdown()
+            self._invalidate_constants()
+
+    def set_forced_touchdown_mode(self, mode: TouchdownMode | None):
+        """
+        Set the forced touchdown mode.
+
+        When set, the touchdown mode calculation will use this mode instead of
+        calculating it from l_AB/l_BC thresholds. This avoids floating-point
+        precision issues when the mode boundaries are recalculated with different
+        scenario parameters.
+
+        Parameters
+        ----------
+        mode : TouchdownMode | None
+            The mode to force ("A_free_hanging", "B_point_contact", "C_in_contact"),
+            or None to use automatic calculation.
+        """
+        if self.config.forced_touchdown_mode != mode:
+            self.config.forced_touchdown_mode = mode
             self._invalidate_slab_touchdown()
             self._invalidate_constants()
 
@@ -390,7 +411,7 @@ class SystemModel:
 
     def z(
         self,
-        x: Union[float, Sequence[float], np.ndarray],
+        x: float | Sequence[float] | np.ndarray,
         C: np.ndarray,
         length: float,
         phi: float,

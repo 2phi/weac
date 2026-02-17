@@ -13,7 +13,7 @@ from weac.analysis.criteria_evaluator import (
     CoupledCriterionResult,
     CriteriaEvaluator,
     FindMinimumForceResult,
-    SSERRResult,
+    SteadyStateResult,
 )
 from weac.components import (
     Config,
@@ -183,8 +183,8 @@ class TestCriteriaEvaluator(unittest.TestCase):
         self.assertIsInstance(results, CoupledCriterionResult)
         self.assertGreater(results.critical_skier_weight, 0)
 
-    def test_evaluate_SSERR(self):
-        """Test the evaluate_SSERR method."""
+    def test_evaluate_SteadyState(self):
+        """Test the evaluate_SteadyState method."""
         segments = [
             Segment(length=self.segments_length, has_foundation=True, m=0),
             Segment(length=self.segments_length, has_foundation=True, m=0),
@@ -196,13 +196,61 @@ class TestCriteriaEvaluator(unittest.TestCase):
                 segments=segments,
                 scenario_config=ScenarioConfig(phi=self.phi),
             ),
-            config=self.config,
+            config=Config(touchdown=True),
         )
-        results: SSERRResult = self.evaluator.evaluate_SSERR(system)
+        results: SteadyStateResult = self.evaluator.evaluate_SteadyState(system)
         self.assertTrue(results.converged)
-        self.assertGreater(results.SSERR, 0)
+        self.assertGreater(results.energy_release_rate, 0)
         self.assertGreater(results.touchdown_distance, 0)
         self.assertLess(results.touchdown_distance, system.scenario.L)
+        max_principal_stress_norm = (
+            results.maximal_stress_result.max_principal_stress_norm
+        )
+        max_Sxx_norm = results.maximal_stress_result.max_Sxx_norm
+        self.assertGreater(max_principal_stress_norm, 0)
+        self.assertGreater(max_Sxx_norm, 0)
+
+    def test_evaluate_SteadyState_without_touchdown_in_config(self):
+        """
+        Test evaluate_SteadyState when SystemModel is initialized without touchdown=True.
+
+        This is a regression test for bug #37: SteadyState evaluation should work
+        even if the SystemModel is not initialized with touchdown=True in Config.
+        The evaluate_SteadyState method should internally enable touchdown mode
+        using toggle_touchdown() to properly invalidate cached properties.
+        """
+        segments = [
+            Segment(length=self.segments_length, has_foundation=True, m=0),
+            Segment(length=self.segments_length, has_foundation=True, m=0),
+        ]
+        # Initialize system WITHOUT touchdown=True (default is False)
+        system = SystemModel(
+            model_input=ModelInput(
+                layers=self.layers,
+                weak_layer=self.weak_layer,
+                segments=segments,
+                scenario_config=ScenarioConfig(phi=self.phi),
+            ),
+            config=Config(),  # touchdown defaults to False
+        )
+
+        # This should not raise AttributeError: 'NoneType' object has no attribute 'l_BC'
+        results: SteadyStateResult = self.evaluator.evaluate_SteadyState(system)
+
+        # Verify results are valid
+        self.assertTrue(results.converged)
+        self.assertGreater(results.energy_release_rate, 0)
+        self.assertGreater(results.touchdown_distance, 0)
+        self.assertLess(results.touchdown_distance, results.system.scenario.L)
+        max_principal_stress_norm = (
+            results.maximal_stress_result.max_principal_stress_norm
+        )
+        max_Sxx_norm = results.maximal_stress_result.max_Sxx_norm
+        self.assertGreater(max_principal_stress_norm, 0)
+        self.assertGreater(max_Sxx_norm, 0)
+
+        # Verify the original system's touchdown state was not modified
+        self.assertFalse(system.config.touchdown)
 
     def test_find_minimum_crack_length(self):
         """Test the find_minimum_crack_length method."""
@@ -223,6 +271,46 @@ class TestCriteriaEvaluator(unittest.TestCase):
         self.assertGreater(crack_length, 0)
         self.assertIsInstance(new_segments, list)
         self.assertTrue(all(isinstance(s, Segment) for s in new_segments))
+
+    def test_evaluate_SteadyState_modes(self):
+        """Test evaluate_SteadyState with various modes."""
+        test_cases = [
+            ("C_in_contact", "C_in_contact"),
+            ("B_point_contact", "B_point_contact"),
+            ("A_free_hanging", "A_free_hanging"),
+            (None, "C_in_contact"),  # default mode
+        ]
+
+        for mode_param, expected_mode in test_cases:
+            with self.subTest(mode=mode_param):
+                segments = [
+                    Segment(length=self.segments_length, has_foundation=True, m=0),
+                    Segment(length=self.segments_length, has_foundation=True, m=0),
+                ]
+                system = SystemModel(
+                    model_input=ModelInput(
+                        layers=self.layers,
+                        weak_layer=self.weak_layer,
+                        segments=segments,
+                        scenario_config=ScenarioConfig(phi=self.phi),
+                    ),
+                    config=Config(touchdown=True),
+                )
+
+                if mode_param is None:
+                    results: SteadyStateResult = self.evaluator.evaluate_SteadyState(
+                        system
+                    )
+                else:
+                    results: SteadyStateResult = self.evaluator.evaluate_SteadyState(
+                        system, mode=mode_param
+                    )
+
+                self.assertTrue(results.converged)
+                self.assertEqual(
+                    results.system.slab_touchdown.touchdown_mode,
+                    expected_mode,
+                )
 
 
 if __name__ == "__main__":

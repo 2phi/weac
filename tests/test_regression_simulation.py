@@ -403,7 +403,7 @@ class TestRegressionSimulation(unittest.TestCase):
         segs = [Segment(length=10000, has_foundation=True, m=0)]
         sc = ScenarioConfig(phi=30.0, system_type="skier", cut_length=0.0)
         mi = ModelInput(layers=layers, weak_layer=wl, segments=segs, scenario_config=sc)
-        sm = SystemModel(model_input=mi, config=Config(touchdown=False))
+        sm = SystemModel(model_input=mi, config=Config(touchdown=True))
 
         evaluator = CriteriaEvaluator(CriteriaConfig())
 
@@ -416,13 +416,13 @@ class TestRegressionSimulation(unittest.TestCase):
         self.assertAlmostEqual(fm.max_dist_stress, 1.0000189267255666, places=6)
         self.assertLess(fm.min_dist_stress, 1.0)
 
-        # evaluate_SSERR baseline
-        ss = evaluator.evaluate_SSERR(system=sm, vertical=False)
+        # evaluate_SteadyState baseline
+        ss = evaluator.evaluate_SteadyState(system=sm, vertical=False)
         self.assertTrue(ss.converged)
         self.assertGreater(ss.touchdown_distance, 0)
         # Baseline values recorded
-        self.assertAlmostEqual(ss.touchdown_distance, 1320.108936137, places=6)
-        np.testing.assert_allclose(ss.SSERR, 2.168112101045914, rtol=1e-8, atol=0)
+        self.assertAlmostEqual(ss.touchdown_distance, 1265.551937834, places=6)
+        np.testing.assert_allclose(ss.energy_release_rate, 2.123992, rtol=1e-6, atol=0)
 
         # evaluate_coupled_criterion baseline
         cc = evaluator.evaluate_coupled_criterion(system=sm, max_iterations=10)

@@ -3,7 +3,7 @@ This module defines the Scenario class, which encapsulates the physical setup of
 """
 
 import logging
-from typing import List, Sequence, Union
+from collections.abc import Sequence
 
 import numpy as np
 
@@ -55,7 +55,7 @@ class Scenario:
 
     # Inputs
     scenario_config: ScenarioConfig
-    segments: List[Segment]
+    segments: list[Segment]
     weak_layer: WeakLayer
     slab: Slab
 
@@ -84,7 +84,7 @@ class Scenario:
     def __init__(
         self,
         scenario_config: ScenarioConfig,
-        segments: List[Segment],
+        segments: list[Segment],
         weak_layer: WeakLayer,
         slab: Slab,
     ):
@@ -123,19 +123,19 @@ class Scenario:
         self._calc_crack_height()
 
     def get_segment_idx(
-        self, x: Union[float, Sequence[float], np.ndarray]
-    ) -> Union[int, np.ndarray]:
+        self, x: float | Sequence[float] | np.ndarray
+    ) -> int | np.ndarray:
         """
         Get the segment index for a given x-coordinate or coordinates.
 
         Parameters
         ----------
-        x: Union[float, Sequence[float], np.ndarray]
+        x: float | Sequence[float] | np.ndarray
             A single x-coordinate or a sequence of x-coordinates.
 
         Returns
         -------
-        Union[int, np.ndarray]
+        int | np.ndarray
             The segment index or an array of indices.
         """
         x_arr = np.asarray(x)

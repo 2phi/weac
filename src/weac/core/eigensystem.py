@@ -4,10 +4,8 @@ the eigenvalue problem for a layered beam on an elastic foundation.
 """
 
 import logging
-from typing import Optional
 
 import numpy as np
-from numpy.typing import NDArray
 
 from weac.components import WeakLayer
 from weac.constants import SHEAR_CORRECTION_FACTOR
@@ -58,17 +56,17 @@ class Eigensystem:
     kA55: float  # shear stiffness
     K0: float  # foundation stiffness
 
-    K: NDArray  # System Matrix
+    K: np.ndarray  # System Matrix
 
     # Eigenvalues and Eigenvectors
-    ewC: NDArray[np.complex128]  # shape (k): Complex Eigenvalues
-    ewR: NDArray[np.float64]  # shape (k): Real Eigenvalues
-    evC: NDArray[np.complex128]  # shape (6, k): Complex Eigenvectors
-    evR: NDArray[np.float64]  # shape (6, k): Real Eigenvectors
-    sR: NDArray[
+    ewC: np.ndarray[np.complex128]  # shape (k): Complex Eigenvalues
+    ewR: np.ndarray[np.float64]  # shape (k): Real Eigenvalues
+    evC: np.ndarray[np.complex128]  # shape (6, k): Complex Eigenvectors
+    evR: np.ndarray[np.float64]  # shape (6, k): Real Eigenvectors
+    sR: np.ndarray[
         np.float64
     ]  # shape (k): Real positive eigenvalue shifts (for numerical robustness)
-    sC: NDArray[
+    sC: np.ndarray[
         np.float64
     ]  # shape (k): Complex positive eigenvalue shifts (for numerical robustness)
 
@@ -114,8 +112,8 @@ class Eigensystem:
         self.K0 = B11**2 - A11 * D11
 
     def assemble_system_matrix(
-        self, kn: Optional[float], kt: Optional[float]
-    ) -> NDArray[np.float64]:
+        self, kn: float | None, kt: float | None
+    ) -> np.ndarray[np.float64]:
         """
         Assemble first-order ODE system matrix K.
 
@@ -171,14 +169,14 @@ class Eigensystem:
         return np.array(K, dtype=np.float64)
 
     def calc_eigenvalues_and_eigenvectors(
-        self, system_matrix: NDArray[np.float64]
+        self, system_matrix: np.ndarray[np.float64]
     ) -> tuple[
-        NDArray[np.complex128],
-        NDArray[np.float64],
-        NDArray[np.complex128],
-        NDArray[np.float64],
-        NDArray[np.float64],
-        NDArray[np.float64],
+        np.ndarray[np.complex128],
+        np.ndarray[np.float64],
+        np.ndarray[np.complex128],
+        np.ndarray[np.float64],
+        np.ndarray[np.float64],
+        np.ndarray[np.float64],
     ]:
         """
         Calculate eigenvalues and eigenvectors of the system matrix.
@@ -215,7 +213,9 @@ class Eigensystem:
         sR[ewR > 0], sC[ewC > 0] = -1, -1
         return ewC, ewR, evC, evR, sR, sC
 
-    def zh(self, x: float, length: float = 0, has_foundation: bool = True) -> NDArray:
+    def zh(
+        self, x: float, length: float = 0, has_foundation: bool = True
+    ) -> np.ndarray:
         """
         Compute bedded or free complementary solution at position x.
 
@@ -275,7 +275,7 @@ class Eigensystem:
 
     def zp(
         self, x: float, phi: float = 0, has_foundation=True, qs: float = 0
-    ) -> NDArray:
+    ) -> np.ndarray:
         """
         Compute bedded or free particular integrals at position x.
 
@@ -357,7 +357,7 @@ class Eigensystem:
 
         return zp
 
-    def get_load_vector(self, phi: float, qs: float = 0) -> NDArray:
+    def get_load_vector(self, phi: float, qs: float = 0) -> np.ndarray:
         """
         Compute system load vector q.
 

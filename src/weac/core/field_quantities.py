@@ -58,19 +58,23 @@ class FieldQuantities:  # pylint: disable=too-many-instance-attributes, too-many
         h0: float = 0,
         unit: LengthUnit = "mm",
     ) -> float | np.ndarray:
-        """Horizontal displacement *u = u₀ + h₀ ψ* at depth h₀."""
+        """
+        Horizontal displacement `u = u₀ + h₀ ψ` at depth `h₀` (mm).
+        """
         return self._unit_factor(unit) * (Z[0, :] + h0 * self.psi(Z))
 
     def du_dx(self, Z: np.ndarray, h0: float) -> float | np.ndarray:
-        """Derivative u' = u₀' + h₀ ψ'."""
+        """Derivative u' = u₀' + h₀ ψ' (-)."""
         return Z[1, :] + h0 * self.dpsi_dx(Z)
 
     def w(self, Z: np.ndarray, unit: LengthUnit = "mm") -> float | np.ndarray:
-        """Center-line deflection *w*."""
+        """
+        Center-line (vertical) deflection `w` (mm).
+        """
         return self._unit_factor(unit) * Z[2, :]
 
     def dw_dx(self, Z: np.ndarray) -> float | np.ndarray:
-        """First derivative w'."""
+        """First derivative `w'` (-)."""
         return Z[3, :]
 
     def psi(
@@ -78,32 +82,32 @@ class FieldQuantities:  # pylint: disable=too-many-instance-attributes, too-many
         Z: np.ndarray,
         unit: AngleUnit = "rad",
     ) -> float | np.ndarray:
-        """Rotation ψ of the mid-plane."""
+        """Rotation `ψ` of the mid-plane (rad)."""
         factor = self._unit_factor(unit)
         return factor * Z[4, :]
 
     def dpsi_dx(self, Z: np.ndarray) -> float | np.ndarray:
-        """First derivative ψ′."""
+        """First derivative `ψ'` (rad/mm)."""
         return Z[5, :]
 
     def N(self, Z: np.ndarray) -> float | np.ndarray:
-        """Axial normal force N = A11 u' + B11 psi' in the slab [N]"""
+        """Axial normal force `N = A11 u' + B11 ψ'` in the slab [N]"""
         return self.es.A11 * Z[1, :] + self.es.B11 * Z[5, :]
 
     def M(self, Z: np.ndarray) -> float | np.ndarray:
-        """Bending moment M = B11 u' + D11 psi' in the slab [Nmm]"""
+        """Bending moment `M = B11 u' + D11 ψ'` in the slab [Nmm]"""
         return self.es.B11 * Z[1, :] + self.es.D11 * Z[5, :]
 
     def V(self, Z: np.ndarray) -> float | np.ndarray:
-        """Vertical shear force V = kA55(w' + psi) [N]"""
+        """Vertical shear force `V = kA55(w' + ψ)` [N]"""
         return self.es.kA55 * (Z[3, :] + Z[4, :])
 
     def sig(self, Z: np.ndarray, unit: StressUnit = "MPa") -> float | np.ndarray:
-        """Weak-layer normal stress"""
+        """Weak-layer normal stress `sig = -kn * w`"""
         return -self._unit_factor(unit) * self.es.weak_layer.kn * self.w(Z)
 
     def tau(self, Z: np.ndarray, unit: StressUnit = "MPa") -> float | np.ndarray:
-        """Weak-layer shear stress"""
+        """Weak-layer shear stress `tau = -kt * (w' * h/2 - u(h=H/2))`"""
         return (
             -self._unit_factor(unit)
             * self.es.weak_layer.kt
@@ -114,11 +118,11 @@ class FieldQuantities:  # pylint: disable=too-many-instance-attributes, too-many
         )
 
     def eps(self, Z: np.ndarray) -> float | np.ndarray:
-        """Weak-layer normal strain"""
+        """Weak-layer normal strain `eps = -w / h`"""
         return -self.w(Z) / self.es.weak_layer.h
 
     def gamma(self, Z: np.ndarray) -> float | np.ndarray:
-        """Weak-layer shear strain."""
+        """Weak-layer shear strain `gamma = (w' * h/2 - u(h=H/2)) / h`"""
         return (
             self.dw_dx(Z) / 2 - self.u(Z, h0=self.es.slab.H / 2) / self.es.weak_layer.h
         )
@@ -178,9 +182,9 @@ class FieldQuantities:  # pylint: disable=too-many-instance-attributes, too-many
 
     def dz_dxdx(self, z: np.ndarray, phi: float, qs: float) -> np.ndarray:
         """
-        Get second derivative z''(x) = K*z'(x) of the solution vector.
+        Get second derivative `z''(x) = K*z'(x)` of the solution vector.
 
-        z''(x) = [u''(x) u'''(x) w''(x) w'''(x) psi''(x), psi'''(x)]^T
+        `z''(x) = [u''(x) u'''(x) w''(x) w'''(x) psi''(x), psi'''(x)]^T`
 
         Parameters
         ----------
@@ -202,7 +206,7 @@ class FieldQuantities:  # pylint: disable=too-many-instance-attributes, too-many
 
     def du0_dxdx(self, z: np.ndarray, phi: float, qs: float) -> float | np.ndarray:
         """
-        Get second derivative of the horiz. centerline displacement u0''(x).
+        Get second derivative of the horiz. centerline displacement `u0''(x)` (mm⁻¹).
 
         Parameters
         ----------
@@ -215,13 +219,13 @@ class FieldQuantities:  # pylint: disable=too-many-instance-attributes, too-many
         -------
         ndarray, float
             Second derivative of the horizontal centerline displacement
-            u0''(x) (1/mm).
+            `u0''(x)`.
         """
         return self.dz_dx(z, phi, qs)[1, :]
 
     def dpsi_dxdx(self, z: np.ndarray, phi: float, qs: float) -> float | np.ndarray:
         """
-        Get second derivative of the cross-section rotation psi''(x).
+        Get second derivative of the cross-section rotation `psi''(x)` (mm⁻²).
 
         Parameters
         ----------
@@ -233,13 +237,13 @@ class FieldQuantities:  # pylint: disable=too-many-instance-attributes, too-many
         Returns
         -------
         ndarray, float
-            Second derivative of the cross-section rotation psi''(x) (1/mm^2).
+            Second derivative of the cross-section rotation psi''(x).
         """
         return self.dz_dx(z, phi, qs)[5, :]
 
     def du0_dxdxdx(self, z: np.ndarray, phi: float, qs: float) -> float | np.ndarray:
         """
-        Get third derivative of the horiz. centerline displacement u0'''(x).
+        Get third derivative of the horiz. centerline displacement `u0'''(x)` (mm⁻²).
 
         Parameters
         ----------
@@ -252,13 +256,13 @@ class FieldQuantities:  # pylint: disable=too-many-instance-attributes, too-many
         -------
         ndarray, float
             Third derivative of the horizontal centerline displacement
-            u0'''(x) (1/mm^2).
+            u0'''(x).
         """
         return self.dz_dxdx(z, phi, qs)[1, :]
 
     def dpsi_dxdxdx(self, z: np.ndarray, phi: float, qs: float) -> float | np.ndarray:
         """
-        Get third derivative of the cross-section rotation psi'''(x).
+        Get third derivative of the cross-section rotation `psi'''(x)` (mm⁻³).
 
         Parameters
         ----------
@@ -270,6 +274,6 @@ class FieldQuantities:  # pylint: disable=too-many-instance-attributes, too-many
         Returns
         -------
         ndarray, float
-            Third derivative of the cross-section rotation psi'''(x) (1/mm^3).
+            Third derivative of the cross-section rotation psi'''(x).
         """
         return self.dz_dxdx(z, phi, qs)[5, :]
