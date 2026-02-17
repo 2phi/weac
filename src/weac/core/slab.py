@@ -37,6 +37,8 @@ class Slab:  # pylint: disable=too-many-instance-attributes,too-few-public-metho
         Poisson Ratio of the layer i [-]
     H: float
         Total slab thickness (i.e. assembled layers) [mm]
+    b: float
+        Total slab width [mm]
     z_cog: float
         z-coordinate of Center of Gravity [mm]
     qw: float
@@ -59,9 +61,11 @@ class Slab:  # pylint: disable=too-many-instance-attributes,too-few-public-metho
     H: float  # Total slab thickness (i.e. assembled layers) [mm]
     z_cog: float  # z-coordinate of Center of Gravity [mm]
     qw: float  # Weight Load of the slab [N/mm]
+    b: float # Total width of the slab [mm]
 
-    def __init__(self, layers: List[Layer]) -> None:
+    def __init__(self, layers: List[Layer], b: float = 300) -> None:
         self.layers = layers
+        self.b = b
         self._calc_slab_params()
 
     def calc_vertical_center_of_gravity(self, phi: float):
@@ -133,7 +137,7 @@ class Slab:  # pylint: disable=too-many-instance-attributes,too-few-public-metho
         zi_bottom = np.cumsum(hi) - H / 2
         z_cog = sum(zi_mid * hi * rhoi) / sum(hi * rhoi)
 
-        qw = sum(rhoi * G_MM_S2 * hi)  # Line load [N/mm]
+        qw = sum(rhoi * G_MM_S2 * hi)  # Line load per mm width[N/mm/mm]
 
         self.rhoi = rhoi
         self.hi = hi
