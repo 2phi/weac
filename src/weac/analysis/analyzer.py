@@ -16,9 +16,11 @@ from scipy.integrate import cumulative_trapezoid, quad
 from weac.constants import G_MM_S2
 
 # Module imports
+from weac.core import scenario
 from weac.core.system_model import SystemModel
 
 logger = logging.getLogger(__name__)
+
 
 
 def track_analyzer_call(func):
@@ -126,14 +128,14 @@ class Analyzer:
                 ki = np.full(len(ki), True)
                 C = self.sm.uncracked_unknown_constants
         phi = self.sm.scenario.phi
+        theta = self.sm.scenario.theta
         li = self.sm.scenario.li
+        gi = self.sm.scenario.gi
         qs = self.sm.scenario.surface_load
-
         # Drop zero-length segments
         li = abs(li)
         isnonzero = li > 0
-        C, ki, li = C[:, isnonzero], ki[isnonzero], li[isnonzero]
-
+        C, ki, li, gi = C[:, isnonzero], ki[isnonzero], li[isnonzero], gi[isnonzero]
         # Compute number of plot points per segment (+1 for last segment)
         ni = np.ceil(li / li.sum() * num).astype("int")
         ni[-1] += 1
@@ -145,8 +147,10 @@ class Analyzer:
         # Initialize arrays
         issupported = np.full(ni.sum(), True)
         xs = np.full(ni.sum(), np.nan)
-        zs = np.full([6, xs.size], np.nan)
-
+        if self.sm.config.backend=="generalized":
+            zs = np.full([24, xs.size], np.nan)
+        else: 
+            zs = np.full([6, xs.size], np.nan)
         # Loop through segments
         for i, length in enumerate(li):
             # Get local x-coordinates of segment i
@@ -160,7 +164,7 @@ class Analyzer:
             if not ki[i]:
                 issupported[nic[i] : nic[i + 1]] = False
             # Compute segment solution
-            zi = self.sm.z(xi, C[:, [i]], length, phi, ki[i], qs=qs)
+            zi = self.sm.z(xi, C[:, [i]], length, phi, theta, ki[i], is_loaded = gi[i], qs=qs)
             # Assemble global solution matrix
             zs[:, nic[i] : nic[i + 1]] = zi
 
@@ -548,6 +552,7 @@ class Analyzer:
         C_uncracked = self.sm.uncracked_unknown_constants
         C_cracked = self.sm.unknown_constants
         phi = self.sm.scenario.phi
+        theta=self.sm.scenario.theta
         qs = self.sm.scenario.surface_load
 
         # Reduce inputs to segments with crack advance
@@ -570,6 +575,7 @@ class Analyzer:
                 C=C_uncracked[:, [j]],
                 length=length,
                 phi=phi,
+                theta=theta,
                 has_foundation=True,
                 qs=qs,
             )
@@ -578,6 +584,7 @@ class Analyzer:
                 C=C_cracked[:, [j]],
                 length=length,
                 phi=phi,
+                theta=theta,
                 has_foundation=False,
                 qs=qs,
             )
@@ -615,8 +622,10 @@ class Analyzer:
         """
         li = self.sm.scenario.li
         ki = self.sm.scenario.ki
+        gi = self.sm.scenario.gi
         C = self.sm.unknown_constants
         phi = self.sm.scenario.phi
+        theta= self.sm.scenario.theta
         qs = self.sm.scenario.surface_load
 
         # Get number and indices of segment transitions
@@ -625,27 +634,42 @@ class Analyzer:
 
         # Identify supported-free and free-supported transitions as crack tips
         iscracktip = [ki[j] != ki[j + 1] for j in range(ntr)]
-
+        
         # Transition indices of crack tips and total number of crack tips
         ict = itr[iscracktip]
         nct = len(ict)
-
         # Initialize energy release rate array
-        Gdif = np.zeros([3, nct])
+        Gdif = np.zeros([4, nct])
 
         # Compute energy relase rate of all crack tips
         for j, idx in enumerate(ict):
+            
             # Solution at crack tip
-            z = self.sm.z(
-                li[idx], C[:, [idx]], li[idx], phi, has_foundation=ki[idx], qs=qs
-            )
-            # Mode I and II differential energy release rates
-            Gdif[1:, j] = np.concatenate(
-                (self.sm.fq.Gi(z, unit=unit), self.sm.fq.Gii(z, unit=unit))
-            )
-
+            
+            # Solution at unpertrubed side
+            
+            # Mode I, II and III differential energy release rates
+            if self.sm.config.backend=="classic":
+                z = self.sm.z(
+                    li[idx], C[:, [idx]], li[idx], phi=phi, theta=theta,has_foundation=ki[idx],is_loaded=gi[idx], qs=qs if gi[idx] else 0
+                )
+                Gdif[1:3, j] = np.concatenate(
+                    (self.sm.fq.Gi(z, unit=unit), self.sm.fq.Gii(z, unit=unit))
+                )
+            else:
+                if ki[idx]:
+                    z_ct = self.sm.z(li[idx], C[:,[idx]], li[idx], phi=phi, theta=theta, has_foundation=ki[idx], is_loaded=gi[idx], qs=qs)
+                    z_ub = self.sm.z(li[idx], C[:,[idx]], li[idx], phi=phi, theta=theta, has_foundation=ki[idx], is_loaded=gi[idx], qs=qs)
+                else:
+                    z_ct = self.sm.z(li[idx], C[:,[idx]], li[idx],  phi=phi, theta=theta, has_foundation=ki[idx], is_loaded=gi[idx], qs=qs)
+                    z_ub = self.sm.z(li[idx], C[:,[idx]], li[idx],  phi=phi, theta=theta, has_foundation=ki[idx], is_loaded=gi[idx], qs=qs)
+                Gdif[1:,j] = np.concatenate(
+                    (self.sm.fq.Gi(z_ct,z_ub,  phi=phi, theta=theta,  unit=unit),
+                    self.sm.fq.Gii(z_ct,z_ub,  phi=phi, theta=theta,  unit=unit),
+                    self.sm.fq.Giii(z_ct,z_ub, phi, theta, unit=unit),)
+                    )
         # Sum mode I and II contributions
-        Gdif[0, :] = Gdif[1, :] + Gdif[2, :]
+        Gdif[0, :] = Gdif[1, :] + Gdif[2, :] + Gdif[3, :]
 
         # Adjust contributions for center cracks
         if nct > 1:
@@ -712,8 +736,8 @@ class Analyzer:
         w0 = self.sm.fq.w(zq)
         us = self.sm.fq.u(zq, h0=self.sm.slab.z_cog)
         # Get weight loads
-        qn = self.sm.scenario.qn
-        qt = self.sm.scenario.qt
+        qn = self.sm.scenario.qz
+        qt = self.sm.scenario.qx
         # use +/- and us[0]/us[-1] according to system and phi
         # compute total external potential
         Pi_ext = (
