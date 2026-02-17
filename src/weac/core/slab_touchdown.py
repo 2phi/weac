@@ -147,7 +147,7 @@ class SlabTouchdown:  # pylint: disable=too-many-instance-attributes,too-few-pub
         ss = self.eigensystem.kA55
         L = self.scenario.L
         crack_h = self.scenario.crack_h
-        qn = self.scenario.qn
+        qn = self.scenario.qz
 
         # Create polynomial expression
         def polynomial(x: float) -> float:
@@ -185,7 +185,7 @@ class SlabTouchdown:  # pylint: disable=too-many-instance-attributes,too-few-pub
         ss = self.eigensystem.kA55
         L = self.scenario.L
         crack_h = self.scenario.crack_h
-        qn = self.scenario.qn
+        qn = self.scenario.qz
 
         # Create polynomial function
         def polynomial(x: float) -> float:
@@ -240,7 +240,7 @@ class SlabTouchdown:  # pylint: disable=too-many-instance-attributes,too-few-pub
         L = self.scenario.L
         cut_length = self.scenario.cut_length
         crack_h = self.scenario.crack_h
-        qn = self.scenario.qn
+        qn = self.scenario.qz
 
         # Spring stiffness of uncollapsed eigensystem of length L - cut_length
         straight_scenario = self._generate_straight_scenario(L - cut_length)
