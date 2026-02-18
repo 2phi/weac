@@ -147,7 +147,7 @@ class Analyzer:
         # Initialize arrays
         issupported = np.full(ni.sum(), True)
         xs = np.full(ni.sum(), np.nan)
-        if self.sm.config.backend=="generalized":
+        if self.sm.is_generalized:
             zs = np.full([24, xs.size], np.nan)
         else: 
             zs = np.full([6, xs.size], np.nan)
@@ -688,7 +688,7 @@ class Analyzer:
             # Solution at unpertrubed side
             
             # Mode I, II and III differential energy release rates
-            if self.sm.config.backend=="classic":
+            if not self.sm.is_generalized:
                 z = self.sm.z(
                     li[idx], C[:, [idx]], li[idx], phi=phi, theta=theta,has_foundation=ki[idx],is_loaded=gi[idx], qs=qs if gi[idx] else 0
                 )

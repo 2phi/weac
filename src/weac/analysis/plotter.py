@@ -2057,7 +2057,7 @@ class Plotter:
         filename: str = "displacements",
     ) -> Figure:
         """Wrap for displacements plot."""
-        if analyzer.sm.config.backend =="classic":
+        if not analyzer.sm.is_generalized:
             data = [
                 [x / 10, analyzer.sm.fq.u(z, unit="mm"), r"$u_0\ (\mathrm{mm})$"],
                 [x / 10, -analyzer.sm.fq.w(z, unit="mm"), r"$-w\ (\mathrm{mm})$"],
@@ -2086,7 +2086,7 @@ class Plotter:
         filename: str = "stresses",
     ) -> Figure:
         """Wrap stress plot."""
-        if analyzer.sm.config.backend =="classic":
+        if not analyzer.sm.is_generalized:
             data = [
                 [x / 10, analyzer.sm.fq.tau(z, unit="kPa"), r"$\tau$"],
                 [x / 10, analyzer.sm.fq.sig(z, unit="kPa"), r"$\sigma$"],

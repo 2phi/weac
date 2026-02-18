@@ -40,6 +40,10 @@ from weac.core.unknown_constants_solver import UnknownConstantsSolver
 
 logger = logging.getLogger(__name__)
 
+# Backend type constants
+BACKEND_GENERALIZED = "generalized"
+BACKEND_CLASSIC = "classic"
+
 
 class SystemModel:
     """
@@ -150,6 +154,17 @@ class SystemModel:
 
         # Cached properties are invalidated via __dict__.pop in the *invalidate_* helpers.
 
+    @property
+    def is_generalized(self) -> bool:
+        """Check if the system is using the generalized backend.
+        
+        Returns
+        -------
+        bool
+            True if config.backend is set to 'generalized', False otherwise.
+        """
+        return self.config.backend == BACKEND_GENERALIZED
+
     @cached_property
     def fq(self) -> FieldQuantities | GeneralizedFieldQuantities:
         """Compute the field quantities."""
@@ -161,7 +176,7 @@ class SystemModel:
     def eigensystem(self) -> Eigensystem | GeneralizedEigensystem:  # heavy
         """Solve for the eigensystem."""
         logger.info("Solving for Eigensystem")
-        if getattr(self.config, "backend", "classic") == "generalized":
+        if self.is_generalized:
             return GeneralizedEigensystem(
                 weak_layer=self.weak_layer, slab=self.slab
             )
@@ -445,7 +460,7 @@ class SystemModel:
             Solution vector (6xN) at position x.
         """
         if isinstance(x, (list, tuple, np.ndarray)):
-            if self.config.backend == "generalized":
+            if self.is_generalized:
                 z = np.concatenate(
                     [
                         np.dot(self.eigensystem.zh(xi, length, has_foundation), C)
@@ -464,7 +479,7 @@ class SystemModel:
                     axis=1,
                 )
         else:
-            if self.config.backend == "generalized":
+            if self.is_generalized:
                 z = np.dot(
                     self.eigensystem.zh(x, length, has_foundation), C
                 ) + self.eigensystem.zp(x, phi, theta, has_foundation, qs if is_loaded else 0.0)
