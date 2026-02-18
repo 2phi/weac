@@ -71,7 +71,7 @@ class ScenarioConfig(BaseModel):
         description="Rotation angle in degrees (counterclockwise positive)",
     )
     b: float = Field(
-        default = 300, ge=1, description= f"Out-of-plane width of the model in [mm]"
+        default = 300, ge=1, description= "Out-of-plane width of the model in [mm]"
     )
     cut_length: float = Field(
         default=0.0, ge=0, description="Cut length of performed PST or VPST [mm]"
