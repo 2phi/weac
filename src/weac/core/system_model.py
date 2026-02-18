@@ -132,10 +132,10 @@ class SystemModel:
     unknown_constants: np.ndarray
     uncracked_unknown_constants: np.ndarray
 
-    def __init__(self, model_input: ModelInput, model_config: Config | None = None):
-        if model_config is None:
-            model_config = Config()
-        self.config = model_config
+    def __init__(self, model_input: ModelInput, config: Config | None = None):
+        if config is None:
+            config = Config()
+        self.config = config
         self.weak_layer = model_input.weak_layer
         self.slab = Slab(layers=model_input.layers, b=model_input.scenario_config.b)
         self.scenario = Scenario(
