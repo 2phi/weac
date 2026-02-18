@@ -2,10 +2,24 @@
 This module defines the Segment class, which represents a segment of the snowpack.
 """
 
+from typing import Annotated
+
 import numpy as np
-from pydantic import BaseModel, Field, field_validator
+from pydantic import BaseModel, Field, field_validator, PlainSerializer, WithJsonSchema
 from pydantic import ConfigDict
 from numpy.typing import NDArray
+
+
+def _serialize_ndarray(arr: np.ndarray) -> list:
+    """Serialize numpy array to nested list for JSON compatibility."""
+    return arr.tolist()
+
+
+NumpyArray = Annotated[
+    np.ndarray,
+    PlainSerializer(_serialize_ndarray, return_type=list),
+    WithJsonSchema({"type": "array", "items": {"type": "array", "items": {"type": "number"}}}),
+]
 
 class Segment(BaseModel):
     """
@@ -37,7 +51,7 @@ class Segment(BaseModel):
         default=0, ge=0, description="Skier mass at the segment's right edge in [kg]"
     )
 
-    f: np.ndarray = Field(
+    f: NumpyArray = Field(
         default_factory=lambda: np.zeros((6,1), dtype=float),
         description=(
             "Load vector acting on the right side of the segment. "

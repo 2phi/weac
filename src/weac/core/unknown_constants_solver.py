@@ -95,10 +95,11 @@ class UnknownConstantsSolver:
             length, has_foundation, is_loaded, pos = li[i], ki[i], gi[i], pi[i]
 
             logger.debug(
-                "Assembling segment %s: length=%s, has_foundation=%s, pos=%s",
+                "Assembling segment %s: length=%s, has_foundation=%s,is_loaded=%s, pos=%s",
                 i,
                 length,
                 has_foundation,
+                is_loaded,
                 pos,
             )
             # Matrix of Size one of: (l: [9,6], m: [12,6], r: [9,6])

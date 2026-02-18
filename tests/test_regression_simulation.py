@@ -270,6 +270,7 @@ class TestRegressionSimulation(unittest.TestCase):
             C=C[:, [0]],
             length=10000,
             phi=10.0,
+            theta=0.0,
             has_foundation=True,
         )
         z2 = sm.z(
@@ -277,6 +278,7 @@ class TestRegressionSimulation(unittest.TestCase):
             C=C[:, [1]],
             length=4000,
             phi=10.0,
+            theta=0.0,
             has_foundation=True,
         )
 
@@ -302,6 +304,7 @@ class TestRegressionSimulation(unittest.TestCase):
             C=C[:, [0]],
             length=5000,
             phi=10.0,
+            theta=0.0,
             has_foundation=True,
         )
         z2 = sm.z(
@@ -309,6 +312,7 @@ class TestRegressionSimulation(unittest.TestCase):
             C=C[:, [1]],
             length=2000,
             phi=10.0,
+            theta=0.0,
             has_foundation=True,
         )
         z3 = sm.z(
@@ -316,6 +320,7 @@ class TestRegressionSimulation(unittest.TestCase):
             C=C[:, [2]],
             length=5000,
             phi=10.0,
+            theta=0.0,
             has_foundation=True,
         )
 
@@ -340,6 +345,7 @@ class TestRegressionSimulation(unittest.TestCase):
             C=C[:, [0]],
             length=10000,
             phi=30.0,
+            theta=0.0,
             has_foundation=True,
         )
         z2 = sm.z(
@@ -347,6 +353,7 @@ class TestRegressionSimulation(unittest.TestCase):
             C=C[:, [1]],
             length=4000,
             phi=30.0,
+            theta=0.0,
             has_foundation=False,
         )
 
@@ -383,6 +390,7 @@ class TestRegressionSimulation(unittest.TestCase):
             C=C[:, [0]],
             length=10000,
             phi=30.0,
+            theta=0.0,
             has_foundation=True,
         )
         z2 = sm.z(
@@ -390,6 +398,7 @@ class TestRegressionSimulation(unittest.TestCase):
             C=C[:, [1]],
             length=4000,
             phi=30.0,
+            theta=0.0,
             has_foundation=False,
         )
 

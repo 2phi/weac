@@ -172,6 +172,7 @@ class Scenario:
         if len(self.li) == 1:
             self.li = np.append(self.li, 0)
             self.ki = np.append(self.ki, True)
+            self.gi = np.append(self.gi, True)
             self.mi = np.append(self.mi, 0)
             self.fi = np.vstack([self.fi, np.zeros((1,6))])
 

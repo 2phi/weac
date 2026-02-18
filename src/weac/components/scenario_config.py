@@ -2,10 +2,22 @@
 This module defines the ScenarioConfig class, which contains the configuration for a given scenario.
 """
 
-from typing import Literal, Any
+from typing import Literal, Any, Annotated
 
-from pydantic import BaseModel, Field, field_validator, ConfigDict
+from pydantic import BaseModel, Field, field_validator, ConfigDict, PlainSerializer, WithJsonSchema
 import numpy as np
+
+
+def _serialize_ndarray(arr: np.ndarray) -> list:
+    """Serialize numpy array to nested list for JSON compatibility."""
+    return arr.tolist()
+
+
+NumpyArray = Annotated[
+    np.ndarray,
+    PlainSerializer(_serialize_ndarray, return_type=list),
+    WithJsonSchema({"type": "array", "items": {"type": "array", "items": {"type": "number"}}}),
+]
 
 SystemType = Literal[
     "skier", "skiers", "pst-", "-pst", "rot", "trans", "vpst-", "-vpst"
@@ -87,12 +99,12 @@ class ScenarioConfig(BaseModel):
         description="Surface line-load on slab [N/mm], e.g. evenly spaced weights, "
         "Adam et al. (2024)",
     )
-    load_vector_left: np.ndarray = Field( 
+    load_vector_left: NumpyArray = Field( 
         default_factory = lambda: np.zeros((6,1)),
         description="Load vector on the left side of the configuration to model external loading in mode III experiments.")
 
 
-    load_vector_right: np.ndarray = Field( 
+    load_vector_right: NumpyArray = Field( 
         default_factory = lambda: np.zeros((6,1)),
         description="Load vector on the right side of the configuration to model external loading in mode III experiments.")
 

@@ -2,6 +2,8 @@
 This module defines the Slab class, which represents the snow slab and its properties.
 """
 
+from typing import List
+
 import numpy as np
 
 from weac.components import Layer
