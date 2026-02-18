@@ -24,6 +24,8 @@ class ScenarioConfig(BaseModel):
         Slope angle in degrees (counterclockwise positive).
     theta : float, optional
         Rotation of the slab around its axis (counterclockwise positive)
+    b : float, optional
+        Out-of-plane width of the model in [mm]. Default is 300 mm.
     system_type : SystemType
         Type of system. Allowed values are:
         - skier: single skier in-between two segments
@@ -67,6 +69,9 @@ class ScenarioConfig(BaseModel):
         ge=-90.0,
         le=90.0,
         description="Rotation angle in degrees (counterclockwise positive)",
+    )
+    b: float = Field(
+        default = 300, ge=1, description= f"Out-of-plane width of the model in [mm]"
     )
     cut_length: float = Field(
         default=0.0, ge=0, description="Cut length of performed PST or VPST [mm]"

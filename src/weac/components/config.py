@@ -43,8 +43,7 @@ class Config(BaseModel):
             "'generalized' routes to an advanced adapter (initially identical behavior)."
         ),
     )
-    b: float = Field(
-        default = 300, ge=1, description= f"Out-of-plane width of the model in [mm]")
+
     forced_touchdown_mode: TouchdownMode | None = Field(
         default=None,
         description="Force a specific touchdown mode instead of auto-calculating",

@@ -135,7 +135,7 @@ class SystemModel:
             config = Config()
         self.config = config
         self.weak_layer = model_input.weak_layer
-        self.slab = Slab(layers=model_input.layers, b=config.b)
+        self.slab = Slab(layers=model_input.layers, b=model_input.scenario_config.b)
         self.scenario = Scenario(
             scenario_config=model_input.scenario_config,
             segments=model_input.segments,
