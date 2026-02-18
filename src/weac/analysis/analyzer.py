@@ -582,6 +582,7 @@ class Analyzer:
         """
         li = self.sm.scenario.li
         ki = self.sm.scenario.ki
+        gi = self.sm.scenario.gi
         k0 = np.ones_like(ki, dtype=bool)
         C_uncracked = self.sm.uncracked_unknown_constants
         C_cracked = self.sm.unknown_constants
@@ -591,10 +592,11 @@ class Analyzer:
 
         # Reduce inputs to segments with crack advance
         iscrack = k0 & ~ki
-        C_uncracked, C_cracked, li = (
+        C_uncracked, C_cracked, li, gi = (
             C_uncracked[:, iscrack],
             C_cracked[:, iscrack],
             li[iscrack],
+            gi[iscrack],
         )
 
         # Compute total crack lenght and initialize outputs
@@ -611,6 +613,7 @@ class Analyzer:
                 phi=phi,
                 theta=theta,
                 has_foundation=True,
+                is_loaded=gi[j],
                 qs=qs,
             )
             z_cracked = partial(
@@ -620,6 +623,7 @@ class Analyzer:
                 phi=phi,
                 theta=theta,
                 has_foundation=False,
+                is_loaded=gi[j],
                 qs=qs,
             )
 
