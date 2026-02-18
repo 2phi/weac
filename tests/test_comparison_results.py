@@ -84,7 +84,7 @@ class TestIntegrationOldVsNew(unittest.TestCase):
             C=new_constants[:, [0]],
             length=10000,
             phi=inclination,
-            theta = 0,
+            theta=0,
             has_foundation=True,
         )
         z2 = new_system.z(
@@ -92,7 +92,7 @@ class TestIntegrationOldVsNew(unittest.TestCase):
             C=new_constants[:, [1]],
             length=4000,
             phi=inclination,
-            theta = 0,
+            theta=0,
             has_foundation=False,
         )
         new_z = np.hstack([z1, z2])
@@ -343,7 +343,7 @@ class TestIntegrationOldVsNew(unittest.TestCase):
                 C=new_constants[:, [i]],
                 length=length,
                 phi=inclination,
-                theta = 0,
+                theta=0,
                 has_foundation=segment.has_foundation,
             )
             z_parts.append(z_segment)

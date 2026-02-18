@@ -14,12 +14,13 @@ from weac.utils.misc import decompose_to_xyz, get_skier_point_load
 
 class TestForceDecomposition(unittest.TestCase):
     """Test the decompose_to_xyz function."""
+
     def test_flat_surface_decomposition(self):
         """Test force decomposition on flat surface (phi=0)."""
         f = 100.0  # Vertical force
         phi = 0.0  # Flat surface
 
-        f_tan, _ , f_norm = decompose_to_xyz(f, phi)
+        f_tan, _, f_norm = decompose_to_xyz(f, phi)
 
         # On flat surface, normal component equals original force, tangential is zero
         self.assertAlmostEqual(
