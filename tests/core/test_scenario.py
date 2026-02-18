@@ -93,16 +93,16 @@ class TestScenario(unittest.TestCase):
         # Expected from decomposition of slab weight and surface load
         qwt, _, qwn = decompose_to_xyz(self.slab.qw, self.cfg.phi)
         qst, _, qsn = decompose_to_xyz(self.cfg.surface_load, self.cfg.phi)
-        np.testing.assert_allclose(s.qn, qwn + qsn, rtol=1e-12, atol=1e-12)
-        np.testing.assert_allclose(s.qt, qwt + qst, rtol=1e-12, atol=1e-12)
-        # Sanity signs: qn positive (into slope), qt negative (downslope)
-        self.assertGreater(s.qn, 0.0)
-        self.assertLessEqual(s.qt, 0.0)
+        np.testing.assert_allclose(s.qz, qwn + qsn, rtol=1e-12, atol=1e-12)
+        np.testing.assert_allclose(s.qx, qwt + qst, rtol=1e-12, atol=1e-12)
+        # Sanity signs: qz positive (into slope), qx negative (downslope)
+        self.assertGreater(s.qz, 0.0)
+        self.assertLessEqual(s.qx, 0.0)
 
     def test_calc_crack_height(self):
         """Test that calc_crack_height computes expected crack height."""
         s = Scenario(self.cfg, self.segments_two, self.weak_layer, self.slab)
-        expected_crack_h = self.weak_layer.collapse_height - s.qn / self.weak_layer.kn
+        expected_crack_h = self.weak_layer.collapse_height - s.qz / self.weak_layer.kn
         self.assertTrue(np.isfinite(expected_crack_h))
         self.assertAlmostEqual(s.crack_h, expected_crack_h)
 
