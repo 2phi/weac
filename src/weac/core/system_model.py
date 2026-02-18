@@ -15,8 +15,6 @@ from functools import cached_property
 
 import numpy as np
 
-# from weac.constants import G_MM_S2, LSKI_MM
-from pydantic import config
 from weac.components import (
     Config,
     Layer,
@@ -134,10 +132,10 @@ class SystemModel:
     unknown_constants: np.ndarray
     uncracked_unknown_constants: np.ndarray
 
-    def __init__(self, model_input: ModelInput, config: Config | None = None):
-        if config is None:
-            config = Config()
-        self.config = config
+    def __init__(self, model_input: ModelInput, model_config: Config | None = None):
+        if model_config is None:
+            model_config = Config()
+        self.config = model_config
         self.weak_layer = model_input.weak_layer
         self.slab = Slab(layers=model_input.layers, b=model_input.scenario_config.b)
         self.scenario = Scenario(
@@ -271,7 +269,7 @@ class SystemModel:
             if isinstance(self.eigensystem, GeneralizedEigensystem)
             else UnknownConstantsSolver
         )
-        
+
         if self.slab_touchdown is not None:
             logger.info("Solving for Unknown Constants")
             return solver.solve_for_unknown_constants(

@@ -99,17 +99,18 @@ class ScenarioConfig(BaseModel):
         description="Surface line-load on slab [N/mm], e.g. evenly spaced weights, "
         "Adam et al. (2024)",
     )
-    load_vector_left: NumpyArray = Field( 
+    load_vector_left: NumpyArray = Field(
         default_factory = lambda: np.zeros((6,1)),
         description="Load vector on the left side of the configuration to model external loading in mode III experiments.")
 
 
-    load_vector_right: NumpyArray = Field( 
+    load_vector_right: NumpyArray = Field(
         default_factory = lambda: np.zeros((6,1)),
         description="Load vector on the right side of the configuration to model external loading in mode III experiments.")
 
 
     @field_validator("load_vector_left", "load_vector_right", mode="after")
+    @classmethod
     def check_load_vector_shape(cls, value: Any) -> Any:
         # Convert to numpy array if needed
         arr = np.asarray(value, dtype=np.float64)
@@ -119,4 +120,4 @@ class ScenarioConfig(BaseModel):
             arr = arr.reshape(-1, 1)
             if arr.shape[0] != 6:
                 raise ValueError(f"load vectors must have shape (6, 1), got {arr.shape}")
-        return arr 
+        return arr

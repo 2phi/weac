@@ -16,7 +16,6 @@ from scipy.integrate import cumulative_trapezoid, quad
 from weac.constants import G_MM_S2
 
 # Module imports
-from weac.core import scenario
 from weac.core.system_model import SystemModel
 
 logger = logging.getLogger(__name__)
@@ -149,7 +148,7 @@ class Analyzer:
         xs = np.full(ni.sum(), np.nan)
         if self.sm.is_generalized:
             zs = np.full([24, xs.size], np.nan)
-        else: 
+        else:
             zs = np.full([6, xs.size], np.nan)
         # Loop through segments
         for i, length in enumerate(li):
@@ -673,7 +672,7 @@ class Analyzer:
 
         # Identify supported-free and free-supported transitions as crack tips
         iscracktip = [ki[j] != ki[j + 1] for j in range(ntr)]
-        
+
         # Transition indices of crack tips and total number of crack tips
         ict = itr[iscracktip]
         nct = len(ict)
@@ -682,11 +681,11 @@ class Analyzer:
 
         # Compute energy relase rate of all crack tips
         for j, idx in enumerate(ict):
-            
+
             # Solution at crack tip
-            
+
             # Solution at unpertrubed side
-            
+
             # Mode I, II and III differential energy release rates
             if not self.sm.is_generalized:
                 z = self.sm.z(

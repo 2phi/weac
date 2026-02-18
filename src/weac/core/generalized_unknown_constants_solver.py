@@ -15,13 +15,10 @@ from numpy.linalg import LinAlgError
 
 
 from weac.components import SystemType
-from weac.constants import G_MM_S2
 from weac.core.generalized_eigensystem import GeneralizedEigensystem
 from weac.core.generalized_field_quantities import GeneralizedFieldQuantities
 from weac.core.scenario import Scenario
 
-# from weac.constants import G_MM_S2, LSKI_MM
-from weac.utils.misc import decompose_to_xyz, get_skier_point_load
 
 logger = logging.getLogger(__name__)
 
@@ -32,7 +29,7 @@ class GeneralizedUnknownConstantsSolver:
     """
 
     @classmethod
-    def solve_for_unknown_constants(
+    def solve_for_unknown_constants(     # pylint: disable=unused-argument
         cls,
         scenario: Scenario,
         eigensystem: GeneralizedEigensystem,
@@ -87,7 +84,7 @@ class GeneralizedUnknownConstantsSolver:
 
         # Initialize matrices
         Zh0_slab = np.zeros((
-            nS * nDOF_unsupported, 
+            nS * nDOF_unsupported,
             nS_supported * nDOF_supported + nS_unsupported*nDOF_unsupported
         ))
         Zp0_slab = np.zeros((nS * nDOF_unsupported, 1))
@@ -100,7 +97,7 @@ class GeneralizedUnknownConstantsSolver:
             nS_supported * (nDOF_supported-nDOF_unsupported),1))
         rhs_weak_layer = np.zeros((
             nS_supported * (nDOF_supported-nDOF_unsupported),1))
-        
+
         logger.debug(
             "Initialized Zh0_Slab shape: %s, Zp0_Slab shape: %s, rhs_Slab shape: %s",
             Zh0_slab.shape,
@@ -130,28 +127,27 @@ class GeneralizedUnknownConstantsSolver:
                 pos,
             )
             # Matrix of Size one of: (l: [18,12], m: [24,12], r: [18,12])
-        
             zhl = eigensystem.zh(
-                x = 0, 
-                length = length, 
+                x = 0,
+                length = length,
                 has_foundation = has_foundation)
             zhr = eigensystem.zh(
-                x = length, 
-                length = length, 
+                x = length,
+                length = length,
                 has_foundation = has_foundation)
             zpl = eigensystem.zp(
-                x = 0, 
+                x = 0,
                 phi = phi,
-                theta = theta, 
-                has_foundation = has_foundation, 
+                theta = theta,
+                has_foundation = has_foundation,
                 qs = qs if is_loaded else 0.0)
             zpr=eigensystem.zp(
-                x = length, 
+                x = length,
                 phi = phi,
-                theta = theta, 
-                has_foundation = has_foundation, 
+                theta = theta,
+                has_foundation = has_foundation,
                 qs = qs if is_loaded else 0.0)
-            
+
             Zhi = cls._setup_conditions_slab(
                 zl=zhl,
                 zr=zhr,
@@ -174,11 +170,9 @@ class GeneralizedUnknownConstantsSolver:
             start = 0 if i == 0 else 6
             stop = 12 if i == nS - 1 else 18
             # Assemble left-hand side
-            
-            
             Zh0_slab[( 12 * i - start) : (12 * i + stop), global_start_slab : global_start_slab + nDOF_segment] = Zhi[:,:nDOF_segment]
             Zp0_slab[(12 * i - start) : (12 * i + stop)] += zpi
-            
+
             logger.debug(
                 "Segment %s: Zhi shape: %s, zpi shape: %s", i, Zhi.shape, zpi.shape
             )
@@ -186,11 +180,11 @@ class GeneralizedUnknownConstantsSolver:
                 # For supported segments, the Zh0_weak_layer and zp0_weak layer are assembled.
                 Zhi_weak_layer = cls._setup_conditions_weak_layer(
                     zl=eigensystem.zh(
-                        x=0, 
-                        length=length, 
-                        has_foundation=has_foundation), 
+                        x=0,
+                        length=length,
+                        has_foundation=has_foundation),
                     zr = eigensystem.zh(
-                        x=length, 
+                        x=length,
                         length=length,
                         has_foundation=has_foundation),
                     eigensystem=eigensystem,pos=pos,
@@ -198,22 +192,22 @@ class GeneralizedUnknownConstantsSolver:
                 zpi_weak_layer = cls._setup_conditions_weak_layer(
                     zl=eigensystem.zp(
                         x=0,
-                        phi=phi, 
-                        theta=theta, 
-                        has_foundation=has_foundation, 
-                        qs = qs if is_loaded else 0.0), 
-                    zr = eigensystem.zp(
-                        x=length, 
-                        phi=phi, 
+                        phi=phi,
                         theta=theta,
-                        has_foundation=has_foundation, 
+                        has_foundation=has_foundation,
+                        qs = qs if is_loaded else 0.0),
+                    zr = eigensystem.zp(
+                        x=length,
+                        phi=phi,
+                        theta=theta,
+                        has_foundation=has_foundation,
                         qs = qs if is_loaded else 0.0),
                     eigensystem=eigensystem,
                     pos=pos,
                     system_type=system_type)
                 if pos in ("l","left"):
                     Zh0_weak_layer[
-                        0:6, 
+                        0:6,
                         global_start_slab : global_start_slab + nDOF_segment
                         ] = Zhi_weak_layer[0:6, :]
                     Zp0_weak_layer[0:6] += zpi_weak_layer[0:6]
@@ -222,7 +216,7 @@ class GeneralizedUnknownConstantsSolver:
                             6 : 18,
                             global_start_slab : global_start_slab + nDOF_segment
                             ] = Zhi_weak_layer[6:, :]
-                        Zp0_weak_layer[6 : 18] +=  zpi_weak_layer[6:] 
+                        Zp0_weak_layer[6 : 18] +=  zpi_weak_layer[6:]
                         # Continuous displacements and section forces in the weak layer
                     else: # Right neighboring segments is unsupported
                         Zh0_weak_layer[
@@ -240,7 +234,7 @@ class GeneralizedUnknownConstantsSolver:
                     Zh0_weak_layer[
                         global_start_weak_layer + local_start : global_start_weak_layer + local_end,
                         global_start_slab : global_start_slab + nDOF_segment ] = np.concatenate([
-                            Zhi_weak_layer[6 + local_start : 12, :], Zhi_weak_layer[6-local_end:, :]], 
+                            Zhi_weak_layer[6 + local_start : 12, :], Zhi_weak_layer[6-local_end:, :]],
                             axis = 0)
                     Zp0_weak_layer[
                         global_start_weak_layer + local_start : global_start_weak_layer + local_end] += np.concatenate([zpi_weak_layer[6 + local_start : 12], zpi_weak_layer[30-local_end:]], axis = 0)
@@ -248,20 +242,20 @@ class GeneralizedUnknownConstantsSolver:
                 elif pos in ("r", "right"):
                     local_start = -18 if k_left else -12
                     Zh0_weak_layer[
-                        local_start : , 
+                        local_start : ,
                         global_start_slab : global_start_slab + nDOF_segment] = Zhi_weak_layer[local_start:, :]
                     Zp0_weak_layer[local_start :] += zpi_weak_layer[local_start:]
-                
+
             global_start_slab += nDOF_segment
             global_start_weak_layer += (nDOF_supported - nDOF_unsupported) if has_foundation else 0
             k_left = has_foundation
-        
+
         for i,f in enumerate(fi, start = 1):
             rhs_slab[12 * i : 12 * i + 6] = np.array(f).reshape(-1,1)
             logger.debug("RHS %s", rhs_slab[12 * i : 12 * i + 6])
         # Set RHS so that Complementary Integral vanishes at boundaries
         if system_type in ["pst-","-pst"]:
-            
+
             rhs_slab[:6] = scenario.load_vector_left.reshape(-1,1)
             rhs_slab[-6:] = scenario.load_vector_right.reshape(-1,1)
 
@@ -342,7 +336,7 @@ class GeneralizedUnknownConstantsSolver:
         for i in range(nS):
             if ki[i]:
                 C_return[i,:] = np.reshape(
-                    C[pos : pos + nDOF_supported], 
+                    C[pos : pos + nDOF_supported],
                     C[pos : pos + nDOF_supported].shape[0])
                 pos += nDOF_supported
             else:
@@ -544,7 +538,7 @@ class GeneralizedUnknownConstantsSolver:
                     fq.Vz_c_weakLayer(zr),  # Vz_c_weak_layeri(xi = li)
                     fq.Vz_l_weakLayer(zr),  # Vz_l_weak_layeri(xi = li)
                 ]
-            )  
+            )
         elif pos in ("m", "mid"):
             conditions = np.array(
                 [
@@ -636,21 +630,21 @@ class GeneralizedUnknownConstantsSolver:
         factor = -1 if pos in ["l", "left"] else 1
         if system_type in ["pst-", "-pst"]:
             bc = np.array([
-                fq.Nx(z, has_foundation), 
-                fq.Vy(z, has_foundation), 
-                fq.Vz(z, has_foundation), 
-                fq.Mx(z, has_foundation), 
-                fq.My(z, has_foundation), 
+                fq.Nx(z, has_foundation),
+                fq.Vy(z, has_foundation),
+                fq.Vz(z, has_foundation),
+                fq.Mx(z, has_foundation),
+                fq.My(z, has_foundation),
                 fq.Mz(z, has_foundation)])
         # Set boundary conditions for SKIER-systems
         elif system_type in ["skier", "skiers"]:
             # Infinite end (vanishing complementary solution)
             bc = np.array([
-                fq.u(z, h0=0, b0=0), 
-                fq.v(z, h0=0), 
-                fq.w(z, b0=0), 
+                fq.u(z, h0=0, b0=0),
+                fq.v(z, h0=0),
+                fq.w(z, b0=0),
                 fq.psix(z),
-                fq.psiy(z), 
+                fq.psiy(z),
                 fq.psiz(z)])
         else:
             raise ValueError(
@@ -697,21 +691,21 @@ class GeneralizedUnknownConstantsSolver:
         factor = -1 if pos in ["l", "left"] else 1
         if system_type in ["pst-", "-pst"]:
             bc = np.array([
-                fq.Nx_c_weakLayer(z), 
-                fq.Nx_l_weakLayer(z), 
-                fq.Vy_c_weakLayer(z), 
-                fq.Vy_l_weakLayer(z), 
-                fq.Vz_c_weakLayer(z), 
+                fq.Nx_c_weakLayer(z),
+                fq.Nx_l_weakLayer(z),
+                fq.Vy_c_weakLayer(z),
+                fq.Vy_l_weakLayer(z),
+                fq.Vz_c_weakLayer(z),
                 fq.Vz_l_weakLayer(z)])
         # Set boundary conditions for SKIER-systems
         elif system_type in ["skier", "skiers"]:
             # Infinite end (vanishing complementary solution)
             bc = np.array([
-                fq.theta_uc(z), 
-                fq.theta_ul(z), 
-                fq.theta_vc(z), 
+                fq.theta_uc(z),
+                fq.theta_ul(z),
+                fq.theta_vc(z),
                 fq.theta_vl(z),
-                fq.theta_wc(z), 
+                fq.theta_wc(z),
                 fq.theta_wl(z)])
         else:
             raise ValueError(
