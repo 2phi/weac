@@ -83,7 +83,7 @@ class GeneralizedUnknownConstantsSolver:
 
         # Assemble position vector
         pi = np.full(nS, "m")
-        pi[0], pi[-1] = "length", "r"
+        pi[0], pi[-1] = "l", "r"
 
         # Initialize matrices
         Zh0_slab = np.zeros((
