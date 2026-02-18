@@ -12,8 +12,8 @@ from weac.constants import G_MM_S2, LSKI_MM
 
 
 def decompose_to_xyz(
-        f: NDArray[np.float64] | float, 
-        phi: NDArray[np.float64] | float, 
+        f: NDArray[np.float64] | float,
+        phi: NDArray[np.float64] | float,
         theta: NDArray[np.float64] | float = 0
         ) :
     """

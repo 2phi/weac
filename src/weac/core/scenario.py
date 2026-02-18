@@ -63,7 +63,7 @@ class Scenario:
     li: np.ndarray  # length of segment i [mm]
     ki: np.ndarray  # booleans indicating foundation support for segment i
     gi: np.ndarray  # booleans indicating loading for segment i
-    fi: np.ndarray  # load vectors on boundaries of segment i and i+1 
+    fi: np.ndarray  # load vectors on boundaries of segment i and i+1
     load_vector_left: np.ndarray # load vector on the left side of the configuration
     load_vector_right: np.ndarray # load vector on the right side of the configuration
 

@@ -13,13 +13,12 @@ behavior. Replace the internals incrementally with the generalized
 """
 
 import logging
-from typing import Optional
 
 import numpy as np
 from numpy.typing import NDArray
 
 from weac.core.slab import Slab
-from weac.constants import SHEAR_CORRECTION_FACTOR, G_MM_S2
+from weac.constants import SHEAR_CORRECTION_FACTOR
 from weac.components import WeakLayer
 from weac.utils.misc import decompose_to_xyz
 
@@ -136,8 +135,6 @@ class GeneralizedEigensystem:
         self.kD55 = kD55
         self.K0 = B11**2 - A11 * D11
 
-        
-
     def assemble_system_matrix(self) -> NDArray[np.float64]:
         """Assemble generalized first-order ODE system matrix K (if needed)."""
         Ew = self.weak_layer.E
@@ -153,8 +150,6 @@ class GeneralizedEigensystem:
         kB55 = self.kB55
         kD55 = self.kD55
         Pi = np.pi
-        # TODO: Compute and implement system matrix for unsupported structures for stress computation
-
 
         c0201=(-3*(2*D11 - B11*H)*Pi**2*Ew*(-1 + 2*nuw))/(h*(-4*D11*(-6 + Pi**2)*h*Ew*(-1 + nuw) + 4*B11*H*(-6 + Pi**2)*h*Ew*(-1 + nuw) - A11*H**2*(-6 + Pi**2)*h*Ew*(-1 + nuw) + 12*B11**2*Pi**2*(-1 + nuw + 2*nuw**2) - 12*A11*D11*Pi**2*(-1 + nuw + 2*nuw**2)))
 
@@ -180,15 +175,15 @@ class GeneralizedEigensystem:
         c0423=(-6*Pi*Ew*(-72*(H*kB55 - 2*kD55)*Pi**2*h*(-1 + nuw + 2*nuw**2) + b**2*(12*kB55*Pi**4*(-1 + nuw**2) + 12*kA55*Pi**2*h*(-1 + nuw + 2*nuw**2) + (-6 + Pi**2)*h*Ew*(H*Pi**2*(-1 + nuw) + 2*h*(-1 + 2*nuw)))))/(b*h*(-1 + 2*nuw)*(b**2*((-6 + Pi**2)*h*Ew + 6*kA55*Pi**2*(1 + nuw))*((-6 + Pi**2)*h*Ew + 6*kA55*Pi**2*(1 + nuw)) - 18*Pi**2*(1 + nuw)*(4*H*kB55*(-6 + Pi**2)*h*Ew - 4*kD55*(-6 + Pi**2)*h*Ew + 24*kB55**2*Pi**2*(1 + nuw) - kA55*(H**2*(-6 + Pi**2)*h*Ew + 24*kD55*Pi**2*(1 + nuw)))))
 
         c0602=(3*Ew*(8 + Pi**2*(-1 + 4*nuw)))/(2*(-1 + 2*nuw)*((-6 + Pi**2)*h*Ew + 6*kA55*Pi**2*(1 + nuw)))
-        
+
         c0605=(6*Pi**2*Ew*(-1 + nuw))/(h*(-1 + 2*nuw)*((-6 + Pi**2)*h*Ew + 6*kA55*Pi**2*(1 + nuw)))
-        
+
         c0610=(3*(-8*kA55*Pi**2*(-1 + nuw + 2*nuw**2) + H*Ew*(8 + Pi**2*(-1 + 4*nuw))))/(4*(-1 + 2*nuw)*((-6 + Pi**2)*h*Ew + 6*kA55*Pi**2*(1 + nuw)))
-        
+
         c0614=(6*Pi*Ew)/((-1 + 2*nuw)*((-6 + Pi**2)*h*Ew + 6*kA55*Pi**2*(1 + nuw)))
-        
+
         c0619=(24*Pi*Ew*nuw)/(b*(-1 + 2*nuw)*((-6 + Pi**2)*h*Ew + 6*kA55*Pi**2*(1 + nuw)))
-        
+
         c0621=(-6*Pi**3*Ew*(-1 + nuw))/(h*(-1 + 2*nuw)*((-6 + Pi**2)*h*Ew + 6*kA55*Pi**2*(1 + nuw)))
 
         c0803=(-18*Ew*(6*H*kA55*Pi**4*(1 + nuw) - 12*kB55*Pi**4*(1 + nuw) + (-8 + Pi**2)*h*((-6 + Pi**2)*h*Ew + 6*kA55*Pi**2*(1 + nuw))))/(h*(b**2*((-6 + Pi**2)*h*Ew + 6*kA55*Pi**2*(1 + nuw))*((-6 + Pi**2)*h*Ew + 6*kA55*Pi**2*(1 + nuw)) - 18*Pi**2*(1 + nuw)*(4*H*kB55*(-6 + Pi**2)*h*Ew - 4*kD55*(-6 + Pi**2)*h*Ew + 24*kB55**2*Pi**2*(1 + nuw) - kA55*(H**2*(-6 + Pi**2)*h*Ew + 24*kD55*Pi**2*(1 + nuw)))))
@@ -203,7 +198,6 @@ class GeneralizedEigensystem:
 
         c0823=(-12*Pi**3*Ew*(-36*(H*kA55 - 2*kB55)*h*(-1 + nuw + 2*nuw**2) + b**2*(-1 + nuw)*((-6 + Pi**2)*h*Ew + 6*kA55*Pi**2*(1 + nuw))))/(b*h*(-1 + 2*nuw)*(b**2*((-6 + Pi**2)*h*Ew + 6*kA55*Pi**2*(1 + nuw))*((-6 + Pi**2)*h*Ew + 6*kA55*Pi**2*(1 + nuw)) - 18*Pi**2*(1 + nuw)*(4*H*kB55*(-6 + Pi**2)*h*Ew - 4*kD55*(-6 + Pi**2)*h*Ew + 24*kB55**2*Pi**2*(1 + nuw) - kA55*(H**2*(-6 + Pi**2)*h*Ew + 24*kD55*Pi**2*(1 + nuw)))))
 
-        
         c1001=(3*(2*B11 - A11*H)*Pi**2*Ew*(-1 + 2*nuw))/(h*(-4*D11*(-6 + Pi**2)*h*Ew*(-1 + nuw) + 4*B11*H*(-6 + Pi**2)*h*Ew*(-1 + nuw) - A11*H**2*(-6 + Pi**2)*h*Ew*(-1 + nuw) + 12*B11**2*Pi**2*(-1 + nuw + 2*nuw**2) - 12*A11*D11*Pi**2*(-1 + nuw + 2*nuw**2)))
 
         c1006=(-8*kA55*(-6 + Pi**2)*h*Ew*(-1 + nuw) + 6*B11*Ew*(8 + Pi**2 - 4*Pi**2*nuw) - 3*A11*(H*Ew*(8 + Pi**2 - 4*Pi**2*nuw) + 8*kA55*Pi**2*(-1 + nuw + 2*nuw**2)))/(8*B11*H*(-6 + Pi**2)*h*Ew*(-1 + nuw) + 24*B11**2*Pi**2*(-1 + nuw + 2*nuw**2) - 2*(4*D11*(-6 + Pi**2)*h*Ew*(-1 + nuw) + A11*H**2*(-6 + Pi**2)*h*Ew*(-1 + nuw) + 12*A11*D11*Pi**2*(-1 + nuw + 2*nuw**2)))
@@ -225,21 +219,21 @@ class GeneralizedEigensystem:
         c1224=(-6*Pi*Ew)/(b*((-6 + Pi**2)*h*Ew*(-1 + nuw) + 3*A11*Pi**2*(-1 + nuw + 2*nuw**2)))
 
         c1401=(3*(4*D11 + H*(-4*B11 + A11*H))*Pi*Ew*(-1 + 2*nuw))/(h*(-4*D11*(-6 + Pi**2)*h*Ew*(-1 + nuw) + 4*B11*H*(-6 + Pi**2)*h*Ew*(-1 + nuw) - A11*H**2*(-6 + Pi**2)*h*Ew*(-1 + nuw) + 12*B11**2*Pi**2*(-1 + nuw + 2*nuw**2) - 12*A11*D11*Pi**2*(-1 + nuw + 2*nuw**2)))
-        
+
         c1406=-1/2*(Pi*(48*B11**2*(-1 + nuw + 2*nuw**2) - 48*A11*D11*(-1 + nuw + 2*nuw**2) + 4*D11*h*Ew*(7 - 19*nuw + 12*nuw**2) + A11*H*h*(-1 + nuw)*(H*Ew*(-7 + 12*nuw) - 24*kA55*(-1 + nuw + 2*nuw**2)) + 4*B11*h*(-1 + nuw)*(H*Ew*(7 - 12*nuw) + 12*kA55*(-1 + nuw + 2*nuw**2))))/(h*(-1 + nuw)*(-4*D11*(-6 + Pi**2)*h*Ew*(-1 + nuw) + 4*B11*H*(-6 + Pi**2)*h*Ew*(-1 + nuw) - A11*H**2*(-6 + Pi**2)*h*Ew*(-1 + nuw) + 12*B11**2*Pi**2*(-1 + nuw + 2*nuw**2) - 12*A11*D11*Pi**2*(-1 + nuw + 2*nuw**2)))
 
         c1409=(-3*Pi*(-1 + 2*nuw)*(4*B11*(H**2*Ew + 4*kA55*h*(1 + nuw)) - H*(4*D11*Ew + A11*H**2*Ew + 8*A11*kA55*h*(1 + nuw))))/(2*h*(-4*D11*(-6 + Pi**2)*h*Ew*(-1 + nuw) + 4*B11*H*(-6 + Pi**2)*h*Ew*(-1 + nuw) - A11*H**2*(-6 + Pi**2)*h*Ew*(-1 + nuw) + 12*B11**2*Pi**2*(-1 + nuw + 2*nuw**2) - 12*A11*D11*Pi**2*(-1 + nuw + 2*nuw**2)))
-        
+
         c1413=-1/2*(Pi**4*(-1 + 2*nuw)*(4*D11*h*Ew*(-1 + nuw) - 4*B11*H*h*Ew*(-1 + nuw) + A11*H**2*h*Ew*(-1 + nuw) - 12*B11**2*(-1 + nuw + 2*nuw**2) + 12*A11*D11*(-1 + nuw + 2*nuw**2)))/(h**2*(-1 + nuw)*(-4*D11*(-6 + Pi**2)*h*Ew*(-1 + nuw) + 4*B11*H*(-6 + Pi**2)*h*Ew*(-1 + nuw) - A11*H**2*(-6 + Pi**2)*h*Ew*(-1 + nuw) + 12*B11**2*Pi**2*(-1 + nuw + 2*nuw**2) - 12*A11*D11*Pi**2*(-1 + nuw + 2*nuw**2)))
 
         c1420=(-2*nuw)/(b - b*nuw)
 
         c1422=(-6*(4*D11 + H*(-4*B11 + A11*H))*Ew)/(4*D11*(-6 + Pi**2)*h*Ew*(-1 + nuw) - 4*B11*H*(-6 + Pi**2)*h*Ew*(-1 + nuw) + A11*H**2*(-6 + Pi**2)*h*Ew*(-1 + nuw) - 12*B11**2*Pi**2*(-1 + nuw + 2*nuw**2) + 12*A11*D11*Pi**2*(-1 + nuw + 2*nuw**2))
-        
+
         c1604=(-18*Pi*(1 + nuw)*(-1 + 2*nuw)*(A11 + 2*kA55*(-1 + nuw) - 2*A11*nuw))/(b*(-1 + nuw)*((-6 + Pi**2)*h*Ew*(-1 + nuw) + 3*A11*Pi**2*(-1 + nuw + 2*nuw**2)))
 
         c1608=(Pi*(-12*A11*(-1 + nuw + 2*nuw**2)*(b**2 + 3*H*h*(-1 + 2*nuw)) + h*(-1 + nuw)*(b**2*Ew*(-7 + 12*nuw) + 144*kB55*(-1 + nuw + 2*nuw**2))))/(4*b*h*(-1 + nuw)*((-6 + Pi**2)*h*Ew*(-1 + nuw) + 3*A11*Pi**2*(-1 + nuw + 2*nuw**2)))
-        
+
         c1611=(-3*Pi*(-1 + 2*nuw)*(12*A11*h*(-1 + nuw + 2*nuw**2) - (-1 + nuw)*(b**2*Ew + 24*kA55*h*(1 + nuw))))/(2*b*h*(-1 + nuw)*((-6 + Pi**2)*h*Ew*(-1 + nuw) + 3*A11*Pi**2*(-1 + nuw + 2*nuw**2)))
 
         c1615=((-1 + 2*nuw)*(h*(b**2*Pi**4 + 12*(-6 + Pi**2)*h**2)*Ew*(-1 + nuw) + 3*A11*Pi**2*(b**2*Pi**2 + 12*h**2)*(-1 + nuw + 2*nuw**2)))/(2*b**2*h**2*(-1 + nuw)*((-6 + Pi**2)*h*Ew*(-1 + nuw) + 3*A11*Pi**2*(-1 + nuw + 2*nuw**2)))
@@ -249,39 +243,39 @@ class GeneralizedEigensystem:
         c1624=(-6*Ew)/((-6 + Pi**2)*h*Ew*(-1 + nuw) + 3*A11*Pi**2*(-1 + nuw + 2*nuw**2))
 
         c1803=(-6*Pi*Ew*(18*(H**2*kA55*Pi**2 - 4*H*kB55*Pi**2 + 4*kD55*Pi**2 + H*kA55*(-8 + Pi**2)*h - 2*kB55*(-8 + Pi**2)*h)*(1 + nuw) + b**2*((-6 + Pi**2)*h*Ew + 6*kA55*Pi**2*(1 + nuw))))/(h*(b**2*((-6 + Pi**2)*h*Ew + 6*kA55*Pi**2*(1 + nuw))*((-6 + Pi**2)*h*Ew + 6*kA55*Pi**2*(1 + nuw)) - 18*Pi**2*(1 + nuw)*(4*H*kB55*(-6 + Pi**2)*h*Ew - 4*kD55*(-6 + Pi**2)*h*Ew + 24*kB55**2*Pi**2*(1 + nuw) - kA55*(H**2*(-6 + Pi**2)*h*Ew + 24*kD55*Pi**2*(1 + nuw)))))
-        
+
         c1807=-((18*Pi*(-1 + nuw + 2*nuw**2)*(-4*kD55*Pi**2*(3*H + 7*h)*Ew + 2*kB55*(6*H**2*Pi**2 + H*(-24 + 17*Pi**2)*h + 4*(-6 + Pi**2)*h**2)*Ew + 96*kB55**2*Pi**2*(1 + nuw) - kA55*(H*(3*H**2*Pi**2 + 2*H*(-12 + 5*Pi**2)*h + 4*(-6 + Pi**2)*h**2)*Ew + 96*kD55*Pi**2*(1 + nuw))) - b**2*Pi*(6*kA55*Pi**2*(-1 + nuw + 2*nuw**2)*((3*H + 7*h)*Ew + 24*kA55*(1 + nuw)) + Ew*(-72*kB55*Pi**2*(-1 + nuw**2) + (-6 + Pi**2)*h*(-1 + 2*nuw)*(7*h*Ew + 24*kA55*(1 + nuw)) + 3*H*((-6 + Pi**2)*h*Ew*(-1 + 2*nuw) + 12*kA55*Pi**2*(-1 + nuw**2)))))/(h*(-1 + 2*nuw)*(b**2*((-6 + Pi**2)*h*Ew + 6*kA55*Pi**2*(1 + nuw))*((-6 + Pi**2)*h*Ew + 6*kA55*Pi**2*(1 + nuw)) - 18*Pi**2*(1 + nuw)*(4*H*kB55*(-6 + Pi**2)*h*Ew - 4*kD55*(-6 + Pi**2)*h*Ew + 24*kB55**2*Pi**2*(1 + nuw) - kA55*(H**2*(-6 + Pi**2)*h*Ew + 24*kD55*Pi**2*(1 + nuw))))))
-        
+
         c1812=(-9*b**2*(H*kA55 - 2*kB55)*Pi*Ew*(1 + nuw)*(8 + Pi**2*(-1 + 4*nuw)))/((-1 + 2*nuw)*(b**2*((-6 + Pi**2)*h*Ew + 6*kA55*Pi**2*(1 + nuw))*((-6 + Pi**2)*h*Ew + 6*kA55*Pi**2*(1 + nuw)) - 18*Pi**2*(1 + nuw)*(4*H*kB55*(-6 + Pi**2)*h*Ew - 4*kD55*(-6 + Pi**2)*h*Ew + 24*kB55**2*Pi**2*(1 + nuw) - kA55*(H**2*(-6 + Pi**2)*h*Ew + 24*kD55*Pi**2*(1 + nuw)))))
 
         c1816=-((-36*Pi**2*(-1 + nuw + 2*nuw**2)*(4*H*kB55*(-6 + Pi**2)*h*Ew - 4*kD55*(-6 + Pi**2)*h*Ew + 24*kB55**2*Pi**2*(1 + nuw) - kA55*(H**2*(-6 + Pi**2)*h*Ew + 24*kD55*Pi**2*(1 + nuw))) + 2*b**2*(6*kA55*Pi**2*(-1 + nuw + 2*nuw**2)*((-6 + Pi**2)*h*Ew + 6*kA55*Pi**2*(1 + nuw)) + Ew*(-36*H*kA55*Pi**2*(1 + nuw) + 72*kB55*Pi**2*(1 + nuw) + (-6 + Pi**2)*h*(-1 + 2*nuw)*((-6 + Pi**2)*h*Ew + 6*kA55*Pi**2*(1 + nuw)))))/(b*(-1 + 2*nuw)*(b**2*((-6 + Pi**2)*h*Ew + 6*kA55*Pi**2*(1 + nuw))*((-6 + Pi**2)*h*Ew + 6*kA55*Pi**2*(1 + nuw)) - 18*Pi**2*(1 + nuw)*(4*H*kB55*(-6 + Pi**2)*h*Ew - 4*kD55*(-6 + Pi**2)*h*Ew + 24*kB55**2*Pi**2*(1 + nuw) - kA55*(H**2*(-6 + Pi**2)*h*Ew + 24*kD55*Pi**2*(1 + nuw))))))
 
-        c1817=-((-(b**2*Pi**4*(h*Ew + 6*kA55*(1 + nuw))*((-6 + Pi**2)*h*Ew + 6*kA55*Pi**2*(1 + nuw))) + 18*Pi**2*(1 + nuw)*(-4*kD55*Pi**4*h*Ew + 4*kB55*h*(H*Pi**4 + 12*h)*Ew + 24*kB55**2*Pi**4*(1 + nuw) - kA55*(H*h*(H*Pi**4 + 24*h)*Ew + 24*kD55*Pi**4*(1 + nuw))))/(h**2*(b**2*((-6 + Pi**2)*h*Ew + 6*kA55*Pi**2*(1 + nuw))*((-6 + Pi**2)*h*Ew + 6*kA55*Pi**2*(1 + nuw)) - 18*Pi**2*(1 + nuw)*(4*H*kB55*(-6 + Pi**2)*h*Ew - 4*kD55*(-6 + Pi**2)*h*Ew + 24*kB55**2*Pi**2*(1 + nuw) - kA55*(H**2*(-6 + Pi**2)*h*Ew + 24*kD55*Pi**2*(1 + nuw)))))) 
-        
+        c1817=-((-(b**2*Pi**4*(h*Ew + 6*kA55*(1 + nuw))*((-6 + Pi**2)*h*Ew + 6*kA55*Pi**2*(1 + nuw))) + 18*Pi**2*(1 + nuw)*(-4*kD55*Pi**4*h*Ew + 4*kB55*h*(H*Pi**4 + 12*h)*Ew + 24*kB55**2*Pi**4*(1 + nuw) - kA55*(H*h*(H*Pi**4 + 24*h)*Ew + 24*kD55*Pi**4*(1 + nuw))))/(h**2*(b**2*((-6 + Pi**2)*h*Ew + 6*kA55*Pi**2*(1 + nuw))*((-6 + Pi**2)*h*Ew + 6*kA55*Pi**2*(1 + nuw)) - 18*Pi**2*(1 + nuw)*(4*H*kB55*(-6 + Pi**2)*h*Ew - 4*kD55*(-6 + Pi**2)*h*Ew + 24*kB55**2*Pi**2*(1 + nuw) - kA55*(H**2*(-6 + Pi**2)*h*Ew + 24*kD55*Pi**2*(1 + nuw))))))
+
         c1823=(24*Ew*(18*(H**2*kA55 - 4*H*kB55 + 4*kD55)*Pi**2*h*(-1 + nuw + 2*nuw**2) + b**2*(-3*H*kA55*Pi**4*(-1 + nuw**2) + 6*kB55*Pi**4*(-1 + nuw**2) + h*(-1 + 2*nuw)*((-6 + Pi**2)*h*Ew + 6*kA55*Pi**2*(1 + nuw)))))/(b*h*(-1 + 2*nuw)*(b**2*((-6 + Pi**2)*h*Ew + 6*kA55*Pi**2*(1 + nuw))*((-6 + Pi**2)*h*Ew + 6*kA55*Pi**2*(1 + nuw)) - 18*Pi**2*(1 + nuw)*(4*H*kB55*(-6 + Pi**2)*h*Ew - 4*kD55*(-6 + Pi**2)*h*Ew + 24*kB55**2*Pi**2*(1 + nuw) - kA55*(H**2*(-6 + Pi**2)*h*Ew + 24*kD55*Pi**2*(1 + nuw)))))
 
         c2002=(24*nuw)/(b*Pi - 2*b*Pi*nuw)
-        
+
         c2005=(-48*nuw)/(b*Pi*h - 2*b*Pi*h*nuw)
-        
+
         c2010=(12*H*nuw)/(b*Pi - 2*b*Pi*nuw)
 
         c2014=(12*nuw)/(b - 2*b*nuw)
-        
+
         c2019=Pi**2/h**2 + (24*(-1 + nuw))/(b**2*(-1 + 2*nuw))
-        
+
         c2202=-((Pi*(24*kA55*(1 + nuw) + h*Ew*(1 + 12*nuw)))/(h*(-1 + 2*nuw)*((-6 + Pi**2)*h*Ew + 6*kA55*Pi**2*(1 + nuw))))
-        
+
         c2205=(-12*Pi*Ew*(-1 + nuw))/(h*(-1 + 2*nuw)*((-6 + Pi**2)*h*Ew + 6*kA55*Pi**2*(1 + nuw)))
-        
+
         c2210=-1/2*(Pi*(24*H*kA55*(1 + nuw) + H*h*Ew*(1 + 12*nuw) - 24*kA55*h*(-1 + nuw + 2*nuw**2)))/(h*(-1 + 2*nuw)*((-6 + Pi**2)*h*Ew + 6*kA55*Pi**2*(1 + nuw)))
-        
+
         c2214=(-12*Ew)/((-1 + 2*nuw)*((-6 + Pi**2)*h*Ew + 6*kA55*Pi**2*(1 + nuw)))
-        
+
         c2219=(-48*Ew*nuw)/(b*(-1 + 2*nuw)*((-6 + Pi**2)*h*Ew + 6*kA55*Pi**2*(1 + nuw)))
-        
+
         c2221=(2*Pi**4*(-1 + nuw)*(h*Ew + 6*kA55*(1 + nuw)))/(h**2*(-1 + 2*nuw)*((-6 + Pi**2)*h*Ew + 6*kA55*Pi**2*(1 + nuw)))
-        
+
         c2403=(-6*Pi*(-72*(1 + nuw)*(4*H*kB55*(-6 + Pi**2)*h*Ew - 4*kD55*(-6 + Pi**2)*h*Ew + 24*kB55**2*Pi**2*(1 + nuw) - kA55*(H**2*(-6 + Pi**2)*h*Ew + 24*kD55*Pi**2*(1 + nuw))) + b**2*(24*kA55*(1 + nuw)*((-6 + Pi**2)*h*Ew + 6*kA55*Pi**2*(1 + nuw)) + Ew*(-18*H*kA55*Pi**2*(1 + nuw) + 36*kB55*Pi**2*(1 + nuw) + h*((-6 + Pi**2)*h*Ew + 6*kA55*Pi**2*(1 + nuw))))))/(b*h*(b**2*((-6 + Pi**2)*h*Ew + 6*kA55*Pi**2*(1 + nuw))*((-6 + Pi**2)*h*Ew + 6*kA55*Pi**2*(1 + nuw)) - 18*Pi**2*(1 + nuw)*(4*H*kB55*(-6 + Pi**2)*h*Ew - 4*kD55*(-6 + Pi**2)*h*Ew + 24*kB55**2*Pi**2*(1 + nuw) - kA55*(H**2*(-6 + Pi**2)*h*Ew + 24*kD55*Pi**2*(1 + nuw)))))
 
         c2407=(-3*Pi*(2*b**4*Ew*(-1 + nuw)*((-6 + Pi**2)*h*Ew + 6*kA55*Pi**2*(1 + nuw)) - 72*(H + h)*(-1 + nuw + 2*nuw**2)*(H**2*kA55*(-6 + Pi**2)*h*Ew - 4*H*kB55*(-6 + Pi**2)*h*Ew + 4*kD55*(-6 + Pi**2)*h*Ew - 24*kB55**2*Pi**2*(1 + nuw) + 24*kA55*kD55*Pi**2*(1 + nuw)) - b**2*(-1 + 2*nuw)*(-18*H**2*kA55*Pi**2*Ew*(1 + nuw) + 12*h*(1 + nuw)*(3*kB55*(8 + Pi**2)*Ew + 2*kA55*((-6 + Pi**2)*h*Ew + 6*kA55*Pi**2*(1 + nuw))) + H*(24*kA55*(1 + nuw)*((-6 + Pi**2)*h*Ew + 6*kA55*Pi**2*(1 + nuw)) + Ew*(36*kB55*Pi**2*(1 + nuw) + h*((-6 + Pi**2)*h*Ew - 12*kA55*(12 + Pi**2)*(1 + nuw)))))))/(b*h*(-1 + 2*nuw)*(b**2*((-6 + Pi**2)*h*Ew + 6*kA55*Pi**2*(1 + nuw))*((-6 + Pi**2)*h*Ew + 6*kA55*Pi**2*(1 + nuw)) - 18*Pi**2*(1 + nuw)*(4*H*kB55*(-6 + Pi**2)*h*Ew - 4*kD55*(-6 + Pi**2)*h*Ew + 24*kB55**2*Pi**2*(1 + nuw) - kA55*(H**2*(-6 + Pi**2)*h*Ew + 24*kD55*Pi**2*(1 + nuw)))))
@@ -293,9 +287,6 @@ class GeneralizedEigensystem:
         c2417=(-36*b*Ew*(3*H*kA55*Pi**4*(1 + nuw) - 6*kB55*Pi**4*(1 + nuw) + 2*h*((-6 + Pi**2)*h*Ew + 6*kA55*Pi**2*(1 + nuw))))/(h*(b**2*((-6 + Pi**2)*h*Ew + 6*kA55*Pi**2*(1 + nuw))*((-6 + Pi**2)*h*Ew + 6*kA55*Pi**2*(1 + nuw)) - 18*Pi**2*(1 + nuw)*(4*H*kB55*(-6 + Pi**2)*h*Ew - 4*kD55*(-6 + Pi**2)*h*Ew + 24*kB55**2*Pi**2*(1 + nuw) - kA55*(H**2*(-6 + Pi**2)*h*Ew + 24*kD55*Pi**2*(1 + nuw)))))
 
         c2423=-((-2*b**4*Pi**4*(-1 + nuw)*(h*Ew + 6*kA55*(1 + nuw))*((-6 + Pi**2)*h*Ew + 6*kA55*Pi**2*(1 + nuw)) + 216*Pi**2*h**2*(-1 + nuw + 2*nuw**2)*(4*H*kB55*(-6 + Pi**2)*h*Ew - 4*kD55*(-6 + Pi**2)*h*Ew + 24*kB55**2*Pi**2*(1 + nuw) - kA55*(H**2*(-6 + Pi**2)*h*Ew + 24*kD55*Pi**2*(1 + nuw))) + 12*b**2*(12*kB55*Pi**2*h*Ew*(6*h*(1 - 2*nuw) + H*Pi**2*(-6 + Pi**2)*(-1 + nuw))*(1 + nuw) + 72*kB55**2*Pi**6*(-1 + nuw)*(1 + nuw)**2 - (-6 + Pi**2)*h*Ew*(12*kD55*Pi**4*(-1 + nuw**2) + h**2*(-1 + 2*nuw)*((-6 + Pi**2)*h*Ew + 6*kA55*Pi**2*(1 + nuw))) - 3*kA55*Pi**2*(1 + nuw)*(24*kD55*Pi**4*(-1 + nuw**2) + h*(12*kA55*Pi**2*h*(-1 + nuw + 2*nuw**2) + Ew*(12*H*h*(1 - 2*nuw) + H**2*Pi**2*(-6 + Pi**2)*(-1 + nuw) + 2*(-6 + Pi**2)*h**2*(-1 + 2*nuw))))))/(b**2*h**2*(-1 + 2*nuw)*(b**2*((-6 + Pi**2)*h*Ew + 6*kA55*Pi**2*(1 + nuw))*((-6 + Pi**2)*h*Ew + 6*kA55*Pi**2*(1 + nuw)) - 18*Pi**2*(1 + nuw)*(4*H*kB55*(-6 + Pi**2)*h*Ew - 4*kD55*(-6 + Pi**2)*h*Ew + 24*kB55**2*Pi**2*(1 + nuw) - kA55*(H**2*(-6 + Pi**2)*h*Ew + 24*kD55*Pi**2*(1 + nuw))))))
-
- 
- 
 
         SystemMatrixC = [[    0,     1,     0,     0,     0,     0,     0,     0,     0,     0,     0,     0,     0,     0,     0,     0,     0,     0,     0,     0,     0,     0,     0,     0],
                          [c0201,     0,     0,     0,     0, c0206,     0,     0, c0209,     0,     0,     0, c0213,     0,     0,     0,     0,     0,     0,     0,     0, c0222,     0,     0],
@@ -322,7 +313,7 @@ class GeneralizedEigensystem:
                          [    0,     0,     0,     0,     0,     0,     0,     0,     0,     0,     0,     0,     0,     0,     0,     0,     0,     0,     0,     0,     0,     0,     0,     1],
                          [    0,     0, c2403,     0,     0,     0, c2407,     0,     0,     0,     0, c2412,     0,     0,     0, c2416, c2417,     0,     0,     0,     0,     0, c2423,     0],]
         return np.array(SystemMatrixC, dtype=np.float64)
-    
+
 
 
     def calc_eigenvalues_and_eigenvectors(
@@ -489,7 +480,7 @@ class GeneralizedEigensystem:
         qw_x, qw_y, qw_z = decompose_to_xyz(f=self.slab.qw, phi=phi,theta=theta)
         qs_x, qs_y, qs_z = decompose_to_xyz(f=qs, phi=phi,theta=theta)
         f_x,f_y,f_z = decompose_to_xyz(f=self.weak_layer.f, phi=phi, theta=theta)
-        
+
         z_w = self.slab.z_cog
 
         z_s = -self.slab.H/2
@@ -605,12 +596,17 @@ class GeneralizedEigensystem:
                 [0],
                 [0]],dtype=np.float64)
         return zp
-        
 
 
 
 
-    def get_load_vector(self, phi: float, theta: float, qs: float = 0,has_foundation: bool = True) -> NDArray:
+
+    def get_load_vector(self,
+                        phi: float,
+                        theta: float,
+                        qs: float = 0,
+                        has_foundation: bool = True # pylint: disable=unused-argument
+                        ) -> NDArray:
         """Return generalized load vector q if your pipeline needs it."""
         qw_x, qw_y, qw_z = decompose_to_xyz(self.slab.qw,phi,theta)
         qs_x,qs_y,qs_z = decompose_to_xyz(qs,phi,theta)
@@ -622,7 +618,7 @@ class GeneralizedEigensystem:
         mz = -qs_x * y_s
         mx = -qw_y * z_w + qs_z * y_s - qs_y * z_s
 
-    
+
         q01=0
 
         q02=(self.slab.H*(-6 + np.pi**2)*(2*my + self.slab.H*(qs_x + qw_x))*self.weak_layer.h*self.weak_layer.E*(-1 + self.weak_layer.nu) + 3*self.B11*(4*my*np.pi**2 - self.slab.b*f_x*self.slab.H*(-8 + np.pi**2)*self.weak_layer.h)*(-1 + self.weak_layer.nu + 2*self.weak_layer.nu**2) + 6*self.D11*(-8*self.slab.b*f_x*self.weak_layer.h + np.pi**2*(2*qs_x + 2*qw_x + self.slab.b*f_x*self.weak_layer.h))*(-1 + self.weak_layer.nu + 2*self.weak_layer.nu**2))/(self.slab.b*(-4*self.D11*(-6 + np.pi**2)*self.weak_layer.h*self.weak_layer.E*(-1 + self.weak_layer.nu) + 4*self.B11*self.slab.H*(-6 + np.pi**2)*self.weak_layer.h*self.weak_layer.E*(-1 + self.weak_layer.nu) - self.A11*self.slab.H**2*(-6 + np.pi**2)*self.weak_layer.h*self.weak_layer.E*(-1 + self.weak_layer.nu) + 12*self.B11**2*np.pi**2*(-1 + self.weak_layer.nu + 2*self.weak_layer.nu**2) - 12*self.A11*self.D11*np.pi**2*(-1 + self.weak_layer.nu + 2*self.weak_layer.nu**2)))
@@ -672,12 +668,4 @@ class GeneralizedEigensystem:
         q24=(-36*np.pi*(1 + self.weak_layer.nu)*((-6 + np.pi**2)*(2*mx - self.slab.H*(qs_y + qw_y))*self.weak_layer.h*self.weak_layer.E + 3*self.kA55*(4*mx*np.pi**2 + self.slab.b*f_y*self.slab.H*(-8 + np.pi**2)*self.weak_layer.h)*(1 + self.weak_layer.nu) - 6*self.kB55*(-8*self.slab.b*f_y*self.weak_layer.h + np.pi**2*(2*qs_y + 2*qw_y + self.slab.b*f_y*self.weak_layer.h))*(1 + self.weak_layer.nu)))/(self.slab.b**2*((-6 + np.pi**2)*self.weak_layer.h*self.weak_layer.E + 6*self.kA55*np.pi**2*(1 + self.weak_layer.nu))**2 - 18*np.pi**2*(1 + self.weak_layer.nu)*(4*self.slab.H*self.kB55*(-6 + np.pi**2)*self.weak_layer.h*self.weak_layer.E - 4*self.kD55*(-6 + np.pi**2)*self.weak_layer.h*self.weak_layer.E + 24*self.kB55**2*np.pi**2*(1 + self.weak_layer.nu) - self.kA55*(self.slab.H**2*(-6 + np.pi**2)*self.weak_layer.h*self.weak_layer.E + 24*self.kD55*np.pi**2*(1 + self.weak_layer.nu))))
         q = np.array([
             [q01],[q02],[q03],[q04],[q05],[q06],[q07],[q08],[q09],[q10],[q11],[q12],[q13],[q14],[q15],[q16],[q17],[q18],[q19],[q20],[q21],[q22],[q23],[q24]],dtype=np.double),
-        # TODO: Determine the load vector for unsupported structures
         return q
-
-
-
-
-
-
-
