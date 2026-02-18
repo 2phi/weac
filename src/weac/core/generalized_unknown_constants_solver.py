@@ -244,6 +244,7 @@ class GeneralizedUnknownConstantsSolver:
                             axis = 0)
                     Zp0_weak_layer[
                         global_start_weak_layer + local_start : global_start_weak_layer + local_end] += np.concatenate([zpi_weak_layer[6 + local_start : 12], zpi_weak_layer[30-local_end:]], axis = 0)
+                    # 30 = nDOF_supported + 6 boundary conditions
                 elif pos in ("r", "right"):
                     local_start = -18 if k_left else -12
                     Zh0_weak_layer[
