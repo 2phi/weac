@@ -117,9 +117,17 @@ class UnknownConstantsSolver:
             )
             # Vector of Size one of: (l: [9,1], m: [12,1], r: [9,1])
             zpi = cls._setup_conditions(
-                zl=eigensystem.zp(x=0, phi=phi, has_foundation=has_foundation, qs=qs if is_loaded else 0),
+                zl=eigensystem.zp(
+                    x=0,
+                    phi=phi,
+                    has_foundation=has_foundation,
+                    qs=qs if is_loaded else 0,
+                ),
                 zr=eigensystem.zp(
-                    x=length, phi=phi, has_foundation=has_foundation, qs=qs if is_loaded else 0
+                    x=length,
+                    phi=phi,
+                    has_foundation=has_foundation,
+                    qs=qs if is_loaded else 0,
                 ),
                 eigensystem=eigensystem,
                 has_foundation=has_foundation,
@@ -143,7 +151,7 @@ class UnknownConstantsSolver:
         for i, m in enumerate(mi, start=1):
             # Get skier point-load
             F = get_skier_point_load(m)
-            Ft, _ ,  Fn  = decompose_to_xyz(f=F, phi=phi)
+            Ft, _, Fn = decompose_to_xyz(f=F, phi=phi)
             # Right-hand side for transmission from segment i-1 to segment i
             rhs[6 * i : 6 * i + 3] = np.vstack([Ft, -Ft * scenario.slab.H / 2, Fn])
             logger.debug("Load %s: m=%s, F=%s, Fn=%s, Ft=%s", i, m, F, Fn, Ft)
@@ -152,7 +160,9 @@ class UnknownConstantsSolver:
         if system_type not in ["pst-", "-pst", "rested"]:
             logger.debug("Pre RHS %s", rhs[:3])
             rhs[:3] = cls._boundary_conditions(
-                eigensystem.zp(x=0, phi=phi, has_foundation=ki[0], qs=qs if gi[0] else 0),
+                eigensystem.zp(
+                    x=0, phi=phi, has_foundation=ki[0], qs=qs if gi[0] else 0
+                ),
                 eigensystem,
                 False,
                 "mid",
@@ -162,7 +172,9 @@ class UnknownConstantsSolver:
             )
             logger.debug("Post RHS %s", rhs[:3])
             rhs[-3:] = cls._boundary_conditions(
-                eigensystem.zp(x=li[-1], phi=phi, has_foundation=ki[-1], qs=qs if gi[-1] else 0),
+                eigensystem.zp(
+                    x=li[-1], phi=phi, has_foundation=ki[-1], qs=qs if gi[-1] else 0
+                ),
                 eigensystem,
                 False,
                 "mid",

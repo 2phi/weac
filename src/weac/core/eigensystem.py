@@ -297,7 +297,7 @@ class Eigensystem:
             Particular integral vector (6x1) at position x.
         """
         # Get weight and surface loads
-        qw_t, _, qw_n  = decompose_to_xyz(f=self.slab.qw, phi=phi)
+        qw_t, _, qw_n = decompose_to_xyz(f=self.slab.qw, phi=phi)
         qs_t, _, qs_n = decompose_to_xyz(f=qs, phi=phi)
 
         # Weak Layer properties

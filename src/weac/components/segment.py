@@ -18,8 +18,11 @@ def _serialize_ndarray(arr: np.ndarray) -> list:
 NumpyArray = Annotated[
     np.ndarray,
     PlainSerializer(_serialize_ndarray, return_type=list),
-    WithJsonSchema({"type": "array", "items": {"type": "array", "items": {"type": "number"}}}),
+    WithJsonSchema(
+        {"type": "array", "items": {"type": "array", "items": {"type": "number"}}}
+    ),
 ]
+
 
 class Segment(BaseModel):
     """
@@ -37,6 +40,7 @@ class Segment(BaseModel):
     m: float
         Skier mass at the segment's right edge [kg].
     """
+
     model_config = ConfigDict(arbitrary_types_allowed=True)
     length: float = Field(default=5e3, ge=0, description="Segment length in [mm]")
     has_foundation: bool = Field(
@@ -45,14 +49,15 @@ class Segment(BaseModel):
         "cracked/free-hanging (no foundation)",
     )
     is_loaded: bool = Field(
-        default=True, description="Whether additional loading is applied at the segment's top side"
+        default=True,
+        description="Whether additional loading is applied at the segment's top side",
     )
     m: float = Field(
         default=0, ge=0, description="Skier mass at the segment's right edge in [kg]"
     )
 
     f: NumpyArray = Field(
-        default_factory=lambda: np.zeros((6,1), dtype=float),
+        default_factory=lambda: np.zeros((6, 1), dtype=float),
         description=(
             "Load vector acting on the right side of the segment. "
             "Includes the six section forces [Nx, Vy, Vz, Mx, My, Mz]."

@@ -2062,7 +2062,7 @@ class Plotter:
                 [x / 10, analyzer.sm.fq.u(z, unit="mm"), r"$u_0\ (\mathrm{mm})$"],
                 [x / 10, -analyzer.sm.fq.w(z, unit="mm"), r"$-w\ (\mathrm{mm})$"],
                 [x / 10, analyzer.sm.fq.psi(z, unit="deg"), r"$\psi\ (^\circ)$ "],
-                ]
+            ]
         else:
             data = [
                 [x / 10, analyzer.sm.fq.u(z, unit="mm"), r"$u_0\ (\mathrm{mm})$"],
@@ -2070,7 +2070,7 @@ class Plotter:
                 [x / 10, -analyzer.sm.fq.w(z, unit="mm"), r"$-w\ (\mathrm{mm})$"],
                 [x / 10, analyzer.sm.fq.psiy(z, unit="deg"), r"$\psi_y\ (^\circ)$ "],
                 [x / 10, analyzer.sm.fq.psiz(z, unit="deg"), r"$\psi_z\ (^\circ)$ "],
-                ]
+            ]
         self._plot_data(
             scenario=analyzer.sm.scenario,
             ax1label=r"Displacements",

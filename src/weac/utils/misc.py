@@ -12,10 +12,10 @@ from weac.constants import G_MM_S2, LSKI_MM
 
 
 def decompose_to_xyz(
-        f: NDArray[np.float64] | float,
-        phi: NDArray[np.float64] | float,
-        theta: NDArray[np.float64] | float = 0
-        ) :
+    f: NDArray[np.float64] | float,
+    phi: NDArray[np.float64] | float,
+    theta: NDArray[np.float64] | float = 0,
+):
     """
     Resolve a gravity-type force/line-load into its x'-component (downslope), y'-component (cross-slope) and z'-component (into-slope)  with respect to an inclined surface.
     Fully vectorized; if input contains arrays, output matches shape.
@@ -36,17 +36,18 @@ def decompose_to_xyz(
     f_x', f_y', f_z': float | NDArray[np.float64]
         Magnitudes of the x'-component (downslope), y'-component (cross-slope) and z'-component (into-slope) components, respectively.
     """
-    f = np.asarray(f, dtype = float)
-    phi = np.asarray(phi, dtype = float)
-    theta = np.asarray(theta, dtype = float)
+    f = np.asarray(f, dtype=float)
+    phi = np.asarray(phi, dtype=float)
+    theta = np.asarray(theta, dtype=float)
 
     phi = np.deg2rad(phi)  # Convert inclination to rad
     theta = np.deg2rad(theta)  # Convert rotation to rad
-    f_x = -f * np.sin(phi) # x'-component
+    f_x = -f * np.sin(phi)  # x'-component
     f_y = f * np.sin(theta)  # y'-component
     f_z = f * np.cos(phi) * np.cos(theta)  # z'-component
 
-    return *(np.squeeze(x) for x in (f_x, f_y, f_z)),
+    return (*(np.squeeze(x) for x in (f_x, f_y, f_z)),)
+
 
 def get_skier_point_load(m: float) -> float:
     """

@@ -59,7 +59,7 @@ class Slab:  # pylint: disable=too-many-instance-attributes,too-few-public-metho
     H: float  # Total slab thickness (i.e. assembled layers) [mm]
     z_cog: float  # z-coordinate of Center of Gravity [mm]
     qw: float  # Weight Load of the slab [N/mm]
-    b: float # Total width of the slab [mm]
+    b: float  # Total width of the slab [mm]
 
     def __init__(self, layers: list[Layer], b: float = 300) -> None:
         if b <= 0:

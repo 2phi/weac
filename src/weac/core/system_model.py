@@ -155,7 +155,7 @@ class SystemModel:
     @property
     def is_generalized(self) -> bool:
         """Check if the system is using the generalized backend.
-        
+
         Returns
         -------
         bool
@@ -175,9 +175,7 @@ class SystemModel:
         """Solve for the eigensystem."""
         logger.info("Solving for Eigensystem")
         if self.is_generalized:
-            return GeneralizedEigensystem(
-                weak_layer=self.weak_layer, slab=self.slab
-            )
+            return GeneralizedEigensystem(weak_layer=self.weak_layer, slab=self.slab)
         return Eigensystem(weak_layer=self.weak_layer, slab=self.slab)
 
     @cached_property
@@ -462,7 +460,9 @@ class SystemModel:
                 z = np.concatenate(
                     [
                         np.dot(self.eigensystem.zh(xi, length, has_foundation), C)
-                        + self.eigensystem.zp(xi, phi, theta, has_foundation, qs if is_loaded else 0.0)
+                        + self.eigensystem.zp(
+                            xi, phi, theta, has_foundation, qs if is_loaded else 0.0
+                        )
                         for xi in x
                     ],
                     axis=1,
@@ -471,7 +471,9 @@ class SystemModel:
                 z = np.concatenate(
                     [
                         np.dot(self.eigensystem.zh(xi, length, has_foundation), C)
-                        + self.eigensystem.zp(xi, phi, has_foundation, qs if is_loaded else 0.0)
+                        + self.eigensystem.zp(
+                            xi, phi, has_foundation, qs if is_loaded else 0.0
+                        )
                         for xi in x
                     ],
                     axis=1,
@@ -480,10 +482,14 @@ class SystemModel:
             if self.is_generalized:
                 z = np.dot(
                     self.eigensystem.zh(x, length, has_foundation), C
-                ) + self.eigensystem.zp(x, phi, theta, has_foundation, qs if is_loaded else 0.0)
+                ) + self.eigensystem.zp(
+                    x, phi, theta, has_foundation, qs if is_loaded else 0.0
+                )
             else:
                 z = np.dot(
                     self.eigensystem.zh(x, length, has_foundation), C
-                ) + self.eigensystem.zp(x, phi, has_foundation, qs if is_loaded else 0.0)
+                ) + self.eigensystem.zp(
+                    x, phi, has_foundation, qs if is_loaded else 0.0
+                )
 
         return z

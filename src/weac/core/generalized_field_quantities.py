@@ -3,7 +3,6 @@ This module defines the GeneralizedFieldQuantities class, which is responsible f
 and providing access to various physical quantities within the slab in the Generalized Model.
 """
 
-
 from typing import Literal
 
 import numpy as np
@@ -39,6 +38,7 @@ class GeneralizedFieldQuantities:
     [u, u',v, v' w, w', ψx, ψx',ψy, ψy',ψz, ψz',thetauc, thetauc', thetaul]ᵀ.  All functions are *vectorized* along the second
     axis (x-coordinate), so they return an `ndarray` of length N.
     """
+
     def __init__(self, eigensystem: GeneralizedEigensystem):
         self.es = eigensystem
 
@@ -52,7 +52,6 @@ class GeneralizedFieldQuantities:
                 f"Unsupported unit: {unit!r}, supported units are {_UNIT_FACTOR}"
             ) from exc
 
-
     def u(
         self,
         Z: np.ndarray,
@@ -61,9 +60,11 @@ class GeneralizedFieldQuantities:
         unit: LengthUnit = "mm",
     ) -> float | np.ndarray:
         """Axial displacement *u = u₀ + h₀ ψy - b₀ ψz * at depth h₀."""
-        return self._unit_factor(unit) * (Z[0, :] + h0 * self.psiy(Z) - b0 * self.psiz(Z))
+        return self._unit_factor(unit) * (
+            Z[0, :] + h0 * self.psiy(Z) - b0 * self.psiz(Z)
+        )
 
-    def du_dx(self, Z: np.ndarray, h0: float= 0, b0: float = 0) -> float | np.ndarray:
+    def du_dx(self, Z: np.ndarray, h0: float = 0, b0: float = 0) -> float | np.ndarray:
         """Derivative u' = u₀' + h₀ ψy'- b₀ ψz'."""
         return Z[1, :] + h0 * self.dpsiy_dx(Z) - b0 * self.dpsiz_dx(Z)
 
@@ -80,9 +81,11 @@ class GeneralizedFieldQuantities:
         """Derivative v' = v₀' - h₀ ψx'."""
         return Z[3, :] - h0 * self.dpsix_dx(Z)
 
-    def w(self, Z: np.ndarray,b0: float =0, unit: LengthUnit = "mm") -> float | np.ndarray:
+    def w(
+        self, Z: np.ndarray, b0: float = 0, unit: LengthUnit = "mm"
+    ) -> float | np.ndarray:
         """Vertical displacement *w = w₀ + b₀ ψx *."""
-        return self._unit_factor(unit) * (Z[4, :] + b0 *self.psix(Z))
+        return self._unit_factor(unit) * (Z[4, :] + b0 * self.psix(Z))
 
     def dw_dx(self, Z: np.ndarray, b0: float = 0) -> float | np.ndarray:
         """First derivative *w' = w₀' + b₀ ψx' *."""
@@ -177,118 +180,483 @@ class GeneralizedFieldQuantities:
 
     def Nx(self, Z: np.ndarray, has_foundation: bool) -> float | np.ndarray:
         """Axial normal force Nx = A11 b u' + B11 b psiy'  in the slab [N]"""
-        Nx_slab = self.es.A11*self.es.slab.b*Z[1,:] + self.es.slab.b*self.es.B11*self.dpsiy_dx(Z)
+        Nx_slab = self.es.A11 * self.es.slab.b * Z[
+            1, :
+        ] + self.es.slab.b * self.es.B11 * self.dpsiy_dx(Z)
         if has_foundation:
-            return Nx_slab +  (self.es.weak_layer.E*(3*self.es.slab.b*np.pi*self.es.weak_layer.nu*Z[4,:] - 12*self.es.weak_layer.h*self.es.weak_layer.nu*self.theta_vl(Z) - 12*self.es.slab.b*self.es.weak_layer.nu*self.theta_wc(Z) + self.es.slab.b*self.es.weak_layer.h*(-1 + self.es.weak_layer.nu)*(2*np.pi*Z[1,:] + 6*self.dtheta_uc_dx(Z) + self.es.slab.H*np.pi*self.dpsiy_dx(Z))))/(6*np.pi*(-1 + self.es.weak_layer.nu + 2*self.es.weak_layer.nu**2))
+            return Nx_slab + (
+                self.es.weak_layer.E
+                * (
+                    3 * self.es.slab.b * np.pi * self.es.weak_layer.nu * Z[4, :]
+                    - 12
+                    * self.es.weak_layer.h
+                    * self.es.weak_layer.nu
+                    * self.theta_vl(Z)
+                    - 12 * self.es.slab.b * self.es.weak_layer.nu * self.theta_wc(Z)
+                    + self.es.slab.b
+                    * self.es.weak_layer.h
+                    * (-1 + self.es.weak_layer.nu)
+                    * (
+                        2 * np.pi * Z[1, :]
+                        + 6 * self.dtheta_uc_dx(Z)
+                        + self.es.slab.H * np.pi * self.dpsiy_dx(Z)
+                    )
+                )
+            ) / (
+                6 * np.pi * (-1 + self.es.weak_layer.nu + 2 * self.es.weak_layer.nu**2)
+            )
         else:
             return Nx_slab
 
     def Vy(self, Z: np.ndarray, has_foundation: bool) -> float | np.ndarray:
         """Vertical out-of-plane shear force Vy = kA66 b (-psiz + v')- kB66 b psix'  [N]"""
         if not has_foundation:
-            return self.es.slab.b*self.es.kA55*(-self.psiz(Z) + Z[3,:]) - self.es.slab.b*self.es.kB55*self.dpsix_dx(Z)
+            return self.es.slab.b * self.es.kA55 * (
+                -self.psiz(Z) + Z[3, :]
+            ) - self.es.slab.b * self.es.kB55 * self.dpsix_dx(Z)
         else:
-            return self.es.slab.b*self.es.kA55*(-self.psiz(Z) + Z[3,:]) - self.es.slab.b*self.es.kB55*self.dpsix_dx(Z) + (self.es.weak_layer.h*self.es.weak_layer.E*(12*self.theta_ul(Z) + self.es.slab.b*(-2*np.pi*self.psiz(Z) + 2*np.pi*Z[3,:] + 6*self.dtheta_vc_dx(Z) - self.es.slab.H*np.pi*self.dpsix_dx(Z))))/(12*np.pi*(1 + self.es.weak_layer.nu))
+            return (
+                self.es.slab.b * self.es.kA55 * (-self.psiz(Z) + Z[3, :])
+                - self.es.slab.b * self.es.kB55 * self.dpsix_dx(Z)
+                + (
+                    self.es.weak_layer.h
+                    * self.es.weak_layer.E
+                    * (
+                        12 * self.theta_ul(Z)
+                        + self.es.slab.b
+                        * (
+                            -2 * np.pi * self.psiz(Z)
+                            + 2 * np.pi * Z[3, :]
+                            + 6 * self.dtheta_vc_dx(Z)
+                            - self.es.slab.H * np.pi * self.dpsix_dx(Z)
+                        )
+                    )
+                )
+                / (12 * np.pi * (1 + self.es.weak_layer.nu))
+            )
 
     def Vz(self, Z: np.ndarray, has_foundation: bool) -> float | np.ndarray:
         """Vertical shear force V = kA55(w' + psiy) [N]"""
         if not has_foundation:
-            return self.es.slab.b*self.es.kA55*(self.psiy(Z) + Z[5,:])
+            return self.es.slab.b * self.es.kA55 * (self.psiy(Z) + Z[5, :])
         else:
-            return self.es.slab.b*self.es.kA55*(self.psiy(Z) + Z[5,:]) + (self.
-            es.slab.b*self.es.weak_layer.E*(-6*np.pi*Z[0,:] + 24*self.theta_uc(Z) - 3*self.es.slab.H*np.pi*self.psiy(Z) + 4*np.pi*self.es.weak_layer.h*Z[5,:] + 12*self.es.weak_layer.h*self.dtheta_wc_dx(Z)))/(24*np.pi*(1 + self.es.weak_layer.nu))
+            return self.es.slab.b * self.es.kA55 * (self.psiy(Z) + Z[5, :]) + (
+                self.es.slab.b
+                * self.es.weak_layer.E
+                * (
+                    -6 * np.pi * Z[0, :]
+                    + 24 * self.theta_uc(Z)
+                    - 3 * self.es.slab.H * np.pi * self.psiy(Z)
+                    + 4 * np.pi * self.es.weak_layer.h * Z[5, :]
+                    + 12 * self.es.weak_layer.h * self.dtheta_wc_dx(Z)
+                )
+            ) / (24 * np.pi * (1 + self.es.weak_layer.nu))
 
     def Mx(self, Z: np.ndarray, has_foundation: bool) -> float | np.ndarray:
         """Torsional moment Mx = kA55 * b^3/12 * psix' + kB66 b (psiz - v0') + kD66 b psix' in the slab [Nmm]"""
         if not has_foundation:
-            return self.es.slab.b*self.es.kB55*(self.psiz(Z) - Z[3,:]) + (self.es.slab.b**3*self.es.kA55*self.dpsix_dx(Z))/12 + self.es.slab.b*self.es.kD55*self.dpsix_dx(Z)
+            return (
+                self.es.slab.b * self.es.kB55 * (self.psiz(Z) - Z[3, :])
+                + (self.es.slab.b**3 * self.es.kA55 * self.dpsix_dx(Z)) / 12
+                + self.es.slab.b * self.es.kD55 * self.dpsix_dx(Z)
+            )
         else:
-            return self.es.slab.b*self.es.kB55*(self.psiz(Z) - Z[3,:]) + (self.es.slab.b**3*self.es.kA55*self.dpsix_dx(Z))/12 + self.es.slab.b*self.es.kD55*self.dpsix_dx(Z) - (self.es.slab.b**2*self.es.weak_layer.E*(-24*self.es.weak_layer.h*self.theta_ul(Z) + 3*self.es.slab.b*np.pi*(-2 + self.es.weak_layer.h)*self.psiz(Z) + 12*(-2 + self.es.weak_layer.h)*self.es.weak_layer.h*self.dtheta_wl_dx(Z) + self.es.slab.b*np.pi*(-3 + self.es.weak_layer.h)*self.es.weak_layer.h*self.dpsix_dx(Z)))/(144*np.pi*self.es.weak_layer.h*(1 + self.es.weak_layer.nu)) - (self.es.slab.H*self.es.weak_layer.h*self.es.weak_layer.E*(12*self.theta_ul(Z) + self.es.slab.b*(-2*np.pi*self.psiz(Z) + 2*np.pi*Z[3,:] + 6*self.dtheta_vc_dx(Z) - self.es.slab.H*np.pi*self.dpsix_dx(Z))))/(24*np.pi*(1 + self.es.weak_layer.nu))
+            return (
+                self.es.slab.b * self.es.kB55 * (self.psiz(Z) - Z[3, :])
+                + (self.es.slab.b**3 * self.es.kA55 * self.dpsix_dx(Z)) / 12
+                + self.es.slab.b * self.es.kD55 * self.dpsix_dx(Z)
+                - (
+                    self.es.slab.b**2
+                    * self.es.weak_layer.E
+                    * (
+                        -24 * self.es.weak_layer.h * self.theta_ul(Z)
+                        + 3
+                        * self.es.slab.b
+                        * np.pi
+                        * (-2 + self.es.weak_layer.h)
+                        * self.psiz(Z)
+                        + 12
+                        * (-2 + self.es.weak_layer.h)
+                        * self.es.weak_layer.h
+                        * self.dtheta_wl_dx(Z)
+                        + self.es.slab.b
+                        * np.pi
+                        * (-3 + self.es.weak_layer.h)
+                        * self.es.weak_layer.h
+                        * self.dpsix_dx(Z)
+                    )
+                )
+                / (144 * np.pi * self.es.weak_layer.h * (1 + self.es.weak_layer.nu))
+                - (
+                    self.es.slab.H
+                    * self.es.weak_layer.h
+                    * self.es.weak_layer.E
+                    * (
+                        12 * self.theta_ul(Z)
+                        + self.es.slab.b
+                        * (
+                            -2 * np.pi * self.psiz(Z)
+                            + 2 * np.pi * Z[3, :]
+                            + 6 * self.dtheta_vc_dx(Z)
+                            - self.es.slab.H * np.pi * self.dpsix_dx(Z)
+                        )
+                    )
+                )
+                / (24 * np.pi * (1 + self.es.weak_layer.nu))
+            )
 
     def My(self, Z: np.ndarray, has_foundation: bool) -> float | np.ndarray:
         """Bending moment My = B11 b u' + D11 b psiy' in the slab[Nmm]"""
         if not has_foundation:
-            return self.es.slab.b*self.es.B11*Z[1,:] + self.es.slab.b*self.es.D11*self.dpsiy_dx(Z)
+            return self.es.slab.b * self.es.B11 * Z[
+                1, :
+            ] + self.es.slab.b * self.es.D11 * self.dpsiy_dx(Z)
         else:
-            return self.es.slab.b*self.es.B11*Z[1,:] + self.es.slab.b*self.es.D11*self.dpsiy_dx(Z) + (self.es.slab.H*self.es.weak_layer.E*(3*self.es.slab.b*np.pi*self.es.weak_layer.nu*Z[4,:] - 12*self.es.weak_layer.h*self.es.weak_layer.nu*self.theta_vl(Z) - 12*self.es.slab.b*self.es.weak_layer.nu*self.theta_wc(Z) + self.es.slab.b*self.es.weak_layer.h*(-1 + self.es.weak_layer.nu)*(2*np.pi*Z[1,:] + 6*self.dtheta_uc_dx(Z) + self.es.slab.H*np.pi*self.dpsiy_dx(Z))))/(12*np.pi*(-1 + self.es.weak_layer.nu + 2*self.es.weak_layer.nu**2))
+            return (
+                self.es.slab.b * self.es.B11 * Z[1, :]
+                + self.es.slab.b * self.es.D11 * self.dpsiy_dx(Z)
+                + (
+                    self.es.slab.H
+                    * self.es.weak_layer.E
+                    * (
+                        3 * self.es.slab.b * np.pi * self.es.weak_layer.nu * Z[4, :]
+                        - 12
+                        * self.es.weak_layer.h
+                        * self.es.weak_layer.nu
+                        * self.theta_vl(Z)
+                        - 12 * self.es.slab.b * self.es.weak_layer.nu * self.theta_wc(Z)
+                        + self.es.slab.b
+                        * self.es.weak_layer.h
+                        * (-1 + self.es.weak_layer.nu)
+                        * (
+                            2 * np.pi * Z[1, :]
+                            + 6 * self.dtheta_uc_dx(Z)
+                            + self.es.slab.H * np.pi * self.dpsiy_dx(Z)
+                        )
+                    )
+                )
+                / (
+                    12
+                    * np.pi
+                    * (-1 + self.es.weak_layer.nu + 2 * self.es.weak_layer.nu**2)
+                )
+            )
 
     def Mz(self, Z: np.ndarray, has_foundation: bool) -> float | np.ndarray:
         """Bending moment Mz = A11 b^3/12 * psiz' in the slab [Nmm]"""
         if not has_foundation:
-            return (self.es.A11*self.es.slab.b**3*self.dpsiz_dx(Z))/12
+            return (self.es.A11 * self.es.slab.b**3 * self.dpsiz_dx(Z)) / 12
         else:
-            return (self.es.A11*self.es.slab.b**3*self.dpsiz_dx(Z))/12 - (self.es.slab.b**2*self.es.weak_layer.E*(-24*self.es.weak_layer.nu*self.theta_wl(Z) + 3*self.es.slab.b*np.pi*self.es.weak_layer.nu*self.psix(Z) + 2*self.es.weak_layer.h*(-1 + self.es.weak_layer.nu)*(6*self.dtheta_ul_dx(Z) - self.es.slab.b*np.pi*self.dpsiz_dx(Z))))/(72*np.pi*(-1 + self.es.weak_layer.nu + 2*self.es.weak_layer.nu**2))
+            return (self.es.A11 * self.es.slab.b**3 * self.dpsiz_dx(Z)) / 12 - (
+                self.es.slab.b**2
+                * self.es.weak_layer.E
+                * (
+                    -24 * self.es.weak_layer.nu * self.theta_wl(Z)
+                    + 3 * self.es.slab.b * np.pi * self.es.weak_layer.nu * self.psix(Z)
+                    + 2
+                    * self.es.weak_layer.h
+                    * (-1 + self.es.weak_layer.nu)
+                    * (
+                        6 * self.dtheta_ul_dx(Z)
+                        - self.es.slab.b * np.pi * self.dpsiz_dx(Z)
+                    )
+                )
+            ) / (
+                72 * np.pi * (-1 + self.es.weak_layer.nu + 2 * self.es.weak_layer.nu**2)
+            )
 
-    def Nx_c_weakLayer(self, Z: np.ndarray)-> float | np.ndarray:
-        """ Generalized axial force associated to theta_uc [N]"""
+    def Nx_c_weakLayer(self, Z: np.ndarray) -> float | np.ndarray:
+        """Generalized axial force associated to theta_uc [N]"""
         return (
-            self.es.weak_layer.E * (4 * self.es.slab.b * self.es.weak_layer.nu * Z[4, :] - 2 * np.pi * self.es.weak_layer.h * self.es.weak_layer.nu * self.theta_vl(Z) +self.es.slab.b * self.es.weak_layer.h * (-1 + self.es.weak_layer.nu) * (2 * Z[1, :] + np.pi * self.dtheta_uc_dx(Z) + self.es.slab.H * self.dpsiy_dx(Z)))) / (2 * np.pi * (1 + self.es.weak_layer.nu) * (-1 + 2 * self.es.weak_layer.nu))
+            self.es.weak_layer.E
+            * (
+                4 * self.es.slab.b * self.es.weak_layer.nu * Z[4, :]
+                - 2
+                * np.pi
+                * self.es.weak_layer.h
+                * self.es.weak_layer.nu
+                * self.theta_vl(Z)
+                + self.es.slab.b
+                * self.es.weak_layer.h
+                * (-1 + self.es.weak_layer.nu)
+                * (
+                    2 * Z[1, :]
+                    + np.pi * self.dtheta_uc_dx(Z)
+                    + self.es.slab.H * self.dpsiy_dx(Z)
+                )
+            )
+        ) / (2 * np.pi * (1 + self.es.weak_layer.nu) * (-1 + 2 * self.es.weak_layer.nu))
 
-    def Nx_l_weakLayer(self, Z: np.ndarray)-> float | np.ndarray:
-        """ Generalized axial force associated to theta_ul [N]"""
+    def Nx_l_weakLayer(self, Z: np.ndarray) -> float | np.ndarray:
+        """Generalized axial force associated to theta_ul [N]"""
         return (
-            self.es.slab.b * self.es.weak_layer.E * (2 * self.es.slab.b * self.psiz(Z) + np.pi * self.es.weak_layer.h * self.dtheta_wl_dx(Z) + self.es.slab.b * self.es.weak_layer.h * self.dpsix_dx(Z))) / (12 * np.pi * (1 + self.es.weak_layer.nu))
+            self.es.slab.b
+            * self.es.weak_layer.E
+            * (
+                2 * self.es.slab.b * self.psiz(Z)
+                + np.pi * self.es.weak_layer.h * self.dtheta_wl_dx(Z)
+                + self.es.slab.b * self.es.weak_layer.h * self.dpsix_dx(Z)
+            )
+        ) / (12 * np.pi * (1 + self.es.weak_layer.nu))
 
-    def Vy_c_weakLayer(self, Z: np.ndarray)-> float | np.ndarray:
-        """ Generalized axial force associated to theta_vc [N]"""
+    def Vy_c_weakLayer(self, Z: np.ndarray) -> float | np.ndarray:
+        """Generalized axial force associated to theta_vc [N]"""
         return (
-            self.es.weak_layer.h * self.es.weak_layer.E * (2 * np.pi * self.theta_ul(Z) + self.es.slab.b * (-2 * self.psiz(Z) + 2 * Z[3, :] + np.pi * self.dtheta_vc_dx(Z) - self.es.slab.H * self.dpsix_dx(Z)))) / (4 * np.pi * (1 + self.es.weak_layer.nu))
+            self.es.weak_layer.h
+            * self.es.weak_layer.E
+            * (
+                2 * np.pi * self.theta_ul(Z)
+                + self.es.slab.b
+                * (
+                    -2 * self.psiz(Z)
+                    + 2 * Z[3, :]
+                    + np.pi * self.dtheta_vc_dx(Z)
+                    - self.es.slab.H * self.dpsix_dx(Z)
+                )
+            )
+        ) / (4 * np.pi * (1 + self.es.weak_layer.nu))
 
-    def Vy_l_weakLayer(self, Z: np.ndarray)-> float | np.ndarray:
-        """ Generalized axial force associated to theta_vl [N]"""
+    def Vy_l_weakLayer(self, Z: np.ndarray) -> float | np.ndarray:
+        """Generalized axial force associated to theta_vl [N]"""
         return (
-            self.es.slab.b * self.es.weak_layer.h * self.es.weak_layer.E * self.dtheta_vl_dx(Z)) / (12 * (1 + self.es.weak_layer.nu))
+            self.es.slab.b
+            * self.es.weak_layer.h
+            * self.es.weak_layer.E
+            * self.dtheta_vl_dx(Z)
+        ) / (12 * (1 + self.es.weak_layer.nu))
 
-    def Vz_c_weakLayer(self, Z: np.ndarray)-> float | np.ndarray:
-        """ Generalized axial force associated to theta_wc [N]"""
+    def Vz_c_weakLayer(self, Z: np.ndarray) -> float | np.ndarray:
+        """Generalized axial force associated to theta_wc [N]"""
         return (
-            self.es.slab.b * self.es.weak_layer.E * (-4 * Z[0, :] - 2 *     self.es.slab.H * self.psiy(Z)+ 2 * self.es.weak_layer.h * Z[5, :] + np.pi * self.es.weak_layer.h * self.dtheta_wc_dx(Z))) / (4 * np.pi * (1 + self.es.weak_layer.nu))
+            self.es.slab.b
+            * self.es.weak_layer.E
+            * (
+                -4 * Z[0, :]
+                - 2 * self.es.slab.H * self.psiy(Z)
+                + 2 * self.es.weak_layer.h * Z[5, :]
+                + np.pi * self.es.weak_layer.h * self.dtheta_wc_dx(Z)
+            )
+        ) / (4 * np.pi * (1 + self.es.weak_layer.nu))
 
-    def Vz_l_weakLayer(self, Z: np.ndarray)-> float | np.ndarray:
-        """ Generalized axial force associated to theta_wl [N]"""
+    def Vz_l_weakLayer(self, Z: np.ndarray) -> float | np.ndarray:
+        """Generalized axial force associated to theta_wl [N]"""
         return (
-            self.es.slab.b * self.es.weak_layer.E * (2 * self.es.slab.b * self.es.weak_layer.nu * self.psix(Z) + self.es.weak_layer.h * (-1 + self.es.weak_layer.nu) * (np.pi * self.dtheta_ul_dx(Z) - self.es.slab.b * self.dpsiz_dx(Z)))) / (6 * np.pi * (1 + self.es.weak_layer.nu) * (-1 + 2 * self.es.weak_layer.nu))
+            self.es.slab.b
+            * self.es.weak_layer.E
+            * (
+                2 * self.es.slab.b * self.es.weak_layer.nu * self.psix(Z)
+                + self.es.weak_layer.h
+                * (-1 + self.es.weak_layer.nu)
+                * (np.pi * self.dtheta_ul_dx(Z) - self.es.slab.b * self.dpsiz_dx(Z))
+            )
+        ) / (6 * np.pi * (1 + self.es.weak_layer.nu) * (-1 + 2 * self.es.weak_layer.nu))
 
-    def sig_zz(self, Z: np.ndarray, h0: float | None = None, b0: float = 0,unit: StressUnit = "MPa") -> float | np.ndarray:
+    def sig_zz(
+        self,
+        Z: np.ndarray,
+        h0: float | None = None,
+        b0: float = 0,
+        unit: StressUnit = "MPa",
+    ) -> float | np.ndarray:
         """Weak-layer normal stress"""
         if h0 is None:
-            h0 = self.es.slab.H/2+ self.es.weak_layer.h/2
-        return self._unit_factor(unit) * (self.es.weak_layer.E*(2*self.es.weak_layer.h*self.es.weak_layer.nu*np.cos((np.pi*(self.es.slab.H + self.es.weak_layer.h - 2*h0))/(2*self.es.weak_layer.h))*self.theta_vl(Z) - (1 - self.es.weak_layer.nu)*(-(np.pi*np.cos((np.pi*(self.es.slab.H - 2*h0))/(2*self.es.weak_layer.h))*(self.es.slab.b*self.theta_wc(Z) + 2*b0*self.theta_wl(Z))) + self.es.slab.b*(Z[4,:] + b0*self.psix(Z))) + self.es.weak_layer.nu*(self.es.weak_layer.h*np.cos((np.pi*(self.es.slab.H + self.es.weak_layer.h - 2*h0))/(2*self.es.weak_layer.h))*(self.es.slab.b*self.dtheta_uc_dx(Z) + 2*b0*self.dtheta_ul_dx(Z)) + (self.es.slab.b*(self.es.slab.H + 2*self.es.weak_layer.h - 2*h0)*(2*Z[1,:] + self.es.slab.H*self.dpsiy_dx(Z) - 2*b0*self.dpsiz_dx(Z)))/4)))/(self.es.slab.b*self.es.weak_layer.h*(1 - 2*self.es.weak_layer.nu)*(1 + self.es.weak_layer.nu))
-
-    def tau_yz(self, Z: np.ndarray, h0: float = 0, b0: float = 0, unit: StressUnit = "MPa") -> float | np.ndarray:
-        """Weak-layer shear stress"""
+            h0 = self.es.slab.H / 2 + self.es.weak_layer.h / 2
         return (
-            self._unit_factor(unit)* (self.es.weak_layer.E*(-((np.pi*np.sin((np.pi*h0)/self.es.weak_layer.h)*(self.theta_vc(Z) + (2*b0*self.theta_vl(Z))/self.es.slab.b))/self.es.weak_layer.h) + (2*np.cos((np.pi*h0)/self.es.weak_layer.h)*self.theta_wl(Z))/self.es.slab.b + (1 - (self.es.weak_layer.h/2 + h0)/self.es.weak_layer.h)*self.psix(Z) - (Z[2,:] - (self.es.slab.H*self.psix(Z))/2)/self.es.weak_layer.h))/(2*(1 + self.es.weak_layer.nu))
+            self._unit_factor(unit)
+            * (
+                self.es.weak_layer.E
+                * (
+                    2
+                    * self.es.weak_layer.h
+                    * self.es.weak_layer.nu
+                    * np.cos(
+                        (np.pi * (self.es.slab.H + self.es.weak_layer.h - 2 * h0))
+                        / (2 * self.es.weak_layer.h)
+                    )
+                    * self.theta_vl(Z)
+                    - (1 - self.es.weak_layer.nu)
+                    * (
+                        -(
+                            np.pi
+                            * np.cos(
+                                (np.pi * (self.es.slab.H - 2 * h0))
+                                / (2 * self.es.weak_layer.h)
+                            )
+                            * (
+                                self.es.slab.b * self.theta_wc(Z)
+                                + 2 * b0 * self.theta_wl(Z)
+                            )
+                        )
+                        + self.es.slab.b * (Z[4, :] + b0 * self.psix(Z))
+                    )
+                    + self.es.weak_layer.nu
+                    * (
+                        self.es.weak_layer.h
+                        * np.cos(
+                            (np.pi * (self.es.slab.H + self.es.weak_layer.h - 2 * h0))
+                            / (2 * self.es.weak_layer.h)
+                        )
+                        * (
+                            self.es.slab.b * self.dtheta_uc_dx(Z)
+                            + 2 * b0 * self.dtheta_ul_dx(Z)
+                        )
+                        + (
+                            self.es.slab.b
+                            * (self.es.slab.H + 2 * self.es.weak_layer.h - 2 * h0)
+                            * (
+                                2 * Z[1, :]
+                                + self.es.slab.H * self.dpsiy_dx(Z)
+                                - 2 * b0 * self.dpsiz_dx(Z)
+                            )
+                        )
+                        / 4
+                    )
+                )
+            )
+            / (
+                self.es.slab.b
+                * self.es.weak_layer.h
+                * (1 - 2 * self.es.weak_layer.nu)
+                * (1 + self.es.weak_layer.nu)
+            )
         )
 
-    def tau_xz(self, Z: np.ndarray, h0: float = 0, b0: float = 0, unit: StressUnit = "MPa") -> float | np.ndarray:
+    def tau_yz(
+        self, Z: np.ndarray, h0: float = 0, b0: float = 0, unit: StressUnit = "MPa"
+    ) -> float | np.ndarray:
         """Weak-layer shear stress"""
         return (
-            self._unit_factor(unit)* (self.es.weak_layer.E*(-((np.pi*np.sin((np.pi*h0)/self.es.weak_layer.h)*(self.theta_uc(Z) + (2*b0*self.theta_ul(Z))/self.es.slab.b))/self.es.weak_layer.h) - (Z[0,:] + (self.es.slab.H*self.psiy(Z))/2 - b0*self.psiz(Z))/self.es.weak_layer.h + np.cos((np.pi*h0)/self.es.weak_layer.h)*(self.dtheta_wc_dx(Z) + (2*b0*self.dtheta_wl_dx(Z))/self.es.slab.b) + (1 - (self.es.weak_layer.h/2 + h0)/self.es.weak_layer.h)*(Z[5,:] + b0*self.dpsix_dx(Z))))/(2*(1 + self.es.weak_layer.nu))
+            self._unit_factor(unit)
+            * (
+                self.es.weak_layer.E
+                * (
+                    -(
+                        (
+                            np.pi
+                            * np.sin((np.pi * h0) / self.es.weak_layer.h)
+                            * (
+                                self.theta_vc(Z)
+                                + (2 * b0 * self.theta_vl(Z)) / self.es.slab.b
+                            )
+                        )
+                        / self.es.weak_layer.h
+                    )
+                    + (
+                        2
+                        * np.cos((np.pi * h0) / self.es.weak_layer.h)
+                        * self.theta_wl(Z)
+                    )
+                    / self.es.slab.b
+                    + (1 - (self.es.weak_layer.h / 2 + h0) / self.es.weak_layer.h)
+                    * self.psix(Z)
+                    - (Z[2, :] - (self.es.slab.H * self.psix(Z)) / 2)
+                    / self.es.weak_layer.h
+                )
+            )
+            / (2 * (1 + self.es.weak_layer.nu))
+        )
+
+    def tau_xz(
+        self, Z: np.ndarray, h0: float = 0, b0: float = 0, unit: StressUnit = "MPa"
+    ) -> float | np.ndarray:
+        """Weak-layer shear stress"""
+        return (
+            self._unit_factor(unit)
+            * (
+                self.es.weak_layer.E
+                * (
+                    -(
+                        (
+                            np.pi
+                            * np.sin((np.pi * h0) / self.es.weak_layer.h)
+                            * (
+                                self.theta_uc(Z)
+                                + (2 * b0 * self.theta_ul(Z)) / self.es.slab.b
+                            )
+                        )
+                        / self.es.weak_layer.h
+                    )
+                    - (
+                        Z[0, :]
+                        + (self.es.slab.H * self.psiy(Z)) / 2
+                        - b0 * self.psiz(Z)
+                    )
+                    / self.es.weak_layer.h
+                    + np.cos((np.pi * h0) / self.es.weak_layer.h)
+                    * (
+                        self.dtheta_wc_dx(Z)
+                        + (2 * b0 * self.dtheta_wl_dx(Z)) / self.es.slab.b
+                    )
+                    + (1 - (self.es.weak_layer.h / 2 + h0) / self.es.weak_layer.h)
+                    * (Z[5, :] + b0 * self.dpsix_dx(Z))
+                )
+            )
+            / (2 * (1 + self.es.weak_layer.nu))
         )
 
     def eps_zz(self, Z: np.ndarray, h0: float = 0, b0: float = 0) -> float | np.ndarray:
         """Weak-layer normal strain"""
-        return -((np.pi*np.sin((np.pi*h0)/self.es.weak_layer.h)*(self.theta_wc(Z) + (2*b0*self.theta_wl(Z))/self.es.slab.b))/self.es.weak_layer.h) - (Z[4,:] + b0*self.psix(Z))/self.es.weak_layer.h
-
-    def gamma_yz(self, Z: np.ndarray, h0: float = 0, b0: float = 0) -> float | np.ndarray:
-        """Weak-layer shear strain."""
         return (
-            -((np.pi*np.sin((np.pi*h0)/self.es.weak_layer.h)*(self.theta_vc(Z) + (2*b0*self.theta_vl(Z))/self.es.slab.b))/self.es.weak_layer.h) + (2*np.cos((np.pi*h0)/self.es.weak_layer.h)*self.theta_wl(Z))/self.es.slab.b + (1 - (self.es.weak_layer.h/2 + h0)/self.es.weak_layer.h)*self.psix(Z) - (Z[2,:] - (self.es.slab.H*self.psix(Z))/2)/self.es.weak_layer.h
+            -(
+                (
+                    np.pi
+                    * np.sin((np.pi * h0) / self.es.weak_layer.h)
+                    * (self.theta_wc(Z) + (2 * b0 * self.theta_wl(Z)) / self.es.slab.b)
+                )
+                / self.es.weak_layer.h
+            )
+            - (Z[4, :] + b0 * self.psix(Z)) / self.es.weak_layer.h
         )
 
-    def gamma_xz(self, Z: np.ndarray, h0: float = 0, b0: float = 0) -> float | np.ndarray:
+    def gamma_yz(
+        self, Z: np.ndarray, h0: float = 0, b0: float = 0
+    ) -> float | np.ndarray:
         """Weak-layer shear strain."""
         return (
-            -((np.pi*np.sin((np.pi*h0)/self.es.weak_layer.h)*(self.theta_uc(Z) + (2*b0*self.theta_ul(Z))/self.es.slab.b))/self.es.weak_layer.h) - (Z[0,:] + (self.es.slab.H*self.psiy(Z))/2 - b0*self.psiz(Z))/self.es.weak_layer.h + np.cos((np.pi*h0)/self.es.weak_layer.h)*(self.dtheta_wc_dx(Z) + (2*b0*self.dtheta_wl_dx(Z))/self.es.slab.b) + (1 - (self.es.weak_layer.h/2 + h0)/self.es.weak_layer.h)*(Z[5,:] + b0*self.dpsix_dx(Z))
+            -(
+                (
+                    np.pi
+                    * np.sin((np.pi * h0) / self.es.weak_layer.h)
+                    * (self.theta_vc(Z) + (2 * b0 * self.theta_vl(Z)) / self.es.slab.b)
+                )
+                / self.es.weak_layer.h
+            )
+            + (2 * np.cos((np.pi * h0) / self.es.weak_layer.h) * self.theta_wl(Z))
+            / self.es.slab.b
+            + (1 - (self.es.weak_layer.h / 2 + h0) / self.es.weak_layer.h)
+            * self.psix(Z)
+            - (Z[2, :] - (self.es.slab.H * self.psix(Z)) / 2) / self.es.weak_layer.h
         )
 
-    def Gi(self, # pylint: disable=unused-argument
-           Z_tip: np.ndarray,
-           _Z_back: np.ndarray,
-           _phi: float,
-           _theta: float,
-           unit: EnergyUnit = "kJ/m^2") -> float | np.ndarray:
+    def gamma_xz(
+        self, Z: np.ndarray, h0: float = 0, b0: float = 0
+    ) -> float | np.ndarray:
+        """Weak-layer shear strain."""
+        return (
+            -(
+                (
+                    np.pi
+                    * np.sin((np.pi * h0) / self.es.weak_layer.h)
+                    * (self.theta_uc(Z) + (2 * b0 * self.theta_ul(Z)) / self.es.slab.b)
+                )
+                / self.es.weak_layer.h
+            )
+            - (Z[0, :] + (self.es.slab.H * self.psiy(Z)) / 2 - b0 * self.psiz(Z))
+            / self.es.weak_layer.h
+            + np.cos((np.pi * h0) / self.es.weak_layer.h)
+            * (self.dtheta_wc_dx(Z) + (2 * b0 * self.dtheta_wl_dx(Z)) / self.es.slab.b)
+            + (1 - (self.es.weak_layer.h / 2 + h0) / self.es.weak_layer.h)
+            * (Z[5, :] + b0 * self.dpsix_dx(Z))
+        )
+
+    def Gi(
+        self,  # pylint: disable=unused-argument
+        Z_tip: np.ndarray,
+        _Z_back: np.ndarray,
+        _phi: float,
+        _theta: float,
+        unit: EnergyUnit = "kJ/m^2",
+    ) -> float | np.ndarray:
         """Mode I differential energy release rate at crack tip."""
         # _,_,fz = decompose_to_xyz(self.es.weak_layer.f, phi, theta)
         # b = self.es.slab.b
@@ -298,14 +666,22 @@ class GeneralizedFieldQuantities:
         # H= self.es.slab.H
         # return self._unit_factor(unit) * 1. / b * (-1. / 2.* ( b * fz * h * (-np.pi * Z_back[4, :] + np.pi * Z_tip[4, :] - 4 * self.theta_wc(Z_back) + 4. * self.theta_wc(Z_tip)))/ np.pi
         # + (E_w* (24. * b * np.pi * (-1. + nu_w) * Z_tip[4, :]**2 + 6. * h * nu_w * Z_tip[4, :] * (16. * self.theta_vl(Z_tip) + b * (2 * np.pi * Z_tip[1, :]+ 8 * self.dtheta_uc_dx(Z_tip)+ H * np.pi * self.dpsiy_dx(Z_tip))) + b * (12 * np.pi**3 * (-1 + nu_w) * self.theta_wc(Z_tip)**2 + 4 * np.pi**3 * (-1 + nu_w) * self.theta_wl(Z_tip)**2 - 24* h * nu_w * self.theta_wc(Z_tip) * (2 * Z_tip[1, :] + H * self.dpsiy_dx(Z_tip)) + 8 * b * h * nu_w * self.theta_wl(Z_tip) * self.dpsiz_dx(Z_tip) + b * self.psix(Z_tip) * (2 * b * np.pi * (-1 + nu_w) * self.psix(Z_tip) + h * nu_w * (8 * self.dtheta_ul_dx(Z_tip) - b * np.pi * self.dpsiz_dx(Z_tip))))))/(48 * np.pi * h * (1 + nu_w) * (-1 + 2 * nu_w)))
-        return self._unit_factor(unit) * 1/2*self.es.weak_layer.kn  *  (self.w(Z_tip)**2 + self.es.slab.b**2/12 * self.psix(Z_tip)**2)
+        return (
+            self._unit_factor(unit)
+            * 1
+            / 2
+            * self.es.weak_layer.kn
+            * (self.w(Z_tip) ** 2 + self.es.slab.b**2 / 12 * self.psix(Z_tip) ** 2)
+        )
 
-    def Gii(self, # pylint: disable=unused-argument
-           Z_tip: np.ndarray,
-           _Z_back: np.ndarray,
-           _phi: float,
-           _theta: float,
-           unit: EnergyUnit = "kJ/m^2") -> float | np.ndarray:
+    def Gii(
+        self,  # pylint: disable=unused-argument
+        Z_tip: np.ndarray,
+        _Z_back: np.ndarray,
+        _phi: float,
+        _theta: float,
+        unit: EnergyUnit = "kJ/m^2",
+    ) -> float | np.ndarray:
         """Mode II differential energy release rate at crack tip."""
         # b = self.es.slab.b
         # h = self.es.weak_layer.h
@@ -318,14 +694,32 @@ class GeneralizedFieldQuantities:
         #         )
         #     )
         # )
-        return self._unit_factor(unit) *  self.es.weak_layer.G/2 *self.es.weak_layer.h* ( (self.dw_dx(Z_tip)/ 2-self.u(Z_tip,h0 = self.es.slab.H/2)/self.es.weak_layer.h)**2 + self.es.slab.b**2/12 *(self.psiz(Z_tip)/self.es.weak_layer.h+ self.dpsix_dx(Z_tip)/2)**2)
+        return (
+            self._unit_factor(unit)
+            * self.es.weak_layer.G
+            / 2
+            * self.es.weak_layer.h
+            * (
+                (
+                    self.dw_dx(Z_tip) / 2
+                    - self.u(Z_tip, h0=self.es.slab.H / 2) / self.es.weak_layer.h
+                )
+                ** 2
+                + self.es.slab.b**2
+                / 12
+                * (self.psiz(Z_tip) / self.es.weak_layer.h + self.dpsix_dx(Z_tip) / 2)
+                ** 2
+            )
+        )
 
-    def Giii(self, # pylint: disable=unused-argument
-           Z_tip: np.ndarray,
-           _Z_back: np.ndarray,
-           _phi: float,
-           _theta: float,
-           unit: EnergyUnit = "kJ/m^2") -> float | np.ndarray:
+    def Giii(
+        self,  # pylint: disable=unused-argument
+        Z_tip: np.ndarray,
+        _Z_back: np.ndarray,
+        _phi: float,
+        _theta: float,
+        unit: EnergyUnit = "kJ/m^2",
+    ) -> float | np.ndarray:
         """Mode III differential energy release rate at crack tip."""
         # b = self.es.slab.b
         # H = self.es.slab.H
@@ -336,7 +730,17 @@ class GeneralizedFieldQuantities:
         # return (
         #     self._unit_factor(unit) * 1 / b * (-1 / 4 * (b * fy * h * (-2 * np.pi * Z_back[2, :] + 2 * np.pi * Z_tip[2, :] - 8 * self.theta_vc(Z_back) + 8 * self.theta_vc(Z_tip) + H * np.pi * self.psix(Z_back)- H * np.pi * self.psix(Z_tip)))/ np.pi + ((E_w * (12 * b**2 * np.pi * Z_tip[2, :]**2 + 2 * b**2 * np.pi**3 * (3 * self.theta_vc(Z_tip)**2 + self.theta_vl(Z_tip)**2) + 24 * np.pi * h**2 * self.theta_wl(Z_tip)**2 + 48 * b * h * (b * self.theta_vc(Z_tip) + (H + h) * self.theta_wl(Z_tip)) * self.psix(Z_tip) + b**2 * np.pi * (3 * H**2 + 6 * H * h + 4 * h**2)* self.psix(Z_tip)**2 - 12 * b * Z_tip[2, :]* (8 * h * self.theta_wl(Z_tip) + b * np.pi * (H + h) * self.psix(Z_tip))))/ (48 * b * np.pi * h * (1 + nu_w))))
         # )
-        return self._unit_factor(unit) *  self.es.weak_layer.G / self.es.weak_layer.h / 2 * ((self.v(Z_tip, h0 = self.es.slab.H/2)) + self.psix(Z_tip)*self.es.weak_layer.h/2)**2
+        return (
+            self._unit_factor(unit)
+            * self.es.weak_layer.G
+            / self.es.weak_layer.h
+            / 2
+            * (
+                (self.v(Z_tip, h0=self.es.slab.H / 2))
+                + self.psix(Z_tip) * self.es.weak_layer.h / 2
+            )
+            ** 2
+        )
 
     def dz_dx(self, z: np.ndarray, phi: float, qs: float = 0) -> np.ndarray:
         """First derivative z'(x) = K*z(x) + q of the solution vector."""

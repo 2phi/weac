@@ -11,6 +11,7 @@ from weac.components import ScenarioConfig, Segment, SystemType, WeakLayer
 from weac.core.slab import Slab
 from weac.utils.misc import decompose_to_xyz
 from weac.constants import G_MM_S2, LSKI_MM
+
 logger = logging.getLogger(__name__)
 
 
@@ -40,13 +41,13 @@ class Scenario:
     load_vector_right : np.ndarray
         load vector on the right side of the configuration
 
-    
+
 
     system_type : SystemType
     phi : float
         Angle of slab in positive in counter-clockwise direction [deg]
-    theta : float 
-        Angle of slab rotation around its axis [deg] 
+    theta : float
+        Angle of slab rotation around its axis [deg]
     L : float
         Length of the model [mm]
     crack_h: float
@@ -64,19 +65,19 @@ class Scenario:
     ki: np.ndarray  # booleans indicating foundation support for segment i
     gi: np.ndarray  # booleans indicating loading for segment i
     fi: np.ndarray  # load vectors on boundaries of segment i and i+1
-    load_vector_left: np.ndarray # load vector on the left side of the configuration
-    load_vector_right: np.ndarray # load vector on the right side of the configuration
+    load_vector_left: np.ndarray  # load vector on the left side of the configuration
+    load_vector_right: np.ndarray  # load vector on the right side of the configuration
 
     cum_sum_li: np.ndarray  # cumulative sum of segment lengths [mm]
 
     system_type: SystemType
     phi: float  # Angle in [deg]
-    theta: float # Angle in [deg]
+    theta: float  # Angle in [deg]
     surface_load: float  # Surface Line-Load [N/mm]
     qw: float  # Weight Line-Load [N/mm]
-    qx: float # Total Axial Line-Load [N/mm]
-    qy: float # Total Transvers Line-Load [N/mm]
-    qz: float # Total Vertical Line-Load [N/mm]
+    qx: float  # Total Axial Line-Load [N/mm]
+    qy: float  # Total Transvers Line-Load [N/mm]
+    qz: float  # Total Vertical Line-Load [N/mm]
     L: float  # Length of the model [mm]
     crack_h: float  # Height of the crack [mm]
     cut_length: float  # Length of the cut [mm]
@@ -157,15 +158,17 @@ class Scenario:
         self.mi = np.array([seg.m for seg in self.segments[:-1]])
         # assume masses attack in the centerline of the upper side of the slab
         F_array = 1e-3 * self.mi * G_MM_S2 / LSKI_MM * self.slab.b
-        Fx,Fy,Fz = decompose_to_xyz(F_array,self.phi,self.theta)
-        self.fi = np.column_stack([
-            Fx,
-            Fy,
-            Fz,
-            Fy * self.slab.H/2,
-            -Fx * self.slab.H/2,
-            np.zeros_like(Fx),
-            ])
+        Fx, Fy, Fz = decompose_to_xyz(F_array, self.phi, self.theta)
+        self.fi = np.column_stack(
+            [
+                Fx,
+                Fy,
+                Fz,
+                Fy * self.slab.H / 2,
+                -Fx * self.slab.H / 2,
+                np.zeros_like(Fx),
+            ]
+        )
         self.cum_sum_li = np.cumsum(self.li)
 
         # Add dummy segment if only one segment provided
@@ -174,7 +177,7 @@ class Scenario:
             self.ki = np.append(self.ki, True)
             self.gi = np.append(self.gi, True)
             self.mi = np.append(self.mi, 0)
-            self.fi = np.vstack([self.fi, np.zeros((1,6))])
+            self.fi = np.vstack([self.fi, np.zeros((1, 6))])
 
         # Calculate the total slab length
         self.L = np.sum(self.li)

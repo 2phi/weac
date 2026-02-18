@@ -4,7 +4,14 @@ This module defines the ScenarioConfig class, which contains the configuration f
 
 from typing import Literal, Any, Annotated
 
-from pydantic import BaseModel, Field, field_validator, ConfigDict, PlainSerializer, WithJsonSchema
+from pydantic import (
+    BaseModel,
+    Field,
+    field_validator,
+    ConfigDict,
+    PlainSerializer,
+    WithJsonSchema,
+)
 import numpy as np
 
 
@@ -16,7 +23,9 @@ def _serialize_ndarray(arr: np.ndarray) -> list:
 NumpyArray = Annotated[
     np.ndarray,
     PlainSerializer(_serialize_ndarray, return_type=list),
-    WithJsonSchema({"type": "array", "items": {"type": "array", "items": {"type": "number"}}}),
+    WithJsonSchema(
+        {"type": "array", "items": {"type": "array", "items": {"type": "number"}}}
+    ),
 ]
 
 SystemType = Literal[
@@ -83,7 +92,7 @@ class ScenarioConfig(BaseModel):
         description="Rotation angle in degrees (counterclockwise positive)",
     )
     b: float = Field(
-        default = 300, ge=1, description= "Out-of-plane width of the model in [mm]"
+        default=300, ge=1, description="Out-of-plane width of the model in [mm]"
     )
     cut_length: float = Field(
         default=0.0, ge=0, description="Cut length of performed PST or VPST [mm]"
@@ -100,14 +109,14 @@ class ScenarioConfig(BaseModel):
         "Adam et al. (2024)",
     )
     load_vector_left: NumpyArray = Field(
-        default_factory = lambda: np.zeros((6,1)),
-        description="Load vector on the left side of the configuration to model external loading in mode III experiments.")
-
+        default_factory=lambda: np.zeros((6, 1)),
+        description="Load vector on the left side of the configuration to model external loading in mode III experiments.",
+    )
 
     load_vector_right: NumpyArray = Field(
-        default_factory = lambda: np.zeros((6,1)),
-        description="Load vector on the right side of the configuration to model external loading in mode III experiments.")
-
+        default_factory=lambda: np.zeros((6, 1)),
+        description="Load vector on the right side of the configuration to model external loading in mode III experiments.",
+    )
 
     @field_validator("load_vector_left", "load_vector_right", mode="after")
     @classmethod
@@ -119,5 +128,7 @@ class ScenarioConfig(BaseModel):
             # Try to reshape if possible
             arr = arr.reshape(-1, 1)
             if arr.shape[0] != 6:
-                raise ValueError(f"load vectors must have shape (6, 1), got {arr.shape}")
+                raise ValueError(
+                    f"load vectors must have shape (6, 1), got {arr.shape}"
+                )
         return arr

@@ -21,7 +21,6 @@ from weac.core.system_model import SystemModel
 logger = logging.getLogger(__name__)
 
 
-
 def track_analyzer_call(func):
     """Decorator to track call count and execution time of Analyzer methods."""
 
@@ -163,7 +162,9 @@ class Analyzer:
             if not ki[i]:
                 issupported[nic[i] : nic[i + 1]] = False
             # Compute segment solution
-            zi = self.sm.z(xi, C[:, [i]], length, phi, theta, ki[i], is_loaded = gi[i], qs=qs)
+            zi = self.sm.z(
+                xi, C[:, [i]], length, phi, theta, ki[i], is_loaded=gi[i], qs=qs
+            )
             # Assemble global solution matrix
             zs[:, nic[i] : nic[i + 1]] = zi
 
@@ -586,7 +587,7 @@ class Analyzer:
         C_uncracked = self.sm.uncracked_unknown_constants
         C_cracked = self.sm.unknown_constants
         phi = self.sm.scenario.phi
-        theta=self.sm.scenario.theta
+        theta = self.sm.scenario.theta
         qs = self.sm.scenario.surface_load
 
         # Reduce inputs to segments with crack advance
@@ -634,7 +635,6 @@ class Analyzer:
                 self._integrand_GII, z_uncracked=z_uncracked, z_cracked=z_cracked
             )
 
-
             # Segment contributions to total crack opening integral
             Ginc1 += quad(intGI, 0, length, epsabs=tolerance, epsrel=tolerance)[0] / (
                 2 * da
@@ -663,7 +663,7 @@ class Analyzer:
         gi = self.sm.scenario.gi
         C = self.sm.unknown_constants
         phi = self.sm.scenario.phi
-        theta= self.sm.scenario.theta
+        theta = self.sm.scenario.theta
         qs = self.sm.scenario.surface_load
 
         # Get number and indices of segment transitions
@@ -681,7 +681,6 @@ class Analyzer:
 
         # Compute energy relase rate of all crack tips
         for j, idx in enumerate(ict):
-
             # Solution at crack tip
 
             # Solution at unpertrubed side
@@ -689,23 +688,68 @@ class Analyzer:
             # Mode I, II and III differential energy release rates
             if not self.sm.is_generalized:
                 z = self.sm.z(
-                    li[idx], C[:, [idx]], li[idx], phi=phi, theta=theta,has_foundation=ki[idx],is_loaded=gi[idx], qs=qs if gi[idx] else 0
+                    li[idx],
+                    C[:, [idx]],
+                    li[idx],
+                    phi=phi,
+                    theta=theta,
+                    has_foundation=ki[idx],
+                    is_loaded=gi[idx],
+                    qs=qs if gi[idx] else 0,
                 )
                 Gdif[1:3, j] = np.concatenate(
                     (self.sm.fq.Gi(z, unit=unit), self.sm.fq.Gii(z, unit=unit))
                 )
             else:
                 if ki[idx]:
-                    z_ct = self.sm.z(li[idx], C[:,[idx]], li[idx], phi=phi, theta=theta, has_foundation=ki[idx], is_loaded=gi[idx], qs=qs)
-                    z_ub = self.sm.z(li[idx], C[:,[idx]], li[idx], phi=phi, theta=theta, has_foundation=ki[idx], is_loaded=gi[idx], qs=qs)
-                else:
-                    z_ct = self.sm.z(li[idx], C[:,[idx]], li[idx],  phi=phi, theta=theta, has_foundation=ki[idx], is_loaded=gi[idx], qs=qs)
-                    z_ub = self.sm.z(li[idx], C[:,[idx]], li[idx],  phi=phi, theta=theta, has_foundation=ki[idx], is_loaded=gi[idx], qs=qs)
-                Gdif[1:,j] = np.concatenate(
-                    (self.sm.fq.Gi(z_ct,z_ub,  phi=phi, theta=theta,  unit=unit),
-                    self.sm.fq.Gii(z_ct,z_ub,  phi=phi, theta=theta,  unit=unit),
-                    self.sm.fq.Giii(z_ct,z_ub, phi, theta, unit=unit),)
+                    z_ct = self.sm.z(
+                        li[idx],
+                        C[:, [idx]],
+                        li[idx],
+                        phi=phi,
+                        theta=theta,
+                        has_foundation=ki[idx],
+                        is_loaded=gi[idx],
+                        qs=qs,
                     )
+                    z_ub = self.sm.z(
+                        li[idx],
+                        C[:, [idx]],
+                        li[idx],
+                        phi=phi,
+                        theta=theta,
+                        has_foundation=ki[idx],
+                        is_loaded=gi[idx],
+                        qs=qs,
+                    )
+                else:
+                    z_ct = self.sm.z(
+                        li[idx],
+                        C[:, [idx]],
+                        li[idx],
+                        phi=phi,
+                        theta=theta,
+                        has_foundation=ki[idx],
+                        is_loaded=gi[idx],
+                        qs=qs,
+                    )
+                    z_ub = self.sm.z(
+                        li[idx],
+                        C[:, [idx]],
+                        li[idx],
+                        phi=phi,
+                        theta=theta,
+                        has_foundation=ki[idx],
+                        is_loaded=gi[idx],
+                        qs=qs,
+                    )
+                Gdif[1:, j] = np.concatenate(
+                    (
+                        self.sm.fq.Gi(z_ct, z_ub, phi=phi, theta=theta, unit=unit),
+                        self.sm.fq.Gii(z_ct, z_ub, phi=phi, theta=theta, unit=unit),
+                        self.sm.fq.Giii(z_ct, z_ub, phi, theta, unit=unit),
+                    )
+                )
         # Sum mode I and II contributions
         Gdif[0, :] = Gdif[1, :] + Gdif[2, :] + Gdif[3, :]
 
