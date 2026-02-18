@@ -60,8 +60,8 @@ class GeneralizedUnknownConstantsSolver:
         Returns
         -------
         C : ndarray
-            Matrix(6xN) of solution constants for a system of N
-            segements. Columns contain the 6 constants of each segement.
+            Matrix(24xN) of solution constants for a system of N
+            segements. Columns contain the 24 constants of each segement.
         """
         logger.debug("Starting solve unknown constants")
         phi = scenario.phi
@@ -573,7 +573,7 @@ class GeneralizedUnknownConstantsSolver:
                     fq.Vz_l_weakLayer(zr),  # Vz_l_weak_layeri(xi = li)
                 ]
             )  #
-        if pos in ("r", "right"):
+        elif pos in ("r", "right"):
             bcs = cls._boundary_conditions_weak_layer(
                 zr,
                 eigensystem,
