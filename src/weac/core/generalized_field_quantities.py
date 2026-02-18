@@ -285,9 +285,9 @@ class GeneralizedFieldQuantities:
 
     def Gi(self, # pylint: disable=unused-argument
            Z_tip: np.ndarray,
-           Z_back: np.ndarray,
-           phi: float,
-           theta: float,
+           _Z_back: np.ndarray,
+           _phi: float,
+           _theta: float,
            unit: EnergyUnit = "kJ/m^2") -> float | np.ndarray:
         """Mode I differential energy release rate at crack tip."""
         # _,_,fz = decompose_to_xyz(self.es.weak_layer.f, phi, theta)
@@ -302,9 +302,9 @@ class GeneralizedFieldQuantities:
 
     def Gii(self, # pylint: disable=unused-argument
            Z_tip: np.ndarray,
-           Z_back: np.ndarray,
-           phi: float,
-           theta: float,
+           _Z_back: np.ndarray,
+           _phi: float,
+           _theta: float,
            unit: EnergyUnit = "kJ/m^2") -> float | np.ndarray:
         """Mode II differential energy release rate at crack tip."""
         # b = self.es.slab.b
@@ -322,9 +322,9 @@ class GeneralizedFieldQuantities:
 
     def Giii(self, # pylint: disable=unused-argument
            Z_tip: np.ndarray,
-           Z_back: np.ndarray,
-           phi: float,
-           theta: float,
+           _Z_back: np.ndarray,
+           _phi: float,
+           _theta: float,
            unit: EnergyUnit = "kJ/m^2") -> float | np.ndarray:
         """Mode III differential energy release rate at crack tip."""
         # b = self.es.slab.b

@@ -60,6 +60,7 @@ class Segment(BaseModel):
     )
 
     @field_validator("f")
+    @classmethod
     def ensure_ndarray(cls, v: NDArray[np.float64]) -> NDArray[np.float64]:
         # allows passing lists/tuples etc. and enforces float dtype
         return np.asarray(v, dtype=float)
