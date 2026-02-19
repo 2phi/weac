@@ -9,18 +9,18 @@ import unittest
 import numpy as np
 
 from weac.constants import G_MM_S2, LSKI_MM
-from weac.utils.misc import decompose_to_normal_tangential, get_skier_point_load
+from weac.utils.misc import decompose_to_xyz, get_skier_point_load
 
 
 class TestForceDecomposition(unittest.TestCase):
-    """Test the decompose_to_normal_tangential function."""
+    """Test the decompose_to_xyz function."""
 
     def test_flat_surface_decomposition(self):
         """Test force decomposition on flat surface (phi=0)."""
         f = 100.0  # Vertical force
         phi = 0.0  # Flat surface
 
-        f_norm, f_tan = decompose_to_normal_tangential(f, phi)
+        f_tan, _, f_norm = decompose_to_xyz(f, phi)
 
         # On flat surface, normal component equals original force, tangential is zero
         self.assertAlmostEqual(
@@ -41,7 +41,7 @@ class TestForceDecomposition(unittest.TestCase):
         f = 100.0  # Vertical force
         phi = 90.0  # Vertical surface
 
-        f_norm, f_tan = decompose_to_normal_tangential(f, phi)
+        f_tan, _, f_norm = decompose_to_xyz(f, phi)
 
         # On vertical surface, normal component is zero, tangential equals original force
         self.assertAlmostEqual(
@@ -62,7 +62,7 @@ class TestForceDecomposition(unittest.TestCase):
         f = 100.0  # Vertical force
         phi = 45.0  # 45-degree surface
 
-        f_norm, f_tan = decompose_to_normal_tangential(f, phi)
+        f_tan, _, f_norm = decompose_to_xyz(f, phi)
 
         # On 45-degree surface, both components should be equal in magnitude
         expected_component = f / np.sqrt(2)
@@ -90,7 +90,7 @@ class TestForceDecomposition(unittest.TestCase):
         f = 100.0  # Vertical force
         phi = 30.0  # 30-degree surface
 
-        f_norm, f_tan = decompose_to_normal_tangential(f, phi)
+        f_tan, _, f_norm = decompose_to_xyz(f, phi)
 
         # Known analytical values for 30 degrees
         expected_norm = f * np.cos(np.deg2rad(30))  # f * cos(30°) = f * √3/2
@@ -104,7 +104,7 @@ class TestForceDecomposition(unittest.TestCase):
         f = 100.0  # Vertical force
         phi = -30.0  # Negative angle (surface slopes down in +x direction)
 
-        f_norm, f_tan = decompose_to_normal_tangential(f, phi)
+        f_tan, _, f_norm = decompose_to_xyz(f, phi)
 
         # Normal component should still be positive and equal to f*cos(phi)
         # Tangential should be positive (upslope for negative angle) with magnitude f*sin(phi)
@@ -118,7 +118,7 @@ class TestForceDecomposition(unittest.TestCase):
         f = 0.0
         phi = 30.0
 
-        f_norm, f_tan = decompose_to_normal_tangential(f, phi)
+        f_tan, _, f_norm = decompose_to_xyz(f, phi)
 
         self.assertEqual(f_norm, 0.0, "Zero force should give zero normal component")
         self.assertEqual(f_tan, 0.0, "Zero force should give zero tangential component")
@@ -128,7 +128,7 @@ class TestForceDecomposition(unittest.TestCase):
         f = 150.0
         phi = 37.0  # Arbitrary angle
 
-        f_norm, f_tan = decompose_to_normal_tangential(f, phi)
+        f_tan, _, f_norm = decompose_to_xyz(f, phi)
 
         # Total magnitude should be conserved: f² = f_norm² + f_tan²
         original_magnitude_squared = f**2
@@ -217,8 +217,8 @@ class TestUtilityFunctionConsistency(unittest.TestCase):
         f = 100.0
         phi = 25.0
 
-        f_norm_pos, f_tan_pos = decompose_to_normal_tangential(f, phi)
-        f_norm_neg, f_tan_neg = decompose_to_normal_tangential(f, -phi)
+        f_tan_pos, _, f_norm_pos = decompose_to_xyz(f, phi)
+        f_tan_neg, _, f_norm_neg = decompose_to_xyz(f, -phi)
 
         # Normal components should be equal
         self.assertAlmostEqual(
@@ -242,7 +242,7 @@ class TestUtilityFunctionConsistency(unittest.TestCase):
 
         # Test beyond 90 degrees
         phi = 120.0
-        f_norm, f_tan = decompose_to_normal_tangential(f, phi)
+        f_tan, _, f_norm = decompose_to_xyz(f, phi)
 
         # At 120°, normal component should be negative (surface leans over)
         # and tangential component should be negative (large downslope)
@@ -256,12 +256,12 @@ class TestUtilityFunctionConsistency(unittest.TestCase):
         f = 100.0
 
         # Test at exactly 0°
-        f_norm, f_tan = decompose_to_normal_tangential(f, 0.0)
+        f_tan, _, f_norm = decompose_to_xyz(f, 0.0)
         self.assertAlmostEqual(f_norm, f, places=15)
         self.assertAlmostEqual(f_tan, 0.0, places=15)
 
         # Test at exactly 90° (expect some floating-point precision issues)
-        f_norm, f_tan = decompose_to_normal_tangential(f, 90.0)
+        f_tan, _, f_norm = decompose_to_xyz(f, 90.0)
         self.assertAlmostEqual(f_norm, 0.0, places=10)  # Reduced precision for 90° case
         self.assertAlmostEqual(f_tan, -f, places=15)
 
@@ -309,7 +309,7 @@ class TestPhysicalReasonableness(unittest.TestCase):
         typical_angles = [25, 30, 35, 40, 45]  # Typical avalanche slope angles
 
         for phi in typical_angles:
-            f_norm, f_tan = decompose_to_normal_tangential(f, phi)
+            f_tan, _, f_norm = decompose_to_xyz(f, phi)
 
             # Both components should be significant but less than original force
             self.assertGreater(

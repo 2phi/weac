@@ -10,7 +10,7 @@ import numpy as np
 from weac.components import WeakLayer
 from weac.constants import SHEAR_CORRECTION_FACTOR
 from weac.core.slab import Slab
-from weac.utils.misc import decompose_to_normal_tangential
+from weac.utils.misc import decompose_to_xyz
 
 logger = logging.getLogger(__name__)
 
@@ -297,8 +297,8 @@ class Eigensystem:
             Particular integral vector (6x1) at position x.
         """
         # Get weight and surface loads
-        qw_n, qw_t = decompose_to_normal_tangential(f=self.slab.qw, phi=phi)
-        qs_n, qs_t = decompose_to_normal_tangential(f=qs, phi=phi)
+        qw_t, _, qw_n = decompose_to_xyz(f=self.slab.qw, phi=phi)
+        qs_t, _, qs_n = decompose_to_xyz(f=qs, phi=phi)
 
         # Weak Layer properties
         kn = self.weak_layer.kn
@@ -378,8 +378,8 @@ class Eigensystem:
             System load vector q (6x1).
         """
         # Get weight and surface loads
-        qw_n, qw_t = decompose_to_normal_tangential(f=self.slab.qw, phi=phi)
-        qs_n, qs_t = decompose_to_normal_tangential(f=qs, phi=phi)
+        qw_t, _, qw_n = decompose_to_xyz(f=self.slab.qw, phi=phi)
+        qs_t, _, qs_n = decompose_to_xyz(f=qs, phi=phi)
 
         return np.array(
             [

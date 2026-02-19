@@ -9,7 +9,7 @@ import numpy as np
 from weac.components import Layer, ScenarioConfig, Segment, WeakLayer
 from weac.core.scenario import Scenario
 from weac.core.slab import Slab
-from weac.utils.misc import decompose_to_normal_tangential
+from weac.utils.misc import decompose_to_xyz
 
 
 class TestScenario(unittest.TestCase):
@@ -91,18 +91,18 @@ class TestScenario(unittest.TestCase):
         """Test that calc_normal_and_tangential_loads computes expected loads."""
         s = Scenario(self.cfg, self.segments_two, self.weak_layer, self.slab)
         # Expected from decomposition of slab weight and surface load
-        qwn, qwt = decompose_to_normal_tangential(self.slab.qw, self.cfg.phi)
-        qsn, qst = decompose_to_normal_tangential(self.cfg.surface_load, self.cfg.phi)
-        np.testing.assert_allclose(s.qn, qwn + qsn, rtol=1e-12, atol=1e-12)
-        np.testing.assert_allclose(s.qt, qwt + qst, rtol=1e-12, atol=1e-12)
-        # Sanity signs: qn positive (into slope), qt negative (downslope)
-        self.assertGreater(s.qn, 0.0)
-        self.assertLessEqual(s.qt, 0.0)
+        qwt, _, qwn = decompose_to_xyz(self.slab.qw, self.cfg.phi)
+        qst, _, qsn = decompose_to_xyz(self.cfg.surface_load, self.cfg.phi)
+        np.testing.assert_allclose(s.qz, qwn + qsn, rtol=1e-12, atol=1e-12)
+        np.testing.assert_allclose(s.qx, qwt + qst, rtol=1e-12, atol=1e-12)
+        # Sanity signs: qz positive (into slope), qx negative (downslope)
+        self.assertGreater(s.qz, 0.0)
+        self.assertLessEqual(s.qx, 0.0)
 
     def test_calc_crack_height(self):
         """Test that calc_crack_height computes expected crack height."""
         s = Scenario(self.cfg, self.segments_two, self.weak_layer, self.slab)
-        expected_crack_h = self.weak_layer.collapse_height - s.qn / self.weak_layer.kn
+        expected_crack_h = self.weak_layer.collapse_height - s.qz / self.weak_layer.kn
         self.assertTrue(np.isfinite(expected_crack_h))
         self.assertAlmostEqual(s.crack_h, expected_crack_h)
 

@@ -746,7 +746,7 @@ class CriteriaEvaluator:
         system_copy.set_forced_touchdown_mode(mode)
         touchdown_distance = system_copy.slab_touchdown.touchdown_distance
         analyzer = Analyzer(system_copy, printing_enabled=print_call_stats)
-        energy_release_rate, _, _ = analyzer.differential_ERR(unit="J/m^2")
+        energy_release_rate, _, _, _ = analyzer.differential_ERR(unit="J/m^2")
         maximal_stress_result = self._calculate_maximal_stresses(
             system_copy, print_call_stats=print_call_stats
         )
@@ -1124,11 +1124,18 @@ class CriteriaEvaluator:
         C = system.unknown_constants[:, [segment_index]]
         li_segment = system.scenario.li[segment_index]
         phi = system.scenario.phi
+        theta = system.scenario.theta
         has_foundation = system.scenario.ki[segment_index]
-
+        is_loaded = system.scenario.gi[segment_index]
         # Calculate the displacement field
         Z = system.z(
-            coordinate_in_segment, C, li_segment, phi, has_foundation=has_foundation
+            coordinate_in_segment,
+            C,
+            li_segment,
+            phi,
+            theta,
+            has_foundation=has_foundation,
+            is_loaded=is_loaded,
         )
 
         # Calculate the stresses

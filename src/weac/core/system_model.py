@@ -15,7 +15,6 @@ from functools import cached_property
 
 import numpy as np
 
-# from weac.constants import G_MM_S2, LSKI_MM
 from weac.components import (
     Config,
     Layer,
@@ -25,7 +24,12 @@ from weac.components import (
     WeakLayer,
 )
 from weac.core.eigensystem import Eigensystem
+from weac.core.generalized_eigensystem import GeneralizedEigensystem
 from weac.core.field_quantities import FieldQuantities
+from weac.core.generalized_field_quantities import GeneralizedFieldQuantities
+from weac.core.generalized_unknown_constants_solver import (
+    GeneralizedUnknownConstantsSolver,
+)
 from weac.core.scenario import Scenario
 from weac.core.slab import Slab
 from weac.components.scenario_config import TouchdownMode
@@ -33,6 +37,10 @@ from weac.core.slab_touchdown import SlabTouchdown
 from weac.core.unknown_constants_solver import UnknownConstantsSolver
 
 logger = logging.getLogger(__name__)
+
+# Backend type constants
+BACKEND_GENERALIZED = "generalized"
+BACKEND_CLASSIC = "classic"
 
 
 class SystemModel:
@@ -57,15 +65,16 @@ class SystemModel:
     system = SystemModel(model_input=model_input, config=config)
     constants = system.unknown_constants  # Shape: (6, N) where N = number of segments
 
-    # Each column represents the 6 constants for one segment:
-    # constants[:, i] = [C1, C2, C3, C4, C5, C6] for segment i
+    # Each column represents the N constants of integration for one segment:
+    # constants[:, i] = [C1, C2, ...,  CN-1, CN] for segment i
+    # N = 6 for the classical WAEC implementation and 24 for a generalized model accounting for biaxial bending
     # These constants define the beam deflection solution within that segment
     ```
 
     **Calculation Flow:**
 
     1. **Eigensystem**: Computes eigenvalues/eigenvectors for the beam-foundation system
-    2. **Slab Touchdown** (if enabled): Calculates touchdown behavior and updates segment lengths
+    2. **Slab Touchdown** (if enabled): Calculates touchdown behavior and updates segment lengths (only available for the classical model)
     3. **Unknown Constants**: Solves the linear system for beam deflection constants
 
     **Touchdown Behavior:**
@@ -128,7 +137,7 @@ class SystemModel:
             config = Config()
         self.config = config
         self.weak_layer = model_input.weak_layer
-        self.slab = Slab(layers=model_input.layers)
+        self.slab = Slab(layers=model_input.layers, b=model_input.scenario_config.b)
         self.scenario = Scenario(
             scenario_config=model_input.scenario_config,
             segments=model_input.segments,
@@ -143,15 +152,30 @@ class SystemModel:
 
         # Cached properties are invalidated via __dict__.pop in the *invalidate_* helpers.
 
+    @property
+    def is_generalized(self) -> bool:
+        """Check if the system is using the generalized backend.
+
+        Returns
+        -------
+        bool
+            True if config.backend is set to 'generalized', False otherwise.
+        """
+        return self.config.backend == BACKEND_GENERALIZED
+
     @cached_property
-    def fq(self) -> FieldQuantities:
+    def fq(self) -> FieldQuantities | GeneralizedFieldQuantities:
         """Compute the field quantities."""
+        if isinstance(self.eigensystem, GeneralizedEigensystem):
+            return GeneralizedFieldQuantities(eigensystem=self.eigensystem)
         return FieldQuantities(eigensystem=self.eigensystem)
 
     @cached_property
-    def eigensystem(self) -> Eigensystem:  # heavy
+    def eigensystem(self) -> Eigensystem | GeneralizedEigensystem:  # heavy
         """Solve for the eigensystem."""
         logger.info("Solving for Eigensystem")
+        if self.is_generalized:
+            return GeneralizedEigensystem(weak_layer=self.weak_layer, slab=self.slab)
         return Eigensystem(weak_layer=self.weak_layer, slab=self.slab)
 
     @cached_property
@@ -207,9 +231,9 @@ class SystemModel:
 
         Returns:
         --------
-        np.ndarray: Solution constants matrix of shape (6, N_segments)
+        np.ndarray: Solution constants matrix of shape (N_dof, N_segments)
             Each column contains the 6 constants for one segment:
-            [C1, C2, C3, C4, C5, C6]
+            [C1, C2, ..., CN-1, CN]
 
             These constants are used in the general solution:
             u(x) = Σ Ci * φi(x) + up(x)
@@ -227,7 +251,7 @@ class SystemModel:
         Example:
             ```python
             system = SystemModel(model_input, config)
-            C = system.unknown_constants  # Shape: (6, 2) for 2-segment system
+            C = system.unknown_constants  # Shape: (N, 2) for 2-segment system
 
             # Constants for first segment
             segment_0_constants = C[:, 0]
@@ -237,9 +261,16 @@ class SystemModel:
             segment_length = system.scenario.li[0]
             ```
         """
+        # Use generalized solver if backend is generalized
+        solver = (
+            GeneralizedUnknownConstantsSolver
+            if isinstance(self.eigensystem, GeneralizedEigensystem)
+            else UnknownConstantsSolver
+        )
+
         if self.slab_touchdown is not None:
             logger.info("Solving for Unknown Constants")
-            return UnknownConstantsSolver.solve_for_unknown_constants(
+            return solver.solve_for_unknown_constants(
                 scenario=self.scenario,
                 eigensystem=self.eigensystem,
                 system_type=self.scenario.system_type,
@@ -248,7 +279,7 @@ class SystemModel:
                 collapsed_weak_layer_kR=self.slab_touchdown.collapsed_weak_layer_kR,
             )
         logger.info("Solving for Unknown Constants")
-        return UnknownConstantsSolver.solve_for_unknown_constants(
+        return solver.solve_for_unknown_constants(
             scenario=self.scenario,
             eigensystem=self.eigensystem,
             system_type=self.scenario.system_type,
@@ -274,8 +305,13 @@ class SystemModel:
         )
 
         logger.info("Solving for Uncracked Unknown Constants")
+        solver = (
+            GeneralizedUnknownConstantsSolver
+            if isinstance(self.eigensystem, GeneralizedEigensystem)
+            else UnknownConstantsSolver
+        )
         if self.slab_touchdown is not None:
-            return UnknownConstantsSolver.solve_for_unknown_constants(
+            return solver.solve_for_unknown_constants(
                 scenario=uncracked_scenario,
                 eigensystem=self.eigensystem,
                 system_type=self.scenario.system_type,
@@ -283,7 +319,7 @@ class SystemModel:
                 touchdown_mode=self.slab_touchdown.touchdown_mode,
                 collapsed_weak_layer_kR=self.slab_touchdown.collapsed_weak_layer_kR,
             )
-        return UnknownConstantsSolver.solve_for_unknown_constants(
+        return solver.solve_for_unknown_constants(
             scenario=uncracked_scenario,
             eigensystem=self.eigensystem,
             system_type=self.scenario.system_type,
@@ -390,7 +426,9 @@ class SystemModel:
         C: np.ndarray,
         length: float,
         phi: float,
+        theta: float,
         has_foundation: bool = True,
+        is_loaded: bool = True,
         qs: float = 0,
     ) -> np.ndarray:
         """
@@ -417,18 +455,41 @@ class SystemModel:
         z : ndarray
             Solution vector (6xN) at position x.
         """
-        if isinstance(x, (np.ndarray, Sequence)):
-            z = np.concatenate(
-                [
-                    np.dot(self.eigensystem.zh(xi, length, has_foundation), C)
-                    + self.eigensystem.zp(xi, phi, has_foundation, qs)
-                    for xi in x
-                ],
-                axis=1,
-            )
+        if isinstance(x, (list, tuple, np.ndarray)):
+            if self.is_generalized:
+                z = np.concatenate(
+                    [
+                        np.dot(self.eigensystem.zh(xi, length, has_foundation), C)
+                        + self.eigensystem.zp(
+                            xi, phi, theta, has_foundation, qs if is_loaded else 0.0
+                        )
+                        for xi in x
+                    ],
+                    axis=1,
+                )
+            else:
+                z = np.concatenate(
+                    [
+                        np.dot(self.eigensystem.zh(xi, length, has_foundation), C)
+                        + self.eigensystem.zp(
+                            xi, phi, has_foundation, qs if is_loaded else 0.0
+                        )
+                        for xi in x
+                    ],
+                    axis=1,
+                )
         else:
-            z = np.dot(
-                self.eigensystem.zh(x, length, has_foundation), C
-            ) + self.eigensystem.zp(x, phi, has_foundation, qs)
+            if self.is_generalized:
+                z = np.dot(
+                    self.eigensystem.zh(x, length, has_foundation), C
+                ) + self.eigensystem.zp(
+                    x, phi, theta, has_foundation, qs if is_loaded else 0.0
+                )
+            else:
+                z = np.dot(
+                    self.eigensystem.zh(x, length, has_foundation), C
+                ) + self.eigensystem.zp(
+                    x, phi, has_foundation, qs if is_loaded else 0.0
+                )
 
         return z

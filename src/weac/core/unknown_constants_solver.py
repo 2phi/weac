@@ -20,7 +20,7 @@ from weac.core.field_quantities import FieldQuantities
 from weac.core.scenario import Scenario
 
 # from weac.constants import G_MM_S2, LSKI_MM
-from weac.utils.misc import decompose_to_normal_tangential, get_skier_point_load
+from weac.utils.misc import get_skier_point_load, decompose_to_xyz
 
 logger = logging.getLogger(__name__)
 
@@ -67,6 +67,7 @@ class UnknownConstantsSolver:
         li = scenario.li
         ki = scenario.ki
         mi = scenario.mi
+        gi = scenario.gi
 
         # Determine size of linear system of equations
         nS = len(li)  # Number of beam segments
@@ -91,13 +92,14 @@ class UnknownConstantsSolver:
         # LHS: Transmission & Boundary Conditions between segments
         for i in range(nS):
             # Length, foundation and position of segment i
-            length, has_foundation, pos = li[i], ki[i], pi[i]
+            length, has_foundation, is_loaded, pos = li[i], ki[i], gi[i], pi[i]
 
             logger.debug(
-                "Assembling segment %s: length=%s, has_foundation=%s, pos=%s",
+                "Assembling segment %s: length=%s, has_foundation=%s,is_loaded=%s, pos=%s",
                 i,
                 length,
                 has_foundation,
+                is_loaded,
                 pos,
             )
             # Matrix of Size one of: (l: [9,6], m: [12,6], r: [9,6])
@@ -115,9 +117,17 @@ class UnknownConstantsSolver:
             )
             # Vector of Size one of: (l: [9,1], m: [12,1], r: [9,1])
             zpi = cls._setup_conditions(
-                zl=eigensystem.zp(x=0, phi=phi, has_foundation=has_foundation, qs=qs),
+                zl=eigensystem.zp(
+                    x=0,
+                    phi=phi,
+                    has_foundation=has_foundation,
+                    qs=qs if is_loaded else 0,
+                ),
                 zr=eigensystem.zp(
-                    x=length, phi=phi, has_foundation=has_foundation, qs=qs
+                    x=length,
+                    phi=phi,
+                    has_foundation=has_foundation,
+                    qs=qs if is_loaded else 0,
                 ),
                 eigensystem=eigensystem,
                 has_foundation=has_foundation,
@@ -141,7 +151,7 @@ class UnknownConstantsSolver:
         for i, m in enumerate(mi, start=1):
             # Get skier point-load
             F = get_skier_point_load(m)
-            Fn, Ft = decompose_to_normal_tangential(f=F, phi=phi)
+            Ft, _, Fn = decompose_to_xyz(f=F, phi=phi)
             # Right-hand side for transmission from segment i-1 to segment i
             rhs[6 * i : 6 * i + 3] = np.vstack([Ft, -Ft * scenario.slab.H / 2, Fn])
             logger.debug("Load %s: m=%s, F=%s, Fn=%s, Ft=%s", i, m, F, Fn, Ft)
@@ -150,7 +160,9 @@ class UnknownConstantsSolver:
         if system_type not in ["pst-", "-pst", "rested"]:
             logger.debug("Pre RHS %s", rhs[:3])
             rhs[:3] = cls._boundary_conditions(
-                eigensystem.zp(x=0, phi=phi, has_foundation=ki[0], qs=qs),
+                eigensystem.zp(
+                    x=0, phi=phi, has_foundation=ki[0], qs=qs if gi[0] else 0
+                ),
                 eigensystem,
                 False,
                 "mid",
@@ -160,7 +172,9 @@ class UnknownConstantsSolver:
             )
             logger.debug("Post RHS %s", rhs[:3])
             rhs[-3:] = cls._boundary_conditions(
-                eigensystem.zp(x=li[-1], phi=phi, has_foundation=ki[-1], qs=qs),
+                eigensystem.zp(
+                    x=li[-1], phi=phi, has_foundation=ki[-1], qs=qs if gi[-1] else 0
+                ),
                 eigensystem,
                 False,
                 "mid",
@@ -201,7 +215,7 @@ class UnknownConstantsSolver:
                     rhs[-3:] = np.vstack([0, 0, scenario.crack_h])
             # Set normal force and displacement BC for stage C
             if not has_foundation and bool(touchdown_mode in ["C_in_contact"]):
-                N = scenario.qt * (scenario.cut_length - touchdown_distance)
+                N = scenario.qx * (scenario.cut_length - touchdown_distance)
                 if i == 0:
                     rhs[:3] = np.vstack([-N, 0, scenario.crack_h])
                 if i == (nS - 1):
@@ -216,7 +230,6 @@ class UnknownConstantsSolver:
             # apply arbitrary force of 1 at left boundary
             rhs = rhs * 0
             rhs[2] = 1
-
         # Solve z0 = Zh0*C + Zp0 = rhs for constants, i.e. Zh0*C = rhs - Zp0
         try:
             C = np.linalg.solve(Zh0, rhs - Zp0)

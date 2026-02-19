@@ -391,7 +391,13 @@ class TestSystemModelBehavior(unittest.TestCase):
             C = np.eye(6)
             # Scalar x
             z_scalar = system.z(
-                x=100.0, C=C, length=1000.0, phi=10.0, has_foundation=True, qs=0.0
+                x=100.0,
+                C=C,
+                length=1000.0,
+                phi=10.0,
+                theta=0.0,
+                has_foundation=True,
+                qs=0.0,
             )
             self.assertEqual(z_scalar.shape, (6, 6))
             expected = 2.0 * I6 + np.ones((6, 1)) @ np.ones(
@@ -405,6 +411,7 @@ class TestSystemModelBehavior(unittest.TestCase):
                 C=C,
                 length=1000.0,
                 phi=10.0,
+                theta=0.0,
                 has_foundation=True,
                 qs=0.0,
             )

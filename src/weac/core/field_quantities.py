@@ -139,7 +139,8 @@ class FieldQuantities:  # pylint: disable=too-many-instance-attributes, too-many
             Desired output unit. Default is kJ/m^2.
         """
         return (
-            self._unit_factor(unit) * self.sig(Ztip) ** 2 / (2 * self.es.weak_layer.kn)
+            self._unit_factor(unit) * self.es.weak_layer.kn / 2 * self.w(Ztip) ** 2
+            # self.sig(Ztip) ** 2 / (2 * self.es.weak_layer.kn)
         )
 
     def Gii(self, Ztip: np.ndarray, unit: EnergyUnit = "kJ/m^2") -> float | np.ndarray:

@@ -6,36 +6,47 @@ from typing import Literal
 
 import numpy as np
 
+from numpy.typing import NDArray
 from weac.components import Layer
 from weac.constants import G_MM_S2, LSKI_MM
 
 
-def decompose_to_normal_tangential(f: float, phi: float) -> tuple[float, float]:
+def decompose_to_xyz(
+    f: NDArray[np.float64] | float,
+    phi: NDArray[np.float64] | float,
+    theta: NDArray[np.float64] | float = 0,
+):
     """
-    Resolve a gravity-type force/line-load into its tangential (downslope) and
-    normal (into-slope) components with respect to an inclined surface.
+    Resolve a gravity-type force/line-load into its x'-component (downslope), y'-component (cross-slope) and z'-component (into-slope)  with respect to an inclined surface.
+    Fully vectorized; if input contains arrays, output matches shape.
 
     Parameters
     ----------
-    f : float
+    f : float | NDArray[np.float64]
         is interpreted as a vertical load magnitude
-        acting straight downward (global y negative).
-    phi : float
-        Surface dip angle `in degrees`, measured from horizontal.
+        acting straight downward (global z negative).
+    phi : float | NDArray[np.float64]
+        Surface dip angle `in degrees`, measured between horizontal plane and the slabs axis (local x'-axis).
         Positive `phi` means the surface slopes upward in +x.
+    theta: float | NDArray[np.float64]
+        rotation angle `in degrees`, measured between the x'z-plane and the x'z'-plane. Positive `theta` means the slab is rotated counterclockwise around the slab axis (local x'-axis).
 
     Returns
     -------
-    f_norm, f_tan : float
-        Magnitudes of the tangential ( + downslope ) and normal
-        ( + into-slope ) components, respectively.
+    f_x', f_y', f_z': float | NDArray[np.float64]
+        Magnitudes of the x'-component (downslope), y'-component (cross-slope) and z'-component (into-slope) components, respectively.
     """
-    # Convert units
+    f = np.asarray(f, dtype=float)
+    phi = np.asarray(phi, dtype=float)
+    theta = np.asarray(theta, dtype=float)
+
     phi = np.deg2rad(phi)  # Convert inclination to rad
-    # Split into components
-    f_norm = f * np.cos(phi)  # Normal direction
-    f_tan = -f * np.sin(phi)  # Tangential direction
-    return f_norm, f_tan
+    theta = np.deg2rad(theta)  # Convert rotation to rad
+    f_x = -f * np.sin(phi)  # x'-component
+    f_y = f * np.sin(theta)  # y'-component
+    f_z = f * np.cos(phi) * np.cos(theta)  # z'-component
+
+    return (*(np.squeeze(x) for x in (f_x, f_y, f_z)),)
 
 
 def get_skier_point_load(m: float) -> float:

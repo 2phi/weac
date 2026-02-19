@@ -149,11 +149,11 @@ class TestAnalyzer(unittest.TestCase):
     def test_energy_release_rates_shapes(self):
         """Test energy release rates shapes."""
         Ginc = self.an_ski.incremental_ERR()
-        self.assertEqual(Ginc.shape, (3,))
+        self.assertEqual(Ginc.shape, (4,))
         self.assertTrue(np.isfinite(Ginc).all())
 
         Gdif = self.an_ski.differential_ERR()
-        self.assertEqual(Gdif.shape, (3,))
+        self.assertEqual(Gdif.shape, (4,))
         self.assertTrue(np.isfinite(Gdif).all())
 
     def test_internal_and_external_potentials_pst(self):

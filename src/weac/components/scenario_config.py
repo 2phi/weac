@@ -2,10 +2,31 @@
 This module defines the ScenarioConfig class, which contains the configuration for a given scenario.
 """
 
-from typing import Literal
+from typing import Literal, Any, Annotated
 
-from pydantic import BaseModel, Field
+from pydantic import (
+    BaseModel,
+    Field,
+    field_validator,
+    ConfigDict,
+    PlainSerializer,
+    WithJsonSchema,
+)
+import numpy as np
 
+
+def _serialize_ndarray(arr: np.ndarray) -> list:
+    """Serialize numpy array to nested list for JSON compatibility."""
+    return arr.tolist()
+
+
+NumpyArray = Annotated[
+    np.ndarray,
+    PlainSerializer(_serialize_ndarray, return_type=list),
+    WithJsonSchema(
+        {"type": "array", "items": {"type": "array", "items": {"type": "number"}}}
+    ),
+]
 
 SystemType = Literal[
     "skier", "skiers", "pst-", "-pst", "rot", "trans", "vpst-", "-vpst"
@@ -22,6 +43,10 @@ class ScenarioConfig(BaseModel):
     ----------
     phi : float, optional
         Slope angle in degrees (counterclockwise positive).
+    theta : float, optional
+        Rotation of the slab around its axis (counterclockwise positive)
+    b : float, optional
+        Out-of-plane width of the model in [mm]. Default is 300 mm.
     system_type : SystemType
         Type of system. Allowed values are:
         - skier: single skier in-between two segments
@@ -37,8 +62,10 @@ class ScenarioConfig(BaseModel):
     stiffness_ratio : float, optional
         Stiffness ratio between collapsed and uncollapsed weak layer.
     surface_load : float, optional
-        Surface line-load on slab [N/mm] (force per mm of out-of-plane width).
+        Surface line-load on slab [N/mm] (force per mm of out-of-plane width)
     """
+
+    model_config = ConfigDict(arbitrary_types_allowed=True)
 
     system_type: SystemType = Field(
         default="skiers",
@@ -58,6 +85,15 @@ class ScenarioConfig(BaseModel):
         le=90.0,
         description="Slope angle in degrees (counterclockwise positive)",
     )
+    theta: float = Field(
+        default=0.0,
+        ge=-90.0,
+        le=90.0,
+        description="Rotation angle in degrees (counterclockwise positive)",
+    )
+    b: float = Field(
+        default=300, ge=1, description="Out-of-plane width of the model in [mm]"
+    )
     cut_length: float = Field(
         default=0.0, ge=0, description="Cut length of performed PST or VPST [mm]"
     )
@@ -72,3 +108,27 @@ class ScenarioConfig(BaseModel):
         description="Surface line-load on slab [N/mm], e.g. evenly spaced weights, "
         "Adam et al. (2024)",
     )
+    load_vector_left: NumpyArray = Field(
+        default_factory=lambda: np.zeros((6, 1)),
+        description="Load vector on the left side of the configuration to model external loading in mode III experiments.",
+    )
+
+    load_vector_right: NumpyArray = Field(
+        default_factory=lambda: np.zeros((6, 1)),
+        description="Load vector on the right side of the configuration to model external loading in mode III experiments.",
+    )
+
+    @field_validator("load_vector_left", "load_vector_right", mode="after")
+    @classmethod
+    def check_load_vector_shape(cls, value: Any) -> Any:
+        # Convert to numpy array if needed
+        arr = np.asarray(value, dtype=np.float64)
+        # Ensure correct shape (6, 1)
+        if arr.shape != (6, 1):
+            # Try to reshape if possible
+            arr = arr.reshape(-1, 1)
+            if arr.shape[0] != 6:
+                raise ValueError(
+                    f"load vectors must have shape (6, 1), got {arr.shape}"
+                )
+        return arr
