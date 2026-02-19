@@ -123,6 +123,9 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../weac.core.html">weac.core package</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="../../../weac.core.eigensystem.html">weac.core.eigensystem module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../weac.core.field_quantities.html">weac.core.field_quantities module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../weac.core.generalized_eigensystem.html">weac.core.generalized_eigensystem module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../weac.core.generalized_field_quantities.html">weac.core.generalized_field_quantities module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../weac.core.generalized_unknown_constants_solver.html">weac.core.generalized_unknown_constants_solver module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../weac.core.scenario.html">weac.core.scenario module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../weac.core.slab.html">weac.core.slab module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../weac.core.slab_touchdown.html">weac.core.slab_touchdown module</a></li>
@@ -368,7 +371,7 @@
 </span><span id="line-165">        <span class="n">ss</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">eigensystem</span><span class="o">.</span><span class="n">kA55</span>
 </span><span id="line-166">        <span class="n">L</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">scenario</span><span class="o">.</span><span class="n">L</span>
 </span><span id="line-167">        <span class="n">crack_h</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">scenario</span><span class="o">.</span><span class="n">crack_h</span>
-</span><span id="line-168">        <span class="n">qn</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">scenario</span><span class="o">.</span><span class="n">qn</span>
+</span><span id="line-168">        <span class="n">qn</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">scenario</span><span class="o">.</span><span class="n">qz</span>
 </span><span id="line-169">
 </span><span id="line-170">        <span class="c1"># Create polynomial expression</span>
 </span><span id="line-171">        <span class="k">def</span><span class="w"> </span><span class="nf">polynomial</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
@@ -406,7 +409,7 @@
 </span><span id="line-203">        <span class="n">ss</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">eigensystem</span><span class="o">.</span><span class="n">kA55</span>
 </span><span id="line-204">        <span class="n">L</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">scenario</span><span class="o">.</span><span class="n">L</span>
 </span><span id="line-205">        <span class="n">crack_h</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">scenario</span><span class="o">.</span><span class="n">crack_h</span>
-</span><span id="line-206">        <span class="n">qn</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">scenario</span><span class="o">.</span><span class="n">qn</span>
+</span><span id="line-206">        <span class="n">qn</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">scenario</span><span class="o">.</span><span class="n">qz</span>
 </span><span id="line-207">
 </span><span id="line-208">        <span class="c1"># Create polynomial function</span>
 </span><span id="line-209">        <span class="k">def</span><span class="w"> </span><span class="nf">polynomial</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
@@ -461,7 +464,7 @@
 </span><span id="line-258">        <span class="n">L</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">scenario</span><span class="o">.</span><span class="n">L</span>
 </span><span id="line-259">        <span class="n">cut_length</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">scenario</span><span class="o">.</span><span class="n">cut_length</span>
 </span><span id="line-260">        <span class="n">crack_h</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">scenario</span><span class="o">.</span><span class="n">crack_h</span>
-</span><span id="line-261">        <span class="n">qn</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">scenario</span><span class="o">.</span><span class="n">qn</span>
+</span><span id="line-261">        <span class="n">qn</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">scenario</span><span class="o">.</span><span class="n">qz</span>
 </span><span id="line-262">
 </span><span id="line-263">        <span class="c1"># Spring stiffness of uncollapsed eigensystem of length L - cut_length</span>
 </span><span id="line-264">        <span class="n">straight_scenario</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_generate_straight_scenario</span><span class="p">(</span><span class="n">L</span> <span class="o">-</span> <span class="n">cut_length</span><span class="p">)</span>

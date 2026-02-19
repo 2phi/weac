@@ -92,6 +92,9 @@
 <li class="toctree-l1 current" x-data="{ expanded: $el.classList.contains('current') ? true : false }"><a :class="{ 'expanded' : expanded }" @click="expanded = !expanded" class="reference internal expandable" href="weac.core.html">weac.core package<button @click.prevent.stop="expanded = !expanded" type="button"><span class="sr-only"></span><svg fill="currentColor" height="18px" stroke="none" viewbox="0 0 24 24" width="18px" xmlns="http://www.w3.org/2000/svg"><path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"></path></svg></button></a><ul class="current" x-show="expanded">
 <li class="toctree-l2"><a class="reference internal" href="weac.core.eigensystem.html">weac.core.eigensystem module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="weac.core.field_quantities.html">weac.core.field_quantities module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="weac.core.generalized_eigensystem.html">weac.core.generalized_eigensystem module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="weac.core.generalized_field_quantities.html">weac.core.generalized_field_quantities module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="weac.core.generalized_unknown_constants_solver.html">weac.core.generalized_unknown_constants_solver module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="weac.core.scenario.html">weac.core.scenario module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="weac.core.slab.html">weac.core.slab module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="weac.core.slab_touchdown.html">weac.core.slab_touchdown module</a></li>
@@ -173,14 +176,15 @@ the solution constants for the beam segments:</p>
 # Basic usage
 system = SystemModel(model_input=model_input, config=config)
 constants = system.unknown_constants  # Shape: (6, N) where N = number of segments</p>
-<p># Each column represents the 6 constants for one segment:
-# constants[:, i] = [C1, C2, C3, C4, C5, C6] for segment i
+<p># Each column represents the N constants of integration for one segment:
+# constants[:, i] = [C1, C2, …,  CN-1, CN] for segment i
+# N = 6 for the classical WAEC implementation and 24 for a generalized model accounting for biaxial bending
 # These constants define the beam deflection solution within that segment
 <a href="#id5"><span class="problematic" id="id6">``</span></a><a href="#id7"><span class="problematic" id="id8">`</span></a></p>
 <p><strong>Calculation Flow:</strong></p>
 <ol class="arabic simple">
 <li><p><strong>Eigensystem</strong>: Computes eigenvalues/eigenvectors for the beam-foundation system</p></li>
-<li><p><strong>Slab Touchdown</strong> (if enabled): Calculates touchdown behavior and updates segment lengths</p></li>
+<li><p><strong>Slab Touchdown</strong> (if enabled): Calculates touchdown behavior and updates segment lengths (only available for the classical model)</p></li>
 <li><p><strong>Unknown Constants</strong>: Solves the linear system for beam deflection constants</p></li>
 </ol>
 <p><strong>Touchdown Behavior:</strong></p>
@@ -319,13 +323,26 @@ eigensystem = system.eigensystem          # Eigenvalue problem solution
 <span class="sig-name descname"><span class="pre">scenario</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="weac.core.scenario.html#weac.core.scenario.Scenario" title="weac.core.scenario.Scenario"><span class="pre">Scenario</span></a></em><a class="headerlink" href="#id19" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id19'">¶</a></dt>
 <dd></dd></dl>
 <dl class="py property">
+<dt class="sig sig-object py" id="weac.core.system_model.SystemModel.is_generalized">
+<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">is_generalized</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></em><a class="headerlink" href="#weac.core.system_model.SystemModel.is_generalized" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#weac.core.system_model.SystemModel.is_generalized'">¶</a></dt>
+<dd><p>Check if the system is using the generalized backend.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>True if config.backend is set to ‘generalized’, False otherwise.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>bool</p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="py property">
 <dt class="sig sig-object py" id="weac.core.system_model.SystemModel.fq">
-<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">fq</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="weac.core.field_quantities.html#weac.core.field_quantities.FieldQuantities" title="weac.core.field_quantities.FieldQuantities"><span class="pre">FieldQuantities</span></a></em><a class="headerlink" href="#weac.core.system_model.SystemModel.fq" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#weac.core.system_model.SystemModel.fq'">¶</a></dt>
+<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">fq</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="weac.core.field_quantities.html#weac.core.field_quantities.FieldQuantities" title="weac.core.field_quantities.FieldQuantities"><span class="pre">FieldQuantities</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference internal" href="weac.core.generalized_field_quantities.html#weac.core.generalized_field_quantities.GeneralizedFieldQuantities" title="weac.core.generalized_field_quantities.GeneralizedFieldQuantities"><span class="pre">GeneralizedFieldQuantities</span></a></em><a class="headerlink" href="#weac.core.system_model.SystemModel.fq" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#weac.core.system_model.SystemModel.fq'">¶</a></dt>
 <dd><p>Compute the field quantities.</p>
 </dd></dl>
 <dl class="py property">
 <dt class="sig sig-object py" id="id20">
-<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">eigensystem</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="weac.core.eigensystem.html#weac.core.eigensystem.Eigensystem" title="weac.core.eigensystem.Eigensystem"><span class="pre">Eigensystem</span></a></em><a class="headerlink" href="#id20" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id20'">¶</a></dt>
+<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">eigensystem</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="weac.core.eigensystem.html#weac.core.eigensystem.Eigensystem" title="weac.core.eigensystem.Eigensystem"><span class="pre">Eigensystem</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference internal" href="weac.core.generalized_eigensystem.html#weac.core.generalized_eigensystem.GeneralizedEigensystem" title="weac.core.generalized_eigensystem.GeneralizedEigensystem"><span class="pre">GeneralizedEigensystem</span></a></em><a class="headerlink" href="#id20" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id20'">¶</a></dt>
 <dd><p>Solve for the eigensystem.</p>
 </dd></dl>
 <dl class="py property">
@@ -346,8 +363,8 @@ distributions within each beam segment.</p>
 <section id="returns">
 <h2>Returns:<a class="headerlink" href="#returns" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#returns'">¶</a></h2>
 <dl>
-<dt>np.ndarray: Solution constants matrix of shape (6, N_segments)</dt><dd><p>Each column contains the 6 constants for one segment:
-[C1, C2, C3, C4, C5, C6]</p>
+<dt>np.ndarray: Solution constants matrix of shape (N_dof, N_segments)</dt><dd><p>Each column contains the 6 constants for one segment:
+[C1, C2, …, CN-1, CN]</p>
 <p>These constants are used in the general solution:
 u(x) = Σ Ci * φi(x) + up(x)</p>
 <p>Where φi(x) are the homogeneous solutions and up(x)
@@ -365,7 +382,7 @@ between segments, and foundation support</p></li>
 <p class="rubric">Example</p>
 <p><a href="#id23"><span class="problematic" id="id24">``</span></a><a href="#id25"><span class="problematic" id="id26">`</span></a>python
 system = SystemModel(model_input, config)
-C = system.unknown_constants  # Shape: (6, 2) for 2-segment system</p>
+C = system.unknown_constants  # Shape: (N, 2) for 2-segment system</p>
 <p># Constants for first segment
 segment_0_constants = C[:, 0]</p>
 <p># Use with eigensystem to compute field quantities
@@ -441,7 +458,7 @@ or None to use automatic calculation.</p>
 </dd></dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="weac.core.system_model.SystemModel.z">
-<span class="sig-name descname"><span class="pre">z</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">C</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">length</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">phi</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">has_foundation</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">qs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/weac/core/system_model.html#SystemModel.z"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#weac.core.system_model.SystemModel.z" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#weac.core.system_model.SystemModel.z'">¶</a></dt>
+<span class="sig-name descname"><span class="pre">z</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">C</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">length</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">phi</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">theta</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">has_foundation</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">is_loaded</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">qs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/weac/core/system_model.html#SystemModel.z"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#weac.core.system_model.SystemModel.z" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#weac.core.system_model.SystemModel.z'">¶</a></dt>
 <dd><p>Assemble solution vector at positions x.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -453,6 +470,8 @@ or None to use automatic calculation.</p>
 <li><p><strong>has_foundation</strong> (<em>bool</em>) – Indicates whether segment has foundation (True) or not
 (False). Default is True.</p></li>
 <li><p><strong>qs</strong> (<em>float</em>) – Surface Load [N/mm]</p></li>
+<li><p><strong>theta</strong> (<em>float</em>)</p></li>
+<li><p><strong>is_loaded</strong> (<em>bool</em>)</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
@@ -481,6 +500,7 @@ or None to use automatic calculation.</p>
 <li><a :data-current="activeSection === '#id17'" class="reference internal" href="#id17"><code class="docutils literal notranslate"><span class="pre">SystemModel.weak_layer</span></code></a></li>
 <li><a :data-current="activeSection === '#id18'" class="reference internal" href="#id18"><code class="docutils literal notranslate"><span class="pre">SystemModel.slab</span></code></a></li>
 <li><a :data-current="activeSection === '#id19'" class="reference internal" href="#id19"><code class="docutils literal notranslate"><span class="pre">SystemModel.scenario</span></code></a></li>
+<li><a :data-current="activeSection === '#weac.core.system_model.SystemModel.is_generalized'" class="reference internal" href="#weac.core.system_model.SystemModel.is_generalized"><code class="docutils literal notranslate"><span class="pre">SystemModel.is_generalized</span></code></a></li>
 <li><a :data-current="activeSection === '#weac.core.system_model.SystemModel.fq'" class="reference internal" href="#weac.core.system_model.SystemModel.fq"><code class="docutils literal notranslate"><span class="pre">SystemModel.fq</span></code></a></li>
 <li><a :data-current="activeSection === '#id20'" class="reference internal" href="#id20"><code class="docutils literal notranslate"><span class="pre">SystemModel.eigensystem</span></code></a></li>
 <li><a :data-current="activeSection === '#id21'" class="reference internal" href="#id21"><code class="docutils literal notranslate"><span class="pre">SystemModel.slab_touchdown</span></code></a></li>

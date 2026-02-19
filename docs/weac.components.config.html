@@ -92,6 +92,9 @@
 <li class="toctree-l1" x-data="{ expanded: $el.classList.contains('current') ? true : false }"><a :class="{ 'expanded' : expanded }" @click="expanded = !expanded" class="reference internal expandable" href="weac.core.html">weac.core package<button @click.prevent.stop="expanded = !expanded" type="button"><span class="sr-only"></span><svg fill="currentColor" height="18px" stroke="none" viewbox="0 0 24 24" width="18px" xmlns="http://www.w3.org/2000/svg"><path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"></path></svg></button></a><ul x-show="expanded">
 <li class="toctree-l2"><a class="reference internal" href="weac.core.eigensystem.html">weac.core.eigensystem module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="weac.core.field_quantities.html">weac.core.field_quantities module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="weac.core.generalized_eigensystem.html">weac.core.generalized_eigensystem module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="weac.core.generalized_field_quantities.html">weac.core.generalized_field_quantities module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="weac.core.generalized_unknown_constants_solver.html">weac.core.generalized_unknown_constants_solver module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="weac.core.scenario.html">weac.core.scenario module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="weac.core.slab.html">weac.core.slab module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="weac.core.slab_touchdown.html">weac.core.slab_touchdown module</a></li>
@@ -158,13 +161,14 @@ field_name: type = Field(…, gt=0, description=”Description”)
 - typing, default value, constraints, description</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="weac.components.config.Config">
-<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">weac.components.config.</span></span><span class="sig-name descname"><span class="pre">Config</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">touchdown</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">forced_touchdown_mode</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/weac/components/config.html#Config"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#weac.components.config.Config" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#weac.components.config.Config'">¶</a></dt>
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">weac.components.config.</span></span><span class="sig-name descname"><span class="pre">Config</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">touchdown</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">backend</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'classic'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">forced_touchdown_mode</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/weac/components/config.html#Config"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#weac.components.config.Config" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#weac.components.config.Config'">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">BaseModel</span></code></p>
 <p>Configuration for the WEAC simulation.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>touchdown</strong> (<em>bool</em>)</p></li>
+<li><p><strong>backend</strong> (<em>Literal</em><em>[</em><em>'classic'</em><em>, </em><em>'generalized'</em><em>]</em>)</p></li>
 <li><p><strong>forced_touchdown_mode</strong> (<em>Literal</em><em>[</em><em>'A_free_hanging'</em><em>, </em><em>'B_point_contact'</em><em>, </em><em>'C_in_contact'</em><em>] </em><em>| </em><em>None</em>)</p></li>
 </ul>
 </dd>
@@ -176,6 +180,16 @@ field_name: type = Field(…, gt=0, description=”Description”)
 <dl class="field-list simple">
 <dt class="field-odd">Type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>bool</p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="weac.components.config.Config.backend">
+<span class="sig-name descname"><span class="pre">backend</span></span><a class="headerlink" href="#weac.components.config.Config.backend" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#weac.components.config.Config.backend'">¶</a></dt>
+<dd><p>Selects which eigensystem implementation to use under the hood.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Literal[“classic”, “generalized”]</p>
 </dd>
 </dl>
 </dd></dl>
@@ -197,7 +211,11 @@ are recalculated with different scenario parameters.</p>
 <dd></dd></dl>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="id1">
-<span class="sig-name descname"><span class="pre">forced_touchdown_mode</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Literal</span><span class="p"><span class="pre">[</span></span><span class="s"><span class="pre">'A_free_hanging'</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="s"><span class="pre">'B_point_contact'</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="s"><span class="pre">'C_in_contact'</span></span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#id1" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id1'">¶</a></dt>
+<span class="sig-name descname"><span class="pre">backend</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Literal</span><span class="p"><span class="pre">[</span></span><span class="s"><span class="pre">'classic'</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="s"><span class="pre">'generalized'</span></span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#id1" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id1'">¶</a></dt>
+<dd></dd></dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="id2">
+<span class="sig-name descname"><span class="pre">forced_touchdown_mode</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Literal</span><span class="p"><span class="pre">[</span></span><span class="s"><span class="pre">'A_free_hanging'</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="s"><span class="pre">'B_point_contact'</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="s"><span class="pre">'C_in_contact'</span></span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#id2" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id2'">¶</a></dt>
 <dd></dd></dl>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="weac.components.config.Config.model_config">
@@ -211,9 +229,11 @@ are recalculated with different scenario parameters.</p>
 <ul>
 <li><a :data-current="activeSection === '#weac.components.config.Config'" class="reference internal" href="#weac.components.config.Config"><code class="docutils literal notranslate"><span class="pre">Config</span></code></a><ul>
 <li><a :data-current="activeSection === '#weac.components.config.Config.touchdown'" class="reference internal" href="#weac.components.config.Config.touchdown"><code class="docutils literal notranslate"><span class="pre">Config.touchdown</span></code></a></li>
+<li><a :data-current="activeSection === '#weac.components.config.Config.backend'" class="reference internal" href="#weac.components.config.Config.backend"><code class="docutils literal notranslate"><span class="pre">Config.backend</span></code></a></li>
 <li><a :data-current="activeSection === '#weac.components.config.Config.forced_touchdown_mode'" class="reference internal" href="#weac.components.config.Config.forced_touchdown_mode"><code class="docutils literal notranslate"><span class="pre">Config.forced_touchdown_mode</span></code></a></li>
 <li><a :data-current="activeSection === '#id0'" class="reference internal" href="#id0"><code class="docutils literal notranslate"><span class="pre">Config.touchdown</span></code></a></li>
-<li><a :data-current="activeSection === '#id1'" class="reference internal" href="#id1"><code class="docutils literal notranslate"><span class="pre">Config.forced_touchdown_mode</span></code></a></li>
+<li><a :data-current="activeSection === '#id1'" class="reference internal" href="#id1"><code class="docutils literal notranslate"><span class="pre">Config.backend</span></code></a></li>
+<li><a :data-current="activeSection === '#id2'" class="reference internal" href="#id2"><code class="docutils literal notranslate"><span class="pre">Config.forced_touchdown_mode</span></code></a></li>
 <li><a :data-current="activeSection === '#weac.components.config.Config.model_config'" class="reference internal" href="#weac.components.config.Config.model_config"><code class="docutils literal notranslate"><span class="pre">Config.model_config</span></code></a></li>
 </ul>
 </li>

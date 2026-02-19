@@ -123,6 +123,9 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../weac.core.html">weac.core package</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="../../../weac.core.eigensystem.html">weac.core.eigensystem module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../weac.core.field_quantities.html">weac.core.field_quantities module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../weac.core.generalized_eigensystem.html">weac.core.generalized_eigensystem module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../weac.core.generalized_field_quantities.html">weac.core.generalized_field_quantities module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../weac.core.generalized_unknown_constants_solver.html">weac.core.generalized_unknown_constants_solver module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../weac.core.scenario.html">weac.core.scenario module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../weac.core.slab.html">weac.core.slab module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../weac.core.slab_touchdown.html">weac.core.slab_touchdown module</a></li>
@@ -975,7 +978,7 @@
 </span><span id="line-746">        <span class="n">system_copy</span><span class="o">.</span><span class="n">set_forced_touchdown_mode</span><span class="p">(</span><span class="n">mode</span><span class="p">)</span>
 </span><span id="line-747">        <span class="n">touchdown_distance</span> <span class="o">=</span> <span class="n">system_copy</span><span class="o">.</span><span class="n">slab_touchdown</span><span class="o">.</span><span class="n">touchdown_distance</span>
 </span><span id="line-748">        <span class="n">analyzer</span> <span class="o">=</span> <span class="n">Analyzer</span><span class="p">(</span><span class="n">system_copy</span><span class="p">,</span> <span class="n">printing_enabled</span><span class="o">=</span><span class="n">print_call_stats</span><span class="p">)</span>
-</span><span id="line-749">        <span class="n">energy_release_rate</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">analyzer</span><span class="o">.</span><span class="n">differential_ERR</span><span class="p">(</span><span class="n">unit</span><span class="o">=</span><span class="s2">&quot;J/m^2&quot;</span><span class="p">)</span>
+</span><span id="line-749">        <span class="n">energy_release_rate</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">analyzer</span><span class="o">.</span><span class="n">differential_ERR</span><span class="p">(</span><span class="n">unit</span><span class="o">=</span><span class="s2">&quot;J/m^2&quot;</span><span class="p">)</span>
 </span><span id="line-750">        <span class="n">maximal_stress_result</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_calculate_maximal_stresses</span><span class="p">(</span>
 </span><span id="line-751">            <span class="n">system_copy</span><span class="p">,</span> <span class="n">print_call_stats</span><span class="o">=</span><span class="n">print_call_stats</span>
 </span><span id="line-752">        <span class="p">)</span>
@@ -1366,169 +1369,176 @@
 </span><span id="line-1124">        <span class="n">C</span> <span class="o">=</span> <span class="n">system</span><span class="o">.</span><span class="n">unknown_constants</span><span class="p">[:,</span> <span class="p">[</span><span class="n">segment_index</span><span class="p">]]</span>
 </span><span id="line-1125">        <span class="n">li_segment</span> <span class="o">=</span> <span class="n">system</span><span class="o">.</span><span class="n">scenario</span><span class="o">.</span><span class="n">li</span><span class="p">[</span><span class="n">segment_index</span><span class="p">]</span>
 </span><span id="line-1126">        <span class="n">phi</span> <span class="o">=</span> <span class="n">system</span><span class="o">.</span><span class="n">scenario</span><span class="o">.</span><span class="n">phi</span>
-</span><span id="line-1127">        <span class="n">has_foundation</span> <span class="o">=</span> <span class="n">system</span><span class="o">.</span><span class="n">scenario</span><span class="o">.</span><span class="n">ki</span><span class="p">[</span><span class="n">segment_index</span><span class="p">]</span>
-</span><span id="line-1128">
-</span><span id="line-1129">        <span class="c1"># Calculate the displacement field</span>
-</span><span id="line-1130">        <span class="n">Z</span> <span class="o">=</span> <span class="n">system</span><span class="o">.</span><span class="n">z</span><span class="p">(</span>
-</span><span id="line-1131">            <span class="n">coordinate_in_segment</span><span class="p">,</span> <span class="n">C</span><span class="p">,</span> <span class="n">li_segment</span><span class="p">,</span> <span class="n">phi</span><span class="p">,</span> <span class="n">has_foundation</span><span class="o">=</span><span class="n">has_foundation</span>
-</span><span id="line-1132">        <span class="p">)</span>
-</span><span id="line-1133">
-</span><span id="line-1134">        <span class="c1"># Calculate the stresses</span>
-</span><span id="line-1135">        <span class="n">tau</span> <span class="o">=</span> <span class="o">-</span><span class="n">system</span><span class="o">.</span><span class="n">fq</span><span class="o">.</span><span class="n">tau</span><span class="p">(</span><span class="n">Z</span><span class="p">,</span> <span class="n">unit</span><span class="o">=</span><span class="s2">&quot;kPa&quot;</span><span class="p">)</span>  <span class="c1"># Negated to match sign convention</span>
-</span><span id="line-1136">        <span class="n">sigma</span> <span class="o">=</span> <span class="n">system</span><span class="o">.</span><span class="n">fq</span><span class="o">.</span><span class="n">sig</span><span class="p">(</span><span class="n">Z</span><span class="p">,</span> <span class="n">unit</span><span class="o">=</span><span class="s2">&quot;kPa&quot;</span><span class="p">)</span>
-</span><span id="line-1137">
-</span><span id="line-1138">        <span class="k">return</span> <span class="n">sigma</span><span class="p">,</span> <span class="n">tau</span>
-</span><span id="line-1139">
-</span><span id="line-1140">    <span class="k">def</span><span class="w"> </span><span class="nf">_get_stress_envelope_exceedance</span><span class="p">(</span>
-</span><span id="line-1141">        <span class="bp">self</span><span class="p">,</span> <span class="n">x_value</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">system</span><span class="p">:</span> <span class="n">SystemModel</span><span class="p">,</span> <span class="n">weak_layer</span><span class="p">:</span> <span class="n">WeakLayer</span>
-</span><span id="line-1142">    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
-</span><span id="line-1143"><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-</span><span id="line-1144"><span class="sd">        Objective function for the root finder.</span>
-</span><span id="line-1145"><span class="sd">        Returns the stress envelope evaluation minus 1.</span>
-</span><span id="line-1146"><span class="sd">        &quot;&quot;&quot;</span>
-</span><span id="line-1147">        <span class="n">sigma</span><span class="p">,</span> <span class="n">tau</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_calculate_sigma_tau_at_x</span><span class="p">(</span><span class="n">x_value</span><span class="p">,</span> <span class="n">system</span><span class="p">)</span>
-</span><span id="line-1148">        <span class="k">return</span> <span class="p">(</span>
-</span><span id="line-1149">            <span class="bp">self</span><span class="o">.</span><span class="n">stress_envelope</span><span class="p">(</span>
-</span><span id="line-1150">                <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">sigma</span><span class="p">]),</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">tau</span><span class="p">]),</span> <span class="n">weak_layer</span><span class="o">=</span><span class="n">weak_layer</span>
-</span><span id="line-1151">            <span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
-</span><span id="line-1152">            <span class="o">-</span> <span class="mi">1</span>
-</span><span id="line-1153">        <span class="p">)</span>
-</span><span id="line-1154">
-</span><span id="line-1155">    <span class="k">def</span><span class="w"> </span><span class="nf">_find_stress_envelope_crossings</span><span class="p">(</span>
-</span><span id="line-1156">        <span class="bp">self</span><span class="p">,</span> <span class="n">system</span><span class="p">:</span> <span class="n">SystemModel</span><span class="p">,</span> <span class="n">weak_layer</span><span class="p">:</span> <span class="n">WeakLayer</span>
-</span><span id="line-1157">    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">float</span><span class="p">]:</span>
-</span><span id="line-1158"><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-</span><span id="line-1159"><span class="sd">        Finds the exact x-coordinates where the stress envelope is crossed.</span>
-</span><span id="line-1160"><span class="sd">        &quot;&quot;&quot;</span>
-</span><span id="line-1161">        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Finding stress envelope crossings.&quot;</span><span class="p">)</span>
-</span><span id="line-1162">        <span class="n">start_time</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
-</span><span id="line-1163">        <span class="n">analyzer</span> <span class="o">=</span> <span class="n">Analyzer</span><span class="p">(</span><span class="n">system</span><span class="p">)</span>
-</span><span id="line-1164">        <span class="n">x_coords</span><span class="p">,</span> <span class="n">z</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">analyzer</span><span class="o">.</span><span class="n">rasterize_solution</span><span class="p">(</span><span class="n">mode</span><span class="o">=</span><span class="s2">&quot;cracked&quot;</span><span class="p">,</span> <span class="n">num</span><span class="o">=</span><span class="mi">2000</span><span class="p">)</span>
-</span><span id="line-1165">
-</span><span id="line-1166">        <span class="n">sigma_kPa</span> <span class="o">=</span> <span class="n">system</span><span class="o">.</span><span class="n">fq</span><span class="o">.</span><span class="n">sig</span><span class="p">(</span><span class="n">z</span><span class="p">,</span> <span class="n">unit</span><span class="o">=</span><span class="s2">&quot;kPa&quot;</span><span class="p">)</span>
-</span><span id="line-1167">        <span class="n">tau_kPa</span> <span class="o">=</span> <span class="n">system</span><span class="o">.</span><span class="n">fq</span><span class="o">.</span><span class="n">tau</span><span class="p">(</span><span class="n">z</span><span class="p">,</span> <span class="n">unit</span><span class="o">=</span><span class="s2">&quot;kPa&quot;</span><span class="p">)</span>
-</span><span id="line-1168">
-</span><span id="line-1169">        <span class="c1"># Calculate the discrete distance to failure</span>
-</span><span id="line-1170">        <span class="n">dist_to_stress_envelope</span> <span class="o">=</span> <span class="p">(</span>
-</span><span id="line-1171">            <span class="bp">self</span><span class="o">.</span><span class="n">stress_envelope</span><span class="p">(</span><span class="n">sigma_kPa</span><span class="p">,</span> <span class="n">tau_kPa</span><span class="p">,</span> <span class="n">weak_layer</span><span class="o">=</span><span class="n">weak_layer</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span>
-</span><span id="line-1172">        <span class="p">)</span>
-</span><span id="line-1173">
-</span><span id="line-1174">        <span class="c1"># Find indices where the envelope function transitions</span>
-</span><span id="line-1175">        <span class="n">transition_indices</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">diff</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sign</span><span class="p">(</span><span class="n">dist_to_stress_envelope</span><span class="p">)))[</span><span class="mi">0</span><span class="p">]</span>
-</span><span id="line-1176">
-</span><span id="line-1177">        <span class="c1"># Find root candidates from transitions</span>
-</span><span id="line-1178">        <span class="n">root_candidates</span> <span class="o">=</span> <span class="p">[]</span>
-</span><span id="line-1179">        <span class="k">for</span> <span class="n">idx</span> <span class="ow">in</span> <span class="n">transition_indices</span><span class="p">:</span>
-</span><span id="line-1180">            <span class="n">x_left</span> <span class="o">=</span> <span class="n">x_coords</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span>
-</span><span id="line-1181">            <span class="n">x_right</span> <span class="o">=</span> <span class="n">x_coords</span><span class="p">[</span><span class="n">idx</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span>
-</span><span id="line-1182">            <span class="n">root_candidates</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">x_left</span><span class="p">,</span> <span class="n">x_right</span><span class="p">))</span>
+</span><span id="line-1127">        <span class="n">theta</span> <span class="o">=</span> <span class="n">system</span><span class="o">.</span><span class="n">scenario</span><span class="o">.</span><span class="n">theta</span>
+</span><span id="line-1128">        <span class="n">has_foundation</span> <span class="o">=</span> <span class="n">system</span><span class="o">.</span><span class="n">scenario</span><span class="o">.</span><span class="n">ki</span><span class="p">[</span><span class="n">segment_index</span><span class="p">]</span>
+</span><span id="line-1129">        <span class="n">is_loaded</span> <span class="o">=</span> <span class="n">system</span><span class="o">.</span><span class="n">scenario</span><span class="o">.</span><span class="n">gi</span><span class="p">[</span><span class="n">segment_index</span><span class="p">]</span>
+</span><span id="line-1130">        <span class="c1"># Calculate the displacement field</span>
+</span><span id="line-1131">        <span class="n">Z</span> <span class="o">=</span> <span class="n">system</span><span class="o">.</span><span class="n">z</span><span class="p">(</span>
+</span><span id="line-1132">            <span class="n">coordinate_in_segment</span><span class="p">,</span>
+</span><span id="line-1133">            <span class="n">C</span><span class="p">,</span>
+</span><span id="line-1134">            <span class="n">li_segment</span><span class="p">,</span>
+</span><span id="line-1135">            <span class="n">phi</span><span class="p">,</span>
+</span><span id="line-1136">            <span class="n">theta</span><span class="p">,</span>
+</span><span id="line-1137">            <span class="n">has_foundation</span><span class="o">=</span><span class="n">has_foundation</span><span class="p">,</span>
+</span><span id="line-1138">            <span class="n">is_loaded</span><span class="o">=</span><span class="n">is_loaded</span><span class="p">,</span>
+</span><span id="line-1139">        <span class="p">)</span>
+</span><span id="line-1140">
+</span><span id="line-1141">        <span class="c1"># Calculate the stresses</span>
+</span><span id="line-1142">        <span class="n">tau</span> <span class="o">=</span> <span class="o">-</span><span class="n">system</span><span class="o">.</span><span class="n">fq</span><span class="o">.</span><span class="n">tau</span><span class="p">(</span><span class="n">Z</span><span class="p">,</span> <span class="n">unit</span><span class="o">=</span><span class="s2">&quot;kPa&quot;</span><span class="p">)</span>  <span class="c1"># Negated to match sign convention</span>
+</span><span id="line-1143">        <span class="n">sigma</span> <span class="o">=</span> <span class="n">system</span><span class="o">.</span><span class="n">fq</span><span class="o">.</span><span class="n">sig</span><span class="p">(</span><span class="n">Z</span><span class="p">,</span> <span class="n">unit</span><span class="o">=</span><span class="s2">&quot;kPa&quot;</span><span class="p">)</span>
+</span><span id="line-1144">
+</span><span id="line-1145">        <span class="k">return</span> <span class="n">sigma</span><span class="p">,</span> <span class="n">tau</span>
+</span><span id="line-1146">
+</span><span id="line-1147">    <span class="k">def</span><span class="w"> </span><span class="nf">_get_stress_envelope_exceedance</span><span class="p">(</span>
+</span><span id="line-1148">        <span class="bp">self</span><span class="p">,</span> <span class="n">x_value</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">system</span><span class="p">:</span> <span class="n">SystemModel</span><span class="p">,</span> <span class="n">weak_layer</span><span class="p">:</span> <span class="n">WeakLayer</span>
+</span><span id="line-1149">    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+</span><span id="line-1150"><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+</span><span id="line-1151"><span class="sd">        Objective function for the root finder.</span>
+</span><span id="line-1152"><span class="sd">        Returns the stress envelope evaluation minus 1.</span>
+</span><span id="line-1153"><span class="sd">        &quot;&quot;&quot;</span>
+</span><span id="line-1154">        <span class="n">sigma</span><span class="p">,</span> <span class="n">tau</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_calculate_sigma_tau_at_x</span><span class="p">(</span><span class="n">x_value</span><span class="p">,</span> <span class="n">system</span><span class="p">)</span>
+</span><span id="line-1155">        <span class="k">return</span> <span class="p">(</span>
+</span><span id="line-1156">            <span class="bp">self</span><span class="o">.</span><span class="n">stress_envelope</span><span class="p">(</span>
+</span><span id="line-1157">                <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">sigma</span><span class="p">]),</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">tau</span><span class="p">]),</span> <span class="n">weak_layer</span><span class="o">=</span><span class="n">weak_layer</span>
+</span><span id="line-1158">            <span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+</span><span id="line-1159">            <span class="o">-</span> <span class="mi">1</span>
+</span><span id="line-1160">        <span class="p">)</span>
+</span><span id="line-1161">
+</span><span id="line-1162">    <span class="k">def</span><span class="w"> </span><span class="nf">_find_stress_envelope_crossings</span><span class="p">(</span>
+</span><span id="line-1163">        <span class="bp">self</span><span class="p">,</span> <span class="n">system</span><span class="p">:</span> <span class="n">SystemModel</span><span class="p">,</span> <span class="n">weak_layer</span><span class="p">:</span> <span class="n">WeakLayer</span>
+</span><span id="line-1164">    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">float</span><span class="p">]:</span>
+</span><span id="line-1165"><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+</span><span id="line-1166"><span class="sd">        Finds the exact x-coordinates where the stress envelope is crossed.</span>
+</span><span id="line-1167"><span class="sd">        &quot;&quot;&quot;</span>
+</span><span id="line-1168">        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Finding stress envelope crossings.&quot;</span><span class="p">)</span>
+</span><span id="line-1169">        <span class="n">start_time</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+</span><span id="line-1170">        <span class="n">analyzer</span> <span class="o">=</span> <span class="n">Analyzer</span><span class="p">(</span><span class="n">system</span><span class="p">)</span>
+</span><span id="line-1171">        <span class="n">x_coords</span><span class="p">,</span> <span class="n">z</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">analyzer</span><span class="o">.</span><span class="n">rasterize_solution</span><span class="p">(</span><span class="n">mode</span><span class="o">=</span><span class="s2">&quot;cracked&quot;</span><span class="p">,</span> <span class="n">num</span><span class="o">=</span><span class="mi">2000</span><span class="p">)</span>
+</span><span id="line-1172">
+</span><span id="line-1173">        <span class="n">sigma_kPa</span> <span class="o">=</span> <span class="n">system</span><span class="o">.</span><span class="n">fq</span><span class="o">.</span><span class="n">sig</span><span class="p">(</span><span class="n">z</span><span class="p">,</span> <span class="n">unit</span><span class="o">=</span><span class="s2">&quot;kPa&quot;</span><span class="p">)</span>
+</span><span id="line-1174">        <span class="n">tau_kPa</span> <span class="o">=</span> <span class="n">system</span><span class="o">.</span><span class="n">fq</span><span class="o">.</span><span class="n">tau</span><span class="p">(</span><span class="n">z</span><span class="p">,</span> <span class="n">unit</span><span class="o">=</span><span class="s2">&quot;kPa&quot;</span><span class="p">)</span>
+</span><span id="line-1175">
+</span><span id="line-1176">        <span class="c1"># Calculate the discrete distance to failure</span>
+</span><span id="line-1177">        <span class="n">dist_to_stress_envelope</span> <span class="o">=</span> <span class="p">(</span>
+</span><span id="line-1178">            <span class="bp">self</span><span class="o">.</span><span class="n">stress_envelope</span><span class="p">(</span><span class="n">sigma_kPa</span><span class="p">,</span> <span class="n">tau_kPa</span><span class="p">,</span> <span class="n">weak_layer</span><span class="o">=</span><span class="n">weak_layer</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span>
+</span><span id="line-1179">        <span class="p">)</span>
+</span><span id="line-1180">
+</span><span id="line-1181">        <span class="c1"># Find indices where the envelope function transitions</span>
+</span><span id="line-1182">        <span class="n">transition_indices</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">diff</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sign</span><span class="p">(</span><span class="n">dist_to_stress_envelope</span><span class="p">)))[</span><span class="mi">0</span><span class="p">]</span>
 </span><span id="line-1183">
-</span><span id="line-1184">        <span class="c1"># Search for roots within the identified candidates</span>
-</span><span id="line-1185">        <span class="n">roots</span> <span class="o">=</span> <span class="p">[]</span>
-</span><span id="line-1186">        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span>
-</span><span id="line-1187">            <span class="s2">&quot;Found </span><span class="si">%d</span><span class="s2"> potential crossing regions. Finding exact roots.&quot;</span><span class="p">,</span>
-</span><span id="line-1188">            <span class="nb">len</span><span class="p">(</span><span class="n">root_candidates</span><span class="p">),</span>
-</span><span id="line-1189">        <span class="p">)</span>
-</span><span id="line-1190">        <span class="n">roots_start_time</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
-</span><span id="line-1191">        <span class="k">for</span> <span class="n">x_left</span><span class="p">,</span> <span class="n">x_right</span> <span class="ow">in</span> <span class="n">root_candidates</span><span class="p">:</span>
-</span><span id="line-1192">            <span class="k">try</span><span class="p">:</span>
-</span><span id="line-1193">                <span class="n">root_result</span> <span class="o">=</span> <span class="n">root_scalar</span><span class="p">(</span>
-</span><span id="line-1194">                    <span class="bp">self</span><span class="o">.</span><span class="n">_get_stress_envelope_exceedance</span><span class="p">,</span>
-</span><span id="line-1195">                    <span class="n">args</span><span class="o">=</span><span class="p">(</span><span class="n">system</span><span class="p">,</span> <span class="n">weak_layer</span><span class="p">),</span>
-</span><span id="line-1196">                    <span class="n">bracket</span><span class="o">=</span><span class="p">[</span><span class="n">x_left</span><span class="p">,</span> <span class="n">x_right</span><span class="p">],</span>
-</span><span id="line-1197">                    <span class="n">method</span><span class="o">=</span><span class="s2">&quot;brentq&quot;</span><span class="p">,</span>
-</span><span id="line-1198">                <span class="p">)</span>
-</span><span id="line-1199">                <span class="k">if</span> <span class="n">root_result</span><span class="o">.</span><span class="n">converged</span><span class="p">:</span>
-</span><span id="line-1200">                    <span class="n">roots</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">root_result</span><span class="o">.</span><span class="n">root</span><span class="p">)</span>
-</span><span id="line-1201">            <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
-</span><span id="line-1202">                <span class="c1"># This can happen if the signs at the bracket edges are not opposite.</span>
-</span><span id="line-1203">                <span class="c1"># It&#39;s safe to ignore in this context.</span>
-</span><span id="line-1204">                <span class="k">pass</span>
-</span><span id="line-1205">        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Root finding took </span><span class="si">%.4f</span><span class="s2"> seconds.&quot;</span><span class="p">,</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span> <span class="o">-</span> <span class="n">roots_start_time</span><span class="p">)</span>
-</span><span id="line-1206">        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
-</span><span id="line-1207">            <span class="s2">&quot;Found </span><span class="si">%d</span><span class="s2"> stress envelope crossings in </span><span class="si">%.4f</span><span class="s2"> seconds.&quot;</span><span class="p">,</span>
-</span><span id="line-1208">            <span class="nb">len</span><span class="p">(</span><span class="n">roots</span><span class="p">),</span>
-</span><span id="line-1209">            <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span> <span class="o">-</span> <span class="n">start_time</span><span class="p">,</span>
-</span><span id="line-1210">        <span class="p">)</span>
-</span><span id="line-1211">        <span class="k">return</span> <span class="n">roots</span>
-</span><span id="line-1212">
-</span><span id="line-1213">    <span class="k">def</span><span class="w"> </span><span class="nf">_fracture_toughness_exceedance</span><span class="p">(</span>
-</span><span id="line-1214">        <span class="bp">self</span><span class="p">,</span> <span class="n">crack_length</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">system</span><span class="p">:</span> <span class="n">SystemModel</span><span class="p">,</span> <span class="n">target</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">1</span>
-</span><span id="line-1215">    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
-</span><span id="line-1216"><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-</span><span id="line-1217"><span class="sd">        Objective function to evaluate the fracture toughness function.</span>
-</span><span id="line-1218"><span class="sd">        &quot;&quot;&quot;</span>
-</span><span id="line-1219">        <span class="n">length</span> <span class="o">=</span> <span class="n">system</span><span class="o">.</span><span class="n">scenario</span><span class="o">.</span><span class="n">L</span>
-</span><span id="line-1220">        <span class="n">segments</span> <span class="o">=</span> <span class="p">[</span>
-</span><span id="line-1221">            <span class="n">Segment</span><span class="p">(</span><span class="n">length</span><span class="o">=</span><span class="n">length</span> <span class="o">/</span> <span class="mi">2</span> <span class="o">-</span> <span class="n">crack_length</span> <span class="o">/</span> <span class="mi">2</span><span class="p">,</span> <span class="n">has_foundation</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">m</span><span class="o">=</span><span class="mi">0</span><span class="p">),</span>
-</span><span id="line-1222">            <span class="n">Segment</span><span class="p">(</span><span class="n">length</span><span class="o">=</span><span class="n">crack_length</span> <span class="o">/</span> <span class="mi">2</span><span class="p">,</span> <span class="n">has_foundation</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">m</span><span class="o">=</span><span class="mi">0</span><span class="p">),</span>
-</span><span id="line-1223">            <span class="n">Segment</span><span class="p">(</span><span class="n">length</span><span class="o">=</span><span class="n">crack_length</span> <span class="o">/</span> <span class="mi">2</span><span class="p">,</span> <span class="n">has_foundation</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">m</span><span class="o">=</span><span class="mi">0</span><span class="p">),</span>
-</span><span id="line-1224">            <span class="n">Segment</span><span class="p">(</span><span class="n">length</span><span class="o">=</span><span class="n">length</span> <span class="o">/</span> <span class="mi">2</span> <span class="o">-</span> <span class="n">crack_length</span> <span class="o">/</span> <span class="mi">2</span><span class="p">,</span> <span class="n">has_foundation</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">m</span><span class="o">=</span><span class="mi">0</span><span class="p">),</span>
-</span><span id="line-1225">        <span class="p">]</span>
-</span><span id="line-1226">        <span class="n">system</span><span class="o">.</span><span class="n">update_scenario</span><span class="p">(</span><span class="n">segments</span><span class="o">=</span><span class="n">segments</span><span class="p">)</span>
-</span><span id="line-1227">
-</span><span id="line-1228">        <span class="n">analyzer</span> <span class="o">=</span> <span class="n">Analyzer</span><span class="p">(</span><span class="n">system</span><span class="p">)</span>
-</span><span id="line-1229">        <span class="n">diff_energy</span> <span class="o">=</span> <span class="n">analyzer</span><span class="o">.</span><span class="n">differential_ERR</span><span class="p">(</span><span class="n">unit</span><span class="o">=</span><span class="s2">&quot;J/m^2&quot;</span><span class="p">)</span>
-</span><span id="line-1230">        <span class="n">G_I</span> <span class="o">=</span> <span class="n">diff_energy</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
-</span><span id="line-1231">        <span class="n">G_II</span> <span class="o">=</span> <span class="n">diff_energy</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
-</span><span id="line-1232">
-</span><span id="line-1233">        <span class="c1"># Evaluate the fracture toughness function (boundary is equal to 1)</span>
-</span><span id="line-1234">        <span class="n">g_delta_diff</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">fracture_toughness_envelope</span><span class="p">(</span><span class="n">G_I</span><span class="p">,</span> <span class="n">G_II</span><span class="p">,</span> <span class="n">system</span><span class="o">.</span><span class="n">weak_layer</span><span class="p">)</span>
-</span><span id="line-1235">
-</span><span id="line-1236">        <span class="c1"># Return the difference from the target</span>
-</span><span id="line-1237">        <span class="k">return</span> <span class="n">g_delta_diff</span> <span class="o">-</span> <span class="n">target</span>
-</span><span id="line-1238">
-</span><span id="line-1239">    <span class="k">def</span><span class="w"> </span><span class="nf">_calculate_maximal_stresses</span><span class="p">(</span>
-</span><span id="line-1240">        <span class="bp">self</span><span class="p">,</span>
-</span><span id="line-1241">        <span class="n">system</span><span class="p">:</span> <span class="n">SystemModel</span><span class="p">,</span>
-</span><span id="line-1242">        <span class="n">print_call_stats</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
-</span><span id="line-1243">    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">MaximalStressResult</span><span class="p">:</span>
-</span><span id="line-1244"><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-</span><span id="line-1245"><span class="sd">        Calculate the maximal stresses in the system.</span>
-</span><span id="line-1246">
-</span><span id="line-1247"><span class="sd">        Parameters</span>
-</span><span id="line-1248"><span class="sd">        ----------</span>
-</span><span id="line-1249"><span class="sd">        system : SystemModel</span>
-</span><span id="line-1250"><span class="sd">            The system model to analyze.</span>
-</span><span id="line-1251"><span class="sd">        print_call_stats : bool, optional</span>
-</span><span id="line-1252"><span class="sd">            Whether to print analyzer call statistics. Default is False.</span>
+</span><span id="line-1184">        <span class="c1"># Find root candidates from transitions</span>
+</span><span id="line-1185">        <span class="n">root_candidates</span> <span class="o">=</span> <span class="p">[]</span>
+</span><span id="line-1186">        <span class="k">for</span> <span class="n">idx</span> <span class="ow">in</span> <span class="n">transition_indices</span><span class="p">:</span>
+</span><span id="line-1187">            <span class="n">x_left</span> <span class="o">=</span> <span class="n">x_coords</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span>
+</span><span id="line-1188">            <span class="n">x_right</span> <span class="o">=</span> <span class="n">x_coords</span><span class="p">[</span><span class="n">idx</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span>
+</span><span id="line-1189">            <span class="n">root_candidates</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">x_left</span><span class="p">,</span> <span class="n">x_right</span><span class="p">))</span>
+</span><span id="line-1190">
+</span><span id="line-1191">        <span class="c1"># Search for roots within the identified candidates</span>
+</span><span id="line-1192">        <span class="n">roots</span> <span class="o">=</span> <span class="p">[]</span>
+</span><span id="line-1193">        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span>
+</span><span id="line-1194">            <span class="s2">&quot;Found </span><span class="si">%d</span><span class="s2"> potential crossing regions. Finding exact roots.&quot;</span><span class="p">,</span>
+</span><span id="line-1195">            <span class="nb">len</span><span class="p">(</span><span class="n">root_candidates</span><span class="p">),</span>
+</span><span id="line-1196">        <span class="p">)</span>
+</span><span id="line-1197">        <span class="n">roots_start_time</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+</span><span id="line-1198">        <span class="k">for</span> <span class="n">x_left</span><span class="p">,</span> <span class="n">x_right</span> <span class="ow">in</span> <span class="n">root_candidates</span><span class="p">:</span>
+</span><span id="line-1199">            <span class="k">try</span><span class="p">:</span>
+</span><span id="line-1200">                <span class="n">root_result</span> <span class="o">=</span> <span class="n">root_scalar</span><span class="p">(</span>
+</span><span id="line-1201">                    <span class="bp">self</span><span class="o">.</span><span class="n">_get_stress_envelope_exceedance</span><span class="p">,</span>
+</span><span id="line-1202">                    <span class="n">args</span><span class="o">=</span><span class="p">(</span><span class="n">system</span><span class="p">,</span> <span class="n">weak_layer</span><span class="p">),</span>
+</span><span id="line-1203">                    <span class="n">bracket</span><span class="o">=</span><span class="p">[</span><span class="n">x_left</span><span class="p">,</span> <span class="n">x_right</span><span class="p">],</span>
+</span><span id="line-1204">                    <span class="n">method</span><span class="o">=</span><span class="s2">&quot;brentq&quot;</span><span class="p">,</span>
+</span><span id="line-1205">                <span class="p">)</span>
+</span><span id="line-1206">                <span class="k">if</span> <span class="n">root_result</span><span class="o">.</span><span class="n">converged</span><span class="p">:</span>
+</span><span id="line-1207">                    <span class="n">roots</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">root_result</span><span class="o">.</span><span class="n">root</span><span class="p">)</span>
+</span><span id="line-1208">            <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
+</span><span id="line-1209">                <span class="c1"># This can happen if the signs at the bracket edges are not opposite.</span>
+</span><span id="line-1210">                <span class="c1"># It&#39;s safe to ignore in this context.</span>
+</span><span id="line-1211">                <span class="k">pass</span>
+</span><span id="line-1212">        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Root finding took </span><span class="si">%.4f</span><span class="s2"> seconds.&quot;</span><span class="p">,</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span> <span class="o">-</span> <span class="n">roots_start_time</span><span class="p">)</span>
+</span><span id="line-1213">        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+</span><span id="line-1214">            <span class="s2">&quot;Found </span><span class="si">%d</span><span class="s2"> stress envelope crossings in </span><span class="si">%.4f</span><span class="s2"> seconds.&quot;</span><span class="p">,</span>
+</span><span id="line-1215">            <span class="nb">len</span><span class="p">(</span><span class="n">roots</span><span class="p">),</span>
+</span><span id="line-1216">            <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span> <span class="o">-</span> <span class="n">start_time</span><span class="p">,</span>
+</span><span id="line-1217">        <span class="p">)</span>
+</span><span id="line-1218">        <span class="k">return</span> <span class="n">roots</span>
+</span><span id="line-1219">
+</span><span id="line-1220">    <span class="k">def</span><span class="w"> </span><span class="nf">_fracture_toughness_exceedance</span><span class="p">(</span>
+</span><span id="line-1221">        <span class="bp">self</span><span class="p">,</span> <span class="n">crack_length</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">system</span><span class="p">:</span> <span class="n">SystemModel</span><span class="p">,</span> <span class="n">target</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">1</span>
+</span><span id="line-1222">    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+</span><span id="line-1223"><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+</span><span id="line-1224"><span class="sd">        Objective function to evaluate the fracture toughness function.</span>
+</span><span id="line-1225"><span class="sd">        &quot;&quot;&quot;</span>
+</span><span id="line-1226">        <span class="n">length</span> <span class="o">=</span> <span class="n">system</span><span class="o">.</span><span class="n">scenario</span><span class="o">.</span><span class="n">L</span>
+</span><span id="line-1227">        <span class="n">segments</span> <span class="o">=</span> <span class="p">[</span>
+</span><span id="line-1228">            <span class="n">Segment</span><span class="p">(</span><span class="n">length</span><span class="o">=</span><span class="n">length</span> <span class="o">/</span> <span class="mi">2</span> <span class="o">-</span> <span class="n">crack_length</span> <span class="o">/</span> <span class="mi">2</span><span class="p">,</span> <span class="n">has_foundation</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">m</span><span class="o">=</span><span class="mi">0</span><span class="p">),</span>
+</span><span id="line-1229">            <span class="n">Segment</span><span class="p">(</span><span class="n">length</span><span class="o">=</span><span class="n">crack_length</span> <span class="o">/</span> <span class="mi">2</span><span class="p">,</span> <span class="n">has_foundation</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">m</span><span class="o">=</span><span class="mi">0</span><span class="p">),</span>
+</span><span id="line-1230">            <span class="n">Segment</span><span class="p">(</span><span class="n">length</span><span class="o">=</span><span class="n">crack_length</span> <span class="o">/</span> <span class="mi">2</span><span class="p">,</span> <span class="n">has_foundation</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">m</span><span class="o">=</span><span class="mi">0</span><span class="p">),</span>
+</span><span id="line-1231">            <span class="n">Segment</span><span class="p">(</span><span class="n">length</span><span class="o">=</span><span class="n">length</span> <span class="o">/</span> <span class="mi">2</span> <span class="o">-</span> <span class="n">crack_length</span> <span class="o">/</span> <span class="mi">2</span><span class="p">,</span> <span class="n">has_foundation</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">m</span><span class="o">=</span><span class="mi">0</span><span class="p">),</span>
+</span><span id="line-1232">        <span class="p">]</span>
+</span><span id="line-1233">        <span class="n">system</span><span class="o">.</span><span class="n">update_scenario</span><span class="p">(</span><span class="n">segments</span><span class="o">=</span><span class="n">segments</span><span class="p">)</span>
+</span><span id="line-1234">
+</span><span id="line-1235">        <span class="n">analyzer</span> <span class="o">=</span> <span class="n">Analyzer</span><span class="p">(</span><span class="n">system</span><span class="p">)</span>
+</span><span id="line-1236">        <span class="n">diff_energy</span> <span class="o">=</span> <span class="n">analyzer</span><span class="o">.</span><span class="n">differential_ERR</span><span class="p">(</span><span class="n">unit</span><span class="o">=</span><span class="s2">&quot;J/m^2&quot;</span><span class="p">)</span>
+</span><span id="line-1237">        <span class="n">G_I</span> <span class="o">=</span> <span class="n">diff_energy</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+</span><span id="line-1238">        <span class="n">G_II</span> <span class="o">=</span> <span class="n">diff_energy</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
+</span><span id="line-1239">
+</span><span id="line-1240">        <span class="c1"># Evaluate the fracture toughness function (boundary is equal to 1)</span>
+</span><span id="line-1241">        <span class="n">g_delta_diff</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">fracture_toughness_envelope</span><span class="p">(</span><span class="n">G_I</span><span class="p">,</span> <span class="n">G_II</span><span class="p">,</span> <span class="n">system</span><span class="o">.</span><span class="n">weak_layer</span><span class="p">)</span>
+</span><span id="line-1242">
+</span><span id="line-1243">        <span class="c1"># Return the difference from the target</span>
+</span><span id="line-1244">        <span class="k">return</span> <span class="n">g_delta_diff</span> <span class="o">-</span> <span class="n">target</span>
+</span><span id="line-1245">
+</span><span id="line-1246">    <span class="k">def</span><span class="w"> </span><span class="nf">_calculate_maximal_stresses</span><span class="p">(</span>
+</span><span id="line-1247">        <span class="bp">self</span><span class="p">,</span>
+</span><span id="line-1248">        <span class="n">system</span><span class="p">:</span> <span class="n">SystemModel</span><span class="p">,</span>
+</span><span id="line-1249">        <span class="n">print_call_stats</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+</span><span id="line-1250">    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">MaximalStressResult</span><span class="p">:</span>
+</span><span id="line-1251"><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+</span><span id="line-1252"><span class="sd">        Calculate the maximal stresses in the system.</span>
 </span><span id="line-1253">
-</span><span id="line-1254"><span class="sd">        Returns</span>
-</span><span id="line-1255"><span class="sd">        -------</span>
-</span><span id="line-1256"><span class="sd">        MaximalStressResult</span>
-</span><span id="line-1257"><span class="sd">            Object containing both absolute (in kPa) and normalized stress fields,</span>
-</span><span id="line-1258"><span class="sd">            along with maximum normalized stress values.</span>
-</span><span id="line-1259"><span class="sd">        &quot;&quot;&quot;</span>
-</span><span id="line-1260">        <span class="n">analyzer</span> <span class="o">=</span> <span class="n">Analyzer</span><span class="p">(</span><span class="n">system</span><span class="p">,</span> <span class="n">printing_enabled</span><span class="o">=</span><span class="n">print_call_stats</span><span class="p">)</span>
-</span><span id="line-1261">        <span class="n">_</span><span class="p">,</span> <span class="n">Z</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">analyzer</span><span class="o">.</span><span class="n">rasterize_solution</span><span class="p">(</span><span class="n">num</span><span class="o">=</span><span class="mi">4000</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s2">&quot;cracked&quot;</span><span class="p">)</span>
-</span><span id="line-1262">        <span class="n">Sxx_kPa</span> <span class="o">=</span> <span class="n">analyzer</span><span class="o">.</span><span class="n">Sxx</span><span class="p">(</span><span class="n">Z</span><span class="o">=</span><span class="n">Z</span><span class="p">,</span> <span class="n">phi</span><span class="o">=</span><span class="n">system</span><span class="o">.</span><span class="n">scenario</span><span class="o">.</span><span class="n">phi</span><span class="p">,</span> <span class="n">dz</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">unit</span><span class="o">=</span><span class="s2">&quot;kPa&quot;</span><span class="p">)</span>
-</span><span id="line-1263">        <span class="n">principal_stress_kPa</span> <span class="o">=</span> <span class="n">analyzer</span><span class="o">.</span><span class="n">principal_stress_slab</span><span class="p">(</span>
-</span><span id="line-1264">            <span class="n">Z</span><span class="o">=</span><span class="n">Z</span><span class="p">,</span> <span class="n">phi</span><span class="o">=</span><span class="n">system</span><span class="o">.</span><span class="n">scenario</span><span class="o">.</span><span class="n">phi</span><span class="p">,</span> <span class="n">dz</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">unit</span><span class="o">=</span><span class="s2">&quot;kPa&quot;</span>
-</span><span id="line-1265">        <span class="p">)</span>
-</span><span id="line-1266">        <span class="n">Sxx_norm</span> <span class="o">=</span> <span class="n">analyzer</span><span class="o">.</span><span class="n">Sxx</span><span class="p">(</span>
-</span><span id="line-1267">            <span class="n">Z</span><span class="o">=</span><span class="n">Z</span><span class="p">,</span> <span class="n">phi</span><span class="o">=</span><span class="n">system</span><span class="o">.</span><span class="n">scenario</span><span class="o">.</span><span class="n">phi</span><span class="p">,</span> <span class="n">dz</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">unit</span><span class="o">=</span><span class="s2">&quot;kPa&quot;</span><span class="p">,</span> <span class="n">normalize</span><span class="o">=</span><span class="kc">True</span>
-</span><span id="line-1268">        <span class="p">)</span>
-</span><span id="line-1269">        <span class="n">principal_stress_norm</span> <span class="o">=</span> <span class="n">analyzer</span><span class="o">.</span><span class="n">principal_stress_slab</span><span class="p">(</span>
-</span><span id="line-1270">            <span class="n">Z</span><span class="o">=</span><span class="n">Z</span><span class="p">,</span> <span class="n">phi</span><span class="o">=</span><span class="n">system</span><span class="o">.</span><span class="n">scenario</span><span class="o">.</span><span class="n">phi</span><span class="p">,</span> <span class="n">dz</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">unit</span><span class="o">=</span><span class="s2">&quot;kPa&quot;</span><span class="p">,</span> <span class="n">normalize</span><span class="o">=</span><span class="kc">True</span>
-</span><span id="line-1271">        <span class="p">)</span>
-</span><span id="line-1272">        <span class="n">max_principal_stress_norm</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">principal_stress_norm</span><span class="p">)</span>
-</span><span id="line-1273">        <span class="n">max_Sxx_norm</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">Sxx_norm</span><span class="p">)</span>
-</span><span id="line-1274">        <span class="c1"># evaluate for each height level if the slab is prone to fail under tensile stresses</span>
-</span><span id="line-1275">        <span class="n">height_level_prone_to_fail</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">Sxx_norm</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
-</span><span id="line-1276">        <span class="n">slab_tensile_criterion</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">height_level_prone_to_fail</span><span class="p">)</span>
-</span><span id="line-1277">        <span class="k">if</span> <span class="n">print_call_stats</span><span class="p">:</span>
-</span><span id="line-1278">            <span class="n">analyzer</span><span class="o">.</span><span class="n">print_call_stats</span><span class="p">(</span>
-</span><span id="line-1279">                <span class="n">message</span><span class="o">=</span><span class="s2">&quot;_calculate_maximal_stresses Call Statistics&quot;</span>
-</span><span id="line-1280">            <span class="p">)</span>
-</span><span id="line-1281">        <span class="k">return</span> <span class="n">MaximalStressResult</span><span class="p">(</span>
-</span><span id="line-1282">            <span class="n">principal_stress_kPa</span><span class="o">=</span><span class="n">principal_stress_kPa</span><span class="p">,</span>
-</span><span id="line-1283">            <span class="n">Sxx_kPa</span><span class="o">=</span><span class="n">Sxx_kPa</span><span class="p">,</span>
-</span><span id="line-1284">            <span class="n">principal_stress_norm</span><span class="o">=</span><span class="n">principal_stress_norm</span><span class="p">,</span>
-</span><span id="line-1285">            <span class="n">Sxx_norm</span><span class="o">=</span><span class="n">Sxx_norm</span><span class="p">,</span>
-</span><span id="line-1286">            <span class="n">max_principal_stress_norm</span><span class="o">=</span><span class="n">max_principal_stress_norm</span><span class="p">,</span>
-</span><span id="line-1287">            <span class="n">max_Sxx_norm</span><span class="o">=</span><span class="n">max_Sxx_norm</span><span class="p">,</span>
-</span><span id="line-1288">            <span class="n">slab_tensile_criterion</span><span class="o">=</span><span class="n">slab_tensile_criterion</span><span class="p">,</span>
-</span><span id="line-1289">        <span class="p">)</span></div>
+</span><span id="line-1254"><span class="sd">        Parameters</span>
+</span><span id="line-1255"><span class="sd">        ----------</span>
+</span><span id="line-1256"><span class="sd">        system : SystemModel</span>
+</span><span id="line-1257"><span class="sd">            The system model to analyze.</span>
+</span><span id="line-1258"><span class="sd">        print_call_stats : bool, optional</span>
+</span><span id="line-1259"><span class="sd">            Whether to print analyzer call statistics. Default is False.</span>
+</span><span id="line-1260">
+</span><span id="line-1261"><span class="sd">        Returns</span>
+</span><span id="line-1262"><span class="sd">        -------</span>
+</span><span id="line-1263"><span class="sd">        MaximalStressResult</span>
+</span><span id="line-1264"><span class="sd">            Object containing both absolute (in kPa) and normalized stress fields,</span>
+</span><span id="line-1265"><span class="sd">            along with maximum normalized stress values.</span>
+</span><span id="line-1266"><span class="sd">        &quot;&quot;&quot;</span>
+</span><span id="line-1267">        <span class="n">analyzer</span> <span class="o">=</span> <span class="n">Analyzer</span><span class="p">(</span><span class="n">system</span><span class="p">,</span> <span class="n">printing_enabled</span><span class="o">=</span><span class="n">print_call_stats</span><span class="p">)</span>
+</span><span id="line-1268">        <span class="n">_</span><span class="p">,</span> <span class="n">Z</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">analyzer</span><span class="o">.</span><span class="n">rasterize_solution</span><span class="p">(</span><span class="n">num</span><span class="o">=</span><span class="mi">4000</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s2">&quot;cracked&quot;</span><span class="p">)</span>
+</span><span id="line-1269">        <span class="n">Sxx_kPa</span> <span class="o">=</span> <span class="n">analyzer</span><span class="o">.</span><span class="n">Sxx</span><span class="p">(</span><span class="n">Z</span><span class="o">=</span><span class="n">Z</span><span class="p">,</span> <span class="n">phi</span><span class="o">=</span><span class="n">system</span><span class="o">.</span><span class="n">scenario</span><span class="o">.</span><span class="n">phi</span><span class="p">,</span> <span class="n">dz</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">unit</span><span class="o">=</span><span class="s2">&quot;kPa&quot;</span><span class="p">)</span>
+</span><span id="line-1270">        <span class="n">principal_stress_kPa</span> <span class="o">=</span> <span class="n">analyzer</span><span class="o">.</span><span class="n">principal_stress_slab</span><span class="p">(</span>
+</span><span id="line-1271">            <span class="n">Z</span><span class="o">=</span><span class="n">Z</span><span class="p">,</span> <span class="n">phi</span><span class="o">=</span><span class="n">system</span><span class="o">.</span><span class="n">scenario</span><span class="o">.</span><span class="n">phi</span><span class="p">,</span> <span class="n">dz</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">unit</span><span class="o">=</span><span class="s2">&quot;kPa&quot;</span>
+</span><span id="line-1272">        <span class="p">)</span>
+</span><span id="line-1273">        <span class="n">Sxx_norm</span> <span class="o">=</span> <span class="n">analyzer</span><span class="o">.</span><span class="n">Sxx</span><span class="p">(</span>
+</span><span id="line-1274">            <span class="n">Z</span><span class="o">=</span><span class="n">Z</span><span class="p">,</span> <span class="n">phi</span><span class="o">=</span><span class="n">system</span><span class="o">.</span><span class="n">scenario</span><span class="o">.</span><span class="n">phi</span><span class="p">,</span> <span class="n">dz</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">unit</span><span class="o">=</span><span class="s2">&quot;kPa&quot;</span><span class="p">,</span> <span class="n">normalize</span><span class="o">=</span><span class="kc">True</span>
+</span><span id="line-1275">        <span class="p">)</span>
+</span><span id="line-1276">        <span class="n">principal_stress_norm</span> <span class="o">=</span> <span class="n">analyzer</span><span class="o">.</span><span class="n">principal_stress_slab</span><span class="p">(</span>
+</span><span id="line-1277">            <span class="n">Z</span><span class="o">=</span><span class="n">Z</span><span class="p">,</span> <span class="n">phi</span><span class="o">=</span><span class="n">system</span><span class="o">.</span><span class="n">scenario</span><span class="o">.</span><span class="n">phi</span><span class="p">,</span> <span class="n">dz</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">unit</span><span class="o">=</span><span class="s2">&quot;kPa&quot;</span><span class="p">,</span> <span class="n">normalize</span><span class="o">=</span><span class="kc">True</span>
+</span><span id="line-1278">        <span class="p">)</span>
+</span><span id="line-1279">        <span class="n">max_principal_stress_norm</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">principal_stress_norm</span><span class="p">)</span>
+</span><span id="line-1280">        <span class="n">max_Sxx_norm</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">Sxx_norm</span><span class="p">)</span>
+</span><span id="line-1281">        <span class="c1"># evaluate for each height level if the slab is prone to fail under tensile stresses</span>
+</span><span id="line-1282">        <span class="n">height_level_prone_to_fail</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">Sxx_norm</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+</span><span id="line-1283">        <span class="n">slab_tensile_criterion</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">height_level_prone_to_fail</span><span class="p">)</span>
+</span><span id="line-1284">        <span class="k">if</span> <span class="n">print_call_stats</span><span class="p">:</span>
+</span><span id="line-1285">            <span class="n">analyzer</span><span class="o">.</span><span class="n">print_call_stats</span><span class="p">(</span>
+</span><span id="line-1286">                <span class="n">message</span><span class="o">=</span><span class="s2">&quot;_calculate_maximal_stresses Call Statistics&quot;</span>
+</span><span id="line-1287">            <span class="p">)</span>
+</span><span id="line-1288">        <span class="k">return</span> <span class="n">MaximalStressResult</span><span class="p">(</span>
+</span><span id="line-1289">            <span class="n">principal_stress_kPa</span><span class="o">=</span><span class="n">principal_stress_kPa</span><span class="p">,</span>
+</span><span id="line-1290">            <span class="n">Sxx_kPa</span><span class="o">=</span><span class="n">Sxx_kPa</span><span class="p">,</span>
+</span><span id="line-1291">            <span class="n">principal_stress_norm</span><span class="o">=</span><span class="n">principal_stress_norm</span><span class="p">,</span>
+</span><span id="line-1292">            <span class="n">Sxx_norm</span><span class="o">=</span><span class="n">Sxx_norm</span><span class="p">,</span>
+</span><span id="line-1293">            <span class="n">max_principal_stress_norm</span><span class="o">=</span><span class="n">max_principal_stress_norm</span><span class="p">,</span>
+</span><span id="line-1294">            <span class="n">max_Sxx_norm</span><span class="o">=</span><span class="n">max_Sxx_norm</span><span class="p">,</span>
+</span><span id="line-1295">            <span class="n">slab_tensile_criterion</span><span class="o">=</span><span class="n">slab_tensile_criterion</span><span class="p">,</span>
+</span><span id="line-1296">        <span class="p">)</span></div>
 
 </span></code></pre></div>
     </div></div>

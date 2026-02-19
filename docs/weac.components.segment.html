@@ -92,6 +92,9 @@
 <li class="toctree-l1" x-data="{ expanded: $el.classList.contains('current') ? true : false }"><a :class="{ 'expanded' : expanded }" @click="expanded = !expanded" class="reference internal expandable" href="weac.core.html">weac.core package<button @click.prevent.stop="expanded = !expanded" type="button"><span class="sr-only"></span><svg fill="currentColor" height="18px" stroke="none" viewbox="0 0 24 24" width="18px" xmlns="http://www.w3.org/2000/svg"><path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"></path></svg></button></a><ul x-show="expanded">
 <li class="toctree-l2"><a class="reference internal" href="weac.core.eigensystem.html">weac.core.eigensystem module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="weac.core.field_quantities.html">weac.core.field_quantities module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="weac.core.generalized_eigensystem.html">weac.core.generalized_eigensystem module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="weac.core.generalized_field_quantities.html">weac.core.generalized_field_quantities module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="weac.core.generalized_unknown_constants_solver.html">weac.core.generalized_unknown_constants_solver module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="weac.core.scenario.html">weac.core.scenario module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="weac.core.slab.html">weac.core.slab module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="weac.core.slab_touchdown.html">weac.core.slab_touchdown module</a></li>
@@ -152,7 +155,7 @@
 <p>This module defines the Segment class, which represents a segment of the snowpack.</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="weac.components.segment.Segment">
-<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">weac.components.segment.</span></span><span class="sig-name descname"><span class="pre">Segment</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">length</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">5000.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">has_foundation</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">m</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/weac/components/segment.html#Segment"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#weac.components.segment.Segment" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#weac.components.segment.Segment'">¶</a></dt>
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">weac.components.segment.</span></span><span class="sig-name descname"><span class="pre">Segment</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">length=5000.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">has_foundation=True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">is_loaded=True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">m=0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">f=&lt;factory&gt;</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/weac/components/segment.html#Segment"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#weac.components.segment.Segment" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#weac.components.segment.Segment'">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">BaseModel</span></code></p>
 <p>Defines a snow-slab segment: its length, foundation support, and applied loads.</p>
 <dl class="field-list simple">
@@ -160,7 +163,9 @@
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>length</strong> (<em>Annotated</em><em>[</em><em>float</em><em>, </em><em>Ge</em><em>(</em><em>ge=0</em><em>)</em><em>]</em>)</p></li>
 <li><p><strong>has_foundation</strong> (<em>bool</em>)</p></li>
+<li><p><strong>is_loaded</strong> (<em>bool</em>)</p></li>
 <li><p><strong>m</strong> (<em>Annotated</em><em>[</em><em>float</em><em>, </em><em>Ge</em><em>(</em><em>ge=0</em><em>)</em><em>]</em>)</p></li>
+<li><p><strong>f</strong> (<em>Annotated</em><em>[</em><em>ndarray</em><em>, </em><em>PlainSerializer</em><em>(</em><em>func=~weac.components.segment._serialize_ndarray</em><em>, </em><em>return_type=list</em><em>, </em><em>when_used=always</em><em>)</em><em>, </em><em>WithJsonSchema</em><em>(</em><em>json_schema={'type': 'array'</em><em>, </em><em>'items': {'type': 'array'</em><em>, </em><em>'items': {'type': 'number'}}}</em><em>, </em><em>mode=None</em><em>)</em><em>]</em>)</p></li>
 </ul>
 </dd>
 </dl>
@@ -186,6 +191,16 @@
 </dl>
 </dd></dl>
 <dl class="py attribute">
+<dt class="sig sig-object py" id="weac.components.segment.Segment.is_loaded">
+<span class="sig-name descname"><span class="pre">is_loaded</span></span><a class="headerlink" href="#weac.components.segment.Segment.is_loaded" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#weac.components.segment.Segment.is_loaded'">¶</a></dt>
+<dd><p>Whether additional loading is applied at the segment’s top side.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>bool</p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="py attribute">
 <dt class="sig sig-object py" id="weac.components.segment.Segment.m">
 <span class="sig-name descname"><span class="pre">m</span></span><a class="headerlink" href="#weac.components.segment.Segment.m" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#weac.components.segment.Segment.m'">¶</a></dt>
 <dd><p>Skier mass at the segment’s right edge [kg].</p>
@@ -194,6 +209,11 @@
 <dd class="field-odd"><p>float</p>
 </dd>
 </dl>
+</dd></dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="weac.components.segment.Segment.model_config">
+<span class="sig-name descname"><span class="pre">model_config</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">ClassVar</span><span class="p"><span class="pre">[</span></span><span class="pre">ConfigDict</span><span class="p"><span class="pre">]</span></span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{'arbitrary_types_allowed':</span> <span class="pre">True}</span></em><a class="headerlink" href="#weac.components.segment.Segment.model_config" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#weac.components.segment.Segment.model_config'">¶</a></dt>
+<dd><p>Configuration for the model, should be a dictionary conforming to [<cite>ConfigDict</cite>][pydantic.config.ConfigDict].</p>
 </dd></dl>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="id0">
@@ -205,12 +225,27 @@
 <dd></dd></dl>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="id2">
-<span class="sig-name descname"><span class="pre">m</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><a class="headerlink" href="#id2" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id2'">¶</a></dt>
+<span class="sig-name descname"><span class="pre">is_loaded</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></em><a class="headerlink" href="#id2" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id2'">¶</a></dt>
 <dd></dd></dl>
 <dl class="py attribute">
-<dt class="sig sig-object py" id="weac.components.segment.Segment.model_config">
-<span class="sig-name descname"><span class="pre">model_config</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">ClassVar</span><span class="p"><span class="pre">[</span></span><span class="pre">ConfigDict</span><span class="p"><span class="pre">]</span></span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{}</span></em><a class="headerlink" href="#weac.components.segment.Segment.model_config" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#weac.components.segment.Segment.model_config'">¶</a></dt>
-<dd><p>Configuration for the model, should be a dictionary conforming to [<cite>ConfigDict</cite>][pydantic.config.ConfigDict].</p>
+<dt class="sig sig-object py" id="id3">
+<span class="sig-name descname"><span class="pre">m</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><a class="headerlink" href="#id3" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id3'">¶</a></dt>
+<dd></dd></dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="weac.components.segment.Segment.f">
+<span class="sig-name descname"><span class="pre">f</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">WithJsonSchema(json_schema={'type':</span> <span class="pre">'array',</span> <span class="pre">'items':</span> <span class="pre">{'type':</span> <span class="pre">'array',</span> <span class="pre">'items':</span> <span class="pre">{'type':</span> <span class="pre">'number'}}},</span> <span class="pre">mode=None)]</span></em><a class="headerlink" href="#weac.components.segment.Segment.f" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#weac.components.segment.Segment.f'">¶</a></dt>
+<dd></dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="weac.components.segment.Segment.ensure_ndarray">
+<em class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">ensure_ndarray</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">v</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/weac/components/segment.html#Segment.ensure_ndarray"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#weac.components.segment.Segment.ensure_ndarray" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#weac.components.segment.Segment.ensure_ndarray'">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>v</strong> (<em>ndarray</em><em>[</em><em>tuple</em><em>[</em><em>Any</em><em>, </em><em>...</em><em>]</em><em>, </em><em>dtype</em><em>[</em><em>float64</em><em>]</em><em>]</em>)</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><em>ndarray</em>[tuple[<em>Any</em>, …], <em>dtype</em>[<em>float64</em>]]</p>
+</dd>
+</dl>
 </dd></dl>
 </dd></dl>
 </section>
@@ -220,11 +255,15 @@
 <li><a :data-current="activeSection === '#weac.components.segment.Segment'" class="reference internal" href="#weac.components.segment.Segment"><code class="docutils literal notranslate"><span class="pre">Segment</span></code></a><ul>
 <li><a :data-current="activeSection === '#weac.components.segment.Segment.length'" class="reference internal" href="#weac.components.segment.Segment.length"><code class="docutils literal notranslate"><span class="pre">Segment.length</span></code></a></li>
 <li><a :data-current="activeSection === '#weac.components.segment.Segment.has_foundation'" class="reference internal" href="#weac.components.segment.Segment.has_foundation"><code class="docutils literal notranslate"><span class="pre">Segment.has_foundation</span></code></a></li>
+<li><a :data-current="activeSection === '#weac.components.segment.Segment.is_loaded'" class="reference internal" href="#weac.components.segment.Segment.is_loaded"><code class="docutils literal notranslate"><span class="pre">Segment.is_loaded</span></code></a></li>
 <li><a :data-current="activeSection === '#weac.components.segment.Segment.m'" class="reference internal" href="#weac.components.segment.Segment.m"><code class="docutils literal notranslate"><span class="pre">Segment.m</span></code></a></li>
+<li><a :data-current="activeSection === '#weac.components.segment.Segment.model_config'" class="reference internal" href="#weac.components.segment.Segment.model_config"><code class="docutils literal notranslate"><span class="pre">Segment.model_config</span></code></a></li>
 <li><a :data-current="activeSection === '#id0'" class="reference internal" href="#id0"><code class="docutils literal notranslate"><span class="pre">Segment.length</span></code></a></li>
 <li><a :data-current="activeSection === '#id1'" class="reference internal" href="#id1"><code class="docutils literal notranslate"><span class="pre">Segment.has_foundation</span></code></a></li>
-<li><a :data-current="activeSection === '#id2'" class="reference internal" href="#id2"><code class="docutils literal notranslate"><span class="pre">Segment.m</span></code></a></li>
-<li><a :data-current="activeSection === '#weac.components.segment.Segment.model_config'" class="reference internal" href="#weac.components.segment.Segment.model_config"><code class="docutils literal notranslate"><span class="pre">Segment.model_config</span></code></a></li>
+<li><a :data-current="activeSection === '#id2'" class="reference internal" href="#id2"><code class="docutils literal notranslate"><span class="pre">Segment.is_loaded</span></code></a></li>
+<li><a :data-current="activeSection === '#id3'" class="reference internal" href="#id3"><code class="docutils literal notranslate"><span class="pre">Segment.m</span></code></a></li>
+<li><a :data-current="activeSection === '#weac.components.segment.Segment.f'" class="reference internal" href="#weac.components.segment.Segment.f"><code class="docutils literal notranslate"><span class="pre">Segment.f</span></code></a></li>
+<li><a :data-current="activeSection === '#weac.components.segment.Segment.ensure_ndarray'" class="reference internal" href="#weac.components.segment.Segment.ensure_ndarray"><code class="docutils literal notranslate"><span class="pre">Segment.ensure_ndarray()</span></code></a></li>
 </ul>
 </li>
 </ul>

@@ -1,0 +1,7 @@
+weac.core.generalized\_field\_quantities module
+===============================================
+
+.. automodule:: weac.core.generalized_field_quantities
+   :members:
+   :show-inheritance:
+   :undoc-members:

@@ -92,6 +92,9 @@
 <li class="toctree-l1 current" x-data="{ expanded: $el.classList.contains('current') ? true : false }"><a :class="{ 'expanded' : expanded }" @click="expanded = !expanded" class="current reference internal expandable" href="#">weac.core package<button @click.prevent.stop="expanded = !expanded" type="button"><span class="sr-only"></span><svg fill="currentColor" height="18px" stroke="none" viewbox="0 0 24 24" width="18px" xmlns="http://www.w3.org/2000/svg"><path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"></path></svg></button></a><ul x-show="expanded">
 <li class="toctree-l2"><a class="reference internal" href="weac.core.eigensystem.html">weac.core.eigensystem module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="weac.core.field_quantities.html">weac.core.field_quantities module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="weac.core.generalized_eigensystem.html">weac.core.generalized_eigensystem module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="weac.core.generalized_field_quantities.html">weac.core.generalized_field_quantities module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="weac.core.generalized_unknown_constants_solver.html">weac.core.generalized_unknown_constants_solver module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="weac.core.scenario.html">weac.core.scenario module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="weac.core.slab.html">weac.core.slab module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="weac.core.slab_touchdown.html">weac.core.slab_touchdown module</a></li>
@@ -220,33 +223,140 @@
 </li>
 </ul>
 </li>
+<li class="toctree-l1"><a class="reference internal" href="weac.core.generalized_eigensystem.html">weac.core.generalized_eigensystem module</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="weac.core.generalized_eigensystem.html#weac.core.generalized_eigensystem.GeneralizedEigensystem"><code class="docutils literal notranslate"><span class="pre">GeneralizedEigensystem</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="weac.core.generalized_eigensystem.html#weac.core.generalized_eigensystem.GeneralizedEigensystem.weak_layer"><code class="docutils literal notranslate"><span class="pre">GeneralizedEigensystem.weak_layer</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="weac.core.generalized_eigensystem.html#weac.core.generalized_eigensystem.GeneralizedEigensystem.slab"><code class="docutils literal notranslate"><span class="pre">GeneralizedEigensystem.slab</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="weac.core.generalized_eigensystem.html#weac.core.generalized_eigensystem.GeneralizedEigensystem.A11"><code class="docutils literal notranslate"><span class="pre">GeneralizedEigensystem.A11</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="weac.core.generalized_eigensystem.html#weac.core.generalized_eigensystem.GeneralizedEigensystem.B11"><code class="docutils literal notranslate"><span class="pre">GeneralizedEigensystem.B11</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="weac.core.generalized_eigensystem.html#weac.core.generalized_eigensystem.GeneralizedEigensystem.D11"><code class="docutils literal notranslate"><span class="pre">GeneralizedEigensystem.D11</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="weac.core.generalized_eigensystem.html#weac.core.generalized_eigensystem.GeneralizedEigensystem.kA55"><code class="docutils literal notranslate"><span class="pre">GeneralizedEigensystem.kA55</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="weac.core.generalized_eigensystem.html#weac.core.generalized_eigensystem.GeneralizedEigensystem.kB55"><code class="docutils literal notranslate"><span class="pre">GeneralizedEigensystem.kB55</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="weac.core.generalized_eigensystem.html#weac.core.generalized_eigensystem.GeneralizedEigensystem.kD55"><code class="docutils literal notranslate"><span class="pre">GeneralizedEigensystem.kD55</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="weac.core.generalized_eigensystem.html#weac.core.generalized_eigensystem.GeneralizedEigensystem.K"><code class="docutils literal notranslate"><span class="pre">GeneralizedEigensystem.K</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="weac.core.generalized_eigensystem.html#id0"><code class="docutils literal notranslate"><span class="pre">GeneralizedEigensystem.A11</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="weac.core.generalized_eigensystem.html#id1"><code class="docutils literal notranslate"><span class="pre">GeneralizedEigensystem.B11</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="weac.core.generalized_eigensystem.html#id2"><code class="docutils literal notranslate"><span class="pre">GeneralizedEigensystem.D11</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="weac.core.generalized_eigensystem.html#id3"><code class="docutils literal notranslate"><span class="pre">GeneralizedEigensystem.kA55</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="weac.core.generalized_eigensystem.html#id4"><code class="docutils literal notranslate"><span class="pre">GeneralizedEigensystem.kB55</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="weac.core.generalized_eigensystem.html#id5"><code class="docutils literal notranslate"><span class="pre">GeneralizedEigensystem.kD55</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="weac.core.generalized_eigensystem.html#weac.core.generalized_eigensystem.GeneralizedEigensystem.K0"><code class="docutils literal notranslate"><span class="pre">GeneralizedEigensystem.K0</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="weac.core.generalized_eigensystem.html#id6"><code class="docutils literal notranslate"><span class="pre">GeneralizedEigensystem.K</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="weac.core.generalized_eigensystem.html#weac.core.generalized_eigensystem.GeneralizedEigensystem.ewC"><code class="docutils literal notranslate"><span class="pre">GeneralizedEigensystem.ewC</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="weac.core.generalized_eigensystem.html#weac.core.generalized_eigensystem.GeneralizedEigensystem.ewR"><code class="docutils literal notranslate"><span class="pre">GeneralizedEigensystem.ewR</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="weac.core.generalized_eigensystem.html#weac.core.generalized_eigensystem.GeneralizedEigensystem.evC"><code class="docutils literal notranslate"><span class="pre">GeneralizedEigensystem.evC</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="weac.core.generalized_eigensystem.html#weac.core.generalized_eigensystem.GeneralizedEigensystem.evR"><code class="docutils literal notranslate"><span class="pre">GeneralizedEigensystem.evR</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="weac.core.generalized_eigensystem.html#weac.core.generalized_eigensystem.GeneralizedEigensystem.sR"><code class="docutils literal notranslate"><span class="pre">GeneralizedEigensystem.sR</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="weac.core.generalized_eigensystem.html#weac.core.generalized_eigensystem.GeneralizedEigensystem.sC"><code class="docutils literal notranslate"><span class="pre">GeneralizedEigensystem.sC</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="weac.core.generalized_eigensystem.html#weac.core.generalized_eigensystem.GeneralizedEigensystem.__init__"><code class="docutils literal notranslate"><span class="pre">GeneralizedEigensystem.__init__()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="weac.core.generalized_eigensystem.html#id7"><code class="docutils literal notranslate"><span class="pre">GeneralizedEigensystem.weak_layer</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="weac.core.generalized_eigensystem.html#id8"><code class="docutils literal notranslate"><span class="pre">GeneralizedEigensystem.slab</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="weac.core.generalized_eigensystem.html#weac.core.generalized_eigensystem.GeneralizedEigensystem.calc_eigensystem"><code class="docutils literal notranslate"><span class="pre">GeneralizedEigensystem.calc_eigensystem()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="weac.core.generalized_eigensystem.html#weac.core.generalized_eigensystem.GeneralizedEigensystem.assemble_system_matrix"><code class="docutils literal notranslate"><span class="pre">GeneralizedEigensystem.assemble_system_matrix()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="weac.core.generalized_eigensystem.html#weac.core.generalized_eigensystem.GeneralizedEigensystem.calc_eigenvalues_and_eigenvectors"><code class="docutils literal notranslate"><span class="pre">GeneralizedEigensystem.calc_eigenvalues_and_eigenvectors()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="weac.core.generalized_eigensystem.html#weac.core.generalized_eigensystem.GeneralizedEigensystem.zh"><code class="docutils literal notranslate"><span class="pre">GeneralizedEigensystem.zh()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="weac.core.generalized_eigensystem.html#weac.core.generalized_eigensystem.GeneralizedEigensystem.zp"><code class="docutils literal notranslate"><span class="pre">GeneralizedEigensystem.zp()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="weac.core.generalized_eigensystem.html#weac.core.generalized_eigensystem.GeneralizedEigensystem.get_load_vector"><code class="docutils literal notranslate"><span class="pre">GeneralizedEigensystem.get_load_vector()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="weac.core.generalized_field_quantities.html">weac.core.generalized_field_quantities module</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="weac.core.generalized_field_quantities.html#weac.core.generalized_field_quantities.GeneralizedFieldQuantities"><code class="docutils literal notranslate"><span class="pre">GeneralizedFieldQuantities</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="weac.core.generalized_field_quantities.html#weac.core.generalized_field_quantities.GeneralizedFieldQuantities.__init__"><code class="docutils literal notranslate"><span class="pre">GeneralizedFieldQuantities.__init__()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="weac.core.generalized_field_quantities.html#weac.core.generalized_field_quantities.GeneralizedFieldQuantities.u"><code class="docutils literal notranslate"><span class="pre">GeneralizedFieldQuantities.u()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="weac.core.generalized_field_quantities.html#weac.core.generalized_field_quantities.GeneralizedFieldQuantities.du_dx"><code class="docutils literal notranslate"><span class="pre">GeneralizedFieldQuantities.du_dx()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="weac.core.generalized_field_quantities.html#weac.core.generalized_field_quantities.GeneralizedFieldQuantities.v"><code class="docutils literal notranslate"><span class="pre">GeneralizedFieldQuantities.v()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="weac.core.generalized_field_quantities.html#weac.core.generalized_field_quantities.GeneralizedFieldQuantities.dv_dx"><code class="docutils literal notranslate"><span class="pre">GeneralizedFieldQuantities.dv_dx()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="weac.core.generalized_field_quantities.html#weac.core.generalized_field_quantities.GeneralizedFieldQuantities.w"><code class="docutils literal notranslate"><span class="pre">GeneralizedFieldQuantities.w()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="weac.core.generalized_field_quantities.html#weac.core.generalized_field_quantities.GeneralizedFieldQuantities.dw_dx"><code class="docutils literal notranslate"><span class="pre">GeneralizedFieldQuantities.dw_dx()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="weac.core.generalized_field_quantities.html#weac.core.generalized_field_quantities.GeneralizedFieldQuantities.psix"><code class="docutils literal notranslate"><span class="pre">GeneralizedFieldQuantities.psix()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="weac.core.generalized_field_quantities.html#weac.core.generalized_field_quantities.GeneralizedFieldQuantities.dpsix_dx"><code class="docutils literal notranslate"><span class="pre">GeneralizedFieldQuantities.dpsix_dx()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="weac.core.generalized_field_quantities.html#weac.core.generalized_field_quantities.GeneralizedFieldQuantities.psiy"><code class="docutils literal notranslate"><span class="pre">GeneralizedFieldQuantities.psiy()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="weac.core.generalized_field_quantities.html#weac.core.generalized_field_quantities.GeneralizedFieldQuantities.dpsiy_dx"><code class="docutils literal notranslate"><span class="pre">GeneralizedFieldQuantities.dpsiy_dx()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="weac.core.generalized_field_quantities.html#weac.core.generalized_field_quantities.GeneralizedFieldQuantities.psiz"><code class="docutils literal notranslate"><span class="pre">GeneralizedFieldQuantities.psiz()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="weac.core.generalized_field_quantities.html#weac.core.generalized_field_quantities.GeneralizedFieldQuantities.dpsiz_dx"><code class="docutils literal notranslate"><span class="pre">GeneralizedFieldQuantities.dpsiz_dx()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="weac.core.generalized_field_quantities.html#weac.core.generalized_field_quantities.GeneralizedFieldQuantities.theta_uc"><code class="docutils literal notranslate"><span class="pre">GeneralizedFieldQuantities.theta_uc()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="weac.core.generalized_field_quantities.html#weac.core.generalized_field_quantities.GeneralizedFieldQuantities.dtheta_uc_dx"><code class="docutils literal notranslate"><span class="pre">GeneralizedFieldQuantities.dtheta_uc_dx()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="weac.core.generalized_field_quantities.html#weac.core.generalized_field_quantities.GeneralizedFieldQuantities.theta_ul"><code class="docutils literal notranslate"><span class="pre">GeneralizedFieldQuantities.theta_ul()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="weac.core.generalized_field_quantities.html#weac.core.generalized_field_quantities.GeneralizedFieldQuantities.dtheta_ul_dx"><code class="docutils literal notranslate"><span class="pre">GeneralizedFieldQuantities.dtheta_ul_dx()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="weac.core.generalized_field_quantities.html#weac.core.generalized_field_quantities.GeneralizedFieldQuantities.theta_vc"><code class="docutils literal notranslate"><span class="pre">GeneralizedFieldQuantities.theta_vc()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="weac.core.generalized_field_quantities.html#weac.core.generalized_field_quantities.GeneralizedFieldQuantities.dtheta_vc_dx"><code class="docutils literal notranslate"><span class="pre">GeneralizedFieldQuantities.dtheta_vc_dx()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="weac.core.generalized_field_quantities.html#weac.core.generalized_field_quantities.GeneralizedFieldQuantities.theta_vl"><code class="docutils literal notranslate"><span class="pre">GeneralizedFieldQuantities.theta_vl()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="weac.core.generalized_field_quantities.html#weac.core.generalized_field_quantities.GeneralizedFieldQuantities.dtheta_vl_dx"><code class="docutils literal notranslate"><span class="pre">GeneralizedFieldQuantities.dtheta_vl_dx()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="weac.core.generalized_field_quantities.html#weac.core.generalized_field_quantities.GeneralizedFieldQuantities.theta_wc"><code class="docutils literal notranslate"><span class="pre">GeneralizedFieldQuantities.theta_wc()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="weac.core.generalized_field_quantities.html#weac.core.generalized_field_quantities.GeneralizedFieldQuantities.dtheta_wc_dx"><code class="docutils literal notranslate"><span class="pre">GeneralizedFieldQuantities.dtheta_wc_dx()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="weac.core.generalized_field_quantities.html#weac.core.generalized_field_quantities.GeneralizedFieldQuantities.theta_wl"><code class="docutils literal notranslate"><span class="pre">GeneralizedFieldQuantities.theta_wl()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="weac.core.generalized_field_quantities.html#weac.core.generalized_field_quantities.GeneralizedFieldQuantities.dtheta_wl_dx"><code class="docutils literal notranslate"><span class="pre">GeneralizedFieldQuantities.dtheta_wl_dx()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="weac.core.generalized_field_quantities.html#weac.core.generalized_field_quantities.GeneralizedFieldQuantities.Nx"><code class="docutils literal notranslate"><span class="pre">GeneralizedFieldQuantities.Nx()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="weac.core.generalized_field_quantities.html#weac.core.generalized_field_quantities.GeneralizedFieldQuantities.Vy"><code class="docutils literal notranslate"><span class="pre">GeneralizedFieldQuantities.Vy()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="weac.core.generalized_field_quantities.html#weac.core.generalized_field_quantities.GeneralizedFieldQuantities.Vz"><code class="docutils literal notranslate"><span class="pre">GeneralizedFieldQuantities.Vz()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="weac.core.generalized_field_quantities.html#weac.core.generalized_field_quantities.GeneralizedFieldQuantities.Mx"><code class="docutils literal notranslate"><span class="pre">GeneralizedFieldQuantities.Mx()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="weac.core.generalized_field_quantities.html#weac.core.generalized_field_quantities.GeneralizedFieldQuantities.My"><code class="docutils literal notranslate"><span class="pre">GeneralizedFieldQuantities.My()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="weac.core.generalized_field_quantities.html#weac.core.generalized_field_quantities.GeneralizedFieldQuantities.Mz"><code class="docutils literal notranslate"><span class="pre">GeneralizedFieldQuantities.Mz()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="weac.core.generalized_field_quantities.html#weac.core.generalized_field_quantities.GeneralizedFieldQuantities.Nx_c_weakLayer"><code class="docutils literal notranslate"><span class="pre">GeneralizedFieldQuantities.Nx_c_weakLayer()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="weac.core.generalized_field_quantities.html#weac.core.generalized_field_quantities.GeneralizedFieldQuantities.Nx_l_weakLayer"><code class="docutils literal notranslate"><span class="pre">GeneralizedFieldQuantities.Nx_l_weakLayer()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="weac.core.generalized_field_quantities.html#weac.core.generalized_field_quantities.GeneralizedFieldQuantities.Vy_c_weakLayer"><code class="docutils literal notranslate"><span class="pre">GeneralizedFieldQuantities.Vy_c_weakLayer()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="weac.core.generalized_field_quantities.html#weac.core.generalized_field_quantities.GeneralizedFieldQuantities.Vy_l_weakLayer"><code class="docutils literal notranslate"><span class="pre">GeneralizedFieldQuantities.Vy_l_weakLayer()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="weac.core.generalized_field_quantities.html#weac.core.generalized_field_quantities.GeneralizedFieldQuantities.Vz_c_weakLayer"><code class="docutils literal notranslate"><span class="pre">GeneralizedFieldQuantities.Vz_c_weakLayer()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="weac.core.generalized_field_quantities.html#weac.core.generalized_field_quantities.GeneralizedFieldQuantities.Vz_l_weakLayer"><code class="docutils literal notranslate"><span class="pre">GeneralizedFieldQuantities.Vz_l_weakLayer()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="weac.core.generalized_field_quantities.html#weac.core.generalized_field_quantities.GeneralizedFieldQuantities.sig_zz"><code class="docutils literal notranslate"><span class="pre">GeneralizedFieldQuantities.sig_zz()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="weac.core.generalized_field_quantities.html#weac.core.generalized_field_quantities.GeneralizedFieldQuantities.tau_yz"><code class="docutils literal notranslate"><span class="pre">GeneralizedFieldQuantities.tau_yz()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="weac.core.generalized_field_quantities.html#weac.core.generalized_field_quantities.GeneralizedFieldQuantities.tau_xz"><code class="docutils literal notranslate"><span class="pre">GeneralizedFieldQuantities.tau_xz()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="weac.core.generalized_field_quantities.html#weac.core.generalized_field_quantities.GeneralizedFieldQuantities.eps_zz"><code class="docutils literal notranslate"><span class="pre">GeneralizedFieldQuantities.eps_zz()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="weac.core.generalized_field_quantities.html#weac.core.generalized_field_quantities.GeneralizedFieldQuantities.gamma_yz"><code class="docutils literal notranslate"><span class="pre">GeneralizedFieldQuantities.gamma_yz()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="weac.core.generalized_field_quantities.html#weac.core.generalized_field_quantities.GeneralizedFieldQuantities.gamma_xz"><code class="docutils literal notranslate"><span class="pre">GeneralizedFieldQuantities.gamma_xz()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="weac.core.generalized_field_quantities.html#weac.core.generalized_field_quantities.GeneralizedFieldQuantities.Gi"><code class="docutils literal notranslate"><span class="pre">GeneralizedFieldQuantities.Gi()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="weac.core.generalized_field_quantities.html#weac.core.generalized_field_quantities.GeneralizedFieldQuantities.Gii"><code class="docutils literal notranslate"><span class="pre">GeneralizedFieldQuantities.Gii()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="weac.core.generalized_field_quantities.html#weac.core.generalized_field_quantities.GeneralizedFieldQuantities.Giii"><code class="docutils literal notranslate"><span class="pre">GeneralizedFieldQuantities.Giii()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="weac.core.generalized_field_quantities.html#weac.core.generalized_field_quantities.GeneralizedFieldQuantities.dz_dx"><code class="docutils literal notranslate"><span class="pre">GeneralizedFieldQuantities.dz_dx()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="weac.core.generalized_field_quantities.html#weac.core.generalized_field_quantities.GeneralizedFieldQuantities.dz_dxdx"><code class="docutils literal notranslate"><span class="pre">GeneralizedFieldQuantities.dz_dxdx()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="weac.core.generalized_field_quantities.html#weac.core.generalized_field_quantities.GeneralizedFieldQuantities.du0_dxdx"><code class="docutils literal notranslate"><span class="pre">GeneralizedFieldQuantities.du0_dxdx()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="weac.core.generalized_field_quantities.html#weac.core.generalized_field_quantities.GeneralizedFieldQuantities.dpsi_dxdx"><code class="docutils literal notranslate"><span class="pre">GeneralizedFieldQuantities.dpsi_dxdx()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="weac.core.generalized_field_quantities.html#weac.core.generalized_field_quantities.GeneralizedFieldQuantities.du0_dxdxdx"><code class="docutils literal notranslate"><span class="pre">GeneralizedFieldQuantities.du0_dxdxdx()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="weac.core.generalized_field_quantities.html#weac.core.generalized_field_quantities.GeneralizedFieldQuantities.dpsi_dxdxdx"><code class="docutils literal notranslate"><span class="pre">GeneralizedFieldQuantities.dpsi_dxdxdx()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="weac.core.generalized_unknown_constants_solver.html">weac.core.generalized_unknown_constants_solver module</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="weac.core.generalized_unknown_constants_solver.html#weac.core.generalized_unknown_constants_solver.GeneralizedUnknownConstantsSolver"><code class="docutils literal notranslate"><span class="pre">GeneralizedUnknownConstantsSolver</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="weac.core.generalized_unknown_constants_solver.html#weac.core.generalized_unknown_constants_solver.GeneralizedUnknownConstantsSolver.solve_for_unknown_constants"><code class="docutils literal notranslate"><span class="pre">GeneralizedUnknownConstantsSolver.solve_for_unknown_constants()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
 <li class="toctree-l1"><a class="reference internal" href="weac.core.scenario.html">weac.core.scenario module</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="weac.core.scenario.html#weac.core.scenario.Scenario"><code class="docutils literal notranslate"><span class="pre">Scenario</span></code></a><ul>
 <li class="toctree-l3"><a class="reference internal" href="weac.core.scenario.html#weac.core.scenario.Scenario.li"><code class="docutils literal notranslate"><span class="pre">Scenario.li</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="weac.core.scenario.html#weac.core.scenario.Scenario.ki"><code class="docutils literal notranslate"><span class="pre">Scenario.ki</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="weac.core.scenario.html#weac.core.scenario.Scenario.mi"><code class="docutils literal notranslate"><span class="pre">Scenario.mi</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="weac.core.scenario.html#weac.core.scenario.Scenario.system_type"><code class="docutils literal notranslate"><span class="pre">Scenario.system_type</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="weac.core.scenario.html#weac.core.scenario.Scenario.phi"><code class="docutils literal notranslate"><span class="pre">Scenario.phi</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="weac.core.scenario.html#weac.core.scenario.Scenario.L"><code class="docutils literal notranslate"><span class="pre">Scenario.L</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="weac.core.scenario.html#weac.core.scenario.Scenario.crack_h"><code class="docutils literal notranslate"><span class="pre">Scenario.crack_h</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="weac.core.scenario.html#weac.core.scenario.Scenario.fi"><code class="docutils literal notranslate"><span class="pre">Scenario.fi</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="weac.core.scenario.html#weac.core.scenario.Scenario.gi"><code class="docutils literal notranslate"><span class="pre">Scenario.gi</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="weac.core.scenario.html#weac.core.scenario.Scenario.load_vector_left"><code class="docutils literal notranslate"><span class="pre">Scenario.load_vector_left</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="weac.core.scenario.html#weac.core.scenario.Scenario.load_vector_right"><code class="docutils literal notranslate"><span class="pre">Scenario.load_vector_right</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="weac.core.scenario.html#id0"><code class="docutils literal notranslate"><span class="pre">Scenario.li</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="weac.core.scenario.html#id1"><code class="docutils literal notranslate"><span class="pre">Scenario.ki</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="weac.core.scenario.html#id2"><code class="docutils literal notranslate"><span class="pre">Scenario.mi</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="weac.core.scenario.html#id2"><code class="docutils literal notranslate"><span class="pre">Scenario.gi</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="weac.core.scenario.html#id3"><code class="docutils literal notranslate"><span class="pre">Scenario.fi</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="weac.core.scenario.html#weac.core.scenario.Scenario.cum_sum_li"><code class="docutils literal notranslate"><span class="pre">Scenario.cum_sum_li</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="weac.core.scenario.html#weac.core.scenario.Scenario.qw"><code class="docutils literal notranslate"><span class="pre">Scenario.qw</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="weac.core.scenario.html#weac.core.scenario.Scenario.qn"><code class="docutils literal notranslate"><span class="pre">Scenario.qn</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="weac.core.scenario.html#weac.core.scenario.Scenario.qt"><code class="docutils literal notranslate"><span class="pre">Scenario.qt</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="weac.core.scenario.html#id3"><code class="docutils literal notranslate"><span class="pre">Scenario.L</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="weac.core.scenario.html#id4"><code class="docutils literal notranslate"><span class="pre">Scenario.crack_h</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="weac.core.scenario.html#weac.core.scenario.Scenario.qx"><code class="docutils literal notranslate"><span class="pre">Scenario.qx</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="weac.core.scenario.html#weac.core.scenario.Scenario.qy"><code class="docutils literal notranslate"><span class="pre">Scenario.qy</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="weac.core.scenario.html#weac.core.scenario.Scenario.qz"><code class="docutils literal notranslate"><span class="pre">Scenario.qz</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="weac.core.scenario.html#weac.core.scenario.Scenario.L"><code class="docutils literal notranslate"><span class="pre">Scenario.L</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="weac.core.scenario.html#weac.core.scenario.Scenario.crack_h"><code class="docutils literal notranslate"><span class="pre">Scenario.crack_h</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="weac.core.scenario.html#weac.core.scenario.Scenario.__init__"><code class="docutils literal notranslate"><span class="pre">Scenario.__init__()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="weac.core.scenario.html#weac.core.scenario.Scenario.scenario_config"><code class="docutils literal notranslate"><span class="pre">Scenario.scenario_config</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="weac.core.scenario.html#weac.core.scenario.Scenario.segments"><code class="docutils literal notranslate"><span class="pre">Scenario.segments</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="weac.core.scenario.html#weac.core.scenario.Scenario.weak_layer"><code class="docutils literal notranslate"><span class="pre">Scenario.weak_layer</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="weac.core.scenario.html#weac.core.scenario.Scenario.slab"><code class="docutils literal notranslate"><span class="pre">Scenario.slab</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="weac.core.scenario.html#id5"><code class="docutils literal notranslate"><span class="pre">Scenario.system_type</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="weac.core.scenario.html#id6"><code class="docutils literal notranslate"><span class="pre">Scenario.phi</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="weac.core.scenario.html#weac.core.scenario.Scenario.system_type"><code class="docutils literal notranslate"><span class="pre">Scenario.system_type</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="weac.core.scenario.html#weac.core.scenario.Scenario.phi"><code class="docutils literal notranslate"><span class="pre">Scenario.phi</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="weac.core.scenario.html#weac.core.scenario.Scenario.theta"><code class="docutils literal notranslate"><span class="pre">Scenario.theta</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="weac.core.scenario.html#weac.core.scenario.Scenario.surface_load"><code class="docutils literal notranslate"><span class="pre">Scenario.surface_load</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="weac.core.scenario.html#weac.core.scenario.Scenario.cut_length"><code class="docutils literal notranslate"><span class="pre">Scenario.cut_length</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="weac.core.scenario.html#id4"><code class="docutils literal notranslate"><span class="pre">Scenario.load_vector_left</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="weac.core.scenario.html#id5"><code class="docutils literal notranslate"><span class="pre">Scenario.load_vector_right</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="weac.core.scenario.html#weac.core.scenario.Scenario.refresh_from_config"><code class="docutils literal notranslate"><span class="pre">Scenario.refresh_from_config()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="weac.core.scenario.html#weac.core.scenario.Scenario.get_segment_idx"><code class="docutils literal notranslate"><span class="pre">Scenario.get_segment_idx()</span></code></a></li>
 </ul>
@@ -263,6 +373,7 @@
 <li class="toctree-l3"><a class="reference internal" href="weac.core.slab.html#weac.core.slab.Slab.Gi"><code class="docutils literal notranslate"><span class="pre">Slab.Gi</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="weac.core.slab.html#weac.core.slab.Slab.nui"><code class="docutils literal notranslate"><span class="pre">Slab.nui</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="weac.core.slab.html#weac.core.slab.Slab.H"><code class="docutils literal notranslate"><span class="pre">Slab.H</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="weac.core.slab.html#weac.core.slab.Slab.b"><code class="docutils literal notranslate"><span class="pre">Slab.b</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="weac.core.slab.html#weac.core.slab.Slab.z_cog"><code class="docutils literal notranslate"><span class="pre">Slab.z_cog</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="weac.core.slab.html#weac.core.slab.Slab.qw"><code class="docutils literal notranslate"><span class="pre">Slab.qw</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="weac.core.slab.html#id0"><code class="docutils literal notranslate"><span class="pre">Slab.rhoi</span></code></a></li>
@@ -278,6 +389,7 @@
 <li class="toctree-l3"><a class="reference internal" href="weac.core.slab.html#id9"><code class="docutils literal notranslate"><span class="pre">Slab.qw</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="weac.core.slab.html#weac.core.slab.Slab.__init__"><code class="docutils literal notranslate"><span class="pre">Slab.__init__()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="weac.core.slab.html#weac.core.slab.Slab.layers"><code class="docutils literal notranslate"><span class="pre">Slab.layers</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="weac.core.slab.html#id10"><code class="docutils literal notranslate"><span class="pre">Slab.b</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="weac.core.slab.html#weac.core.slab.Slab.calc_vertical_center_of_gravity"><code class="docutils literal notranslate"><span class="pre">Slab.calc_vertical_center_of_gravity()</span></code></a></li>
 </ul>
 </li>
@@ -314,6 +426,7 @@
 <li class="toctree-l3"><a class="reference internal" href="weac.core.system_model.html#id17"><code class="docutils literal notranslate"><span class="pre">SystemModel.weak_layer</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="weac.core.system_model.html#id18"><code class="docutils literal notranslate"><span class="pre">SystemModel.slab</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="weac.core.system_model.html#id19"><code class="docutils literal notranslate"><span class="pre">SystemModel.scenario</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="weac.core.system_model.html#weac.core.system_model.SystemModel.is_generalized"><code class="docutils literal notranslate"><span class="pre">SystemModel.is_generalized</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="weac.core.system_model.html#weac.core.system_model.SystemModel.fq"><code class="docutils literal notranslate"><span class="pre">SystemModel.fq</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="weac.core.system_model.html#id20"><code class="docutils literal notranslate"><span class="pre">SystemModel.eigensystem</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="weac.core.system_model.html#id21"><code class="docutils literal notranslate"><span class="pre">SystemModel.slab_touchdown</span></code></a></li>
@@ -720,54 +833,58 @@ is True.</p></li>
 </dl>
 </dd></dl>
 <dl class="py attribute">
-<dt class="sig sig-object py" id="weac.core.Scenario.mi">
-<span class="sig-name descname"><span class="pre">mi</span></span><a class="headerlink" href="#weac.core.Scenario.mi" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#weac.core.Scenario.mi'">¶</a></dt>
-<dd><p>skier masses (kg) on boundary of segment i and i+1 [kg]</p>
+<dt class="sig sig-object py" id="weac.core.Scenario.fi">
+<span class="sig-name descname"><span class="pre">fi</span></span><a class="headerlink" href="#weac.core.Scenario.fi" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#weac.core.Scenario.fi'">¶</a></dt>
+<dd><p>force vectors at the boundaries of the segments masses (kg) on boundary of segment i and i+1 [N, N N, Nmm, Nmm, Nmm]</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>List[float]</p>
+<dd class="field-odd"><p>List[np.arrays]</p>
 </dd>
 </dl>
 </dd></dl>
 <dl class="py attribute">
-<dt class="sig sig-object py" id="weac.core.Scenario.system_type">
-<span class="sig-name descname"><span class="pre">system_type</span></span><a class="headerlink" href="#weac.core.Scenario.system_type" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#weac.core.Scenario.system_type'">¶</a></dt>
-<dd><dl class="field-list simple">
+<dt class="sig sig-object py" id="weac.core.Scenario.gi">
+<span class="sig-name descname"><span class="pre">gi</span></span><a class="headerlink" href="#weac.core.Scenario.gi" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#weac.core.Scenario.gi'">¶</a></dt>
+<dd><p>booleans indicating loading for segment i</p>
+<dl class="field-list simple">
 <dt class="field-odd">Type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>SystemType</p>
+<dd class="field-odd"><p>List[bool]</p>
 </dd>
 </dl>
 </dd></dl>
 <dl class="py attribute">
-<dt class="sig sig-object py" id="weac.core.Scenario.phi">
-<span class="sig-name descname"><span class="pre">phi</span></span><a class="headerlink" href="#weac.core.Scenario.phi" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#weac.core.Scenario.phi'">¶</a></dt>
-<dd><p>Angle of slab in positive in counter-clockwise direction [deg]</p>
+<dt class="sig sig-object py" id="weac.core.Scenario.load_vector_left">
+<span class="sig-name descname"><span class="pre">load_vector_left</span></span><a class="headerlink" href="#weac.core.Scenario.load_vector_left" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#weac.core.Scenario.load_vector_left'">¶</a></dt>
+<dd><p>load vector on the left side of the configuration</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>float</p>
+<dd class="field-odd"><p>np.ndarray</p>
 </dd>
 </dl>
 </dd></dl>
 <dl class="py attribute">
-<dt class="sig sig-object py" id="weac.core.Scenario.L">
-<span class="sig-name descname"><span class="pre">L</span></span><a class="headerlink" href="#weac.core.Scenario.L" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#weac.core.Scenario.L'">¶</a></dt>
-<dd><p>Length of the model [mm]</p>
+<dt class="sig sig-object py" id="weac.core.Scenario.load_vector_right">
+<span class="sig-name descname"><span class="pre">load_vector_right</span></span><a class="headerlink" href="#weac.core.Scenario.load_vector_right" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#weac.core.Scenario.load_vector_right'">¶</a></dt>
+<dd><p>load vector on the right side of the configuration</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>float</p>
+<dd class="field-odd"><p>np.ndarray</p>
 </dd>
 </dl>
 </dd></dl>
-<dl class="py attribute">
-<dt class="sig sig-object py" id="weac.core.Scenario.crack_h">
-<span class="sig-name descname"><span class="pre">crack_h</span></span><a class="headerlink" href="#weac.core.Scenario.crack_h" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#weac.core.Scenario.crack_h'">¶</a></dt>
-<dd><p>Height of the crack [mm]</p>
-<dl class="field-list simple">
-<dt class="field-odd">Type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>float</p>
+<p>system_type : SystemType
+phi : float</p>
+<blockquote>
+<div><p>Angle of slab in positive in counter-clockwise direction [deg]</p>
+</div></blockquote>
+<dl class="simple">
+<dt>theta<span class="classifier">float</span></dt><dd><p>Angle of slab rotation around its axis [deg]</p>
+</dd>
+<dt>L<span class="classifier">float</span></dt><dd><p>Length of the model [mm]</p>
+</dd>
+<dt>crack_h: float</dt><dd><p>Height of the crack [mm]</p>
 </dd>
 </dl>
-</dd></dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="weac.core.Scenario.__init__">
 <span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">scenario_config</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">segments</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">weak_layer</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">slab</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/weac/core/scenario.html#Scenario.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#weac.core.Scenario.__init__" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#weac.core.Scenario.__init__'">¶</a></dt>
@@ -830,19 +947,35 @@ and recompute derived attributes.</p>
 <dd></dd></dl>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="id15">
-<span class="sig-name descname"><span class="pre">mi</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">ndarray</span></em><a class="headerlink" href="#id15" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id15'">¶</a></dt>
+<span class="sig-name descname"><span class="pre">gi</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">ndarray</span></em><a class="headerlink" href="#id15" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id15'">¶</a></dt>
+<dd></dd></dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="id16">
+<span class="sig-name descname"><span class="pre">fi</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">ndarray</span></em><a class="headerlink" href="#id16" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id16'">¶</a></dt>
+<dd></dd></dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="id17">
+<span class="sig-name descname"><span class="pre">load_vector_left</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">ndarray</span></em><a class="headerlink" href="#id17" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id17'">¶</a></dt>
+<dd></dd></dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="id18">
+<span class="sig-name descname"><span class="pre">load_vector_right</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">ndarray</span></em><a class="headerlink" href="#id18" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id18'">¶</a></dt>
 <dd></dd></dl>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="weac.core.Scenario.cum_sum_li">
 <span class="sig-name descname"><span class="pre">cum_sum_li</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">ndarray</span></em><a class="headerlink" href="#weac.core.Scenario.cum_sum_li" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#weac.core.Scenario.cum_sum_li'">¶</a></dt>
 <dd></dd></dl>
 <dl class="py attribute">
-<dt class="sig sig-object py" id="id16">
-<span class="sig-name descname"><span class="pre">system_type</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Literal</span><span class="p"><span class="pre">[</span></span><span class="s"><span class="pre">'skier'</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="s"><span class="pre">'skiers'</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="s"><span class="pre">'pst-'</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="s"><span class="pre">'-pst'</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="s"><span class="pre">'rot'</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="s"><span class="pre">'trans'</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="s"><span class="pre">'vpst-'</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="s"><span class="pre">'-vpst'</span></span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#id16" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id16'">¶</a></dt>
+<dt class="sig sig-object py" id="weac.core.Scenario.system_type">
+<span class="sig-name descname"><span class="pre">system_type</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Literal</span><span class="p"><span class="pre">[</span></span><span class="s"><span class="pre">'skier'</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="s"><span class="pre">'skiers'</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="s"><span class="pre">'pst-'</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="s"><span class="pre">'-pst'</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="s"><span class="pre">'rot'</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="s"><span class="pre">'trans'</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="s"><span class="pre">'vpst-'</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="s"><span class="pre">'-vpst'</span></span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#weac.core.Scenario.system_type" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#weac.core.Scenario.system_type'">¶</a></dt>
 <dd></dd></dl>
 <dl class="py attribute">
-<dt class="sig sig-object py" id="id17">
-<span class="sig-name descname"><span class="pre">phi</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><a class="headerlink" href="#id17" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id17'">¶</a></dt>
+<dt class="sig sig-object py" id="weac.core.Scenario.phi">
+<span class="sig-name descname"><span class="pre">phi</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><a class="headerlink" href="#weac.core.Scenario.phi" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#weac.core.Scenario.phi'">¶</a></dt>
+<dd></dd></dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="weac.core.Scenario.theta">
+<span class="sig-name descname"><span class="pre">theta</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><a class="headerlink" href="#weac.core.Scenario.theta" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#weac.core.Scenario.theta'">¶</a></dt>
 <dd></dd></dl>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="weac.core.Scenario.surface_load">
@@ -853,20 +986,24 @@ and recompute derived attributes.</p>
 <span class="sig-name descname"><span class="pre">qw</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><a class="headerlink" href="#weac.core.Scenario.qw" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#weac.core.Scenario.qw'">¶</a></dt>
 <dd></dd></dl>
 <dl class="py attribute">
-<dt class="sig sig-object py" id="weac.core.Scenario.qn">
-<span class="sig-name descname"><span class="pre">qn</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><a class="headerlink" href="#weac.core.Scenario.qn" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#weac.core.Scenario.qn'">¶</a></dt>
+<dt class="sig sig-object py" id="weac.core.Scenario.qx">
+<span class="sig-name descname"><span class="pre">qx</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><a class="headerlink" href="#weac.core.Scenario.qx" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#weac.core.Scenario.qx'">¶</a></dt>
 <dd></dd></dl>
 <dl class="py attribute">
-<dt class="sig sig-object py" id="weac.core.Scenario.qt">
-<span class="sig-name descname"><span class="pre">qt</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><a class="headerlink" href="#weac.core.Scenario.qt" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#weac.core.Scenario.qt'">¶</a></dt>
+<dt class="sig sig-object py" id="weac.core.Scenario.qy">
+<span class="sig-name descname"><span class="pre">qy</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><a class="headerlink" href="#weac.core.Scenario.qy" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#weac.core.Scenario.qy'">¶</a></dt>
 <dd></dd></dl>
 <dl class="py attribute">
-<dt class="sig sig-object py" id="id18">
-<span class="sig-name descname"><span class="pre">L</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><a class="headerlink" href="#id18" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id18'">¶</a></dt>
+<dt class="sig sig-object py" id="weac.core.Scenario.qz">
+<span class="sig-name descname"><span class="pre">qz</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><a class="headerlink" href="#weac.core.Scenario.qz" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#weac.core.Scenario.qz'">¶</a></dt>
 <dd></dd></dl>
 <dl class="py attribute">
-<dt class="sig sig-object py" id="id19">
-<span class="sig-name descname"><span class="pre">crack_h</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><a class="headerlink" href="#id19" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id19'">¶</a></dt>
+<dt class="sig sig-object py" id="weac.core.Scenario.L">
+<span class="sig-name descname"><span class="pre">L</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><a class="headerlink" href="#weac.core.Scenario.L" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#weac.core.Scenario.L'">¶</a></dt>
+<dd></dd></dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="weac.core.Scenario.crack_h">
+<span class="sig-name descname"><span class="pre">crack_h</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><a class="headerlink" href="#weac.core.Scenario.crack_h" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#weac.core.Scenario.crack_h'">¶</a></dt>
 <dd></dd></dl>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="weac.core.Scenario.cut_length">
@@ -875,7 +1012,7 @@ and recompute derived attributes.</p>
 </dd></dl>
 <dl class="py class">
 <dt class="sig sig-object py" id="weac.core.Slab">
-<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">weac.core.</span></span><span class="sig-name descname"><span class="pre">Slab</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">layers</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/weac/core/slab.html#Slab"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#weac.core.Slab" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#weac.core.Slab'">¶</a></dt>
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">weac.core.</span></span><span class="sig-name descname"><span class="pre">Slab</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">layers</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">b</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">300</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/weac/core/slab.html#Slab"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#weac.core.Slab" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#weac.core.Slab'">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <p>Parameters of all layers assembled into a slab,
 provided as np.ndarray for easier access.</p>
@@ -884,7 +1021,10 @@ provided as np.ndarray for easier access.</p>
 - z = 0 is set at the mid-point of the slab’s thickness</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>layers</strong> (<em>list</em><em>[</em><a class="reference internal" href="weac.components.layer.html#weac.components.layer.Layer" title="weac.components.layer.Layer"><em>Layer</em></a><em>]</em>)</p>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>layers</strong> (<em>list</em><em>[</em><a class="reference internal" href="weac.components.layer.html#weac.components.layer.Layer" title="weac.components.layer.Layer"><em>Layer</em></a><em>]</em>)</p></li>
+<li><p><strong>b</strong> (<em>float</em>)</p></li>
+</ul>
 </dd>
 </dl>
 <dl class="py attribute">
@@ -968,6 +1108,16 @@ provided as np.ndarray for easier access.</p>
 </dl>
 </dd></dl>
 <dl class="py attribute">
+<dt class="sig sig-object py" id="weac.core.Slab.b">
+<span class="sig-name descname"><span class="pre">b</span></span><a class="headerlink" href="#weac.core.Slab.b" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#weac.core.Slab.b'">¶</a></dt>
+<dd><p>Total slab width [mm]</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="py attribute">
 <dt class="sig sig-object py" id="weac.core.Slab.z_cog">
 <span class="sig-name descname"><span class="pre">z_cog</span></span><a class="headerlink" href="#weac.core.Slab.z_cog" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#weac.core.Slab.z_cog'">¶</a></dt>
 <dd><p>z-coordinate of Center of Gravity [mm]</p>
@@ -989,10 +1139,13 @@ provided as np.ndarray for easier access.</p>
 </dd></dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="weac.core.Slab.__init__">
-<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">layers</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/weac/core/slab.html#Slab.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#weac.core.Slab.__init__" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#weac.core.Slab.__init__'">¶</a></dt>
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">layers</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">b</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">300</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/weac/core/slab.html#Slab.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#weac.core.Slab.__init__" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#weac.core.Slab.__init__'">¶</a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>layers</strong> (<em>list</em><em>[</em><a class="reference internal" href="weac.components.layer.html#weac.components.layer.Layer" title="weac.components.layer.Layer"><em>Layer</em></a><em>]</em>)</p>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>layers</strong> (<em>list</em><em>[</em><a class="reference internal" href="weac.components.layer.html#weac.components.layer.Layer" title="weac.components.layer.Layer"><em>Layer</em></a><em>]</em>)</p></li>
+<li><p><strong>b</strong> (<em>float</em>)</p></li>
+</ul>
 </dd>
 <dt class="field-even">Return type<span class="colon">:</span></dt>
 <dd class="field-even"><p>None</p>
@@ -1023,48 +1176,52 @@ Calculate center of gravity of triangular slab segments for vertical PSTs.</p>
 <span class="sig-name descname"><span class="pre">layers</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="weac.components.layer.html#weac.components.layer.Layer" title="weac.components.layer.Layer"><span class="pre">Layer</span></a><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#weac.core.Slab.layers" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#weac.core.Slab.layers'">¶</a></dt>
 <dd></dd></dl>
 <dl class="py attribute">
+<dt class="sig sig-object py" id="id19">
+<span class="sig-name descname"><span class="pre">rhoi</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">ndarray</span></em><a class="headerlink" href="#id19" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id19'">¶</a></dt>
+<dd></dd></dl>
+<dl class="py attribute">
 <dt class="sig sig-object py" id="id20">
-<span class="sig-name descname"><span class="pre">rhoi</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">ndarray</span></em><a class="headerlink" href="#id20" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id20'">¶</a></dt>
+<span class="sig-name descname"><span class="pre">hi</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">ndarray</span></em><a class="headerlink" href="#id20" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id20'">¶</a></dt>
 <dd></dd></dl>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="id21">
-<span class="sig-name descname"><span class="pre">hi</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">ndarray</span></em><a class="headerlink" href="#id21" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id21'">¶</a></dt>
+<span class="sig-name descname"><span class="pre">Ei</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">ndarray</span></em><a class="headerlink" href="#id21" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id21'">¶</a></dt>
 <dd></dd></dl>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="id22">
-<span class="sig-name descname"><span class="pre">Ei</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">ndarray</span></em><a class="headerlink" href="#id22" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id22'">¶</a></dt>
+<span class="sig-name descname"><span class="pre">Gi</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">ndarray</span></em><a class="headerlink" href="#id22" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id22'">¶</a></dt>
 <dd></dd></dl>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="id23">
-<span class="sig-name descname"><span class="pre">Gi</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">ndarray</span></em><a class="headerlink" href="#id23" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id23'">¶</a></dt>
-<dd></dd></dl>
-<dl class="py attribute">
-<dt class="sig sig-object py" id="id24">
-<span class="sig-name descname"><span class="pre">nui</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">ndarray</span></em><a class="headerlink" href="#id24" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id24'">¶</a></dt>
+<span class="sig-name descname"><span class="pre">nui</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">ndarray</span></em><a class="headerlink" href="#id23" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id23'">¶</a></dt>
 <dd></dd></dl>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="weac.core.Slab.z0">
 <span class="sig-name descname"><span class="pre">z0</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><a class="headerlink" href="#weac.core.Slab.z0" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#weac.core.Slab.z0'">¶</a></dt>
 <dd></dd></dl>
 <dl class="py attribute">
+<dt class="sig sig-object py" id="id24">
+<span class="sig-name descname"><span class="pre">zi_mid</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">ndarray</span></em><a class="headerlink" href="#id24" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id24'">¶</a></dt>
+<dd></dd></dl>
+<dl class="py attribute">
 <dt class="sig sig-object py" id="id25">
-<span class="sig-name descname"><span class="pre">zi_mid</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">ndarray</span></em><a class="headerlink" href="#id25" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id25'">¶</a></dt>
+<span class="sig-name descname"><span class="pre">zi_bottom</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">ndarray</span></em><a class="headerlink" href="#id25" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id25'">¶</a></dt>
 <dd></dd></dl>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="id26">
-<span class="sig-name descname"><span class="pre">zi_bottom</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">ndarray</span></em><a class="headerlink" href="#id26" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id26'">¶</a></dt>
+<span class="sig-name descname"><span class="pre">H</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><a class="headerlink" href="#id26" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id26'">¶</a></dt>
 <dd></dd></dl>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="id27">
-<span class="sig-name descname"><span class="pre">H</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><a class="headerlink" href="#id27" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id27'">¶</a></dt>
+<span class="sig-name descname"><span class="pre">z_cog</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><a class="headerlink" href="#id27" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id27'">¶</a></dt>
 <dd></dd></dl>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="id28">
-<span class="sig-name descname"><span class="pre">z_cog</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><a class="headerlink" href="#id28" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id28'">¶</a></dt>
+<span class="sig-name descname"><span class="pre">qw</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><a class="headerlink" href="#id28" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id28'">¶</a></dt>
 <dd></dd></dl>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="id29">
-<span class="sig-name descname"><span class="pre">qw</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><a class="headerlink" href="#id29" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id29'">¶</a></dt>
+<span class="sig-name descname"><span class="pre">b</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><a class="headerlink" href="#id29" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id29'">¶</a></dt>
 <dd></dd></dl>
 </dd></dl>
 <dl class="py class">
@@ -1085,14 +1242,15 @@ the solution constants for the beam segments:</p>
 # Basic usage
 system = SystemModel(model_input=model_input, config=config)
 constants = system.unknown_constants  # Shape: (6, N) where N = number of segments</p>
-<p># Each column represents the 6 constants for one segment:
-# constants[:, i] = [C1, C2, C3, C4, C5, C6] for segment i
+<p># Each column represents the N constants of integration for one segment:
+# constants[:, i] = [C1, C2, …,  CN-1, CN] for segment i
+# N = 6 for the classical WAEC implementation and 24 for a generalized model accounting for biaxial bending
 # These constants define the beam deflection solution within that segment
 <a href="#id34"><span class="problematic" id="id35">``</span></a><a href="#id36"><span class="problematic" id="id37">`</span></a></p>
 <p><strong>Calculation Flow:</strong></p>
 <ol class="arabic simple">
 <li><p><strong>Eigensystem</strong>: Computes eigenvalues/eigenvectors for the beam-foundation system</p></li>
-<li><p><strong>Slab Touchdown</strong> (if enabled): Calculates touchdown behavior and updates segment lengths</p></li>
+<li><p><strong>Slab Touchdown</strong> (if enabled): Calculates touchdown behavior and updates segment lengths (only available for the classical model)</p></li>
 <li><p><strong>Unknown Constants</strong>: Solves the linear system for beam deflection constants</p></li>
 </ol>
 <p><strong>Touchdown Behavior:</strong></p>
@@ -1216,13 +1374,26 @@ eigensystem = system.eigensystem          # Eigenvalue problem solution
 </dd></dl>
 <dl class="py property">
 <dt class="sig sig-object py" id="id46">
-<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">eigensystem</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="weac.core.eigensystem.html#weac.core.eigensystem.Eigensystem" title="weac.core.eigensystem.Eigensystem"><span class="pre">Eigensystem</span></a></em><a class="headerlink" href="#id46" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id46'">¶</a></dt>
+<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">eigensystem</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="weac.core.eigensystem.html#weac.core.eigensystem.Eigensystem" title="weac.core.eigensystem.Eigensystem"><span class="pre">Eigensystem</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference internal" href="weac.core.generalized_eigensystem.html#weac.core.generalized_eigensystem.GeneralizedEigensystem" title="weac.core.generalized_eigensystem.GeneralizedEigensystem"><span class="pre">GeneralizedEigensystem</span></a></em><a class="headerlink" href="#id46" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id46'">¶</a></dt>
 <dd><p>Solve for the eigensystem.</p>
 </dd></dl>
 <dl class="py property">
 <dt class="sig sig-object py" id="weac.core.SystemModel.fq">
-<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">fq</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="weac.core.field_quantities.html#weac.core.field_quantities.FieldQuantities" title="weac.core.field_quantities.FieldQuantities"><span class="pre">FieldQuantities</span></a></em><a class="headerlink" href="#weac.core.SystemModel.fq" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#weac.core.SystemModel.fq'">¶</a></dt>
+<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">fq</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="weac.core.field_quantities.html#weac.core.field_quantities.FieldQuantities" title="weac.core.field_quantities.FieldQuantities"><span class="pre">FieldQuantities</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference internal" href="weac.core.generalized_field_quantities.html#weac.core.generalized_field_quantities.GeneralizedFieldQuantities" title="weac.core.generalized_field_quantities.GeneralizedFieldQuantities"><span class="pre">GeneralizedFieldQuantities</span></a></em><a class="headerlink" href="#weac.core.SystemModel.fq" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#weac.core.SystemModel.fq'">¶</a></dt>
 <dd><p>Compute the field quantities.</p>
+</dd></dl>
+<dl class="py property">
+<dt class="sig sig-object py" id="weac.core.SystemModel.is_generalized">
+<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">is_generalized</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></em><a class="headerlink" href="#weac.core.SystemModel.is_generalized" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#weac.core.SystemModel.is_generalized'">¶</a></dt>
+<dd><p>Check if the system is using the generalized backend.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>True if config.backend is set to ‘generalized’, False otherwise.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>bool</p>
+</dd>
+</dl>
 </dd></dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="weac.core.SystemModel.set_forced_touchdown_mode">
@@ -1273,8 +1444,8 @@ distributions within each beam segment.</p>
 <section id="returns">
 <h3>Returns:<a class="headerlink" href="#returns" title="Link to this heading" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#returns'">¶</a></h3>
 <dl>
-<dt>np.ndarray: Solution constants matrix of shape (6, N_segments)</dt><dd><p>Each column contains the 6 constants for one segment:
-[C1, C2, C3, C4, C5, C6]</p>
+<dt>np.ndarray: Solution constants matrix of shape (N_dof, N_segments)</dt><dd><p>Each column contains the 6 constants for one segment:
+[C1, C2, …, CN-1, CN]</p>
 <p>These constants are used in the general solution:
 u(x) = Σ Ci * φi(x) + up(x)</p>
 <p>Where φi(x) are the homogeneous solutions and up(x)
@@ -1292,7 +1463,7 @@ between segments, and foundation support</p></li>
 <p class="rubric">Example</p>
 <p><a href="#id49"><span class="problematic" id="id50">``</span></a><a href="#id51"><span class="problematic" id="id52">`</span></a>python
 system = SystemModel(model_input, config)
-C = system.unknown_constants  # Shape: (6, 2) for 2-segment system</p>
+C = system.unknown_constants  # Shape: (N, 2) for 2-segment system</p>
 <p># Constants for first segment
 segment_0_constants = C[:, 0]</p>
 <p># Use with eigensystem to compute field quantities
@@ -1337,7 +1508,7 @@ Scenario object itself, then refresh and invalidate constants.</p>
 </dd></dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="weac.core.SystemModel.z">
-<span class="sig-name descname"><span class="pre">z</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">C</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">length</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">phi</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">has_foundation</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">qs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/weac/core/system_model.html#SystemModel.z"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#weac.core.SystemModel.z" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#weac.core.SystemModel.z'">¶</a></dt>
+<span class="sig-name descname"><span class="pre">z</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">C</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">length</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">phi</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">theta</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">has_foundation</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">is_loaded</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">qs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/weac/core/system_model.html#SystemModel.z"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#weac.core.SystemModel.z" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#weac.core.SystemModel.z'">¶</a></dt>
 <dd><p>Assemble solution vector at positions x.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -1349,6 +1520,8 @@ Scenario object itself, then refresh and invalidate constants.</p>
 <li><p><strong>has_foundation</strong> (<em>bool</em>) – Indicates whether segment has foundation (True) or not
 (False). Default is True.</p></li>
 <li><p><strong>qs</strong> (<em>float</em>) – Surface Load [N/mm]</p></li>
+<li><p><strong>theta</strong> (<em>float</em>)</p></li>
+<li><p><strong>is_loaded</strong> (<em>bool</em>)</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
@@ -1423,11 +1596,10 @@ Scenario object itself, then refresh and invalidate constants.</p>
 <li><a :data-current="activeSection === '#weac.core.Scenario'" class="reference internal" href="#weac.core.Scenario"><code class="docutils literal notranslate"><span class="pre">Scenario</span></code></a><ul>
 <li><a :data-current="activeSection === '#weac.core.Scenario.li'" class="reference internal" href="#weac.core.Scenario.li"><code class="docutils literal notranslate"><span class="pre">Scenario.li</span></code></a></li>
 <li><a :data-current="activeSection === '#weac.core.Scenario.ki'" class="reference internal" href="#weac.core.Scenario.ki"><code class="docutils literal notranslate"><span class="pre">Scenario.ki</span></code></a></li>
-<li><a :data-current="activeSection === '#weac.core.Scenario.mi'" class="reference internal" href="#weac.core.Scenario.mi"><code class="docutils literal notranslate"><span class="pre">Scenario.mi</span></code></a></li>
-<li><a :data-current="activeSection === '#weac.core.Scenario.system_type'" class="reference internal" href="#weac.core.Scenario.system_type"><code class="docutils literal notranslate"><span class="pre">Scenario.system_type</span></code></a></li>
-<li><a :data-current="activeSection === '#weac.core.Scenario.phi'" class="reference internal" href="#weac.core.Scenario.phi"><code class="docutils literal notranslate"><span class="pre">Scenario.phi</span></code></a></li>
-<li><a :data-current="activeSection === '#weac.core.Scenario.L'" class="reference internal" href="#weac.core.Scenario.L"><code class="docutils literal notranslate"><span class="pre">Scenario.L</span></code></a></li>
-<li><a :data-current="activeSection === '#weac.core.Scenario.crack_h'" class="reference internal" href="#weac.core.Scenario.crack_h"><code class="docutils literal notranslate"><span class="pre">Scenario.crack_h</span></code></a></li>
+<li><a :data-current="activeSection === '#weac.core.Scenario.fi'" class="reference internal" href="#weac.core.Scenario.fi"><code class="docutils literal notranslate"><span class="pre">Scenario.fi</span></code></a></li>
+<li><a :data-current="activeSection === '#weac.core.Scenario.gi'" class="reference internal" href="#weac.core.Scenario.gi"><code class="docutils literal notranslate"><span class="pre">Scenario.gi</span></code></a></li>
+<li><a :data-current="activeSection === '#weac.core.Scenario.load_vector_left'" class="reference internal" href="#weac.core.Scenario.load_vector_left"><code class="docutils literal notranslate"><span class="pre">Scenario.load_vector_left</span></code></a></li>
+<li><a :data-current="activeSection === '#weac.core.Scenario.load_vector_right'" class="reference internal" href="#weac.core.Scenario.load_vector_right"><code class="docutils literal notranslate"><span class="pre">Scenario.load_vector_right</span></code></a></li>
 <li><a :data-current="activeSection === '#weac.core.Scenario.__init__'" class="reference internal" href="#weac.core.Scenario.__init__"><code class="docutils literal notranslate"><span class="pre">Scenario.__init__()</span></code></a></li>
 <li><a :data-current="activeSection === '#weac.core.Scenario.get_segment_idx'" class="reference internal" href="#weac.core.Scenario.get_segment_idx"><code class="docutils literal notranslate"><span class="pre">Scenario.get_segment_idx()</span></code></a></li>
 <li><a :data-current="activeSection === '#weac.core.Scenario.refresh_from_config'" class="reference internal" href="#weac.core.Scenario.refresh_from_config"><code class="docutils literal notranslate"><span class="pre">Scenario.refresh_from_config()</span></code></a></li>
@@ -1437,16 +1609,21 @@ Scenario object itself, then refresh and invalidate constants.</p>
 <li><a :data-current="activeSection === '#weac.core.Scenario.slab'" class="reference internal" href="#weac.core.Scenario.slab"><code class="docutils literal notranslate"><span class="pre">Scenario.slab</span></code></a></li>
 <li><a :data-current="activeSection === '#id13'" class="reference internal" href="#id13"><code class="docutils literal notranslate"><span class="pre">Scenario.li</span></code></a></li>
 <li><a :data-current="activeSection === '#id14'" class="reference internal" href="#id14"><code class="docutils literal notranslate"><span class="pre">Scenario.ki</span></code></a></li>
-<li><a :data-current="activeSection === '#id15'" class="reference internal" href="#id15"><code class="docutils literal notranslate"><span class="pre">Scenario.mi</span></code></a></li>
+<li><a :data-current="activeSection === '#id15'" class="reference internal" href="#id15"><code class="docutils literal notranslate"><span class="pre">Scenario.gi</span></code></a></li>
+<li><a :data-current="activeSection === '#id16'" class="reference internal" href="#id16"><code class="docutils literal notranslate"><span class="pre">Scenario.fi</span></code></a></li>
+<li><a :data-current="activeSection === '#id17'" class="reference internal" href="#id17"><code class="docutils literal notranslate"><span class="pre">Scenario.load_vector_left</span></code></a></li>
+<li><a :data-current="activeSection === '#id18'" class="reference internal" href="#id18"><code class="docutils literal notranslate"><span class="pre">Scenario.load_vector_right</span></code></a></li>
 <li><a :data-current="activeSection === '#weac.core.Scenario.cum_sum_li'" class="reference internal" href="#weac.core.Scenario.cum_sum_li"><code class="docutils literal notranslate"><span class="pre">Scenario.cum_sum_li</span></code></a></li>
-<li><a :data-current="activeSection === '#id16'" class="reference internal" href="#id16"><code class="docutils literal notranslate"><span class="pre">Scenario.system_type</span></code></a></li>
-<li><a :data-current="activeSection === '#id17'" class="reference internal" href="#id17"><code class="docutils literal notranslate"><span class="pre">Scenario.phi</span></code></a></li>
+<li><a :data-current="activeSection === '#weac.core.Scenario.system_type'" class="reference internal" href="#weac.core.Scenario.system_type"><code class="docutils literal notranslate"><span class="pre">Scenario.system_type</span></code></a></li>
+<li><a :data-current="activeSection === '#weac.core.Scenario.phi'" class="reference internal" href="#weac.core.Scenario.phi"><code class="docutils literal notranslate"><span class="pre">Scenario.phi</span></code></a></li>
+<li><a :data-current="activeSection === '#weac.core.Scenario.theta'" class="reference internal" href="#weac.core.Scenario.theta"><code class="docutils literal notranslate"><span class="pre">Scenario.theta</span></code></a></li>
 <li><a :data-current="activeSection === '#weac.core.Scenario.surface_load'" class="reference internal" href="#weac.core.Scenario.surface_load"><code class="docutils literal notranslate"><span class="pre">Scenario.surface_load</span></code></a></li>
 <li><a :data-current="activeSection === '#weac.core.Scenario.qw'" class="reference internal" href="#weac.core.Scenario.qw"><code class="docutils literal notranslate"><span class="pre">Scenario.qw</span></code></a></li>
-<li><a :data-current="activeSection === '#weac.core.Scenario.qn'" class="reference internal" href="#weac.core.Scenario.qn"><code class="docutils literal notranslate"><span class="pre">Scenario.qn</span></code></a></li>
-<li><a :data-current="activeSection === '#weac.core.Scenario.qt'" class="reference internal" href="#weac.core.Scenario.qt"><code class="docutils literal notranslate"><span class="pre">Scenario.qt</span></code></a></li>
-<li><a :data-current="activeSection === '#id18'" class="reference internal" href="#id18"><code class="docutils literal notranslate"><span class="pre">Scenario.L</span></code></a></li>
-<li><a :data-current="activeSection === '#id19'" class="reference internal" href="#id19"><code class="docutils literal notranslate"><span class="pre">Scenario.crack_h</span></code></a></li>
+<li><a :data-current="activeSection === '#weac.core.Scenario.qx'" class="reference internal" href="#weac.core.Scenario.qx"><code class="docutils literal notranslate"><span class="pre">Scenario.qx</span></code></a></li>
+<li><a :data-current="activeSection === '#weac.core.Scenario.qy'" class="reference internal" href="#weac.core.Scenario.qy"><code class="docutils literal notranslate"><span class="pre">Scenario.qy</span></code></a></li>
+<li><a :data-current="activeSection === '#weac.core.Scenario.qz'" class="reference internal" href="#weac.core.Scenario.qz"><code class="docutils literal notranslate"><span class="pre">Scenario.qz</span></code></a></li>
+<li><a :data-current="activeSection === '#weac.core.Scenario.L'" class="reference internal" href="#weac.core.Scenario.L"><code class="docutils literal notranslate"><span class="pre">Scenario.L</span></code></a></li>
+<li><a :data-current="activeSection === '#weac.core.Scenario.crack_h'" class="reference internal" href="#weac.core.Scenario.crack_h"><code class="docutils literal notranslate"><span class="pre">Scenario.crack_h</span></code></a></li>
 <li><a :data-current="activeSection === '#weac.core.Scenario.cut_length'" class="reference internal" href="#weac.core.Scenario.cut_length"><code class="docutils literal notranslate"><span class="pre">Scenario.cut_length</span></code></a></li>
 </ul>
 </li>
@@ -1459,22 +1636,24 @@ Scenario object itself, then refresh and invalidate constants.</p>
 <li><a :data-current="activeSection === '#weac.core.Slab.Gi'" class="reference internal" href="#weac.core.Slab.Gi"><code class="docutils literal notranslate"><span class="pre">Slab.Gi</span></code></a></li>
 <li><a :data-current="activeSection === '#weac.core.Slab.nui'" class="reference internal" href="#weac.core.Slab.nui"><code class="docutils literal notranslate"><span class="pre">Slab.nui</span></code></a></li>
 <li><a :data-current="activeSection === '#weac.core.Slab.H'" class="reference internal" href="#weac.core.Slab.H"><code class="docutils literal notranslate"><span class="pre">Slab.H</span></code></a></li>
+<li><a :data-current="activeSection === '#weac.core.Slab.b'" class="reference internal" href="#weac.core.Slab.b"><code class="docutils literal notranslate"><span class="pre">Slab.b</span></code></a></li>
 <li><a :data-current="activeSection === '#weac.core.Slab.z_cog'" class="reference internal" href="#weac.core.Slab.z_cog"><code class="docutils literal notranslate"><span class="pre">Slab.z_cog</span></code></a></li>
 <li><a :data-current="activeSection === '#weac.core.Slab.qw'" class="reference internal" href="#weac.core.Slab.qw"><code class="docutils literal notranslate"><span class="pre">Slab.qw</span></code></a></li>
 <li><a :data-current="activeSection === '#weac.core.Slab.__init__'" class="reference internal" href="#weac.core.Slab.__init__"><code class="docutils literal notranslate"><span class="pre">Slab.__init__()</span></code></a></li>
 <li><a :data-current="activeSection === '#weac.core.Slab.calc_vertical_center_of_gravity'" class="reference internal" href="#weac.core.Slab.calc_vertical_center_of_gravity"><code class="docutils literal notranslate"><span class="pre">Slab.calc_vertical_center_of_gravity()</span></code></a></li>
 <li><a :data-current="activeSection === '#weac.core.Slab.layers'" class="reference internal" href="#weac.core.Slab.layers"><code class="docutils literal notranslate"><span class="pre">Slab.layers</span></code></a></li>
-<li><a :data-current="activeSection === '#id20'" class="reference internal" href="#id20"><code class="docutils literal notranslate"><span class="pre">Slab.rhoi</span></code></a></li>
-<li><a :data-current="activeSection === '#id21'" class="reference internal" href="#id21"><code class="docutils literal notranslate"><span class="pre">Slab.hi</span></code></a></li>
-<li><a :data-current="activeSection === '#id22'" class="reference internal" href="#id22"><code class="docutils literal notranslate"><span class="pre">Slab.Ei</span></code></a></li>
-<li><a :data-current="activeSection === '#id23'" class="reference internal" href="#id23"><code class="docutils literal notranslate"><span class="pre">Slab.Gi</span></code></a></li>
-<li><a :data-current="activeSection === '#id24'" class="reference internal" href="#id24"><code class="docutils literal notranslate"><span class="pre">Slab.nui</span></code></a></li>
+<li><a :data-current="activeSection === '#id19'" class="reference internal" href="#id19"><code class="docutils literal notranslate"><span class="pre">Slab.rhoi</span></code></a></li>
+<li><a :data-current="activeSection === '#id20'" class="reference internal" href="#id20"><code class="docutils literal notranslate"><span class="pre">Slab.hi</span></code></a></li>
+<li><a :data-current="activeSection === '#id21'" class="reference internal" href="#id21"><code class="docutils literal notranslate"><span class="pre">Slab.Ei</span></code></a></li>
+<li><a :data-current="activeSection === '#id22'" class="reference internal" href="#id22"><code class="docutils literal notranslate"><span class="pre">Slab.Gi</span></code></a></li>
+<li><a :data-current="activeSection === '#id23'" class="reference internal" href="#id23"><code class="docutils literal notranslate"><span class="pre">Slab.nui</span></code></a></li>
 <li><a :data-current="activeSection === '#weac.core.Slab.z0'" class="reference internal" href="#weac.core.Slab.z0"><code class="docutils literal notranslate"><span class="pre">Slab.z0</span></code></a></li>
-<li><a :data-current="activeSection === '#id25'" class="reference internal" href="#id25"><code class="docutils literal notranslate"><span class="pre">Slab.zi_mid</span></code></a></li>
-<li><a :data-current="activeSection === '#id26'" class="reference internal" href="#id26"><code class="docutils literal notranslate"><span class="pre">Slab.zi_bottom</span></code></a></li>
-<li><a :data-current="activeSection === '#id27'" class="reference internal" href="#id27"><code class="docutils literal notranslate"><span class="pre">Slab.H</span></code></a></li>
-<li><a :data-current="activeSection === '#id28'" class="reference internal" href="#id28"><code class="docutils literal notranslate"><span class="pre">Slab.z_cog</span></code></a></li>
-<li><a :data-current="activeSection === '#id29'" class="reference internal" href="#id29"><code class="docutils literal notranslate"><span class="pre">Slab.qw</span></code></a></li>
+<li><a :data-current="activeSection === '#id24'" class="reference internal" href="#id24"><code class="docutils literal notranslate"><span class="pre">Slab.zi_mid</span></code></a></li>
+<li><a :data-current="activeSection === '#id25'" class="reference internal" href="#id25"><code class="docutils literal notranslate"><span class="pre">Slab.zi_bottom</span></code></a></li>
+<li><a :data-current="activeSection === '#id26'" class="reference internal" href="#id26"><code class="docutils literal notranslate"><span class="pre">Slab.H</span></code></a></li>
+<li><a :data-current="activeSection === '#id27'" class="reference internal" href="#id27"><code class="docutils literal notranslate"><span class="pre">Slab.z_cog</span></code></a></li>
+<li><a :data-current="activeSection === '#id28'" class="reference internal" href="#id28"><code class="docutils literal notranslate"><span class="pre">Slab.qw</span></code></a></li>
+<li><a :data-current="activeSection === '#id29'" class="reference internal" href="#id29"><code class="docutils literal notranslate"><span class="pre">Slab.b</span></code></a></li>
 </ul>
 </li>
 <li><a :data-current="activeSection === '#weac.core.SystemModel'" class="reference internal" href="#weac.core.SystemModel"><code class="docutils literal notranslate"><span class="pre">SystemModel</span></code></a><ul>
@@ -1488,6 +1667,7 @@ Scenario object itself, then refresh and invalidate constants.</p>
 <li><a :data-current="activeSection === '#weac.core.SystemModel.__init__'" class="reference internal" href="#weac.core.SystemModel.__init__"><code class="docutils literal notranslate"><span class="pre">SystemModel.__init__()</span></code></a></li>
 <li><a :data-current="activeSection === '#id46'" class="reference internal" href="#id46"><code class="docutils literal notranslate"><span class="pre">SystemModel.eigensystem</span></code></a></li>
 <li><a :data-current="activeSection === '#weac.core.SystemModel.fq'" class="reference internal" href="#weac.core.SystemModel.fq"><code class="docutils literal notranslate"><span class="pre">SystemModel.fq</span></code></a></li>
+<li><a :data-current="activeSection === '#weac.core.SystemModel.is_generalized'" class="reference internal" href="#weac.core.SystemModel.is_generalized"><code class="docutils literal notranslate"><span class="pre">SystemModel.is_generalized</span></code></a></li>
 <li><a :data-current="activeSection === '#weac.core.SystemModel.set_forced_touchdown_mode'" class="reference internal" href="#weac.core.SystemModel.set_forced_touchdown_mode"><code class="docutils literal notranslate"><span class="pre">SystemModel.set_forced_touchdown_mode()</span></code></a></li>
 <li><a :data-current="activeSection === '#id47'" class="reference internal" href="#id47"><code class="docutils literal notranslate"><span class="pre">SystemModel.slab_touchdown</span></code></a></li>
 <li><a :data-current="activeSection === '#weac.core.SystemModel.toggle_touchdown'" class="reference internal" href="#weac.core.SystemModel.toggle_touchdown"><code class="docutils literal notranslate"><span class="pre">SystemModel.toggle_touchdown()</span></code></a></li>

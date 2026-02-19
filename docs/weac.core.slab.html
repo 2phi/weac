@@ -92,6 +92,9 @@
 <li class="toctree-l1 current" x-data="{ expanded: $el.classList.contains('current') ? true : false }"><a :class="{ 'expanded' : expanded }" @click="expanded = !expanded" class="reference internal expandable" href="weac.core.html">weac.core package<button @click.prevent.stop="expanded = !expanded" type="button"><span class="sr-only"></span><svg fill="currentColor" height="18px" stroke="none" viewbox="0 0 24 24" width="18px" xmlns="http://www.w3.org/2000/svg"><path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"></path></svg></button></a><ul class="current" x-show="expanded">
 <li class="toctree-l2"><a class="reference internal" href="weac.core.eigensystem.html">weac.core.eigensystem module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="weac.core.field_quantities.html">weac.core.field_quantities module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="weac.core.generalized_eigensystem.html">weac.core.generalized_eigensystem module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="weac.core.generalized_field_quantities.html">weac.core.generalized_field_quantities module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="weac.core.generalized_unknown_constants_solver.html">weac.core.generalized_unknown_constants_solver module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="weac.core.scenario.html">weac.core.scenario module</a></li>
 <li class="toctree-l2 current"><a class="current reference internal" href="#">weac.core.slab module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="weac.core.slab_touchdown.html">weac.core.slab_touchdown module</a></li>
@@ -152,7 +155,7 @@
 <p>This module defines the Slab class, which represents the snow slab and its properties.</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="weac.core.slab.Slab">
-<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">weac.core.slab.</span></span><span class="sig-name descname"><span class="pre">Slab</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">layers</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/weac/core/slab.html#Slab"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#weac.core.slab.Slab" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#weac.core.slab.Slab'">¶</a></dt>
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">weac.core.slab.</span></span><span class="sig-name descname"><span class="pre">Slab</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">layers</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">b</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">300</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/weac/core/slab.html#Slab"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#weac.core.slab.Slab" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#weac.core.slab.Slab'">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <p>Parameters of all layers assembled into a slab,
 provided as np.ndarray for easier access.</p>
@@ -161,7 +164,10 @@ provided as np.ndarray for easier access.</p>
 - z = 0 is set at the mid-point of the slab’s thickness</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>layers</strong> (<em>list</em><em>[</em><a class="reference internal" href="weac.components.layer.html#weac.components.layer.Layer" title="weac.components.layer.Layer"><em>Layer</em></a><em>]</em>)</p>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>layers</strong> (<em>list</em><em>[</em><a class="reference internal" href="weac.components.layer.html#weac.components.layer.Layer" title="weac.components.layer.Layer"><em>Layer</em></a><em>]</em>)</p></li>
+<li><p><strong>b</strong> (<em>float</em>)</p></li>
+</ul>
 </dd>
 </dl>
 <dl class="py attribute">
@@ -245,6 +251,16 @@ provided as np.ndarray for easier access.</p>
 </dl>
 </dd></dl>
 <dl class="py attribute">
+<dt class="sig sig-object py" id="weac.core.slab.Slab.b">
+<span class="sig-name descname"><span class="pre">b</span></span><a class="headerlink" href="#weac.core.slab.Slab.b" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#weac.core.slab.Slab.b'">¶</a></dt>
+<dd><p>Total slab width [mm]</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="py attribute">
 <dt class="sig sig-object py" id="weac.core.slab.Slab.z_cog">
 <span class="sig-name descname"><span class="pre">z_cog</span></span><a class="headerlink" href="#weac.core.slab.Slab.z_cog" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#weac.core.slab.Slab.z_cog'">¶</a></dt>
 <dd><p>z-coordinate of Center of Gravity [mm]</p>
@@ -310,10 +326,13 @@ provided as np.ndarray for easier access.</p>
 <dd></dd></dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="weac.core.slab.Slab.__init__">
-<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">layers</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/weac/core/slab.html#Slab.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#weac.core.slab.Slab.__init__" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#weac.core.slab.Slab.__init__'">¶</a></dt>
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">layers</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">b</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">300</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/weac/core/slab.html#Slab.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#weac.core.slab.Slab.__init__" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#weac.core.slab.Slab.__init__'">¶</a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>layers</strong> (<em>list</em><em>[</em><a class="reference internal" href="weac.components.layer.html#weac.components.layer.Layer" title="weac.components.layer.Layer"><em>Layer</em></a><em>]</em>)</p>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>layers</strong> (<em>list</em><em>[</em><a class="reference internal" href="weac.components.layer.html#weac.components.layer.Layer" title="weac.components.layer.Layer"><em>Layer</em></a><em>]</em>)</p></li>
+<li><p><strong>b</strong> (<em>float</em>)</p></li>
+</ul>
 </dd>
 <dt class="field-even">Return type<span class="colon">:</span></dt>
 <dd class="field-even"><p>None</p>
@@ -323,6 +342,10 @@ provided as np.ndarray for easier access.</p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="weac.core.slab.Slab.layers">
 <span class="sig-name descname"><span class="pre">layers</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="weac.components.layer.html#weac.components.layer.Layer" title="weac.components.layer.Layer"><span class="pre">Layer</span></a><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#weac.core.slab.Slab.layers" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#weac.core.slab.Slab.layers'">¶</a></dt>
+<dd></dd></dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="id10">
+<span class="sig-name descname"><span class="pre">b</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><a class="headerlink" href="#id10" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id10'">¶</a></dt>
 <dd></dd></dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="weac.core.slab.Slab.calc_vertical_center_of_gravity">
@@ -357,6 +380,7 @@ Calculate center of gravity of triangular slab segments for vertical PSTs.</p>
 <li><a :data-current="activeSection === '#weac.core.slab.Slab.Gi'" class="reference internal" href="#weac.core.slab.Slab.Gi"><code class="docutils literal notranslate"><span class="pre">Slab.Gi</span></code></a></li>
 <li><a :data-current="activeSection === '#weac.core.slab.Slab.nui'" class="reference internal" href="#weac.core.slab.Slab.nui"><code class="docutils literal notranslate"><span class="pre">Slab.nui</span></code></a></li>
 <li><a :data-current="activeSection === '#weac.core.slab.Slab.H'" class="reference internal" href="#weac.core.slab.Slab.H"><code class="docutils literal notranslate"><span class="pre">Slab.H</span></code></a></li>
+<li><a :data-current="activeSection === '#weac.core.slab.Slab.b'" class="reference internal" href="#weac.core.slab.Slab.b"><code class="docutils literal notranslate"><span class="pre">Slab.b</span></code></a></li>
 <li><a :data-current="activeSection === '#weac.core.slab.Slab.z_cog'" class="reference internal" href="#weac.core.slab.Slab.z_cog"><code class="docutils literal notranslate"><span class="pre">Slab.z_cog</span></code></a></li>
 <li><a :data-current="activeSection === '#weac.core.slab.Slab.qw'" class="reference internal" href="#weac.core.slab.Slab.qw"><code class="docutils literal notranslate"><span class="pre">Slab.qw</span></code></a></li>
 <li><a :data-current="activeSection === '#id0'" class="reference internal" href="#id0"><code class="docutils literal notranslate"><span class="pre">Slab.rhoi</span></code></a></li>
@@ -372,6 +396,7 @@ Calculate center of gravity of triangular slab segments for vertical PSTs.</p>
 <li><a :data-current="activeSection === '#id9'" class="reference internal" href="#id9"><code class="docutils literal notranslate"><span class="pre">Slab.qw</span></code></a></li>
 <li><a :data-current="activeSection === '#weac.core.slab.Slab.__init__'" class="reference internal" href="#weac.core.slab.Slab.__init__"><code class="docutils literal notranslate"><span class="pre">Slab.__init__()</span></code></a></li>
 <li><a :data-current="activeSection === '#weac.core.slab.Slab.layers'" class="reference internal" href="#weac.core.slab.Slab.layers"><code class="docutils literal notranslate"><span class="pre">Slab.layers</span></code></a></li>
+<li><a :data-current="activeSection === '#id10'" class="reference internal" href="#id10"><code class="docutils literal notranslate"><span class="pre">Slab.b</span></code></a></li>
 <li><a :data-current="activeSection === '#weac.core.slab.Slab.calc_vertical_center_of_gravity'" class="reference internal" href="#weac.core.slab.Slab.calc_vertical_center_of_gravity"><code class="docutils literal notranslate"><span class="pre">Slab.calc_vertical_center_of_gravity()</span></code></a></li>
 </ul>
 </li>

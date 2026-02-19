@@ -1,0 +1,7 @@
+weac.core.generalized\_eigensystem module
+=========================================
+
+.. automodule:: weac.core.generalized_eigensystem
+   :members:
+   :show-inheritance:
+   :undoc-members:

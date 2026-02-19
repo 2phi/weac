@@ -9,6 +9,9 @@ Submodules
 
    weac.core.eigensystem
    weac.core.field_quantities
+   weac.core.generalized_eigensystem
+   weac.core.generalized_field_quantities
+   weac.core.generalized_unknown_constants_solver
    weac.core.scenario
    weac.core.slab
    weac.core.slab_touchdown

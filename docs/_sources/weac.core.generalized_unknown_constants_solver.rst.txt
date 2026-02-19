@@ -1,0 +1,7 @@
+weac.core.generalized\_unknown\_constants\_solver module
+========================================================
+
+.. automodule:: weac.core.generalized_unknown_constants_solver
+   :members:
+   :show-inheritance:
+   :undoc-members:

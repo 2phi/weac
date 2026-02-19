@@ -1,0 +1,1038 @@
+<!DOCTYPE html>
+
+<html :class="{'dark': darkMode === 'dark' || (darkMode === 'system' &amp;&amp; window.matchMedia('(prefers-color-scheme: dark)').matches)}" class="scroll-smooth" data-content_root="./" lang="en" x-data="{ darkMode: localStorage.getItem('darkMode') || localStorage.setItem('darkMode', 'system'), activeSection: '' }" x-init="$watch('darkMode', val =&gt; localStorage.setItem('darkMode', val))">
+<head>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<meta charset="utf-8"/>
+<meta content="white" media="(prefers-color-scheme: light)" name="theme-color"/>
+<meta content="black" media="(prefers-color-scheme: dark)" name="theme-color"/>
+<meta content="width=device-width, initial-scale=1" name="viewport"/>
+<title>weac.core.generalized_field_quantities module | WEAC 3.1.3</title>
+<meta content="weac.core.generalized_field_quantities module | WEAC 3.1.3" property="og:title"/>
+<meta content="weac.core.generalized_field_quantities module | WEAC 3.1.3" name="twitter:title"/>
+<link href="_static/pygments.css?v=e72c8e07" rel="stylesheet" type="text/css"/>
+<link href="_static/theme.css?v=42baaae4" rel="stylesheet" type="text/css"/>
+<link href="https://2phi.github.io/weac/weac.core.generalized_field_quantities.html" rel="canonical"/>
+<link href="search.html" rel="search" title="Search"/>
+<link href="genindex.html" rel="index" title="Index"/>
+<link href="weac.core.generalized_unknown_constants_solver.html" rel="next" title="weac.core.generalized_unknown_constants_solver module"/>
+<link href="weac.core.generalized_eigensystem.html" rel="prev" title="weac.core.generalized_eigensystem module"/>
+<script>
+    <!-- Prevent Flash of wrong theme -->
+      const userPreference = localStorage.getItem('darkMode');
+      let mode;
+      if (userPreference === 'dark' || window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        mode = 'dark';
+        document.documentElement.classList.add('dark');
+      } else {
+        mode = 'light';
+      }
+      if (!userPreference) {localStorage.setItem('darkMode', mode)}
+    </script>
+</head>
+<body :class="{ 'overflow-hidden': showSidebar }" class="min-h-screen font-sans antialiased bg-background text-foreground" x-data="{ showSidebar: false, showScrollTop: false }">
+<div @click.self="showSidebar = false" class="fixed inset-0 z-50 overflow-hidden bg-background/80 backdrop-blur-sm md:hidden" x-cloak="" x-show="showSidebar"></div><div class="relative flex flex-col min-h-screen" id="page"><a class="absolute top-0 left-0 z-[100] block bg-background p-4 text-xl transition -translate-x-full opacity-0 focus:translate-x-0 focus:opacity-100" href="#content">
+      Skip to content
+    </a><header class="sticky top-0 z-40 w-full border-b shadow-sm border-border supports-backdrop-blur:bg-background/60 bg-background/95 backdrop-blur"><div class="container flex items-center h-14">
+<div class="hidden mr-4 md:flex">
+<a class="flex items-center mr-6" href="index.html"><span class="hidden font-bold sm:inline-block text-clip whitespace-nowrap">WEAC 3.1.3</span>
+</a></div><button @click="showSidebar = true" class="inline-flex items-center justify-center h-10 px-0 py-2 mr-2 text-base font-medium transition-colors rounded-md hover:text-accent-foreground hover:bg-transparent md:hidden" type="button">
+<svg aria-hidden="true" fill="currentColor" height="24" viewbox="0 96 960 960" width="24" xmlns="http://www.w3.org/2000/svg">
+<path d="M152.587 825.087q-19.152 0-32.326-13.174t-13.174-32.326q0-19.152 13.174-32.326t32.326-13.174h440q19.152 0 32.326 13.174t13.174 32.326q0 19.152-13.174 32.326t-32.326 13.174h-440Zm0-203.587q-19.152 0-32.326-13.174T107.087 576q0-19.152 13.174-32.326t32.326-13.174h320q19.152 0 32.326 13.174T518.087 576q0 19.152-13.174 32.326T472.587 621.5h-320Zm0-203.587q-19.152 0-32.326-13.174t-13.174-32.326q0-19.152 13.174-32.326t32.326-13.174h440q19.152 0 32.326 13.174t13.174 32.326q0 19.152-13.174 32.326t-32.326 13.174h-440ZM708.913 576l112.174 112.174q12.674 12.674 12.674 31.826t-12.674 31.826Q808.413 764.5 789.261 764.5t-31.826-12.674l-144-144Q600 594.391 600 576t13.435-31.826l144-144q12.674-12.674 31.826-12.674t31.826 12.674q12.674 12.674 12.674 31.826t-12.674 31.826L708.913 576Z"></path>
+</svg>
+<span class="sr-only">Toggle navigation menu</span>
+</button>
+<div class="flex items-center justify-between flex-1 space-x-2 sm:space-x-4 md:justify-end">
+<div class="flex-1 w-full md:w-auto md:flex-none"><form @keydown.k.window.meta="$refs.search.focus()" action="search.html" class="relative flex items-center group" id="searchbox" method="get">
+<input aria-label="Search the docs" class="inline-flex items-center font-medium transition-colors bg-transparent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 ring-offset-background border border-input hover:bg-accent focus:bg-accent hover:text-accent-foreground focus:text-accent-foreground hover:placeholder-accent-foreground py-2 px-4 relative h-9 w-full justify-start rounded-[0.5rem] text-sm text-muted-foreground sm:pr-12 md:w-40 lg:w-64" id="search-input" name="q" placeholder="Search ..." type="search" x-ref="search"/>
+<kbd class="pointer-events-none absolute right-1.5 top-2 hidden h-5 select-none text-muted-foreground items-center gap-1 rounded border border-border bg-muted px-1.5 font-mono text-[10px] font-medium opacity-100 sm:flex group-hover:bg-accent group-hover:text-accent-foreground">
+<span class="text-xs">⌘</span>
+    K
+  </kbd>
+</form>
+</div>
+<nav class="flex items-center space-x-1">
+<button @click="darkMode = darkMode === 'light' ? 'dark' : 'light'" aria-label="Color theme switcher" class="relative inline-flex items-center justify-center px-0 text-sm font-medium transition-colors rounded-md hover:bg-accent hover:text-accent-foreground h-9 w-9" type="button">
+<svg class="absolute transition-all scale-100 rotate-0 dark:-rotate-90 dark:scale-0" fill="currentColor" height="24" viewbox="0 96 960 960" width="24" xmlns="http://www.w3.org/2000/svg">
+<path d="M480 685q45.456 0 77.228-31.772Q589 621.456 589 576q0-45.456-31.772-77.228Q525.456 467 480 467q-45.456 0-77.228 31.772Q371 530.544 371 576q0 45.456 31.772 77.228Q434.544 685 480 685Zm0 91q-83 0-141.5-58.5T280 576q0-83 58.5-141.5T480 376q83 0 141.5 58.5T680 576q0 83-58.5 141.5T480 776ZM80 621.5q-19.152 0-32.326-13.174T34.5 576q0-19.152 13.174-32.326T80 530.5h80q19.152 0 32.326 13.174T205.5 576q0 19.152-13.174 32.326T160 621.5H80Zm720 0q-19.152 0-32.326-13.174T754.5 576q0-19.152 13.174-32.326T800 530.5h80q19.152 0 32.326 13.174T925.5 576q0 19.152-13.174 32.326T880 621.5h-80Zm-320-320q-19.152 0-32.326-13.174T434.5 256v-80q0-19.152 13.174-32.326T480 130.5q19.152 0 32.326 13.174T525.5 176v80q0 19.152-13.174 32.326T480 301.5Zm0 720q-19.152 0-32.326-13.17Q434.5 995.152 434.5 976v-80q0-19.152 13.174-32.326T480 850.5q19.152 0 32.326 13.174T525.5 896v80q0 19.152-13.174 32.33-13.174 13.17-32.326 13.17ZM222.174 382.065l-43-42Q165.5 327.391 166 308.239t13.174-33.065q13.435-13.674 32.587-13.674t32.065 13.674l42.239 43q12.674 13.435 12.555 31.706-.12 18.272-12.555 31.946-12.674 13.674-31.445 13.413-18.772-.261-32.446-13.174Zm494 494.761-42.239-43q-12.674-13.435-12.674-32.087t12.674-31.565Q686.609 756.5 705.38 757q18.772.5 32.446 13.174l43 41.761Q794.5 824.609 794 843.761t-13.174 33.065Q767.391 890.5 748.239 890.5t-32.065-13.674Zm-42-494.761Q660.5 369.391 661 350.62q.5-18.772 13.174-32.446l41.761-43Q728.609 261.5 747.761 262t33.065 13.174q13.674 13.435 13.674 32.587t-13.674 32.065l-43 42.239q-13.435 12.674-31.706 12.555-18.272-.12-31.946-12.555Zm-495 494.761Q165.5 863.391 165.5 844.239t13.674-32.065l43-42.239q13.435-12.674 32.087-12.674t31.565 12.674Q299.5 782.609 299 801.38q-.5 18.772-13.174 32.446l-41.761 43Q231.391 890.5 212.239 890t-33.065-13.174ZM480 576Z"></path>
+</svg>
+<svg class="absolute transition-all scale-0 rotate-90 dark:rotate-0 dark:scale-100" fill="currentColor" height="24" viewbox="0 96 960 960" width="24" xmlns="http://www.w3.org/2000/svg">
+<path d="M480 936q-151 0-255.5-104.5T120 576q0-138 90-239.5T440 218q25-3 39 18t-1 44q-17 26-25.5 55t-8.5 61q0 90 63 153t153 63q31 0 61.5-9t54.5-25q21-14 43-1.5t19 39.5q-14 138-117.5 229T480 936Zm0-80q88 0 158-48.5T740 681q-20 5-40 8t-40 3q-123 0-209.5-86.5T364 396q0-20 3-40t8-40q-78 32-126.5 102T200 576q0 116 82 198t198 82Zm-10-270Z"></path>
+</svg>
+</button>
+</nav>
+</div>
+</div>
+</header>
+<div class="flex-1"><div class="container flex-1 items-start md:grid md:grid-cols-[220px_minmax(0,1fr)] md:gap-6 lg:grid-cols-[240px_minmax(0,1fr)] lg:gap-10"><aside :aria-hidden="!showSidebar" :class="{ 'translate-x-0': showSidebar }" class="fixed inset-y-0 left-0 md:top-14 z-50 md:z-30 bg-background md:bg-transparent transition-all duration-100 -translate-x-full md:translate-x-0 ml-0 p-6 md:p-0 md:-ml-2 md:h-[calc(100vh-3.5rem)] w-5/6 md:w-full shrink-0 overflow-y-auto border-r border-border md:sticky" id="left-sidebar">
+<a class="!justify-start text-sm md:!hidden bg-background" href="index.html"><span class="font-bold text-clip whitespace-nowrap">WEAC 3.1.3</span>
+</a>
+<div class="relative overflow-hidden md:overflow-auto my-4 md:my-0 h-[calc(100vh-8rem)] md:h-auto">
+<div class="overflow-y-auto h-full w-full relative pr-6"><nav class="table w-full min-w-full my-6 lg:my-8">
+<p class="caption" role="heading"><span class="caption-text">Getting Started</span></p>
+<ul class="current">
+<li class="toctree-l1 current" x-data="{ expanded: $el.classList.contains('current') ? true : false }"><a :class="{ 'expanded' : expanded }" @click="expanded = !expanded" class="reference internal expandable" href="weac.html">weac package<button @click.prevent.stop="expanded = !expanded" type="button"><span class="sr-only"></span><svg fill="currentColor" height="18px" stroke="none" viewbox="0 0 24 24" width="18px" xmlns="http://www.w3.org/2000/svg"><path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"></path></svg></button></a><ul class="current" x-show="expanded">
+<li class="toctree-l2"><a class="reference internal" href="weac.analysis.html">weac.analysis package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="weac.components.html">weac.components package</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="weac.core.html">weac.core package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="weac.utils.html">weac.utils package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="weac.constants.html">weac.constants module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="weac.logging_config.html">weac.logging_config module</a></li>
+</ul>
+</li>
+<li class="toctree-l1" x-data="{ expanded: $el.classList.contains('current') ? true : false }"><a :class="{ 'expanded' : expanded }" @click="expanded = !expanded" class="reference internal expandable" href="weac.components.html">weac.components package<button @click.prevent.stop="expanded = !expanded" type="button"><span class="sr-only"></span><svg fill="currentColor" height="18px" stroke="none" viewbox="0 0 24 24" width="18px" xmlns="http://www.w3.org/2000/svg"><path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"></path></svg></button></a><ul x-show="expanded">
+<li class="toctree-l2"><a class="reference internal" href="weac.components.config.html">weac.components.config module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="weac.components.criteria_config.html">weac.components.criteria_config module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="weac.components.layer.html">weac.components.layer module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="weac.components.model_input.html">weac.components.model_input module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="weac.components.scenario_config.html">weac.components.scenario_config module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="weac.components.segment.html">weac.components.segment module</a></li>
+</ul>
+</li>
+<li class="toctree-l1 current" x-data="{ expanded: $el.classList.contains('current') ? true : false }"><a :class="{ 'expanded' : expanded }" @click="expanded = !expanded" class="reference internal expandable" href="weac.core.html">weac.core package<button @click.prevent.stop="expanded = !expanded" type="button"><span class="sr-only"></span><svg fill="currentColor" height="18px" stroke="none" viewbox="0 0 24 24" width="18px" xmlns="http://www.w3.org/2000/svg"><path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"></path></svg></button></a><ul class="current" x-show="expanded">
+<li class="toctree-l2"><a class="reference internal" href="weac.core.eigensystem.html">weac.core.eigensystem module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="weac.core.field_quantities.html">weac.core.field_quantities module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="weac.core.generalized_eigensystem.html">weac.core.generalized_eigensystem module</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">weac.core.generalized_field_quantities module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="weac.core.generalized_unknown_constants_solver.html">weac.core.generalized_unknown_constants_solver module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="weac.core.scenario.html">weac.core.scenario module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="weac.core.slab.html">weac.core.slab module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="weac.core.slab_touchdown.html">weac.core.slab_touchdown module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="weac.core.system_model.html">weac.core.system_model module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="weac.core.unknown_constants_solver.html">weac.core.unknown_constants_solver module</a></li>
+</ul>
+</li>
+<li class="toctree-l1" x-data="{ expanded: $el.classList.contains('current') ? true : false }"><a :class="{ 'expanded' : expanded }" @click="expanded = !expanded" class="reference internal expandable" href="weac.analysis.html">weac.analysis package<button @click.prevent.stop="expanded = !expanded" type="button"><span class="sr-only"></span><svg fill="currentColor" height="18px" stroke="none" viewbox="0 0 24 24" width="18px" xmlns="http://www.w3.org/2000/svg"><path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"></path></svg></button></a><ul x-show="expanded">
+<li class="toctree-l2"><a class="reference internal" href="weac.analysis.analyzer.html">weac.analysis.analyzer module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="weac.analysis.criteria_evaluator.html">weac.analysis.criteria_evaluator module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="weac.analysis.plotter.html">weac.analysis.plotter module</a></li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Utilities &amp; Tools</span></p>
+<ul>
+<li class="toctree-l1" x-data="{ expanded: $el.classList.contains('current') ? true : false }"><a :class="{ 'expanded' : expanded }" @click="expanded = !expanded" class="reference internal expandable" href="weac.utils.html">weac.utils package<button @click.prevent.stop="expanded = !expanded" type="button"><span class="sr-only"></span><svg fill="currentColor" height="18px" stroke="none" viewbox="0 0 24 24" width="18px" xmlns="http://www.w3.org/2000/svg"><path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"></path></svg></button></a><ul x-show="expanded">
+<li class="toctree-l2"><a class="reference internal" href="weac.utils.geldsetzer.html">weac.utils.geldsetzer module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="weac.utils.misc.html">weac.utils.misc module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="weac.utils.snow_types.html">weac.utils.snow_types module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="weac.utils.snowpilot_parser.html">weac.utils.snowpilot_parser module</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="weac.logging_config.html">weac.logging_config module</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Examples &amp; Reference</span></p>
+<ul class="current">
+<li class="toctree-l1 current" x-data="{ expanded: $el.classList.contains('current') ? true : false }"><a :class="{ 'expanded' : expanded }" @click="expanded = !expanded" class="reference internal expandable" href="modules.html">weac<button @click.prevent.stop="expanded = !expanded" type="button"><span class="sr-only"></span><svg fill="currentColor" height="18px" stroke="none" viewbox="0 0 24 24" width="18px" xmlns="http://www.w3.org/2000/svg"><path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"></path></svg></button></a><ul class="current" x-show="expanded">
+<li class="toctree-l2 current"><a class="reference internal" href="weac.html">weac package</a></li>
+</ul>
+</li>
+</ul>
+</nav>
+</div>
+</div>
+<button @click="showSidebar = false" class="absolute md:hidden right-4 top-4 rounded-sm opacity-70 transition-opacity hover:opacity-100" type="button">
+<svg class="h-4 w-4" fill="currentColor" height="24" stroke="none" viewbox="0 96 960 960" width="24" xmlns="http://www.w3.org/2000/svg">
+<path d="M480 632 284 828q-11 11-28 11t-28-11q-11-11-11-28t11-28l196-196-196-196q-11-11-11-28t11-28q11-11 28-11t28 11l196 196 196-196q11-11 28-11t28 11q11 11 11 28t-11 28L536 576l196 196q11 11 11 28t-11 28q-11 11-28 11t-28-11L480 632Z"></path>
+</svg>
+</button>
+</aside>
+<main class="relative py-6 lg:gap-10 lg:py-8 xl:grid xl:grid-cols-[1fr_300px]">
+<div class="w-full min-w-0 mx-auto">
+<nav aria-label="breadcrumbs" class="flex items-center mb-4 space-x-1 text-sm text-muted-foreground">
+<a class="overflow-hidden text-ellipsis whitespace-nowrap hover:text-foreground" href="index.html">
+<span class="hidden md:inline">WEAC 3.1.3</span>
+<svg aria-label="Home" class="md:hidden" fill="currentColor" height="18" stroke="none" viewbox="0 96 960 960" width="18" xmlns="http://www.w3.org/2000/svg">
+<path d="M240 856h120V616h240v240h120V496L480 316 240 496v360Zm-80 80V456l320-240 320 240v480H520V696h-80v240H160Zm320-350Z"></path>
+</svg>
+</a>
+<div class="mr-1"> &gt; </div><a class="hover:text-foreground overflow-hidden text-ellipsis whitespace-nowrap" href="weac.html">weac package</a>
+<div class="mr-1"> &gt; </div><a class="hover:text-foreground overflow-hidden text-ellipsis whitespace-nowrap" href="weac.core.html">weac.core package</a>
+<div class="mr-1"> &gt; </div><span aria-current="page" class="font-medium text-foreground overflow-hidden text-ellipsis whitespace-nowrap">weac.core.generalized_field_quantities module</span>
+</nav>
+<div id="content" role="main">
+<section id="module-weac.core.generalized_field_quantities">
+<span id="weac-core-generalized-field-quantities-module"></span><h1>weac.core.generalized_field_quantities module<a class="headerlink" href="#module-weac.core.generalized_field_quantities" title="Link to this heading">¶</a></h1>
+<p>This module defines the GeneralizedFieldQuantities class, which is responsible for calculating
+and providing access to various physical quantities within the slab in the Generalized Model.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="weac.core.generalized_field_quantities.GeneralizedFieldQuantities">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">weac.core.generalized_field_quantities.</span></span><span class="sig-name descname"><span class="pre">GeneralizedFieldQuantities</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">eigensystem</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/weac/core/generalized_field_quantities.html#GeneralizedFieldQuantities"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#weac.core.generalized_field_quantities.GeneralizedFieldQuantities" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#weac.core.generalized_field_quantities.GeneralizedFieldQuantities'">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Convenience accessors for a 24xN solution matrix Z =
+[u, u’,v, v’ w, w’, ψx, ψx’,ψy, ψy’,ψz, ψz’,thetauc, thetauc’, thetaul]ᵀ.  All functions are <em>vectorized</em> along the second
+axis (x-coordinate), so they return an <cite>ndarray</cite> of length N.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>eigensystem</strong> (<a class="reference internal" href="weac.core.generalized_eigensystem.html#weac.core.generalized_eigensystem.GeneralizedEigensystem" title="weac.core.generalized_eigensystem.GeneralizedEigensystem"><em>GeneralizedEigensystem</em></a>)</p>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="weac.core.generalized_field_quantities.GeneralizedFieldQuantities.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">eigensystem</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/weac/core/generalized_field_quantities.html#GeneralizedFieldQuantities.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#weac.core.generalized_field_quantities.GeneralizedFieldQuantities.__init__" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#weac.core.generalized_field_quantities.GeneralizedFieldQuantities.__init__'">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>eigensystem</strong> (<a class="reference internal" href="weac.core.generalized_eigensystem.html#weac.core.generalized_eigensystem.GeneralizedEigensystem" title="weac.core.generalized_eigensystem.GeneralizedEigensystem"><em>GeneralizedEigensystem</em></a>)</p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="weac.core.generalized_field_quantities.GeneralizedFieldQuantities.u">
+<span class="sig-name descname"><span class="pre">u</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">Z</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">h0</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">b0</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">unit</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'mm'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/weac/core/generalized_field_quantities.html#GeneralizedFieldQuantities.u"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#weac.core.generalized_field_quantities.GeneralizedFieldQuantities.u" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#weac.core.generalized_field_quantities.GeneralizedFieldQuantities.u'">¶</a></dt>
+<dd><p>Axial displacement <a href="#id1"><span class="problematic" id="id2">*</span></a>u = u₀ + h₀ ψy - b₀ ψz * at depth h₀.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>Z</strong> (<em>ndarray</em>)</p></li>
+<li><p><strong>h0</strong> (<em>float</em>)</p></li>
+<li><p><strong>b0</strong> (<em>float</em>)</p></li>
+<li><p><strong>unit</strong> (<em>Literal</em><em>[</em><em>'m'</em><em>, </em><em>'cm'</em><em>, </em><em>'mm'</em><em>, </em><em>'um'</em><em>]</em>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>float | <em>ndarray</em></p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="weac.core.generalized_field_quantities.GeneralizedFieldQuantities.du_dx">
+<span class="sig-name descname"><span class="pre">du_dx</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">Z</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">h0</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">b0</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/weac/core/generalized_field_quantities.html#GeneralizedFieldQuantities.du_dx"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#weac.core.generalized_field_quantities.GeneralizedFieldQuantities.du_dx" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#weac.core.generalized_field_quantities.GeneralizedFieldQuantities.du_dx'">¶</a></dt>
+<dd><p>Derivative u’ = u₀’ + h₀ ψy’- b₀ ψz’.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>Z</strong> (<em>ndarray</em>)</p></li>
+<li><p><strong>h0</strong> (<em>float</em>)</p></li>
+<li><p><strong>b0</strong> (<em>float</em>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>float | <em>ndarray</em></p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="weac.core.generalized_field_quantities.GeneralizedFieldQuantities.v">
+<span class="sig-name descname"><span class="pre">v</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">Z</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">h0</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">unit</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'mm'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/weac/core/generalized_field_quantities.html#GeneralizedFieldQuantities.v"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#weac.core.generalized_field_quantities.GeneralizedFieldQuantities.v" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#weac.core.generalized_field_quantities.GeneralizedFieldQuantities.v'">¶</a></dt>
+<dd><p>Transverse displacement <a href="#id3"><span class="problematic" id="id4">*</span></a>v = v₀ - h₀ ψx * at depth h₀.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>Z</strong> (<em>ndarray</em>)</p></li>
+<li><p><strong>h0</strong> (<em>float</em>)</p></li>
+<li><p><strong>unit</strong> (<em>Literal</em><em>[</em><em>'m'</em><em>, </em><em>'cm'</em><em>, </em><em>'mm'</em><em>, </em><em>'um'</em><em>]</em>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>float | <em>ndarray</em></p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="weac.core.generalized_field_quantities.GeneralizedFieldQuantities.dv_dx">
+<span class="sig-name descname"><span class="pre">dv_dx</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">Z</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">h0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/weac/core/generalized_field_quantities.html#GeneralizedFieldQuantities.dv_dx"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#weac.core.generalized_field_quantities.GeneralizedFieldQuantities.dv_dx" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#weac.core.generalized_field_quantities.GeneralizedFieldQuantities.dv_dx'">¶</a></dt>
+<dd><p>Derivative v’ = v₀’ - h₀ ψx’.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>Z</strong> (<em>ndarray</em>)</p></li>
+<li><p><strong>h0</strong> (<em>float</em>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>float | <em>ndarray</em></p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="weac.core.generalized_field_quantities.GeneralizedFieldQuantities.w">
+<span class="sig-name descname"><span class="pre">w</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">Z</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">b0</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">unit</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'mm'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/weac/core/generalized_field_quantities.html#GeneralizedFieldQuantities.w"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#weac.core.generalized_field_quantities.GeneralizedFieldQuantities.w" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#weac.core.generalized_field_quantities.GeneralizedFieldQuantities.w'">¶</a></dt>
+<dd><p>Vertical displacement <a href="#id5"><span class="problematic" id="id6">*</span></a>w = w₀ + b₀ ψx <a href="#id7"><span class="problematic" id="id8">*</span></a>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>Z</strong> (<em>ndarray</em>)</p></li>
+<li><p><strong>b0</strong> (<em>float</em>)</p></li>
+<li><p><strong>unit</strong> (<em>Literal</em><em>[</em><em>'m'</em><em>, </em><em>'cm'</em><em>, </em><em>'mm'</em><em>, </em><em>'um'</em><em>]</em>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>float | <em>ndarray</em></p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="weac.core.generalized_field_quantities.GeneralizedFieldQuantities.dw_dx">
+<span class="sig-name descname"><span class="pre">dw_dx</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">Z</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">b0</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/weac/core/generalized_field_quantities.html#GeneralizedFieldQuantities.dw_dx"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#weac.core.generalized_field_quantities.GeneralizedFieldQuantities.dw_dx" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#weac.core.generalized_field_quantities.GeneralizedFieldQuantities.dw_dx'">¶</a></dt>
+<dd><p>First derivative <a href="#id9"><span class="problematic" id="id10">*</span></a>w’ = w₀’ + b₀ ψx’ <a href="#id11"><span class="problematic" id="id12">*</span></a>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>Z</strong> (<em>ndarray</em>)</p></li>
+<li><p><strong>b0</strong> (<em>float</em>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>float | <em>ndarray</em></p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="weac.core.generalized_field_quantities.GeneralizedFieldQuantities.psix">
+<span class="sig-name descname"><span class="pre">psix</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">Z</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">unit</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'rad'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/weac/core/generalized_field_quantities.html#GeneralizedFieldQuantities.psix"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#weac.core.generalized_field_quantities.GeneralizedFieldQuantities.psix" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#weac.core.generalized_field_quantities.GeneralizedFieldQuantities.psix'">¶</a></dt>
+<dd><p>Torsional rotation ψx of the mid-plane.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>Z</strong> (<em>ndarray</em>)</p></li>
+<li><p><strong>unit</strong> (<em>Literal</em><em>[</em><em>'deg'</em><em>, </em><em>'rad'</em><em>]</em>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>float | <em>ndarray</em></p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="weac.core.generalized_field_quantities.GeneralizedFieldQuantities.dpsix_dx">
+<span class="sig-name descname"><span class="pre">dpsix_dx</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">Z</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/weac/core/generalized_field_quantities.html#GeneralizedFieldQuantities.dpsix_dx"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#weac.core.generalized_field_quantities.GeneralizedFieldQuantities.dpsix_dx" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#weac.core.generalized_field_quantities.GeneralizedFieldQuantities.dpsix_dx'">¶</a></dt>
+<dd><p>First derivative ψx′.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>Z</strong> (<em>ndarray</em>)</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>float | <em>ndarray</em></p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="weac.core.generalized_field_quantities.GeneralizedFieldQuantities.psiy">
+<span class="sig-name descname"><span class="pre">psiy</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">Z</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">unit</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'rad'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/weac/core/generalized_field_quantities.html#GeneralizedFieldQuantities.psiy"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#weac.core.generalized_field_quantities.GeneralizedFieldQuantities.psiy" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#weac.core.generalized_field_quantities.GeneralizedFieldQuantities.psiy'">¶</a></dt>
+<dd><p>Bending rotation ψy of the mid-plane around the y-axis.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>Z</strong> (<em>ndarray</em>)</p></li>
+<li><p><strong>unit</strong> (<em>Literal</em><em>[</em><em>'deg'</em><em>, </em><em>'rad'</em><em>]</em>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>float | <em>ndarray</em></p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="weac.core.generalized_field_quantities.GeneralizedFieldQuantities.dpsiy_dx">
+<span class="sig-name descname"><span class="pre">dpsiy_dx</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">Z</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/weac/core/generalized_field_quantities.html#GeneralizedFieldQuantities.dpsiy_dx"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#weac.core.generalized_field_quantities.GeneralizedFieldQuantities.dpsiy_dx" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#weac.core.generalized_field_quantities.GeneralizedFieldQuantities.dpsiy_dx'">¶</a></dt>
+<dd><p>First derivative ψy′.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>Z</strong> (<em>ndarray</em>)</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>float | <em>ndarray</em></p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="weac.core.generalized_field_quantities.GeneralizedFieldQuantities.psiz">
+<span class="sig-name descname"><span class="pre">psiz</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">Z</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">unit</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'rad'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/weac/core/generalized_field_quantities.html#GeneralizedFieldQuantities.psiz"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#weac.core.generalized_field_quantities.GeneralizedFieldQuantities.psiz" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#weac.core.generalized_field_quantities.GeneralizedFieldQuantities.psiz'">¶</a></dt>
+<dd><p>Bending rotation ψz of the mid-plane around the z-axis.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>Z</strong> (<em>ndarray</em>)</p></li>
+<li><p><strong>unit</strong> (<em>Literal</em><em>[</em><em>'deg'</em><em>, </em><em>'rad'</em><em>]</em>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>float | <em>ndarray</em></p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="weac.core.generalized_field_quantities.GeneralizedFieldQuantities.dpsiz_dx">
+<span class="sig-name descname"><span class="pre">dpsiz_dx</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">Z</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/weac/core/generalized_field_quantities.html#GeneralizedFieldQuantities.dpsiz_dx"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#weac.core.generalized_field_quantities.GeneralizedFieldQuantities.dpsiz_dx" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#weac.core.generalized_field_quantities.GeneralizedFieldQuantities.dpsiz_dx'">¶</a></dt>
+<dd><p>First derivative ψz′.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>Z</strong> (<em>ndarray</em>)</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>float | <em>ndarray</em></p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="weac.core.generalized_field_quantities.GeneralizedFieldQuantities.theta_uc">
+<span class="sig-name descname"><span class="pre">theta_uc</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">Z</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/weac/core/generalized_field_quantities.html#GeneralizedFieldQuantities.theta_uc"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#weac.core.generalized_field_quantities.GeneralizedFieldQuantities.theta_uc" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#weac.core.generalized_field_quantities.GeneralizedFieldQuantities.theta_uc'">¶</a></dt>
+<dd><p>Linear amplitude of axial cosine shaped displacements in the weak layer.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>Z</strong> (<em>ndarray</em>)</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>float | <em>ndarray</em></p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="weac.core.generalized_field_quantities.GeneralizedFieldQuantities.dtheta_uc_dx">
+<span class="sig-name descname"><span class="pre">dtheta_uc_dx</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">Z</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/weac/core/generalized_field_quantities.html#GeneralizedFieldQuantities.dtheta_uc_dx"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#weac.core.generalized_field_quantities.GeneralizedFieldQuantities.dtheta_uc_dx" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#weac.core.generalized_field_quantities.GeneralizedFieldQuantities.dtheta_uc_dx'">¶</a></dt>
+<dd><p>First derivative of the constant amplitude of axial cosine shaped displacements in the weak layer.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>Z</strong> (<em>ndarray</em>)</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>float | <em>ndarray</em></p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="weac.core.generalized_field_quantities.GeneralizedFieldQuantities.theta_ul">
+<span class="sig-name descname"><span class="pre">theta_ul</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">Z</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/weac/core/generalized_field_quantities.html#GeneralizedFieldQuantities.theta_ul"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#weac.core.generalized_field_quantities.GeneralizedFieldQuantities.theta_ul" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#weac.core.generalized_field_quantities.GeneralizedFieldQuantities.theta_ul'">¶</a></dt>
+<dd><p>Linear amplitude of axial cosine shaped displacements in the weak layer.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>Z</strong> (<em>ndarray</em>)</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>float | <em>ndarray</em></p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="weac.core.generalized_field_quantities.GeneralizedFieldQuantities.dtheta_ul_dx">
+<span class="sig-name descname"><span class="pre">dtheta_ul_dx</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">Z</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/weac/core/generalized_field_quantities.html#GeneralizedFieldQuantities.dtheta_ul_dx"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#weac.core.generalized_field_quantities.GeneralizedFieldQuantities.dtheta_ul_dx" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#weac.core.generalized_field_quantities.GeneralizedFieldQuantities.dtheta_ul_dx'">¶</a></dt>
+<dd><p>First derivative of the linear amplitude of axial cosine shaped displacements in the weak layer.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>Z</strong> (<em>ndarray</em>)</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>float | <em>ndarray</em></p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="weac.core.generalized_field_quantities.GeneralizedFieldQuantities.theta_vc">
+<span class="sig-name descname"><span class="pre">theta_vc</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">Z</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/weac/core/generalized_field_quantities.html#GeneralizedFieldQuantities.theta_vc"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#weac.core.generalized_field_quantities.GeneralizedFieldQuantities.theta_vc" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#weac.core.generalized_field_quantities.GeneralizedFieldQuantities.theta_vc'">¶</a></dt>
+<dd><p>Linear amplitude of axial cosine shaped displacements in the weak layer.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>Z</strong> (<em>ndarray</em>)</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>float | <em>ndarray</em></p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="weac.core.generalized_field_quantities.GeneralizedFieldQuantities.dtheta_vc_dx">
+<span class="sig-name descname"><span class="pre">dtheta_vc_dx</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">Z</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/weac/core/generalized_field_quantities.html#GeneralizedFieldQuantities.dtheta_vc_dx"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#weac.core.generalized_field_quantities.GeneralizedFieldQuantities.dtheta_vc_dx" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#weac.core.generalized_field_quantities.GeneralizedFieldQuantities.dtheta_vc_dx'">¶</a></dt>
+<dd><p>First derivative of the constant amplitude of out-of-plane cosine shaped displacements in the weak layer.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>Z</strong> (<em>ndarray</em>)</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>float | <em>ndarray</em></p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="weac.core.generalized_field_quantities.GeneralizedFieldQuantities.theta_vl">
+<span class="sig-name descname"><span class="pre">theta_vl</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">Z</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/weac/core/generalized_field_quantities.html#GeneralizedFieldQuantities.theta_vl"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#weac.core.generalized_field_quantities.GeneralizedFieldQuantities.theta_vl" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#weac.core.generalized_field_quantities.GeneralizedFieldQuantities.theta_vl'">¶</a></dt>
+<dd><p>Linear amplitude of axial cosine shaped displacements in the weak layer.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>Z</strong> (<em>ndarray</em>)</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>float | <em>ndarray</em></p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="weac.core.generalized_field_quantities.GeneralizedFieldQuantities.dtheta_vl_dx">
+<span class="sig-name descname"><span class="pre">dtheta_vl_dx</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">Z</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/weac/core/generalized_field_quantities.html#GeneralizedFieldQuantities.dtheta_vl_dx"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#weac.core.generalized_field_quantities.GeneralizedFieldQuantities.dtheta_vl_dx" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#weac.core.generalized_field_quantities.GeneralizedFieldQuantities.dtheta_vl_dx'">¶</a></dt>
+<dd><p>First derivative of the linear amplitude of out-of-plane cosine shaped displacements in the weak layer.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>Z</strong> (<em>ndarray</em>)</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>float | <em>ndarray</em></p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="weac.core.generalized_field_quantities.GeneralizedFieldQuantities.theta_wc">
+<span class="sig-name descname"><span class="pre">theta_wc</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">Z</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/weac/core/generalized_field_quantities.html#GeneralizedFieldQuantities.theta_wc"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#weac.core.generalized_field_quantities.GeneralizedFieldQuantities.theta_wc" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#weac.core.generalized_field_quantities.GeneralizedFieldQuantities.theta_wc'">¶</a></dt>
+<dd><p>Linear amplitude of axial cosine shaped displacements in the weak layer.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>Z</strong> (<em>ndarray</em>)</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>float | <em>ndarray</em></p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="weac.core.generalized_field_quantities.GeneralizedFieldQuantities.dtheta_wc_dx">
+<span class="sig-name descname"><span class="pre">dtheta_wc_dx</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">Z</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/weac/core/generalized_field_quantities.html#GeneralizedFieldQuantities.dtheta_wc_dx"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#weac.core.generalized_field_quantities.GeneralizedFieldQuantities.dtheta_wc_dx" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#weac.core.generalized_field_quantities.GeneralizedFieldQuantities.dtheta_wc_dx'">¶</a></dt>
+<dd><p>First derivative of the constant amplitude of vertical cosine shaped displacements in the weak layer.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>Z</strong> (<em>ndarray</em>)</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>float | <em>ndarray</em></p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="weac.core.generalized_field_quantities.GeneralizedFieldQuantities.theta_wl">
+<span class="sig-name descname"><span class="pre">theta_wl</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">Z</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/weac/core/generalized_field_quantities.html#GeneralizedFieldQuantities.theta_wl"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#weac.core.generalized_field_quantities.GeneralizedFieldQuantities.theta_wl" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#weac.core.generalized_field_quantities.GeneralizedFieldQuantities.theta_wl'">¶</a></dt>
+<dd><p>Linear amplitude of axial cosine shaped displacements in the weak layer.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>Z</strong> (<em>ndarray</em>)</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>float | <em>ndarray</em></p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="weac.core.generalized_field_quantities.GeneralizedFieldQuantities.dtheta_wl_dx">
+<span class="sig-name descname"><span class="pre">dtheta_wl_dx</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">Z</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/weac/core/generalized_field_quantities.html#GeneralizedFieldQuantities.dtheta_wl_dx"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#weac.core.generalized_field_quantities.GeneralizedFieldQuantities.dtheta_wl_dx" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#weac.core.generalized_field_quantities.GeneralizedFieldQuantities.dtheta_wl_dx'">¶</a></dt>
+<dd><p>First derivative of the linear amplitude of vertical cosine shaped displacements in the weak layer.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>Z</strong> (<em>ndarray</em>)</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>float | <em>ndarray</em></p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="weac.core.generalized_field_quantities.GeneralizedFieldQuantities.Nx">
+<span class="sig-name descname"><span class="pre">Nx</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">Z</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">has_foundation</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/weac/core/generalized_field_quantities.html#GeneralizedFieldQuantities.Nx"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#weac.core.generalized_field_quantities.GeneralizedFieldQuantities.Nx" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#weac.core.generalized_field_quantities.GeneralizedFieldQuantities.Nx'">¶</a></dt>
+<dd><p>Axial normal force Nx = A11 b u’ + B11 b psiy’  in the slab [N]</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>Z</strong> (<em>ndarray</em>)</p></li>
+<li><p><strong>has_foundation</strong> (<em>bool</em>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>float | <em>ndarray</em></p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="weac.core.generalized_field_quantities.GeneralizedFieldQuantities.Vy">
+<span class="sig-name descname"><span class="pre">Vy</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">Z</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">has_foundation</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/weac/core/generalized_field_quantities.html#GeneralizedFieldQuantities.Vy"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#weac.core.generalized_field_quantities.GeneralizedFieldQuantities.Vy" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#weac.core.generalized_field_quantities.GeneralizedFieldQuantities.Vy'">¶</a></dt>
+<dd><p>Vertical out-of-plane shear force Vy = kA66 b (-psiz + v’)- kB66 b psix’  [N]</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>Z</strong> (<em>ndarray</em>)</p></li>
+<li><p><strong>has_foundation</strong> (<em>bool</em>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>float | <em>ndarray</em></p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="weac.core.generalized_field_quantities.GeneralizedFieldQuantities.Vz">
+<span class="sig-name descname"><span class="pre">Vz</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">Z</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">has_foundation</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/weac/core/generalized_field_quantities.html#GeneralizedFieldQuantities.Vz"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#weac.core.generalized_field_quantities.GeneralizedFieldQuantities.Vz" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#weac.core.generalized_field_quantities.GeneralizedFieldQuantities.Vz'">¶</a></dt>
+<dd><p>Vertical shear force V = kA55(w’ + psiy) [N]</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>Z</strong> (<em>ndarray</em>)</p></li>
+<li><p><strong>has_foundation</strong> (<em>bool</em>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>float | <em>ndarray</em></p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="weac.core.generalized_field_quantities.GeneralizedFieldQuantities.Mx">
+<span class="sig-name descname"><span class="pre">Mx</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">Z</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">has_foundation</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/weac/core/generalized_field_quantities.html#GeneralizedFieldQuantities.Mx"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#weac.core.generalized_field_quantities.GeneralizedFieldQuantities.Mx" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#weac.core.generalized_field_quantities.GeneralizedFieldQuantities.Mx'">¶</a></dt>
+<dd><p>Torsional moment Mx = kA55 * b^3/12 * psix’ + kB66 b (psiz - v0’) + kD66 b psix’ in the slab [Nmm]</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>Z</strong> (<em>ndarray</em>)</p></li>
+<li><p><strong>has_foundation</strong> (<em>bool</em>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>float | <em>ndarray</em></p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="weac.core.generalized_field_quantities.GeneralizedFieldQuantities.My">
+<span class="sig-name descname"><span class="pre">My</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">Z</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">has_foundation</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/weac/core/generalized_field_quantities.html#GeneralizedFieldQuantities.My"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#weac.core.generalized_field_quantities.GeneralizedFieldQuantities.My" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#weac.core.generalized_field_quantities.GeneralizedFieldQuantities.My'">¶</a></dt>
+<dd><p>Bending moment My = B11 b u’ + D11 b psiy’ in the slab[Nmm]</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>Z</strong> (<em>ndarray</em>)</p></li>
+<li><p><strong>has_foundation</strong> (<em>bool</em>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>float | <em>ndarray</em></p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="weac.core.generalized_field_quantities.GeneralizedFieldQuantities.Mz">
+<span class="sig-name descname"><span class="pre">Mz</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">Z</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">has_foundation</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/weac/core/generalized_field_quantities.html#GeneralizedFieldQuantities.Mz"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#weac.core.generalized_field_quantities.GeneralizedFieldQuantities.Mz" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#weac.core.generalized_field_quantities.GeneralizedFieldQuantities.Mz'">¶</a></dt>
+<dd><p>Bending moment Mz = A11 b^3/12 * psiz’ in the slab [Nmm]</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>Z</strong> (<em>ndarray</em>)</p></li>
+<li><p><strong>has_foundation</strong> (<em>bool</em>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>float | <em>ndarray</em></p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="weac.core.generalized_field_quantities.GeneralizedFieldQuantities.Nx_c_weakLayer">
+<span class="sig-name descname"><span class="pre">Nx_c_weakLayer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">Z</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/weac/core/generalized_field_quantities.html#GeneralizedFieldQuantities.Nx_c_weakLayer"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#weac.core.generalized_field_quantities.GeneralizedFieldQuantities.Nx_c_weakLayer" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#weac.core.generalized_field_quantities.GeneralizedFieldQuantities.Nx_c_weakLayer'">¶</a></dt>
+<dd><p>Generalized axial force associated to theta_uc [N]</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>Z</strong> (<em>ndarray</em>)</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>float | <em>ndarray</em></p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="weac.core.generalized_field_quantities.GeneralizedFieldQuantities.Nx_l_weakLayer">
+<span class="sig-name descname"><span class="pre">Nx_l_weakLayer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">Z</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/weac/core/generalized_field_quantities.html#GeneralizedFieldQuantities.Nx_l_weakLayer"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#weac.core.generalized_field_quantities.GeneralizedFieldQuantities.Nx_l_weakLayer" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#weac.core.generalized_field_quantities.GeneralizedFieldQuantities.Nx_l_weakLayer'">¶</a></dt>
+<dd><p>Generalized axial force associated to theta_ul [N]</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>Z</strong> (<em>ndarray</em>)</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>float | <em>ndarray</em></p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="weac.core.generalized_field_quantities.GeneralizedFieldQuantities.Vy_c_weakLayer">
+<span class="sig-name descname"><span class="pre">Vy_c_weakLayer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">Z</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/weac/core/generalized_field_quantities.html#GeneralizedFieldQuantities.Vy_c_weakLayer"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#weac.core.generalized_field_quantities.GeneralizedFieldQuantities.Vy_c_weakLayer" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#weac.core.generalized_field_quantities.GeneralizedFieldQuantities.Vy_c_weakLayer'">¶</a></dt>
+<dd><p>Generalized axial force associated to theta_vc [N]</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>Z</strong> (<em>ndarray</em>)</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>float | <em>ndarray</em></p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="weac.core.generalized_field_quantities.GeneralizedFieldQuantities.Vy_l_weakLayer">
+<span class="sig-name descname"><span class="pre">Vy_l_weakLayer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">Z</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/weac/core/generalized_field_quantities.html#GeneralizedFieldQuantities.Vy_l_weakLayer"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#weac.core.generalized_field_quantities.GeneralizedFieldQuantities.Vy_l_weakLayer" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#weac.core.generalized_field_quantities.GeneralizedFieldQuantities.Vy_l_weakLayer'">¶</a></dt>
+<dd><p>Generalized axial force associated to theta_vl [N]</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>Z</strong> (<em>ndarray</em>)</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>float | <em>ndarray</em></p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="weac.core.generalized_field_quantities.GeneralizedFieldQuantities.Vz_c_weakLayer">
+<span class="sig-name descname"><span class="pre">Vz_c_weakLayer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">Z</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/weac/core/generalized_field_quantities.html#GeneralizedFieldQuantities.Vz_c_weakLayer"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#weac.core.generalized_field_quantities.GeneralizedFieldQuantities.Vz_c_weakLayer" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#weac.core.generalized_field_quantities.GeneralizedFieldQuantities.Vz_c_weakLayer'">¶</a></dt>
+<dd><p>Generalized axial force associated to theta_wc [N]</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>Z</strong> (<em>ndarray</em>)</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>float | <em>ndarray</em></p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="weac.core.generalized_field_quantities.GeneralizedFieldQuantities.Vz_l_weakLayer">
+<span class="sig-name descname"><span class="pre">Vz_l_weakLayer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">Z</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/weac/core/generalized_field_quantities.html#GeneralizedFieldQuantities.Vz_l_weakLayer"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#weac.core.generalized_field_quantities.GeneralizedFieldQuantities.Vz_l_weakLayer" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#weac.core.generalized_field_quantities.GeneralizedFieldQuantities.Vz_l_weakLayer'">¶</a></dt>
+<dd><p>Generalized axial force associated to theta_wl [N]</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>Z</strong> (<em>ndarray</em>)</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>float | <em>ndarray</em></p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="weac.core.generalized_field_quantities.GeneralizedFieldQuantities.sig_zz">
+<span class="sig-name descname"><span class="pre">sig_zz</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">Z</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">h0</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">b0</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">unit</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'MPa'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/weac/core/generalized_field_quantities.html#GeneralizedFieldQuantities.sig_zz"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#weac.core.generalized_field_quantities.GeneralizedFieldQuantities.sig_zz" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#weac.core.generalized_field_quantities.GeneralizedFieldQuantities.sig_zz'">¶</a></dt>
+<dd><p>Weak-layer normal stress</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>Z</strong> (<em>ndarray</em>)</p></li>
+<li><p><strong>h0</strong> (<em>float</em><em> | </em><em>None</em>)</p></li>
+<li><p><strong>b0</strong> (<em>float</em>)</p></li>
+<li><p><strong>unit</strong> (<em>Literal</em><em>[</em><em>'Pa'</em><em>, </em><em>'kPa'</em><em>, </em><em>'MPa'</em><em>, </em><em>'GPa'</em><em>]</em>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>float | <em>ndarray</em></p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="weac.core.generalized_field_quantities.GeneralizedFieldQuantities.tau_yz">
+<span class="sig-name descname"><span class="pre">tau_yz</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">Z</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">h0</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">b0</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">unit</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'MPa'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/weac/core/generalized_field_quantities.html#GeneralizedFieldQuantities.tau_yz"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#weac.core.generalized_field_quantities.GeneralizedFieldQuantities.tau_yz" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#weac.core.generalized_field_quantities.GeneralizedFieldQuantities.tau_yz'">¶</a></dt>
+<dd><p>Weak-layer shear stress</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>Z</strong> (<em>ndarray</em>)</p></li>
+<li><p><strong>h0</strong> (<em>float</em>)</p></li>
+<li><p><strong>b0</strong> (<em>float</em>)</p></li>
+<li><p><strong>unit</strong> (<em>Literal</em><em>[</em><em>'Pa'</em><em>, </em><em>'kPa'</em><em>, </em><em>'MPa'</em><em>, </em><em>'GPa'</em><em>]</em>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>float | <em>ndarray</em></p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="weac.core.generalized_field_quantities.GeneralizedFieldQuantities.tau_xz">
+<span class="sig-name descname"><span class="pre">tau_xz</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">Z</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">h0</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">b0</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">unit</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'MPa'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/weac/core/generalized_field_quantities.html#GeneralizedFieldQuantities.tau_xz"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#weac.core.generalized_field_quantities.GeneralizedFieldQuantities.tau_xz" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#weac.core.generalized_field_quantities.GeneralizedFieldQuantities.tau_xz'">¶</a></dt>
+<dd><p>Weak-layer shear stress</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>Z</strong> (<em>ndarray</em>)</p></li>
+<li><p><strong>h0</strong> (<em>float</em>)</p></li>
+<li><p><strong>b0</strong> (<em>float</em>)</p></li>
+<li><p><strong>unit</strong> (<em>Literal</em><em>[</em><em>'Pa'</em><em>, </em><em>'kPa'</em><em>, </em><em>'MPa'</em><em>, </em><em>'GPa'</em><em>]</em>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>float | <em>ndarray</em></p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="weac.core.generalized_field_quantities.GeneralizedFieldQuantities.eps_zz">
+<span class="sig-name descname"><span class="pre">eps_zz</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">Z</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">h0</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">b0</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/weac/core/generalized_field_quantities.html#GeneralizedFieldQuantities.eps_zz"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#weac.core.generalized_field_quantities.GeneralizedFieldQuantities.eps_zz" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#weac.core.generalized_field_quantities.GeneralizedFieldQuantities.eps_zz'">¶</a></dt>
+<dd><p>Weak-layer normal strain</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>Z</strong> (<em>ndarray</em>)</p></li>
+<li><p><strong>h0</strong> (<em>float</em>)</p></li>
+<li><p><strong>b0</strong> (<em>float</em>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>float | <em>ndarray</em></p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="weac.core.generalized_field_quantities.GeneralizedFieldQuantities.gamma_yz">
+<span class="sig-name descname"><span class="pre">gamma_yz</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">Z</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">h0</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">b0</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/weac/core/generalized_field_quantities.html#GeneralizedFieldQuantities.gamma_yz"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#weac.core.generalized_field_quantities.GeneralizedFieldQuantities.gamma_yz" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#weac.core.generalized_field_quantities.GeneralizedFieldQuantities.gamma_yz'">¶</a></dt>
+<dd><p>Weak-layer shear strain.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>Z</strong> (<em>ndarray</em>)</p></li>
+<li><p><strong>h0</strong> (<em>float</em>)</p></li>
+<li><p><strong>b0</strong> (<em>float</em>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>float | <em>ndarray</em></p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="weac.core.generalized_field_quantities.GeneralizedFieldQuantities.gamma_xz">
+<span class="sig-name descname"><span class="pre">gamma_xz</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">Z</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">h0</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">b0</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/weac/core/generalized_field_quantities.html#GeneralizedFieldQuantities.gamma_xz"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#weac.core.generalized_field_quantities.GeneralizedFieldQuantities.gamma_xz" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#weac.core.generalized_field_quantities.GeneralizedFieldQuantities.gamma_xz'">¶</a></dt>
+<dd><p>Weak-layer shear strain.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>Z</strong> (<em>ndarray</em>)</p></li>
+<li><p><strong>h0</strong> (<em>float</em>)</p></li>
+<li><p><strong>b0</strong> (<em>float</em>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>float | <em>ndarray</em></p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="weac.core.generalized_field_quantities.GeneralizedFieldQuantities.Gi">
+<span class="sig-name descname"><span class="pre">Gi</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">Z_tip</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">_Z_back</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">_phi</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">_theta</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">unit</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'kJ/m^2'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/weac/core/generalized_field_quantities.html#GeneralizedFieldQuantities.Gi"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#weac.core.generalized_field_quantities.GeneralizedFieldQuantities.Gi" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#weac.core.generalized_field_quantities.GeneralizedFieldQuantities.Gi'">¶</a></dt>
+<dd><p>Mode I differential energy release rate at crack tip.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>Z_tip</strong> (<em>ndarray</em>)</p></li>
+<li><p><strong>_Z_back</strong> (<em>ndarray</em>)</p></li>
+<li><p><strong>_phi</strong> (<em>float</em>)</p></li>
+<li><p><strong>_theta</strong> (<em>float</em>)</p></li>
+<li><p><strong>unit</strong> (<em>Literal</em><em>[</em><em>'J/m^2'</em><em>, </em><em>'kJ/m^2'</em><em>, </em><em>'N/mm'</em><em>]</em>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>float | <em>ndarray</em></p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="weac.core.generalized_field_quantities.GeneralizedFieldQuantities.Gii">
+<span class="sig-name descname"><span class="pre">Gii</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">Z_tip</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">_Z_back</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">_phi</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">_theta</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">unit</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'kJ/m^2'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/weac/core/generalized_field_quantities.html#GeneralizedFieldQuantities.Gii"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#weac.core.generalized_field_quantities.GeneralizedFieldQuantities.Gii" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#weac.core.generalized_field_quantities.GeneralizedFieldQuantities.Gii'">¶</a></dt>
+<dd><p>Mode II differential energy release rate at crack tip.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>Z_tip</strong> (<em>ndarray</em>)</p></li>
+<li><p><strong>_Z_back</strong> (<em>ndarray</em>)</p></li>
+<li><p><strong>_phi</strong> (<em>float</em>)</p></li>
+<li><p><strong>_theta</strong> (<em>float</em>)</p></li>
+<li><p><strong>unit</strong> (<em>Literal</em><em>[</em><em>'J/m^2'</em><em>, </em><em>'kJ/m^2'</em><em>, </em><em>'N/mm'</em><em>]</em>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>float | <em>ndarray</em></p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="weac.core.generalized_field_quantities.GeneralizedFieldQuantities.Giii">
+<span class="sig-name descname"><span class="pre">Giii</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">Z_tip</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">_Z_back</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">_phi</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">_theta</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">unit</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'kJ/m^2'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/weac/core/generalized_field_quantities.html#GeneralizedFieldQuantities.Giii"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#weac.core.generalized_field_quantities.GeneralizedFieldQuantities.Giii" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#weac.core.generalized_field_quantities.GeneralizedFieldQuantities.Giii'">¶</a></dt>
+<dd><p>Mode III differential energy release rate at crack tip.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>Z_tip</strong> (<em>ndarray</em>)</p></li>
+<li><p><strong>_Z_back</strong> (<em>ndarray</em>)</p></li>
+<li><p><strong>_phi</strong> (<em>float</em>)</p></li>
+<li><p><strong>_theta</strong> (<em>float</em>)</p></li>
+<li><p><strong>unit</strong> (<em>Literal</em><em>[</em><em>'J/m^2'</em><em>, </em><em>'kJ/m^2'</em><em>, </em><em>'N/mm'</em><em>]</em>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>float | <em>ndarray</em></p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="weac.core.generalized_field_quantities.GeneralizedFieldQuantities.dz_dx">
+<span class="sig-name descname"><span class="pre">dz_dx</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">z</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">phi</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">qs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/weac/core/generalized_field_quantities.html#GeneralizedFieldQuantities.dz_dx"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#weac.core.generalized_field_quantities.GeneralizedFieldQuantities.dz_dx" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#weac.core.generalized_field_quantities.GeneralizedFieldQuantities.dz_dx'">¶</a></dt>
+<dd><p>First derivative z’(x) = K*z(x) + q of the solution vector.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>z</strong> (<em>ndarray</em>)</p></li>
+<li><p><strong>phi</strong> (<em>float</em>)</p></li>
+<li><p><strong>qs</strong> (<em>float</em>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><em>ndarray</em></p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="weac.core.generalized_field_quantities.GeneralizedFieldQuantities.dz_dxdx">
+<span class="sig-name descname"><span class="pre">dz_dxdx</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">z</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">phi</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">qs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/weac/core/generalized_field_quantities.html#GeneralizedFieldQuantities.dz_dxdx"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#weac.core.generalized_field_quantities.GeneralizedFieldQuantities.dz_dxdx" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#weac.core.generalized_field_quantities.GeneralizedFieldQuantities.dz_dxdx'">¶</a></dt>
+<dd><p>Second derivative z’’(x) = K*z’(x) of the solution vector.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>z</strong> (<em>ndarray</em>)</p></li>
+<li><p><strong>phi</strong> (<em>float</em>)</p></li>
+<li><p><strong>qs</strong> (<em>float</em>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><em>ndarray</em></p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="weac.core.generalized_field_quantities.GeneralizedFieldQuantities.du0_dxdx">
+<span class="sig-name descname"><span class="pre">du0_dxdx</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">z</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">phi</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">qs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/weac/core/generalized_field_quantities.html#GeneralizedFieldQuantities.du0_dxdx"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#weac.core.generalized_field_quantities.GeneralizedFieldQuantities.du0_dxdx" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#weac.core.generalized_field_quantities.GeneralizedFieldQuantities.du0_dxdx'">¶</a></dt>
+<dd><p>Second derivative of the horiz. centerline displacement u0’’(x).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>z</strong> (<em>ndarray</em>)</p></li>
+<li><p><strong>phi</strong> (<em>float</em>)</p></li>
+<li><p><strong>qs</strong> (<em>float</em>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>float | <em>ndarray</em></p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="weac.core.generalized_field_quantities.GeneralizedFieldQuantities.dpsi_dxdx">
+<span class="sig-name descname"><span class="pre">dpsi_dxdx</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">z</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">phi</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">qs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/weac/core/generalized_field_quantities.html#GeneralizedFieldQuantities.dpsi_dxdx"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#weac.core.generalized_field_quantities.GeneralizedFieldQuantities.dpsi_dxdx" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#weac.core.generalized_field_quantities.GeneralizedFieldQuantities.dpsi_dxdx'">¶</a></dt>
+<dd><p>Second derivative of the cross-section rotation psi’’(x).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>z</strong> (<em>ndarray</em>)</p></li>
+<li><p><strong>phi</strong> (<em>float</em>)</p></li>
+<li><p><strong>qs</strong> (<em>float</em>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>float | <em>ndarray</em></p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="weac.core.generalized_field_quantities.GeneralizedFieldQuantities.du0_dxdxdx">
+<span class="sig-name descname"><span class="pre">du0_dxdxdx</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">z</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">phi</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">qs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/weac/core/generalized_field_quantities.html#GeneralizedFieldQuantities.du0_dxdxdx"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#weac.core.generalized_field_quantities.GeneralizedFieldQuantities.du0_dxdxdx" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#weac.core.generalized_field_quantities.GeneralizedFieldQuantities.du0_dxdxdx'">¶</a></dt>
+<dd><p>Third derivative of the horiz. centerline displacement u0’’’(x).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>z</strong> (<em>ndarray</em>)</p></li>
+<li><p><strong>phi</strong> (<em>float</em>)</p></li>
+<li><p><strong>qs</strong> (<em>float</em>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>float | <em>ndarray</em></p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="weac.core.generalized_field_quantities.GeneralizedFieldQuantities.dpsi_dxdxdx">
+<span class="sig-name descname"><span class="pre">dpsi_dxdxdx</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">z</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">phi</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">qs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/weac/core/generalized_field_quantities.html#GeneralizedFieldQuantities.dpsi_dxdxdx"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#weac.core.generalized_field_quantities.GeneralizedFieldQuantities.dpsi_dxdxdx" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#weac.core.generalized_field_quantities.GeneralizedFieldQuantities.dpsi_dxdxdx'">¶</a></dt>
+<dd><p>Third derivative of the cross-section rotation psi’’’(x).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>z</strong> (<em>ndarray</em>)</p></li>
+<li><p><strong>phi</strong> (<em>float</em>)</p></li>
+<li><p><strong>qs</strong> (<em>float</em>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>float | <em>ndarray</em></p>
+</dd>
+</dl>
+</dd></dl>
+</dd></dl>
+</section>
+</div></div><aside class="hidden text-sm xl:block" id="right-sidebar">
+<div class="sticky top-16 -mt-10 max-h-[calc(100vh-5rem)] overflow-y-auto pt-6 space-y-2"><p class="font-medium">On this page</p>
+<ul>
+<li><a :data-current="activeSection === '#weac.core.generalized_field_quantities.GeneralizedFieldQuantities'" class="reference internal" href="#weac.core.generalized_field_quantities.GeneralizedFieldQuantities"><code class="docutils literal notranslate"><span class="pre">GeneralizedFieldQuantities</span></code></a><ul>
+<li><a :data-current="activeSection === '#weac.core.generalized_field_quantities.GeneralizedFieldQuantities.__init__'" class="reference internal" href="#weac.core.generalized_field_quantities.GeneralizedFieldQuantities.__init__"><code class="docutils literal notranslate"><span class="pre">GeneralizedFieldQuantities.__init__()</span></code></a></li>
+<li><a :data-current="activeSection === '#weac.core.generalized_field_quantities.GeneralizedFieldQuantities.u'" class="reference internal" href="#weac.core.generalized_field_quantities.GeneralizedFieldQuantities.u"><code class="docutils literal notranslate"><span class="pre">GeneralizedFieldQuantities.u()</span></code></a></li>
+<li><a :data-current="activeSection === '#weac.core.generalized_field_quantities.GeneralizedFieldQuantities.du_dx'" class="reference internal" href="#weac.core.generalized_field_quantities.GeneralizedFieldQuantities.du_dx"><code class="docutils literal notranslate"><span class="pre">GeneralizedFieldQuantities.du_dx()</span></code></a></li>
+<li><a :data-current="activeSection === '#weac.core.generalized_field_quantities.GeneralizedFieldQuantities.v'" class="reference internal" href="#weac.core.generalized_field_quantities.GeneralizedFieldQuantities.v"><code class="docutils literal notranslate"><span class="pre">GeneralizedFieldQuantities.v()</span></code></a></li>
+<li><a :data-current="activeSection === '#weac.core.generalized_field_quantities.GeneralizedFieldQuantities.dv_dx'" class="reference internal" href="#weac.core.generalized_field_quantities.GeneralizedFieldQuantities.dv_dx"><code class="docutils literal notranslate"><span class="pre">GeneralizedFieldQuantities.dv_dx()</span></code></a></li>
+<li><a :data-current="activeSection === '#weac.core.generalized_field_quantities.GeneralizedFieldQuantities.w'" class="reference internal" href="#weac.core.generalized_field_quantities.GeneralizedFieldQuantities.w"><code class="docutils literal notranslate"><span class="pre">GeneralizedFieldQuantities.w()</span></code></a></li>
+<li><a :data-current="activeSection === '#weac.core.generalized_field_quantities.GeneralizedFieldQuantities.dw_dx'" class="reference internal" href="#weac.core.generalized_field_quantities.GeneralizedFieldQuantities.dw_dx"><code class="docutils literal notranslate"><span class="pre">GeneralizedFieldQuantities.dw_dx()</span></code></a></li>
+<li><a :data-current="activeSection === '#weac.core.generalized_field_quantities.GeneralizedFieldQuantities.psix'" class="reference internal" href="#weac.core.generalized_field_quantities.GeneralizedFieldQuantities.psix"><code class="docutils literal notranslate"><span class="pre">GeneralizedFieldQuantities.psix()</span></code></a></li>
+<li><a :data-current="activeSection === '#weac.core.generalized_field_quantities.GeneralizedFieldQuantities.dpsix_dx'" class="reference internal" href="#weac.core.generalized_field_quantities.GeneralizedFieldQuantities.dpsix_dx"><code class="docutils literal notranslate"><span class="pre">GeneralizedFieldQuantities.dpsix_dx()</span></code></a></li>
+<li><a :data-current="activeSection === '#weac.core.generalized_field_quantities.GeneralizedFieldQuantities.psiy'" class="reference internal" href="#weac.core.generalized_field_quantities.GeneralizedFieldQuantities.psiy"><code class="docutils literal notranslate"><span class="pre">GeneralizedFieldQuantities.psiy()</span></code></a></li>
+<li><a :data-current="activeSection === '#weac.core.generalized_field_quantities.GeneralizedFieldQuantities.dpsiy_dx'" class="reference internal" href="#weac.core.generalized_field_quantities.GeneralizedFieldQuantities.dpsiy_dx"><code class="docutils literal notranslate"><span class="pre">GeneralizedFieldQuantities.dpsiy_dx()</span></code></a></li>
+<li><a :data-current="activeSection === '#weac.core.generalized_field_quantities.GeneralizedFieldQuantities.psiz'" class="reference internal" href="#weac.core.generalized_field_quantities.GeneralizedFieldQuantities.psiz"><code class="docutils literal notranslate"><span class="pre">GeneralizedFieldQuantities.psiz()</span></code></a></li>
+<li><a :data-current="activeSection === '#weac.core.generalized_field_quantities.GeneralizedFieldQuantities.dpsiz_dx'" class="reference internal" href="#weac.core.generalized_field_quantities.GeneralizedFieldQuantities.dpsiz_dx"><code class="docutils literal notranslate"><span class="pre">GeneralizedFieldQuantities.dpsiz_dx()</span></code></a></li>
+<li><a :data-current="activeSection === '#weac.core.generalized_field_quantities.GeneralizedFieldQuantities.theta_uc'" class="reference internal" href="#weac.core.generalized_field_quantities.GeneralizedFieldQuantities.theta_uc"><code class="docutils literal notranslate"><span class="pre">GeneralizedFieldQuantities.theta_uc()</span></code></a></li>
+<li><a :data-current="activeSection === '#weac.core.generalized_field_quantities.GeneralizedFieldQuantities.dtheta_uc_dx'" class="reference internal" href="#weac.core.generalized_field_quantities.GeneralizedFieldQuantities.dtheta_uc_dx"><code class="docutils literal notranslate"><span class="pre">GeneralizedFieldQuantities.dtheta_uc_dx()</span></code></a></li>
+<li><a :data-current="activeSection === '#weac.core.generalized_field_quantities.GeneralizedFieldQuantities.theta_ul'" class="reference internal" href="#weac.core.generalized_field_quantities.GeneralizedFieldQuantities.theta_ul"><code class="docutils literal notranslate"><span class="pre">GeneralizedFieldQuantities.theta_ul()</span></code></a></li>
+<li><a :data-current="activeSection === '#weac.core.generalized_field_quantities.GeneralizedFieldQuantities.dtheta_ul_dx'" class="reference internal" href="#weac.core.generalized_field_quantities.GeneralizedFieldQuantities.dtheta_ul_dx"><code class="docutils literal notranslate"><span class="pre">GeneralizedFieldQuantities.dtheta_ul_dx()</span></code></a></li>
+<li><a :data-current="activeSection === '#weac.core.generalized_field_quantities.GeneralizedFieldQuantities.theta_vc'" class="reference internal" href="#weac.core.generalized_field_quantities.GeneralizedFieldQuantities.theta_vc"><code class="docutils literal notranslate"><span class="pre">GeneralizedFieldQuantities.theta_vc()</span></code></a></li>
+<li><a :data-current="activeSection === '#weac.core.generalized_field_quantities.GeneralizedFieldQuantities.dtheta_vc_dx'" class="reference internal" href="#weac.core.generalized_field_quantities.GeneralizedFieldQuantities.dtheta_vc_dx"><code class="docutils literal notranslate"><span class="pre">GeneralizedFieldQuantities.dtheta_vc_dx()</span></code></a></li>
+<li><a :data-current="activeSection === '#weac.core.generalized_field_quantities.GeneralizedFieldQuantities.theta_vl'" class="reference internal" href="#weac.core.generalized_field_quantities.GeneralizedFieldQuantities.theta_vl"><code class="docutils literal notranslate"><span class="pre">GeneralizedFieldQuantities.theta_vl()</span></code></a></li>
+<li><a :data-current="activeSection === '#weac.core.generalized_field_quantities.GeneralizedFieldQuantities.dtheta_vl_dx'" class="reference internal" href="#weac.core.generalized_field_quantities.GeneralizedFieldQuantities.dtheta_vl_dx"><code class="docutils literal notranslate"><span class="pre">GeneralizedFieldQuantities.dtheta_vl_dx()</span></code></a></li>
+<li><a :data-current="activeSection === '#weac.core.generalized_field_quantities.GeneralizedFieldQuantities.theta_wc'" class="reference internal" href="#weac.core.generalized_field_quantities.GeneralizedFieldQuantities.theta_wc"><code class="docutils literal notranslate"><span class="pre">GeneralizedFieldQuantities.theta_wc()</span></code></a></li>
+<li><a :data-current="activeSection === '#weac.core.generalized_field_quantities.GeneralizedFieldQuantities.dtheta_wc_dx'" class="reference internal" href="#weac.core.generalized_field_quantities.GeneralizedFieldQuantities.dtheta_wc_dx"><code class="docutils literal notranslate"><span class="pre">GeneralizedFieldQuantities.dtheta_wc_dx()</span></code></a></li>
+<li><a :data-current="activeSection === '#weac.core.generalized_field_quantities.GeneralizedFieldQuantities.theta_wl'" class="reference internal" href="#weac.core.generalized_field_quantities.GeneralizedFieldQuantities.theta_wl"><code class="docutils literal notranslate"><span class="pre">GeneralizedFieldQuantities.theta_wl()</span></code></a></li>
+<li><a :data-current="activeSection === '#weac.core.generalized_field_quantities.GeneralizedFieldQuantities.dtheta_wl_dx'" class="reference internal" href="#weac.core.generalized_field_quantities.GeneralizedFieldQuantities.dtheta_wl_dx"><code class="docutils literal notranslate"><span class="pre">GeneralizedFieldQuantities.dtheta_wl_dx()</span></code></a></li>
+<li><a :data-current="activeSection === '#weac.core.generalized_field_quantities.GeneralizedFieldQuantities.Nx'" class="reference internal" href="#weac.core.generalized_field_quantities.GeneralizedFieldQuantities.Nx"><code class="docutils literal notranslate"><span class="pre">GeneralizedFieldQuantities.Nx()</span></code></a></li>
+<li><a :data-current="activeSection === '#weac.core.generalized_field_quantities.GeneralizedFieldQuantities.Vy'" class="reference internal" href="#weac.core.generalized_field_quantities.GeneralizedFieldQuantities.Vy"><code class="docutils literal notranslate"><span class="pre">GeneralizedFieldQuantities.Vy()</span></code></a></li>
+<li><a :data-current="activeSection === '#weac.core.generalized_field_quantities.GeneralizedFieldQuantities.Vz'" class="reference internal" href="#weac.core.generalized_field_quantities.GeneralizedFieldQuantities.Vz"><code class="docutils literal notranslate"><span class="pre">GeneralizedFieldQuantities.Vz()</span></code></a></li>
+<li><a :data-current="activeSection === '#weac.core.generalized_field_quantities.GeneralizedFieldQuantities.Mx'" class="reference internal" href="#weac.core.generalized_field_quantities.GeneralizedFieldQuantities.Mx"><code class="docutils literal notranslate"><span class="pre">GeneralizedFieldQuantities.Mx()</span></code></a></li>
+<li><a :data-current="activeSection === '#weac.core.generalized_field_quantities.GeneralizedFieldQuantities.My'" class="reference internal" href="#weac.core.generalized_field_quantities.GeneralizedFieldQuantities.My"><code class="docutils literal notranslate"><span class="pre">GeneralizedFieldQuantities.My()</span></code></a></li>
+<li><a :data-current="activeSection === '#weac.core.generalized_field_quantities.GeneralizedFieldQuantities.Mz'" class="reference internal" href="#weac.core.generalized_field_quantities.GeneralizedFieldQuantities.Mz"><code class="docutils literal notranslate"><span class="pre">GeneralizedFieldQuantities.Mz()</span></code></a></li>
+<li><a :data-current="activeSection === '#weac.core.generalized_field_quantities.GeneralizedFieldQuantities.Nx_c_weakLayer'" class="reference internal" href="#weac.core.generalized_field_quantities.GeneralizedFieldQuantities.Nx_c_weakLayer"><code class="docutils literal notranslate"><span class="pre">GeneralizedFieldQuantities.Nx_c_weakLayer()</span></code></a></li>
+<li><a :data-current="activeSection === '#weac.core.generalized_field_quantities.GeneralizedFieldQuantities.Nx_l_weakLayer'" class="reference internal" href="#weac.core.generalized_field_quantities.GeneralizedFieldQuantities.Nx_l_weakLayer"><code class="docutils literal notranslate"><span class="pre">GeneralizedFieldQuantities.Nx_l_weakLayer()</span></code></a></li>
+<li><a :data-current="activeSection === '#weac.core.generalized_field_quantities.GeneralizedFieldQuantities.Vy_c_weakLayer'" class="reference internal" href="#weac.core.generalized_field_quantities.GeneralizedFieldQuantities.Vy_c_weakLayer"><code class="docutils literal notranslate"><span class="pre">GeneralizedFieldQuantities.Vy_c_weakLayer()</span></code></a></li>
+<li><a :data-current="activeSection === '#weac.core.generalized_field_quantities.GeneralizedFieldQuantities.Vy_l_weakLayer'" class="reference internal" href="#weac.core.generalized_field_quantities.GeneralizedFieldQuantities.Vy_l_weakLayer"><code class="docutils literal notranslate"><span class="pre">GeneralizedFieldQuantities.Vy_l_weakLayer()</span></code></a></li>
+<li><a :data-current="activeSection === '#weac.core.generalized_field_quantities.GeneralizedFieldQuantities.Vz_c_weakLayer'" class="reference internal" href="#weac.core.generalized_field_quantities.GeneralizedFieldQuantities.Vz_c_weakLayer"><code class="docutils literal notranslate"><span class="pre">GeneralizedFieldQuantities.Vz_c_weakLayer()</span></code></a></li>
+<li><a :data-current="activeSection === '#weac.core.generalized_field_quantities.GeneralizedFieldQuantities.Vz_l_weakLayer'" class="reference internal" href="#weac.core.generalized_field_quantities.GeneralizedFieldQuantities.Vz_l_weakLayer"><code class="docutils literal notranslate"><span class="pre">GeneralizedFieldQuantities.Vz_l_weakLayer()</span></code></a></li>
+<li><a :data-current="activeSection === '#weac.core.generalized_field_quantities.GeneralizedFieldQuantities.sig_zz'" class="reference internal" href="#weac.core.generalized_field_quantities.GeneralizedFieldQuantities.sig_zz"><code class="docutils literal notranslate"><span class="pre">GeneralizedFieldQuantities.sig_zz()</span></code></a></li>
+<li><a :data-current="activeSection === '#weac.core.generalized_field_quantities.GeneralizedFieldQuantities.tau_yz'" class="reference internal" href="#weac.core.generalized_field_quantities.GeneralizedFieldQuantities.tau_yz"><code class="docutils literal notranslate"><span class="pre">GeneralizedFieldQuantities.tau_yz()</span></code></a></li>
+<li><a :data-current="activeSection === '#weac.core.generalized_field_quantities.GeneralizedFieldQuantities.tau_xz'" class="reference internal" href="#weac.core.generalized_field_quantities.GeneralizedFieldQuantities.tau_xz"><code class="docutils literal notranslate"><span class="pre">GeneralizedFieldQuantities.tau_xz()</span></code></a></li>
+<li><a :data-current="activeSection === '#weac.core.generalized_field_quantities.GeneralizedFieldQuantities.eps_zz'" class="reference internal" href="#weac.core.generalized_field_quantities.GeneralizedFieldQuantities.eps_zz"><code class="docutils literal notranslate"><span class="pre">GeneralizedFieldQuantities.eps_zz()</span></code></a></li>
+<li><a :data-current="activeSection === '#weac.core.generalized_field_quantities.GeneralizedFieldQuantities.gamma_yz'" class="reference internal" href="#weac.core.generalized_field_quantities.GeneralizedFieldQuantities.gamma_yz"><code class="docutils literal notranslate"><span class="pre">GeneralizedFieldQuantities.gamma_yz()</span></code></a></li>
+<li><a :data-current="activeSection === '#weac.core.generalized_field_quantities.GeneralizedFieldQuantities.gamma_xz'" class="reference internal" href="#weac.core.generalized_field_quantities.GeneralizedFieldQuantities.gamma_xz"><code class="docutils literal notranslate"><span class="pre">GeneralizedFieldQuantities.gamma_xz()</span></code></a></li>
+<li><a :data-current="activeSection === '#weac.core.generalized_field_quantities.GeneralizedFieldQuantities.Gi'" class="reference internal" href="#weac.core.generalized_field_quantities.GeneralizedFieldQuantities.Gi"><code class="docutils literal notranslate"><span class="pre">GeneralizedFieldQuantities.Gi()</span></code></a></li>
+<li><a :data-current="activeSection === '#weac.core.generalized_field_quantities.GeneralizedFieldQuantities.Gii'" class="reference internal" href="#weac.core.generalized_field_quantities.GeneralizedFieldQuantities.Gii"><code class="docutils literal notranslate"><span class="pre">GeneralizedFieldQuantities.Gii()</span></code></a></li>
+<li><a :data-current="activeSection === '#weac.core.generalized_field_quantities.GeneralizedFieldQuantities.Giii'" class="reference internal" href="#weac.core.generalized_field_quantities.GeneralizedFieldQuantities.Giii"><code class="docutils literal notranslate"><span class="pre">GeneralizedFieldQuantities.Giii()</span></code></a></li>
+<li><a :data-current="activeSection === '#weac.core.generalized_field_quantities.GeneralizedFieldQuantities.dz_dx'" class="reference internal" href="#weac.core.generalized_field_quantities.GeneralizedFieldQuantities.dz_dx"><code class="docutils literal notranslate"><span class="pre">GeneralizedFieldQuantities.dz_dx()</span></code></a></li>
+<li><a :data-current="activeSection === '#weac.core.generalized_field_quantities.GeneralizedFieldQuantities.dz_dxdx'" class="reference internal" href="#weac.core.generalized_field_quantities.GeneralizedFieldQuantities.dz_dxdx"><code class="docutils literal notranslate"><span class="pre">GeneralizedFieldQuantities.dz_dxdx()</span></code></a></li>
+<li><a :data-current="activeSection === '#weac.core.generalized_field_quantities.GeneralizedFieldQuantities.du0_dxdx'" class="reference internal" href="#weac.core.generalized_field_quantities.GeneralizedFieldQuantities.du0_dxdx"><code class="docutils literal notranslate"><span class="pre">GeneralizedFieldQuantities.du0_dxdx()</span></code></a></li>
+<li><a :data-current="activeSection === '#weac.core.generalized_field_quantities.GeneralizedFieldQuantities.dpsi_dxdx'" class="reference internal" href="#weac.core.generalized_field_quantities.GeneralizedFieldQuantities.dpsi_dxdx"><code class="docutils literal notranslate"><span class="pre">GeneralizedFieldQuantities.dpsi_dxdx()</span></code></a></li>
+<li><a :data-current="activeSection === '#weac.core.generalized_field_quantities.GeneralizedFieldQuantities.du0_dxdxdx'" class="reference internal" href="#weac.core.generalized_field_quantities.GeneralizedFieldQuantities.du0_dxdxdx"><code class="docutils literal notranslate"><span class="pre">GeneralizedFieldQuantities.du0_dxdxdx()</span></code></a></li>
+<li><a :data-current="activeSection === '#weac.core.generalized_field_quantities.GeneralizedFieldQuantities.dpsi_dxdxdx'" class="reference internal" href="#weac.core.generalized_field_quantities.GeneralizedFieldQuantities.dpsi_dxdxdx"><code class="docutils literal notranslate"><span class="pre">GeneralizedFieldQuantities.dpsi_dxdxdx()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</div>
+</aside>
+</main>
+</div>
+</div><footer class="py-6 border-t border-border md:py-0">
+<div class="container flex flex-col items-center justify-between gap-4 md:h-24 md:flex-row">
+<div class="flex flex-col items-center gap-4 px-8 md:flex-row md:gap-2 md:px-0">
+<p class="text-sm leading-loose text-center text-muted-foreground md:text-left">Built with <a class="font-medium underline underline-offset-4" href="https://www.sphinx-doc.org" rel="noreferrer">Sphinx 8.2.3</a></p>
+</div>
+</div>
+</footer>
+</div>
+<script src="_static/documentation_options.js?v=eaea8fc6"></script>
+<script src="_static/doctools.js?v=9bcbadda"></script>
+<script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+<script defer="defer" src="_static/theme.js?v=073f68d9"></script>
+</body>
+</html>
