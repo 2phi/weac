@@ -12,7 +12,7 @@ field_name: type = Field(..., gt=0, description="Description")
 
 from typing import Literal
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, model_validator
 
 from weac.components.scenario_config import TouchdownMode
 
@@ -48,6 +48,15 @@ class Config(BaseModel):
         default=None,
         description="Force a specific touchdown mode instead of auto-calculating",
     )
+
+    @model_validator(mode="after")
+    def validate_touchdown_backend_compatibility(self):
+        if self.touchdown and self.backend == "generalized":
+            raise ValueError(
+                "Slab touchdown is only available for the classic backend. "
+                "Set backend='classic' or disable touchdown."
+            )
+        return self
 
 
 if __name__ == "__main__":
