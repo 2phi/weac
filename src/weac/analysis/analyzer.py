@@ -701,53 +701,21 @@ class Analyzer:
                     (self.sm.fq.Gi(z, unit=unit), self.sm.fq.Gii(z, unit=unit))
                 )
             else:
-                if ki[idx]:
-                    z_ct = self.sm.z(
-                        li[idx],
-                        C[:, [idx]],
-                        li[idx],
-                        phi=phi,
-                        theta=theta,
-                        has_foundation=ki[idx],
-                        is_loaded=gi[idx],
-                        qs=qs,
-                    )
-                    z_ub = self.sm.z(
-                        li[idx],
-                        C[:, [idx]],
-                        li[idx],
-                        phi=phi,
-                        theta=theta,
-                        has_foundation=ki[idx],
-                        is_loaded=gi[idx],
-                        qs=qs,
-                    )
-                else:
-                    z_ct = self.sm.z(
-                        li[idx],
-                        C[:, [idx]],
-                        li[idx],
-                        phi=phi,
-                        theta=theta,
-                        has_foundation=ki[idx],
-                        is_loaded=gi[idx],
-                        qs=qs,
-                    )
-                    z_ub = self.sm.z(
-                        li[idx],
-                        C[:, [idx]],
-                        li[idx],
-                        phi=phi,
-                        theta=theta,
-                        has_foundation=ki[idx],
-                        is_loaded=gi[idx],
-                        qs=qs,
-                    )
+                z_ct = self.sm.z(
+                    li[idx],
+                    C[:, [idx]],
+                    li[idx],
+                    phi=phi,
+                    theta=theta,
+                    has_foundation=ki[idx],
+                    is_loaded=gi[idx],
+                    qs=qs,
+                )
                 Gdif[1:, j] = np.concatenate(
                     (
-                        self.sm.fq.Gi(z_ct, z_ub, phi=phi, theta=theta, unit=unit),
-                        self.sm.fq.Gii(z_ct, z_ub, phi=phi, theta=theta, unit=unit),
-                        self.sm.fq.Giii(z_ct, z_ub, phi, theta, unit=unit),
+                        self.sm.fq.Gi(z_ct, unit=unit),
+                        self.sm.fq.Gii(z_ct, unit=unit),
+                        self.sm.fq.Giii(z_ct, unit=unit),
                     )
                 )
         # Sum mode I and II contributions
