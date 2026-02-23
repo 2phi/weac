@@ -312,6 +312,640 @@ class TestCriteriaEvaluator(unittest.TestCase):
                     expected_mode,
                 )
 
+    def test_steady_state_maximal_stress_structure(self):
+        """Test that maximal stress result has correct structure and valid values."""
+        segments = [
+            Segment(length=self.segments_length, has_foundation=True, m=0),
+            Segment(length=self.segments_length, has_foundation=True, m=0),
+        ]
+        system = SystemModel(
+            model_input=ModelInput(
+                layers=self.layers,
+                weak_layer=self.weak_layer,
+                segments=segments,
+                scenario_config=ScenarioConfig(phi=self.phi),
+            ),
+            config=Config(touchdown=True),
+        )
+
+        result = self.evaluator.evaluate_SteadyState(system)
+        maximal_stress = result.maximal_stress_result
+
+        # Check that all arrays have correct shape
+        self.assertEqual(
+            maximal_stress.principal_stress_kPa.shape,
+            maximal_stress.Sxx_kPa.shape,
+        )
+        self.assertEqual(
+            maximal_stress.principal_stress_norm.shape,
+            maximal_stress.Sxx_norm.shape,
+        )
+
+        # Check that arrays are not empty
+        self.assertGreater(maximal_stress.principal_stress_kPa.size, 0)
+        self.assertGreater(maximal_stress.Sxx_kPa.size, 0)
+
+        # Check that maximum values are positive
+        self.assertGreater(maximal_stress.max_principal_stress_norm, 0)
+        self.assertGreater(maximal_stress.max_Sxx_norm, 0)
+
+        # Check that slab_tensile_criterion is between 0 and 1
+        self.assertGreaterEqual(maximal_stress.slab_tensile_criterion, 0)
+        self.assertLessEqual(maximal_stress.slab_tensile_criterion, 1)
+
+    def test_steady_state_energy_release_rate_positive(self):
+        """Test that steady state ERR is always positive."""
+        segments = [
+            Segment(length=self.segments_length, has_foundation=True, m=0),
+            Segment(length=self.segments_length, has_foundation=True, m=0),
+        ]
+        system = SystemModel(
+            model_input=ModelInput(
+                layers=self.layers,
+                weak_layer=self.weak_layer,
+                segments=segments,
+                scenario_config=ScenarioConfig(phi=self.phi),
+            ),
+            config=Config(touchdown=True),
+        )
+
+        result = self.evaluator.evaluate_SteadyState(system)
+        self.assertGreater(
+            result.energy_release_rate,
+            0,
+            "Steady state ERR should be positive",
+        )
+
+    def test_steady_state_with_different_weak_layers(self):
+        """Test steady state evaluation with different weak layer properties."""
+        weak_layers = [
+            WeakLayer(rho=150, h=10, G_Ic=0.3, G_IIc=0.6, kn=50, kt=50),
+            WeakLayer(rho=200, h=15, G_Ic=0.8, G_IIc=1.2, kn=150, kt=150),
+            WeakLayer(rho=180, h=10, G_Ic=0.5, G_IIc=0.8, kn=100, kt=100),
+        ]
+
+        segments = [
+            Segment(length=self.segments_length, has_foundation=True, m=0),
+            Segment(length=self.segments_length, has_foundation=True, m=0),
+        ]
+
+        for weak_layer in weak_layers:
+            with self.subTest(weak_layer=weak_layer):
+                system = SystemModel(
+                    model_input=ModelInput(
+                        layers=self.layers,
+                        weak_layer=weak_layer,
+                        segments=segments,
+                        scenario_config=ScenarioConfig(phi=self.phi),
+                    ),
+                    config=Config(touchdown=True),
+                )
+
+                result = self.evaluator.evaluate_SteadyState(system)
+                self.assertTrue(result.converged)
+                self.assertGreater(result.energy_release_rate, 0)
+                self.assertGreater(result.touchdown_distance, 0)
+
+    def test_steady_state_with_different_slope_angles(self):
+        """Test steady state evaluation at different slope angles."""
+        slope_angles = [20.0, 30.0, 40.0, 45.0]
+
+        segments = [
+            Segment(length=self.segments_length, has_foundation=True, m=0),
+            Segment(length=self.segments_length, has_foundation=True, m=0),
+        ]
+
+        for phi in slope_angles:
+            with self.subTest(phi=phi):
+                system = SystemModel(
+                    model_input=ModelInput(
+                        layers=self.layers,
+                        weak_layer=self.weak_layer,
+                        segments=segments,
+                        scenario_config=ScenarioConfig(phi=phi),
+                    ),
+                    config=Config(touchdown=True),
+                )
+
+                result = self.evaluator.evaluate_SteadyState(system)
+                self.assertTrue(result.converged)
+                self.assertGreater(result.energy_release_rate, 0)
+                self.assertGreater(result.touchdown_distance, 0)
+                self.assertIsNotNone(result.maximal_stress_result)
+
+    def test_steady_state_system_isolation(self):
+        """Test that evaluate_SteadyState doesn't modify original system."""
+        segments = [
+            Segment(length=self.segments_length, has_foundation=True, m=0),
+            Segment(length=self.segments_length, has_foundation=True, m=0),
+        ]
+        system = SystemModel(
+            model_input=ModelInput(
+                layers=self.layers,
+                weak_layer=self.weak_layer,
+                segments=segments,
+                scenario_config=ScenarioConfig(phi=self.phi),
+            ),
+            config=Config(touchdown=True),
+        )
+
+        original_segments = system.scenario.segments.copy()
+        original_phi = system.scenario.phi
+        original_L = system.scenario.L
+
+        result = self.evaluator.evaluate_SteadyState(system)
+
+        # Verify original system is unchanged
+        self.assertEqual(len(system.scenario.segments), len(original_segments))
+        self.assertEqual(system.scenario.phi, original_phi)
+        self.assertEqual(system.scenario.L, original_L)
+
+        # Verify result system is different
+        self.assertEqual(result.system.scenario.phi, 0.0)
+
+    def test_steady_state_message_format(self):
+        """Test that steady state result message is correctly formatted."""
+        segments = [
+            Segment(length=self.segments_length, has_foundation=True, m=0),
+            Segment(length=self.segments_length, has_foundation=True, m=0),
+        ]
+        system = SystemModel(
+            model_input=ModelInput(
+                layers=self.layers,
+                weak_layer=self.weak_layer,
+                segments=segments,
+                scenario_config=ScenarioConfig(phi=self.phi),
+            ),
+            config=Config(touchdown=True),
+        )
+
+        result = self.evaluator.evaluate_SteadyState(system)
+        self.assertIsInstance(result.message, str)
+        self.assertGreater(len(result.message), 0)
+        self.assertEqual(result.message, "Steady State evaluation successful.")
+
+    def test_steady_state_normalized_stresses_consistency(self):
+        """Test consistency between absolute and normalized stress values."""
+        segments = [
+            Segment(length=self.segments_length, has_foundation=True, m=0),
+            Segment(length=self.segments_length, has_foundation=True, m=0),
+        ]
+        system = SystemModel(
+            model_input=ModelInput(
+                layers=self.layers,
+                weak_layer=self.weak_layer,
+                segments=segments,
+                scenario_config=ScenarioConfig(phi=self.phi),
+            ),
+            config=Config(touchdown=True),
+        )
+
+        result = self.evaluator.evaluate_SteadyState(system)
+        maximal_stress = result.maximal_stress_result
+
+        # Verify that max normalized values match the max of the arrays
+        computed_max_principal = np.max(maximal_stress.principal_stress_norm)
+        computed_max_Sxx = np.max(maximal_stress.Sxx_norm)
+
+        np.testing.assert_almost_equal(
+            computed_max_principal,
+            maximal_stress.max_principal_stress_norm,
+            decimal=5,
+        )
+        np.testing.assert_almost_equal(
+            computed_max_Sxx,
+            maximal_stress.max_Sxx_norm,
+            decimal=5,
+        )
+
+    def test_steady_state_with_thin_weak_layer(self):
+        """Test steady state evaluation with a thin weak layer."""
+        thin_weak_layer = WeakLayer(rho=180, h=5, G_Ic=0.5, G_IIc=0.8, kn=100, kt=100)
+        segments = [
+            Segment(length=self.segments_length, has_foundation=True, m=0),
+            Segment(length=self.segments_length, has_foundation=True, m=0),
+        ]
+        system = SystemModel(
+            model_input=ModelInput(
+                layers=self.layers,
+                weak_layer=thin_weak_layer,
+                segments=segments,
+                scenario_config=ScenarioConfig(phi=self.phi),
+            ),
+            config=Config(touchdown=True),
+        )
+
+        result = self.evaluator.evaluate_SteadyState(system)
+        self.assertTrue(result.converged)
+        self.assertGreater(result.touchdown_distance, 0)
+        self.assertGreater(result.energy_release_rate, 0)
+
+    def test_steady_state_with_thick_weak_layer(self):
+        """Test steady state evaluation with a thick weak layer."""
+        thick_weak_layer = WeakLayer(rho=180, h=20, G_Ic=0.5, G_IIc=0.8, kn=100, kt=100)
+        segments = [
+            Segment(length=self.segments_length, has_foundation=True, m=0),
+            Segment(length=self.segments_length, has_foundation=True, m=0),
+        ]
+        system = SystemModel(
+            model_input=ModelInput(
+                layers=self.layers,
+                weak_layer=thick_weak_layer,
+                segments=segments,
+                scenario_config=ScenarioConfig(phi=self.phi),
+            ),
+            config=Config(touchdown=True),
+        )
+
+        result = self.evaluator.evaluate_SteadyState(system)
+        self.assertTrue(result.converged)
+        self.assertGreater(result.touchdown_distance, 0)
+        self.assertGreater(result.energy_release_rate, 0)
+
+    def test_steady_state_vertical_mode_warning(self):
+        """Test that vertical mode raises a warning."""
+        segments = [
+            Segment(length=self.segments_length, has_foundation=True, m=0),
+            Segment(length=self.segments_length, has_foundation=True, m=0),
+        ]
+        system = SystemModel(
+            model_input=ModelInput(
+                layers=self.layers,
+                weak_layer=self.weak_layer,
+                segments=segments,
+                scenario_config=ScenarioConfig(phi=self.phi),
+            ),
+            config=Config(touchdown=True),
+        )
+
+        with self.assertWarns(UserWarning):
+            result = self.evaluator.evaluate_SteadyState(system, vertical=True)
+            self.assertTrue(result.converged)
+
+    def test_steady_state_slab_tensile_criterion_calculation(self):
+        """Test the slab tensile criterion calculation in steady state."""
+        segments = [
+            Segment(length=self.segments_length, has_foundation=True, m=0),
+            Segment(length=self.segments_length, has_foundation=True, m=0),
+        ]
+        system = SystemModel(
+            model_input=ModelInput(
+                layers=self.layers,
+                weak_layer=self.weak_layer,
+                segments=segments,
+                scenario_config=ScenarioConfig(phi=self.phi),
+            ),
+            config=Config(touchdown=True),
+        )
+
+        result = self.evaluator.evaluate_SteadyState(system)
+        slab_tensile_criterion = result.maximal_stress_result.slab_tensile_criterion
+
+        # Verify it's within valid range
+        self.assertGreaterEqual(slab_tensile_criterion, 0.0)
+        self.assertLessEqual(slab_tensile_criterion, 1.0)
+
+    def test_steady_state_stress_arrays_shapes(self):
+        """Test that stress arrays in maximal stress result have consistent shapes."""
+        segments = [
+            Segment(length=self.segments_length, has_foundation=True, m=0),
+            Segment(length=self.segments_length, has_foundation=True, m=0),
+        ]
+        system = SystemModel(
+            model_input=ModelInput(
+                layers=self.layers,
+                weak_layer=self.weak_layer,
+                segments=segments,
+                scenario_config=ScenarioConfig(phi=self.phi),
+            ),
+            config=Config(touchdown=True),
+        )
+
+        result = self.evaluator.evaluate_SteadyState(system)
+        maximal_stress = result.maximal_stress_result
+
+        # All stress arrays should have the same shape
+        self.assertEqual(
+            maximal_stress.principal_stress_kPa.shape,
+            maximal_stress.principal_stress_norm.shape,
+        )
+        self.assertEqual(
+            maximal_stress.Sxx_kPa.shape,
+            maximal_stress.Sxx_norm.shape,
+        )
+        self.assertEqual(
+            maximal_stress.principal_stress_kPa.shape,
+            maximal_stress.Sxx_kPa.shape,
+        )
+
+        # Arrays should be 2D (spatial dimensions)
+        self.assertEqual(len(maximal_stress.principal_stress_kPa.shape), 2)
+        self.assertEqual(len(maximal_stress.Sxx_kPa.shape), 2)
+
+    def test_steady_state_with_varying_stiffness(self):
+        """Test steady state evaluation with different weak layer stiffnesses."""
+        stiffness_values = [(50, 50), (100, 100), (200, 200)]
+
+        segments = [
+            Segment(length=self.segments_length, has_foundation=True, m=0),
+            Segment(length=self.segments_length, has_foundation=True, m=0),
+        ]
+
+        results_list = []
+        for kn, kt in stiffness_values:
+            weak_layer = WeakLayer(rho=180, h=10, G_Ic=0.5, G_IIc=0.8, kn=kn, kt=kt)
+            system = SystemModel(
+                model_input=ModelInput(
+                    layers=self.layers,
+                    weak_layer=weak_layer,
+                    segments=segments,
+                    scenario_config=ScenarioConfig(phi=self.phi),
+                ),
+                config=Config(touchdown=True),
+            )
+
+            result = self.evaluator.evaluate_SteadyState(system)
+            self.assertTrue(result.converged)
+            results_list.append(result)
+
+        # Verify that all results are valid
+        for result in results_list:
+            self.assertGreater(result.touchdown_distance, 0)
+            self.assertGreater(result.energy_release_rate, 0)
+
+    def test_steady_state_scenario_config_phi_reset(self):
+        """Test that steady state evaluation sets phi to 0.0 internally."""
+        segments = [
+            Segment(length=self.segments_length, has_foundation=True, m=0),
+            Segment(length=self.segments_length, has_foundation=True, m=0),
+        ]
+        original_phi = 35.0
+        system = SystemModel(
+            model_input=ModelInput(
+                layers=self.layers,
+                weak_layer=self.weak_layer,
+                segments=segments,
+                scenario_config=ScenarioConfig(phi=original_phi),
+            ),
+            config=Config(touchdown=True),
+        )
+
+        result = self.evaluator.evaluate_SteadyState(system)
+
+        # The result system should have phi=0 for steady state evaluation
+        self.assertEqual(result.system.scenario.phi, 0.0)
+
+        # The original system should be unchanged
+        self.assertEqual(system.scenario.phi, original_phi)
+
+    def test_steady_state_touchdown_distance_bounds(self):
+        """Test that touchdown distance is within reasonable bounds."""
+        segments = [
+            Segment(length=self.segments_length, has_foundation=True, m=0),
+            Segment(length=self.segments_length, has_foundation=True, m=0),
+        ]
+        system = SystemModel(
+            model_input=ModelInput(
+                layers=self.layers,
+                weak_layer=self.weak_layer,
+                segments=segments,
+                scenario_config=ScenarioConfig(phi=self.phi),
+            ),
+            config=Config(touchdown=True),
+        )
+
+        result = self.evaluator.evaluate_SteadyState(system)
+
+        # Touchdown distance should be positive
+        self.assertGreater(result.touchdown_distance, 0)
+
+        # Touchdown distance should be less than the cut distance (5e3)
+        # which is the length of the hanging segment in the steady state setup
+        self.assertLess(result.touchdown_distance, 5e3)
+
+    def test_steady_state_mode_forced_correctly(self):
+        """Test that the forced touchdown mode is correctly applied."""
+        segments = [
+            Segment(length=self.segments_length, has_foundation=True, m=0),
+            Segment(length=self.segments_length, has_foundation=True, m=0),
+        ]
+
+        for mode in ["C_in_contact", "B_point_contact", "A_free_hanging"]:
+            with self.subTest(mode=mode):
+                system = SystemModel(
+                    model_input=ModelInput(
+                        layers=self.layers,
+                        weak_layer=self.weak_layer,
+                        segments=segments,
+                        scenario_config=ScenarioConfig(phi=self.phi),
+                    ),
+                    config=Config(touchdown=True),
+                )
+
+                result = self.evaluator.evaluate_SteadyState(system, mode=mode)
+
+                # Verify the result system has the correct forced mode
+                self.assertEqual(result.system.slab_touchdown.touchdown_mode, mode)
+
+    def test_steady_state_regression_c_in_contact_values(self):
+        """
+        Regression test: Check specific numerical values for C_in_contact mode.
+
+        These values are baseline references to catch breaking changes.
+        Update these values if intentional changes are made to the calculation.
+        """
+        segments = [
+            Segment(length=self.segments_length, has_foundation=True, m=0),
+            Segment(length=self.segments_length, has_foundation=True, m=0),
+        ]
+        system = SystemModel(
+            model_input=ModelInput(
+                layers=self.layers,
+                weak_layer=self.weak_layer,
+                segments=segments,
+                scenario_config=ScenarioConfig(phi=self.phi),
+            ),
+            config=Config(touchdown=True),
+        )
+
+        result = self.evaluator.evaluate_SteadyState(system, mode="C_in_contact")
+
+        expected_touchdown_distance = 1913.1270
+        expected_err = 5.7857
+        expected_max_principal_stress_norm = 443161.8028
+        expected_max_Sxx_norm = 2.2260
+        expected_slab_tensile_criterion = 0.51129
+
+        # Allow small tolerances for numerical precision
+        np.testing.assert_allclose(
+            result.touchdown_distance,
+            expected_touchdown_distance,
+            rtol=1e-4,
+            err_msg="Touchdown distance changed unexpectedly",
+        )
+        np.testing.assert_allclose(
+            result.energy_release_rate,
+            expected_err,
+            rtol=1e-4,
+            err_msg="Energy release rate changed unexpectedly",
+        )
+        np.testing.assert_allclose(
+            result.maximal_stress_result.max_principal_stress_norm,
+            expected_max_principal_stress_norm,
+            rtol=1e-4,
+            err_msg="Max principal stress norm changed unexpectedly",
+        )
+        np.testing.assert_allclose(
+            result.maximal_stress_result.max_Sxx_norm,
+            expected_max_Sxx_norm,
+            rtol=1e-4,
+            err_msg="Max Sxx norm changed unexpectedly",
+        )
+        np.testing.assert_allclose(
+            result.maximal_stress_result.slab_tensile_criterion,
+            expected_slab_tensile_criterion,
+            rtol=1e-4,
+            err_msg="Slab tensile criterion changed unexpectedly",
+        )
+
+    def test_steady_state_regression_b_point_contact_values(self):
+        """
+        Regression test: Check specific numerical values for B_point_contact mode.
+
+        These values are baseline references to catch breaking changes.
+        Update these values if intentional changes are made to the calculation.
+        """
+        segments = [
+            Segment(length=self.segments_length, has_foundation=True, m=0),
+            Segment(length=self.segments_length, has_foundation=True, m=0),
+        ]
+        system = SystemModel(
+            model_input=ModelInput(
+                layers=self.layers,
+                weak_layer=self.weak_layer,
+                segments=segments,
+                scenario_config=ScenarioConfig(phi=self.phi),
+            ),
+            config=Config(touchdown=True),
+        )
+
+        result = self.evaluator.evaluate_SteadyState(system, mode="B_point_contact")
+
+        expected_touchdown_distance = 2111.1553
+        expected_err = 5.5184
+        expected_max_Sxx_norm = 2.1727
+
+        np.testing.assert_allclose(
+            result.touchdown_distance,
+            expected_touchdown_distance,
+            rtol=1e-4,
+            err_msg="Touchdown distance changed unexpectedly",
+        )
+        np.testing.assert_allclose(
+            result.energy_release_rate,
+            expected_err,
+            rtol=1e-4,
+            err_msg="Energy release rate changed unexpectedly",
+        )
+        np.testing.assert_allclose(
+            result.maximal_stress_result.max_Sxx_norm,
+            expected_max_Sxx_norm,
+            rtol=1e-4,
+            err_msg="Max Sxx norm changed unexpectedly",
+        )
+
+    def test_steady_state_regression_a_free_hanging_values(self):
+        """
+        Regression test: Check specific numerical values for A_free_hanging mode.
+
+        These values are baseline references to catch breaking changes.
+        Update these values if intentional changes are made to the calculation.
+        """
+        segments = [
+            Segment(length=self.segments_length, has_foundation=True, m=0),
+            Segment(length=self.segments_length, has_foundation=True, m=0),
+        ]
+        system = SystemModel(
+            model_input=ModelInput(
+                layers=self.layers,
+                weak_layer=self.weak_layer,
+                segments=segments,
+                scenario_config=ScenarioConfig(phi=self.phi),
+            ),
+            config=Config(touchdown=True),
+        )
+
+        result = self.evaluator.evaluate_SteadyState(system, mode="A_free_hanging")
+
+        expected_touchdown_distance = 1207.9559
+        expected_err = 5.6629
+        expected_max_Sxx_norm = 2.2981
+
+        np.testing.assert_allclose(
+            result.touchdown_distance,
+            expected_touchdown_distance,
+            rtol=1e-4,
+            err_msg="Touchdown distance changed unexpectedly",
+        )
+        np.testing.assert_allclose(
+            result.energy_release_rate,
+            expected_err,
+            rtol=1e-4,
+            err_msg="Energy release rate changed unexpectedly",
+        )
+        np.testing.assert_allclose(
+            result.maximal_stress_result.max_Sxx_norm,
+            expected_max_Sxx_norm,
+            rtol=1e-4,
+            err_msg="Max Sxx norm changed unexpectedly",
+        )
+
+    def test_steady_state_regression_different_weak_layer(self):
+        """
+        Regression test: Check specific numerical values with different weak layer properties.
+
+        Tests with a weaker layer to ensure parameter variations are handled consistently.
+        """
+        weak_weak_layer = WeakLayer(rho=150, h=10, G_Ic=0.3, G_IIc=0.6, kn=50, kt=50)
+        segments = [
+            Segment(length=self.segments_length, has_foundation=True, m=0),
+            Segment(length=self.segments_length, has_foundation=True, m=0),
+        ]
+        system = SystemModel(
+            model_input=ModelInput(
+                layers=self.layers,
+                weak_layer=weak_weak_layer,
+                segments=segments,
+                scenario_config=ScenarioConfig(phi=self.phi),
+            ),
+            config=Config(touchdown=True),
+        )
+
+        result = self.evaluator.evaluate_SteadyState(system, mode="C_in_contact")
+
+        expected_touchdown_distance = 1911.4747
+        expected_err = 5.0860
+        expected_slab_tensile_criterion = 0.5092
+
+        np.testing.assert_allclose(
+            result.touchdown_distance,
+            expected_touchdown_distance,
+            rtol=1e-4,
+            err_msg="Touchdown distance changed unexpectedly for weak layer",
+        )
+        np.testing.assert_allclose(
+            result.energy_release_rate,
+            expected_err,
+            rtol=1e-4,
+            err_msg="Energy release rate changed unexpectedly for weak layer",
+        )
+        np.testing.assert_allclose(
+            result.maximal_stress_result.slab_tensile_criterion,
+            expected_slab_tensile_criterion,
+            rtol=1e-4,
+            err_msg="Slab tensile criterion changed unexpectedly for weak layer",
+        )
+
 
 if __name__ == "__main__":
     unittest.main()
