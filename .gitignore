@@ -28,6 +28,7 @@ venv/
 .env
 .env.local
 .env.*
+!.env.example
 
 # Caches
 .ruff_cache/
