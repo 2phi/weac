@@ -231,7 +231,7 @@ class WeakLayer(BaseModel):
     h : float
         Height/Thickness of the layer [mm].
     f : float
-        Resultant force of the layer [N/mm]
+        Resultant body force per length of the layer [N/mm]
     nu : float
         Poisson's ratio [-] Defaults to `weac.constants.NU`).
     E : float, optional
@@ -255,7 +255,7 @@ class WeakLayer(BaseModel):
     rho: float = Field(default=125, gt=0, description="Density of the Slab  [kg m⁻³]")
     h: float = Field(default=20, gt=0, description="Height/Thickness of the slab  [mm]")
     f: float | None = Field(
-        default=None, description="Weight density of the weak layer [N/mm^3]"
+        default=None, description="Resultant body force per length of the layer [N/mm]"
     )
     collapse_height: float = Field(
         default=0.0, ge=0, description="Collapse height [mm]"
