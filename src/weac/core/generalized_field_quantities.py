@@ -652,20 +652,9 @@ class GeneralizedFieldQuantities:
     def Gi(
         self,  # pylint: disable=unused-argument
         Z_tip: np.ndarray,
-        _Z_back: np.ndarray,
-        _phi: float,
-        _theta: float,
         unit: EnergyUnit = "kJ/m^2",
     ) -> float | np.ndarray:
         """Mode I differential energy release rate at crack tip."""
-        # _,_,fz = decompose_to_xyz(self.es.weak_layer.f, phi, theta)
-        # b = self.es.slab.b
-        # h = self.es.weak_layer.h
-        # E_w = self.es.weak_layer.E
-        # nu_w = self.es.weak_layer.nu
-        # H= self.es.slab.H
-        # return self._unit_factor(unit) * 1. / b * (-1. / 2.* ( b * fz * h * (-np.pi * Z_back[4, :] + np.pi * Z_tip[4, :] - 4 * self.theta_wc(Z_back) + 4. * self.theta_wc(Z_tip)))/ np.pi
-        # + (E_w* (24. * b * np.pi * (-1. + nu_w) * Z_tip[4, :]**2 + 6. * h * nu_w * Z_tip[4, :] * (16. * self.theta_vl(Z_tip) + b * (2 * np.pi * Z_tip[1, :]+ 8 * self.dtheta_uc_dx(Z_tip)+ H * np.pi * self.dpsiy_dx(Z_tip))) + b * (12 * np.pi**3 * (-1 + nu_w) * self.theta_wc(Z_tip)**2 + 4 * np.pi**3 * (-1 + nu_w) * self.theta_wl(Z_tip)**2 - 24* h * nu_w * self.theta_wc(Z_tip) * (2 * Z_tip[1, :] + H * self.dpsiy_dx(Z_tip)) + 8 * b * h * nu_w * self.theta_wl(Z_tip) * self.dpsiz_dx(Z_tip) + b * self.psix(Z_tip) * (2 * b * np.pi * (-1 + nu_w) * self.psix(Z_tip) + h * nu_w * (8 * self.dtheta_ul_dx(Z_tip) - b * np.pi * self.dpsiz_dx(Z_tip))))))/(48 * np.pi * h * (1 + nu_w) * (-1 + 2 * nu_w)))
         return (
             self._unit_factor(unit)
             * 1
@@ -677,23 +666,9 @@ class GeneralizedFieldQuantities:
     def Gii(
         self,  # pylint: disable=unused-argument
         Z_tip: np.ndarray,
-        _Z_back: np.ndarray,
-        _phi: float,
-        _theta: float,
         unit: EnergyUnit = "kJ/m^2",
     ) -> float | np.ndarray:
         """Mode II differential energy release rate at crack tip."""
-        # b = self.es.slab.b
-        # h = self.es.weak_layer.h
-        # H= self.es.slab.H
-        # E_w = self.es.weak_layer.E
-        # nu_w = self.es.weak_layer.nu
-        # fx,_,_ = decompose_to_xyz(self.es.weak_layer.f, phi, theta)
-        # return (
-        #     self._unit_factor(unit) * 1 / b * ((-b * fx * h * (-2 * np.pi * Z_back[0, :] + 2 * np.pi * Z_tip[0, :] - 8 * self.theta_uc(Z_back) + 8 * self.theta_uc(Z_tip) - H * np.pi * self.psiy(Z_back) + H * np.pi * self.psiy(Z_tip))) / (4 * np.pi) + ((b * E_w * (36 * np.pi * Z_tip[0, :]**2 + 36 * Z_tip[0, :] * (H * np.pi * self.psiy(Z_tip) - h * (np.pi * Z_tip[5, :] + 4 * self.dtheta_wc_dx(Z_tip))) + 3 * (6 * np.pi**3 * self.theta_uc(Z_tip)**2 + 2 * np.pi**3 * self.theta_ul(Z_tip)**2 + 3 * H**2 * np.pi * self.psiy(Z_tip)**2 + b**2 * np.pi * self.psiz(Z_tip)**2 + 48 * h * self.theta_uc(Z_tip) * Z_tip[5, :] - 6 * H * np.pi * h * self.psiy(Z_tip) * Z_tip[5, :] + 4 * np.pi * h**2 * Z_tip[5, :]**2 - 24 * H * h * self.psiy(Z_tip) * self.dtheta_wc_dx(Z_tip) + 24 * h**2 * Z_tip[5, :] * self.dtheta_wc_dx(Z_tip) + 6 * np.pi * h**2 * self.dtheta_wc_dx(Z_tip)**2 + 8 * b * h * self.psiz(Z_tip) * self.dtheta_wl_dx(Z_tip) + 2 * np.pi * h**2 * self.dtheta_wl_dx(Z_tip)**2) + 3 * b * h * (8 * self.theta_ul(Z_tip) + b * np.pi * self.psiz(Z_tip) + 4 * h * self.dtheta_wl_dx(Z_tip)) * self.dpsix_dx(Z_tip)+ b**2 * np.pi * h**2 * self.dpsix_dx(Z_tip)**2)) / (144 * np.pi * h * (1 + nu_w))
-        #         )
-        #     )
-        # )
         return (
             self._unit_factor(unit)
             * self.es.weak_layer.G
@@ -715,21 +690,9 @@ class GeneralizedFieldQuantities:
     def Giii(
         self,  # pylint: disable=unused-argument
         Z_tip: np.ndarray,
-        _Z_back: np.ndarray,
-        _phi: float,
-        _theta: float,
         unit: EnergyUnit = "kJ/m^2",
     ) -> float | np.ndarray:
         """Mode III differential energy release rate at crack tip."""
-        # b = self.es.slab.b
-        # H = self.es.slab.H
-        # h = self.es.weak_layer.h
-        # E_w = self.es.weak_layer.E
-        # nu_w = self.es.weak_layer.collapse_height
-        # _,fy,_ = decompose_to_xyz(self.es.weak_layer.f, phi, theta)
-        # return (
-        #     self._unit_factor(unit) * 1 / b * (-1 / 4 * (b * fy * h * (-2 * np.pi * Z_back[2, :] + 2 * np.pi * Z_tip[2, :] - 8 * self.theta_vc(Z_back) + 8 * self.theta_vc(Z_tip) + H * np.pi * self.psix(Z_back)- H * np.pi * self.psix(Z_tip)))/ np.pi + ((E_w * (12 * b**2 * np.pi * Z_tip[2, :]**2 + 2 * b**2 * np.pi**3 * (3 * self.theta_vc(Z_tip)**2 + self.theta_vl(Z_tip)**2) + 24 * np.pi * h**2 * self.theta_wl(Z_tip)**2 + 48 * b * h * (b * self.theta_vc(Z_tip) + (H + h) * self.theta_wl(Z_tip)) * self.psix(Z_tip) + b**2 * np.pi * (3 * H**2 + 6 * H * h + 4 * h**2)* self.psix(Z_tip)**2 - 12 * b * Z_tip[2, :]* (8 * h * self.theta_wl(Z_tip) + b * np.pi * (H + h) * self.psix(Z_tip))))/ (48 * b * np.pi * h * (1 + nu_w))))
-        # )
         return (
             self._unit_factor(unit)
             * self.es.weak_layer.G
