@@ -1270,9 +1270,7 @@ class CriteriaEvaluator:
         principal_stress_kPa = analyzer.principal_stress_slab(
             Z=Z, phi=system.scenario.phi, dz=1, unit="kPa"
         )
-        Sxx_norm = analyzer.Sxx(
-            Z=Z, phi=system.scenario.phi, dz=1, normalize=True
-        )
+        Sxx_norm = analyzer.Sxx(Z=Z, phi=system.scenario.phi, dz=1, normalize=True)
         principal_stress_norm = analyzer.principal_stress_slab(
             Z=Z, phi=system.scenario.phi, dz=1, normalize=True
         )
