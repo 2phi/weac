@@ -1271,10 +1271,10 @@ class CriteriaEvaluator:
             Z=Z, phi=system.scenario.phi, dz=1, unit="kPa"
         )
         Sxx_norm = analyzer.Sxx(
-            Z=Z, phi=system.scenario.phi, dz=1, unit="kPa", normalize=True
+            Z=Z, phi=system.scenario.phi, dz=1, normalize=True
         )
         principal_stress_norm = analyzer.principal_stress_slab(
-            Z=Z, phi=system.scenario.phi, dz=1, unit="kPa", normalize=True
+            Z=Z, phi=system.scenario.phi, dz=1, normalize=True
         )
         max_principal_stress_norm = np.max(principal_stress_norm)
         max_Sxx_norm = np.max(Sxx_norm)
