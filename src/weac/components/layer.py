@@ -239,7 +239,7 @@ class WeakLayer(BaseModel):
     G : float, optional
         Shear modulus G [MPa].  If omitted it is derived from ``E`` and ``nu``.
     kn : float, optional
-        Normal (compression) spring stiffness kₙ [N mm⁻³].  If omitted it is
+        Normal (compression) spring stiffness kₙ [N mm⁻³].  If omitted is
         computed as ``E_plane / t`` where
         ``E_plane = E / (1 - nu²)``.
     kt : float, optional
