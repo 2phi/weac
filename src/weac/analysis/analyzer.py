@@ -745,8 +745,8 @@ class Analyzer:
                     )
                 Gdif[1:, j] = np.concatenate(
                     (
-                        self.sm.fq.Gi(z_ct, z_ub, phi=phi, theta=theta, unit=unit),
-                        self.sm.fq.Gii(z_ct, z_ub, phi=phi, theta=theta, unit=unit),
+                        self.sm.fq.Gi(z_ct, z_ub, phi, theta, unit=unit),
+                        self.sm.fq.Gii(z_ct, z_ub, phi, theta, unit=unit),
                         self.sm.fq.Giii(z_ct, z_ub, phi, theta, unit=unit),
                     )
                 )

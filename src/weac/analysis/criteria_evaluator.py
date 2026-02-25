@@ -1266,20 +1266,18 @@ class CriteriaEvaluator:
         """
         analyzer = Analyzer(system, printing_enabled=print_call_stats)
         _, Z, _ = analyzer.rasterize_solution(num=4000, mode="cracked")
-        Sxx_kPa = analyzer.Sxx(Z=Z, phi=system.scenario.phi, dz=5, unit="kPa")
+        Sxx_kPa = analyzer.Sxx(Z=Z, phi=system.scenario.phi, dz=1, unit="kPa")
         principal_stress_kPa = analyzer.principal_stress_slab(
-            Z=Z, phi=system.scenario.phi, dz=5, unit="kPa"
+            Z=Z, phi=system.scenario.phi, dz=1, unit="kPa"
         )
-        Sxx_norm = analyzer.Sxx(
-            Z=Z, phi=system.scenario.phi, dz=5, unit="kPa", normalize=True
-        )
+        Sxx_norm = analyzer.Sxx(Z=Z, phi=system.scenario.phi, dz=1, normalize=True)
         principal_stress_norm = analyzer.principal_stress_slab(
-            Z=Z, phi=system.scenario.phi, dz=5, unit="kPa", normalize=True
+            Z=Z, phi=system.scenario.phi, dz=1, normalize=True
         )
         max_principal_stress_norm = np.max(principal_stress_norm)
         max_Sxx_norm = np.max(Sxx_norm)
         # evaluate for each height level if the slab is prone to fail under tensile stresses
-        height_level_prone_to_fail = np.max(Sxx_norm, axis=1)
+        height_level_prone_to_fail = np.max(Sxx_norm, axis=1) > 1
         slab_tensile_criterion = np.mean(height_level_prone_to_fail)
         if print_call_stats:
             analyzer.print_call_stats(

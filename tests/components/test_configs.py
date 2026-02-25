@@ -30,6 +30,80 @@ class TestConfig(unittest.TestCase):
         # Check default values
         self.assertFalse(config.touchdown)
 
+    def test_config_backend_touchdown_compatibility_at_construction(self):
+        """Test that generalized backend + touchdown=True is rejected at construction."""
+        # Valid combinations should work
+        Config(backend="classic", touchdown=False)  # OK
+        Config(backend="classic", touchdown=True)  # OK
+        Config(backend="generalized", touchdown=False)  # OK
+
+        # Invalid combination should raise ValidationError
+        with self.assertRaises(ValidationError) as context:
+            Config(backend="generalized", touchdown=True)
+
+        error_msg = str(context.exception)
+        self.assertIn(
+            "Slab touchdown is only available for the classic backend", error_msg
+        )
+
+    def test_config_backend_touchdown_compatibility_via_direct_assignment(self):
+        """Test that validation runs when fields are directly assigned."""
+        # Start with a valid configuration
+        config = Config(backend="generalized", touchdown=False)
+        self.assertFalse(config.touchdown)
+        self.assertEqual(config.backend, "generalized")
+
+        # Direct assignment of touchdown should trigger validation and fail
+        with self.assertRaises(ValidationError) as context:
+            config.touchdown = True
+
+        error_msg = str(context.exception)
+        self.assertIn(
+            "Slab touchdown is only available for the classic backend", error_msg
+        )
+
+        # Verify config state hasn't changed
+        self.assertFalse(config.touchdown)
+        self.assertEqual(config.backend, "generalized")
+
+    def test_config_backend_touchdown_compatibility_via_backend_assignment(self):
+        """Test that validation runs when backend is changed to incompatible value."""
+        # Start with touchdown enabled on classic backend
+        config = Config(backend="classic", touchdown=True)
+        self.assertTrue(config.touchdown)
+        self.assertEqual(config.backend, "classic")
+
+        # Changing backend to generalized should trigger validation and fail
+        with self.assertRaises(ValidationError) as context:
+            config.backend = "generalized"
+
+        error_msg = str(context.exception)
+        self.assertIn(
+            "Slab touchdown is only available for the classic backend", error_msg
+        )
+
+        # Verify config state hasn't changed
+        self.assertTrue(config.touchdown)
+        self.assertEqual(config.backend, "classic")
+
+    def test_config_valid_assignment_transitions(self):
+        """Test that valid field assignments work correctly."""
+        config = Config(backend="generalized", touchdown=False)
+
+        # Switch to classic backend first, then enable touchdown - should work
+        config.backend = "classic"
+        config.touchdown = True
+
+        self.assertEqual(config.backend, "classic")
+        self.assertTrue(config.touchdown)
+
+        # Disable touchdown, then switch to generalized - should work
+        config.touchdown = False
+        config.backend = "generalized"
+
+        self.assertEqual(config.backend, "generalized")
+        self.assertFalse(config.touchdown)
+
 
 class TestScenarioConfig(unittest.TestCase):
     """Test the ScenarioConfig class."""

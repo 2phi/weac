@@ -19,18 +19,19 @@ class TestForceDecomposition(unittest.TestCase):
         """Test force decomposition on flat surface (phi=0)."""
         f = 100.0  # Vertical force
         phi = 0.0  # Flat surface
+        theta = 0.0  # No rotation
 
-        f_tan, _, f_norm = decompose_to_xyz(f, phi)
+        fx, _, fz = decompose_to_xyz(f, phi, theta)
 
         # On flat surface, normal component equals original force, tangential is zero
         self.assertAlmostEqual(
-            f_norm,
+            fz,
             f,
             places=10,
             msg="Normal component should equal original force on flat surface",
         )
         self.assertAlmostEqual(
-            f_tan,
+            fx,
             0.0,
             places=10,
             msg="Tangential component should be zero on flat surface",
@@ -40,18 +41,19 @@ class TestForceDecomposition(unittest.TestCase):
         """Test force decomposition on vertical surface (phi=90)."""
         f = 100.0  # Vertical force
         phi = 90.0  # Vertical surface
+        theta = 0.0  # No rotation
 
-        f_tan, _, f_norm = decompose_to_xyz(f, phi)
+        fx, _, fz = decompose_to_xyz(f, phi, theta)
 
         # On vertical surface, normal component is zero, tangential equals original force
         self.assertAlmostEqual(
-            f_norm,
+            fz,
             0.0,
             places=10,
             msg="Normal component should be zero on vertical surface",
         )
         self.assertAlmostEqual(
-            f_tan,
+            fx,
             -f,
             places=10,
             msg="Tangential component should equal negative original force",
@@ -61,78 +63,81 @@ class TestForceDecomposition(unittest.TestCase):
         """Test force decomposition on 45-degree surface."""
         f = 100.0  # Vertical force
         phi = 45.0  # 45-degree surface
+        theta = 0.0  # No rotation
 
-        f_tan, _, f_norm = decompose_to_xyz(f, phi)
+        fx, _, fz = decompose_to_xyz(f, phi, theta)
 
         # On 45-degree surface, both components should be equal in magnitude
         expected_component = f / np.sqrt(2)
         self.assertAlmostEqual(
-            abs(f_norm),
+            abs(fz),
             expected_component,
             places=8,
             msg="Normal component magnitude should be f/√2 for 45° surface",
         )
         self.assertAlmostEqual(
-            abs(f_tan),
+            abs(fx),
             expected_component,
             places=8,
             msg="Tangential component magnitude should be f/√2 for 45° surface",
         )
 
         # Check signs: normal should be positive (into slope), tangential negative (downslope)
-        self.assertGreater(
-            f_norm, 0, "Normal component should be positive (into slope)"
-        )
-        self.assertLess(f_tan, 0, "Tangential component should be negative (downslope)")
+        self.assertGreater(fz, 0, "Normal component should be positive (into slope)")
+        self.assertLess(fx, 0, "Tangential component should be negative (downslope)")
 
     def test_30_degree_decomposition(self):
         """Test force decomposition on 30-degree surface."""
         f = 100.0  # Vertical force
         phi = 30.0  # 30-degree surface
+        theta = 0.0  # No rotation
 
-        f_tan, _, f_norm = decompose_to_xyz(f, phi)
+        fx, _, fz = decompose_to_xyz(f, phi, theta)
 
         # Known analytical values for 30 degrees
-        expected_norm = f * np.cos(np.deg2rad(30))  # f * cos(30°) = f * √3/2
-        expected_tan = -f * np.sin(np.deg2rad(30))  # -f * sin(30°) = -f/2
+        expected_z = f * np.cos(np.deg2rad(30))  # f * cos(30°) = f * √3/2
+        expected_x = -f * np.sin(np.deg2rad(30))  # -f * sin(30°) = -f/2
 
-        self.assertAlmostEqual(f_norm, expected_norm, places=10)
-        self.assertAlmostEqual(f_tan, expected_tan, places=10)
+        self.assertAlmostEqual(fz, expected_z, places=10)
+        self.assertAlmostEqual(fx, expected_x, places=10)
 
     def test_negative_angles(self):
         """Test force decomposition with negative angles."""
         f = 100.0  # Vertical force
         phi = -30.0  # Negative angle (surface slopes down in +x direction)
+        theta = 0.0  # No rotation
 
-        f_tan, _, f_norm = decompose_to_xyz(f, phi)
+        fx, _, fz = decompose_to_xyz(f, phi, theta)
 
         # Normal component should still be positive and equal to f*cos(phi)
         # Tangential should be positive (upslope for negative angle) with magnitude f*sin(phi)
-        expected_norm = f * np.cos(np.deg2rad(phi))
-        expected_tan = -f * np.sin(np.deg2rad(phi))
-        self.assertAlmostEqual(f_norm, expected_norm, places=10)
-        self.assertAlmostEqual(f_tan, expected_tan, places=10)
+        expected_z = f * np.cos(np.deg2rad(phi))
+        expected_x = -f * np.sin(np.deg2rad(phi))
+        self.assertAlmostEqual(fz, expected_z, places=10)
+        self.assertAlmostEqual(fx, expected_x, places=10)
 
     def test_zero_force(self):
         """Test force decomposition with zero force."""
         f = 0.0
         phi = 30.0
+        theta = 0.0
 
-        f_tan, _, f_norm = decompose_to_xyz(f, phi)
+        fx, _, fz = decompose_to_xyz(f, phi, theta)
 
-        self.assertEqual(f_norm, 0.0, "Zero force should give zero normal component")
-        self.assertEqual(f_tan, 0.0, "Zero force should give zero tangential component")
+        self.assertEqual(fz, 0.0, "Zero force should give zero normal component")
+        self.assertEqual(fx, 0.0, "Zero force should give zero tangential component")
 
     def test_energy_conservation(self):
         """Test that force decomposition conserves energy (magnitude)."""
         f = 150.0
         phi = 37.0  # Arbitrary angle
+        theta = 0.0  # No rotation
 
-        f_tan, _, f_norm = decompose_to_xyz(f, phi)
+        fx, fy, fz = decompose_to_xyz(f, phi, theta)
 
-        # Total magnitude should be conserved: f² = f_norm² + f_tan²
+        # Total magnitude should be conserved: f² = fx² + fy² + fz²
         original_magnitude_squared = f**2
-        decomposed_magnitude_squared = f_norm**2 + f_tan**2
+        decomposed_magnitude_squared = fx**2 + fy**2 + fz**2
 
         self.assertAlmostEqual(
             original_magnitude_squared,
@@ -216,22 +221,23 @@ class TestUtilityFunctionConsistency(unittest.TestCase):
         """Test that force decomposition is symmetric for opposite angles."""
         f = 100.0
         phi = 25.0
+        theta = 0.0
 
-        f_tan_pos, _, f_norm_pos = decompose_to_xyz(f, phi)
-        f_tan_neg, _, f_norm_neg = decompose_to_xyz(f, -phi)
+        fx_pos, _, fz_pos = decompose_to_xyz(f, phi, theta)
+        fx_neg, _, fz_neg = decompose_to_xyz(f, -phi, theta)
 
         # Normal components should be equal
         self.assertAlmostEqual(
-            f_norm_pos,
-            f_norm_neg,
+            fz_pos,
+            fz_neg,
             places=10,
             msg="Normal components should be equal for ±φ",
         )
 
         # Tangential components should be opposite
         self.assertAlmostEqual(
-            f_tan_pos,
-            -f_tan_neg,
+            fx_pos,
+            -fx_neg,
             places=10,
             msg="Tangential components should be opposite for ±φ",
         )
@@ -239,31 +245,31 @@ class TestUtilityFunctionConsistency(unittest.TestCase):
     def test_large_angles(self):
         """Test force decomposition for large angles."""
         f = 100.0
+        theta = 0.0
 
         # Test beyond 90 degrees
         phi = 120.0
-        f_tan, _, f_norm = decompose_to_xyz(f, phi)
+        fx, _, fz = decompose_to_xyz(f, phi, theta)
 
         # At 120°, normal component should be negative (surface leans over)
         # and tangential component should be negative (large downslope)
-        self.assertLess(
-            f_norm, 0, "Normal component should be negative for obtuse angles"
-        )
-        self.assertLess(f_tan, 0, "Tangential component should be negative")
+        self.assertLess(fz, 0, "Normal component should be negative for obtuse angles")
+        self.assertLess(fx, 0, "Tangential component should be negative")
 
     def test_angle_bounds(self):
         """Test force decomposition at angle boundaries."""
         f = 100.0
+        theta = 0.0
 
         # Test at exactly 0°
-        f_tan, _, f_norm = decompose_to_xyz(f, 0.0)
-        self.assertAlmostEqual(f_norm, f, places=15)
-        self.assertAlmostEqual(f_tan, 0.0, places=15)
+        fx, _, fz = decompose_to_xyz(f, 0.0, theta)
+        self.assertAlmostEqual(fz, f, places=15)
+        self.assertAlmostEqual(fx, 0.0, places=15)
 
         # Test at exactly 90° (expect some floating-point precision issues)
-        f_tan, _, f_norm = decompose_to_xyz(f, 90.0)
-        self.assertAlmostEqual(f_norm, 0.0, places=10)  # Reduced precision for 90° case
-        self.assertAlmostEqual(f_tan, -f, places=15)
+        fx, _, fz = decompose_to_xyz(f, 90.0, theta)
+        self.assertAlmostEqual(fz, 0.0, places=10)  # Reduced precision for 90° case
+        self.assertAlmostEqual(fx, -f, places=15)
 
     def test_force_decomposition_with_arrays(self):
         """Test that functions work with array inputs (if applicable)."""
@@ -306,23 +312,24 @@ class TestPhysicalReasonableness(unittest.TestCase):
     def test_typical_force_decompositions(self):
         """Test force decomposition for typical avalanche slopes."""
         f = 100.0  # Typical force
+        theta = 0.0  # No rotation
         typical_angles = [25, 30, 35, 40, 45]  # Typical avalanche slope angles
 
         for phi in typical_angles:
-            f_tan, _, f_norm = decompose_to_xyz(f, phi)
+            fx, _, fz = decompose_to_xyz(f, phi, theta)
 
             # Both components should be significant but less than original force
             self.assertGreater(
-                abs(f_norm), 0, f"Normal component should be non-zero at {phi}°"
+                abs(fz), 0, f"Normal component should be non-zero at {phi}°"
             )
             self.assertGreater(
-                abs(f_tan), 0, f"Tangential component should be non-zero at {phi}°"
+                abs(fx), 0, f"Tangential component should be non-zero at {phi}°"
             )
             self.assertLess(
-                abs(f_norm), f, f"Normal component should be less than total at {phi}°"
+                abs(fz), f, f"Normal component should be less than total at {phi}°"
             )
             self.assertLess(
-                abs(f_tan),
+                abs(fx),
                 f,
                 f"Tangential component should be less than total at {phi}°",
             )
