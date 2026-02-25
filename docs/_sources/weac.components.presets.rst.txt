@@ -1,0 +1,7 @@
+weac.components.presets module
+==============================
+
+.. automodule:: weac.components.presets
+   :members:
+   :show-inheritance:
+   :undoc-members:

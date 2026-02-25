@@ -11,6 +11,7 @@ Submodules
    weac.components.criteria_config
    weac.components.layer
    weac.components.model_input
+   weac.components.presets
    weac.components.scenario_config
    weac.components.segment
 

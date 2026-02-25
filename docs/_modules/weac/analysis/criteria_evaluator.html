@@ -12,9 +12,9 @@
   <meta name="theme-color" media="(prefers-color-scheme: light)" content="white" />
   <meta name="theme-color" media="(prefers-color-scheme: dark)" content="black" />
   
-    <title>weac.analysis.criteria_evaluator | WEAC 3.1.3</title>
-    <meta property="og:title" content="weac.analysis.criteria_evaluator | WEAC 3.1.3" />
-    <meta name="twitter:title" content="weac.analysis.criteria_evaluator | WEAC 3.1.3" />
+    <title>weac.analysis.criteria_evaluator | WEAC 3.1.4</title>
+    <meta property="og:title" content="weac.analysis.criteria_evaluator | WEAC 3.1.4" />
+    <meta name="twitter:title" content="weac.analysis.criteria_evaluator | WEAC 3.1.4" />
       <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=e72c8e07" />
       <link rel="stylesheet" type="text/css" href="../../../_static/theme.css?v=42baaae4" />
     <link rel="canonical" href="https://2phi.github.io/weac/_modules/weac/analysis/criteria_evaluator.html" />
@@ -40,7 +40,7 @@
     </a><header
   class="sticky top-0 z-40 w-full border-b shadow-sm border-border supports-backdrop-blur:bg-background/60 bg-background/95 backdrop-blur"><div class="container flex items-center h-14">
     <div class="hidden mr-4 md:flex">
-      <a href="../../../index.html" class="flex items-center mr-6"><span class="hidden font-bold sm:inline-block text-clip whitespace-nowrap">WEAC 3.1.3</span>
+      <a href="../../../index.html" class="flex items-center mr-6"><span class="hidden font-bold sm:inline-block text-clip whitespace-nowrap">WEAC 3.1.4</span>
       </a></div><button
       class="inline-flex items-center justify-center h-10 px-0 py-2 mr-2 text-base font-medium transition-colors rounded-md hover:text-accent-foreground hover:bg-transparent md:hidden"
       type="button" @click="showSidebar = true">
@@ -95,7 +95,7 @@
   class="fixed inset-y-0 left-0 md:top-14 z-50 md:z-30 bg-background md:bg-transparent transition-all duration-100 -translate-x-full md:translate-x-0 ml-0 p-6 md:p-0 md:-ml-2 md:h-[calc(100vh-3.5rem)] w-5/6 md:w-full shrink-0 overflow-y-auto border-r border-border md:sticky"
   :aria-hidden="!showSidebar" :class="{ 'translate-x-0': showSidebar }">
 
-    <a href="../../../index.html" class="!justify-start text-sm md:!hidden bg-background"><span class="font-bold text-clip whitespace-nowrap">WEAC 3.1.3</span>
+    <a href="../../../index.html" class="!justify-start text-sm md:!hidden bg-background"><span class="font-bold text-clip whitespace-nowrap">WEAC 3.1.4</span>
     </a>
 
     <div class="relative overflow-hidden md:overflow-auto my-4 md:my-0 h-[calc(100vh-8rem)] md:h-auto">
@@ -116,6 +116,7 @@
 <li class="toctree-l2"><a class="reference internal" href="../../../weac.components.criteria_config.html">weac.components.criteria_config module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../weac.components.layer.html">weac.components.layer module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../weac.components.model_input.html">weac.components.model_input module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../weac.components.presets.html">weac.components.presets module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../weac.components.scenario_config.html">weac.components.scenario_config module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../weac.components.segment.html">weac.components.segment module</a></li>
 </ul>
@@ -177,7 +178,7 @@
      class="flex items-center mb-4 space-x-1 text-sm text-muted-foreground">
   <a class="overflow-hidden text-ellipsis whitespace-nowrap hover:text-foreground"
      href="../../../index.html">
-    <span class="hidden md:inline">WEAC 3.1.3</span>
+    <span class="hidden md:inline">WEAC 3.1.4</span>
     <svg xmlns="http://www.w3.org/2000/svg"
          height="18"
          width="18"
@@ -1511,34 +1512,32 @@
 </span><span id="line-1266"><span class="sd">        &quot;&quot;&quot;</span>
 </span><span id="line-1267">        <span class="n">analyzer</span> <span class="o">=</span> <span class="n">Analyzer</span><span class="p">(</span><span class="n">system</span><span class="p">,</span> <span class="n">printing_enabled</span><span class="o">=</span><span class="n">print_call_stats</span><span class="p">)</span>
 </span><span id="line-1268">        <span class="n">_</span><span class="p">,</span> <span class="n">Z</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">analyzer</span><span class="o">.</span><span class="n">rasterize_solution</span><span class="p">(</span><span class="n">num</span><span class="o">=</span><span class="mi">4000</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s2">&quot;cracked&quot;</span><span class="p">)</span>
-</span><span id="line-1269">        <span class="n">Sxx_kPa</span> <span class="o">=</span> <span class="n">analyzer</span><span class="o">.</span><span class="n">Sxx</span><span class="p">(</span><span class="n">Z</span><span class="o">=</span><span class="n">Z</span><span class="p">,</span> <span class="n">phi</span><span class="o">=</span><span class="n">system</span><span class="o">.</span><span class="n">scenario</span><span class="o">.</span><span class="n">phi</span><span class="p">,</span> <span class="n">dz</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">unit</span><span class="o">=</span><span class="s2">&quot;kPa&quot;</span><span class="p">)</span>
+</span><span id="line-1269">        <span class="n">Sxx_kPa</span> <span class="o">=</span> <span class="n">analyzer</span><span class="o">.</span><span class="n">Sxx</span><span class="p">(</span><span class="n">Z</span><span class="o">=</span><span class="n">Z</span><span class="p">,</span> <span class="n">phi</span><span class="o">=</span><span class="n">system</span><span class="o">.</span><span class="n">scenario</span><span class="o">.</span><span class="n">phi</span><span class="p">,</span> <span class="n">dz</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">unit</span><span class="o">=</span><span class="s2">&quot;kPa&quot;</span><span class="p">)</span>
 </span><span id="line-1270">        <span class="n">principal_stress_kPa</span> <span class="o">=</span> <span class="n">analyzer</span><span class="o">.</span><span class="n">principal_stress_slab</span><span class="p">(</span>
-</span><span id="line-1271">            <span class="n">Z</span><span class="o">=</span><span class="n">Z</span><span class="p">,</span> <span class="n">phi</span><span class="o">=</span><span class="n">system</span><span class="o">.</span><span class="n">scenario</span><span class="o">.</span><span class="n">phi</span><span class="p">,</span> <span class="n">dz</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">unit</span><span class="o">=</span><span class="s2">&quot;kPa&quot;</span>
+</span><span id="line-1271">            <span class="n">Z</span><span class="o">=</span><span class="n">Z</span><span class="p">,</span> <span class="n">phi</span><span class="o">=</span><span class="n">system</span><span class="o">.</span><span class="n">scenario</span><span class="o">.</span><span class="n">phi</span><span class="p">,</span> <span class="n">dz</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">unit</span><span class="o">=</span><span class="s2">&quot;kPa&quot;</span>
 </span><span id="line-1272">        <span class="p">)</span>
-</span><span id="line-1273">        <span class="n">Sxx_norm</span> <span class="o">=</span> <span class="n">analyzer</span><span class="o">.</span><span class="n">Sxx</span><span class="p">(</span>
-</span><span id="line-1274">            <span class="n">Z</span><span class="o">=</span><span class="n">Z</span><span class="p">,</span> <span class="n">phi</span><span class="o">=</span><span class="n">system</span><span class="o">.</span><span class="n">scenario</span><span class="o">.</span><span class="n">phi</span><span class="p">,</span> <span class="n">dz</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">unit</span><span class="o">=</span><span class="s2">&quot;kPa&quot;</span><span class="p">,</span> <span class="n">normalize</span><span class="o">=</span><span class="kc">True</span>
-</span><span id="line-1275">        <span class="p">)</span>
-</span><span id="line-1276">        <span class="n">principal_stress_norm</span> <span class="o">=</span> <span class="n">analyzer</span><span class="o">.</span><span class="n">principal_stress_slab</span><span class="p">(</span>
-</span><span id="line-1277">            <span class="n">Z</span><span class="o">=</span><span class="n">Z</span><span class="p">,</span> <span class="n">phi</span><span class="o">=</span><span class="n">system</span><span class="o">.</span><span class="n">scenario</span><span class="o">.</span><span class="n">phi</span><span class="p">,</span> <span class="n">dz</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">unit</span><span class="o">=</span><span class="s2">&quot;kPa&quot;</span><span class="p">,</span> <span class="n">normalize</span><span class="o">=</span><span class="kc">True</span>
-</span><span id="line-1278">        <span class="p">)</span>
-</span><span id="line-1279">        <span class="n">max_principal_stress_norm</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">principal_stress_norm</span><span class="p">)</span>
-</span><span id="line-1280">        <span class="n">max_Sxx_norm</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">Sxx_norm</span><span class="p">)</span>
-</span><span id="line-1281">        <span class="c1"># evaluate for each height level if the slab is prone to fail under tensile stresses</span>
-</span><span id="line-1282">        <span class="n">height_level_prone_to_fail</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">Sxx_norm</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
-</span><span id="line-1283">        <span class="n">slab_tensile_criterion</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">height_level_prone_to_fail</span><span class="p">)</span>
-</span><span id="line-1284">        <span class="k">if</span> <span class="n">print_call_stats</span><span class="p">:</span>
-</span><span id="line-1285">            <span class="n">analyzer</span><span class="o">.</span><span class="n">print_call_stats</span><span class="p">(</span>
-</span><span id="line-1286">                <span class="n">message</span><span class="o">=</span><span class="s2">&quot;_calculate_maximal_stresses Call Statistics&quot;</span>
-</span><span id="line-1287">            <span class="p">)</span>
-</span><span id="line-1288">        <span class="k">return</span> <span class="n">MaximalStressResult</span><span class="p">(</span>
-</span><span id="line-1289">            <span class="n">principal_stress_kPa</span><span class="o">=</span><span class="n">principal_stress_kPa</span><span class="p">,</span>
-</span><span id="line-1290">            <span class="n">Sxx_kPa</span><span class="o">=</span><span class="n">Sxx_kPa</span><span class="p">,</span>
-</span><span id="line-1291">            <span class="n">principal_stress_norm</span><span class="o">=</span><span class="n">principal_stress_norm</span><span class="p">,</span>
-</span><span id="line-1292">            <span class="n">Sxx_norm</span><span class="o">=</span><span class="n">Sxx_norm</span><span class="p">,</span>
-</span><span id="line-1293">            <span class="n">max_principal_stress_norm</span><span class="o">=</span><span class="n">max_principal_stress_norm</span><span class="p">,</span>
-</span><span id="line-1294">            <span class="n">max_Sxx_norm</span><span class="o">=</span><span class="n">max_Sxx_norm</span><span class="p">,</span>
-</span><span id="line-1295">            <span class="n">slab_tensile_criterion</span><span class="o">=</span><span class="n">slab_tensile_criterion</span><span class="p">,</span>
-</span><span id="line-1296">        <span class="p">)</span></div>
+</span><span id="line-1273">        <span class="n">Sxx_norm</span> <span class="o">=</span> <span class="n">analyzer</span><span class="o">.</span><span class="n">Sxx</span><span class="p">(</span><span class="n">Z</span><span class="o">=</span><span class="n">Z</span><span class="p">,</span> <span class="n">phi</span><span class="o">=</span><span class="n">system</span><span class="o">.</span><span class="n">scenario</span><span class="o">.</span><span class="n">phi</span><span class="p">,</span> <span class="n">dz</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">normalize</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</span><span id="line-1274">        <span class="n">principal_stress_norm</span> <span class="o">=</span> <span class="n">analyzer</span><span class="o">.</span><span class="n">principal_stress_slab</span><span class="p">(</span>
+</span><span id="line-1275">            <span class="n">Z</span><span class="o">=</span><span class="n">Z</span><span class="p">,</span> <span class="n">phi</span><span class="o">=</span><span class="n">system</span><span class="o">.</span><span class="n">scenario</span><span class="o">.</span><span class="n">phi</span><span class="p">,</span> <span class="n">dz</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">normalize</span><span class="o">=</span><span class="kc">True</span>
+</span><span id="line-1276">        <span class="p">)</span>
+</span><span id="line-1277">        <span class="n">max_principal_stress_norm</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">principal_stress_norm</span><span class="p">)</span>
+</span><span id="line-1278">        <span class="n">max_Sxx_norm</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">Sxx_norm</span><span class="p">)</span>
+</span><span id="line-1279">        <span class="c1"># evaluate for each height level if the slab is prone to fail under tensile stresses</span>
+</span><span id="line-1280">        <span class="n">height_level_prone_to_fail</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">Sxx_norm</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span>
+</span><span id="line-1281">        <span class="n">slab_tensile_criterion</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">height_level_prone_to_fail</span><span class="p">)</span>
+</span><span id="line-1282">        <span class="k">if</span> <span class="n">print_call_stats</span><span class="p">:</span>
+</span><span id="line-1283">            <span class="n">analyzer</span><span class="o">.</span><span class="n">print_call_stats</span><span class="p">(</span>
+</span><span id="line-1284">                <span class="n">message</span><span class="o">=</span><span class="s2">&quot;_calculate_maximal_stresses Call Statistics&quot;</span>
+</span><span id="line-1285">            <span class="p">)</span>
+</span><span id="line-1286">        <span class="k">return</span> <span class="n">MaximalStressResult</span><span class="p">(</span>
+</span><span id="line-1287">            <span class="n">principal_stress_kPa</span><span class="o">=</span><span class="n">principal_stress_kPa</span><span class="p">,</span>
+</span><span id="line-1288">            <span class="n">Sxx_kPa</span><span class="o">=</span><span class="n">Sxx_kPa</span><span class="p">,</span>
+</span><span id="line-1289">            <span class="n">principal_stress_norm</span><span class="o">=</span><span class="n">principal_stress_norm</span><span class="p">,</span>
+</span><span id="line-1290">            <span class="n">Sxx_norm</span><span class="o">=</span><span class="n">Sxx_norm</span><span class="p">,</span>
+</span><span id="line-1291">            <span class="n">max_principal_stress_norm</span><span class="o">=</span><span class="n">max_principal_stress_norm</span><span class="p">,</span>
+</span><span id="line-1292">            <span class="n">max_Sxx_norm</span><span class="o">=</span><span class="n">max_Sxx_norm</span><span class="p">,</span>
+</span><span id="line-1293">            <span class="n">slab_tensile_criterion</span><span class="o">=</span><span class="n">slab_tensile_criterion</span><span class="p">,</span>
+</span><span id="line-1294">        <span class="p">)</span></div>
 
 </span></code></pre></div>
     </div></div>
@@ -1555,7 +1554,7 @@
 </footer>
   </div>
   
-    <script src="../../../_static/documentation_options.js?v=eaea8fc6"></script>
+    <script src="../../../_static/documentation_options.js?v=21631f0b"></script>
     <script src="../../../_static/doctools.js?v=9bcbadda"></script>
     <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script defer="defer" src="../../../_static/theme.js?v=073f68d9"></script>
