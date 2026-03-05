@@ -103,7 +103,7 @@ class SnowPilotParser:
             layer_depth_top_mm = layer.depth_top[0] * convert_to_mm[layer.depth_top[1]]
             layer_depth_bottom_mm = layer_depth_top_mm + thickness
             # Try to find density measurement that overlaps with this layer
-            measured_density = self.get_density_for_layer_range(
+            measured_density = self._get_density_for_layer_range(
                 layer_depth_top_mm, layer_depth_bottom_mm, sp_density_layers
             )
 
@@ -118,7 +118,7 @@ class SnowPilotParser:
 
                 # Create top layer (first half)
                 if measured_density is not None:
-                    density_top = self.get_density_for_layer_range(
+                    density_top = self._get_density_for_layer_range(
                         layer_depth_top_mm, layer_mid_depth_mm, sp_density_layers
                     )
                     if density_top is None:
@@ -142,7 +142,7 @@ class SnowPilotParser:
 
                 # Create bottom layer (second half)
                 if measured_density is not None:
-                    density_bottom = self.get_density_for_layer_range(
+                    density_bottom = self._get_density_for_layer_range(
                         layer_mid_depth_mm, layer_depth_bottom_mm, sp_density_layers
                     )
                     if density_bottom is None:
@@ -208,7 +208,7 @@ class SnowPilotParser:
             )
         return layers, density_methods
 
-    def get_density_for_layer_range(
+    def _get_density_for_layer_range(
         self,
         layer_top_mm: float,
         layer_bottom_mm: float,
@@ -270,62 +270,3 @@ class SnowPilotParser:
                 )
                 return float(weighted_density)
         return None
-
-    def extract_weak_layer_and_layers_above(
-        self, weak_layer_depth: float, layers: list[Layer]
-    ) -> tuple[WeakLayer, list[Layer]]:
-        """Extract weak layer and layers above the weak layer for the given
-        depth_top extracted from the stability test."""
-        depth = 0
-        layers_above = []
-        weak_layer_rho = None
-        weak_layer_hand_hardness = None
-        weak_layer_grain_type = None
-        weak_layer_grain_size = None
-        if weak_layer_depth <= 0:
-            raise ValueError(
-                "The depth of the weak layer is not positive. "
-                "Excluding SnowPit from calculations."
-            )
-        if weak_layer_depth > sum(layer.h for layer in layers):
-            raise ValueError(
-                "The depth of the weak layer is below the recorded layers. "
-                "Excluding SnowPit from calculations."
-            )
-        layers = [layer.model_copy(deep=True) for layer in layers]
-        for i, layer in enumerate(layers):
-            if depth + layer.h < weak_layer_depth:
-                layers_above.append(layer)
-                depth += layer.h
-            elif depth < weak_layer_depth < depth + layer.h:
-                layer.h = weak_layer_depth - depth
-                layers_above.append(layer)
-                weak_layer_rho = layers[i].rho
-                weak_layer_hand_hardness = layers[i].hand_hardness
-                weak_layer_grain_type = layers[i].grain_type
-                weak_layer_grain_size = layers[i].grain_size
-                break
-            elif depth + layer.h == weak_layer_depth:
-                if i + 1 < len(layers):
-                    layers_above.append(layer)
-                    weak_layer_rho = layers[i + 1].rho
-                    weak_layer_hand_hardness = layers[i + 1].hand_hardness
-                    weak_layer_grain_type = layers[i + 1].grain_type
-                    weak_layer_grain_size = layers[i + 1].grain_size
-                else:
-                    weak_layer_rho = layers[i].rho
-                    weak_layer_hand_hardness = layers[i].hand_hardness
-                    weak_layer_grain_type = layers[i].grain_type
-                    weak_layer_grain_size = layers[i].grain_size
-                break
-
-        weak_layer = WeakLayer(
-            rho=weak_layer_rho,
-            h=20.0,
-            hand_hardness=weak_layer_hand_hardness,
-            grain_type=weak_layer_grain_type,
-            grain_size=weak_layer_grain_size,
-        )
-        if len(layers_above) == 0:
-            raise ValueError("No layers above weak layer found")
-        return weak_layer, layers_above

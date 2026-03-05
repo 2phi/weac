@@ -111,34 +111,6 @@ class TestSnowPilotParser(unittest.TestCase):
                     f"Layer {i} density should be reasonable (<= 1000 kg/m³)",
                 )
 
-    def test_weak_layer_extraction(self):
-        """Test weak layer extraction for different depths."""
-        parser = SnowPilotParser(self.caaml_with_density)
-        layers, _ = parser.extract_layers()
-
-        # Test weak layer extraction at a specific depth (e.g., 21cm from CT test)
-        test_depth_mm = 210  # 21cm converted to mm
-        weak_layer, layers_above = parser.extract_weak_layer_and_layers_above(
-            test_depth_mm, layers
-        )
-
-        # Validate weak layer
-        self.assertIsInstance(
-            weak_layer, WeakLayer, "Should extract WeakLayer instance"
-        )
-        self.assertGreater(weak_layer.rho, 0, "Weak layer density should be positive")
-        self.assertGreater(weak_layer.h, 0, "Weak layer thickness should be positive")
-
-        # Validate layers above
-        self.assertGreater(len(layers_above), 0, "Should have layers above weak layer")
-        total_depth_above = sum(layer.h for layer in layers_above)
-        self.assertAlmostEqual(
-            total_depth_above,
-            test_depth_mm,
-            delta=1,
-            msg="Total depth of layers above should match test depth",
-        )
-
     def test_error_handling_missing_data(self):
         """Test error handling for missing required data."""
         # This would require creating a malformed CAAML file or mocking
