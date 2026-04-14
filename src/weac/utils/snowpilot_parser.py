@@ -72,7 +72,9 @@ class SnowPilotParser:
         value, unit = loc.slope_angle
         return float(value) * convert_to_deg[unit]
 
-    def extract_layers(self, slope_angle_deg: float = 0.0) -> tuple[list[Layer], list[str]]:
+    def extract_layers(
+        self, slope_angle_deg: float = 0.0
+    ) -> tuple[list[Layer], list[str]]:
         """Extract layers from snowpit.
 
         Depths and thicknesses in CAAML are measured along the vertical. For WEAC,
