@@ -4,6 +4,8 @@ This module contains tests for the CriteriaEvaluator class.
 
 # Standard library imports
 import unittest
+from types import SimpleNamespace
+from unittest.mock import patch
 
 # Third party imports
 import numpy as np
@@ -64,6 +66,46 @@ class TestCriteriaEvaluator(unittest.TestCase):
         sigma, tau = np.array([2.0]), np.array([1.5])
         result = self.evaluator.stress_envelope(sigma, tau, self.weak_layer)
         self.assertGreater(result[0], 0)
+
+    @patch("weac.analysis.criteria_evaluator.Analyzer")
+    def test_calculate_maximal_stresses_uses_configured_low_density_threshold(
+        self, mock_analyzer_cls
+    ):
+        """Test that the slab tensile criterion uses the configured density cutoff."""
+        sxx_kpa = np.zeros((3, 1))
+        principal_stress_kPa = np.zeros((3, 1))
+        sxx_norm = np.full((3, 1), 0.5)
+        principal_stress_norm = np.full((3, 1), 0.5)
+
+        mock_analyzer = mock_analyzer_cls.return_value
+        mock_analyzer.rasterize_solution.return_value = (
+            None,
+            np.array([0, 1, 2]),
+            None,
+        )
+        mock_analyzer.Sxx.side_effect = (
+            lambda *args, normalize=False, **kwargs: sxx_norm if normalize else sxx_kpa
+        )
+        mock_analyzer.principal_stress_slab.side_effect = (
+            lambda *args, normalize=False, **kwargs: (
+                principal_stress_norm if normalize else principal_stress_kPa
+            )
+        )
+        mock_analyzer.get_zmesh.return_value = {
+            "rho": np.array([90.0, 110.0, 130.0]) * 1e-12
+        }
+        system = SimpleNamespace(scenario=SimpleNamespace(phi=30.0))
+
+        # Access the helper directly so the test can isolate the density-threshold logic.
+        default_result = CriteriaEvaluator(
+            CriteriaConfig()
+        )._calculate_maximal_stresses(system=system)  # pylint: disable=protected-access
+        tuned_result = CriteriaEvaluator(
+            CriteriaConfig(low_density_threshold_kg_m3=120)
+        )._calculate_maximal_stresses(system=system)  # pylint: disable=protected-access
+
+        self.assertAlmostEqual(default_result.slab_tensile_criterion, 1 / 3)
+        self.assertAlmostEqual(tuned_result.slab_tensile_criterion, 2 / 3)
 
     def test_find_minimum_force_convergence(self):
         """Test the convergence of find_minimum_force."""

@@ -164,15 +164,23 @@ class TestCriteriaConfig(unittest.TestCase):
         self.assertEqual(criteria.fm, 2.0)
         self.assertEqual(criteria.gn, 5.0)
         self.assertAlmostEqual(criteria.gm, 1 / 0.45, places=10)
+        self.assertEqual(criteria.low_density_threshold_kg_m3, 100)
 
     def test_criteria_config_custom_values(self):
         """Test CriteriaConfig with custom values."""
-        criteria = CriteriaConfig(fn=1.5, fm=2.0, gn=0.8, gm=1.2)
+        criteria = CriteriaConfig(
+            fn=1.5,
+            fm=2.0,
+            gn=0.8,
+            gm=1.2,
+            low_density_threshold_kg_m3=120,
+        )
 
         self.assertEqual(criteria.fn, 1.5)
         self.assertEqual(criteria.fm, 2.0)
         self.assertEqual(criteria.gn, 0.8)
         self.assertEqual(criteria.gm, 1.2)
+        self.assertEqual(criteria.low_density_threshold_kg_m3, 120)
 
     def test_criteria_config_validation(self):
         """Test CriteriaConfig validation."""
@@ -188,6 +196,9 @@ class TestCriteriaConfig(unittest.TestCase):
 
         with self.assertRaises(ValidationError):
             CriteriaConfig(gm=0.0)
+
+        with self.assertRaises(ValidationError):
+            CriteriaConfig(low_density_threshold_kg_m3=0.0)
 
 
 class TestSegment(unittest.TestCase):

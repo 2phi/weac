@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "weac"
-version = "3.1.4"
+version = "3.1.5"
 authors = [{ name = "2phi GbR", email = "mail@2phi.de" }]
 description = "Weak layer anticrack nucleation model"
 readme = "README.md"
@@ -23,7 +23,8 @@ dependencies = [
     "numpy>=2.3.5,<2.4.0",
     "scipy>=1.14.0",
     "pydantic>=2.11.7",
-    "snowpylot>=1.1.3",
+    # Required for SLF CAAML parsing; can upgrade once version >=1.1.5 is released
+    "snowpylot @ git+https://github.com/connellymk/snowpylot.git@e1a0d7c3f16a05ea97f75e97bdacece86ac4704b",
 ]
 
 [project.urls]
@@ -82,6 +83,9 @@ package-dir = { "" = "src" }
 [tool.setuptools.packages.find]
 where = ["src"]
 
+# [tool.uv.sources]
+# snowpylot = { path = "../snowpylot", editable = true }
+
 [tool.ruff.lint]
 ignore = ["E741"]
 
@@ -123,7 +127,7 @@ ignore = [
 ]
 
 [tool.bumpversion]
-current_version = "3.1.4"
+current_version = "3.1.5"
 
 [[tool.bumpversion.files]]
 filename = "pyproject.toml"
