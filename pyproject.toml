@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "weac"
-version = "3.1.4"
+version = "3.1.5"
 authors = [{ name = "2phi GbR", email = "mail@2phi.de" }]
 description = "Weak layer anticrack nucleation model"
 readme = "README.md"
@@ -127,7 +127,7 @@ ignore = [
 ]
 
 [tool.bumpversion]
-current_version = "3.1.4"
+current_version = "3.1.5"
 
 [[tool.bumpversion.files]]
 filename = "pyproject.toml"
