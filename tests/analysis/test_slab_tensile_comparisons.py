@@ -1,7 +1,7 @@
 """
-Data-driven slab tensile comparison tests.
+Data-driven slab tensile criterion comparison tests.
 
-Populate ``COMPARISON_CASES`` with the seven A/B setup pairs to assert that
+Populate ``COMPARISON_CASES``defines A/B setup pairs to assert that
 ``A.slab_tensile_criterion > B.slab_tensile_criterion`` for each case.
 """
 

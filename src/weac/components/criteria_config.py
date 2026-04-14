@@ -7,6 +7,8 @@ Main fields:
 - stress_envelope_method: one of
         {"adam_unpublished", "schottner", "mede_s-RG1", "mede_s-RG2", "mede_s-FCDH"}.
 - scaling_factor, order_of_magnitude: positive scalars applied to the stress envelope.
+- low_density_threshold_kg_m3: slab density threshold in kg/m^3 below which a layer is
+        treated as weak snow in the slab tensile criterion.
 
 Typical usage:
     from weac.components.criteria_config import CriteriaConfig
@@ -46,6 +48,9 @@ class CriteriaConfig(BaseModel):
         Scaling factor for stress envelope. Default is 1.0.
     order_of_magnitude : float
         Order of magnitude for stress envelope. Default is 1.0.
+    low_density_threshold_kg_m3 : float
+        Slab density threshold in kg/m^3 below which a layer is treated as weak snow
+        and counted as prone to tensile failure in the slab tensile criterion.
     """
 
     fn: float = Field(
@@ -83,4 +88,12 @@ class CriteriaConfig(BaseModel):
         default=1,
         gt=0,
         description="Order of magnitude for stress envelope",
+    )
+    low_density_threshold_kg_m3: float = Field(
+        default=100,
+        gt=0,
+        description=(
+            "Slab density threshold in kg/m^3 below which a layer is treated as weak "
+            "snow in the slab tensile criterion"
+        ),
     )
