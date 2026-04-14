@@ -78,7 +78,11 @@ class TestCriteriaEvaluator(unittest.TestCase):
         principal_stress_norm = np.full((3, 1), 0.5)
 
         mock_analyzer = mock_analyzer_cls.return_value
-        mock_analyzer.rasterize_solution.return_value = (None, np.array([0, 1, 2]), None)
+        mock_analyzer.rasterize_solution.return_value = (
+            None,
+            np.array([0, 1, 2]),
+            None,
+        )
         mock_analyzer.Sxx.side_effect = (
             lambda *args, normalize=False, **kwargs: sxx_norm if normalize else sxx_kpa
         )
@@ -93,8 +97,12 @@ class TestCriteriaEvaluator(unittest.TestCase):
         system = SimpleNamespace(scenario=SimpleNamespace(phi=30.0))
 
         # Access the helper directly so the test can isolate the density-threshold logic.
-        default_result = CriteriaEvaluator(CriteriaConfig())._calculate_maximal_stresses(system=system)  # pylint: disable=protected-access
-        tuned_result = CriteriaEvaluator(CriteriaConfig(low_density_threshold_kg_m3=120))._calculate_maximal_stresses(system=system)  # pylint: disable=protected-access
+        default_result = CriteriaEvaluator(
+            CriteriaConfig()
+        )._calculate_maximal_stresses(system=system)  # pylint: disable=protected-access
+        tuned_result = CriteriaEvaluator(
+            CriteriaConfig(low_density_threshold_kg_m3=120)
+        )._calculate_maximal_stresses(system=system)  # pylint: disable=protected-access
 
         self.assertAlmostEqual(default_result.slab_tensile_criterion, 1 / 3)
         self.assertAlmostEqual(tuned_result.slab_tensile_criterion, 2 / 3)

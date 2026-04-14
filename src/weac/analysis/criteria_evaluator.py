@@ -1282,9 +1282,7 @@ class CriteriaEvaluator:
         zmesh = analyzer.get_zmesh(dz=1)
         rho_kg_m3 = zmesh["rho"] * 1e12
         tensile_exceeds = np.max(Sxx_norm, axis=1) > 1
-        low_density = (
-            rho_kg_m3 <= self.criteria_config.low_density_threshold_kg_m3
-        )
+        low_density = rho_kg_m3 <= self.criteria_config.low_density_threshold_kg_m3
         height_level_prone_to_fail = tensile_exceeds | low_density
         slab_tensile_criterion = np.mean(height_level_prone_to_fail)
         if print_call_stats:
