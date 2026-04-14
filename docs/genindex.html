@@ -1,46 +1,48 @@
 <!DOCTYPE html>
-<html lang="en"
-      data-content_root="./"
-      x-data="{ darkMode: localStorage.getItem('darkMode') || localStorage.setItem('darkMode', 'system'), activeSection: '' }"
-      x-init="$watch('darkMode', val => localStorage.setItem('darkMode', val))"
-      class="scroll-smooth"
-      :class="{'dark': darkMode === 'dark' || (darkMode === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches)}"
->
+<html lang="en" data-content_root="./"
+  x-data="{ darkMode: $persist(window.matchMedia('(prefers-color-scheme: dark)').matches), activeSection: ''}"
+  :class="{ 'dark' : darkMode === true }">
+
 <head>
+  <script>
+    (function () {
+      // Set initial color scheme
+      if ((localStorage.getItem("_x_darkMode") === "true") || (window.matchMedia("(prefers-color-scheme: dark)").matches)) {
+        document.documentElement.classList.add("dark");
+      }
+
+      // Watch for media preference changes
+      window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change", (event) => {
+        localStorage.setItem("_x_darkMode", event.matches);
+        document.documentElement.classList.toggle("dark", event.matches);
+      });
+    })();
+  </script>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta charset="utf-8" />
-  <meta name="theme-color" media="(prefers-color-scheme: light)" content="white" />
-  <meta name="theme-color" media="(prefers-color-scheme: dark)" content="black" />
+  <meta name="theme-color" media="(prefers-color-scheme: light)" content="#ffffff" />
+  <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#030711" />
   
-    <title>Index | WEAC 3.1.4</title>
-    <meta property="og:title" content="Index | WEAC 3.1.4" />
-    <meta name="twitter:title" content="Index | WEAC 3.1.4" />
-      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=e72c8e07" />
-      <link rel="stylesheet" type="text/css" href="_static/theme.css?v=42baaae4" />
-    <link rel="canonical" href="https://2phi.github.io/weac/genindex.html" />
-        <link rel="search" title="Search" href="search.html" />
-        <link rel="index" title="Index" href="#" />
-
-    <script>
-    <!-- Prevent Flash of wrong theme -->
-      const userPreference = localStorage.getItem('darkMode');
-      let mode;
-      if (userPreference === 'dark' || window.matchMedia('(prefers-color-scheme: dark)').matches) {
-        mode = 'dark';
-        document.documentElement.classList.add('dark');
-      } else {
-        mode = 'light';
-      }
-      if (!userPreference) {localStorage.setItem('darkMode', mode)}
-    </script>
+  <title>Index | WEAC 3.1.5</title>
+  <meta property="og:title" content="Index | WEAC 3.1.5" />
+  <meta name="twitter:title" content="Index | WEAC 3.1.5" />
+  <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=e72c8e07" />
+  <link rel="stylesheet" type="text/css" href="_static/theme.css?v=73505e79" />
+  <link rel="canonical" href="https://2phi.github.io/weac/genindex.html" />
+  <link rel="search" title="Search" href="search.html" />
+  <link rel="index" title="Index" href="#" />
 </head>
-  <body x-data="{ showSidebar: false, showScrollTop: false }" class="min-h-screen font-sans antialiased bg-background text-foreground" :class="{ 'overflow-hidden': showSidebar }">
-    <div x-cloak x-show="showSidebar" class="fixed inset-0 z-50 overflow-hidden bg-background/80 backdrop-blur-sm md:hidden" @click.self="showSidebar = false"></div><div id="page" class="relative flex flex-col min-h-screen"><a href="#content" class="absolute top-0 left-0 z-[100] block bg-background p-4 text-xl transition -translate-x-full opacity-0 focus:translate-x-0 focus:opacity-100">
+
+<body x-data="{ showSidebar: false, showScrollTop: false }"
+  class="min-h-screen font-sans antialiased bg-background text-foreground" :class="{ 'overflow-hidden': showSidebar }">
+  <div x-cloak x-show="showSidebar"
+    class="fixed inset-0 z-50 overflow-hidden bg-background/80 backdrop-blur-sm md:hidden"
+    @click.self="showSidebar = false"></div><div id="page" class="relative flex flex-col min-h-screen"><a href="#content"
+      class="absolute top-0 left-0 z-[100] block bg-background p-4 text-xl transition -translate-x-full opacity-0 focus:translate-x-0 focus:opacity-100">
       Skip to content
-    </a><header
-  class="sticky top-0 z-40 w-full border-b shadow-sm border-border supports-backdrop-blur:bg-background/60 bg-background/95 backdrop-blur"><div class="container flex items-center h-14">
+    </a><header class="sticky top-0 z-40 w-full border-b shadow-xs border-border bg-background/90 backdrop-blur"><div class="container flex items-center h-14">
     <div class="hidden mr-4 md:flex">
-      <a href="index.html" class="flex items-center mr-6"><span class="hidden font-bold sm:inline-block text-clip whitespace-nowrap">WEAC 3.1.4</span>
+      <a href="index.html" class="flex items-center mr-6"><span class="hidden font-bold sm:inline-block text-clip whitespace-nowrap">WEAC 3.1.5</span>
       </a></div><button
       class="inline-flex items-center justify-center h-10 px-0 py-2 mr-2 text-base font-medium transition-colors rounded-md hover:text-accent-foreground hover:bg-transparent md:hidden"
       type="button" @click="showSidebar = true">
@@ -51,7 +53,7 @@
       </svg>
       <span class="sr-only">Toggle navigation menu</span>
     </button>
-    <div class="flex items-center justify-between flex-1 space-x-2 sm:space-x-4 md:justify-end">
+    <div class="flex items-center justify-between flex-1 gap-2 sm:gap-4 md:justify-end">
       <div class="flex-1 w-full md:w-auto md:flex-none"><form id="searchbox"
       action="search.html"
       method="get"
@@ -70,17 +72,17 @@
   </kbd>
 </form>
       </div>
-      <nav class="flex items-center space-x-1">
-        <button @click="darkMode = darkMode === 'light' ? 'dark' : 'light'"
+      <nav class="flex items-center gap-1">
+        <button @click="darkMode = !darkMode"
           class="relative inline-flex items-center justify-center px-0 text-sm font-medium transition-colors rounded-md hover:bg-accent hover:text-accent-foreground h-9 w-9"
           type="button"
-          aria-label="Color theme switcher">
-          <svg xmlns="http://www.w3.org/2000/svg" height="24" width="24" viewBox="0 96 960 960" fill="currentColor"
+          title="Toggle color scheme">
+          <svg xmlns="http://www.w3.org/2000/svg" height="16" width="16" viewBox="0 96 960 960" fill="currentColor"
             class="absolute transition-all scale-100 rotate-0 dark:-rotate-90 dark:scale-0">
             <path
               d="M480 685q45.456 0 77.228-31.772Q589 621.456 589 576q0-45.456-31.772-77.228Q525.456 467 480 467q-45.456 0-77.228 31.772Q371 530.544 371 576q0 45.456 31.772 77.228Q434.544 685 480 685Zm0 91q-83 0-141.5-58.5T280 576q0-83 58.5-141.5T480 376q83 0 141.5 58.5T680 576q0 83-58.5 141.5T480 776ZM80 621.5q-19.152 0-32.326-13.174T34.5 576q0-19.152 13.174-32.326T80 530.5h80q19.152 0 32.326 13.174T205.5 576q0 19.152-13.174 32.326T160 621.5H80Zm720 0q-19.152 0-32.326-13.174T754.5 576q0-19.152 13.174-32.326T800 530.5h80q19.152 0 32.326 13.174T925.5 576q0 19.152-13.174 32.326T880 621.5h-80Zm-320-320q-19.152 0-32.326-13.174T434.5 256v-80q0-19.152 13.174-32.326T480 130.5q19.152 0 32.326 13.174T525.5 176v80q0 19.152-13.174 32.326T480 301.5Zm0 720q-19.152 0-32.326-13.17Q434.5 995.152 434.5 976v-80q0-19.152 13.174-32.326T480 850.5q19.152 0 32.326 13.174T525.5 896v80q0 19.152-13.174 32.33-13.174 13.17-32.326 13.17ZM222.174 382.065l-43-42Q165.5 327.391 166 308.239t13.174-33.065q13.435-13.674 32.587-13.674t32.065 13.674l42.239 43q12.674 13.435 12.555 31.706-.12 18.272-12.555 31.946-12.674 13.674-31.445 13.413-18.772-.261-32.446-13.174Zm494 494.761-42.239-43q-12.674-13.435-12.674-32.087t12.674-31.565Q686.609 756.5 705.38 757q18.772.5 32.446 13.174l43 41.761Q794.5 824.609 794 843.761t-13.174 33.065Q767.391 890.5 748.239 890.5t-32.065-13.674Zm-42-494.761Q660.5 369.391 661 350.62q.5-18.772 13.174-32.446l41.761-43Q728.609 261.5 747.761 262t33.065 13.174q13.674 13.435 13.674 32.587t-13.674 32.065l-43 42.239q-13.435 12.674-31.706 12.555-18.272-.12-31.946-12.555Zm-495 494.761Q165.5 863.391 165.5 844.239t13.674-32.065l43-42.239q13.435-12.674 32.087-12.674t31.565 12.674Q299.5 782.609 299 801.38q-.5 18.772-13.174 32.446l-41.761 43Q231.391 890.5 212.239 890t-33.065-13.174ZM480 576Z" />
           </svg>
-          <svg xmlns="http://www.w3.org/2000/svg" height="24" width="24" viewBox="0 96 960 960" fill="currentColor"
+          <svg xmlns="http://www.w3.org/2000/svg" height="16" width="16" viewBox="0 96 960 960" fill="currentColor"
             class="absolute transition-all scale-0 rotate-90 dark:rotate-0 dark:scale-100">
             <path
               d="M480 936q-151 0-255.5-104.5T120 576q0-138 90-239.5T440 218q25-3 39 18t-1 44q-17 26-25.5 55t-8.5 61q0 90 63 153t153 63q31 0 61.5-9t54.5-25q21-14 43-1.5t19 39.5q-14 138-117.5 229T480 936Zm0-80q88 0 158-48.5T740 681q-20 5-40 8t-40 3q-123 0-209.5-86.5T364 396q0-20 3-40t8-40q-78 32-126.5 102T200 576q0 116 82 198t198 82Zm-10-270Z" />
@@ -91,14 +93,15 @@
   </div>
 </header>
 
-    <div class="flex-1"><div class="container flex-1 items-start md:grid md:grid-cols-[220px_minmax(0,1fr)] md:gap-6 lg:grid-cols-[240px_minmax(0,1fr)] lg:gap-10"><aside id="left-sidebar"
-  class="fixed inset-y-0 left-0 md:top-14 z-50 md:z-30 bg-background md:bg-transparent transition-all duration-100 -translate-x-full md:translate-x-0 ml-0 p-6 md:p-0 md:-ml-2 md:h-[calc(100vh-3.5rem)] w-5/6 md:w-full shrink-0 overflow-y-auto border-r border-border md:sticky"
+    <div class="flex-1"><div
+        class="container md:grid md:grid-cols-[220px_minmax(0,1fr)] md:gap-6 lg:grid-cols-[240px_minmax(0,1fr)] lg:gap-10"><aside id="left-sidebar"
+  class="fixed inset-y-0 left-0 md:top-14 z-50 md:z-30 bg-background md:bg-transparent transition-all duration-100 -translate-x-full md:translate-x-0 ml-0 p-6 md:p-0 md:-ml-2 md:h-[calc(100vh-3.5rem)] w-5/6 md:w-full overflow-y-auto border-r border-border md:sticky"
   :aria-hidden="!showSidebar" :class="{ 'translate-x-0': showSidebar }">
 
-    <a href="index.html" class="!justify-start text-sm md:!hidden bg-background"><span class="font-bold text-clip whitespace-nowrap">WEAC 3.1.4</span>
+    <a href="index.html" class="justify-start text-sm md:!hidden bg-background"><span class="font-bold text-clip whitespace-nowrap">WEAC 3.1.5</span>
     </a>
 
-    <div class="relative overflow-hidden md:overflow-auto my-4 md:my-0 h-[calc(100vh-8rem)] md:h-auto">
+    <div class="relative overflow-hidden md:overflow-auto my-4 md:my-0">
       <div class="overflow-y-auto h-full w-full relative pr-6"><nav class="table w-full min-w-full my-6 lg:my-8">
   <p class="caption" role="heading"><span class="caption-text">Getting Started</span></p>
 <ul>
@@ -172,13 +175,13 @@
       </svg>
     </button>
   </aside>
-        <main class="relative py-6 lg:gap-10 lg:py-8 xl:grid xl:grid-cols-[1fr_300px]">
+          <main class="relative py-6 lg:gap-10 lg:py-8 xl:grid xl:grid-cols-[1fr_300px]">
 <div class="w-full min-w-0 mx-auto">
 <nav aria-label="breadcrumbs"
      class="flex items-center mb-4 space-x-1 text-sm text-muted-foreground">
   <a class="overflow-hidden text-ellipsis whitespace-nowrap hover:text-foreground"
      href="index.html">
-    <span class="hidden md:inline">WEAC 3.1.4</span>
+    <span class="hidden md:inline">WEAC 3.1.5</span>
     <svg xmlns="http://www.w3.org/2000/svg"
          height="18"
          width="18"
@@ -270,7 +273,7 @@
   <h2 id="A">A</h2>
   <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul style="margin-left:0;list-style-type:none">
-      <li><a href="weac.core.html#id2">A11 (weac.core.Eigensystem attribute)</a>, <a href="weac.core.html#weac.core.Eigensystem.A11">[1]</a>
+      <li><a href="weac.core.html#id0">A11 (weac.core.Eigensystem attribute)</a>, <a href="weac.core.html#weac.core.Eigensystem.A11">[1]</a>
 
       <ul style="list-style-type:none">
         <li><a href="weac.core.eigensystem.html#id0">(weac.core.eigensystem.Eigensystem attribute)</a>, <a href="weac.core.eigensystem.html#weac.core.eigensystem.Eigensystem.A11">[1]</a>
@@ -304,7 +307,7 @@
       <li><a href="weac.components.scenario_config.html#id3">b (weac.components.scenario_config.ScenarioConfig attribute)</a>, <a href="weac.components.scenario_config.html#weac.components.scenario_config.ScenarioConfig.b">[1]</a>
 
       <ul style="list-style-type:none">
-        <li><a href="weac.components.html#id24">(weac.components.ScenarioConfig attribute)</a>, <a href="weac.components.html#weac.components.ScenarioConfig.b">[1]</a>
+        <li><a href="weac.components.html#id25">(weac.components.ScenarioConfig attribute)</a>, <a href="weac.components.html#weac.components.ScenarioConfig.b">[1]</a>
 </li>
         <li><a href="weac.core.html#id29">(weac.core.Slab attribute)</a>, <a href="weac.core.html#weac.core.Slab.b">[1]</a>
 </li>
@@ -313,7 +316,7 @@
       </ul></li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul style="margin-left:0;list-style-type:none">
-      <li><a href="weac.core.html#id3">B11 (weac.core.Eigensystem attribute)</a>, <a href="weac.core.html#weac.core.Eigensystem.B11">[1]</a>
+      <li><a href="weac.core.html#id1">B11 (weac.core.Eigensystem attribute)</a>, <a href="weac.core.html#weac.core.Eigensystem.B11">[1]</a>
 
       <ul style="list-style-type:none">
         <li><a href="weac.core.eigensystem.html#id1">(weac.core.eigensystem.Eigensystem attribute)</a>, <a href="weac.core.eigensystem.html#weac.core.eigensystem.Eigensystem.B11">[1]</a>
@@ -391,7 +394,7 @@
       <li><a href="weac.core.system_model.html#id0">config (weac.core.system_model.SystemModel attribute)</a>, <a href="weac.core.system_model.html#weac.core.system_model.SystemModel.config">[1]</a>
 
       <ul style="list-style-type:none">
-        <li><a href="weac.core.html#id57">(weac.core.SystemModel attribute)</a>, <a href="weac.core.html#weac.core.SystemModel.config">[1]</a>
+        <li><a href="weac.core.html#id46">(weac.core.SystemModel attribute)</a>, <a href="weac.core.html#weac.core.SystemModel.config">[1]</a>
 </li>
       </ul></li>
       <li><a href="weac.components.layer.html#weac.components.layer.WeakLayer.constitutive_model">constitutive_model (weac.components.layer.WeakLayer attribute)</a>
@@ -479,7 +482,7 @@
       <li><a href="weac.components.scenario_config.html#id4">cut_length (weac.components.scenario_config.ScenarioConfig attribute)</a>, <a href="weac.components.scenario_config.html#weac.components.scenario_config.ScenarioConfig.cut_length">[1]</a>
 
       <ul style="list-style-type:none">
-        <li><a href="weac.components.html#id25">(weac.components.ScenarioConfig attribute)</a>, <a href="weac.components.html#weac.components.ScenarioConfig.cut_length">[1]</a>
+        <li><a href="weac.components.html#id26">(weac.components.ScenarioConfig attribute)</a>, <a href="weac.components.html#weac.components.ScenarioConfig.cut_length">[1]</a>
 </li>
         <li><a href="weac.core.html#weac.core.Scenario.cut_length">(weac.core.Scenario attribute)</a>
 </li>
@@ -493,7 +496,7 @@
   <h2 id="D">D</h2>
   <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul style="margin-left:0;list-style-type:none">
-      <li><a href="weac.core.html#id4">D11 (weac.core.Eigensystem attribute)</a>, <a href="weac.core.html#weac.core.Eigensystem.D11">[1]</a>
+      <li><a href="weac.core.html#id2">D11 (weac.core.Eigensystem attribute)</a>, <a href="weac.core.html#weac.core.Eigensystem.D11">[1]</a>
 
       <ul style="list-style-type:none">
         <li><a href="weac.core.eigensystem.html#id2">(weac.core.eigensystem.Eigensystem attribute)</a>, <a href="weac.core.eigensystem.html#weac.core.eigensystem.Eigensystem.D11">[1]</a>
@@ -624,14 +627,14 @@
   <h2 id="E">E</h2>
   <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul style="margin-left:0;list-style-type:none">
-      <li><a href="weac.components.html#id13">E (weac.components.Layer attribute)</a>, <a href="weac.components.html#weac.components.Layer.E">[1]</a>
+      <li><a href="weac.components.html#id14">E (weac.components.Layer attribute)</a>, <a href="weac.components.html#weac.components.Layer.E">[1]</a>
 
       <ul style="list-style-type:none">
         <li><a href="weac.components.layer.html#id3">(weac.components.layer.Layer attribute)</a>, <a href="weac.components.layer.html#weac.components.layer.Layer.E">[1]</a>
 </li>
         <li><a href="weac.components.layer.html#id11">(weac.components.layer.WeakLayer attribute)</a>, <a href="weac.components.layer.html#weac.components.layer.WeakLayer.E">[1]</a>
 </li>
-        <li><a href="weac.components.html#id36">(weac.components.WeakLayer attribute)</a>, <a href="weac.components.html#weac.components.WeakLayer.E">[1]</a>
+        <li><a href="weac.components.html#id37">(weac.components.WeakLayer attribute)</a>, <a href="weac.components.html#weac.components.WeakLayer.E">[1]</a>
 </li>
       </ul></li>
       <li><a href="weac.components.html#weac.components.Layer.E_method">E_method (weac.components.Layer attribute)</a>
@@ -665,7 +668,7 @@
 </li>
         <li><a href="weac.core.html#weac.core.SystemModel.eigensystem">(weac.core.SystemModel attribute)</a>
 </li>
-        <li><a href="weac.core.html#id46">(weac.core.SystemModel property)</a>
+        <li><a href="weac.core.html#id50">(weac.core.SystemModel property)</a>
 </li>
       </ul></li>
       <li><a href="weac.analysis.criteria_evaluator.html#weac.analysis.criteria_evaluator.SteadyStateResult.energy_release_rate">energy_release_rate (weac.analysis.criteria_evaluator.SteadyStateResult attribute)</a>
@@ -698,7 +701,7 @@
         <li><a href="weac.analysis.html#weac.analysis.CriteriaEvaluator.evaluate_SteadyState">(weac.analysis.CriteriaEvaluator method)</a>
 </li>
       </ul></li>
-      <li><a href="weac.core.html#id9">evC (weac.core.Eigensystem attribute)</a>, <a href="weac.core.html#weac.core.Eigensystem.evC">[1]</a>
+      <li><a href="weac.core.html#id7">evC (weac.core.Eigensystem attribute)</a>, <a href="weac.core.html#weac.core.Eigensystem.evC">[1]</a>
 
       <ul style="list-style-type:none">
         <li><a href="weac.core.eigensystem.html#id7">(weac.core.eigensystem.Eigensystem attribute)</a>, <a href="weac.core.eigensystem.html#weac.core.eigensystem.Eigensystem.evC">[1]</a>
@@ -706,7 +709,7 @@
         <li><a href="weac.core.generalized_eigensystem.html#weac.core.generalized_eigensystem.GeneralizedEigensystem.evC">(weac.core.generalized_eigensystem.GeneralizedEigensystem attribute)</a>
 </li>
       </ul></li>
-      <li><a href="weac.core.html#id10">evR (weac.core.Eigensystem attribute)</a>, <a href="weac.core.html#weac.core.Eigensystem.evR">[1]</a>
+      <li><a href="weac.core.html#id8">evR (weac.core.Eigensystem attribute)</a>, <a href="weac.core.html#weac.core.Eigensystem.evR">[1]</a>
 
       <ul style="list-style-type:none">
         <li><a href="weac.core.eigensystem.html#id8">(weac.core.eigensystem.Eigensystem attribute)</a>, <a href="weac.core.eigensystem.html#weac.core.eigensystem.Eigensystem.evR">[1]</a>
@@ -714,7 +717,7 @@
         <li><a href="weac.core.generalized_eigensystem.html#weac.core.generalized_eigensystem.GeneralizedEigensystem.evR">(weac.core.generalized_eigensystem.GeneralizedEigensystem attribute)</a>
 </li>
       </ul></li>
-      <li><a href="weac.core.html#id7">ewC (weac.core.Eigensystem attribute)</a>, <a href="weac.core.html#weac.core.Eigensystem.ewC">[1]</a>
+      <li><a href="weac.core.html#id5">ewC (weac.core.Eigensystem attribute)</a>, <a href="weac.core.html#weac.core.Eigensystem.ewC">[1]</a>
 
       <ul style="list-style-type:none">
         <li><a href="weac.core.eigensystem.html#id5">(weac.core.eigensystem.Eigensystem attribute)</a>, <a href="weac.core.eigensystem.html#weac.core.eigensystem.Eigensystem.ewC">[1]</a>
@@ -722,7 +725,7 @@
         <li><a href="weac.core.generalized_eigensystem.html#weac.core.generalized_eigensystem.GeneralizedEigensystem.ewC">(weac.core.generalized_eigensystem.GeneralizedEigensystem attribute)</a>
 </li>
       </ul></li>
-      <li><a href="weac.core.html#id8">ewR (weac.core.Eigensystem attribute)</a>, <a href="weac.core.html#weac.core.Eigensystem.ewR">[1]</a>
+      <li><a href="weac.core.html#id6">ewR (weac.core.Eigensystem attribute)</a>, <a href="weac.core.html#weac.core.Eigensystem.ewR">[1]</a>
 
       <ul style="list-style-type:none">
         <li><a href="weac.core.eigensystem.html#id6">(weac.core.eigensystem.Eigensystem attribute)</a>, <a href="weac.core.eigensystem.html#weac.core.eigensystem.Eigensystem.ewR">[1]</a>
@@ -731,8 +734,6 @@
 </li>
       </ul></li>
       <li><a href="weac.utils.snowpilot_parser.html#weac.utils.snowpilot_parser.SnowPilotParser.extract_layers">extract_layers() (weac.utils.snowpilot_parser.SnowPilotParser method)</a>
-</li>
-      <li><a href="weac.utils.snowpilot_parser.html#weac.utils.snowpilot_parser.SnowPilotParser.extract_weak_layer_and_layers_above">extract_weak_layer_and_layers_above() (weac.utils.snowpilot_parser.SnowPilotParser method)</a>
 </li>
   </ul></td>
   </tr>
@@ -748,7 +749,7 @@
 </li>
         <li><a href="weac.components.segment.html#weac.components.segment.Segment.f">(weac.components.segment.Segment attribute)</a>
 </li>
-        <li><a href="weac.components.html#id34">(weac.components.WeakLayer attribute)</a>, <a href="weac.components.html#weac.components.WeakLayer.f">[1]</a>
+        <li><a href="weac.components.html#id35">(weac.components.WeakLayer attribute)</a>, <a href="weac.components.html#weac.components.WeakLayer.f">[1]</a>
 </li>
       </ul></li>
       <li><a href="weac.utils.snow_types.html#weac.utils.snow_types.HandHardness.F">F (weac.utils.snow_types.HandHardness attribute)</a>
@@ -844,20 +845,14 @@
   <h2 id="G">G</h2>
   <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul style="margin-left:0;list-style-type:none">
-      <li><a href="weac.components.html#id14">G (weac.components.Layer attribute)</a>, <a href="weac.components.html#weac.components.Layer.G">[1]</a>
+      <li><a href="weac.components.html#id15">G (weac.components.Layer attribute)</a>, <a href="weac.components.html#weac.components.Layer.G">[1]</a>
 
       <ul style="list-style-type:none">
         <li><a href="weac.components.layer.html#id4">(weac.components.layer.Layer attribute)</a>, <a href="weac.components.layer.html#weac.components.layer.Layer.G">[1]</a>
 </li>
         <li><a href="weac.components.layer.html#id12">(weac.components.layer.WeakLayer attribute)</a>, <a href="weac.components.layer.html#weac.components.layer.WeakLayer.G">[1]</a>
 </li>
-        <li><a href="weac.components.html#id37">(weac.components.WeakLayer attribute)</a>, <a href="weac.components.html#weac.components.WeakLayer.G">[1]</a>
-</li>
-      </ul></li>
-      <li><a href="weac.components.layer.html#id15">G_c (weac.components.layer.WeakLayer attribute)</a>, <a href="weac.components.layer.html#weac.components.layer.WeakLayer.G_c">[1]</a>
-
-      <ul style="list-style-type:none">
-        <li><a href="weac.components.html#id40">(weac.components.WeakLayer attribute)</a>, <a href="weac.components.html#weac.components.WeakLayer.G_c">[1]</a>
+        <li><a href="weac.components.html#id38">(weac.components.WeakLayer attribute)</a>, <a href="weac.components.html#weac.components.WeakLayer.G">[1]</a>
 </li>
       </ul></li>
       <li><a href="weac.analysis.html#weac.analysis.CoupledCriterionResult.g_delta">g_delta (weac.analysis.CoupledCriterionResult attribute)</a>
@@ -872,13 +867,13 @@
         <li><a href="weac.analysis.criteria_evaluator.html#weac.analysis.criteria_evaluator.CoupledCriterionHistory.g_deltas">(weac.analysis.criteria_evaluator.CoupledCriterionHistory attribute)</a>
 </li>
       </ul></li>
-      <li><a href="weac.components.layer.html#id16">G_Ic (weac.components.layer.WeakLayer attribute)</a>, <a href="weac.components.layer.html#weac.components.layer.WeakLayer.G_Ic">[1]</a>
+      <li><a href="weac.components.layer.html#id15">G_Ic (weac.components.layer.WeakLayer attribute)</a>, <a href="weac.components.layer.html#weac.components.layer.WeakLayer.G_Ic">[1]</a>
 
       <ul style="list-style-type:none">
         <li><a href="weac.components.html#id41">(weac.components.WeakLayer attribute)</a>, <a href="weac.components.html#weac.components.WeakLayer.G_Ic">[1]</a>
 </li>
       </ul></li>
-      <li><a href="weac.components.layer.html#id17">G_IIc (weac.components.layer.WeakLayer attribute)</a>, <a href="weac.components.layer.html#weac.components.layer.WeakLayer.G_IIc">[1]</a>
+      <li><a href="weac.components.layer.html#id16">G_IIc (weac.components.layer.WeakLayer attribute)</a>, <a href="weac.components.layer.html#weac.components.layer.WeakLayer.G_IIc">[1]</a>
 
       <ul style="list-style-type:none">
         <li><a href="weac.components.html#id42">(weac.components.WeakLayer attribute)</a>, <a href="weac.components.html#weac.components.WeakLayer.G_IIc">[1]</a>
@@ -912,14 +907,14 @@
         <li><a href="weac.core.generalized_eigensystem.html#weac.core.generalized_eigensystem.GeneralizedEigensystem.get_load_vector">(weac.core.generalized_eigensystem.GeneralizedEigensystem method)</a>
 </li>
       </ul></li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul style="margin-left:0;list-style-type:none">
       <li><a href="weac.core.html#weac.core.Scenario.get_segment_idx">get_segment_idx() (weac.core.Scenario method)</a>
 
       <ul style="list-style-type:none">
         <li><a href="weac.core.scenario.html#weac.core.scenario.Scenario.get_segment_idx">(weac.core.scenario.Scenario method)</a>
 </li>
       </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul style="margin-left:0;list-style-type:none">
       <li><a href="weac.utils.misc.html#weac.utils.misc.get_skier_point_load">get_skier_point_load() (in module weac.utils.misc)</a>
 </li>
       <li><a href="weac.analysis.html#weac.analysis.Analyzer.get_zmesh">get_zmesh() (weac.analysis.Analyzer method)</a>
@@ -995,14 +990,14 @@
   <h2 id="H">H</h2>
   <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul style="margin-left:0;list-style-type:none">
-      <li><a href="weac.components.html#id11">h (weac.components.Layer attribute)</a>, <a href="weac.components.html#weac.components.Layer.h">[1]</a>
+      <li><a href="weac.components.html#id12">h (weac.components.Layer attribute)</a>, <a href="weac.components.html#weac.components.Layer.h">[1]</a>
 
       <ul style="list-style-type:none">
         <li><a href="weac.components.layer.html#id1">(weac.components.layer.Layer attribute)</a>, <a href="weac.components.layer.html#weac.components.layer.Layer.h">[1]</a>
 </li>
         <li><a href="weac.components.layer.html#id8">(weac.components.layer.WeakLayer attribute)</a>, <a href="weac.components.layer.html#weac.components.layer.WeakLayer.h">[1]</a>
 </li>
-        <li><a href="weac.components.html#id33">(weac.components.WeakLayer attribute)</a>, <a href="weac.components.html#weac.components.WeakLayer.h">[1]</a>
+        <li><a href="weac.components.html#id34">(weac.components.WeakLayer attribute)</a>, <a href="weac.components.html#weac.components.WeakLayer.h">[1]</a>
 </li>
       </ul></li>
       <li><a href="weac.core.html#id26">H (weac.core.Slab attribute)</a>, <a href="weac.core.html#weac.core.Slab.H">[1]</a>
@@ -1025,7 +1020,7 @@
   <td style="width: 33%; vertical-align: top;"><ul style="margin-left:0;list-style-type:none">
       <li><a href="weac.utils.snow_types.html#weac.utils.snow_types.HandHardness">HandHardness (class in weac.utils.snow_types)</a>
 </li>
-      <li><a href="weac.components.html#id29">has_foundation (weac.components.Segment attribute)</a>, <a href="weac.components.html#weac.components.Segment.has_foundation">[1]</a>
+      <li><a href="weac.components.html#id30">has_foundation (weac.components.Segment attribute)</a>, <a href="weac.components.html#weac.components.Segment.has_foundation">[1]</a>
 
       <ul style="list-style-type:none">
         <li><a href="weac.components.segment.html#id1">(weac.components.segment.Segment attribute)</a>, <a href="weac.components.segment.html#weac.components.segment.Segment.has_foundation">[1]</a>
@@ -1094,7 +1089,7 @@
         <li><a href="weac.core.html#weac.core.SystemModel.is_generalized">(weac.core.SystemModel property)</a>
 </li>
       </ul></li>
-      <li><a href="weac.components.html#id30">is_loaded (weac.components.Segment attribute)</a>, <a href="weac.components.html#weac.components.Segment.is_loaded">[1]</a>
+      <li><a href="weac.components.html#id31">is_loaded (weac.components.Segment attribute)</a>, <a href="weac.components.html#weac.components.Segment.is_loaded">[1]</a>
 
       <ul style="list-style-type:none">
         <li><a href="weac.components.segment.html#id2">(weac.components.segment.Segment attribute)</a>, <a href="weac.components.segment.html#weac.components.segment.Segment.is_loaded">[1]</a>
@@ -1129,7 +1124,7 @@
         <li><a href="weac.utils.snow_types.html#weac.utils.snow_types.HandHardness.K">(weac.utils.snow_types.HandHardness attribute)</a>
 </li>
       </ul></li>
-      <li><a href="weac.core.html#id6">K0 (weac.core.Eigensystem attribute)</a>, <a href="weac.core.html#weac.core.Eigensystem.K0">[1]</a>
+      <li><a href="weac.core.html#id4">K0 (weac.core.Eigensystem attribute)</a>, <a href="weac.core.html#weac.core.Eigensystem.K0">[1]</a>
 
       <ul style="list-style-type:none">
         <li><a href="weac.core.eigensystem.html#id4">(weac.core.eigensystem.Eigensystem attribute)</a>, <a href="weac.core.eigensystem.html#weac.core.eigensystem.Eigensystem.K0">[1]</a>
@@ -1139,7 +1134,7 @@
       </ul></li>
       <li><a href="weac.utils.snow_types.html#weac.utils.snow_types.HandHardness.K_I">K_I (weac.utils.snow_types.HandHardness attribute)</a>
 </li>
-      <li><a href="weac.core.html#id5">kA55 (weac.core.Eigensystem attribute)</a>, <a href="weac.core.html#weac.core.Eigensystem.kA55">[1]</a>
+      <li><a href="weac.core.html#id3">kA55 (weac.core.Eigensystem attribute)</a>, <a href="weac.core.html#weac.core.Eigensystem.kA55">[1]</a>
 
       <ul style="list-style-type:none">
         <li><a href="weac.core.eigensystem.html#id3">(weac.core.eigensystem.Eigensystem attribute)</a>, <a href="weac.core.eigensystem.html#weac.core.eigensystem.Eigensystem.kA55">[1]</a>
@@ -1164,7 +1159,7 @@
       <li><a href="weac.components.layer.html#id13">kn (weac.components.layer.WeakLayer attribute)</a>, <a href="weac.components.layer.html#weac.components.layer.WeakLayer.kn">[1]</a>
 
       <ul style="list-style-type:none">
-        <li><a href="weac.components.html#id38">(weac.components.WeakLayer attribute)</a>, <a href="weac.components.html#weac.components.WeakLayer.kn">[1]</a>
+        <li><a href="weac.components.html#id39">(weac.components.WeakLayer attribute)</a>, <a href="weac.components.html#weac.components.WeakLayer.kn">[1]</a>
 </li>
       </ul></li>
       <li><a href="weac.utils.snow_types.html#weac.utils.snow_types.HandHardness.Kp">Kp (weac.utils.snow_types.HandHardness attribute)</a>
@@ -1172,7 +1167,7 @@
       <li><a href="weac.components.layer.html#id14">kt (weac.components.layer.WeakLayer attribute)</a>, <a href="weac.components.layer.html#weac.components.layer.WeakLayer.kt">[1]</a>
 
       <ul style="list-style-type:none">
-        <li><a href="weac.components.html#id39">(weac.components.WeakLayer attribute)</a>, <a href="weac.components.html#weac.components.WeakLayer.kt">[1]</a>
+        <li><a href="weac.components.html#id40">(weac.components.WeakLayer attribute)</a>, <a href="weac.components.html#weac.components.WeakLayer.kt">[1]</a>
 </li>
       </ul></li>
   </ul></td>
@@ -1201,14 +1196,14 @@
       <li><a href="weac.components.model_input.html#id1">layers (weac.components.model_input.ModelInput attribute)</a>, <a href="weac.components.model_input.html#weac.components.model_input.ModelInput.layers">[1]</a>
 
       <ul style="list-style-type:none">
-        <li><a href="weac.components.html#id18">(weac.components.ModelInput attribute)</a>, <a href="weac.components.html#weac.components.ModelInput.layers">[1]</a>
+        <li><a href="weac.components.html#id19">(weac.components.ModelInput attribute)</a>, <a href="weac.components.html#weac.components.ModelInput.layers">[1]</a>
 </li>
         <li><a href="weac.core.html#weac.core.Slab.layers">(weac.core.Slab attribute)</a>
 </li>
         <li><a href="weac.core.slab.html#weac.core.slab.Slab.layers">(weac.core.slab.Slab attribute)</a>
 </li>
       </ul></li>
-      <li><a href="weac.components.html#id28">length (weac.components.Segment attribute)</a>, <a href="weac.components.html#weac.components.Segment.length">[1]</a>
+      <li><a href="weac.components.html#id29">length (weac.components.Segment attribute)</a>, <a href="weac.components.html#weac.components.Segment.length">[1]</a>
 
       <ul style="list-style-type:none">
         <li><a href="weac.components.segment.html#id0">(weac.components.segment.Segment attribute)</a>, <a href="weac.components.segment.html#weac.components.segment.Segment.length">[1]</a>
@@ -1244,6 +1239,12 @@
         <li><a href="weac.core.scenario.html#id5">(weac.core.scenario.Scenario attribute)</a>, <a href="weac.core.scenario.html#weac.core.scenario.Scenario.load_vector_right">[1]</a>
 </li>
       </ul></li>
+      <li><a href="weac.components.criteria_config.html#id7">low_density_threshold_kg_m3 (weac.components.criteria_config.CriteriaConfig attribute)</a>, <a href="weac.components.criteria_config.html#weac.components.criteria_config.CriteriaConfig.low_density_threshold_kg_m3">[1]</a>
+
+      <ul style="list-style-type:none">
+        <li><a href="weac.components.html#id10">(weac.components.CriteriaConfig attribute)</a>, <a href="weac.components.html#weac.components.CriteriaConfig.low_density_threshold_kg_m3">[1]</a>
+</li>
+      </ul></li>
   </ul></td>
   </tr>
       </table>
@@ -1251,7 +1252,7 @@
   <h2 id="M">M</h2>
   <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul style="margin-left:0;list-style-type:none">
-      <li><a href="weac.components.html#id31">m (weac.components.Segment attribute)</a>, <a href="weac.components.html#weac.components.Segment.m">[1]</a>
+      <li><a href="weac.components.html#id32">m (weac.components.Segment attribute)</a>, <a href="weac.components.html#weac.components.Segment.m">[1]</a>
 
       <ul style="list-style-type:none">
         <li><a href="weac.components.segment.html#id3">(weac.components.segment.Segment attribute)</a>, <a href="weac.components.segment.html#weac.components.segment.Segment.m">[1]</a>
@@ -1449,14 +1450,14 @@
         <li><a href="weac.analysis.html#weac.analysis.FindMinimumForceResult.new_segments">(weac.analysis.FindMinimumForceResult attribute)</a>
 </li>
       </ul></li>
-      <li><a href="weac.components.html#id12">nu (weac.components.Layer attribute)</a>, <a href="weac.components.html#weac.components.Layer.nu">[1]</a>
+      <li><a href="weac.components.html#id13">nu (weac.components.Layer attribute)</a>, <a href="weac.components.html#weac.components.Layer.nu">[1]</a>
 
       <ul style="list-style-type:none">
         <li><a href="weac.components.layer.html#id2">(weac.components.layer.Layer attribute)</a>, <a href="weac.components.layer.html#weac.components.layer.Layer.nu">[1]</a>
 </li>
         <li><a href="weac.components.layer.html#id10">(weac.components.layer.WeakLayer attribute)</a>, <a href="weac.components.layer.html#weac.components.layer.WeakLayer.nu">[1]</a>
 </li>
-        <li><a href="weac.components.html#id35">(weac.components.WeakLayer attribute)</a>, <a href="weac.components.html#weac.components.WeakLayer.nu">[1]</a>
+        <li><a href="weac.components.html#id36">(weac.components.WeakLayer attribute)</a>, <a href="weac.components.html#weac.components.WeakLayer.nu">[1]</a>
 </li>
       </ul></li>
   </ul></td>
@@ -1508,13 +1509,15 @@
       <li><a href="weac.components.scenario_config.html#id1">phi (weac.components.scenario_config.ScenarioConfig attribute)</a>, <a href="weac.components.scenario_config.html#weac.components.scenario_config.ScenarioConfig.phi">[1]</a>
 
       <ul style="list-style-type:none">
-        <li><a href="weac.components.html#id22">(weac.components.ScenarioConfig attribute)</a>, <a href="weac.components.html#weac.components.ScenarioConfig.phi">[1]</a>
+        <li><a href="weac.components.html#id23">(weac.components.ScenarioConfig attribute)</a>, <a href="weac.components.html#weac.components.ScenarioConfig.phi">[1]</a>
 </li>
         <li><a href="weac.core.html#weac.core.Scenario.phi">(weac.core.Scenario attribute)</a>
 </li>
         <li><a href="weac.core.scenario.html#weac.core.scenario.Scenario.phi">(weac.core.scenario.Scenario attribute)</a>
 </li>
       </ul></li>
+      <li><a href="weac.utils.snowpilot_parser.html#weac.utils.snowpilot_parser.SnowPilotParser.pit_slope_angle_deg">pit_slope_angle_deg() (weac.utils.snowpilot_parser.SnowPilotParser method)</a>
+</li>
       <li><a href="weac.analysis.html#weac.analysis.Plotter.plot_analysis">plot_analysis() (weac.analysis.Plotter method)</a>
 
       <ul style="list-style-type:none">
@@ -1753,14 +1756,14 @@
 </li>
       <li><a href="weac.utils.snow_types.html#weac.utils.snow_types.GrainType.RGxf">RGxf (weac.utils.snow_types.GrainType attribute)</a>
 </li>
-      <li><a href="weac.components.html#id10">rho (weac.components.Layer attribute)</a>, <a href="weac.components.html#weac.components.Layer.rho">[1]</a>
+      <li><a href="weac.components.html#id11">rho (weac.components.Layer attribute)</a>, <a href="weac.components.html#weac.components.Layer.rho">[1]</a>
 
       <ul style="list-style-type:none">
         <li><a href="weac.components.layer.html#id0">(weac.components.layer.Layer attribute)</a>, <a href="weac.components.layer.html#weac.components.layer.Layer.rho">[1]</a>
 </li>
         <li><a href="weac.components.layer.html#id7">(weac.components.layer.WeakLayer attribute)</a>, <a href="weac.components.layer.html#weac.components.layer.WeakLayer.rho">[1]</a>
 </li>
-        <li><a href="weac.components.html#id32">(weac.components.WeakLayer attribute)</a>, <a href="weac.components.html#weac.components.WeakLayer.rho">[1]</a>
+        <li><a href="weac.components.html#id33">(weac.components.WeakLayer attribute)</a>, <a href="weac.components.html#weac.components.WeakLayer.rho">[1]</a>
 </li>
       </ul></li>
       <li><a href="weac.core.html#id19">rhoi (weac.core.Slab attribute)</a>, <a href="weac.core.html#weac.core.Slab.rhoi">[1]</a>
@@ -1776,7 +1779,7 @@
   <h2 id="S">S</h2>
   <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul style="margin-left:0;list-style-type:none">
-      <li><a href="weac.core.html#id12">sC (weac.core.Eigensystem attribute)</a>, <a href="weac.core.html#weac.core.Eigensystem.sC">[1]</a>
+      <li><a href="weac.core.html#id10">sC (weac.core.Eigensystem attribute)</a>, <a href="weac.core.html#weac.core.Eigensystem.sC">[1]</a>
 
       <ul style="list-style-type:none">
         <li><a href="weac.core.eigensystem.html#id10">(weac.core.eigensystem.Eigensystem attribute)</a>, <a href="weac.core.eigensystem.html#weac.core.eigensystem.Eigensystem.sC">[1]</a>
@@ -1801,13 +1804,13 @@
       <ul style="list-style-type:none">
         <li><a href="weac.core.system_model.html#id19">(weac.core.system_model.SystemModel attribute)</a>, <a href="weac.core.system_model.html#weac.core.system_model.SystemModel.scenario">[1]</a>
 </li>
-        <li><a href="weac.core.html#id60">(weac.core.SystemModel attribute)</a>, <a href="weac.core.html#weac.core.SystemModel.scenario">[1]</a>
+        <li><a href="weac.core.html#id49">(weac.core.SystemModel attribute)</a>, <a href="weac.core.html#weac.core.SystemModel.scenario">[1]</a>
 </li>
       </ul></li>
       <li><a href="weac.components.model_input.html#id2">scenario_config (weac.components.model_input.ModelInput attribute)</a>, <a href="weac.components.model_input.html#weac.components.model_input.ModelInput.scenario_config">[1]</a>
 
       <ul style="list-style-type:none">
-        <li><a href="weac.components.html#id19">(weac.components.ModelInput attribute)</a>, <a href="weac.components.html#weac.components.ModelInput.scenario_config">[1]</a>
+        <li><a href="weac.components.html#id20">(weac.components.ModelInput attribute)</a>, <a href="weac.components.html#weac.components.ModelInput.scenario_config">[1]</a>
 </li>
         <li><a href="weac.core.html#weac.core.Scenario.scenario_config">(weac.core.Scenario attribute)</a>
 </li>
@@ -1829,7 +1832,7 @@
       <li><a href="weac.components.model_input.html#id3">segments (weac.components.model_input.ModelInput attribute)</a>, <a href="weac.components.model_input.html#weac.components.model_input.ModelInput.segments">[1]</a>
 
       <ul style="list-style-type:none">
-        <li><a href="weac.components.html#id20">(weac.components.ModelInput attribute)</a>, <a href="weac.components.html#weac.components.ModelInput.segments">[1]</a>
+        <li><a href="weac.components.html#id21">(weac.components.ModelInput attribute)</a>, <a href="weac.components.html#weac.components.ModelInput.segments">[1]</a>
 </li>
         <li><a href="weac.core.html#weac.core.Scenario.segments">(weac.core.Scenario attribute)</a>
 </li>
@@ -1886,7 +1889,7 @@
         <li><a href="weac.core.slab.html#weac.core.slab.Slab">(class in weac.core.slab)</a>
 </li>
       </ul></li>
-      <li><a href="weac.core.html#id1">slab (weac.core.Eigensystem attribute)</a>, <a href="weac.core.html#weac.core.Eigensystem.slab">[1]</a>
+      <li><a href="weac.core.html#id11">slab (weac.core.Eigensystem attribute)</a>, <a href="weac.core.html#weac.core.Eigensystem.slab">[1]</a>
 
       <ul style="list-style-type:none">
         <li><a href="weac.core.eigensystem.html#id11">(weac.core.eigensystem.Eigensystem attribute)</a>, <a href="weac.core.eigensystem.html#weac.core.eigensystem.Eigensystem.slab">[1]</a>
@@ -1899,7 +1902,7 @@
 </li>
         <li><a href="weac.core.system_model.html#id18">(weac.core.system_model.SystemModel attribute)</a>, <a href="weac.core.system_model.html#weac.core.system_model.SystemModel.slab">[1]</a>
 </li>
-        <li><a href="weac.core.html#id58">(weac.core.SystemModel attribute)</a>, <a href="weac.core.html#weac.core.SystemModel.slab">[1]</a>
+        <li><a href="weac.core.html#id48">(weac.core.SystemModel attribute)</a>, <a href="weac.core.html#weac.core.SystemModel.slab">[1]</a>
 </li>
       </ul></li>
   </ul></td>
@@ -1913,7 +1916,7 @@
 </li>
         <li><a href="weac.core.html#weac.core.SystemModel.slab_touchdown">(weac.core.SystemModel attribute)</a>
 </li>
-        <li><a href="weac.core.html#id47">(weac.core.SystemModel property)</a>
+        <li><a href="weac.core.html#id51">(weac.core.SystemModel property)</a>
 </li>
       </ul></li>
       <li><a href="weac.core.slab_touchdown.html#weac.core.slab_touchdown.SlabTouchdown">SlabTouchdown (class in weac.core.slab_touchdown)</a>
@@ -1932,7 +1935,7 @@
         <li><a href="weac.core.unknown_constants_solver.html#weac.core.unknown_constants_solver.UnknownConstantsSolver.solve_for_unknown_constants">(weac.core.unknown_constants_solver.UnknownConstantsSolver class method)</a>
 </li>
       </ul></li>
-      <li><a href="weac.core.html#id11">sR (weac.core.Eigensystem attribute)</a>, <a href="weac.core.html#weac.core.Eigensystem.sR">[1]</a>
+      <li><a href="weac.core.html#id9">sR (weac.core.Eigensystem attribute)</a>, <a href="weac.core.html#weac.core.Eigensystem.sR">[1]</a>
 
       <ul style="list-style-type:none">
         <li><a href="weac.core.eigensystem.html#id9">(weac.core.eigensystem.Eigensystem attribute)</a>, <a href="weac.core.eigensystem.html#weac.core.eigensystem.Eigensystem.sR">[1]</a>
@@ -1949,7 +1952,7 @@
       <li><a href="weac.components.scenario_config.html#id5">stiffness_ratio (weac.components.scenario_config.ScenarioConfig attribute)</a>, <a href="weac.components.scenario_config.html#weac.components.scenario_config.ScenarioConfig.stiffness_ratio">[1]</a>
 
       <ul style="list-style-type:none">
-        <li><a href="weac.components.html#id26">(weac.components.ScenarioConfig attribute)</a>, <a href="weac.components.html#weac.components.ScenarioConfig.stiffness_ratio">[1]</a>
+        <li><a href="weac.components.html#id27">(weac.components.ScenarioConfig attribute)</a>, <a href="weac.components.html#weac.components.ScenarioConfig.stiffness_ratio">[1]</a>
 </li>
       </ul></li>
       <li><a href="weac.core.slab_touchdown.html#weac.core.slab_touchdown.SlabTouchdown.straight_scenario">straight_scenario (weac.core.slab_touchdown.SlabTouchdown attribute)</a>
@@ -1975,7 +1978,7 @@
       <li><a href="weac.components.scenario_config.html#id6">surface_load (weac.components.scenario_config.ScenarioConfig attribute)</a>, <a href="weac.components.scenario_config.html#weac.components.scenario_config.ScenarioConfig.surface_load">[1]</a>
 
       <ul style="list-style-type:none">
-        <li><a href="weac.components.html#id27">(weac.components.ScenarioConfig attribute)</a>, <a href="weac.components.html#weac.components.ScenarioConfig.surface_load">[1]</a>
+        <li><a href="weac.components.html#id28">(weac.components.ScenarioConfig attribute)</a>, <a href="weac.components.html#weac.components.ScenarioConfig.surface_load">[1]</a>
 </li>
         <li><a href="weac.core.html#weac.core.Scenario.surface_load">(weac.core.Scenario attribute)</a>
 </li>
@@ -2001,7 +2004,7 @@
       <li><a href="weac.components.scenario_config.html#id0">system_type (weac.components.scenario_config.ScenarioConfig attribute)</a>, <a href="weac.components.scenario_config.html#weac.components.scenario_config.ScenarioConfig.system_type">[1]</a>
 
       <ul style="list-style-type:none">
-        <li><a href="weac.components.html#id21">(weac.components.ScenarioConfig attribute)</a>, <a href="weac.components.html#weac.components.ScenarioConfig.system_type">[1]</a>
+        <li><a href="weac.components.html#id22">(weac.components.ScenarioConfig attribute)</a>, <a href="weac.components.html#weac.components.ScenarioConfig.system_type">[1]</a>
 </li>
         <li><a href="weac.core.html#weac.core.Scenario.system_type">(weac.core.Scenario attribute)</a>
 </li>
@@ -2039,13 +2042,13 @@
 </li>
       <li><a href="weac.core.generalized_field_quantities.html#weac.core.generalized_field_quantities.GeneralizedFieldQuantities.tau_yz">tau_yz() (weac.core.generalized_field_quantities.GeneralizedFieldQuantities method)</a>
 </li>
-      <li><a href="weac.components.html#id15">tensile_strength (weac.components.Layer attribute)</a>, <a href="weac.components.html#weac.components.Layer.tensile_strength">[1]</a>
+      <li><a href="weac.components.html#id16">tensile_strength (weac.components.Layer attribute)</a>, <a href="weac.components.html#weac.components.Layer.tensile_strength">[1]</a>
 
       <ul style="list-style-type:none">
         <li><a href="weac.components.layer.html#id5">(weac.components.layer.Layer attribute)</a>, <a href="weac.components.layer.html#weac.components.layer.Layer.tensile_strength">[1]</a>
 </li>
       </ul></li>
-      <li><a href="weac.components.html#id16">tensile_strength_method (weac.components.Layer attribute)</a>, <a href="weac.components.html#weac.components.Layer.tensile_strength_method">[1]</a>
+      <li><a href="weac.components.html#id17">tensile_strength_method (weac.components.Layer attribute)</a>, <a href="weac.components.html#weac.components.Layer.tensile_strength_method">[1]</a>
 
       <ul style="list-style-type:none">
         <li><a href="weac.components.layer.html#id6">(weac.components.layer.Layer attribute)</a>, <a href="weac.components.layer.html#weac.components.layer.Layer.tensile_strength_method">[1]</a>
@@ -2054,7 +2057,7 @@
       <li><a href="weac.components.scenario_config.html#id2">theta (weac.components.scenario_config.ScenarioConfig attribute)</a>, <a href="weac.components.scenario_config.html#weac.components.scenario_config.ScenarioConfig.theta">[1]</a>
 
       <ul style="list-style-type:none">
-        <li><a href="weac.components.html#id23">(weac.components.ScenarioConfig attribute)</a>, <a href="weac.components.html#weac.components.ScenarioConfig.theta">[1]</a>
+        <li><a href="weac.components.html#id24">(weac.components.ScenarioConfig attribute)</a>, <a href="weac.components.html#weac.components.ScenarioConfig.theta">[1]</a>
 </li>
         <li><a href="weac.core.html#weac.core.Scenario.theta">(weac.core.Scenario attribute)</a>
 </li>
@@ -2137,7 +2140,7 @@
 </li>
         <li><a href="weac.core.html#weac.core.SystemModel.unknown_constants">(weac.core.SystemModel attribute)</a>
 </li>
-        <li><a href="weac.core.html#id48">(weac.core.SystemModel property)</a>
+        <li><a href="weac.core.html#id52">(weac.core.SystemModel property)</a>
 </li>
       </ul></li>
   </ul></td>
@@ -2203,6 +2206,8 @@
         <li><a href="weac.components.config.html#weac.components.config.Config.validate_touchdown_with_backend">(weac.components.config.Config class method)</a>
 </li>
       </ul></li>
+      <li><a href="weac.utils.snowpilot_parser.html#weac.utils.snowpilot_parser.vertical_to_slope_normal_depth_scale">vertical_to_slope_normal_depth_scale() (in module weac.utils.snowpilot_parser)</a>
+</li>
       <li><a href="weac.core.generalized_field_quantities.html#weac.core.generalized_field_quantities.GeneralizedFieldQuantities.Vy">Vy() (weac.core.generalized_field_quantities.GeneralizedFieldQuantities method)</a>
 </li>
       <li><a href="weac.core.generalized_field_quantities.html#weac.core.generalized_field_quantities.GeneralizedFieldQuantities.Vy_c_weakLayer">Vy_c_weakLayer() (weac.core.generalized_field_quantities.GeneralizedFieldQuantities method)</a>
@@ -2450,9 +2455,9 @@
       <li><a href="weac.components.model_input.html#id0">weak_layer (weac.components.model_input.ModelInput attribute)</a>, <a href="weac.components.model_input.html#weac.components.model_input.ModelInput.weak_layer">[1]</a>
 
       <ul style="list-style-type:none">
-        <li><a href="weac.components.html#id17">(weac.components.ModelInput attribute)</a>, <a href="weac.components.html#weac.components.ModelInput.weak_layer">[1]</a>
+        <li><a href="weac.components.html#id18">(weac.components.ModelInput attribute)</a>, <a href="weac.components.html#weac.components.ModelInput.weak_layer">[1]</a>
 </li>
-        <li><a href="weac.core.html#id0">(weac.core.Eigensystem attribute)</a>, <a href="weac.core.html#weac.core.Eigensystem.weak_layer">[1]</a>
+        <li><a href="weac.core.html#id12">(weac.core.Eigensystem attribute)</a>, <a href="weac.core.html#weac.core.Eigensystem.weak_layer">[1]</a>
 </li>
         <li><a href="weac.core.eigensystem.html#id12">(weac.core.eigensystem.Eigensystem attribute)</a>, <a href="weac.core.eigensystem.html#weac.core.eigensystem.Eigensystem.weak_layer">[1]</a>
 </li>
@@ -2464,7 +2469,7 @@
 </li>
         <li><a href="weac.core.system_model.html#id17">(weac.core.system_model.SystemModel attribute)</a>, <a href="weac.core.system_model.html#weac.core.system_model.SystemModel.weak_layer">[1]</a>
 </li>
-        <li><a href="weac.core.html#id59">(weac.core.SystemModel attribute)</a>, <a href="weac.core.html#weac.core.SystemModel.weak_layer">[1]</a>
+        <li><a href="weac.core.html#id47">(weac.core.SystemModel attribute)</a>, <a href="weac.core.html#weac.core.SystemModel.weak_layer">[1]</a>
 </li>
       </ul></li>
       <li><a href="weac.components.html#weac.components.weak_layer_from_preset">weak_layer_from_preset() (in module weac.components)</a>
@@ -2545,23 +2550,24 @@
 <a class="pt-2 block text-muted-foreground no-underline transition-colors hover:text-foreground focus-visible:outline-offset-[-1px]" href="#_">_</a><a class="pt-2 block text-muted-foreground no-underline transition-colors hover:text-foreground focus-visible:outline-offset-[-1px]" href="#A">A</a><a class="pt-2 block text-muted-foreground no-underline transition-colors hover:text-foreground focus-visible:outline-offset-[-1px]" href="#B">B</a><a class="pt-2 block text-muted-foreground no-underline transition-colors hover:text-foreground focus-visible:outline-offset-[-1px]" href="#C">C</a><a class="pt-2 block text-muted-foreground no-underline transition-colors hover:text-foreground focus-visible:outline-offset-[-1px]" href="#D">D</a><a class="pt-2 block text-muted-foreground no-underline transition-colors hover:text-foreground focus-visible:outline-offset-[-1px]" href="#E">E</a><a class="pt-2 block text-muted-foreground no-underline transition-colors hover:text-foreground focus-visible:outline-offset-[-1px]" href="#F">F</a><a class="pt-2 block text-muted-foreground no-underline transition-colors hover:text-foreground focus-visible:outline-offset-[-1px]" href="#G">G</a><a class="pt-2 block text-muted-foreground no-underline transition-colors hover:text-foreground focus-visible:outline-offset-[-1px]" href="#H">H</a><a class="pt-2 block text-muted-foreground no-underline transition-colors hover:text-foreground focus-visible:outline-offset-[-1px]" href="#I">I</a><a class="pt-2 block text-muted-foreground no-underline transition-colors hover:text-foreground focus-visible:outline-offset-[-1px]" href="#K">K</a><a class="pt-2 block text-muted-foreground no-underline transition-colors hover:text-foreground focus-visible:outline-offset-[-1px]" href="#L">L</a><a class="pt-2 block text-muted-foreground no-underline transition-colors hover:text-foreground focus-visible:outline-offset-[-1px]" href="#M">M</a><a class="pt-2 block text-muted-foreground no-underline transition-colors hover:text-foreground focus-visible:outline-offset-[-1px]" href="#N">N</a><a class="pt-2 block text-muted-foreground no-underline transition-colors hover:text-foreground focus-visible:outline-offset-[-1px]" href="#O">O</a><a class="pt-2 block text-muted-foreground no-underline transition-colors hover:text-foreground focus-visible:outline-offset-[-1px]" href="#P">P</a><a class="pt-2 block text-muted-foreground no-underline transition-colors hover:text-foreground focus-visible:outline-offset-[-1px]" href="#Q">Q</a><a class="pt-2 block text-muted-foreground no-underline transition-colors hover:text-foreground focus-visible:outline-offset-[-1px]" href="#R">R</a><a class="pt-2 block text-muted-foreground no-underline transition-colors hover:text-foreground focus-visible:outline-offset-[-1px]" href="#S">S</a><a class="pt-2 block text-muted-foreground no-underline transition-colors hover:text-foreground focus-visible:outline-offset-[-1px]" href="#T">T</a><a class="pt-2 block text-muted-foreground no-underline transition-colors hover:text-foreground focus-visible:outline-offset-[-1px]" href="#U">U</a><a class="pt-2 block text-muted-foreground no-underline transition-colors hover:text-foreground focus-visible:outline-offset-[-1px]" href="#V">V</a><a class="pt-2 block text-muted-foreground no-underline transition-colors hover:text-foreground focus-visible:outline-offset-[-1px]" href="#W">W</a><a class="pt-2 block text-muted-foreground no-underline transition-colors hover:text-foreground focus-visible:outline-offset-[-1px]" href="#Z">Z</a>
 </div>
 </aside>
-        </main>
-      </div>
-    </div><footer class="py-6 border-t border-border md:py-0">
+          </main>
+        </div>
+      </div><footer class="py-6 border-t border-border md:py-0">
     <div class="container flex flex-col items-center justify-between gap-4 md:h-24 md:flex-row">
       <div class="flex flex-col items-center gap-4 px-8 md:flex-row md:gap-2 md:px-0">
         <p class="text-sm leading-loose text-center text-muted-foreground md:text-left">Built with <a class="font-medium underline underline-offset-4"
     href="https://www.sphinx-doc.org"
-    rel="noreferrer">Sphinx 8.2.3</a></p>
+    rel="noreferrer">Sphinx 9.1.0</a></p>
 </div>
 </div>
 </footer>
-  </div>
-  
-    <script src="_static/documentation_options.js?v=21631f0b"></script>
-    <script src="_static/doctools.js?v=9bcbadda"></script>
-    <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
-    <script defer="defer" src="_static/theme.js?v=073f68d9"></script>
-  
+    </div>
+    
+    <script src="_static/documentation_options.js?v=851b9b12"></script>
+    <script src="_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script defer="defer" src="_static/theme.js?v=582b20c5"></script>
+    
 </body>
+
 </html>
