@@ -344,7 +344,6 @@ class TestWeakLayer(unittest.TestCase):
         self.assertGreater(wl.kt, 0, "Shear stiffness should be positive")
 
         # Check default fracture properties
-        self.assertEqual(wl.G_c, 1.0)
         self.assertEqual(wl.G_Ic, 0.56)
         self.assertEqual(wl.G_IIc, 0.79)
 
@@ -371,18 +370,13 @@ class TestWeakLayer(unittest.TestCase):
 
     def test_weak_layer_fracture_properties(self):
         """Test weak layer fracture property validation."""
-        wl = WeakLayer(rho=90.0, h=25.0, G_c=2.5, G_Ic=1.5, G_IIc=1.8)
+        wl = WeakLayer(rho=90.0, h=25.0, G_Ic=1.5, G_IIc=1.8)
 
-        self.assertEqual(wl.G_c, 2.5)
         self.assertEqual(wl.G_Ic, 1.5)
         self.assertEqual(wl.G_IIc, 1.8)
 
     def test_weak_layer_validation_errors(self):
         """Test weak layer validation errors."""
-        # Negative fracture energy
-        with self.assertRaises(ValidationError):
-            WeakLayer(rho=100.0, h=20.0, G_c=-1.0)
-
         # Zero thickness
         with self.assertRaises(ValidationError):
             WeakLayer(rho=100.0, h=0.0)

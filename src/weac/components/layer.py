@@ -244,8 +244,6 @@ class WeakLayer(BaseModel):
         ``E_plane = E / (1 - nu²)``.
     kt : float, optional
         Shear spring stiffness kₜ [N mm⁻³].  If omitted it is ``G / t``.
-    G_c : float
-        Total fracture energy Gc [J/m^2].  Default 1.0 J/m^2.
     G_Ic : float
         Mode-I fracture toughness GIc [J/m^2].  Default 0.56 J/m^2.
     G_IIc : float
@@ -268,9 +266,6 @@ class WeakLayer(BaseModel):
     kn: float = Field(default=0.0, description="Normal stiffness  [N mm⁻³]")
     kt: float = Field(default=0.0, description="Shear  stiffness  [N mm⁻³]")
     # fracture-mechanics parameters
-    G_c: float = Field(
-        default=1.0, gt=0, description="Total fracture energy Gc [J/m^2]"
-    )
     G_Ic: float = Field(
         default=0.56, gt=0, description="Mode-I fracture toughness GIc [J/m^2]"
     )

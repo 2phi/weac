@@ -5,11 +5,15 @@ Tests the parsing of CAAML files, density measurement extraction,
 fallback to hardness+grain type calculations, and stability test parsing.
 """
 
+import math
 import os
 import unittest
 
-from weac.components import Layer, WeakLayer
-from weac.utils.snowpilot_parser import SnowPilotParser
+from weac.components import Layer
+from weac.utils.snowpilot_parser import (
+    SnowPilotParser,
+    vertical_to_slope_normal_depth_scale,
+)
 
 
 class TestSnowPilotParser(unittest.TestCase):
@@ -120,6 +124,42 @@ class TestSnowPilotParser(unittest.TestCase):
         # Test with empty density layers list
         result = parser.get_density_for_layer_range(0, 100, [])
         self.assertIsNone(result, "Should return None for empty density layers")
+
+    def test_pit_slope_angle_from_caaml(self):
+        """Location validSlopeAngle is exposed when present."""
+        parser = SnowPilotParser(self.caaml_with_density)
+        self.assertAlmostEqual(parser.pit_slope_angle_deg() or 0.0, 33.0)
+
+    def test_slope_normal_le_plumb_depth(self):
+        """Slope-normal depth is less than or equal to plumb-line depth."""
+        d_v = 100.0  # arbitrary plumb thickness [mm]
+        self.assertEqual(vertical_to_slope_normal_depth_scale(0.0), 1.0)
+        self.assertEqual(d_v * vertical_to_slope_normal_depth_scale(0.0), d_v)
+        for phi in (5.0, 15.0, 33.0, 45.0, 60.0, 75.0):
+            scale = vertical_to_slope_normal_depth_scale(phi)
+            d_n = d_v * scale
+            self.assertLessEqual(
+                scale,
+                1.0,
+                msg="scale should be <= 1 for tilted slopes",
+            )
+            self.assertLessEqual(
+                d_n,
+                d_v,
+                msg="slope-normal thickness should be <= plumb thickness",
+            )
+
+    def test_slope_normal_thickness_scaling(self):
+        """Non-zero phi scales vertical thickness to slope-normal (cos(phi))."""
+        parser = SnowPilotParser(self.caaml_with_density)
+        layers_0, _ = parser.extract_layers(0.0)
+        phi = 60.0
+        scale = math.cos(math.radians(phi))
+        layers_sloped, _ = parser.extract_layers(phi)
+        self.assertEqual(len(layers_0), len(layers_sloped))
+        for i, (a, b) in enumerate(zip(layers_0, layers_sloped)):
+            with self.subTest(layer_index=i):
+                self.assertAlmostEqual(b.h, a.h * scale, places=5)
 
     def test_unit_conversion(self):
         """Test that different units are converted correctly."""
