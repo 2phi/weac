@@ -172,7 +172,7 @@ class TestSlabTensileComparisons(unittest.TestCase):
     def test_slab_tensile_criterion_ordering(self):
         """Each case asserts that setup A exceeds setup B."""
         if not COMPARISON_CASES:
-            self.skipTest("Populate COMPARISON_CASES with the seven A/B setup pairs.")
+            self.skipTest("Populate COMPARISON_CASES A/B setup pairs.")
 
         for case in COMPARISON_CASES:
             with self.subTest(case=case.name):
@@ -187,7 +187,7 @@ class TestSlabTensileComparisons(unittest.TestCase):
                     criterion_a,
                     criterion_b,
                     msg=(
-                        f"{case.name}: expected A > B, got "
+                        f"{case.name}: expected A >= B, got "
                         f"A={criterion_a:.6f}, B={criterion_b:.6f}"
                     ),
                 )
