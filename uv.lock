@@ -2474,11 +2474,15 @@ wheels = [
 
 [[package]]
 name = "snowpylot"
-version = "1.1.3"
-source = { git = "https://github.com/connellymk/snowpylot.git?rev=e1a0d7c3f16a05ea97f75e97bdacece86ac4704b#e1a0d7c3f16a05ea97f75e97bdacece86ac4704b" }
+version = "1.1.5"
+source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "beautifulsoup4" },
     { name = "requests" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/f5/e3/9cfa0fffe42d4ea3e70013c7adc5cc2f1c68a069b43bf519823fb6e3d25f/snowpylot-1.1.5.tar.gz", hash = "sha256:173e46dec12136506e57dfef2551c45d0793585cecd36d2bc499355f54b41c2a", size = 24469, upload-time = "2026-04-15T19:20:52.697Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/41/bd/cc1aca4a3cdcab3a020a17044ca65262c6485423864c29ff39100c15ff7c/snowpylot-1.1.5-py3-none-any.whl", hash = "sha256:e8fa82f591142d42d2e32e9d755b5173dd3dfaa9598791e19e60239eb7510e24", size = 19507, upload-time = "2026-04-15T19:20:51.719Z" },
 ]
 
 [[package]]
@@ -2857,7 +2861,7 @@ requires-dist = [
     { name = "pyzmq", marker = "extra == 'interactive'", specifier = ">=27.0.1" },
     { name = "ruff", marker = "extra == 'dev'", specifier = ">=0.4.0" },
     { name = "scipy", specifier = ">=1.14.0" },
-    { name = "snowpylot", git = "https://github.com/connellymk/snowpylot.git?rev=e1a0d7c3f16a05ea97f75e97bdacece86ac4704b" },
+    { name = "snowpylot", specifier = ">=1.1.5" },
     { name = "sphinx", marker = "extra == 'docs'" },
     { name = "sphinxawesome-theme", marker = "extra == 'docs'" },
     { name = "tornado", marker = "extra == 'dev'", specifier = ">=6.5.2" },
