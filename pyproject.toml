@@ -23,8 +23,7 @@ dependencies = [
     "numpy>=2.3.5,<2.4.0",
     "scipy>=1.14.0",
     "pydantic>=2.11.7",
-    # Required for SLF CAAML parsing; can upgrade once version >=1.1.5 is released
-    "snowpylot @ git+https://github.com/connellymk/snowpylot.git@e1a0d7c3f16a05ea97f75e97bdacece86ac4704b",
+    "snowpylot>=1.1.5",
 ]
 
 [project.urls]
