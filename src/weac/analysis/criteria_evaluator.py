@@ -37,6 +37,8 @@ class CoupledCriterionHistory:
     skier_weights: list[float]
     crack_lengths: list[float]
     incr_energies: list[np.ndarray]
+    sigma_maxs: list[float]
+    tau_maxs: list[float]
     g_deltas: list[float]
     dist_maxs: list[float]
     dist_mins: list[float]
@@ -441,7 +443,7 @@ class CriteriaEvaluator:
                 inc_energy[1], inc_energy[2], system.weak_layer
             )
 
-            history_data = CoupledCriterionHistory([], [], [], [], [], [])
+            history_data = CoupledCriterionHistory([], [], [], [], [], [], [], [])
             analyzer.print_call_stats(
                 message="evaluate_coupled_criterion Call Statistics"
             )
@@ -466,7 +468,7 @@ class CriteriaEvaluator:
         crack_length = 1.0
         dist_ERR_envelope = 1000
         g_delta = 0
-        history = CoupledCriterionHistory([], [], [], [], [], [])
+        history = CoupledCriterionHistory([], [], [], [], [], [], [], [])
         iteration_count = 0
         skier_weight = initial_critical_skier_weight * 1.005
         min_skier_weight = 1e-6
@@ -542,6 +544,8 @@ class CriteriaEvaluator:
             history.skier_weights.append(skier_weight)
             history.crack_lengths.append(crack_length)
             history.incr_energies.append(incr_energy)
+            history.sigma_maxs.append(np.max(sigma_kPa))
+            history.tau_maxs.append(np.max(tau_kPa))
             history.g_deltas.append(g_delta)
             history.dist_maxs.append(max_dist_stress)
             history.dist_mins.append(min_dist_stress)
