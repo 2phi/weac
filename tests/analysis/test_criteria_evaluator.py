@@ -224,6 +224,13 @@ class TestCriteriaEvaluator(unittest.TestCase):
         )
         self.assertIsInstance(results, CoupledCriterionResult)
         self.assertGreater(results.critical_skier_weight, 0)
+        self.assertIsNotNone(results.history)
+        history = results.history
+        assert history is not None
+        self.assertEqual(len(history.sigma_maxs), len(history.skier_weights))
+        self.assertGreater(len(history.sigma_maxs), 0)
+        self.assertEqual(len(history.tau_maxs), len(history.skier_weights))
+        self.assertGreater(len(history.tau_maxs), 0)
 
     def test_evaluate_SteadyState(self):
         """Test the evaluate_SteadyState method."""

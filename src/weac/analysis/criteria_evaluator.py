@@ -8,7 +8,7 @@ import copy
 import logging
 import time
 import warnings
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 
 # Third party imports
 import numpy as np
@@ -32,14 +32,37 @@ logger = logging.getLogger(__name__)
 
 @dataclass
 class CoupledCriterionHistory:
-    """Stores the history of the coupled criterion evaluation."""
+    """
+    Stores the history of the coupled criterion evaluation.
 
-    skier_weights: list[float]
-    crack_lengths: list[float]
-    incr_energies: list[np.ndarray]
-    g_deltas: list[float]
-    dist_maxs: list[float]
-    dist_mins: list[float]
+    Attributes:
+    -----------
+    skier_weights : list[float]
+        Skier weights evaluated during the iteration.
+    crack_lengths : list[float]
+        Crack lengths evaluated during the iteration.
+    incr_energies : list[np.ndarray]
+        Incremental energy release rates for each evaluated state.
+    sigma_maxs : list[float]
+        Maximum normal stress values in kPa for each evaluated state.
+    tau_maxs : list[float]
+        Maximum shear stress values in kPa for each evaluated state.
+    g_deltas : list[float]
+        Fracture toughness envelope values for each evaluated state.
+    dist_maxs : list[float]
+        Maximum distances to the stress envelope for each evaluated state.
+    dist_mins : list[float]
+        Minimum distances to the stress envelope for each evaluated state.
+    """
+
+    skier_weights: list[float] = field(default_factory=list)
+    crack_lengths: list[float] = field(default_factory=list)
+    incr_energies: list[np.ndarray] = field(default_factory=list)
+    sigma_maxs: list[float] = field(default_factory=list)
+    tau_maxs: list[float] = field(default_factory=list)
+    g_deltas: list[float] = field(default_factory=list)
+    dist_maxs: list[float] = field(default_factory=list)
+    dist_mins: list[float] = field(default_factory=list)
 
 
 @dataclass
@@ -441,7 +464,7 @@ class CriteriaEvaluator:
                 inc_energy[1], inc_energy[2], system.weak_layer
             )
 
-            history_data = CoupledCriterionHistory([], [], [], [], [], [])
+            history_data = CoupledCriterionHistory()
             analyzer.print_call_stats(
                 message="evaluate_coupled_criterion Call Statistics"
             )
@@ -466,7 +489,7 @@ class CriteriaEvaluator:
         crack_length = 1.0
         dist_ERR_envelope = 1000
         g_delta = 0
-        history = CoupledCriterionHistory([], [], [], [], [], [])
+        history = CoupledCriterionHistory()
         iteration_count = 0
         skier_weight = initial_critical_skier_weight * 1.005
         min_skier_weight = 1e-6
@@ -542,6 +565,8 @@ class CriteriaEvaluator:
             history.skier_weights.append(skier_weight)
             history.crack_lengths.append(crack_length)
             history.incr_energies.append(incr_energy)
+            history.sigma_maxs.append(np.max(sigma_kPa))
+            history.tau_maxs.append(np.max(tau_kPa))
             history.g_deltas.append(g_delta)
             history.dist_maxs.append(max_dist_stress)
             history.dist_mins.append(min_dist_stress)
