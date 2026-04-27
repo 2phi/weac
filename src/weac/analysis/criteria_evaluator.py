@@ -721,6 +721,12 @@ class CriteriaEvaluator:
         -----------
         system: SystemModel
             The system model.
+        mode: TouchdownMode, optional
+            Touchdown evaluation mode. The three supported modes are:
+            ``"C_in_contact"`` for a cut distance of ``2 * l_BC``,
+            ``"B_point_contact"`` for a cut distance just shorter than ``l_BC``,
+            and ``"A_free_hanging"`` for a cut distance just shorter than ``l_AB``.
+            Defaults to ``"C_in_contact"``.
         vertical: bool, optional
             Whether to evaluate the system in a vertical configuration.
             Defaults to False.
