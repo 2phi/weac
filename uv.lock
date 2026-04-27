@@ -2775,7 +2775,7 @@ wheels = [
 
 [[package]]
 name = "weac"
-version = "3.1.6"
+version = "3.1.7"
 source = { editable = "." }
 dependencies = [
     { name = "matplotlib" },
