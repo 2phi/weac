@@ -80,8 +80,8 @@ COMPARISON_CASES: tuple[ComparisonCase, ...] = (
     ),
     ComparisonCase(
         name="case_2",
-        setup_a=_setup_from_cm((50, 75), (20, 225)),
-        setup_b=_setup_from_cm((30, 75), (20, 225)),
+        setup_a=_setup_from_cm((30, 75), (20, 225)),
+        setup_b=_setup_from_cm((50, 75), (20, 225)),
     ),
     ComparisonCase(
         name="case_3",
@@ -115,8 +115,13 @@ COMPARISON_CASES: tuple[ComparisonCase, ...] = (
     ),
     ComparisonCase(
         name="case_9",
-        setup_a=_setup_from_cm((15, 275), (40, 75)),
-        setup_b=_setup_from_cm((40, 75), (15, 275)),
+        setup_a=_setup_from_cm((40, 75), (15, 275)),
+        setup_b=_setup_from_cm((15, 275), (40, 75)),
+    ),
+    ComparisonCase(
+        name="case_10",
+        setup_a=_setup_from_cm((30, 75), (20, 275)),
+        setup_b=_setup_from_cm((50, 75), (20, 275)),
     ),
 )
 

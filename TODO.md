@@ -2,12 +2,15 @@
 
 ## Major
 
+- [ ] Layer & Slab using pipelines from Mary-Kate + Attributes (value, calculated [bool], pipeline, uncertainty)
+- [ ] Uncertainties propagation
 - [ ] Use Classes for Boundary Types
 - [ ] Automatically figure out type of system
 - [ ] Automatically set boundary conditions based on system
 
 ## Minor
 
+- [ ] Swap to Pytest from Unittest
 - [ ] resolve fracture criterion also when lower than strength criterion
 - [ ] Florian CriterionEvaluator: clarify and fix damping behavior (find_minimum_force / evaluate_coupled_criterion)
   - Expected behavior
