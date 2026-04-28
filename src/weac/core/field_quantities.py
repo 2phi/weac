@@ -107,13 +107,14 @@ class FieldQuantities:  # pylint: disable=too-many-instance-attributes, too-many
         return -self._unit_factor(unit) * self.es.weak_layer.kn * self.w(Z)
 
     def tau(self, Z: np.ndarray, unit: StressUnit = "MPa") -> float | np.ndarray:
-        """Weak-layer shear stress `tau = -kt * (w' * h/2 - u(h=H/2))`"""
+        """Weak-layer shear stress `tau = kt * h * (w' / 2 - u(h=H/2) / h)`"""
         return (
-            -self._unit_factor(unit)
+            self._unit_factor(unit)
             * self.es.weak_layer.kt
+            * self.es.weak_layer.h
             * (
-                self.dw_dx(Z) * self.es.weak_layer.h / 2
-                - self.u(Z, h0=self.es.slab.H / 2)
+                self.dw_dx(Z) / 2
+                - self.u(Z, h0=self.es.slab.H / 2) / self.es.weak_layer.h
             )
         )
 
@@ -122,7 +123,7 @@ class FieldQuantities:  # pylint: disable=too-many-instance-attributes, too-many
         return -self.w(Z) / self.es.weak_layer.h
 
     def gamma(self, Z: np.ndarray) -> float | np.ndarray:
-        """Weak-layer shear strain `gamma = (w' * h/2 - u(h=H/2)) / h`"""
+        """Weak-layer shear strain `gamma = w' / 2 - u(h=H/2) / h`"""
         return (
             self.dw_dx(Z) / 2 - self.u(Z, h0=self.es.slab.H / 2) / self.es.weak_layer.h
         )
