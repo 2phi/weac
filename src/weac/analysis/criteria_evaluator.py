@@ -1307,15 +1307,30 @@ class CriteriaEvaluator:
         )
         max_principal_stress_norm = np.max(principal_stress_norm)
         max_Sxx_norm = np.max(Sxx_norm)
-        # Count height levels as failure-prone when tensile stress exceeds the layer
-        # strength or the slab density is below the configured weak-snow threshold.
-        # zmesh rho is t/mm^3, layer rho is kg/m^3
+        # zmesh rows are ordered from slab top to bottom. Low-density levels only
+        # fail through downward growth from tensile failures above; when they do,
+        # they are excluded from the slab tensile criterion denominator.
+        # zmesh rho is t/mm^3, layer rho is kg/m^3.
         zmesh = analyzer.get_zmesh(dz=1)
         rho_kg_m3 = zmesh["rho"] * 1e12
         tensile_exceeds = np.max(Sxx_norm, axis=1) > 1
         low_density = rho_kg_m3 <= self.criteria_config.low_density_threshold_kg_m3
-        height_level_prone_to_fail = tensile_exceeds | low_density
-        slab_tensile_criterion = np.mean(height_level_prone_to_fail)
+        height_level_prone_to_fail = np.zeros_like(tensile_exceeds, dtype=bool)
+        all_above_prone_to_fail = True
+        for index, is_low_density in enumerate(low_density):
+            if is_low_density:
+                height_level_prone_to_fail[index] = all_above_prone_to_fail
+            else:
+                height_level_prone_to_fail[index] = tensile_exceeds[index]
+            all_above_prone_to_fail &= height_level_prone_to_fail[index]
+
+        low_density_prone_to_fail = low_density & height_level_prone_to_fail
+        load_bearing_levels = ~low_density_prone_to_fail
+        slab_tensile_criterion = (
+            np.mean(height_level_prone_to_fail[load_bearing_levels])
+            if np.any(load_bearing_levels)
+            else 1.0
+        )
         if print_call_stats:
             analyzer.print_call_stats(
                 message="_calculate_maximal_stresses Call Statistics"
