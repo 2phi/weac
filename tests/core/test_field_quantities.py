@@ -272,7 +272,7 @@ class TestFieldQuantitiesStresses(unittest.TestCase):
         H = self.fq.es.slab.H
         u_surface = self.fq.u(self.Z, h0=H / 2)
 
-        expected = -self.fq.es.weak_layer.kt * (self.Z[3, :] * h / 2 - u_surface)
+        expected = self.fq.es.weak_layer.kt * (self.Z[3, :] * h / 2 - u_surface)
         np.testing.assert_array_almost_equal(
             tau,
             expected,

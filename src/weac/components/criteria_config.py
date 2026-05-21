@@ -50,7 +50,8 @@ class CriteriaConfig(BaseModel):
         Order of magnitude for stress envelope. Default is 1.0.
     low_density_threshold_kg_m3 : float
         Slab density threshold in kg/m^3 below which a layer is treated as weak snow
-        and counted as prone to tensile failure in the slab tensile criterion.
+        and excluded from the slab tensile criterion percentage when broken through
+        directional growth from above.
     """
 
     fn: float = Field(
@@ -94,6 +95,6 @@ class CriteriaConfig(BaseModel):
         gt=0,
         description=(
             "Slab density threshold in kg/m^3 below which a layer is treated as weak "
-            "snow in the slab tensile criterion"
+            "snow and conditionally excluded from the slab tensile criterion percentage"
         ),
     )
