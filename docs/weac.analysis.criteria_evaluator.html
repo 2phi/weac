@@ -825,6 +825,12 @@ Energy Release Rate.</p>
 <dl class="simple">
 <dt>system: SystemModel</dt><dd><p>The system model.</p>
 </dd>
+<dt>mode: TouchdownMode, optional</dt><dd><p>Touchdown evaluation mode. The three supported modes are:
+<code class="docutils literal notranslate"><span class="pre">"C_in_contact"</span></code> for a cut distance of <code class="docutils literal notranslate"><span class="pre">2</span> <span class="pre">*</span> <span class="pre">l_BC</span></code>,
+<code class="docutils literal notranslate"><span class="pre">"B_point_contact"</span></code> for a cut distance just shorter than <code class="docutils literal notranslate"><span class="pre">l_BC</span></code>,
+and <code class="docutils literal notranslate"><span class="pre">"A_free_hanging"</span></code> for a cut distance just shorter than <code class="docutils literal notranslate"><span class="pre">l_AB</span></code>.
+Defaults to <code class="docutils literal notranslate"><span class="pre">"C_in_contact"</span></code>.</p>
+</dd>
 <dt>vertical: bool, optional</dt><dd><p>Whether to evaluate the system in a vertical configuration.
 Defaults to False.</p>
 </dd>

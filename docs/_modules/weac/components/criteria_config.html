@@ -257,53 +257,54 @@
 </span><span id="line-50"><span class="sd">        Order of magnitude for stress envelope. Default is 1.0.</span>
 </span><span id="line-51"><span class="sd">    low_density_threshold_kg_m3 : float</span>
 </span><span id="line-52"><span class="sd">        Slab density threshold in kg/m^3 below which a layer is treated as weak snow</span>
-</span><span id="line-53"><span class="sd">        and counted as prone to tensile failure in the slab tensile criterion.</span>
-</span><span id="line-54"><span class="sd">    &quot;&quot;&quot;</span>
-</span><span id="line-55">
-</span><span id="line-56">    <span class="n">fn</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
-</span><span id="line-57">        <span class="n">default</span><span class="o">=</span><span class="mf">2.0</span><span class="p">,</span>
-</span><span id="line-58">        <span class="n">gt</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
-</span><span id="line-59">        <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Failure mode interaction exponent for normal stress (sigma)&quot;</span><span class="p">,</span>
-</span><span id="line-60">    <span class="p">)</span>
-</span><span id="line-61">    <span class="n">fm</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
-</span><span id="line-62">        <span class="n">default</span><span class="o">=</span><span class="mf">2.0</span><span class="p">,</span>
-</span><span id="line-63">        <span class="n">gt</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
-</span><span id="line-64">        <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Failure mode interaction exponent for shear stress (tau)&quot;</span><span class="p">,</span>
-</span><span id="line-65">    <span class="p">)</span>
-</span><span id="line-66">    <span class="n">gn</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
-</span><span id="line-67">        <span class="n">default</span><span class="o">=</span><span class="mi">1</span> <span class="o">/</span> <span class="mf">0.2</span><span class="p">,</span>
-</span><span id="line-68">        <span class="n">gt</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
-</span><span id="line-69">        <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Failure mode interaction exponent for closing energy release rate (G_I)&quot;</span><span class="p">,</span>
-</span><span id="line-70">    <span class="p">)</span>
-</span><span id="line-71">    <span class="n">gm</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
-</span><span id="line-72">        <span class="n">default</span><span class="o">=</span><span class="mi">1</span> <span class="o">/</span> <span class="mf">0.45</span><span class="p">,</span>
-</span><span id="line-73">        <span class="n">gt</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
-</span><span id="line-74">        <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Failure mode interaction exponent for shearing energy release rate (G_II)&quot;</span><span class="p">,</span>
-</span><span id="line-75">    <span class="p">)</span>
-</span><span id="line-76">    <span class="n">stress_envelope_method</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span>
-</span><span id="line-77">        <span class="s2">&quot;adam_unpublished&quot;</span><span class="p">,</span> <span class="s2">&quot;schottner&quot;</span><span class="p">,</span> <span class="s2">&quot;mede_s-RG1&quot;</span><span class="p">,</span> <span class="s2">&quot;mede_s-RG2&quot;</span><span class="p">,</span> <span class="s2">&quot;mede_s-FCDH&quot;</span>
-</span><span id="line-78">    <span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
-</span><span id="line-79">        <span class="n">default</span><span class="o">=</span><span class="s2">&quot;adam_unpublished&quot;</span><span class="p">,</span>
-</span><span id="line-80">        <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Method to calculate the stress failure envelope&quot;</span><span class="p">,</span>
-</span><span id="line-81">    <span class="p">)</span>
-</span><span id="line-82">    <span class="n">scaling_factor</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
-</span><span id="line-83">        <span class="n">default</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
-</span><span id="line-84">        <span class="n">gt</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
-</span><span id="line-85">        <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Scaling factor for stress envelope&quot;</span><span class="p">,</span>
-</span><span id="line-86">    <span class="p">)</span>
-</span><span id="line-87">    <span class="n">order_of_magnitude</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
-</span><span id="line-88">        <span class="n">default</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
-</span><span id="line-89">        <span class="n">gt</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
-</span><span id="line-90">        <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Order of magnitude for stress envelope&quot;</span><span class="p">,</span>
-</span><span id="line-91">    <span class="p">)</span>
-</span><span id="line-92">    <span class="n">low_density_threshold_kg_m3</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
-</span><span id="line-93">        <span class="n">default</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span>
-</span><span id="line-94">        <span class="n">gt</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
-</span><span id="line-95">        <span class="n">description</span><span class="o">=</span><span class="p">(</span>
-</span><span id="line-96">            <span class="s2">&quot;Slab density threshold in kg/m^3 below which a layer is treated as weak &quot;</span>
-</span><span id="line-97">            <span class="s2">&quot;snow in the slab tensile criterion&quot;</span>
-</span><span id="line-98">        <span class="p">),</span>
-</span><span id="line-99">    <span class="p">)</span></div>
+</span><span id="line-53"><span class="sd">        and excluded from the slab tensile criterion percentage when broken through</span>
+</span><span id="line-54"><span class="sd">        directional growth from above.</span>
+</span><span id="line-55"><span class="sd">    &quot;&quot;&quot;</span>
+</span><span id="line-56">
+</span><span id="line-57">    <span class="n">fn</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
+</span><span id="line-58">        <span class="n">default</span><span class="o">=</span><span class="mf">2.0</span><span class="p">,</span>
+</span><span id="line-59">        <span class="n">gt</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+</span><span id="line-60">        <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Failure mode interaction exponent for normal stress (sigma)&quot;</span><span class="p">,</span>
+</span><span id="line-61">    <span class="p">)</span>
+</span><span id="line-62">    <span class="n">fm</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
+</span><span id="line-63">        <span class="n">default</span><span class="o">=</span><span class="mf">2.0</span><span class="p">,</span>
+</span><span id="line-64">        <span class="n">gt</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+</span><span id="line-65">        <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Failure mode interaction exponent for shear stress (tau)&quot;</span><span class="p">,</span>
+</span><span id="line-66">    <span class="p">)</span>
+</span><span id="line-67">    <span class="n">gn</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
+</span><span id="line-68">        <span class="n">default</span><span class="o">=</span><span class="mi">1</span> <span class="o">/</span> <span class="mf">0.2</span><span class="p">,</span>
+</span><span id="line-69">        <span class="n">gt</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+</span><span id="line-70">        <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Failure mode interaction exponent for closing energy release rate (G_I)&quot;</span><span class="p">,</span>
+</span><span id="line-71">    <span class="p">)</span>
+</span><span id="line-72">    <span class="n">gm</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
+</span><span id="line-73">        <span class="n">default</span><span class="o">=</span><span class="mi">1</span> <span class="o">/</span> <span class="mf">0.45</span><span class="p">,</span>
+</span><span id="line-74">        <span class="n">gt</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+</span><span id="line-75">        <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Failure mode interaction exponent for shearing energy release rate (G_II)&quot;</span><span class="p">,</span>
+</span><span id="line-76">    <span class="p">)</span>
+</span><span id="line-77">    <span class="n">stress_envelope_method</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span>
+</span><span id="line-78">        <span class="s2">&quot;adam_unpublished&quot;</span><span class="p">,</span> <span class="s2">&quot;schottner&quot;</span><span class="p">,</span> <span class="s2">&quot;mede_s-RG1&quot;</span><span class="p">,</span> <span class="s2">&quot;mede_s-RG2&quot;</span><span class="p">,</span> <span class="s2">&quot;mede_s-FCDH&quot;</span>
+</span><span id="line-79">    <span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
+</span><span id="line-80">        <span class="n">default</span><span class="o">=</span><span class="s2">&quot;adam_unpublished&quot;</span><span class="p">,</span>
+</span><span id="line-81">        <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Method to calculate the stress failure envelope&quot;</span><span class="p">,</span>
+</span><span id="line-82">    <span class="p">)</span>
+</span><span id="line-83">    <span class="n">scaling_factor</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
+</span><span id="line-84">        <span class="n">default</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+</span><span id="line-85">        <span class="n">gt</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+</span><span id="line-86">        <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Scaling factor for stress envelope&quot;</span><span class="p">,</span>
+</span><span id="line-87">    <span class="p">)</span>
+</span><span id="line-88">    <span class="n">order_of_magnitude</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
+</span><span id="line-89">        <span class="n">default</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+</span><span id="line-90">        <span class="n">gt</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+</span><span id="line-91">        <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Order of magnitude for stress envelope&quot;</span><span class="p">,</span>
+</span><span id="line-92">    <span class="p">)</span>
+</span><span id="line-93">    <span class="n">low_density_threshold_kg_m3</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
+</span><span id="line-94">        <span class="n">default</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span>
+</span><span id="line-95">        <span class="n">gt</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+</span><span id="line-96">        <span class="n">description</span><span class="o">=</span><span class="p">(</span>
+</span><span id="line-97">            <span class="s2">&quot;Slab density threshold in kg/m^3 below which a layer is treated as weak &quot;</span>
+</span><span id="line-98">            <span class="s2">&quot;snow and conditionally excluded from the slab tensile criterion percentage&quot;</span>
+</span><span id="line-99">        <span class="p">),</span>
+</span><span id="line-100">    <span class="p">)</span></div>
 
 </span></code></pre></div>
     </div></div>

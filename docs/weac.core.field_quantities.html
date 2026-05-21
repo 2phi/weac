@@ -327,7 +327,7 @@ axis (x-coordinate), so they return an <cite>ndarray</cite> of length N.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="weac.core.field_quantities.FieldQuantities.tau">
 <span class="sig-name descname"><span class="pre">tau</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">Z</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">unit</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'MPa'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/weac/core/field_quantities.html#FieldQuantities.tau"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#weac.core.field_quantities.FieldQuantities.tau" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#weac.core.field_quantities.FieldQuantities.tau'">¶</a></dt>
-<dd><p>Weak-layer shear stress <cite>tau = -kt * (w’ * h/2 - u(h=H/2))</cite></p>
+<dd><p>Weak-layer shear stress <cite>tau = kt * h * (w’ / 2 - u(h=H/2) / h)</cite></p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
@@ -356,7 +356,7 @@ axis (x-coordinate), so they return an <cite>ndarray</cite> of length N.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="weac.core.field_quantities.FieldQuantities.gamma">
 <span class="sig-name descname"><span class="pre">gamma</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">Z</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/weac/core/field_quantities.html#FieldQuantities.gamma"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#weac.core.field_quantities.FieldQuantities.gamma" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#weac.core.field_quantities.FieldQuantities.gamma'">¶</a></dt>
-<dd><p>Weak-layer shear strain <cite>gamma = (w’ * h/2 - u(h=H/2)) / h</cite></p>
+<dd><p>Weak-layer shear strain <cite>gamma = w’ / 2 - u(h=H/2) / h</cite></p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>Z</strong> (<em>ndarray</em>)</p>
