@@ -171,6 +171,7 @@ class TestAnalyzer(unittest.TestCase):
         analyzer = Analyzer(system_model=system, printing_enabled=False)
 
         z_uncracked = np.array([[0.0], [0.0], [1.0], [0.2], [0.0], [0.0]])
+
         def constant_solution(x):
             return np.repeat(z_uncracked, np.size(np.atleast_1d(x)), axis=1)
 
@@ -182,7 +183,9 @@ class TestAnalyzer(unittest.TestCase):
         )
 
         self.assertTrue(np.all(mode_i >= 0), "Mode I integrand should be non-negative")
-        self.assertTrue(np.all(mode_ii >= 0), "Mode II integrand should be non-negative")
+        self.assertTrue(
+            np.all(mode_ii >= 0), "Mode II integrand should be non-negative"
+        )
 
     def test_internal_and_external_potentials_pst(self):
         """Test internal and external potentials for PST."""
