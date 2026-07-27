@@ -2,9 +2,8 @@
 This module contains regression tests for the WEAC model.
 """
 
-import unittest
-
 import numpy as np
+import pytest
 
 from weac.analysis import CriteriaEvaluator
 from weac.components import (
@@ -249,7 +248,7 @@ GT_pst_with_touchdown = np.array(
 )
 
 
-class TestRegressionSimulation(unittest.TestCase):
+class TestRegressionSimulation:
     """Regression tests asserting stable outputs for key scenarios."""
 
     def test_skier_baseline(self):
@@ -376,8 +375,10 @@ class TestRegressionSimulation(unittest.TestCase):
         C = sm.unknown_constants
 
         # Touchdown mode and distance baselines
-        self.assertEqual(td.touchdown_mode, "C_in_contact")
-        self.assertAlmostEqual(td.touchdown_distance, 1577.2698088929287, places=6)
+        assert td.touchdown_mode == "C_in_contact"
+        assert td.touchdown_distance == pytest.approx(
+            1577.2698088929287, abs=0.5 * 10 ** (-6)
+        )
 
         # Scenario segments updated by touchdown length
         seg_lengths = np.array([seg.length for seg in sm.scenario.segments])
@@ -418,28 +419,36 @@ class TestRegressionSimulation(unittest.TestCase):
 
         # find_minimum_force baseline
         fm = evaluator.find_minimum_force(system=sm, tolerance_stress=0.005)
-        self.assertTrue(fm.success)
-        self.assertGreater(fm.critical_skier_weight, 0)
+        assert fm.success
+        assert fm.critical_skier_weight > 0
         # Baseline values recorded
-        self.assertAlmostEqual(fm.critical_skier_weight, 75.17870187198098, places=6)
-        self.assertAlmostEqual(fm.max_dist_stress, 1.0000048176337313, places=6)
-        self.assertLess(fm.min_dist_stress, 1.0)
+        assert fm.critical_skier_weight == pytest.approx(
+            75.17870187198098, abs=0.5 * 10 ** (-6)
+        )
+        assert fm.max_dist_stress == pytest.approx(
+            1.0000048176337313, abs=0.5 * 10 ** (-6)
+        )
+        assert fm.min_dist_stress < 1.0
 
         # evaluate_SteadyState baseline
         ss = evaluator.evaluate_SteadyState(system=sm, vertical=False)
-        self.assertTrue(ss.converged)
-        self.assertGreater(ss.touchdown_distance, 0)
+        assert ss.converged
+        assert ss.touchdown_distance > 0
         # Baseline values recorded
-        self.assertAlmostEqual(ss.touchdown_distance, 1262.7061033873686, places=6)
-        np.testing.assert_allclose(ss.energy_release_rate, 2.110196960094839, rtol=1e-6, atol=0)
+        assert ss.touchdown_distance == pytest.approx(
+            1262.7061033873686, abs=0.5 * 10 ** (-6)
+        )
+        np.testing.assert_allclose(
+            ss.energy_release_rate, 2.110196960094839, rtol=1e-6, atol=0
+        )
 
         # evaluate_coupled_criterion baseline
         cc = evaluator.evaluate_coupled_criterion(system=sm, max_iterations=10)
-        self.assertIsNotNone(cc)
-        self.assertIsInstance(cc.critical_skier_weight, float)
-        self.assertIsInstance(cc.crack_length, float)
+        assert cc is not None
+        assert isinstance(cc.critical_skier_weight, float)
+        assert isinstance(cc.crack_length, float)
         # Baseline values recorded
-        self.assertTrue(cc.converged)
+        assert cc.converged
         np.testing.assert_allclose(
             cc.critical_skier_weight, 180.87597195071328, rtol=1e-2
         )
@@ -449,11 +458,7 @@ class TestRegressionSimulation(unittest.TestCase):
 
         # find_minimum_crack_length baseline (returns crack length > 0)
         crack_len, new_segments = evaluator.find_minimum_crack_length(system=sm)
-        self.assertGreater(crack_len, 0)
-        self.assertTrue(all(isinstance(s, Segment) for s in new_segments))
+        assert crack_len > 0
+        assert all(isinstance(s, Segment) for s in new_segments)
         # Baseline value recorded
         np.testing.assert_allclose(crack_len, 1564.671141349807, rtol=1e-2)
-
-
-if __name__ == "__main__":
-    unittest.main(verbosity=2)

@@ -7,7 +7,8 @@ fallback to hardness+grain type calculations, and stability test parsing.
 
 import math
 import os
-import unittest
+
+import pytest
 
 from weac.components import Layer
 from weac.utils.snowpilot_parser import (
@@ -16,55 +17,54 @@ from weac.utils.snowpilot_parser import (
 )
 
 
-class TestSnowPilotParser(unittest.TestCase):
+@pytest.fixture
+def materials_dir():
+    """Path to test materials in .materials/."""
+    return os.path.join(os.path.dirname(os.path.dirname(__file__)), ".materials")
+
+
+@pytest.fixture
+def caaml_with_density(materials_dir):
+    """CAAML file that contains density measurements."""
+    path = os.path.join(materials_dir, "test_snowpit1.xml")
+    assert os.path.exists(path), f"Test file not found: {path}"
+    return path
+
+
+@pytest.fixture
+def caaml_without_density(materials_dir):
+    """CAAML file that lacks density measurements."""
+    path = os.path.join(materials_dir, "test_snowpit2.xml")
+    assert os.path.exists(path), f"Test file not found: {path}"
+    return path
+
+
+class TestSnowPilotParser:
     """Test the SnowPilotParser functionality."""
 
-    def setUp(self):
-        """Set up test fixtures with paths to test CAAML files."""
-        # Paths to test materials in .materials/
-        self.materials_dir = os.path.join(
-            os.path.dirname(os.path.dirname(__file__)), ".materials"
-        )
-        self.caaml_with_density = os.path.join(self.materials_dir, "test_snowpit1.xml")
-        self.caaml_without_density = os.path.join(
-            self.materials_dir, "test_snowpit2.xml"
-        )
-
-        # Verify test files exist
-        self.assertTrue(
-            os.path.exists(self.caaml_with_density),
-            f"Test file not found: {self.caaml_with_density}",
-        )
-        self.assertTrue(
-            os.path.exists(self.caaml_without_density),
-            f"Test file not found: {self.caaml_without_density}",
-        )
-
-    def test_parse_caaml_with_density_measurements(self):
+    def test_parse_caaml_with_density_measurements(self, caaml_with_density):
         """Test parsing CAAML file that contains density measurements."""
-        parser = SnowPilotParser(self.caaml_with_density)
+        parser = SnowPilotParser(caaml_with_density)
         layers, density_methods = parser.extract_layers()
 
         # Should have extracted layers
-        self.assertGreater(len(layers), 0, "Should extract layers from CAAML")
-        self.assertGreater(
-            density_methods.count("density_obs"),
-            0,
-            "Should use measured density for some layers",
+        assert len(layers) > 0, "Should extract layers from CAAML"
+        assert density_methods.count("density_obs") > 0, (
+            "Should use measured density for some layers"
         )
 
-    def test_parse_caaml_without_density_measurements(self):
+    def test_parse_caaml_without_density_measurements(self, caaml_without_density):
         """Test parsing CAAML file that lacks density measurements."""
-        parser = SnowPilotParser(self.caaml_without_density)
+        parser = SnowPilotParser(caaml_without_density)
         layers, density_methods = parser.extract_layers()
 
         # Should have extracted layers
-        self.assertGreater(len(layers), 0, "Should extract layers from CAAML")
-        self.assertEqual(density_methods.count("geldsetzer"), len(layers))
+        assert len(layers) > 0, "Should extract layers from CAAML"
+        assert density_methods.count("geldsetzer") == len(layers)
 
-    def test_density_extraction_logic(self):
+    def test_density_extraction_logic(self, caaml_with_density):
         """Test the density extraction logic with overlapping measurements."""
-        parser = SnowPilotParser(self.caaml_with_density)
+        parser = SnowPilotParser(caaml_with_density)
 
         # Get density layers for testing
         sp_density_layers = [
@@ -79,104 +79,88 @@ class TestSnowPilotParser(unittest.TestCase):
         density = parser.get_density_for_layer_range(
             20, 60, sp_density_layers
         )  # 2-6cm in mm
-        self.assertIsNotNone(density, "Should find density for overlapping layer")
-        self.assertIsInstance(density, float, "Density should be a float")
-        self.assertGreater(density, 0, "Density should be positive")
+        assert density is not None, "Should find density for overlapping layer"
+        assert isinstance(density, float), "Density should be a float"
+        assert density > 0, "Density should be positive"
 
         # Test case 2: Layer with no overlap
         # Test a layer well beyond the density measurements
         density_no_overlap = parser.get_density_for_layer_range(
             1000, 1100, sp_density_layers
         )  # 100-110cm
-        self.assertIsNone(
-            density_no_overlap, "Should return None for non-overlapping layer"
+        assert density_no_overlap is None, (
+            "Should return None for non-overlapping layer"
         )
 
-    def test_layer_properties_validation(self):
+    def test_layer_properties_validation(self, caaml_with_density):
         """Test that extracted layers have valid properties."""
-        parser = SnowPilotParser(self.caaml_with_density)
+        parser = SnowPilotParser(caaml_with_density)
         layers, _ = parser.extract_layers()
 
         for i, layer in enumerate(layers):
-            with self.subTest(layer_index=i):
-                # Validate layer properties
-                self.assertIsInstance(
-                    layer, Layer, f"Layer {i} should be Layer instance"
-                )
-                self.assertGreater(
-                    layer.rho, 0, f"Layer {i} density should be positive"
-                )
-                self.assertGreater(
-                    layer.h, 0, f"Layer {i} thickness should be positive"
-                )
-                self.assertLessEqual(
-                    layer.rho,
-                    1000,
-                    f"Layer {i} density should be reasonable (<= 1000 kg/m³)",
-                )
+            # Validate layer properties
+            assert isinstance(layer, Layer), f"Layer {i} should be Layer instance"
+            assert layer.rho > 0, f"Layer {i} density should be positive"
+            assert layer.h > 0, f"Layer {i} thickness should be positive"
+            assert layer.rho <= 1000, (
+                f"Layer {i} density should be reasonable (<= 1000 kg/m³)"
+            )
 
-    def test_error_handling_missing_data(self):
+    def test_error_handling_missing_data(self, caaml_without_density):
         """Test error handling for missing required data."""
         # This would require creating a malformed CAAML file or mocking
         # For now, test that parser handles empty density layers gracefully
-        parser = SnowPilotParser(self.caaml_without_density)
+        parser = SnowPilotParser(caaml_without_density)
 
         # Test with empty density layers list
         result = parser.get_density_for_layer_range(0, 100, [])
-        self.assertIsNone(result, "Should return None for empty density layers")
+        assert result is None, "Should return None for empty density layers"
 
-    def test_pit_slope_angle_from_caaml(self):
+    def test_pit_slope_angle_from_caaml(self, caaml_with_density):
         """Location validSlopeAngle is exposed when present."""
-        parser = SnowPilotParser(self.caaml_with_density)
-        self.assertAlmostEqual(parser.pit_slope_angle_deg() or 0.0, 33.0)
+        parser = SnowPilotParser(caaml_with_density)
+        assert (parser.pit_slope_angle_deg() or 0.0) == pytest.approx(
+            33.0, abs=0.5 * 10 ** (-7)
+        )
 
     def test_slope_normal_le_plumb_depth(self):
         """Slope-normal depth is less than or equal to plumb-line depth."""
         d_v = 100.0  # arbitrary plumb thickness [mm]
-        self.assertEqual(vertical_to_slope_normal_depth_scale(0.0), 1.0)
-        self.assertEqual(d_v * vertical_to_slope_normal_depth_scale(0.0), d_v)
+        assert vertical_to_slope_normal_depth_scale(0.0) == 1.0
+        assert d_v * vertical_to_slope_normal_depth_scale(0.0) == d_v
         for phi in (5.0, 15.0, 33.0, 45.0, 60.0, 75.0):
             scale = vertical_to_slope_normal_depth_scale(phi)
             d_n = d_v * scale
-            self.assertLessEqual(
-                scale,
-                1.0,
-                msg="scale should be <= 1 for tilted slopes",
-            )
-            self.assertLessEqual(
-                d_n,
-                d_v,
-                msg="slope-normal thickness should be <= plumb thickness",
-            )
+            assert scale <= 1.0, "scale should be <= 1 for tilted slopes"
+            assert d_n <= d_v, "slope-normal thickness should be <= plumb thickness"
 
-    def test_slope_normal_thickness_scaling(self):
+    def test_slope_normal_thickness_scaling(self, caaml_with_density):
         """Non-zero phi scales vertical thickness to slope-normal (cos(phi))."""
-        parser = SnowPilotParser(self.caaml_with_density)
+        parser = SnowPilotParser(caaml_with_density)
         layers_0, _ = parser.extract_layers(0.0)
         phi = 60.0
         scale = math.cos(math.radians(phi))
         layers_sloped, _ = parser.extract_layers(phi)
-        self.assertEqual(len(layers_0), len(layers_sloped))
-        for i, (a, b) in enumerate(zip(layers_0, layers_sloped)):
-            with self.subTest(layer_index=i):
-                self.assertAlmostEqual(b.h, a.h * scale, places=5)
+        assert len(layers_0) == len(layers_sloped)
+        for a, b in zip(layers_0, layers_sloped):
+            assert b.h == pytest.approx(a.h * scale, abs=0.5 * 10 ** (-5))
 
-    def test_unit_conversion(self):
+    def test_unit_conversion(self, caaml_with_density):
         """Test that different units are converted correctly."""
-        parser = SnowPilotParser(self.caaml_with_density)
+        parser = SnowPilotParser(caaml_with_density)
         layers, _ = parser.extract_layers()
 
         # All thicknesses should be in mm (converted from cm in CAAML)
         for layer in layers:
             # Thicknesses should be reasonable for mm units (> 1mm, < 2000mm typically)
-            self.assertGreater(layer.h, 0.1, "Layer thickness should be > 0.1mm")
-            self.assertLess(
-                layer.h, 5000, "Layer thickness should be < 5000mm (reasonable limit)"
+            assert layer.h > 0.1, "Layer thickness should be > 0.1mm"
+            assert layer.h < 5000, (
+                "Layer thickness should be < 5000mm (reasonable limit)"
             )
 
-    def test_density_weighted_average(self):
+    def test_density_weighted_average(self, caaml_with_density):
         """Test that overlapping density measurements are weighted correctly."""
-        parser = SnowPilotParser(self.caaml_with_density)
+        parser = SnowPilotParser(caaml_with_density)
 
         # Get density layers
         sp_density_layers = [
@@ -195,18 +179,7 @@ class TestSnowPilotParser(unittest.TestCase):
         )  # 0-25cm in mm
 
         if density is not None:  # May be None if no overlap logic issue
-            self.assertIsInstance(density, float, "Weighted density should be float")
-            self.assertGreater(density, 0, "Weighted density should be positive")
+            assert isinstance(density, float), "Weighted density should be float"
+            assert density > 0, "Weighted density should be positive"
             # Should be close to 20 since most measurements are 20 kg/m³
-            self.assertAlmostEqual(
-                density, 20, delta=5, msg="Weighted average should be close to 20 kg/m³"
-            )
-
-
-if __name__ == "__main__":
-    # Set up logging to see debug info during tests
-    import logging
-
-    logging.basicConfig(level=logging.INFO)
-
-    unittest.main()
+            assert density == pytest.approx(20, abs=5)

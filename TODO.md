@@ -10,7 +10,6 @@
 
 ## Minor
 
-- [ ] Swap to Pytest from Unittest
 - [ ] resolve fracture criterion also when lower than strength criterion
 - [ ] Florian CriterionEvaluator: clarify and fix damping behavior (find_minimum_force / evaluate_coupled_criterion)
   - Expected behavior

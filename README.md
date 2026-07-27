@@ -173,10 +173,6 @@ source .venv/bin/activate  # On Windows: .venv\Scripts\activate
 Run the test suite using uv:
 
 ```bash
-# Run all tests
-uv run python tests/run_tests.py
-
-# Or use pytest directly (if installed)
 uv run pytest
 ```
 
