@@ -336,17 +336,17 @@ class TestWeakLayer:
 
     def test_weak_layer_presets_density_to_E(self):
         """Presets derive E from Schottner at their densities."""
-        assert VERY_WEAK_LAYER.rho == 150
-        assert WEAK_LAYER.rho == 200
-        assert LESS_WEAK_LAYER.rho == 250
+        assert VERY_WEAK_LAYER.rho == 100
+        assert WEAK_LAYER.rho == 150
+        assert LESS_WEAK_LAYER.rho == 200
         assert VERY_WEAK_LAYER.E == pytest.approx(
-            _schottner_fc_dh_youngs_modulus(150), abs=0.5 * 10 ** (-10)
+            _schottner_fc_dh_youngs_modulus(100), abs=0.5 * 10 ** (-10)
         )
         assert WEAK_LAYER.E == pytest.approx(
-            _schottner_fc_dh_youngs_modulus(200), abs=0.5 * 10 ** (-10)
+            _schottner_fc_dh_youngs_modulus(150), abs=0.5 * 10 ** (-10)
         )
         assert LESS_WEAK_LAYER.E == pytest.approx(
-            _schottner_fc_dh_youngs_modulus(250), abs=0.5 * 10 ** (-10)
+            _schottner_fc_dh_youngs_modulus(200), abs=0.5 * 10 ** (-10)
         )
 
     def test_weak_layer_creation_minimal(self):
