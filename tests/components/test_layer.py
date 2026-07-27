@@ -362,21 +362,23 @@ class TestWeakLayer(unittest.TestCase):
         wl = WeakLayer(rho=200.0, E_method="bergfeld")
         expected = _bergfeld_youngs_modulus(200.0)
         self.assertAlmostEqual(wl.E, expected, places=10)
-        self.assertNotAlmostEqual(wl.E, _schottner_fc_dh_youngs_modulus(200.0), places=5)
+        self.assertNotAlmostEqual(
+            wl.E, _schottner_fc_dh_youngs_modulus(200.0), places=5
+        )
 
     def test_weak_layer_presets_density_to_E(self):
         """Presets derive E from Schottner at their densities."""
-        self.assertEqual(VERY_WEAK_LAYER.rho, 150)
-        self.assertEqual(WEAK_LAYER.rho, 200)
-        self.assertEqual(LESS_WEAK_LAYER.rho, 250)
+        self.assertEqual(VERY_WEAK_LAYER.rho, 100)
+        self.assertEqual(WEAK_LAYER.rho, 150)
+        self.assertEqual(LESS_WEAK_LAYER.rho, 200)
         self.assertAlmostEqual(
-            VERY_WEAK_LAYER.E, _schottner_fc_dh_youngs_modulus(150), places=10
+            VERY_WEAK_LAYER.E, _schottner_fc_dh_youngs_modulus(100), places=10
         )
         self.assertAlmostEqual(
-            WEAK_LAYER.E, _schottner_fc_dh_youngs_modulus(200), places=10
+            WEAK_LAYER.E, _schottner_fc_dh_youngs_modulus(150), places=10
         )
         self.assertAlmostEqual(
-            LESS_WEAK_LAYER.E, _schottner_fc_dh_youngs_modulus(250), places=10
+            LESS_WEAK_LAYER.E, _schottner_fc_dh_youngs_modulus(200), places=10
         )
 
     def test_weak_layer_creation_minimal(self):

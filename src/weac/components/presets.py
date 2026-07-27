@@ -4,7 +4,7 @@ from weac.components.weak_layer import WeakLayer
 
 _WEAK_LAYER_PARAMS: dict[str, dict] = {
     "very_weak": {
-        "rho": 150,
+        "rho": 100,
         "h": 10,
         "sigma_c": 5.16,
         "tau_c": 4.09,
@@ -12,7 +12,7 @@ _WEAK_LAYER_PARAMS: dict[str, dict] = {
         "G_IIc": 0.5,
     },
     "weak": {
-        "rho": 200,
+        "rho": 150,
         "h": 10,
         "sigma_c": 6.16,
         "tau_c": 5.09,
@@ -20,7 +20,7 @@ _WEAK_LAYER_PARAMS: dict[str, dict] = {
         "G_IIc": 1.5,
     },
     "less_weak": {
-        "rho": 250,
+        "rho": 200,
         "h": 10,
         "sigma_c": 7.16,
         "tau_c": 6.09,
