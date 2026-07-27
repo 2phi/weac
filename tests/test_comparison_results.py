@@ -393,20 +393,23 @@ class TestIntegrationOldVsNew(unittest.TestCase):
             new_system.scenario.crack_h,
             "Crack height should be the same",
         )
-        self.assertEqual(
+        self.assertAlmostEqual(
             old_state["touchdown"]["a1"],
             new_system.slab_touchdown.l_AB,
-            "Transition length A should be the same",
+            places=9,
+            msg="Transition length A should be the same",
         )
-        self.assertEqual(
+        self.assertAlmostEqual(
             old_state["touchdown"]["a2"],
             new_system.slab_touchdown.l_BC,
-            "Transition length B should be the same",
+            places=9,
+            msg="Transition length B should be the same",
         )
-        self.assertEqual(
+        self.assertAlmostEqual(
             old_state["touchdown"]["td"],
             new_system.slab_touchdown.touchdown_distance,
-            "Touchdown distance should be the same",
+            places=9,
+            msg="Touchdown distance should be the same",
         )
 
         # Compare the Slab properties

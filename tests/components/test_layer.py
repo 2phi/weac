@@ -11,14 +11,19 @@ from pydantic import ValidationError
 
 from weac.components.layer import (
     Layer,
-    WeakLayer,
     _adam_tensile_strength,
     _bergfeld_youngs_modulus,
     _gerling_youngs_modulus,
     _scapozza_youngs_modulus,
     _sigrist_tensile_strength,
 )
-from weac.constants import NU
+from weac.components.presets import (
+    LESS_WEAK_LAYER,
+    VERY_WEAK_LAYER,
+    WEAK_LAYER,
+)
+from weac.components.weak_layer import WeakLayer, _schottner_fc_dh_youngs_modulus
+from weac.constants import CS0, CS1, NU, RHO_ICE
 
 
 class TestLayerPropertyCalculations(unittest.TestCase):
@@ -45,6 +50,19 @@ class TestLayerPropertyCalculations(unittest.TestCase):
         """Test Gerling Young's modulus calculation."""
         E = _gerling_youngs_modulus(rho=250.0)
         self.assertGreater(E, 0, "Young's modulus should be positive")
+
+    def test_schottner_fc_dh_calculation(self):
+        """Test Schöttner FC&DH Young's modulus at paper benchmark densities."""
+        E_150 = _schottner_fc_dh_youngs_modulus(rho=150.0)
+        E_250 = _schottner_fc_dh_youngs_modulus(rho=250.0)
+        expected_150 = CS0 * (150.0 / RHO_ICE) ** CS1
+        expected_250 = CS0 * (250.0 / RHO_ICE) ** CS1
+        self.assertAlmostEqual(E_150, expected_150, places=10)
+        self.assertAlmostEqual(E_250, expected_250, places=10)
+        # Paper window: ~1.5 MPa at 150 kg/m³, ~24 MPa at 250 kg/m³
+        self.assertAlmostEqual(E_150, 1.5, delta=0.1)
+        self.assertAlmostEqual(E_250, 24.0, delta=1.0)
+        self.assertLess(E_150, E_250)
 
 
 class TestTensileStrengthCalculations(unittest.TestCase):
@@ -324,6 +342,42 @@ class TestLayer(unittest.TestCase):
 
 class TestWeakLayer(unittest.TestCase):
     """Test the WeakLayer class functionality."""
+
+    def test_weak_layer_defaults_schottner(self):
+        """Bare WeakLayer uses Schöttner FC&DH at rho=150."""
+        wl = WeakLayer()
+        self.assertEqual(wl.rho, 150.0)
+        self.assertEqual(wl.E_method, "schottner_fc_dh")
+        expected = CS0 * (150.0 / RHO_ICE) ** CS1
+        self.assertAlmostEqual(wl.E, expected, places=10)
+        self.assertAlmostEqual(wl.E, 1.55, delta=0.02)
+
+    def test_weak_layer_explicit_E_skips_density_law(self):
+        """Explicit E > 0 overrides the density law (PlaneStrain keeps E)."""
+        wl = WeakLayer(rho=200.0, E=5.0)
+        self.assertAlmostEqual(wl.E, 5.0, places=10)
+
+    def test_weak_layer_bergfeld_selection(self):
+        """Explicit E_method=bergfeld uses Bergfeld, not Schottner."""
+        wl = WeakLayer(rho=200.0, E_method="bergfeld")
+        expected = _bergfeld_youngs_modulus(200.0)
+        self.assertAlmostEqual(wl.E, expected, places=10)
+        self.assertNotAlmostEqual(wl.E, _schottner_fc_dh_youngs_modulus(200.0), places=5)
+
+    def test_weak_layer_presets_density_to_E(self):
+        """Presets derive E from Schottner at their densities."""
+        self.assertEqual(VERY_WEAK_LAYER.rho, 150)
+        self.assertEqual(WEAK_LAYER.rho, 200)
+        self.assertEqual(LESS_WEAK_LAYER.rho, 250)
+        self.assertAlmostEqual(
+            VERY_WEAK_LAYER.E, _schottner_fc_dh_youngs_modulus(150), places=10
+        )
+        self.assertAlmostEqual(
+            WEAK_LAYER.E, _schottner_fc_dh_youngs_modulus(200), places=10
+        )
+        self.assertAlmostEqual(
+            LESS_WEAK_LAYER.E, _schottner_fc_dh_youngs_modulus(250), places=10
+        )
 
     def test_weak_layer_creation_minimal(self):
         """Test creating a weak layer with minimal required fields."""

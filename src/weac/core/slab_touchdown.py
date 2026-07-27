@@ -8,7 +8,7 @@ from typing import Literal
 
 from scipy.optimize import brentq
 
-from weac.components.layer import WeakLayer
+from weac.components.weak_layer import WeakLayer
 from weac.components.scenario_config import ScenarioConfig, TouchdownMode
 from weac.components.segment import Segment
 from weac.constants import STIFFNESS_COLLAPSE_FACTOR

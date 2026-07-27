@@ -24,7 +24,7 @@ from weac.analysis.criteria_evaluator import (
 )
 
 # Module imports
-from weac.components.layer import WeakLayer
+from weac.components.weak_layer import WeakLayer
 from weac.core.scenario import Scenario
 from weac.core.slab import Slab
 from weac.core.system_model import SystemModel
