@@ -39,13 +39,13 @@ class TestCriteriaEvaluator(unittest.TestCase):
         self.evaluator = CriteriaEvaluator(self.criteria_config)
 
         self.layers = [
-            Layer(rho=170, h=100),
-            Layer(rho=190, h=40),
-            Layer(rho=230, h=130),
-            Layer(rho=250, h=20),
-            Layer(rho=210, h=70),
-            Layer(rho=380, h=20),
-            Layer(rho=280, h=100),
+            Layer(rho=170, h=100, tensile_strength_method="hybrid"),
+            Layer(rho=190, h=40, tensile_strength_method="hybrid"),
+            Layer(rho=230, h=130, tensile_strength_method="hybrid"),
+            Layer(rho=250, h=20, tensile_strength_method="hybrid"),
+            Layer(rho=210, h=70, tensile_strength_method="hybrid"),
+            Layer(rho=380, h=20, tensile_strength_method="hybrid"),
+            Layer(rho=280, h=100, tensile_strength_method="hybrid"),
         ]
         self.weak_layer = WeakLayer(rho=180, h=10, G_Ic=0.5, G_IIc=0.8, kn=100, kt=100)
         self.phi = 30.0

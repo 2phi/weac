@@ -14,6 +14,7 @@ from weac.components.layer import (
     _adam_tensile_strength,
     _bergfeld_youngs_modulus,
     _gerling_youngs_modulus,
+    _jamieson_johnson_tensile_strength,
     _scapozza_youngs_modulus,
     _sigrist_tensile_strength,
 )
@@ -108,6 +109,37 @@ class TestTensileStrengthCalculations(unittest.TestCase):
             ts_kPa, ts_MPa * 1000, places=5, msg="Unit conversion should be correct"
         )
 
+    def test_jamieson_johnson_calculation_kPa(self):
+        """Test Jamieson–Johnson tensile strength calculation in kPa."""
+        ts = _jamieson_johnson_tensile_strength(rho=200.0, unit="kPa")
+        self.assertGreater(ts, 0, "Tensile strength should be positive")
+        self.assertTrue(np.isscalar(ts), "Result should be a scalar")
+
+        ts_light = _jamieson_johnson_tensile_strength(rho=100.0, unit="kPa")
+        ts_heavy = _jamieson_johnson_tensile_strength(rho=400.0, unit="kPa")
+        self.assertLess(ts_light, ts_heavy, "Heavier snow should have higher strength")
+
+    def test_jamieson_johnson_calculation_MPa(self):
+        """Test Jamieson–Johnson tensile strength calculation in MPa."""
+        ts_kPa = _jamieson_johnson_tensile_strength(rho=200.0, unit="kPa")
+        ts_MPa = _jamieson_johnson_tensile_strength(rho=200.0, unit="MPa")
+        self.assertAlmostEqual(
+            ts_kPa, ts_MPa * 1000, places=5, msg="Unit conversion should be correct"
+        )
+
+    def test_jamieson_johnson_hand_calc_rho_200(self):
+        """Lock Pa→kPa conversion at ρ=200 kg/m³."""
+        rho = 200.0
+        expected_pa = 7.97e4 * (rho / RHO_ICE) ** 2.39
+        expected_kPa = expected_pa * 1e-3
+        ts_kPa = _jamieson_johnson_tensile_strength(rho=rho, unit="kPa")
+        self.assertAlmostEqual(ts_kPa, expected_kPa, places=10)
+        # Same ballpark as Sigrist (not ~1000× from treating Pa as kPa)
+        ts_sigrist = _sigrist_tensile_strength(rho=rho, unit="kPa")
+        ratio = ts_kPa / ts_sigrist
+        self.assertGreater(ratio, 0.1)
+        self.assertLess(ratio, 10.0)
+
     def test_sigrist_vs_adam_comparison(self):
         """Compare Sigrist and Adam formulations at different densities."""
         # At low densities, compare the formulations
@@ -134,8 +166,8 @@ class TestLayerTensileStrength(unittest.TestCase):
         layer = Layer(rho=200.0, h=100.0)
         self.assertEqual(
             layer.tensile_strength_method,
-            "hybrid",
-            "Default method should be 'hybrid'",
+            "jamieson_johnson",
+            "Default method should be 'jamieson_johnson'",
         )
         self.assertGreater(
             layer.tensile_strength, 0, "Tensile strength should be calculated"
@@ -161,6 +193,17 @@ class TestLayerTensileStrength(unittest.TestCase):
             expected_ts,
             places=5,
             msg="Tensile strength should match Adam calculation",
+        )
+
+    def test_layer_jamieson_johnson_method(self):
+        """Test Layer with explicit Jamieson–Johnson method."""
+        layer = Layer(rho=200.0, h=100.0, tensile_strength_method="jamieson_johnson")
+        expected_ts = _jamieson_johnson_tensile_strength(rho=200.0, unit="kPa")
+        self.assertAlmostEqual(
+            layer.tensile_strength,
+            expected_ts,
+            places=5,
+            msg="Tensile strength should match Jamieson–Johnson calculation",
         )
 
     def test_layer_hybrid_method_low_density(self):
@@ -253,7 +296,7 @@ class TestTensileStrengthPhysicalConsistency(unittest.TestCase):
     def test_all_methods_give_positive_strength(self):
         """Test that all methods produce positive tensile strength."""
         rho_values = [100.0, 200.0, 300.0, 400.0]
-        methods = ["sigrist", "adam", "hybrid"]
+        methods = ["sigrist", "adam", "hybrid", "jamieson_johnson"]
 
         for rho in rho_values:
             for method in methods:
@@ -267,7 +310,7 @@ class TestTensileStrengthPhysicalConsistency(unittest.TestCase):
     def test_tensile_strength_density_monotonicity(self):
         """Test that tensile strength increases monotonically with density."""
         densities = [100.0, 150.0, 200.0, 250.0, 300.0, 350.0, 400.0]
-        methods = ["sigrist", "adam", "hybrid"]
+        methods = ["sigrist", "adam", "hybrid", "jamieson_johnson"]
 
         for method in methods:
             strengths = [

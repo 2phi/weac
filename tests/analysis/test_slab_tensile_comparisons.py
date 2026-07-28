@@ -73,55 +73,126 @@ def _setup_from_cm(*layers: tuple[float, float]) -> SetupDefinition:
 
 
 COMPARISON_CASES: tuple[ComparisonCase, ...] = (
+    # Left slab thinner than right slab; same density
     ComparisonCase(
         name="case_1",
-        setup_a=_setup_from_cm((20, 175), (30, 275)),
-        setup_b=_setup_from_cm((30, 275)),
+        setup_a=_setup_from_cm((20, 75)),
+        setup_b=_setup_from_cm((40, 75)),
     ),
     ComparisonCase(
         name="case_2",
-        setup_a=_setup_from_cm((30, 75), (20, 225)),
-        setup_b=_setup_from_cm((50, 75), (20, 225)),
+        setup_a=_setup_from_cm((20, 125)),
+        setup_b=_setup_from_cm((40, 125)),
     ),
     ComparisonCase(
         name="case_3",
-        setup_a=_setup_from_cm((50, 75), (20, 125)),
-        setup_b=_setup_from_cm((30, 75), (20, 125)),
+        setup_a=_setup_from_cm((20, 175)),
+        setup_b=_setup_from_cm((40, 175)),
     ),
     ComparisonCase(
         name="case_4",
+        setup_a=_setup_from_cm((20, 275)),
+        setup_b=_setup_from_cm((40, 275)),
+    ),
+    # Same height of slabs; A slab has lower density than B slab
+    ComparisonCase(
+        name="case_5",
         setup_a=_setup_from_cm((50, 75)),
         setup_b=_setup_from_cm((50, 125)),
     ),
     ComparisonCase(
-        name="case_5",
-        setup_a=_setup_from_cm((50, 175)),
-        setup_b=_setup_from_cm((50, 125)),
-    ),
-    ComparisonCase(
         name="case_6",
-        setup_a=_setup_from_cm((20, 275)),
-        setup_b=_setup_from_cm((40, 275)),
+        setup_a=_setup_from_cm((50, 125)),
+        setup_b=_setup_from_cm((50, 175)),
     ),
     ComparisonCase(
         name="case_7",
+        setup_a=_setup_from_cm((50, 175)),
+        setup_b=_setup_from_cm((50, 275)),
+    ),
+    # A slab is B slab plus a thin slab of lower density on top
+    ComparisonCase(
+        name="case_8",
+        setup_a=_setup_from_cm((20, 75), (30, 175)),
+        setup_b=_setup_from_cm((50, 175)),
+    ),
+    ComparisonCase(
+        name="case_9",
+        setup_a=_setup_from_cm((20, 75), (30, 275)),
+        setup_b=_setup_from_cm((50, 275)),
+    ),
+    ComparisonCase(
+        name="case_10",
+        setup_a=_setup_from_cm((20, 125), (30, 275)),
+        setup_b=_setup_from_cm((50, 275)),
+    ),
+    ComparisonCase(
+        name="case_11",
+        setup_a=_setup_from_cm((20, 175), (30, 275)),
+        setup_b=_setup_from_cm((50, 275)),
+    ),
+    # A slab is B slab plus a thin slab of higher density on top
+    ComparisonCase(
+        name="case_12",
+        setup_a=_setup_from_cm((20, 175), (30, 75)),
+        setup_b=_setup_from_cm((50, 75)),
+    ),
+    ComparisonCase(
+        name="case_13",
+        setup_a=_setup_from_cm((20, 275), (30, 75)),
+        setup_b=_setup_from_cm((50, 75)),
+    ),
+    ComparisonCase(
+        name="case_14",
+        setup_a=_setup_from_cm((20, 175), (30, 125)),
+        setup_b=_setup_from_cm((50, 125)),
+    ),
+    ComparisonCase(
+        name="case_15",
+        setup_a=_setup_from_cm((20, 275), (30, 125)),
+        setup_b=_setup_from_cm((50, 125)),
+    ),
+    # Both slabs two layers; thin and thicker, but A slab's thin slab is thinner
+    ComparisonCase(
+        name="case_16",
+        setup_a=_setup_from_cm((30, 75), (20, 125)),
+        setup_b=_setup_from_cm((50, 75), (20, 125)),
+    ),
+    ComparisonCase(
+        name="case_17",
+        setup_a=_setup_from_cm((30, 75), (20, 225)),
+        setup_b=_setup_from_cm((50, 75), (20, 225)),
+    ),
+    ComparisonCase(
+        name="case_18",
+        setup_a=_setup_from_cm((30, 75), (20, 275)),
+        setup_b=_setup_from_cm((50, 75), (20, 275)),
+    ),
+    ComparisonCase(
+        name="case_19",
+        setup_a=_setup_from_cm((30, 125), (20, 225)),
+        setup_b=_setup_from_cm((50, 125), (20, 225)),
+    ),
+    ComparisonCase(
+        name="case_20",
+        setup_a=_setup_from_cm((30, 125), (20, 275)),
+        setup_b=_setup_from_cm((50, 125), (20, 275)),
+    ),
+    # A has higher density slab at bottom and lower density slab at top, B vice versa
+    ComparisonCase(
+        name="case_21",
         setup_a=_setup_from_cm((40, 125), (5, 350)),
         setup_b=_setup_from_cm((5, 350), (40, 125)),
     ),
     ComparisonCase(
-        name="case_8",
-        setup_a=_setup_from_cm((40, 175), (15, 275)),
-        setup_b=_setup_from_cm((15, 275), (40, 175)),
-    ),
-    ComparisonCase(
-        name="case_9",
+        name="case_22",
         setup_a=_setup_from_cm((40, 75), (15, 275)),
         setup_b=_setup_from_cm((15, 275), (40, 75)),
     ),
     ComparisonCase(
-        name="case_10",
-        setup_a=_setup_from_cm((30, 75), (20, 275)),
-        setup_b=_setup_from_cm((50, 75), (20, 275)),
+        name="case_23",
+        setup_a=_setup_from_cm((40, 175), (15, 275)),
+        setup_b=_setup_from_cm((15, 275), (40, 175)),
     ),
 )
 
