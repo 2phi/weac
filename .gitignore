@@ -59,19 +59,6 @@ old*
 
 .weac-reference/
 
-# Folder for development and local testing (ignore contents, not the dirs,
-# so we can whitelist specific studies below)
-dev/*
-# Keep the alt steady-state study + results findable on this branch
-!dev/alt_steady_state/
-!dev/alt_steady_state/**
-# Global `plots/` rule still matches; re-allow approach plot artifacts
-!dev/alt_steady_state/**/plots/
-!dev/alt_steady_state/**/plots/**
-# Whitelist above re-includes caches; keep them out
-dev/alt_steady_state/**/__pycache__/
-
-todo/*
-!todo/alternative_steady_state_approaches.md
-!todo/jj-tensile-strength-impact.md
-!todo/slab-tensile-comparison-*.md
+# Folder for development and local testing
+dev/
+todo/
