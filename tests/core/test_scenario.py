@@ -47,9 +47,7 @@ class TestScenario:
             scenario_parts.slab,
         )
         assert s.system_type == scenario_parts.cfg.system_type
-        assert s.phi == pytest.approx(
-            scenario_parts.cfg.phi, abs=0.5 * 10 ** (-7)
-        )
+        assert s.phi == pytest.approx(scenario_parts.cfg.phi, abs=0.5 * 10 ** (-7))
         assert s.surface_load == pytest.approx(
             scenario_parts.cfg.surface_load, abs=0.5 * 10 ** (-7)
         )

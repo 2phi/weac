@@ -215,7 +215,6 @@ def __getattr__(name: str):
 
 __all__ = [
     "Layer",
-    "WeakLayer",
     "_adam_tensile_strength",
     "_bergfeld_youngs_modulus",
     "_gerling_youngs_modulus",

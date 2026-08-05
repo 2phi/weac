@@ -428,9 +428,7 @@ class TestCriteriaEvaluator:
         maximal_stress = result.maximal_stress_result
 
         # Check that all arrays have correct shape
-        assert (
-            maximal_stress.principal_stress_kPa.shape == maximal_stress.Sxx_kPa.shape
-        )
+        assert maximal_stress.principal_stress_kPa.shape == maximal_stress.Sxx_kPa.shape
         assert (
             maximal_stress.principal_stress_norm.shape == maximal_stress.Sxx_norm.shape
         )
@@ -740,9 +738,7 @@ class TestCriteriaEvaluator:
             == maximal_stress.principal_stress_norm.shape
         )
         assert maximal_stress.Sxx_kPa.shape == maximal_stress.Sxx_norm.shape
-        assert (
-            maximal_stress.principal_stress_kPa.shape == maximal_stress.Sxx_kPa.shape
-        )
+        assert maximal_stress.principal_stress_kPa.shape == maximal_stress.Sxx_kPa.shape
 
         # Arrays should be 2D (spatial dimensions)
         assert len(maximal_stress.principal_stress_kPa.shape) == 2

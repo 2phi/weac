@@ -83,9 +83,9 @@ class TestTensileStrengthCalculations:
         """Test Sigrist tensile strength calculation in MPa."""
         ts_kPa = _sigrist_tensile_strength(rho=200.0, unit="kPa")
         ts_MPa = _sigrist_tensile_strength(rho=200.0, unit="MPa")
-        assert ts_kPa == pytest.approx(
-            ts_MPa * 1000, abs=0.5 * 10 ** (-5)
-        ), "Unit conversion should be correct"
+        assert ts_kPa == pytest.approx(ts_MPa * 1000, abs=0.5 * 10 ** (-5)), (
+            "Unit conversion should be correct"
+        )
 
     def test_adam_calculation_kPa(self):
         """Test Adam tensile strength calculation in kPa."""
@@ -103,9 +103,9 @@ class TestTensileStrengthCalculations:
         """Test Adam tensile strength calculation in MPa."""
         ts_kPa = _adam_tensile_strength(rho=300.0, unit="kPa")
         ts_MPa = _adam_tensile_strength(rho=300.0, unit="MPa")
-        assert ts_kPa == pytest.approx(
-            ts_MPa * 1000, abs=0.5 * 10 ** (-5)
-        ), "Unit conversion should be correct"
+        assert ts_kPa == pytest.approx(ts_MPa * 1000, abs=0.5 * 10 ** (-5)), (
+            "Unit conversion should be correct"
+        )
 
     def test_sigrist_vs_adam_comparison(self):
         """Compare Sigrist and Adam formulations at different densities."""
@@ -131,9 +131,9 @@ class TestLayerTensileStrength:
     def test_layer_default_tensile_strength_method(self):
         """Test that default method is 'hybrid'."""
         layer = Layer(rho=200.0, h=100.0)
-        assert (
-            layer.tensile_strength_method == "hybrid"
-        ), "Default method should be 'hybrid'"
+        assert layer.tensile_strength_method == "hybrid", (
+            "Default method should be 'hybrid'"
+        )
         assert layer.tensile_strength > 0, "Tensile strength should be calculated"
 
     def test_layer_sigrist_method(self):
@@ -188,9 +188,9 @@ class TestLayerTensileStrength:
             tensile_strength=custom_ts,
             tensile_strength_method="sigrist",
         )
-        assert (
-            layer.tensile_strength == custom_ts
-        ), "Custom tensile strength should override calculation"
+        assert layer.tensile_strength == custom_ts, (
+            "Custom tensile strength should override calculation"
+        )
 
 
 class TestTensileStrengthPhysicalConsistency:
@@ -201,9 +201,9 @@ class TestTensileStrengthPhysicalConsistency:
         layer_light = Layer(rho=150.0, h=100.0)
         layer_heavy = Layer(rho=350.0, h=100.0)
 
-        assert (
-            layer_light.tensile_strength < layer_heavy.tensile_strength
-        ), "Heavier snow should have higher tensile strength"
+        assert layer_light.tensile_strength < layer_heavy.tensile_strength, (
+            "Heavier snow should have higher tensile strength"
+        )
 
     def test_hybrid_continuity_around_threshold(self):
         """Test continuity of hybrid method around 250 kg/m³ threshold."""
@@ -230,9 +230,9 @@ class TestTensileStrengthPhysicalConsistency:
         for rho in rho_values:
             for method in methods:
                 layer = Layer(rho=rho, h=100.0, tensile_strength_method=method)
-                assert (
-                    layer.tensile_strength > 0
-                ), f"Method {method} with rho={rho} should give positive strength"
+                assert layer.tensile_strength > 0, (
+                    f"Method {method} with rho={rho} should give positive strength"
+                )
 
     def test_tensile_strength_density_monotonicity(self):
         """Test that tensile strength increases monotonically with density."""
@@ -246,9 +246,9 @@ class TestTensileStrengthPhysicalConsistency:
             ]
             # Check that each strength is greater than the previous
             for i in range(1, len(strengths)):
-                assert (
-                    strengths[i] > strengths[i - 1]
-                ), f"Strength should increase with density for {method} method"
+                assert strengths[i] > strengths[i - 1], (
+                    f"Strength should increase with density for {method} method"
+                )
 
 
 class TestLayer:
@@ -414,24 +414,24 @@ class TestLayerPhysicalConsistency:
         layer_light = Layer(rho=150.0, h=100.0)
         layer_heavy = Layer(rho=350.0, h=100.0)
 
-        assert (
-            layer_light.E < layer_heavy.E
-        ), "Heavier snow should have higher Young's modulus"
-        assert (
-            layer_light.G < layer_heavy.G
-        ), "Heavier snow should have higher shear modulus"
+        assert layer_light.E < layer_heavy.E, (
+            "Heavier snow should have higher Young's modulus"
+        )
+        assert layer_light.G < layer_heavy.G, (
+            "Heavier snow should have higher shear modulus"
+        )
 
     def test_weak_layer_thickness_stiffness_relationship(self):
         """Test that thicker weak layers have lower stiffness."""
         wl_thin = WeakLayer(rho=100.0, h=10.0)
         wl_thick = WeakLayer(rho=100.0, h=30.0)
 
-        assert (
-            wl_thin.kn > wl_thick.kn
-        ), "Thinner weak layer should have higher normal stiffness"
-        assert (
-            wl_thin.kt > wl_thick.kt
-        ), "Thinner weak layer should have higher shear stiffness"
+        assert wl_thin.kn > wl_thick.kn, (
+            "Thinner weak layer should have higher normal stiffness"
+        )
+        assert wl_thin.kt > wl_thick.kt, (
+            "Thinner weak layer should have higher shear stiffness"
+        )
 
     def test_poisson_ratio_bounds(self):
         """Test Poisson's ratio physical bounds."""

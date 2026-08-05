@@ -323,9 +323,9 @@ class TestModelInputPhysicalConsistency:
 
         # Check that weak layer is less dense than slab layers
         for layer in layers:
-            assert (
-                weak_layer.rho < layer.rho
-            ), "Weak layer should typically be less dense than slab layers"
+            assert weak_layer.rho < layer.rho, (
+                "Weak layer should typically be less dense than slab layers"
+            )
 
     def test_segment_length_consistency(self):
         """Test that segment lengths are reasonable."""

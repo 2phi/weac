@@ -61,9 +61,7 @@ def displacement_fq():
 def stress_fq():
     """FieldQuantities with known elastic properties for stress tests."""
     layers = [Layer(rho=200, h=100, E=50, nu=0.25)]  # Known elastic properties
-    weak_layer = WeakLayer(
-        rho=50, h=20, E=0.5, kn=10.0, kt=5.0
-    )  # Known stiffnesses
+    weak_layer = WeakLayer(rho=50, h=20, E=0.5, kn=10.0, kt=5.0)  # Known stiffnesses
     slab = Slab(layers)
     eigensystem = Eigensystem(weak_layer, slab)
     fq = FieldQuantities(eigensystem)

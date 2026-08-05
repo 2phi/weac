@@ -198,7 +198,9 @@ class TestEigensystemSolutionMethods:
 
         # At x=0, certain columns should have specific values
         # For free segments, the polynomial form gives specific patterns
-        assert np.isfinite(zh_bedded).all(), "Bedded solution should be finite at origin"
+        assert np.isfinite(zh_bedded).all(), (
+            "Bedded solution should be finite at origin"
+        )
         assert np.isfinite(zh_free).all(), "Free solution should be finite at origin"
 
     def test_particular_solution_bedded(self, solution_eigensystem):
