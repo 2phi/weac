@@ -20,6 +20,11 @@ from weac.core.system_model import SystemModel
 
 logger = logging.getLogger(__name__)
 
+# Default boundary-refined rasterization (stress / tip sampling).
+RASTER_NUM = 800
+BOUNDARY_WINDOW_MM = 15.0
+BOUNDARY_DX_MM = 0.5
+
 
 def track_analyzer_call(func):
     """Decorator to track call count and execution time of Analyzer methods."""
@@ -45,6 +50,92 @@ def track_analyzer_call(func):
         return result
 
     return wrapper
+
+
+def local_segment_grid(
+    length: float,
+    n_budget: int,
+    *,
+    include_right_endpoint: bool,
+    boundary_window: float | None = None,
+    boundary_dx: float | None = None,
+) -> np.ndarray:
+    """
+    Build monotonic local sample coordinates on a segment ``[0, length]``.
+
+    Uniform mode (``boundary_window is None``)
+        ``np.linspace`` with ``n_budget`` points (same as historical rasterize).
+
+    Boundary-refined mode
+        Piecewise fine windows of half-width ``boundary_window`` and spacing
+        ``boundary_dx`` at both segment ends (domain ends and joints), with any
+        remaining ``n_budget`` spent on a coarse interior. Fine resolution is
+        preserved even if that makes the point count exceed ``n_budget``.
+
+    The right endpoint ``length`` is included only when
+    ``include_right_endpoint`` is True (last segment). Other segments omit it so
+    the joint is owned by the next segment's local ``x = 0``.
+    """
+    if length < 0:
+        raise ValueError(f"segment length must be >= 0, got {length}")
+    if length == 0:
+        return np.array([0.0]) if include_right_endpoint else np.array([])
+
+    if boundary_window is None and boundary_dx is None:
+        n = max(int(n_budget), 1)
+        return np.linspace(0.0, length, num=n, endpoint=include_right_endpoint)
+
+    if boundary_window is None or boundary_dx is None:
+        raise ValueError(
+            "boundary_window and boundary_dx must be set together "
+            "(or both omitted for uniform spacing)"
+        )
+    if boundary_window <= 0 or boundary_dx <= 0:
+        raise ValueError(
+            f"boundary_window and boundary_dx must be > 0, "
+            f"got window={boundary_window}, dx={boundary_dx}"
+        )
+
+    window = min(float(boundary_window), 0.5 * float(length))
+    dx = float(boundary_dx)
+    n_fine = max(1, int(np.ceil(window / dx)))
+
+    # Left fine window [0, window], inclusive at both ends for stitching to interior.
+    x_left = np.linspace(0.0, window, num=n_fine + 1, endpoint=True)
+
+    # Right fine window [length - window, length].
+    if include_right_endpoint:
+        x_right = np.linspace(
+            length - window, length, num=n_fine + 1, endpoint=True
+        )
+    else:
+        # Approach the joint from the left; joint itself is next segment's x=0.
+        x_right = np.linspace(
+            length - window, length, num=n_fine + 1, endpoint=False
+        )
+
+    n_budget = max(int(n_budget), 1)
+    n_interior = max(0, n_budget - len(x_left) - len(x_right))
+    interior_lo = window
+    interior_hi = length - window
+    if n_interior > 0 and interior_hi > interior_lo + 1e-15:
+        # Endpoints already provided by the fine windows.
+        x_interior = np.linspace(
+            interior_lo, interior_hi, num=n_interior + 2, endpoint=True
+        )[1:-1]
+    else:
+        x_interior = np.array([], dtype=float)
+
+    xi = np.unique(np.concatenate([x_left, x_interior, x_right]))
+    if not include_right_endpoint:
+        xi = xi[xi < length - 1e-15]
+    if xi.size == 0:
+        xi = np.array([0.0])
+    elif xi[0] > 0.0:
+        xi = np.insert(xi, 0, 0.0)
+    if include_right_endpoint and xi[-1] < length:
+        xi = np.append(xi, length)
+    return xi
 
 
 class Analyzer:
@@ -96,16 +187,28 @@ class Analyzer:
         self,
         mode: Literal["cracked", "uncracked"] = "cracked",
         num: int = 4000,
+        *,
+        boundary_window: float | None = None,
+        boundary_dx: float | None = None,
     ):
         """
         Compute rasterized solution vector.
 
-        Parameters:
-        ---------
+        Parameters
+        ----------
         mode : Literal["cracked", "uncracked"]
             Mode of the solution.
         num : int
-            Number of grid points.
+            Soft budget for the number of grid points (length-proportional per
+            segment). With boundary refinement, fine windows are always filled
+            even if the realized count exceeds ``num``.
+        boundary_window : float, optional
+            Half-width [mm] of piecewise-fine sampling windows at every segment
+            end (domain ends and inter-segment joints). ``None`` keeps uniform
+            ``linspace`` spacing (historical default).
+        boundary_dx : float, optional
+            Target spacing [mm] inside fine windows. Required together with
+            ``boundary_window``.
 
         Returns
         -------
@@ -134,38 +237,42 @@ class Analyzer:
         li = abs(li)
         isnonzero = li > 0
         C, ki, li, gi = C[:, isnonzero], ki[isnonzero], li[isnonzero], gi[isnonzero]
-        # Compute number of plot points per segment (+1 for last segment)
+        # Soft per-segment budgets (+1 for last segment, historical)
         ni = np.ceil(li / li.sum() * num).astype("int")
         ni[-1] += 1
 
-        # Provide cumulated length and plot point lists
+        # Build local grids first (boundary mode may exceed ni)
+        local_grids = [
+            local_segment_grid(
+                float(length),
+                int(ni[i]),
+                include_right_endpoint=(i == li.size - 1),
+                boundary_window=boundary_window,
+                boundary_dx=boundary_dx,
+            )
+            for i, length in enumerate(li)
+        ]
+        counts = np.array([g.size for g in local_grids], dtype=int)
         lic = np.insert(np.cumsum(li), 0, 0)
-        nic = np.insert(np.cumsum(ni), 0, 0)
+        nic = np.insert(np.cumsum(counts), 0, 0)
+        n_total = int(counts.sum())
 
-        # Initialize arrays
-        issupported = np.full(ni.sum(), True)
-        xs = np.full(ni.sum(), np.nan)
+        issupported = np.full(n_total, True)
+        xs = np.full(n_total, np.nan)
         if self.sm.is_generalized:
-            zs = np.full([24, xs.size], np.nan)
+            zs = np.full([24, n_total], np.nan)
         else:
-            zs = np.full([6, xs.size], np.nan)
-        # Loop through segments
+            zs = np.full([6, n_total], np.nan)
+
         for i, length in enumerate(li):
-            # Get local x-coordinates of segment i
-            endpoint = i == li.size - 1
-            xi = np.linspace(0, length, num=ni[i], endpoint=endpoint)
-            # Compute start and end coordinates of segment i
+            xi = local_grids[i]
             x0 = lic[i]
-            # Assemble global coordinate vector
             xs[nic[i] : nic[i + 1]] = x0 + xi
-            # Mask coordinates not on foundation (including endpoints)
             if not ki[i]:
                 issupported[nic[i] : nic[i + 1]] = False
-            # Compute segment solution
             zi = self.sm.z(
                 xi, C[:, [i]], length, phi, theta, ki[i], is_loaded=gi[i], qs=qs
             )
-            # Assemble global solution matrix
             zs[:, nic[i] : nic[i + 1]] = zi
 
         # Make sure cracktips are included
@@ -173,8 +280,7 @@ class Analyzer:
         for i, truefalse in enumerate(transmissionbool, start=1):
             issupported[nic[i]] = truefalse
 
-        # Assemble vector of coordinates on foundation
-        xs_supported = np.full(ni.sum(), np.nan)
+        xs_supported = np.full(n_total, np.nan)
         xs_supported[issupported] = xs[issupported]
 
         return xs, zs, xs_supported
@@ -770,7 +876,9 @@ class Analyzer:
         """
         sig_uncracked = self.sm.fq.sig(z_uncracked(x))
         eps_cracked = self.sm.fq.eps(z_cracked(x))
-        return sig_uncracked * eps_cracked * self.sm.weak_layer.h
+        value = np.asarray(sig_uncracked * eps_cracked * self.sm.weak_layer.h)
+        # scipy.integrate.quad requires a Python scalar
+        return value.item() if value.size == 1 else value
 
     def _integrand_GII(
         self, x: float | np.ndarray, z_uncracked, z_cracked
@@ -780,7 +888,9 @@ class Analyzer:
         """
         tau_uncracked = self.sm.fq.tau(z_uncracked(x))
         gamma_cracked = self.sm.fq.gamma(z_cracked(x))
-        return tau_uncracked * gamma_cracked * self.sm.weak_layer.h
+        value = np.asarray(tau_uncracked * gamma_cracked * self.sm.weak_layer.h)
+        # scipy.integrate.quad requires a Python scalar
+        return value.item() if value.size == 1 else value
 
     @track_analyzer_call
     def total_potential(self):

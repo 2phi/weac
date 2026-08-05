@@ -1,8 +1,16 @@
 """
-Data-driven slab tensile criterion comparison tests.
+Data-driven slab A/B comparison tests (hybrid steady state).
 
-Populate ``COMPARISON_CASES``defines A/B setup pairs to assert that
-``A.slab_tensile_criterion > B.slab_tensile_criterion`` for each case.
+Populate ``COMPARISON_CASES`` with A/B setup pairs. Both gates use production
+``CriteriaEvaluator.evaluate_SteadyState`` (hybrid).
+
+Tensile ease (shorter ``critical_cut_length`` = easier) follows Steph's tensile
+map: cases 1–11 & 21–23 → A easier; 12–15 → B easier. Cases 16–20 are
+smoke-only for tensile (structured positive fields; no A/B ordering).
+
+ERR yardstick (higher ``err.energy_release_rate`` wins) follows Steph §2 with
+**no** smoke exclusions: cases 1–11 & 16–20 → B higher ERR; 12–15 & 21–23 → A
+higher ERR.
 """
 
 from dataclasses import dataclass, field
@@ -41,7 +49,7 @@ class SetupDefinition:
 
 @dataclass(frozen=True)
 class ComparisonCase:
-    """Two setups where setup A must exceed setup B."""
+    """Two setups compared for tensile ease."""
 
     name: str
     setup_a: SetupDefinition
@@ -50,13 +58,28 @@ class ComparisonCase:
 
 DEFAULT_SCENARIO_KWARGS: dict[str, float | str] = {"phi": 35.0}
 DEFAULT_CONFIG_KWARGS: dict[str, bool | str] = {
-    "touchdown": True,
+    "touchdown": False,
 }
 DEFAULT_SEGMENTS: tuple[tuple[float, bool, float], ...] = (
     (10000.0, True, 0.0),
     (10000.0, True, 0.0),
 )
 
+# Steph tensile map: A easier (shorter L_crit) except 12–15 (B easier).
+# Cases 16–20 are smoke-only (no tensile A/B ordering).
+A_EASIER_CASES = frozenset(
+    {f"case_{i}" for i in list(range(1, 12)) + list(range(21, 24))}
+)
+B_EASIER_CASES = frozenset({f"case_{i}" for i in range(12, 16)})
+SMOKE_ONLY_CASES = frozenset({f"case_{i}" for i in range(16, 21)})
+
+# Steph ERR map (§2): higher energy_release_rate wins; no smoke exclusions.
+A_HIGHER_ERR_CASES = frozenset(
+    {f"case_{i}" for i in list(range(12, 16)) + list(range(21, 24))}
+)
+B_HIGHER_ERR_CASES = frozenset(
+    {f"case_{i}" for i in list(range(1, 12)) + list(range(16, 21))}
+)
 
 def _layer_cm(thickness_cm: float, density: float) -> LayerDefinition:
     """Create a layer definition from thickness in centimeters."""
@@ -227,46 +250,108 @@ def _build_system(setup: SetupDefinition) -> SystemModel:
     return SystemModel(model_input=model_input, config=Config(**config_kwargs))
 
 
-def _evaluate_slab_tensile_criterion(
-    evaluator: CriteriaEvaluator, setup: SetupDefinition
-) -> float:
-    """Run the steady-state evaluator and return the slab tensile criterion."""
-    result = evaluator.evaluate_SteadyState(
-        _build_system(setup), mode="B_point_contact"
-    )
-    return result.maximal_stress_result.slab_tensile_criterion
+def _evaluate_hybrid_ss(evaluator: CriteriaEvaluator, setup: SetupDefinition):
+    """Run production hybrid steady state for a setup."""
+    return evaluator.evaluate_SteadyState(_build_system(setup))
 
 
 class TestSlabTensileComparisons(unittest.TestCase):
-    """Regression checks for slab tensile setup ordering."""
+    """Regression checks for hybrid tensile ease and ERR ordering."""
 
     @classmethod
     def setUpClass(cls):
-        """Create a shared evaluator for the comparison matrix."""
+        """Create a shared evaluator and cache hybrid A/B results per case."""
         cls.evaluator = CriteriaEvaluator(CriteriaConfig())
+        cls.hybrid_results: dict[str, tuple] = {
+            case.name: (
+                _evaluate_hybrid_ss(cls.evaluator, case.setup_a),
+                _evaluate_hybrid_ss(cls.evaluator, case.setup_b),
+            )
+            for case in COMPARISON_CASES
+        }
 
-    def test_slab_tensile_criterion_ordering(self):
-        """Each case asserts that setup A exceeds setup B."""
+    def test_hybrid_steady_state_structured_fields(self):
+        """Smoke: hybrid SS exposes tensile L_crit and ERR scalars."""
+        if not COMPARISON_CASES:
+            self.skipTest("Populate COMPARISON_CASES A/B setup pairs.")
+        result_a, _ = self.hybrid_results[COMPARISON_CASES[0].name]
+        self.assertGreater(result_a.tensile.critical_cut_length, 0)
+        self.assertTrue(hasattr(result_a.err, "energy_release_rate"))
+        self.assertGreater(result_a.err.energy_release_rate, 0)
+
+    def test_slab_tensile_ease_ordering(self):
+        """Steph tensile map: A/B ease via shorter critical_cut_length."""
         if not COMPARISON_CASES:
             self.skipTest("Populate COMPARISON_CASES A/B setup pairs.")
 
         for case in COMPARISON_CASES:
             with self.subTest(case=case.name):
-                criterion_a = _evaluate_slab_tensile_criterion(
-                    self.evaluator, case.setup_a
-                )
-                criterion_b = _evaluate_slab_tensile_criterion(
-                    self.evaluator, case.setup_b
-                )
-                # print(f"{case.name}: A={criterion_a:.6f}, B={criterion_b:.6f}")
-                self.assertGreaterEqual(
-                    criterion_a,
-                    criterion_b,
-                    msg=(
-                        f"{case.name}: expected A >= B, got "
-                        f"A={criterion_a:.6f}, B={criterion_b:.6f}"
-                    ),
-                )
+                result_a, result_b = self.hybrid_results[case.name]
+                l_a = result_a.tensile.critical_cut_length
+                l_b = result_b.tensile.critical_cut_length
+                # Always require structured ERR fields.
+                self.assertGreater(result_a.err.energy_release_rate, 0)
+                self.assertGreater(result_b.err.energy_release_rate, 0)
+
+                if case.name in SMOKE_ONLY_CASES:
+                    self.assertGreater(l_a, 0)
+                    self.assertGreater(l_b, 0)
+                    continue
+                if case.name in A_EASIER_CASES:
+                    self.assertLessEqual(
+                        l_a,
+                        l_b,
+                        msg=(
+                            f"{case.name}: expected A easier (L_crit A <= B), got "
+                            f"A={l_a:.6f}, B={l_b:.6f}"
+                        ),
+                    )
+                elif case.name in B_EASIER_CASES:
+                    self.assertLessEqual(
+                        l_b,
+                        l_a,
+                        msg=(
+                            f"{case.name}: expected B easier (L_crit B <= A), got "
+                            f"A={l_a:.6f}, B={l_b:.6f}"
+                        ),
+                    )
+                else:
+                    self.assertGreater(l_a, 0)
+                    self.assertGreater(l_b, 0)
+
+    def test_slab_err_ordering(self):
+        """Steph ERR map: higher energy_release_rate for all cases (no smoke)."""
+        if not COMPARISON_CASES:
+            self.skipTest("Populate COMPARISON_CASES A/B setup pairs.")
+
+        for case in COMPARISON_CASES:
+            with self.subTest(case=case.name):
+                result_a, result_b = self.hybrid_results[case.name]
+                err_a = result_a.err.energy_release_rate
+                err_b = result_b.err.energy_release_rate
+                self.assertGreater(err_a, 0)
+                self.assertGreater(err_b, 0)
+
+                if case.name in A_HIGHER_ERR_CASES:
+                    self.assertGreaterEqual(
+                        err_a,
+                        err_b,
+                        msg=(
+                            f"{case.name}: expected A higher ERR (A >= B), got "
+                            f"A={err_a:.6f}, B={err_b:.6f}"
+                        ),
+                    )
+                elif case.name in B_HIGHER_ERR_CASES:
+                    self.assertGreaterEqual(
+                        err_b,
+                        err_a,
+                        msg=(
+                            f"{case.name}: expected B higher ERR (B >= A), got "
+                            f"A={err_a:.6f}, B={err_b:.6f}"
+                        ),
+                    )
+                else:
+                    self.fail(f"{case.name}: missing from ERR expectation frozensets")
 
 
 if __name__ == "__main__":

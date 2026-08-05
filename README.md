@@ -376,16 +376,28 @@ See the [open issues](https://github.com/2phi/weac/issues) for a list of propose
 
 - [ ] Change to scenario & scenario_config: InfEnd/Cut/Segment/Weight
 
-### v3.2
-<!-- - [ ] New mathematical foundation to improve the weak-layer representation -->
-- [ ] Complex terrain through the addition of out-of-plane tilt
-- [ ] Up, down, and cross-slope cracks
 
-### v3.1
+### v3.3
 
 - [ ] Improved CriteriaEvaluator Optimization (x2 time reduction)
 
 ## Release history
+
+### v3.2.0
+
+- **Breaking:** `CriteriaEvaluator.evaluate_SteadyState` rewrite uses different inputs and produces different outputs. Two independent configurations are evaluated for tensile failure and energy release rate
+- steady-state evaluation uses independent configurations (for tensile and ERR legs)
+- Analysis package flatten: Steady State and CoupledCriterion and Envelopes live in independent files
+- Split `Layer` and `WeakLayer` component models
+- Jamieson–Johnson slab tensile strength method (`tensile_strength_method="jamieson_johnson"`)
+- Schottner FC&DH weak-layer Young's modulus law (`E_method="schottner_fc_dh"`)
+
+### v3.1
+- Variational model for out-of-plane bending
+- Complex terrain through the addition of out-of-plane tilt
+- Up, down, and cross-slope cracks
+- "generalized" backend with multi-component field support, selectable constitutive models, slab width (b), rotation angle (theta), explicit left/right load vectors, per-segment loading flags, and Mode‑III workflows (GIII).
+
 
 ### v3.0
 

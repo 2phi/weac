@@ -67,7 +67,7 @@ GT_skier_baseline = np.array(
             2.1861445155788474e-06,
             -3.6611891841525330e-11,
             -3.1307448147011621e-15,
-        ]
+        ],
     ]
 )
 
@@ -138,7 +138,7 @@ GT_skiers_baseline = np.array(
             1.5197214594845995e-06,
             -8.1335195861421427e-12,
             -4.2196897119194863e-16,
-        ]
+        ],
     ]
 )
 
@@ -147,13 +147,13 @@ GT_pst_without_touchdown = np.array(
         [
             -8.4871937355689708e-03,
             -7.1030228169780734e-03,
-            2.1468411930446529e+00,
-            2.1468411930446507e+00,
-            1.2199839953114783e+01,
-            1.3555514675869393e+01,
+            2.1468411930446529e00,
+            2.1468411930446507e00,
+            1.2199839953114783e01,
+            1.3555514675869393e01,
         ],
         [
-            0.0000000000000000e+00,
+            0.0000000000000000e00,
             1.9281153001886413e-09,
             8.6973240373155267e-03,
             8.6973240373155267e-03,
@@ -163,10 +163,10 @@ GT_pst_without_touchdown = np.array(
         [
             6.4429390610499186e-03,
             3.1432512066047066e-03,
-            1.9796843832394049e+00,
-            1.9796843832394051e+00,
-            3.1544987306063848e+02,
-            8.3417059155662048e+02,
+            1.9796843832394049e00,
+            1.9796843832394051e00,
+            3.1544987306063848e02,
+            8.3417059155662048e02,
         ],
         [
             -3.4064303328982494e-05,
@@ -190,8 +190,8 @@ GT_pst_without_touchdown = np.array(
             -1.7819428769682468e-04,
             -1.7819428769682468e-04,
             -4.4063073869004441e-05,
-            0.0000000000000000e+00,
-        ]
+            0.0000000000000000e00,
+        ],
     ]
 )
 
@@ -425,13 +425,17 @@ class TestRegressionSimulation(unittest.TestCase):
         self.assertAlmostEqual(fm.max_dist_stress, 1.0000048176337313, places=6)
         self.assertLess(fm.min_dist_stress, 1.0)
 
-        # evaluate_SteadyState baseline
-        ss = evaluator.evaluate_SteadyState(system=sm, vertical=False)
+        # evaluate_SteadyState baseline (hybrid structured result)
+        ss = evaluator.evaluate_SteadyState(system=sm)
         self.assertTrue(ss.converged)
-        self.assertGreater(ss.touchdown_distance, 0)
-        # Baseline values recorded
-        self.assertAlmostEqual(ss.touchdown_distance, 1262.7061033873686, places=6)
-        np.testing.assert_allclose(ss.energy_release_rate, 2.110196960094839, rtol=1e-6, atol=0)
+        self.assertGreater(ss.tensile.critical_cut_length, 0)
+        self.assertGreater(ss.err.energy_release_rate, 0)
+        self.assertEqual(ss.phi, 30.0)
+        # Baseline values recorded from a green hybrid SS run
+        self.assertAlmostEqual(ss.tensile.critical_cut_length, 276.88720225, places=6)
+        self.assertAlmostEqual(ss.err.energy_release_rate, 1.8587470190926725, places=6)
+        self.assertEqual(ss.tensile.cut_direction_winner, "upslope")
+        self.assertEqual(ss.err.cut_direction_winner, "upslope")
 
         # evaluate_coupled_criterion baseline
         cc = evaluator.evaluate_coupled_criterion(system=sm, max_iterations=10)
