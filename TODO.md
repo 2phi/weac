@@ -21,8 +21,6 @@
     - Document interaction with slab width `b`: `l_eff` is the out-of-plane contact extent of *this* load; clipping to `min(l_eff, b)` may be needed when the object is wider than the specimen.
     - Unit tests: same `m`, two `l_eff` values → interface load scales as `1/l_eff`; default `l_eff` matches legacy `LSKI_MM` results.
   - Out of scope for this item: finite along-slope contact length (patch/`qs`); full `AppliedLoad` objects; tilted-cube contact modes.
-- [ ] Swap to Pytest from Unittest
-- [ ] resolve fracture criterion also when lower than strength criterion
 - [ ] Florian CriterionEvaluator: clarify and fix damping behavior (find_minimum_force / evaluate_coupled_criterion)
   - Expected behavior
     - find_minimum_force: compute the critical skier weight w* [kg] such that max(stress_envelope) == 1 within tolerance_stress. This solver should not apply damping; it must return the numerically precise root of residual(weight) = max(stress_envelope) - 1 using a bracketed method and finite tolerances.
@@ -144,7 +142,6 @@
 - [ ] Make rasterize_solution smarter (iterative convergence)
 - [ ] SNOWPACK Parser
 - [ ] SMP Parser
-- [ ] Build Tests: Integration -> Pure
 
 ## Patch
 

@@ -4,15 +4,14 @@ Unit tests for utility functions.
 Tests force decomposition, skier load calculations, and other utility functions.
 """
 
-import unittest
-
 import numpy as np
+import pytest
 
 from weac.constants import G_MM_S2, LSKI_MM
 from weac.utils.misc import decompose_to_xyz, get_skier_point_load
 
 
-class TestForceDecomposition(unittest.TestCase):
+class TestForceDecomposition:
     """Test the decompose_to_xyz function."""
 
     def test_flat_surface_decomposition(self):
@@ -24,18 +23,8 @@ class TestForceDecomposition(unittest.TestCase):
         fx, _, fz = decompose_to_xyz(f, phi, theta)
 
         # On flat surface, normal component equals original force, tangential is zero
-        self.assertAlmostEqual(
-            fz,
-            f,
-            places=10,
-            msg="Normal component should equal original force on flat surface",
-        )
-        self.assertAlmostEqual(
-            fx,
-            0.0,
-            places=10,
-            msg="Tangential component should be zero on flat surface",
-        )
+        assert fz == pytest.approx(f, abs=0.5 * 10 ** (-10))
+        assert fx == pytest.approx(0.0, abs=0.5 * 10 ** (-10))
 
     def test_vertical_surface_decomposition(self):
         """Test force decomposition on vertical surface (phi=90)."""
@@ -46,18 +35,8 @@ class TestForceDecomposition(unittest.TestCase):
         fx, _, fz = decompose_to_xyz(f, phi, theta)
 
         # On vertical surface, normal component is zero, tangential equals original force
-        self.assertAlmostEqual(
-            fz,
-            0.0,
-            places=10,
-            msg="Normal component should be zero on vertical surface",
-        )
-        self.assertAlmostEqual(
-            fx,
-            -f,
-            places=10,
-            msg="Tangential component should equal negative original force",
-        )
+        assert fz == pytest.approx(0.0, abs=0.5 * 10 ** (-10))
+        assert fx == pytest.approx(-f, abs=0.5 * 10 ** (-10))
 
     def test_45_degree_decomposition(self):
         """Test force decomposition on 45-degree surface."""
@@ -69,22 +48,12 @@ class TestForceDecomposition(unittest.TestCase):
 
         # On 45-degree surface, both components should be equal in magnitude
         expected_component = f / np.sqrt(2)
-        self.assertAlmostEqual(
-            abs(fz),
-            expected_component,
-            places=8,
-            msg="Normal component magnitude should be f/√2 for 45° surface",
-        )
-        self.assertAlmostEqual(
-            abs(fx),
-            expected_component,
-            places=8,
-            msg="Tangential component magnitude should be f/√2 for 45° surface",
-        )
+        assert abs(fz) == pytest.approx(expected_component, abs=0.5 * 10 ** (-8))
+        assert abs(fx) == pytest.approx(expected_component, abs=0.5 * 10 ** (-8))
 
         # Check signs: normal should be positive (into slope), tangential negative (downslope)
-        self.assertGreater(fz, 0, "Normal component should be positive (into slope)")
-        self.assertLess(fx, 0, "Tangential component should be negative (downslope)")
+        assert fz > 0, "Normal component should be positive (into slope)"
+        assert fx < 0, "Tangential component should be negative (downslope)"
 
     def test_30_degree_decomposition(self):
         """Test force decomposition on 30-degree surface."""
@@ -98,8 +67,8 @@ class TestForceDecomposition(unittest.TestCase):
         expected_z = f * np.cos(np.deg2rad(30))  # f * cos(30°) = f * √3/2
         expected_x = -f * np.sin(np.deg2rad(30))  # -f * sin(30°) = -f/2
 
-        self.assertAlmostEqual(fz, expected_z, places=10)
-        self.assertAlmostEqual(fx, expected_x, places=10)
+        assert fz == pytest.approx(expected_z, abs=0.5 * 10 ** (-10))
+        assert fx == pytest.approx(expected_x, abs=0.5 * 10 ** (-10))
 
     def test_negative_angles(self):
         """Test force decomposition with negative angles."""
@@ -113,8 +82,8 @@ class TestForceDecomposition(unittest.TestCase):
         # Tangential should be positive (upslope for negative angle) with magnitude f*sin(phi)
         expected_z = f * np.cos(np.deg2rad(phi))
         expected_x = -f * np.sin(np.deg2rad(phi))
-        self.assertAlmostEqual(fz, expected_z, places=10)
-        self.assertAlmostEqual(fx, expected_x, places=10)
+        assert fz == pytest.approx(expected_z, abs=0.5 * 10 ** (-10))
+        assert fx == pytest.approx(expected_x, abs=0.5 * 10 ** (-10))
 
     def test_zero_force(self):
         """Test force decomposition with zero force."""
@@ -124,8 +93,8 @@ class TestForceDecomposition(unittest.TestCase):
 
         fx, _, fz = decompose_to_xyz(f, phi, theta)
 
-        self.assertEqual(fz, 0.0, "Zero force should give zero normal component")
-        self.assertEqual(fx, 0.0, "Zero force should give zero tangential component")
+        assert fz == 0.0, "Zero force should give zero normal component"
+        assert fx == 0.0, "Zero force should give zero tangential component"
 
     def test_energy_conservation(self):
         """Test that force decomposition conserves energy (magnitude)."""
@@ -139,15 +108,12 @@ class TestForceDecomposition(unittest.TestCase):
         original_magnitude_squared = f**2
         decomposed_magnitude_squared = fx**2 + fy**2 + fz**2
 
-        self.assertAlmostEqual(
-            original_magnitude_squared,
-            decomposed_magnitude_squared,
-            places=10,
-            msg="Force magnitude should be conserved in decomposition",
+        assert original_magnitude_squared == pytest.approx(
+            decomposed_magnitude_squared, abs=0.5 * 10 ** (-10)
         )
 
 
-class TestSkierPointLoad(unittest.TestCase):
+class TestSkierPointLoad:
     """Test the get_skier_point_load function."""
 
     def test_skier_load_calculation(self):
@@ -159,9 +125,7 @@ class TestSkierPointLoad(unittest.TestCase):
         # Expected calculation: F = 1e-3 * m * G_MM_S2 / LSKI_MM
         expected_F = 1e-3 * m * G_MM_S2 / LSKI_MM
 
-        self.assertAlmostEqual(
-            F, expected_F, places=10, msg="Skier load should match expected calculation"
-        )
+        assert F == pytest.approx(expected_F, abs=0.5 * 10 ** (-10))
 
     def test_skier_load_units(self):
         """Test that skier load has correct units."""
@@ -170,15 +134,15 @@ class TestSkierPointLoad(unittest.TestCase):
 
         # Result should be in N/mm (force per unit length)
         # For typical values, this should be a small positive number
-        self.assertGreater(F, 0, "Skier load should be positive")
-        self.assertLess(F, 1, "Skier load should be reasonable magnitude (< 1 N/mm)")
+        assert F > 0, "Skier load should be positive"
+        assert F < 1, "Skier load should be reasonable magnitude (< 1 N/mm)"
 
     def test_zero_mass_skier(self):
         """Test skier load calculation with zero mass."""
         m = 0.0
         F = get_skier_point_load(m)
 
-        self.assertEqual(F, 0.0, "Zero mass should give zero load")
+        assert F == 0.0, "Zero mass should give zero load"
 
     def test_heavy_skier(self):
         """Test skier load calculation with heavy skier."""
@@ -189,13 +153,8 @@ class TestSkierPointLoad(unittest.TestCase):
         m_light = 60.0
         F_light = get_skier_point_load(m_light)
 
-        self.assertGreater(F, F_light, "Heavier skier should produce larger load")
-        self.assertAlmostEqual(
-            F / F_light,
-            m / m_light,
-            places=10,
-            msg="Load should scale linearly with mass",
-        )
+        assert F > F_light, "Heavier skier should produce larger load"
+        assert F / F_light == pytest.approx(m / m_light, abs=0.5 * 10 ** (-10))
 
     def test_skier_load_scaling(self):
         """Test that skier load scales linearly with mass."""
@@ -206,15 +165,10 @@ class TestSkierPointLoad(unittest.TestCase):
         for i in range(1, len(masses)):
             ratio_mass = masses[i] / masses[0]
             ratio_load = loads[i] / loads[0]
-            self.assertAlmostEqual(
-                ratio_mass,
-                ratio_load,
-                places=10,
-                msg=f"Load should scale linearly: mass ratio {ratio_mass}, load ratio {ratio_load}",
-            )
+            assert ratio_mass == pytest.approx(ratio_load, abs=0.5 * 10 ** (-10))
 
 
-class TestUtilityFunctionConsistency(unittest.TestCase):
+class TestUtilityFunctionConsistency:
     """Test consistency and edge cases for utility functions."""
 
     def test_decomposition_symmetry(self):
@@ -227,20 +181,10 @@ class TestUtilityFunctionConsistency(unittest.TestCase):
         fx_neg, _, fz_neg = decompose_to_xyz(f, -phi, theta)
 
         # Normal components should be equal
-        self.assertAlmostEqual(
-            fz_pos,
-            fz_neg,
-            places=10,
-            msg="Normal components should be equal for ±φ",
-        )
+        assert fz_pos == pytest.approx(fz_neg, abs=0.5 * 10 ** (-10))
 
         # Tangential components should be opposite
-        self.assertAlmostEqual(
-            fx_pos,
-            -fx_neg,
-            places=10,
-            msg="Tangential components should be opposite for ±φ",
-        )
+        assert fx_pos == pytest.approx(-fx_neg, abs=0.5 * 10 ** (-10))
 
     def test_large_angles(self):
         """Test force decomposition for large angles."""
@@ -253,8 +197,8 @@ class TestUtilityFunctionConsistency(unittest.TestCase):
 
         # At 120°, normal component should be negative (surface leans over)
         # and tangential component should be negative (large downslope)
-        self.assertLess(fz, 0, "Normal component should be negative for obtuse angles")
-        self.assertLess(fx, 0, "Tangential component should be negative")
+        assert fz < 0, "Normal component should be negative for obtuse angles"
+        assert fx < 0, "Tangential component should be negative"
 
     def test_angle_bounds(self):
         """Test force decomposition at angle boundaries."""
@@ -263,13 +207,13 @@ class TestUtilityFunctionConsistency(unittest.TestCase):
 
         # Test at exactly 0°
         fx, _, fz = decompose_to_xyz(f, 0.0, theta)
-        self.assertAlmostEqual(fz, f, places=15)
-        self.assertAlmostEqual(fx, 0.0, places=15)
+        assert fz == pytest.approx(f, abs=0.5 * 10 ** (-15))
+        assert fx == pytest.approx(0.0, abs=0.5 * 10 ** (-15))
 
         # Test at exactly 90° (expect some floating-point precision issues)
         fx, _, fz = decompose_to_xyz(f, 90.0, theta)
-        self.assertAlmostEqual(fz, 0.0, places=10)  # Reduced precision for 90° case
-        self.assertAlmostEqual(fx, -f, places=15)
+        assert fz == pytest.approx(0.0, abs=0.5 * 10 ** (-10))
+        assert fx == pytest.approx(-f, abs=0.5 * 10 ** (-15))
 
     def test_force_decomposition_with_arrays(self):
         """Test that functions work with array inputs (if applicable)."""
@@ -279,15 +223,15 @@ class TestUtilityFunctionConsistency(unittest.TestCase):
         # Should work with array input
         try:
             loads = get_skier_point_load(masses)
-            self.assertEqual(len(loads), len(masses), "Should handle array input")
+            assert len(loads) == len(masses), "Should handle array input"
             for i, m in enumerate(masses):
                 expected = get_skier_point_load(m)
-                self.assertAlmostEqual(loads[i], expected, places=10)
+                assert loads[i] == pytest.approx(expected, abs=0.5 * 10 ** (-10))
         except (TypeError, AttributeError) as exc:
-            self.skipTest(f"get_skier_point_load does not support array inputs: {exc}")
+            pytest.skip(f"get_skier_point_load does not support array inputs: {exc}")
 
 
-class TestPhysicalReasonableness(unittest.TestCase):
+class TestPhysicalReasonableness:
     """Test that utility functions produce physically reasonable results."""
 
     def test_typical_skier_loads(self):
@@ -299,14 +243,14 @@ class TestPhysicalReasonableness(unittest.TestCase):
             F = get_skier_point_load(m)
 
             # Load should be positive but not huge
-            self.assertGreater(F, 0, f"Load should be positive for {m} kg skier")
-            self.assertLess(F, 10, f"Load should be reasonable for {m} kg skier")
+            assert F > 0, f"Load should be positive for {m} kg skier"
+            assert F < 10, f"Load should be reasonable for {m} kg skier"
 
             # Rough sanity check: load should be on order of mg/length
             # where length is ski contact length
             rough_estimate = m * 9.81 / 1000  # Very rough estimate in N/mm
-            self.assertLess(
-                F, 10 * rough_estimate, "Load should be reasonable compared to weight"
+            assert F < 10 * rough_estimate, (
+                "Load should be reasonable compared to weight"
             )
 
     def test_typical_force_decompositions(self):
@@ -319,21 +263,9 @@ class TestPhysicalReasonableness(unittest.TestCase):
             fx, _, fz = decompose_to_xyz(f, phi, theta)
 
             # Both components should be significant but less than original force
-            self.assertGreater(
-                abs(fz), 0, f"Normal component should be non-zero at {phi}°"
+            assert abs(fz) > 0, f"Normal component should be non-zero at {phi}°"
+            assert abs(fx) > 0, f"Tangential component should be non-zero at {phi}°"
+            assert abs(fz) < f, f"Normal component should be less than total at {phi}°"
+            assert abs(fx) < f, (
+                f"Tangential component should be less than total at {phi}°"
             )
-            self.assertGreater(
-                abs(fx), 0, f"Tangential component should be non-zero at {phi}°"
-            )
-            self.assertLess(
-                abs(fz), f, f"Normal component should be less than total at {phi}°"
-            )
-            self.assertLess(
-                abs(fx),
-                f,
-                f"Tangential component should be less than total at {phi}°",
-            )
-
-
-if __name__ == "__main__":
-    unittest.main(verbosity=2)

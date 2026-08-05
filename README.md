@@ -173,10 +173,6 @@ source .venv/bin/activate  # On Windows: .venv\Scripts\activate
 Run the test suite using uv:
 
 ```bash
-# Run all tests
-uv run python tests/run_tests.py
-
-# Or use pytest directly (if installed)
 uv run pytest
 ```
 
@@ -386,6 +382,12 @@ See the [open issues](https://github.com/2phi/weac/issues) for a list of propose
 - [ ] Improved CriteriaEvaluator Optimization (x2 time reduction)
 
 ## Release history
+
+### v3.2
+
+- Split `Layer` and `WeakLayer` into separate component models
+- Weak-layer Young's modulus from Schöttner FC&DH density law (`E_method="schottner_fc_dh"`)
+- Lowered weak-layer preset densities to 100/150/200 kg/m³ (within the Schöttner ≤250 kg/m³ range)
 
 ### v3.0
 
