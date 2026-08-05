@@ -1,0 +1,1842 @@
+{
+  "case_1": {
+    "a": {
+      "case": "case_1",
+      "characteristic_length": 500.0,
+      "converged": true,
+      "diagnostics": {
+        "cut_length": 500.0,
+        "downslope": {
+          "energy_release_rate": 4.218346096832132,
+          "free_segment_length": 500.0,
+          "max_Sxx_norm": 12.786205530003539,
+          "orientation": "downslope",
+          "phi": 15.0,
+          "system_type": "pst-",
+          "thickness_fraction_without_density_gate": 0.7860696517412935
+        },
+        "err_winner": "upslope",
+        "method": "pst_fixed_cut",
+        "phi": 15.0,
+        "selection_rule": "ease:max_Sxx_norm",
+        "upslope": {
+          "energy_release_rate": 4.702000483533121,
+          "free_segment_length": 500.0,
+          "max_Sxx_norm": 13.733739619070194,
+          "orientation": "upslope",
+          "phi": 15.0,
+          "system_type": "-pst",
+          "thickness_fraction_without_density_gate": 0.8308457711442786
+        },
+        "winner": "upslope"
+      },
+      "energy_release_rate": 4.702000483533121,
+      "error": null,
+      "max_Sxx_norm": 13.733739619070194,
+      "message": "PST fixed cut 500 mm; upslope orientation won on ease (max_Sxx_norm)",
+      "method": "pst_fixed_cut",
+      "ok": true,
+      "setup": "a",
+      "thickness_fraction_without_density_gate": 0.8308457711442786
+    },
+    "b": {
+      "case": "case_1",
+      "characteristic_length": 500.0,
+      "converged": true,
+      "diagnostics": {
+        "cut_length": 500.0,
+        "downslope": {
+          "energy_release_rate": 2.840302885775311,
+          "free_segment_length": 500.0,
+          "max_Sxx_norm": 6.155745475690577,
+          "orientation": "downslope",
+          "phi": 15.0,
+          "system_type": "pst-",
+          "thickness_fraction_without_density_gate": 0.5685785536159601
+        },
+        "err_winner": "upslope",
+        "method": "pst_fixed_cut",
+        "phi": 15.0,
+        "selection_rule": "ease:max_Sxx_norm",
+        "upslope": {
+          "energy_release_rate": 3.8286546095747047,
+          "free_segment_length": 500.0,
+          "max_Sxx_norm": 7.103279564757232,
+          "orientation": "upslope",
+          "phi": 15.0,
+          "system_type": "-pst",
+          "thickness_fraction_without_density_gate": 0.7206982543640897
+        },
+        "winner": "upslope"
+      },
+      "energy_release_rate": 3.8286546095747047,
+      "error": null,
+      "max_Sxx_norm": 7.103279564757232,
+      "message": "PST fixed cut 500 mm; upslope orientation won on ease (max_Sxx_norm)",
+      "method": "pst_fixed_cut",
+      "ok": true,
+      "setup": "b",
+      "thickness_fraction_without_density_gate": 0.7206982543640897
+    }
+  },
+  "case_10": {
+    "a": {
+      "case": "case_10",
+      "characteristic_length": 500.0,
+      "converged": true,
+      "diagnostics": {
+        "cut_length": 500.0,
+        "downslope": {
+          "energy_release_rate": 0.34350690760913466,
+          "free_segment_length": 500.0,
+          "max_Sxx_norm": 1.3944792154035304,
+          "orientation": "downslope",
+          "phi": 15.0,
+          "system_type": "pst-",
+          "thickness_fraction_without_density_gate": 0.0796812749003984
+        },
+        "err_winner": "upslope",
+        "method": "pst_fixed_cut",
+        "phi": 15.0,
+        "selection_rule": "ease:max_Sxx_norm",
+        "upslope": {
+          "energy_release_rate": 0.46788775241222236,
+          "free_segment_length": 500.0,
+          "max_Sxx_norm": 1.8104401583240617,
+          "orientation": "upslope",
+          "phi": 15.0,
+          "system_type": "-pst",
+          "thickness_fraction_without_density_gate": 0.1454183266932271
+        },
+        "winner": "upslope"
+      },
+      "energy_release_rate": 0.46788775241222236,
+      "error": null,
+      "max_Sxx_norm": 1.8104401583240617,
+      "message": "PST fixed cut 500 mm; upslope orientation won on ease (max_Sxx_norm)",
+      "method": "pst_fixed_cut",
+      "ok": true,
+      "setup": "a",
+      "thickness_fraction_without_density_gate": 0.1454183266932271
+    },
+    "b": {
+      "case": "case_10",
+      "characteristic_length": 500.0,
+      "converged": true,
+      "diagnostics": {
+        "cut_length": 500.0,
+        "downslope": {
+          "energy_release_rate": 0.23991511396467338,
+          "free_segment_length": 500.0,
+          "max_Sxx_norm": 0.8164352286539447,
+          "orientation": "downslope",
+          "phi": 15.0,
+          "system_type": "pst-",
+          "thickness_fraction_without_density_gate": 0.0
+        },
+        "err_winner": "upslope",
+        "method": "pst_fixed_cut",
+        "phi": 15.0,
+        "selection_rule": "ease:max_Sxx_norm",
+        "upslope": {
+          "energy_release_rate": 0.32153256027256855,
+          "free_segment_length": 500.0,
+          "max_Sxx_norm": 1.0312955811817415,
+          "orientation": "upslope",
+          "phi": 15.0,
+          "system_type": "-pst",
+          "thickness_fraction_without_density_gate": 0.017964071856287425
+        },
+        "winner": "upslope"
+      },
+      "energy_release_rate": 0.32153256027256855,
+      "error": null,
+      "max_Sxx_norm": 1.0312955811817415,
+      "message": "PST fixed cut 500 mm; upslope orientation won on ease (max_Sxx_norm)",
+      "method": "pst_fixed_cut",
+      "ok": true,
+      "setup": "b",
+      "thickness_fraction_without_density_gate": 0.017964071856287425
+    }
+  },
+  "case_11": {
+    "a": {
+      "case": "case_11",
+      "characteristic_length": 500.0,
+      "converged": true,
+      "diagnostics": {
+        "cut_length": 500.0,
+        "downslope": {
+          "energy_release_rate": 0.3212482247729552,
+          "free_segment_length": 500.0,
+          "max_Sxx_norm": 0.9639685544519693,
+          "orientation": "downslope",
+          "phi": 15.0,
+          "system_type": "pst-",
+          "thickness_fraction_without_density_gate": 0.0
+        },
+        "err_winner": "upslope",
+        "method": "pst_fixed_cut",
+        "phi": 15.0,
+        "selection_rule": "ease:max_Sxx_norm",
+        "upslope": {
+          "energy_release_rate": 0.44934779422832827,
+          "free_segment_length": 500.0,
+          "max_Sxx_norm": 1.2711491895657732,
+          "orientation": "upslope",
+          "phi": 15.0,
+          "system_type": "-pst",
+          "thickness_fraction_without_density_gate": 0.18127490039840638
+        },
+        "winner": "upslope"
+      },
+      "energy_release_rate": 0.44934779422832827,
+      "error": null,
+      "max_Sxx_norm": 1.2711491895657732,
+      "message": "PST fixed cut 500 mm; upslope orientation won on ease (max_Sxx_norm)",
+      "method": "pst_fixed_cut",
+      "ok": true,
+      "setup": "a",
+      "thickness_fraction_without_density_gate": 0.18127490039840638
+    },
+    "b": {
+      "case": "case_11",
+      "characteristic_length": 500.0,
+      "converged": true,
+      "diagnostics": {
+        "cut_length": 500.0,
+        "downslope": {
+          "energy_release_rate": 0.23991511396467338,
+          "free_segment_length": 500.0,
+          "max_Sxx_norm": 0.8164352286539447,
+          "orientation": "downslope",
+          "phi": 15.0,
+          "system_type": "pst-",
+          "thickness_fraction_without_density_gate": 0.0
+        },
+        "err_winner": "upslope",
+        "method": "pst_fixed_cut",
+        "phi": 15.0,
+        "selection_rule": "ease:max_Sxx_norm",
+        "upslope": {
+          "energy_release_rate": 0.32153256027256855,
+          "free_segment_length": 500.0,
+          "max_Sxx_norm": 1.0312955811817415,
+          "orientation": "upslope",
+          "phi": 15.0,
+          "system_type": "-pst",
+          "thickness_fraction_without_density_gate": 0.017964071856287425
+        },
+        "winner": "upslope"
+      },
+      "energy_release_rate": 0.32153256027256855,
+      "error": null,
+      "max_Sxx_norm": 1.0312955811817415,
+      "message": "PST fixed cut 500 mm; upslope orientation won on ease (max_Sxx_norm)",
+      "method": "pst_fixed_cut",
+      "ok": true,
+      "setup": "b",
+      "thickness_fraction_without_density_gate": 0.017964071856287425
+    }
+  },
+  "case_12": {
+    "a": {
+      "case": "case_12",
+      "characteristic_length": 500.0,
+      "converged": true,
+      "diagnostics": {
+        "cut_length": 500.0,
+        "downslope": {
+          "energy_release_rate": 0.7873972066315449,
+          "free_segment_length": 500.0,
+          "max_Sxx_norm": 4.376979072428349,
+          "orientation": "downslope",
+          "phi": 15.0,
+          "system_type": "pst-",
+          "thickness_fraction_without_density_gate": 0.1593625498007968
+        },
+        "err_winner": "upslope",
+        "method": "pst_fixed_cut",
+        "phi": 15.0,
+        "selection_rule": "ease:max_Sxx_norm",
+        "upslope": {
+          "energy_release_rate": 0.7916371192837603,
+          "free_segment_length": 500.0,
+          "max_Sxx_norm": 4.036003397150188,
+          "orientation": "upslope",
+          "phi": 15.0,
+          "system_type": "-pst",
+          "thickness_fraction_without_density_gate": 0.17330677290836655
+        },
+        "winner": "downslope"
+      },
+      "energy_release_rate": 0.7873972066315449,
+      "error": null,
+      "max_Sxx_norm": 4.376979072428349,
+      "message": "PST fixed cut 500 mm; downslope orientation won on ease (max_Sxx_norm)",
+      "method": "pst_fixed_cut",
+      "ok": true,
+      "setup": "a",
+      "thickness_fraction_without_density_gate": 0.1593625498007968
+    },
+    "b": {
+      "case": "case_12",
+      "characteristic_length": 500.0,
+      "converged": true,
+      "diagnostics": {
+        "cut_length": 500.0,
+        "downslope": {
+          "energy_release_rate": 2.593716654851014,
+          "free_segment_length": 500.0,
+          "max_Sxx_norm": 4.82965346482798,
+          "orientation": "downslope",
+          "phi": 15.0,
+          "system_type": "pst-",
+          "thickness_fraction_without_density_gate": 0.44510978043912175
+        },
+        "err_winner": "upslope",
+        "method": "pst_fixed_cut",
+        "phi": 15.0,
+        "selection_rule": "ease:max_Sxx_norm",
+        "upslope": {
+          "energy_release_rate": 3.9016519156620912,
+          "free_segment_length": 500.0,
+          "max_Sxx_norm": 5.777187553894637,
+          "orientation": "upslope",
+          "phi": 15.0,
+          "system_type": "-pst",
+          "thickness_fraction_without_density_gate": 0.6766467065868264
+        },
+        "winner": "upslope"
+      },
+      "energy_release_rate": 3.9016519156620912,
+      "error": null,
+      "max_Sxx_norm": 5.777187553894637,
+      "message": "PST fixed cut 500 mm; upslope orientation won on ease (max_Sxx_norm)",
+      "method": "pst_fixed_cut",
+      "ok": true,
+      "setup": "b",
+      "thickness_fraction_without_density_gate": 0.6766467065868264
+    }
+  },
+  "case_13": {
+    "a": {
+      "case": "case_13",
+      "characteristic_length": 500.0,
+      "converged": true,
+      "diagnostics": {
+        "cut_length": 500.0,
+        "downslope": {
+          "energy_release_rate": 0.33596261840518604,
+          "free_segment_length": 500.0,
+          "max_Sxx_norm": 2.923408035062853,
+          "orientation": "downslope",
+          "phi": 15.0,
+          "system_type": "pst-",
+          "thickness_fraction_without_density_gate": 0.1294820717131474
+        },
+        "err_winner": "upslope",
+        "method": "pst_fixed_cut",
+        "phi": 15.0,
+        "selection_rule": "ease:max_Sxx_norm",
+        "upslope": {
+          "energy_release_rate": 0.33601073786595415,
+          "free_segment_length": 500.0,
+          "max_Sxx_norm": 2.7108054550347602,
+          "orientation": "upslope",
+          "phi": 15.0,
+          "system_type": "-pst",
+          "thickness_fraction_without_density_gate": 0.13346613545816732
+        },
+        "winner": "downslope"
+      },
+      "energy_release_rate": 0.33596261840518604,
+      "error": null,
+      "max_Sxx_norm": 2.923408035062853,
+      "message": "PST fixed cut 500 mm; downslope orientation won on ease (max_Sxx_norm)",
+      "method": "pst_fixed_cut",
+      "ok": true,
+      "setup": "a",
+      "thickness_fraction_without_density_gate": 0.1294820717131474
+    },
+    "b": {
+      "case": "case_13",
+      "characteristic_length": 500.0,
+      "converged": true,
+      "diagnostics": {
+        "cut_length": 500.0,
+        "downslope": {
+          "energy_release_rate": 2.593716654851014,
+          "free_segment_length": 500.0,
+          "max_Sxx_norm": 4.82965346482798,
+          "orientation": "downslope",
+          "phi": 15.0,
+          "system_type": "pst-",
+          "thickness_fraction_without_density_gate": 0.44510978043912175
+        },
+        "err_winner": "upslope",
+        "method": "pst_fixed_cut",
+        "phi": 15.0,
+        "selection_rule": "ease:max_Sxx_norm",
+        "upslope": {
+          "energy_release_rate": 3.9016519156620912,
+          "free_segment_length": 500.0,
+          "max_Sxx_norm": 5.777187553894637,
+          "orientation": "upslope",
+          "phi": 15.0,
+          "system_type": "-pst",
+          "thickness_fraction_without_density_gate": 0.6766467065868264
+        },
+        "winner": "upslope"
+      },
+      "energy_release_rate": 3.9016519156620912,
+      "error": null,
+      "max_Sxx_norm": 5.777187553894637,
+      "message": "PST fixed cut 500 mm; upslope orientation won on ease (max_Sxx_norm)",
+      "method": "pst_fixed_cut",
+      "ok": true,
+      "setup": "b",
+      "thickness_fraction_without_density_gate": 0.6766467065868264
+    }
+  },
+  "case_14": {
+    "a": {
+      "case": "case_14",
+      "characteristic_length": 500.0,
+      "converged": true,
+      "diagnostics": {
+        "cut_length": 500.0,
+        "downslope": {
+          "energy_release_rate": 0.5344142151296285,
+          "free_segment_length": 500.0,
+          "max_Sxx_norm": 2.0401811207305753,
+          "orientation": "downslope",
+          "phi": 15.0,
+          "system_type": "pst-",
+          "thickness_fraction_without_density_gate": 0.15139442231075698
+        },
+        "err_winner": "upslope",
+        "method": "pst_fixed_cut",
+        "phi": 15.0,
+        "selection_rule": "ease:max_Sxx_norm",
+        "upslope": {
+          "energy_release_rate": 0.687230690655851,
+          "free_segment_length": 500.0,
+          "max_Sxx_norm": 2.1927451626360446,
+          "orientation": "upslope",
+          "phi": 15.0,
+          "system_type": "-pst",
+          "thickness_fraction_without_density_gate": 0.199203187250996
+        },
+        "winner": "upslope"
+      },
+      "energy_release_rate": 0.687230690655851,
+      "error": null,
+      "max_Sxx_norm": 2.1927451626360446,
+      "message": "PST fixed cut 500 mm; upslope orientation won on ease (max_Sxx_norm)",
+      "method": "pst_fixed_cut",
+      "ok": true,
+      "setup": "a",
+      "thickness_fraction_without_density_gate": 0.199203187250996
+    },
+    "b": {
+      "case": "case_14",
+      "characteristic_length": 500.0,
+      "converged": true,
+      "diagnostics": {
+        "cut_length": 500.0,
+        "downslope": {
+          "energy_release_rate": 0.7895498288018152,
+          "free_segment_length": 500.0,
+          "max_Sxx_norm": 2.3743580391488854,
+          "orientation": "downslope",
+          "phi": 15.0,
+          "system_type": "pst-",
+          "thickness_fraction_without_density_gate": 0.2634730538922156
+        },
+        "err_winner": "upslope",
+        "method": "pst_fixed_cut",
+        "phi": 15.0,
+        "selection_rule": "ease:max_Sxx_norm",
+        "upslope": {
+          "energy_release_rate": 1.1692088333766144,
+          "free_segment_length": 500.0,
+          "max_Sxx_norm": 2.840185494084757,
+          "orientation": "upslope",
+          "phi": 15.0,
+          "system_type": "-pst",
+          "thickness_fraction_without_density_gate": 0.37924151696606784
+        },
+        "winner": "upslope"
+      },
+      "energy_release_rate": 1.1692088333766144,
+      "error": null,
+      "max_Sxx_norm": 2.840185494084757,
+      "message": "PST fixed cut 500 mm; upslope orientation won on ease (max_Sxx_norm)",
+      "method": "pst_fixed_cut",
+      "ok": true,
+      "setup": "b",
+      "thickness_fraction_without_density_gate": 0.37924151696606784
+    }
+  },
+  "case_15": {
+    "a": {
+      "case": "case_15",
+      "characteristic_length": 500.0,
+      "converged": true,
+      "diagnostics": {
+        "cut_length": 500.0,
+        "downslope": {
+          "energy_release_rate": 0.34323382160562177,
+          "free_segment_length": 500.0,
+          "max_Sxx_norm": 2.1751884359555405,
+          "orientation": "downslope",
+          "phi": 15.0,
+          "system_type": "pst-",
+          "thickness_fraction_without_density_gate": 0.11354581673306773
+        },
+        "err_winner": "upslope",
+        "method": "pst_fixed_cut",
+        "phi": 15.0,
+        "selection_rule": "ease:max_Sxx_norm",
+        "upslope": {
+          "energy_release_rate": 0.3523694300574436,
+          "free_segment_length": 500.0,
+          "max_Sxx_norm": 2.0197848666882923,
+          "orientation": "upslope",
+          "phi": 15.0,
+          "system_type": "-pst",
+          "thickness_fraction_without_density_gate": 0.11952191235059761
+        },
+        "winner": "downslope"
+      },
+      "energy_release_rate": 0.34323382160562177,
+      "error": null,
+      "max_Sxx_norm": 2.1751884359555405,
+      "message": "PST fixed cut 500 mm; downslope orientation won on ease (max_Sxx_norm)",
+      "method": "pst_fixed_cut",
+      "ok": true,
+      "setup": "a",
+      "thickness_fraction_without_density_gate": 0.11354581673306773
+    },
+    "b": {
+      "case": "case_15",
+      "characteristic_length": 500.0,
+      "converged": true,
+      "diagnostics": {
+        "cut_length": 500.0,
+        "downslope": {
+          "energy_release_rate": 0.7895498288018152,
+          "free_segment_length": 500.0,
+          "max_Sxx_norm": 2.3743580391488854,
+          "orientation": "downslope",
+          "phi": 15.0,
+          "system_type": "pst-",
+          "thickness_fraction_without_density_gate": 0.2634730538922156
+        },
+        "err_winner": "upslope",
+        "method": "pst_fixed_cut",
+        "phi": 15.0,
+        "selection_rule": "ease:max_Sxx_norm",
+        "upslope": {
+          "energy_release_rate": 1.1692088333766144,
+          "free_segment_length": 500.0,
+          "max_Sxx_norm": 2.840185494084757,
+          "orientation": "upslope",
+          "phi": 15.0,
+          "system_type": "-pst",
+          "thickness_fraction_without_density_gate": 0.37924151696606784
+        },
+        "winner": "upslope"
+      },
+      "energy_release_rate": 1.1692088333766144,
+      "error": null,
+      "max_Sxx_norm": 2.840185494084757,
+      "message": "PST fixed cut 500 mm; upslope orientation won on ease (max_Sxx_norm)",
+      "method": "pst_fixed_cut",
+      "ok": true,
+      "setup": "b",
+      "thickness_fraction_without_density_gate": 0.37924151696606784
+    }
+  },
+  "case_16": {
+    "a": {
+      "case": "case_16",
+      "characteristic_length": 500.0,
+      "converged": true,
+      "diagnostics": {
+        "cut_length": 500.0,
+        "downslope": {
+          "energy_release_rate": 1.3738855253038817,
+          "free_segment_length": 500.0,
+          "max_Sxx_norm": 3.62710541606403,
+          "orientation": "downslope",
+          "phi": 15.0,
+          "system_type": "pst-",
+          "thickness_fraction_without_density_gate": 0.6235059760956175
+        },
+        "err_winner": "upslope",
+        "method": "pst_fixed_cut",
+        "phi": 15.0,
+        "selection_rule": "ease:max_Sxx_norm",
+        "upslope": {
+          "energy_release_rate": 2.2027300167143222,
+          "free_segment_length": 500.0,
+          "max_Sxx_norm": 4.647891589546863,
+          "orientation": "upslope",
+          "phi": 15.0,
+          "system_type": "-pst",
+          "thickness_fraction_without_density_gate": 0.8127490039840638
+        },
+        "winner": "upslope"
+      },
+      "energy_release_rate": 2.2027300167143222,
+      "error": null,
+      "max_Sxx_norm": 4.647891589546863,
+      "message": "PST fixed cut 500 mm; upslope orientation won on ease (max_Sxx_norm)",
+      "method": "pst_fixed_cut",
+      "ok": true,
+      "setup": "a",
+      "thickness_fraction_without_density_gate": 0.8127490039840638
+    },
+    "b": {
+      "case": "case_16",
+      "characteristic_length": 500.0,
+      "converged": true,
+      "diagnostics": {
+        "cut_length": 500.0,
+        "downslope": {
+          "energy_release_rate": 1.2255566609609263,
+          "free_segment_length": 500.0,
+          "max_Sxx_norm": 2.374857511220694,
+          "orientation": "downslope",
+          "phi": 15.0,
+          "system_type": "pst-",
+          "thickness_fraction_without_density_gate": 0.4074074074074074
+        },
+        "err_winner": "upslope",
+        "method": "pst_fixed_cut",
+        "phi": 15.0,
+        "selection_rule": "ease:max_Sxx_norm",
+        "upslope": {
+          "energy_release_rate": 2.5220076809372087,
+          "free_segment_length": 500.0,
+          "max_Sxx_norm": 3.578435714900416,
+          "orientation": "upslope",
+          "phi": 15.0,
+          "system_type": "-pst",
+          "thickness_fraction_without_density_gate": 0.688034188034188
+        },
+        "winner": "upslope"
+      },
+      "energy_release_rate": 2.5220076809372087,
+      "error": null,
+      "max_Sxx_norm": 3.578435714900416,
+      "message": "PST fixed cut 500 mm; upslope orientation won on ease (max_Sxx_norm)",
+      "method": "pst_fixed_cut",
+      "ok": true,
+      "setup": "b",
+      "thickness_fraction_without_density_gate": 0.688034188034188
+    }
+  },
+  "case_17": {
+    "a": {
+      "case": "case_17",
+      "characteristic_length": 500.0,
+      "converged": true,
+      "diagnostics": {
+        "cut_length": 500.0,
+        "downslope": {
+          "energy_release_rate": 0.6088814898959555,
+          "free_segment_length": 500.0,
+          "max_Sxx_norm": 2.91730526655792,
+          "orientation": "downslope",
+          "phi": 15.0,
+          "system_type": "pst-",
+          "thickness_fraction_without_density_gate": 0.33665338645418325
+        },
+        "err_winner": "upslope",
+        "method": "pst_fixed_cut",
+        "phi": 15.0,
+        "selection_rule": "ease:max_Sxx_norm",
+        "upslope": {
+          "energy_release_rate": 0.8714872559251029,
+          "free_segment_length": 500.0,
+          "max_Sxx_norm": 3.806340753181426,
+          "orientation": "upslope",
+          "phi": 15.0,
+          "system_type": "-pst",
+          "thickness_fraction_without_density_gate": 0.47808764940239046
+        },
+        "winner": "upslope"
+      },
+      "energy_release_rate": 0.8714872559251029,
+      "error": null,
+      "max_Sxx_norm": 3.806340753181426,
+      "message": "PST fixed cut 500 mm; upslope orientation won on ease (max_Sxx_norm)",
+      "method": "pst_fixed_cut",
+      "ok": true,
+      "setup": "a",
+      "thickness_fraction_without_density_gate": 0.47808764940239046
+    },
+    "b": {
+      "case": "case_17",
+      "characteristic_length": 500.0,
+      "converged": true,
+      "diagnostics": {
+        "cut_length": 500.0,
+        "downslope": {
+          "energy_release_rate": 0.6210766266075717,
+          "free_segment_length": 500.0,
+          "max_Sxx_norm": 2.0836708222835076,
+          "orientation": "downslope",
+          "phi": 15.0,
+          "system_type": "pst-",
+          "thickness_fraction_without_density_gate": 0.36324786324786323
+        },
+        "err_winner": "upslope",
+        "method": "pst_fixed_cut",
+        "phi": 15.0,
+        "selection_rule": "ease:max_Sxx_norm",
+        "upslope": {
+          "energy_release_rate": 1.1354752967173174,
+          "free_segment_length": 500.0,
+          "max_Sxx_norm": 3.3457516246201076,
+          "orientation": "upslope",
+          "phi": 15.0,
+          "system_type": "-pst",
+          "thickness_fraction_without_density_gate": 0.5754985754985755
+        },
+        "winner": "upslope"
+      },
+      "energy_release_rate": 1.1354752967173174,
+      "error": null,
+      "max_Sxx_norm": 3.3457516246201076,
+      "message": "PST fixed cut 500 mm; upslope orientation won on ease (max_Sxx_norm)",
+      "method": "pst_fixed_cut",
+      "ok": true,
+      "setup": "b",
+      "thickness_fraction_without_density_gate": 0.5754985754985755
+    }
+  },
+  "case_18": {
+    "a": {
+      "case": "case_18",
+      "characteristic_length": 500.0,
+      "converged": true,
+      "diagnostics": {
+        "cut_length": 500.0,
+        "downslope": {
+          "energy_release_rate": 0.4389617364883236,
+          "free_segment_length": 500.0,
+          "max_Sxx_norm": 2.4513900192588594,
+          "orientation": "downslope",
+          "phi": 15.0,
+          "system_type": "pst-",
+          "thickness_fraction_without_density_gate": 0.11553784860557768
+        },
+        "err_winner": "upslope",
+        "method": "pst_fixed_cut",
+        "phi": 15.0,
+        "selection_rule": "ease:max_Sxx_norm",
+        "upslope": {
+          "energy_release_rate": 0.5980794421518919,
+          "free_segment_length": 500.0,
+          "max_Sxx_norm": 3.114186029847736,
+          "orientation": "upslope",
+          "phi": 15.0,
+          "system_type": "-pst",
+          "thickness_fraction_without_density_gate": 0.1454183266932271
+        },
+        "winner": "upslope"
+      },
+      "energy_release_rate": 0.5980794421518919,
+      "error": null,
+      "max_Sxx_norm": 3.114186029847736,
+      "message": "PST fixed cut 500 mm; upslope orientation won on ease (max_Sxx_norm)",
+      "method": "pst_fixed_cut",
+      "ok": true,
+      "setup": "a",
+      "thickness_fraction_without_density_gate": 0.1454183266932271
+    },
+    "b": {
+      "case": "case_18",
+      "characteristic_length": 500.0,
+      "converged": true,
+      "diagnostics": {
+        "cut_length": 500.0,
+        "downslope": {
+          "energy_release_rate": 0.48648915151833805,
+          "free_segment_length": 500.0,
+          "max_Sxx_norm": 2.159343530411339,
+          "orientation": "downslope",
+          "phi": 15.0,
+          "system_type": "pst-",
+          "thickness_fraction_without_density_gate": 0.07692307692307693
+        },
+        "err_winner": "upslope",
+        "method": "pst_fixed_cut",
+        "phi": 15.0,
+        "selection_rule": "ease:max_Sxx_norm",
+        "upslope": {
+          "energy_release_rate": 0.8262147215678776,
+          "free_segment_length": 500.0,
+          "max_Sxx_norm": 3.2312480080509354,
+          "orientation": "upslope",
+          "phi": 15.0,
+          "system_type": "-pst",
+          "thickness_fraction_without_density_gate": 0.3433048433048433
+        },
+        "winner": "upslope"
+      },
+      "energy_release_rate": 0.8262147215678776,
+      "error": null,
+      "max_Sxx_norm": 3.2312480080509354,
+      "message": "PST fixed cut 500 mm; upslope orientation won on ease (max_Sxx_norm)",
+      "method": "pst_fixed_cut",
+      "ok": true,
+      "setup": "b",
+      "thickness_fraction_without_density_gate": 0.3433048433048433
+    }
+  },
+  "case_19": {
+    "a": {
+      "case": "case_19",
+      "characteristic_length": 500.0,
+      "converged": true,
+      "diagnostics": {
+        "cut_length": 500.0,
+        "downslope": {
+          "energy_release_rate": 0.4838524871969584,
+          "free_segment_length": 500.0,
+          "max_Sxx_norm": 1.6880456294951793,
+          "orientation": "downslope",
+          "phi": 15.0,
+          "system_type": "pst-",
+          "thickness_fraction_without_density_gate": 0.3047808764940239
+        },
+        "err_winner": "upslope",
+        "method": "pst_fixed_cut",
+        "phi": 15.0,
+        "selection_rule": "ease:max_Sxx_norm",
+        "upslope": {
+          "energy_release_rate": 0.7358370727523444,
+          "free_segment_length": 500.0,
+          "max_Sxx_norm": 2.163464364292659,
+          "orientation": "upslope",
+          "phi": 15.0,
+          "system_type": "-pst",
+          "thickness_fraction_without_density_gate": 0.4940239043824701
+        },
+        "winner": "upslope"
+      },
+      "energy_release_rate": 0.7358370727523444,
+      "error": null,
+      "max_Sxx_norm": 2.163464364292659,
+      "message": "PST fixed cut 500 mm; upslope orientation won on ease (max_Sxx_norm)",
+      "method": "pst_fixed_cut",
+      "ok": true,
+      "setup": "a",
+      "thickness_fraction_without_density_gate": 0.4940239043824701
+    },
+    "b": {
+      "case": "case_19",
+      "characteristic_length": 500.0,
+      "converged": true,
+      "diagnostics": {
+        "cut_length": 500.0,
+        "downslope": {
+          "energy_release_rate": 0.43497055895070147,
+          "free_segment_length": 500.0,
+          "max_Sxx_norm": 1.1538449185300972,
+          "orientation": "downslope",
+          "phi": 15.0,
+          "system_type": "pst-",
+          "thickness_fraction_without_density_gate": 0.09971509971509972
+        },
+        "err_winner": "upslope",
+        "method": "pst_fixed_cut",
+        "phi": 15.0,
+        "selection_rule": "ease:max_Sxx_norm",
+        "upslope": {
+          "energy_release_rate": 0.8328660804734203,
+          "free_segment_length": 500.0,
+          "max_Sxx_norm": 1.769373214452759,
+          "orientation": "upslope",
+          "phi": 15.0,
+          "system_type": "-pst",
+          "thickness_fraction_without_density_gate": 0.3575498575498576
+        },
+        "winner": "upslope"
+      },
+      "energy_release_rate": 0.8328660804734203,
+      "error": null,
+      "max_Sxx_norm": 1.769373214452759,
+      "message": "PST fixed cut 500 mm; upslope orientation won on ease (max_Sxx_norm)",
+      "method": "pst_fixed_cut",
+      "ok": true,
+      "setup": "b",
+      "thickness_fraction_without_density_gate": 0.3575498575498576
+    }
+  },
+  "case_2": {
+    "a": {
+      "case": "case_2",
+      "characteristic_length": 500.0,
+      "converged": true,
+      "diagnostics": {
+        "cut_length": 500.0,
+        "downslope": {
+          "energy_release_rate": 1.1525763554049466,
+          "free_segment_length": 500.0,
+          "max_Sxx_norm": 6.285964430256516,
+          "orientation": "downslope",
+          "phi": 15.0,
+          "system_type": "pst-",
+          "thickness_fraction_without_density_gate": 0.5124378109452736
+        },
+        "err_winner": "upslope",
+        "method": "pst_fixed_cut",
+        "phi": 15.0,
+        "selection_rule": "ease:max_Sxx_norm",
+        "upslope": {
+          "energy_release_rate": 1.26844424225896,
+          "free_segment_length": 500.0,
+          "max_Sxx_norm": 6.751791885192394,
+          "orientation": "upslope",
+          "phi": 15.0,
+          "system_type": "-pst",
+          "thickness_fraction_without_density_gate": 0.5970149253731343
+        },
+        "winner": "upslope"
+      },
+      "energy_release_rate": 1.26844424225896,
+      "error": null,
+      "max_Sxx_norm": 6.751791885192394,
+      "message": "PST fixed cut 500 mm; upslope orientation won on ease (max_Sxx_norm)",
+      "method": "pst_fixed_cut",
+      "ok": true,
+      "setup": "a",
+      "thickness_fraction_without_density_gate": 0.5970149253731343
+    },
+    "b": {
+      "case": "case_2",
+      "characteristic_length": 500.0,
+      "converged": true,
+      "diagnostics": {
+        "cut_length": 500.0,
+        "downslope": {
+          "energy_release_rate": 0.841862700070033,
+          "free_segment_length": 500.0,
+          "max_Sxx_norm": 3.026292437666823,
+          "orientation": "downslope",
+          "phi": 15.0,
+          "system_type": "pst-",
+          "thickness_fraction_without_density_gate": 0.3117206982543641
+        },
+        "err_winner": "upslope",
+        "method": "pst_fixed_cut",
+        "phi": 15.0,
+        "selection_rule": "ease:max_Sxx_norm",
+        "upslope": {
+          "energy_release_rate": 1.1200262166995987,
+          "free_segment_length": 500.0,
+          "max_Sxx_norm": 3.4921198926026955,
+          "orientation": "upslope",
+          "phi": 15.0,
+          "system_type": "-pst",
+          "thickness_fraction_without_density_gate": 0.4339152119700748
+        },
+        "winner": "upslope"
+      },
+      "energy_release_rate": 1.1200262166995987,
+      "error": null,
+      "max_Sxx_norm": 3.4921198926026955,
+      "message": "PST fixed cut 500 mm; upslope orientation won on ease (max_Sxx_norm)",
+      "method": "pst_fixed_cut",
+      "ok": true,
+      "setup": "b",
+      "thickness_fraction_without_density_gate": 0.4339152119700748
+    }
+  },
+  "case_20": {
+    "a": {
+      "case": "case_20",
+      "characteristic_length": 500.0,
+      "converged": true,
+      "diagnostics": {
+        "cut_length": 500.0,
+        "downslope": {
+          "energy_release_rate": 0.4175266693606294,
+          "free_segment_length": 500.0,
+          "max_Sxx_norm": 1.4548670222087425,
+          "orientation": "downslope",
+          "phi": 15.0,
+          "system_type": "pst-",
+          "thickness_fraction_without_density_gate": 0.250996015936255
+        },
+        "err_winner": "upslope",
+        "method": "pst_fixed_cut",
+        "phi": 15.0,
+        "selection_rule": "ease:max_Sxx_norm",
+        "upslope": {
+          "energy_release_rate": 0.6119486294042019,
+          "free_segment_length": 500.0,
+          "max_Sxx_norm": 2.0578574560136635,
+          "orientation": "upslope",
+          "phi": 15.0,
+          "system_type": "-pst",
+          "thickness_fraction_without_density_gate": 0.4342629482071713
+        },
+        "winner": "upslope"
+      },
+      "energy_release_rate": 0.6119486294042019,
+      "error": null,
+      "max_Sxx_norm": 2.0578574560136635,
+      "message": "PST fixed cut 500 mm; upslope orientation won on ease (max_Sxx_norm)",
+      "method": "pst_fixed_cut",
+      "ok": true,
+      "setup": "a",
+      "thickness_fraction_without_density_gate": 0.4342629482071713
+    },
+    "b": {
+      "case": "case_20",
+      "characteristic_length": 500.0,
+      "converged": true,
+      "diagnostics": {
+        "cut_length": 500.0,
+        "downslope": {
+          "energy_release_rate": 0.3834943224404476,
+          "free_segment_length": 500.0,
+          "max_Sxx_norm": 1.0958860613182,
+          "orientation": "downslope",
+          "phi": 15.0,
+          "system_type": "pst-",
+          "thickness_fraction_without_density_gate": 0.07122507122507123
+        },
+        "err_winner": "upslope",
+        "method": "pst_fixed_cut",
+        "phi": 15.0,
+        "selection_rule": "ease:max_Sxx_norm",
+        "upslope": {
+          "energy_release_rate": 0.7068178278354821,
+          "free_segment_length": 500.0,
+          "max_Sxx_norm": 1.6500138199863628,
+          "orientation": "upslope",
+          "phi": 15.0,
+          "system_type": "-pst",
+          "thickness_fraction_without_density_gate": 0.3646723646723647
+        },
+        "winner": "upslope"
+      },
+      "energy_release_rate": 0.7068178278354821,
+      "error": null,
+      "max_Sxx_norm": 1.6500138199863628,
+      "message": "PST fixed cut 500 mm; upslope orientation won on ease (max_Sxx_norm)",
+      "method": "pst_fixed_cut",
+      "ok": true,
+      "setup": "b",
+      "thickness_fraction_without_density_gate": 0.3646723646723647
+    }
+  },
+  "case_21": {
+    "a": {
+      "case": "case_21",
+      "characteristic_length": 500.0,
+      "converged": true,
+      "diagnostics": {
+        "cut_length": 500.0,
+        "downslope": {
+          "energy_release_rate": 0.3258633001720817,
+          "free_segment_length": 500.0,
+          "max_Sxx_norm": 1.6675233473856554,
+          "orientation": "downslope",
+          "phi": 15.0,
+          "system_type": "pst-",
+          "thickness_fraction_without_density_gate": 0.3584070796460177
+        },
+        "err_winner": "upslope",
+        "method": "pst_fixed_cut",
+        "phi": 15.0,
+        "selection_rule": "ease:max_Sxx_norm",
+        "upslope": {
+          "energy_release_rate": 0.5434511936469558,
+          "free_segment_length": 500.0,
+          "max_Sxx_norm": 2.3497570206150518,
+          "orientation": "upslope",
+          "phi": 15.0,
+          "system_type": "-pst",
+          "thickness_fraction_without_density_gate": 0.5265486725663717
+        },
+        "winner": "upslope"
+      },
+      "energy_release_rate": 0.5434511936469558,
+      "error": null,
+      "max_Sxx_norm": 2.3497570206150518,
+      "message": "PST fixed cut 500 mm; upslope orientation won on ease (max_Sxx_norm)",
+      "method": "pst_fixed_cut",
+      "ok": true,
+      "setup": "a",
+      "thickness_fraction_without_density_gate": 0.5265486725663717
+    },
+    "b": {
+      "case": "case_21",
+      "characteristic_length": 500.0,
+      "converged": true,
+      "diagnostics": {
+        "cut_length": 500.0,
+        "downslope": {
+          "energy_release_rate": 0.28676455064755835,
+          "free_segment_length": 500.0,
+          "max_Sxx_norm": 1.654164281683514,
+          "orientation": "downslope",
+          "phi": 15.0,
+          "system_type": "pst-",
+          "thickness_fraction_without_density_gate": 0.035398230088495575
+        },
+        "err_winner": "downslope",
+        "method": "pst_fixed_cut",
+        "phi": 15.0,
+        "selection_rule": "ease:max_Sxx_norm",
+        "upslope": {
+          "energy_release_rate": 0.23462427763755667,
+          "free_segment_length": 500.0,
+          "max_Sxx_norm": 1.5400653498260677,
+          "orientation": "upslope",
+          "phi": 15.0,
+          "system_type": "-pst",
+          "thickness_fraction_without_density_gate": 0.03982300884955752
+        },
+        "winner": "downslope"
+      },
+      "energy_release_rate": 0.28676455064755835,
+      "error": null,
+      "max_Sxx_norm": 1.654164281683514,
+      "message": "PST fixed cut 500 mm; downslope orientation won on ease (max_Sxx_norm)",
+      "method": "pst_fixed_cut",
+      "ok": true,
+      "setup": "b",
+      "thickness_fraction_without_density_gate": 0.035398230088495575
+    }
+  },
+  "case_22": {
+    "a": {
+      "case": "case_22",
+      "characteristic_length": 500.0,
+      "converged": true,
+      "diagnostics": {
+        "cut_length": 500.0,
+        "downslope": {
+          "energy_release_rate": 0.5627094360086266,
+          "free_segment_length": 500.0,
+          "max_Sxx_norm": 2.9275934063727864,
+          "orientation": "downslope",
+          "phi": 15.0,
+          "system_type": "pst-",
+          "thickness_fraction_without_density_gate": 0.3442028985507246
+        },
+        "err_winner": "upslope",
+        "method": "pst_fixed_cut",
+        "phi": 15.0,
+        "selection_rule": "ease:max_Sxx_norm",
+        "upslope": {
+          "energy_release_rate": 0.8694542783165096,
+          "free_segment_length": 500.0,
+          "max_Sxx_norm": 4.0485390792235245,
+          "orientation": "upslope",
+          "phi": 15.0,
+          "system_type": "-pst",
+          "thickness_fraction_without_density_gate": 0.5072463768115942
+        },
+        "winner": "upslope"
+      },
+      "energy_release_rate": 0.8694542783165096,
+      "error": null,
+      "max_Sxx_norm": 4.0485390792235245,
+      "message": "PST fixed cut 500 mm; upslope orientation won on ease (max_Sxx_norm)",
+      "method": "pst_fixed_cut",
+      "ok": true,
+      "setup": "a",
+      "thickness_fraction_without_density_gate": 0.5072463768115942
+    },
+    "b": {
+      "case": "case_22",
+      "characteristic_length": 500.0,
+      "converged": true,
+      "diagnostics": {
+        "cut_length": 500.0,
+        "downslope": {
+          "energy_release_rate": 0.46682653852073674,
+          "free_segment_length": 500.0,
+          "max_Sxx_norm": 3.9760372638298325,
+          "orientation": "downslope",
+          "phi": 15.0,
+          "system_type": "pst-",
+          "thickness_fraction_without_density_gate": 0.10326086956521739
+        },
+        "err_winner": "downslope",
+        "method": "pst_fixed_cut",
+        "phi": 15.0,
+        "selection_rule": "ease:max_Sxx_norm",
+        "upslope": {
+          "energy_release_rate": 0.38769193654902767,
+          "free_segment_length": 500.0,
+          "max_Sxx_norm": 3.3519402569186614,
+          "orientation": "upslope",
+          "phi": 15.0,
+          "system_type": "-pst",
+          "thickness_fraction_without_density_gate": 0.10326086956521739
+        },
+        "winner": "downslope"
+      },
+      "energy_release_rate": 0.46682653852073674,
+      "error": null,
+      "max_Sxx_norm": 3.9760372638298325,
+      "message": "PST fixed cut 500 mm; downslope orientation won on ease (max_Sxx_norm)",
+      "method": "pst_fixed_cut",
+      "ok": true,
+      "setup": "b",
+      "thickness_fraction_without_density_gate": 0.10326086956521739
+    }
+  },
+  "case_23": {
+    "a": {
+      "case": "case_23",
+      "characteristic_length": 500.0,
+      "converged": true,
+      "diagnostics": {
+        "cut_length": 500.0,
+        "downslope": {
+          "energy_release_rate": 0.3078504485202476,
+          "free_segment_length": 500.0,
+          "max_Sxx_norm": 1.0300662881927858,
+          "orientation": "downslope",
+          "phi": 15.0,
+          "system_type": "pst-",
+          "thickness_fraction_without_density_gate": 0.021739130434782608
+        },
+        "err_winner": "upslope",
+        "method": "pst_fixed_cut",
+        "phi": 15.0,
+        "selection_rule": "ease:max_Sxx_norm",
+        "upslope": {
+          "energy_release_rate": 0.49210338663769765,
+          "free_segment_length": 500.0,
+          "max_Sxx_norm": 1.4501172061718515,
+          "orientation": "upslope",
+          "phi": 15.0,
+          "system_type": "-pst",
+          "thickness_fraction_without_density_gate": 0.2427536231884058
+        },
+        "winner": "upslope"
+      },
+      "energy_release_rate": 0.49210338663769765,
+      "error": null,
+      "max_Sxx_norm": 1.4501172061718515,
+      "message": "PST fixed cut 500 mm; upslope orientation won on ease (max_Sxx_norm)",
+      "method": "pst_fixed_cut",
+      "ok": true,
+      "setup": "a",
+      "thickness_fraction_without_density_gate": 0.2427536231884058
+    },
+    "b": {
+      "case": "case_23",
+      "characteristic_length": 500.0,
+      "converged": true,
+      "diagnostics": {
+        "cut_length": 500.0,
+        "downslope": {
+          "energy_release_rate": 0.27212229356731304,
+          "free_segment_length": 500.0,
+          "max_Sxx_norm": 1.0401774339997534,
+          "orientation": "downslope",
+          "phi": 15.0,
+          "system_type": "pst-",
+          "thickness_fraction_without_density_gate": 0.009057971014492754
+        },
+        "err_winner": "upslope",
+        "method": "pst_fixed_cut",
+        "phi": 15.0,
+        "selection_rule": "ease:max_Sxx_norm",
+        "upslope": {
+          "energy_release_rate": 0.34039392472710067,
+          "free_segment_length": 500.0,
+          "max_Sxx_norm": 1.1176375677299109,
+          "orientation": "upslope",
+          "phi": 15.0,
+          "system_type": "-pst",
+          "thickness_fraction_without_density_gate": 0.034420289855072464
+        },
+        "winner": "upslope"
+      },
+      "energy_release_rate": 0.34039392472710067,
+      "error": null,
+      "max_Sxx_norm": 1.1176375677299109,
+      "message": "PST fixed cut 500 mm; upslope orientation won on ease (max_Sxx_norm)",
+      "method": "pst_fixed_cut",
+      "ok": true,
+      "setup": "b",
+      "thickness_fraction_without_density_gate": 0.034420289855072464
+    }
+  },
+  "case_3": {
+    "a": {
+      "case": "case_3",
+      "characteristic_length": 500.0,
+      "converged": true,
+      "diagnostics": {
+        "cut_length": 500.0,
+        "downslope": {
+          "energy_release_rate": 0.5701443159808095,
+          "free_segment_length": 500.0,
+          "max_Sxx_norm": 3.937802674415528,
+          "orientation": "downslope",
+          "phi": 15.0,
+          "system_type": "pst-",
+          "thickness_fraction_without_density_gate": 0.373134328358209
+        },
+        "err_winner": "upslope",
+        "method": "pst_fixed_cut",
+        "phi": 15.0,
+        "selection_rule": "ease:max_Sxx_norm",
+        "upslope": {
+          "energy_release_rate": 0.6222166613081146,
+          "free_segment_length": 500.0,
+          "max_Sxx_norm": 4.229617338372803,
+          "orientation": "upslope",
+          "phi": 15.0,
+          "system_type": "-pst",
+          "thickness_fraction_without_density_gate": 0.4228855721393035
+        },
+        "winner": "upslope"
+      },
+      "energy_release_rate": 0.6222166613081146,
+      "error": null,
+      "max_Sxx_norm": 4.229617338372803,
+      "message": "PST fixed cut 500 mm; upslope orientation won on ease (max_Sxx_norm)",
+      "method": "pst_fixed_cut",
+      "ok": true,
+      "setup": "a",
+      "thickness_fraction_without_density_gate": 0.4228855721393035
+    },
+    "b": {
+      "case": "case_3",
+      "characteristic_length": 500.0,
+      "converged": true,
+      "diagnostics": {
+        "cut_length": 500.0,
+        "downslope": {
+          "energy_release_rate": 0.44356047784778063,
+          "free_segment_length": 500.0,
+          "max_Sxx_norm": 1.8958017638864684,
+          "orientation": "downslope",
+          "phi": 15.0,
+          "system_type": "pst-",
+          "thickness_fraction_without_density_gate": 0.2194513715710723
+        },
+        "err_winner": "upslope",
+        "method": "pst_fixed_cut",
+        "phi": 15.0,
+        "selection_rule": "ease:max_Sxx_norm",
+        "upslope": {
+          "energy_release_rate": 0.5760991700170853,
+          "free_segment_length": 500.0,
+          "max_Sxx_norm": 2.1876164278437433,
+          "orientation": "upslope",
+          "phi": 15.0,
+          "system_type": "-pst",
+          "thickness_fraction_without_density_gate": 0.29925187032418954
+        },
+        "winner": "upslope"
+      },
+      "energy_release_rate": 0.5760991700170853,
+      "error": null,
+      "max_Sxx_norm": 2.1876164278437433,
+      "message": "PST fixed cut 500 mm; upslope orientation won on ease (max_Sxx_norm)",
+      "method": "pst_fixed_cut",
+      "ok": true,
+      "setup": "b",
+      "thickness_fraction_without_density_gate": 0.29925187032418954
+    }
+  },
+  "case_4": {
+    "a": {
+      "case": "case_4",
+      "characteristic_length": 500.0,
+      "converged": true,
+      "diagnostics": {
+        "cut_length": 500.0,
+        "downslope": {
+          "energy_release_rate": 0.2668379995642427,
+          "free_segment_length": 500.0,
+          "max_Sxx_norm": 2.11041629468732,
+          "orientation": "downslope",
+          "phi": 15.0,
+          "system_type": "pst-",
+          "thickness_fraction_without_density_gate": 0.25870646766169153
+        },
+        "err_winner": "upslope",
+        "method": "pst_fixed_cut",
+        "phi": 15.0,
+        "selection_rule": "ease:max_Sxx_norm",
+        "upslope": {
+          "energy_release_rate": 0.287787663060162,
+          "free_segment_length": 500.0,
+          "max_Sxx_norm": 2.286009149203476,
+          "orientation": "upslope",
+          "phi": 15.0,
+          "system_type": "-pst",
+          "thickness_fraction_without_density_gate": 0.29850746268656714
+        },
+        "winner": "upslope"
+      },
+      "energy_release_rate": 0.287787663060162,
+      "error": null,
+      "max_Sxx_norm": 2.286009149203476,
+      "message": "PST fixed cut 500 mm; upslope orientation won on ease (max_Sxx_norm)",
+      "method": "pst_fixed_cut",
+      "ok": true,
+      "setup": "a",
+      "thickness_fraction_without_density_gate": 0.29850746268656714
+    },
+    "b": {
+      "case": "case_4",
+      "characteristic_length": 500.0,
+      "converged": true,
+      "diagnostics": {
+        "cut_length": 500.0,
+        "downslope": {
+          "energy_release_rate": 0.23844140034053224,
+          "free_segment_length": 500.0,
+          "max_Sxx_norm": 1.032344272874348,
+          "orientation": "downslope",
+          "phi": 15.0,
+          "system_type": "pst-",
+          "thickness_fraction_without_density_gate": 0.017456359102244388
+        },
+        "err_winner": "upslope",
+        "method": "pst_fixed_cut",
+        "phi": 15.0,
+        "selection_rule": "ease:max_Sxx_norm",
+        "upslope": {
+          "energy_release_rate": 0.29604112932058135,
+          "free_segment_length": 500.0,
+          "max_Sxx_norm": 1.23555519554048,
+          "orientation": "upslope",
+          "phi": 15.0,
+          "system_type": "-pst",
+          "thickness_fraction_without_density_gate": 0.10723192019950124
+        },
+        "winner": "upslope"
+      },
+      "energy_release_rate": 0.29604112932058135,
+      "error": null,
+      "max_Sxx_norm": 1.23555519554048,
+      "message": "PST fixed cut 500 mm; upslope orientation won on ease (max_Sxx_norm)",
+      "method": "pst_fixed_cut",
+      "ok": true,
+      "setup": "b",
+      "thickness_fraction_without_density_gate": 0.10723192019950124
+    }
+  },
+  "case_5": {
+    "a": {
+      "case": "case_5",
+      "characteristic_length": 500.0,
+      "converged": true,
+      "diagnostics": {
+        "cut_length": 500.0,
+        "downslope": {
+          "energy_release_rate": 2.593716654851014,
+          "free_segment_length": 500.0,
+          "max_Sxx_norm": 4.82965346482798,
+          "orientation": "downslope",
+          "phi": 15.0,
+          "system_type": "pst-",
+          "thickness_fraction_without_density_gate": 0.44510978043912175
+        },
+        "err_winner": "upslope",
+        "method": "pst_fixed_cut",
+        "phi": 15.0,
+        "selection_rule": "ease:max_Sxx_norm",
+        "upslope": {
+          "energy_release_rate": 3.9016519156620912,
+          "free_segment_length": 500.0,
+          "max_Sxx_norm": 5.777187553894637,
+          "orientation": "upslope",
+          "phi": 15.0,
+          "system_type": "-pst",
+          "thickness_fraction_without_density_gate": 0.6766467065868264
+        },
+        "winner": "upslope"
+      },
+      "energy_release_rate": 3.9016519156620912,
+      "error": null,
+      "max_Sxx_norm": 5.777187553894637,
+      "message": "PST fixed cut 500 mm; upslope orientation won on ease (max_Sxx_norm)",
+      "method": "pst_fixed_cut",
+      "ok": true,
+      "setup": "a",
+      "thickness_fraction_without_density_gate": 0.6766467065868264
+    },
+    "b": {
+      "case": "case_5",
+      "characteristic_length": 500.0,
+      "converged": true,
+      "diagnostics": {
+        "cut_length": 500.0,
+        "downslope": {
+          "energy_release_rate": 0.7895498288018152,
+          "free_segment_length": 500.0,
+          "max_Sxx_norm": 2.3743580391488854,
+          "orientation": "downslope",
+          "phi": 15.0,
+          "system_type": "pst-",
+          "thickness_fraction_without_density_gate": 0.2634730538922156
+        },
+        "err_winner": "upslope",
+        "method": "pst_fixed_cut",
+        "phi": 15.0,
+        "selection_rule": "ease:max_Sxx_norm",
+        "upslope": {
+          "energy_release_rate": 1.1692088333766144,
+          "free_segment_length": 500.0,
+          "max_Sxx_norm": 2.840185494084757,
+          "orientation": "upslope",
+          "phi": 15.0,
+          "system_type": "-pst",
+          "thickness_fraction_without_density_gate": 0.37924151696606784
+        },
+        "winner": "upslope"
+      },
+      "energy_release_rate": 1.1692088333766144,
+      "error": null,
+      "max_Sxx_norm": 2.840185494084757,
+      "message": "PST fixed cut 500 mm; upslope orientation won on ease (max_Sxx_norm)",
+      "method": "pst_fixed_cut",
+      "ok": true,
+      "setup": "b",
+      "thickness_fraction_without_density_gate": 0.37924151696606784
+    }
+  },
+  "case_6": {
+    "a": {
+      "case": "case_6",
+      "characteristic_length": 500.0,
+      "converged": true,
+      "diagnostics": {
+        "cut_length": 500.0,
+        "downslope": {
+          "energy_release_rate": 0.7895498288018152,
+          "free_segment_length": 500.0,
+          "max_Sxx_norm": 2.3743580391488854,
+          "orientation": "downslope",
+          "phi": 15.0,
+          "system_type": "pst-",
+          "thickness_fraction_without_density_gate": 0.2634730538922156
+        },
+        "err_winner": "upslope",
+        "method": "pst_fixed_cut",
+        "phi": 15.0,
+        "selection_rule": "ease:max_Sxx_norm",
+        "upslope": {
+          "energy_release_rate": 1.1692088333766144,
+          "free_segment_length": 500.0,
+          "max_Sxx_norm": 2.840185494084757,
+          "orientation": "upslope",
+          "phi": 15.0,
+          "system_type": "-pst",
+          "thickness_fraction_without_density_gate": 0.37924151696606784
+        },
+        "winner": "upslope"
+      },
+      "energy_release_rate": 1.1692088333766144,
+      "error": null,
+      "max_Sxx_norm": 2.840185494084757,
+      "message": "PST fixed cut 500 mm; upslope orientation won on ease (max_Sxx_norm)",
+      "method": "pst_fixed_cut",
+      "ok": true,
+      "setup": "a",
+      "thickness_fraction_without_density_gate": 0.37924151696606784
+    },
+    "b": {
+      "case": "case_6",
+      "characteristic_length": 500.0,
+      "converged": true,
+      "diagnostics": {
+        "cut_length": 500.0,
+        "downslope": {
+          "energy_release_rate": 0.42508544765627293,
+          "free_segment_length": 500.0,
+          "max_Sxx_norm": 1.487401581780658,
+          "orientation": "downslope",
+          "phi": 15.0,
+          "system_type": "pst-",
+          "thickness_fraction_without_density_gate": 0.1497005988023952
+        },
+        "err_winner": "upslope",
+        "method": "pst_fixed_cut",
+        "phi": 15.0,
+        "selection_rule": "ease:max_Sxx_norm",
+        "upslope": {
+          "energy_release_rate": 0.6085295410100006,
+          "free_segment_length": 500.0,
+          "max_Sxx_norm": 1.779216245737928,
+          "orientation": "upslope",
+          "phi": 15.0,
+          "system_type": "-pst",
+          "thickness_fraction_without_density_gate": 0.2435129740518962
+        },
+        "winner": "upslope"
+      },
+      "energy_release_rate": 0.6085295410100006,
+      "error": null,
+      "max_Sxx_norm": 1.779216245737928,
+      "message": "PST fixed cut 500 mm; upslope orientation won on ease (max_Sxx_norm)",
+      "method": "pst_fixed_cut",
+      "ok": true,
+      "setup": "b",
+      "thickness_fraction_without_density_gate": 0.2435129740518962
+    }
+  },
+  "case_7": {
+    "a": {
+      "case": "case_7",
+      "characteristic_length": 500.0,
+      "converged": true,
+      "diagnostics": {
+        "cut_length": 500.0,
+        "downslope": {
+          "energy_release_rate": 0.42508544765627293,
+          "free_segment_length": 500.0,
+          "max_Sxx_norm": 1.487401581780658,
+          "orientation": "downslope",
+          "phi": 15.0,
+          "system_type": "pst-",
+          "thickness_fraction_without_density_gate": 0.1497005988023952
+        },
+        "err_winner": "upslope",
+        "method": "pst_fixed_cut",
+        "phi": 15.0,
+        "selection_rule": "ease:max_Sxx_norm",
+        "upslope": {
+          "energy_release_rate": 0.6085295410100006,
+          "free_segment_length": 500.0,
+          "max_Sxx_norm": 1.779216245737928,
+          "orientation": "upslope",
+          "phi": 15.0,
+          "system_type": "-pst",
+          "thickness_fraction_without_density_gate": 0.2435129740518962
+        },
+        "winner": "upslope"
+      },
+      "energy_release_rate": 0.6085295410100006,
+      "error": null,
+      "max_Sxx_norm": 1.779216245737928,
+      "message": "PST fixed cut 500 mm; upslope orientation won on ease (max_Sxx_norm)",
+      "method": "pst_fixed_cut",
+      "ok": true,
+      "setup": "a",
+      "thickness_fraction_without_density_gate": 0.2435129740518962
+    },
+    "b": {
+      "case": "case_7",
+      "characteristic_length": 500.0,
+      "converged": true,
+      "diagnostics": {
+        "cut_length": 500.0,
+        "downslope": {
+          "energy_release_rate": 0.23991511396467338,
+          "free_segment_length": 500.0,
+          "max_Sxx_norm": 0.8164352286539447,
+          "orientation": "downslope",
+          "phi": 15.0,
+          "system_type": "pst-",
+          "thickness_fraction_without_density_gate": 0.0
+        },
+        "err_winner": "upslope",
+        "method": "pst_fixed_cut",
+        "phi": 15.0,
+        "selection_rule": "ease:max_Sxx_norm",
+        "upslope": {
+          "energy_release_rate": 0.32153256027256855,
+          "free_segment_length": 500.0,
+          "max_Sxx_norm": 1.0312955811817415,
+          "orientation": "upslope",
+          "phi": 15.0,
+          "system_type": "-pst",
+          "thickness_fraction_without_density_gate": 0.017964071856287425
+        },
+        "winner": "upslope"
+      },
+      "energy_release_rate": 0.32153256027256855,
+      "error": null,
+      "max_Sxx_norm": 1.0312955811817415,
+      "message": "PST fixed cut 500 mm; upslope orientation won on ease (max_Sxx_norm)",
+      "method": "pst_fixed_cut",
+      "ok": true,
+      "setup": "b",
+      "thickness_fraction_without_density_gate": 0.017964071856287425
+    }
+  },
+  "case_8": {
+    "a": {
+      "case": "case_8",
+      "characteristic_length": 500.0,
+      "converged": true,
+      "diagnostics": {
+        "cut_length": 500.0,
+        "downslope": {
+          "energy_release_rate": 0.6669335364290806,
+          "free_segment_length": 500.0,
+          "max_Sxx_norm": 2.6431983300403323,
+          "orientation": "downslope",
+          "phi": 15.0,
+          "system_type": "pst-",
+          "thickness_fraction_without_density_gate": 0.2788844621513944
+        },
+        "err_winner": "upslope",
+        "method": "pst_fixed_cut",
+        "phi": 15.0,
+        "selection_rule": "ease:max_Sxx_norm",
+        "upslope": {
+          "energy_release_rate": 0.9445536857073963,
+          "free_segment_length": 500.0,
+          "max_Sxx_norm": 3.343685449732329,
+          "orientation": "upslope",
+          "phi": 15.0,
+          "system_type": "-pst",
+          "thickness_fraction_without_density_gate": 0.43824701195219123
+        },
+        "winner": "upslope"
+      },
+      "energy_release_rate": 0.9445536857073963,
+      "error": null,
+      "max_Sxx_norm": 3.343685449732329,
+      "message": "PST fixed cut 500 mm; upslope orientation won on ease (max_Sxx_norm)",
+      "method": "pst_fixed_cut",
+      "ok": true,
+      "setup": "a",
+      "thickness_fraction_without_density_gate": 0.43824701195219123
+    },
+    "b": {
+      "case": "case_8",
+      "characteristic_length": 500.0,
+      "converged": true,
+      "diagnostics": {
+        "cut_length": 500.0,
+        "downslope": {
+          "energy_release_rate": 0.42508544765627293,
+          "free_segment_length": 500.0,
+          "max_Sxx_norm": 1.487401581780658,
+          "orientation": "downslope",
+          "phi": 15.0,
+          "system_type": "pst-",
+          "thickness_fraction_without_density_gate": 0.1497005988023952
+        },
+        "err_winner": "upslope",
+        "method": "pst_fixed_cut",
+        "phi": 15.0,
+        "selection_rule": "ease:max_Sxx_norm",
+        "upslope": {
+          "energy_release_rate": 0.6085295410100006,
+          "free_segment_length": 500.0,
+          "max_Sxx_norm": 1.779216245737928,
+          "orientation": "upslope",
+          "phi": 15.0,
+          "system_type": "-pst",
+          "thickness_fraction_without_density_gate": 0.2435129740518962
+        },
+        "winner": "upslope"
+      },
+      "energy_release_rate": 0.6085295410100006,
+      "error": null,
+      "max_Sxx_norm": 1.779216245737928,
+      "message": "PST fixed cut 500 mm; upslope orientation won on ease (max_Sxx_norm)",
+      "method": "pst_fixed_cut",
+      "ok": true,
+      "setup": "b",
+      "thickness_fraction_without_density_gate": 0.2435129740518962
+    }
+  },
+  "case_9": {
+    "a": {
+      "case": "case_9",
+      "characteristic_length": 500.0,
+      "converged": true,
+      "diagnostics": {
+        "cut_length": 500.0,
+        "downslope": {
+          "energy_release_rate": 0.3171187926076919,
+          "free_segment_length": 500.0,
+          "max_Sxx_norm": 1.5396440968114409,
+          "orientation": "downslope",
+          "phi": 15.0,
+          "system_type": "pst-",
+          "thickness_fraction_without_density_gate": 0.10358565737051793
+        },
+        "err_winner": "upslope",
+        "method": "pst_fixed_cut",
+        "phi": 15.0,
+        "selection_rule": "ease:max_Sxx_norm",
+        "upslope": {
+          "energy_release_rate": 0.409709715830848,
+          "free_segment_length": 500.0,
+          "max_Sxx_norm": 1.897683447859552,
+          "orientation": "upslope",
+          "phi": 15.0,
+          "system_type": "-pst",
+          "thickness_fraction_without_density_gate": 0.1553784860557769
+        },
+        "winner": "upslope"
+      },
+      "energy_release_rate": 0.409709715830848,
+      "error": null,
+      "max_Sxx_norm": 1.897683447859552,
+      "message": "PST fixed cut 500 mm; upslope orientation won on ease (max_Sxx_norm)",
+      "method": "pst_fixed_cut",
+      "ok": true,
+      "setup": "a",
+      "thickness_fraction_without_density_gate": 0.1553784860557769
+    },
+    "b": {
+      "case": "case_9",
+      "characteristic_length": 500.0,
+      "converged": true,
+      "diagnostics": {
+        "cut_length": 500.0,
+        "downslope": {
+          "energy_release_rate": 0.23991511396467338,
+          "free_segment_length": 500.0,
+          "max_Sxx_norm": 0.8164352286539447,
+          "orientation": "downslope",
+          "phi": 15.0,
+          "system_type": "pst-",
+          "thickness_fraction_without_density_gate": 0.0
+        },
+        "err_winner": "upslope",
+        "method": "pst_fixed_cut",
+        "phi": 15.0,
+        "selection_rule": "ease:max_Sxx_norm",
+        "upslope": {
+          "energy_release_rate": 0.32153256027256855,
+          "free_segment_length": 500.0,
+          "max_Sxx_norm": 1.0312955811817415,
+          "orientation": "upslope",
+          "phi": 15.0,
+          "system_type": "-pst",
+          "thickness_fraction_without_density_gate": 0.017964071856287425
+        },
+        "winner": "upslope"
+      },
+      "energy_release_rate": 0.32153256027256855,
+      "error": null,
+      "max_Sxx_norm": 1.0312955811817415,
+      "message": "PST fixed cut 500 mm; upslope orientation won on ease (max_Sxx_norm)",
+      "method": "pst_fixed_cut",
+      "ok": true,
+      "setup": "b",
+      "thickness_fraction_without_density_gate": 0.017964071856287425
+    }
+  }
+}

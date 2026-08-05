@@ -1,0 +1,968 @@
+{
+  "case_1": {
+    "a": {
+      "case": "case_1",
+      "characteristic_length": 454.3227763022572,
+      "converged": true,
+      "diagnostics": {
+        "method": "baseline_B_point_contact",
+        "production_slab_tensile_criterion": 1.0,
+        "touchdown_distance": 454.3227763022572
+      },
+      "energy_release_rate": 0.5965091540887368,
+      "error": null,
+      "max_Sxx_norm": 1.3543160027692163,
+      "message": "Steady State evaluation successful.",
+      "method": "baseline_ss",
+      "ok": true,
+      "production_slab_tensile_criterion": 1.0,
+      "setup": "a",
+      "tensile_strength_method": "hybrid",
+      "thickness_fraction_without_density_gate": 0.13432835820895522
+    },
+    "b": {
+      "case": "case_1",
+      "characteristic_length": 530.6625065053131,
+      "converged": true,
+      "diagnostics": {
+        "method": "baseline_B_point_contact",
+        "production_slab_tensile_criterion": 1.0,
+        "touchdown_distance": 530.6625065053131
+      },
+      "energy_release_rate": 1.0703102309915844,
+      "error": null,
+      "max_Sxx_norm": 1.0500935984069106,
+      "message": "Steady State evaluation successful.",
+      "method": "baseline_ss",
+      "ok": true,
+      "production_slab_tensile_criterion": 1.0,
+      "setup": "b",
+      "tensile_strength_method": "hybrid",
+      "thickness_fraction_without_density_gate": 0.02493765586034913
+    }
+  },
+  "case_10": {
+    "a": {
+      "case": "case_10",
+      "characteristic_length": 1899.4340656655722,
+      "converged": true,
+      "diagnostics": {
+        "method": "baseline_B_point_contact",
+        "production_slab_tensile_criterion": 0.18326693227091634,
+        "touchdown_distance": 1899.4340656655722
+      },
+      "energy_release_rate": 3.6454248031258727,
+      "error": null,
+      "max_Sxx_norm": 1.7397341700345061,
+      "message": "Steady State evaluation successful.",
+      "method": "baseline_ss",
+      "ok": true,
+      "production_slab_tensile_criterion": 0.18326693227091634,
+      "setup": "a",
+      "tensile_strength_method": "hybrid",
+      "thickness_fraction_without_density_gate": 0.18326693227091634
+    },
+    "b": {
+      "case": "case_10",
+      "characteristic_length": 2467.377964386884,
+      "converged": true,
+      "diagnostics": {
+        "method": "baseline_B_point_contact",
+        "production_slab_tensile_criterion": 0.19760479041916168,
+        "touchdown_distance": 2467.377964386884
+      },
+      "energy_release_rate": 4.629726742714907,
+      "error": null,
+      "max_Sxx_norm": 1.6296856455211548,
+      "message": "Steady State evaluation successful.",
+      "method": "baseline_ss",
+      "ok": true,
+      "production_slab_tensile_criterion": 0.19760479041916168,
+      "setup": "b",
+      "tensile_strength_method": "hybrid",
+      "thickness_fraction_without_density_gate": 0.19760479041916168
+    }
+  },
+  "case_11": {
+    "a": {
+      "case": "case_11",
+      "characteristic_length": 2024.983961267051,
+      "converged": true,
+      "diagnostics": {
+        "method": "baseline_B_point_contact",
+        "production_slab_tensile_criterion": 0.33067729083665337,
+        "touchdown_distance": 2024.983961267051
+      },
+      "energy_release_rate": 3.9712605878695824,
+      "error": null,
+      "max_Sxx_norm": 1.6745141441042468,
+      "message": "Steady State evaluation successful.",
+      "method": "baseline_ss",
+      "ok": true,
+      "production_slab_tensile_criterion": 0.33067729083665337,
+      "setup": "a",
+      "tensile_strength_method": "hybrid",
+      "thickness_fraction_without_density_gate": 0.33067729083665337
+    },
+    "b": {
+      "case": "case_11",
+      "characteristic_length": 2467.377964386884,
+      "converged": true,
+      "diagnostics": {
+        "method": "baseline_B_point_contact",
+        "production_slab_tensile_criterion": 0.19760479041916168,
+        "touchdown_distance": 2467.377964386884
+      },
+      "energy_release_rate": 4.629726742714907,
+      "error": null,
+      "max_Sxx_norm": 1.6296856455211548,
+      "message": "Steady State evaluation successful.",
+      "method": "baseline_ss",
+      "ok": true,
+      "production_slab_tensile_criterion": 0.19760479041916168,
+      "setup": "b",
+      "tensile_strength_method": "hybrid",
+      "thickness_fraction_without_density_gate": 0.19760479041916168
+    }
+  },
+  "case_12": {
+    "a": {
+      "case": "case_12",
+      "characteristic_length": 1102.6693263189422,
+      "converged": true,
+      "diagnostics": {
+        "method": "baseline_B_point_contact",
+        "production_slab_tensile_criterion": 0.1294820717131474,
+        "touchdown_distance": 1102.6693263189422
+      },
+      "energy_release_rate": 1.9021314046707698,
+      "error": null,
+      "max_Sxx_norm": 2.4452976190763716,
+      "message": "Steady State evaluation successful.",
+      "method": "baseline_ss",
+      "ok": true,
+      "production_slab_tensile_criterion": 0.1294820717131474,
+      "setup": "a",
+      "tensile_strength_method": "hybrid",
+      "thickness_fraction_without_density_gate": 0.1294820717131474
+    },
+    "b": {
+      "case": "case_12",
+      "characteristic_length": 546.3920593179975,
+      "converged": true,
+      "diagnostics": {
+        "method": "baseline_B_point_contact",
+        "production_slab_tensile_criterion": 1.0,
+        "touchdown_distance": 546.3920593179975
+      },
+      "energy_release_rate": 1.3090116697422256,
+      "error": null,
+      "max_Sxx_norm": 0.9607903560204056,
+      "message": "Steady State evaluation successful.",
+      "method": "baseline_ss",
+      "ok": true,
+      "production_slab_tensile_criterion": 1.0,
+      "setup": "b",
+      "tensile_strength_method": "hybrid",
+      "thickness_fraction_without_density_gate": 0.0
+    }
+  },
+  "case_13": {
+    "a": {
+      "case": "case_13",
+      "characteristic_length": 1583.4581414517534,
+      "converged": true,
+      "diagnostics": {
+        "method": "baseline_B_point_contact",
+        "production_slab_tensile_criterion": 0.12350597609561753,
+        "touchdown_distance": 1583.4581414517534
+      },
+      "energy_release_rate": 2.5919478031761054,
+      "error": null,
+      "max_Sxx_norm": 2.5705046667532456,
+      "message": "Steady State evaluation successful.",
+      "method": "baseline_ss",
+      "ok": true,
+      "production_slab_tensile_criterion": 0.12350597609561753,
+      "setup": "a",
+      "tensile_strength_method": "hybrid",
+      "thickness_fraction_without_density_gate": 0.12350597609561753
+    },
+    "b": {
+      "case": "case_13",
+      "characteristic_length": 546.3920593179975,
+      "converged": true,
+      "diagnostics": {
+        "method": "baseline_B_point_contact",
+        "production_slab_tensile_criterion": 1.0,
+        "touchdown_distance": 546.3920593179975
+      },
+      "energy_release_rate": 1.3090116697422256,
+      "error": null,
+      "max_Sxx_norm": 0.9607903560204056,
+      "message": "Steady State evaluation successful.",
+      "method": "baseline_ss",
+      "ok": true,
+      "production_slab_tensile_criterion": 1.0,
+      "setup": "b",
+      "tensile_strength_method": "hybrid",
+      "thickness_fraction_without_density_gate": 0.0
+    }
+  },
+  "case_14": {
+    "a": {
+      "case": "case_14",
+      "characteristic_length": 1338.3292134577805,
+      "converged": true,
+      "diagnostics": {
+        "method": "baseline_B_point_contact",
+        "production_slab_tensile_criterion": 0.13745019920318724,
+        "touchdown_distance": 1338.3292134577805
+      },
+      "energy_release_rate": 2.3751451816537803,
+      "error": null,
+      "max_Sxx_norm": 1.7214341822511559,
+      "message": "Steady State evaluation successful.",
+      "method": "baseline_ss",
+      "ok": true,
+      "production_slab_tensile_criterion": 0.13745019920318724,
+      "setup": "a",
+      "tensile_strength_method": "hybrid",
+      "thickness_fraction_without_density_gate": 0.13745019920318724
+    },
+    "b": {
+      "case": "case_14",
+      "characteristic_length": 1085.1624351009837,
+      "converged": true,
+      "diagnostics": {
+        "method": "baseline_B_point_contact",
+        "production_slab_tensile_criterion": 0.14770459081836326,
+        "touchdown_distance": 1085.1624351009837
+      },
+      "energy_release_rate": 2.035141925550086,
+      "error": null,
+      "max_Sxx_norm": 1.4125959164988255,
+      "message": "Steady State evaluation successful.",
+      "method": "baseline_ss",
+      "ok": true,
+      "production_slab_tensile_criterion": 0.14770459081836326,
+      "setup": "b",
+      "tensile_strength_method": "hybrid",
+      "thickness_fraction_without_density_gate": 0.14770459081836326
+    }
+  },
+  "case_15": {
+    "a": {
+      "case": "case_15",
+      "characteristic_length": 1709.686633236953,
+      "converged": true,
+      "diagnostics": {
+        "method": "baseline_B_point_contact",
+        "production_slab_tensile_criterion": 0.12151394422310757,
+        "touchdown_distance": 1709.686633236953
+      },
+      "energy_release_rate": 3.0923983358535505,
+      "error": null,
+      "max_Sxx_norm": 2.180609516476635,
+      "message": "Steady State evaluation successful.",
+      "method": "baseline_ss",
+      "ok": true,
+      "production_slab_tensile_criterion": 0.12151394422310757,
+      "setup": "a",
+      "tensile_strength_method": "hybrid",
+      "thickness_fraction_without_density_gate": 0.12151394422310757
+    },
+    "b": {
+      "case": "case_15",
+      "characteristic_length": 1085.1624351009837,
+      "converged": true,
+      "diagnostics": {
+        "method": "baseline_B_point_contact",
+        "production_slab_tensile_criterion": 0.14770459081836326,
+        "touchdown_distance": 1085.1624351009837
+      },
+      "energy_release_rate": 2.035141925550086,
+      "error": null,
+      "max_Sxx_norm": 1.4125959164988255,
+      "message": "Steady State evaluation successful.",
+      "method": "baseline_ss",
+      "ok": true,
+      "production_slab_tensile_criterion": 0.14770459081836326,
+      "setup": "b",
+      "tensile_strength_method": "hybrid",
+      "thickness_fraction_without_density_gate": 0.14770459081836326
+    }
+  },
+  "case_16": {
+    "a": {
+      "case": "case_16",
+      "characteristic_length": 827.6160944925552,
+      "converged": true,
+      "diagnostics": {
+        "method": "baseline_B_point_contact",
+        "production_slab_tensile_criterion": 0.0,
+        "touchdown_distance": 827.6160944925552
+      },
+      "energy_release_rate": 1.5799992219331074,
+      "error": null,
+      "max_Sxx_norm": 1.2823851313811836,
+      "message": "Steady State evaluation successful.",
+      "method": "baseline_ss",
+      "ok": true,
+      "production_slab_tensile_criterion": 0.0,
+      "setup": "a",
+      "tensile_strength_method": "hybrid",
+      "thickness_fraction_without_density_gate": 0.16135458167330677
+    },
+    "b": {
+      "case": "case_16",
+      "characteristic_length": 856.6103527067784,
+      "converged": true,
+      "diagnostics": {
+        "method": "baseline_B_point_contact",
+        "production_slab_tensile_criterion": 0.0,
+        "touchdown_distance": 856.6103527067784
+      },
+      "energy_release_rate": 2.0119253435607356,
+      "error": null,
+      "max_Sxx_norm": 1.0420939491012675,
+      "message": "Steady State evaluation successful.",
+      "method": "baseline_ss",
+      "ok": true,
+      "production_slab_tensile_criterion": 0.0,
+      "setup": "b",
+      "tensile_strength_method": "hybrid",
+      "thickness_fraction_without_density_gate": 0.03133903133903134
+    }
+  },
+  "case_17": {
+    "a": {
+      "case": "case_17",
+      "characteristic_length": 1286.8481567273786,
+      "converged": true,
+      "diagnostics": {
+        "method": "baseline_B_point_contact",
+        "production_slab_tensile_criterion": 0.34328358208955223,
+        "touchdown_distance": 1286.8481567273786
+      },
+      "energy_release_rate": 2.288752339719393,
+      "error": null,
+      "max_Sxx_norm": 2.2252066830705757,
+      "message": "Steady State evaluation successful.",
+      "method": "baseline_ss",
+      "ok": true,
+      "production_slab_tensile_criterion": 0.34328358208955223,
+      "setup": "a",
+      "tensile_strength_method": "hybrid",
+      "thickness_fraction_without_density_gate": 0.18127490039840638
+    },
+    "b": {
+      "case": "case_17",
+      "characteristic_length": 1320.161419613193,
+      "converged": true,
+      "diagnostics": {
+        "method": "baseline_B_point_contact",
+        "production_slab_tensile_criterion": 0.263681592039801,
+        "touchdown_distance": 1320.161419613193
+      },
+      "energy_release_rate": 2.781764878377662,
+      "error": null,
+      "max_Sxx_norm": 1.8428680378186997,
+      "message": "Steady State evaluation successful.",
+      "method": "baseline_ss",
+      "ok": true,
+      "production_slab_tensile_criterion": 0.263681592039801,
+      "setup": "b",
+      "tensile_strength_method": "hybrid",
+      "thickness_fraction_without_density_gate": 0.2934472934472934
+    }
+  },
+  "case_18": {
+    "a": {
+      "case": "case_18",
+      "characteristic_length": 1524.7546341119032,
+      "converged": true,
+      "diagnostics": {
+        "method": "baseline_B_point_contact",
+        "production_slab_tensile_criterion": 0.27860696517412936,
+        "touchdown_distance": 1524.7546341119032
+      },
+      "energy_release_rate": 2.6421450230409786,
+      "error": null,
+      "max_Sxx_norm": 2.021834065431854,
+      "message": "Steady State evaluation successful.",
+      "method": "baseline_ss",
+      "ok": true,
+      "production_slab_tensile_criterion": 0.27860696517412936,
+      "setup": "a",
+      "tensile_strength_method": "hybrid",
+      "thickness_fraction_without_density_gate": 0.11155378486055777
+    },
+    "b": {
+      "case": "case_18",
+      "characteristic_length": 1518.8910155554975,
+      "converged": true,
+      "diagnostics": {
+        "method": "baseline_B_point_contact",
+        "production_slab_tensile_criterion": 0.25870646766169153,
+        "touchdown_distance": 1518.8910155554975
+      },
+      "energy_release_rate": 3.150080672936345,
+      "error": null,
+      "max_Sxx_norm": 1.9044430550871216,
+      "message": "Steady State evaluation successful.",
+      "method": "baseline_ss",
+      "ok": true,
+      "production_slab_tensile_criterion": 0.25870646766169153,
+      "setup": "b",
+      "tensile_strength_method": "hybrid",
+      "thickness_fraction_without_density_gate": 0.16666666666666666
+    }
+  },
+  "case_19": {
+    "a": {
+      "case": "case_19",
+      "characteristic_length": 1490.0701756915607,
+      "converged": true,
+      "diagnostics": {
+        "method": "baseline_B_point_contact",
+        "production_slab_tensile_criterion": 0.3346613545816733,
+        "touchdown_distance": 1490.0701756915607
+      },
+      "energy_release_rate": 2.763768218161367,
+      "error": null,
+      "max_Sxx_norm": 1.7164964677293089,
+      "message": "Steady State evaluation successful.",
+      "method": "baseline_ss",
+      "ok": true,
+      "production_slab_tensile_criterion": 0.3346613545816733,
+      "setup": "a",
+      "tensile_strength_method": "hybrid",
+      "thickness_fraction_without_density_gate": 0.3346613545816733
+    },
+    "b": {
+      "case": "case_19",
+      "characteristic_length": 1658.2501489733322,
+      "converged": true,
+      "diagnostics": {
+        "method": "baseline_B_point_contact",
+        "production_slab_tensile_criterion": 0.28062678062678065,
+        "touchdown_distance": 1658.2501489733322
+      },
+      "energy_release_rate": 3.5252361177540634,
+      "error": null,
+      "max_Sxx_norm": 1.5554717689155408,
+      "message": "Steady State evaluation successful.",
+      "method": "baseline_ss",
+      "ok": true,
+      "production_slab_tensile_criterion": 0.28062678062678065,
+      "setup": "b",
+      "tensile_strength_method": "hybrid",
+      "thickness_fraction_without_density_gate": 0.28062678062678065
+    }
+  },
+  "case_2": {
+    "a": {
+      "case": "case_2",
+      "characteristic_length": 791.4055386757932,
+      "converged": true,
+      "diagnostics": {
+        "method": "baseline_B_point_contact",
+        "production_slab_tensile_criterion": 0.22885572139303484,
+        "touchdown_distance": 791.4055386757932
+      },
+      "energy_release_rate": 0.8707232318095555,
+      "error": null,
+      "max_Sxx_norm": 1.8248422582481687,
+      "message": "Steady State evaluation successful.",
+      "method": "baseline_ss",
+      "ok": true,
+      "production_slab_tensile_criterion": 0.22885572139303484,
+      "setup": "a",
+      "tensile_strength_method": "hybrid",
+      "thickness_fraction_without_density_gate": 0.22885572139303484
+    },
+    "b": {
+      "case": "case_2",
+      "characteristic_length": 1015.372317210665,
+      "converged": true,
+      "diagnostics": {
+        "method": "baseline_B_point_contact",
+        "production_slab_tensile_criterion": 0.17206982543640897,
+        "touchdown_distance": 1015.372317210665
+      },
+      "energy_release_rate": 1.6548695148917338,
+      "error": null,
+      "max_Sxx_norm": 1.5204238130884984,
+      "message": "Steady State evaluation successful.",
+      "method": "baseline_ss",
+      "ok": true,
+      "production_slab_tensile_criterion": 0.17206982543640897,
+      "setup": "b",
+      "tensile_strength_method": "hybrid",
+      "thickness_fraction_without_density_gate": 0.17206982543640897
+    }
+  },
+  "case_20": {
+    "a": {
+      "case": "case_20",
+      "characteristic_length": 1651.421280008999,
+      "converged": true,
+      "diagnostics": {
+        "method": "baseline_B_point_contact",
+        "production_slab_tensile_criterion": 0.35856573705179284,
+        "touchdown_distance": 1651.421280008999
+      },
+      "energy_release_rate": 3.140567222875144,
+      "error": null,
+      "max_Sxx_norm": 1.630607106517802,
+      "message": "Steady State evaluation successful.",
+      "method": "baseline_ss",
+      "ok": true,
+      "production_slab_tensile_criterion": 0.35856573705179284,
+      "setup": "a",
+      "tensile_strength_method": "hybrid",
+      "thickness_fraction_without_density_gate": 0.35856573705179284
+    },
+    "b": {
+      "case": "case_20",
+      "characteristic_length": 1818.8554460762793,
+      "converged": true,
+      "diagnostics": {
+        "method": "baseline_B_point_contact",
+        "production_slab_tensile_criterion": 0.3418803418803419,
+        "touchdown_distance": 1818.8554460762793
+      },
+      "energy_release_rate": 3.948632240787244,
+      "error": null,
+      "max_Sxx_norm": 1.703335732132138,
+      "message": "Steady State evaluation successful.",
+      "method": "baseline_ss",
+      "ok": true,
+      "production_slab_tensile_criterion": 0.3418803418803419,
+      "setup": "b",
+      "tensile_strength_method": "hybrid",
+      "thickness_fraction_without_density_gate": 0.3418803418803419
+    }
+  },
+  "case_21": {
+    "a": {
+      "case": "case_21",
+      "characteristic_length": 1576.3717105795238,
+      "converged": true,
+      "diagnostics": {
+        "method": "baseline_B_point_contact",
+        "production_slab_tensile_criterion": 0.4358407079646018,
+        "touchdown_distance": 1576.3717105795238
+      },
+      "energy_release_rate": 2.2904262735310073,
+      "error": null,
+      "max_Sxx_norm": 1.92181965007891,
+      "message": "Steady State evaluation successful.",
+      "method": "baseline_ss",
+      "ok": true,
+      "production_slab_tensile_criterion": 0.4358407079646018,
+      "setup": "a",
+      "tensile_strength_method": "hybrid",
+      "thickness_fraction_without_density_gate": 0.4358407079646018
+    },
+    "b": {
+      "case": "case_21",
+      "characteristic_length": 1649.6145814406384,
+      "converged": true,
+      "diagnostics": {
+        "method": "baseline_B_point_contact",
+        "production_slab_tensile_criterion": 0.017699115044247787,
+        "touchdown_distance": 1649.6145814406384
+      },
+      "energy_release_rate": 2.2530637964342235,
+      "error": null,
+      "max_Sxx_norm": 1.2277077117614212,
+      "message": "Steady State evaluation successful.",
+      "method": "baseline_ss",
+      "ok": true,
+      "production_slab_tensile_criterion": 0.017699115044247787,
+      "setup": "b",
+      "tensile_strength_method": "hybrid",
+      "thickness_fraction_without_density_gate": 0.017699115044247787
+    }
+  },
+  "case_22": {
+    "a": {
+      "case": "case_22",
+      "characteristic_length": 1337.3884205036886,
+      "converged": true,
+      "diagnostics": {
+        "method": "baseline_B_point_contact",
+        "production_slab_tensile_criterion": 0.271523178807947,
+        "touchdown_distance": 1337.3884205036886
+      },
+      "energy_release_rate": 2.4326605518106534,
+      "error": null,
+      "max_Sxx_norm": 1.955269670503317,
+      "message": "Steady State evaluation successful.",
+      "method": "baseline_ss",
+      "ok": true,
+      "production_slab_tensile_criterion": 0.271523178807947,
+      "setup": "a",
+      "tensile_strength_method": "hybrid",
+      "thickness_fraction_without_density_gate": 0.23007246376811594
+    },
+    "b": {
+      "case": "case_22",
+      "characteristic_length": 1402.0102473173642,
+      "converged": true,
+      "diagnostics": {
+        "method": "baseline_B_point_contact",
+        "production_slab_tensile_criterion": 0.08876811594202899,
+        "touchdown_distance": 1402.0102473173642
+      },
+      "energy_release_rate": 2.3731797726572177,
+      "error": null,
+      "max_Sxx_norm": 2.694616537702145,
+      "message": "Steady State evaluation successful.",
+      "method": "baseline_ss",
+      "ok": true,
+      "production_slab_tensile_criterion": 0.08876811594202899,
+      "setup": "b",
+      "tensile_strength_method": "hybrid",
+      "thickness_fraction_without_density_gate": 0.08876811594202899
+    }
+  },
+  "case_23": {
+    "a": {
+      "case": "case_23",
+      "characteristic_length": 1995.905749307509,
+      "converged": true,
+      "diagnostics": {
+        "method": "baseline_B_point_contact",
+        "production_slab_tensile_criterion": 0.33152173913043476,
+        "touchdown_distance": 1995.905749307509
+      },
+      "energy_release_rate": 3.706535205459681,
+      "error": null,
+      "max_Sxx_norm": 1.805111692385939,
+      "message": "Steady State evaluation successful.",
+      "method": "baseline_ss",
+      "ok": true,
+      "production_slab_tensile_criterion": 0.33152173913043476,
+      "setup": "a",
+      "tensile_strength_method": "hybrid",
+      "thickness_fraction_without_density_gate": 0.33152173913043476
+    },
+    "b": {
+      "case": "case_23",
+      "characteristic_length": 2048.505474664043,
+      "converged": true,
+      "diagnostics": {
+        "method": "baseline_B_point_contact",
+        "production_slab_tensile_criterion": 0.09601449275362318,
+        "touchdown_distance": 2048.505474664043
+      },
+      "energy_release_rate": 3.682724168247571,
+      "error": null,
+      "max_Sxx_norm": 1.5406963961348077,
+      "message": "Steady State evaluation successful.",
+      "method": "baseline_ss",
+      "ok": true,
+      "production_slab_tensile_criterion": 0.09601449275362318,
+      "setup": "b",
+      "tensile_strength_method": "hybrid",
+      "thickness_fraction_without_density_gate": 0.09601449275362318
+    }
+  },
+  "case_3": {
+    "a": {
+      "case": "case_3",
+      "characteristic_length": 1093.2785288675736,
+      "converged": true,
+      "diagnostics": {
+        "method": "baseline_B_point_contact",
+        "production_slab_tensile_criterion": 0.25870646766169153,
+        "touchdown_distance": 1093.2785288675736
+      },
+      "energy_release_rate": 1.1927721274893026,
+      "error": null,
+      "max_Sxx_norm": 2.0782438980746463,
+      "message": "Steady State evaluation successful.",
+      "method": "baseline_ss",
+      "ok": true,
+      "production_slab_tensile_criterion": 0.25870646766169153,
+      "setup": "a",
+      "tensile_strength_method": "hybrid",
+      "thickness_fraction_without_density_gate": 0.25870646766169153
+    },
+    "b": {
+      "case": "case_3",
+      "characteristic_length": 1454.7064677933056,
+      "converged": true,
+      "diagnostics": {
+        "method": "baseline_B_point_contact",
+        "production_slab_tensile_criterion": 0.22443890274314215,
+        "touchdown_distance": 1454.7064677933056
+      },
+      "energy_release_rate": 2.320707197100619,
+      "error": null,
+      "max_Sxx_norm": 1.810184048005857,
+      "message": "Steady State evaluation successful.",
+      "method": "baseline_ss",
+      "ok": true,
+      "production_slab_tensile_criterion": 0.22443890274314215,
+      "setup": "b",
+      "tensile_strength_method": "hybrid",
+      "thickness_fraction_without_density_gate": 0.22443890274314215
+    }
+  },
+  "case_4": {
+    "a": {
+      "case": "case_4",
+      "characteristic_length": 1639.7892500777525,
+      "converged": true,
+      "diagnostics": {
+        "method": "baseline_B_point_contact",
+        "production_slab_tensile_criterion": 0.23880597014925373,
+        "touchdown_distance": 1639.7892500777525
+      },
+      "energy_release_rate": 1.873988777604898,
+      "error": null,
+      "max_Sxx_norm": 1.8911366170801927,
+      "message": "Steady State evaluation successful.",
+      "method": "baseline_ss",
+      "ok": true,
+      "production_slab_tensile_criterion": 0.23880597014925373,
+      "setup": "a",
+      "tensile_strength_method": "hybrid",
+      "thickness_fraction_without_density_gate": 0.23880597014925373
+    },
+    "b": {
+      "case": "case_4",
+      "characteristic_length": 2240.600393462753,
+      "converged": true,
+      "diagnostics": {
+        "method": "baseline_B_point_contact",
+        "production_slab_tensile_criterion": 0.20947630922693267,
+        "touchdown_distance": 2240.600393462753
+      },
+      "energy_release_rate": 3.7187118127636345,
+      "error": null,
+      "max_Sxx_norm": 1.7008032118640268,
+      "message": "Steady State evaluation successful.",
+      "method": "baseline_ss",
+      "ok": true,
+      "production_slab_tensile_criterion": 0.20947630922693267,
+      "setup": "b",
+      "tensile_strength_method": "hybrid",
+      "thickness_fraction_without_density_gate": 0.20947630922693267
+    }
+  },
+  "case_5": {
+    "a": {
+      "case": "case_5",
+      "characteristic_length": 546.3920593179975,
+      "converged": true,
+      "diagnostics": {
+        "method": "baseline_B_point_contact",
+        "production_slab_tensile_criterion": 1.0,
+        "touchdown_distance": 546.3920593179975
+      },
+      "energy_release_rate": 1.3090116697422256,
+      "error": null,
+      "max_Sxx_norm": 0.9607903560204056,
+      "message": "Steady State evaluation successful.",
+      "method": "baseline_ss",
+      "ok": true,
+      "production_slab_tensile_criterion": 1.0,
+      "setup": "a",
+      "tensile_strength_method": "hybrid",
+      "thickness_fraction_without_density_gate": 0.0
+    },
+    "b": {
+      "case": "case_5",
+      "characteristic_length": 1085.1624351009837,
+      "converged": true,
+      "diagnostics": {
+        "method": "baseline_B_point_contact",
+        "production_slab_tensile_criterion": 0.14770459081836326,
+        "touchdown_distance": 1085.1624351009837
+      },
+      "energy_release_rate": 2.035141925550086,
+      "error": null,
+      "max_Sxx_norm": 1.4125959164988255,
+      "message": "Steady State evaluation successful.",
+      "method": "baseline_ss",
+      "ok": true,
+      "production_slab_tensile_criterion": 0.14770459081836326,
+      "setup": "b",
+      "tensile_strength_method": "hybrid",
+      "thickness_fraction_without_density_gate": 0.14770459081836326
+    }
+  },
+  "case_6": {
+    "a": {
+      "case": "case_6",
+      "characteristic_length": 1085.1624351009837,
+      "converged": true,
+      "diagnostics": {
+        "method": "baseline_B_point_contact",
+        "production_slab_tensile_criterion": 0.14770459081836326,
+        "touchdown_distance": 1085.1624351009837
+      },
+      "energy_release_rate": 2.035141925550086,
+      "error": null,
+      "max_Sxx_norm": 1.4125959164988255,
+      "message": "Steady State evaluation successful.",
+      "method": "baseline_ss",
+      "ok": true,
+      "production_slab_tensile_criterion": 0.14770459081836326,
+      "setup": "a",
+      "tensile_strength_method": "hybrid",
+      "thickness_fraction_without_density_gate": 0.14770459081836326
+    },
+    "b": {
+      "case": "case_6",
+      "characteristic_length": 1581.0712110643722,
+      "converged": true,
+      "diagnostics": {
+        "method": "baseline_B_point_contact",
+        "production_slab_tensile_criterion": 0.20758483033932135,
+        "touchdown_distance": 1581.0712110643722
+      },
+      "energy_release_rate": 2.869012472534722,
+      "error": null,
+      "max_Sxx_norm": 1.7090183301557356,
+      "message": "Steady State evaluation successful.",
+      "method": "baseline_ss",
+      "ok": true,
+      "production_slab_tensile_criterion": 0.20758483033932135,
+      "setup": "b",
+      "tensile_strength_method": "hybrid",
+      "thickness_fraction_without_density_gate": 0.20758483033932135
+    }
+  },
+  "case_7": {
+    "a": {
+      "case": "case_7",
+      "characteristic_length": 1581.0712110643722,
+      "converged": true,
+      "diagnostics": {
+        "method": "baseline_B_point_contact",
+        "production_slab_tensile_criterion": 0.20758483033932135,
+        "touchdown_distance": 1581.0712110643722
+      },
+      "energy_release_rate": 2.869012472534722,
+      "error": null,
+      "max_Sxx_norm": 1.7090183301557356,
+      "message": "Steady State evaluation successful.",
+      "method": "baseline_ss",
+      "ok": true,
+      "production_slab_tensile_criterion": 0.20758483033932135,
+      "setup": "a",
+      "tensile_strength_method": "hybrid",
+      "thickness_fraction_without_density_gate": 0.20758483033932135
+    },
+    "b": {
+      "case": "case_7",
+      "characteristic_length": 2467.377964386884,
+      "converged": true,
+      "diagnostics": {
+        "method": "baseline_B_point_contact",
+        "production_slab_tensile_criterion": 0.19760479041916168,
+        "touchdown_distance": 2467.377964386884
+      },
+      "energy_release_rate": 4.629726742714907,
+      "error": null,
+      "max_Sxx_norm": 1.6296856455211548,
+      "message": "Steady State evaluation successful.",
+      "method": "baseline_ss",
+      "ok": true,
+      "production_slab_tensile_criterion": 0.19760479041916168,
+      "setup": "b",
+      "tensile_strength_method": "hybrid",
+      "thickness_fraction_without_density_gate": 0.19760479041916168
+    }
+  },
+  "case_8": {
+    "a": {
+      "case": "case_8",
+      "characteristic_length": 1235.1814036458636,
+      "converged": true,
+      "diagnostics": {
+        "method": "baseline_B_point_contact",
+        "production_slab_tensile_criterion": 0.23255813953488372,
+        "touchdown_distance": 1235.1814036458636
+      },
+      "energy_release_rate": 2.2549054868890135,
+      "error": null,
+      "max_Sxx_norm": 1.9012854613893528,
+      "message": "Steady State evaluation successful.",
+      "method": "baseline_ss",
+      "ok": true,
+      "production_slab_tensile_criterion": 0.23255813953488372,
+      "setup": "a",
+      "tensile_strength_method": "hybrid",
+      "thickness_fraction_without_density_gate": 0.1394422310756972
+    },
+    "b": {
+      "case": "case_8",
+      "characteristic_length": 1581.0712110643722,
+      "converged": true,
+      "diagnostics": {
+        "method": "baseline_B_point_contact",
+        "production_slab_tensile_criterion": 0.20758483033932135,
+        "touchdown_distance": 1581.0712110643722
+      },
+      "energy_release_rate": 2.869012472534722,
+      "error": null,
+      "max_Sxx_norm": 1.7090183301557356,
+      "message": "Steady State evaluation successful.",
+      "method": "baseline_ss",
+      "ok": true,
+      "production_slab_tensile_criterion": 0.20758483033932135,
+      "setup": "b",
+      "tensile_strength_method": "hybrid",
+      "thickness_fraction_without_density_gate": 0.20758483033932135
+    }
+  },
+  "case_9": {
+    "a": {
+      "case": "case_9",
+      "characteristic_length": 1889.0395345565414,
+      "converged": true,
+      "diagnostics": {
+        "method": "baseline_B_point_contact",
+        "production_slab_tensile_criterion": 0.23588039867109634,
+        "touchdown_distance": 1889.0395345565414
+      },
+      "energy_release_rate": 3.3099037696538267,
+      "error": null,
+      "max_Sxx_norm": 1.8723150838657092,
+      "message": "Steady State evaluation successful.",
+      "method": "baseline_ss",
+      "ok": true,
+      "production_slab_tensile_criterion": 0.23588039867109634,
+      "setup": "a",
+      "tensile_strength_method": "hybrid",
+      "thickness_fraction_without_density_gate": 0.14143426294820718
+    },
+    "b": {
+      "case": "case_9",
+      "characteristic_length": 2467.377964386884,
+      "converged": true,
+      "diagnostics": {
+        "method": "baseline_B_point_contact",
+        "production_slab_tensile_criterion": 0.19760479041916168,
+        "touchdown_distance": 2467.377964386884
+      },
+      "energy_release_rate": 4.629726742714907,
+      "error": null,
+      "max_Sxx_norm": 1.6296856455211548,
+      "message": "Steady State evaluation successful.",
+      "method": "baseline_ss",
+      "ok": true,
+      "production_slab_tensile_criterion": 0.19760479041916168,
+      "setup": "b",
+      "tensile_strength_method": "hybrid",
+      "thickness_fraction_without_density_gate": 0.19760479041916168
+    }
+  }
+}
