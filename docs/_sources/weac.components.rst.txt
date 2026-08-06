@@ -14,6 +14,7 @@ Submodules
    weac.components.presets
    weac.components.scenario_config
    weac.components.segment
+   weac.components.weak_layer
 
 Module contents
 ---------------

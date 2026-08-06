@@ -90,6 +90,7 @@
 <li class="toctree-l2"><a class="reference internal" href="weac.components.presets.html">weac.components.presets module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="weac.components.scenario_config.html">weac.components.scenario_config module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="weac.components.segment.html">weac.components.segment module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="weac.components.weak_layer.html">weac.components.weak_layer module</a></li>
 </ul>
 </li>
 <li class="toctree-l1 current" x-data="{ expanded: $el.classList.contains('current') ? true : false }"><a :class="{ 'expanded' : expanded }" @click="expanded = !expanded" class="reference internal expandable" href="weac.core.html">weac.core package<button @click.prevent.stop="expanded = !expanded" type="button" x-cloak=""><span class="sr-only"></span><svg fill="currentColor" height="18px" stroke="none" viewbox="0 0 24 24" width="18px" xmlns="http://www.w3.org/2000/svg"><path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"></path></svg></button></a><ul class="current" x-show="expanded">
@@ -166,7 +167,7 @@ for a layered beam on an elastic foundation (Winkler model).</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>weak_layer</strong> (<a class="reference internal" href="weac.components.layer.html#weac.components.layer.WeakLayer" title="weac.components.layer.WeakLayer"><em>WeakLayer</em></a>)</p></li>
+<li><p><strong>weak_layer</strong> (<a class="reference internal" href="weac.components.weak_layer.html#weac.components.weak_layer.WeakLayer" title="weac.components.weak_layer.WeakLayer"><em>WeakLayer</em></a>)</p></li>
 <li><p><strong>slab</strong> (<a class="reference internal" href="weac.core.slab.html#weac.core.slab.Slab" title="weac.core.slab.Slab"><em>Slab</em></a>)</p></li>
 </ul>
 </dd>
@@ -360,7 +361,7 @@ for a layered beam on an elastic foundation (Winkler model).</p>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>weak_layer</strong> (<a class="reference internal" href="weac.components.layer.html#weac.components.layer.WeakLayer" title="weac.components.layer.WeakLayer"><em>WeakLayer</em></a>)</p></li>
+<li><p><strong>weak_layer</strong> (<a class="reference internal" href="weac.components.weak_layer.html#weac.components.weak_layer.WeakLayer" title="weac.components.weak_layer.WeakLayer"><em>WeakLayer</em></a>)</p></li>
 <li><p><strong>slab</strong> (<a class="reference internal" href="weac.core.slab.html#weac.core.slab.Slab" title="weac.core.slab.Slab"><em>Slab</em></a>)</p></li>
 </ul>
 </dd>
@@ -372,7 +373,7 @@ for a layered beam on an elastic foundation (Winkler model).</p>
 <dd></dd></dl>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="id12">
-<span class="sig-name descname"><span class="pre">weak_layer</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="weac.components.layer.html#weac.components.layer.WeakLayer" title="weac.components.layer.WeakLayer"><span class="pre">WeakLayer</span></a></span><a class="headerlink" href="#id12" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id12'">¶</a></dt>
+<span class="sig-name descname"><span class="pre">weak_layer</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="weac.components.weak_layer.html#weac.components.weak_layer.WeakLayer" title="weac.components.weak_layer.WeakLayer"><span class="pre">WeakLayer</span></a></span><a class="headerlink" href="#id12" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id12'">¶</a></dt>
 <dd></dd></dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="weac.core.eigensystem.Eigensystem.calc_eigensystem">

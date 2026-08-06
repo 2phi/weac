@@ -30,7 +30,7 @@
 <link href="search.html" rel="search" title="Search"/>
 <link href="genindex.html" rel="index" title="Index"/>
 <link href="weac.core.eigensystem.html" rel="next" title="weac.core.eigensystem module"/>
-<link href="weac.components.segment.html" rel="prev" title="weac.components.segment module"/>
+<link href="weac.components.weak_layer.html" rel="prev" title="weac.components.weak_layer module"/>
 </head>
 <body :class="{ 'overflow-hidden': showSidebar }" class="min-h-screen font-sans antialiased bg-background text-foreground" x-data="{ showSidebar: false, showScrollTop: false }">
 <div @click.self="showSidebar = false" class="fixed inset-0 z-50 overflow-hidden bg-background/80 backdrop-blur-sm md:hidden" x-cloak="" x-show="showSidebar"></div><div class="relative flex flex-col min-h-screen" id="page"><a class="absolute top-0 left-0 z-[100] block bg-background p-4 text-xl transition -translate-x-full opacity-0 focus:translate-x-0 focus:opacity-100" href="#content">
@@ -90,6 +90,7 @@
 <li class="toctree-l2"><a class="reference internal" href="weac.components.presets.html">weac.components.presets module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="weac.components.scenario_config.html">weac.components.scenario_config module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="weac.components.segment.html">weac.components.segment module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="weac.components.weak_layer.html">weac.components.weak_layer module</a></li>
 </ul>
 </li>
 <li class="toctree-l1 current" x-data="{ expanded: $el.classList.contains('current') ? true : false }"><a :class="{ 'expanded' : expanded }" @click="expanded = !expanded" class="current reference internal expandable" href="#">weac.core package<button @click.prevent.stop="expanded = !expanded" type="button" x-cloak=""><span class="sr-only"></span><svg fill="currentColor" height="18px" stroke="none" viewbox="0 0 24 24" width="18px" xmlns="http://www.w3.org/2000/svg"><path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"></path></svg></button></a><ul x-cloak="" x-show="expanded">
@@ -467,7 +468,7 @@ for a layered beam on an elastic foundation (Winkler model).</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>weak_layer</strong> (<a class="reference internal" href="weac.components.layer.html#weac.components.layer.WeakLayer" title="weac.components.layer.WeakLayer"><em>WeakLayer</em></a>)</p></li>
+<li><p><strong>weak_layer</strong> (<a class="reference internal" href="weac.components.weak_layer.html#weac.components.weak_layer.WeakLayer" title="weac.components.weak_layer.WeakLayer"><em>WeakLayer</em></a>)</p></li>
 <li><p><strong>slab</strong> (<a class="reference internal" href="weac.core.slab.html#weac.core.slab.Slab" title="weac.core.slab.Slab"><em>Slab</em></a>)</p></li>
 </ul>
 </dd>
@@ -661,7 +662,7 @@ for a layered beam on an elastic foundation (Winkler model).</p>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>weak_layer</strong> (<a class="reference internal" href="weac.components.layer.html#weac.components.layer.WeakLayer" title="weac.components.layer.WeakLayer"><em>WeakLayer</em></a>)</p></li>
+<li><p><strong>weak_layer</strong> (<a class="reference internal" href="weac.components.weak_layer.html#weac.components.weak_layer.WeakLayer" title="weac.components.weak_layer.WeakLayer"><em>WeakLayer</em></a>)</p></li>
 <li><p><strong>slab</strong> (<a class="reference internal" href="weac.core.slab.html#weac.core.slab.Slab" title="weac.core.slab.Slab"><em>Slab</em></a>)</p></li>
 </ul>
 </dd>
@@ -673,7 +674,7 @@ for a layered beam on an elastic foundation (Winkler model).</p>
 <dd></dd></dl>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="id12">
-<span class="sig-name descname"><span class="pre">weak_layer</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="weac.components.layer.html#weac.components.layer.WeakLayer" title="weac.components.layer.WeakLayer"><span class="pre">WeakLayer</span></a></span><a class="headerlink" href="#id12" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id12'">¶</a></dt>
+<span class="sig-name descname"><span class="pre">weak_layer</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="weac.components.weak_layer.html#weac.components.weak_layer.WeakLayer" title="weac.components.weak_layer.WeakLayer"><span class="pre">WeakLayer</span></a></span><a class="headerlink" href="#id12" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id12'">¶</a></dt>
 <dd></dd></dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="weac.core.Eigensystem.calc_eigensystem">
@@ -940,7 +941,7 @@ phi : float</p>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>scenario_config</strong> (<a class="reference internal" href="weac.components.scenario_config.html#weac.components.scenario_config.ScenarioConfig" title="weac.components.scenario_config.ScenarioConfig"><em>ScenarioConfig</em></a>)</p></li>
 <li><p><strong>segments</strong> (<em>list</em><em>[</em><a class="reference internal" href="weac.components.segment.html#weac.components.segment.Segment" title="weac.components.segment.Segment"><em>Segment</em></a><em>]</em>)</p></li>
-<li><p><strong>weak_layer</strong> (<a class="reference internal" href="weac.components.layer.html#weac.components.layer.WeakLayer" title="weac.components.layer.WeakLayer"><em>WeakLayer</em></a>)</p></li>
+<li><p><strong>weak_layer</strong> (<a class="reference internal" href="weac.components.weak_layer.html#weac.components.weak_layer.WeakLayer" title="weac.components.weak_layer.WeakLayer"><em>WeakLayer</em></a>)</p></li>
 <li><p><strong>slab</strong> (<a class="reference internal" href="weac.core.slab.html#weac.core.slab.Slab" title="weac.core.slab.Slab"><em>Slab</em></a>)</p></li>
 </ul>
 </dd>
@@ -956,7 +957,7 @@ phi : float</p>
 <dd></dd></dl>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="weac.core.Scenario.weak_layer">
-<span class="sig-name descname"><span class="pre">weak_layer</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="weac.components.layer.html#weac.components.layer.WeakLayer" title="weac.components.layer.WeakLayer"><span class="pre">WeakLayer</span></a></span><a class="headerlink" href="#weac.core.Scenario.weak_layer" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#weac.core.Scenario.weak_layer'">¶</a></dt>
+<span class="sig-name descname"><span class="pre">weak_layer</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="weac.components.weak_layer.html#weac.components.weak_layer.WeakLayer" title="weac.components.weak_layer.WeakLayer"><span class="pre">WeakLayer</span></a></span><a class="headerlink" href="#weac.core.Scenario.weak_layer" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#weac.core.Scenario.weak_layer'">¶</a></dt>
 <dd></dd></dl>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="weac.core.Scenario.slab">
@@ -1319,7 +1320,7 @@ eigensystem = system.eigensystem          # Eigenvalue problem solution
 <dd><p>Weak layer properties (stiffness, thickness, etc.)</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type<span class="colon">:</span></dt>
-<dd class="field-odd"><p><a class="reference internal" href="weac.components.layer.html#weac.components.layer.WeakLayer" title="weac.components.layer.WeakLayer">weac.components.layer.WeakLayer</a></p>
+<dd class="field-odd"><p><a class="reference internal" href="weac.components.weak_layer.html#weac.components.weak_layer.WeakLayer" title="weac.components.weak_layer.WeakLayer">weac.components.weak_layer.WeakLayer</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -1381,7 +1382,7 @@ eigensystem = system.eigensystem          # Eigenvalue problem solution
 <dd></dd></dl>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="id47">
-<span class="sig-name descname"><span class="pre">weak_layer</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="weac.components.layer.html#weac.components.layer.WeakLayer" title="weac.components.layer.WeakLayer"><span class="pre">WeakLayer</span></a></span><a class="headerlink" href="#id47" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id47'">¶</a></dt>
+<span class="sig-name descname"><span class="pre">weak_layer</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="weac.components.weak_layer.html#weac.components.weak_layer.WeakLayer" title="weac.components.weak_layer.WeakLayer"><span class="pre">WeakLayer</span></a></span><a class="headerlink" href="#id47" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#id47'">¶</a></dt>
 <dd></dd></dl>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="id48">
@@ -1472,7 +1473,7 @@ This is the solution for the case where the slab is cracked nowhere.</p>
 <dd><p>Update the weak layer.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>weak_layer</strong> (<a class="reference internal" href="weac.components.layer.html#weac.components.layer.WeakLayer" title="weac.components.layer.WeakLayer"><em>WeakLayer</em></a>)</p>
+<dd class="field-odd"><p><strong>weak_layer</strong> (<a class="reference internal" href="weac.components.weak_layer.html#weac.components.weak_layer.WeakLayer" title="weac.components.weak_layer.WeakLayer"><em>WeakLayer</em></a>)</p>
 </dd>
 </dl>
 </dd></dl>
