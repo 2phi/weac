@@ -356,9 +356,7 @@ class TestCriteriaEvaluator:
             "find_minimum_force",
             wraps=engine.find_minimum_force,
         ) as mock_fm:
-            results = evaluator.evaluate_coupled_criterion(
-                system=sm, max_iterations=10
-            )
+            results = evaluator.evaluate_coupled_criterion(system=sm, max_iterations=10)
 
         assert mock_fm.call_count == 1
         assert results.converged
@@ -383,9 +381,7 @@ class TestCriteriaEvaluator:
             return original_rasterize(self, *args, **kwargs)
 
         with patch.object(Analyzer, "rasterize_solution", counting_rasterize):
-            results = evaluator.evaluate_coupled_criterion(
-                system=sm, max_iterations=10
-            )
+            results = evaluator.evaluate_coupled_criterion(system=sm, max_iterations=10)
 
         assert results.converged
         assert results.iterations > 1
@@ -446,9 +442,7 @@ class TestCriteriaEvaluator:
         )
         maximal_stress = result.tensile.maximal_stress_result
         assert maximal_stress is not None
-        assert (
-            maximal_stress.principal_stress_kPa.shape == maximal_stress.Sxx_kPa.shape
-        )
+        assert maximal_stress.principal_stress_kPa.shape == maximal_stress.Sxx_kPa.shape
         assert maximal_stress.principal_stress_kPa.size > 0
         assert maximal_stress.max_Sxx_norm > 0
         assert 0 <= maximal_stress.slab_tensile_criterion <= 1
@@ -548,9 +542,7 @@ class TestCriteriaEvaluator:
     ):
         """Hybrid SS must not force φ→0."""
         original_phi = 35.0
-        system = _make_ss_system(
-            layers, weak_layer, segments_length, phi=original_phi
-        )
+        system = _make_ss_system(layers, weak_layer, segments_length, phi=original_phi)
         result = evaluator.evaluate_SteadyState(system)
         assert result.phi == original_phi
         assert system.scenario.phi == original_phi

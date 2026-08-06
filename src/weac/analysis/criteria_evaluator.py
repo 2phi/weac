@@ -65,9 +65,7 @@ class CriteriaEvaluator:
 
         A value of 1 indicates the boundary of the fracture toughness envelope.
         """
-        return _fracture_toughness_envelope(
-            self.criteria_config, G_I, G_II, weak_layer
-        )
+        return _fracture_toughness_envelope(self.criteria_config, G_I, G_II, weak_layer)
 
     def stress_envelope(
         self,

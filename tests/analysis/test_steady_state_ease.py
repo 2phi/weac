@@ -53,7 +53,9 @@ class TestEaseSelection(unittest.TestCase):
 
     def test_one_unusable_side_selects_usable(self) -> None:
         result = select_ease_orientation(
-            _side(ease=10.0, err=5.0, never_cracked=True, ease_key="critical_cut_length"),
+            _side(
+                ease=10.0, err=5.0, never_cracked=True, ease_key="critical_cut_length"
+            ),
             _side(ease=50.0, err=1.0, ease_key="critical_cut_length"),
             ease_key="critical_cut_length",
             higher_is_easier=False,

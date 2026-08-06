@@ -207,9 +207,7 @@ class CoupledCriterionEngine:
         self.criteria_config = criteria_config
 
     def fracture_toughness_envelope(self, G_I, G_II, weak_layer):
-        return _fracture_toughness_envelope(
-            self.criteria_config, G_I, G_II, weak_layer
-        )
+        return _fracture_toughness_envelope(self.criteria_config, G_I, G_II, weak_layer)
 
     def stress_envelope(self, sigma, tau, weak_layer, method=None):
         return _stress_envelope(
@@ -413,9 +411,7 @@ class CoupledCriterionEngine:
                 # History choice: reuse last (iter-1) stress samples so
                 # sigma_maxs/tau_maxs/dist_* stay length-aligned with weights.
                 if iteration_count == 1:
-                    _, z, _ = analyzer.rasterize_solution(
-                        mode="uncracked", num=2000
-                    )
+                    _, z, _ = analyzer.rasterize_solution(mode="uncracked", num=2000)
                     sigma_kPa = system.fq.sig(z, unit="kPa")
                     tau_kPa = system.fq.tau(z, unit="kPa")
                     stress_env = self.stress_envelope(
@@ -614,7 +610,6 @@ class CoupledCriterionEngine:
                 iteration_budget,
             )
 
-
     def find_minimum_force(
         self,
         system: SystemModel,
@@ -742,7 +737,6 @@ class CoupledCriterionEngine:
             min_dist_stress=min_dist_stress,
         )
 
-
     def find_minimum_crack_length(
         self,
         system: SystemModel,
@@ -795,7 +789,6 @@ class CoupledCriterionEngine:
         logger.error("Root search did not converge.")
         return 0.0, new_segments
 
-
     def check_crack_self_propagation(
         self,
         system: SystemModel,
@@ -847,7 +840,6 @@ class CoupledCriterionEngine:
         )
 
         return g_delta_diff, bool(can_propagate)
-
 
     def find_crack_length_for_weight(
         self,
@@ -976,7 +968,6 @@ class CoupledCriterionEngine:
 
         return new_crack_length, new_segments
 
-
     def _calculate_sigma_tau_at_x(
         self, x_value: float, system: SystemModel
     ) -> tuple[float, float]:
@@ -1013,7 +1004,6 @@ class CoupledCriterionEngine:
 
         return float(np.asarray(sigma).item()), float(np.asarray(tau).item())
 
-
     def _get_stress_envelope_exceedance(
         self, x_value: float, system: SystemModel, weak_layer: WeakLayer
     ) -> float:
@@ -1022,10 +1012,7 @@ class CoupledCriterionEngine:
         Returns the stress envelope evaluation minus 1.
         """
         sigma, tau = self._calculate_sigma_tau_at_x(x_value, system)
-        return float(
-            self.stress_envelope(sigma, tau, weak_layer=weak_layer).item() - 1
-        )
-
+        return float(self.stress_envelope(sigma, tau, weak_layer=weak_layer).item() - 1)
 
     def _find_stress_envelope_crossings(
         self,
@@ -1106,7 +1093,6 @@ class CoupledCriterionEngine:
         )
         return roots
 
-
     def _fracture_toughness_exceedance(
         self, crack_length: float, system: SystemModel, target: float = 1
     ) -> float:
@@ -1132,7 +1118,6 @@ class CoupledCriterionEngine:
 
         # Return the difference from the target (scalar for scipy root finders)
         return float(np.asarray(g_delta_diff).item() - target)
-
 
     def _calculate_maximal_stresses(
         self,
@@ -1209,5 +1194,3 @@ class CoupledCriterionEngine:
             max_Sxx_norm=max_Sxx_norm,
             slab_tensile_criterion=slab_tensile_criterion,
         )
-
-

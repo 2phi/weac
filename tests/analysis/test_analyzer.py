@@ -55,16 +55,13 @@ def an_pst(sm_pst):
     return Analyzer(system_model=sm_pst, printing_enabled=False)
 
 
-
 class TestLocalSegmentGrid:
     """Unit tests for piecewise boundary-refined local grids."""
 
     def test_uniform_matches_linspace(self):
         """Omitting boundary knobs preserves historical linspace behavior."""
         for endpoint in (True, False):
-            got = local_segment_grid(
-                1000.0, 11, include_right_endpoint=endpoint
-            )
+            got = local_segment_grid(1000.0, 11, include_right_endpoint=endpoint)
             expected = np.linspace(0.0, 1000.0, num=11, endpoint=endpoint)
             np.testing.assert_allclose(got, expected)
 
@@ -116,9 +113,7 @@ class TestLocalSegmentGrid:
                 100.0, 10, include_right_endpoint=True, boundary_window=15.0
             )
         with pytest.raises(ValueError):
-            local_segment_grid(
-                100.0, 10, include_right_endpoint=True, boundary_dx=0.5
-            )
+            local_segment_grid(100.0, 10, include_right_endpoint=True, boundary_dx=0.5)
 
 
 class TestAnalyzer:

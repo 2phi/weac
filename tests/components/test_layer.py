@@ -108,7 +108,6 @@ class TestTensileStrengthCalculations:
             "Unit conversion should be correct"
         )
 
-
     def test_jamieson_johnson_calculation_kPa(self):
         """Test Jamieson–Johnson tensile strength calculation in kPa."""
         ts = _jamieson_johnson_tensile_strength(rho=200.0, unit="kPa")
@@ -184,7 +183,6 @@ class TestLayerTensileStrength:
         assert layer.tensile_strength == pytest.approx(
             expected_ts, abs=0.5 * 10 ** (-5)
         ), "Tensile strength should match Adam calculation"
-
 
     def test_layer_jamieson_johnson_method(self):
         """Test Layer with explicit Jamieson–Johnson method."""

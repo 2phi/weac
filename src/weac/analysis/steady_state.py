@@ -895,11 +895,7 @@ def _print_ss_call_stats(result: SteadyStateResult) -> None:
         leg = diag.get(leg_name, {})
         elapsed = float(leg.get("elapsed_s", 0.0))
         n_samples = int(leg.get("n_cut_samples", 0))
-        print(
-            f"- {leg_name}: "
-            f"{elapsed:.4f}s wall, "
-            f"{n_samples} cut samples"
-        )
+        print(f"- {leg_name}: {elapsed:.4f}s wall, {n_samples} cut samples")
     print(
         f"- total: {float(diag.get('elapsed_s', 0.0)):.4f}s wall, "
         f"{int(diag.get('n_cut_samples', 0))} cut samples"

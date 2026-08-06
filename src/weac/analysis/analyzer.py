@@ -105,14 +105,10 @@ def local_segment_grid(
 
     # Right fine window [length - window, length].
     if include_right_endpoint:
-        x_right = np.linspace(
-            length - window, length, num=n_fine + 1, endpoint=True
-        )
+        x_right = np.linspace(length - window, length, num=n_fine + 1, endpoint=True)
     else:
         # Approach the joint from the left; joint itself is next segment's x=0.
-        x_right = np.linspace(
-            length - window, length, num=n_fine + 1, endpoint=False
-        )
+        x_right = np.linspace(length - window, length, num=n_fine + 1, endpoint=False)
 
     n_budget = max(int(n_budget), 1)
     n_interior = max(0, n_budget - len(x_left) - len(x_right))

@@ -82,6 +82,7 @@ B_HIGHER_ERR_CASES = frozenset(
     {f"case_{i}" for i in list(range(1, 12)) + list(range(16, 21))}
 )
 
+
 def _layer_cm(thickness_cm: float, density: float) -> LayerDefinition:
     """Create a layer definition from thickness in centimeters."""
     return LayerDefinition(rho=density, h=thickness_cm * 10.0)
