@@ -2,14 +2,14 @@ cff-version: 1.2.0
 message: "If you use this software, please cite it as below."
 title: "Weak Layer Anticrack Nucleation Model (WEAC)"
 authors:
-- family-names: "Rosendahl"
-  given-names: "Philipp Laurens"
-  orcid: "https://orcid.org/0000-0002-6587-875X"
-- family-names: "Weissgraeber"
-  given-names: "Philipp"
-  orcid: "https://orcid.org/0000-0001-8320-8672"
+  - family-names: "Rosendahl"
+    given-names: "Philipp Laurens"
+    orcid: "https://orcid.org/0000-0002-6587-875X"
+  - family-names: "Weissgraeber"
+    given-names: "Philipp"
+    orcid: "https://orcid.org/0000-0001-8320-8672"
 version: 3.2.0
-date-released: 2021-12-30
+date-released: 2026-08-06
 identifiers:
   - description: Collection of archived snapshots of all versions of WEAC
     type: doi
@@ -33,13 +33,13 @@ url: "https://github.com/2phi/weac"
 preferred-citation:
   type: article
   authors:
-  - family-names: "Weißgraeber"
-    given-names: "Philipp"
-    orcid: "https://orcid.org/0000-0001-8320-8672"
-  - family-names: "Rosendahl"
-    given-names: "Philipp Laurens"
-    orcid: "https://orcid.org/0000-0002-6587-875X"
-  doi: "10.5194/tc-17-1475-2023" 
+    - family-names: "Weißgraeber"
+      given-names: "Philipp"
+      orcid: "https://orcid.org/0000-0001-8320-8672"
+    - family-names: "Rosendahl"
+      given-names: "Philipp Laurens"
+      orcid: "https://orcid.org/0000-0002-6587-875X"
+  doi: "10.5194/tc-17-1475-2023"
   journal: "The Cryosphere"
   start: 1475 # First page number
   end: 1496 # Last page number

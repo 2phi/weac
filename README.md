@@ -374,7 +374,6 @@ See the [open issues](https://github.com/2phi/weac/issues) for a list of propose
 
 - [ ] Change to scenario & scenario_config: InfEnd/Cut/Segment/Weight
 
-
 ### v3.3
 
 - [ ] Improved CriteriaEvaluator Optimization (x2 time reduction)
@@ -392,6 +391,7 @@ See the [open issues](https://github.com/2phi/weac/issues) for a list of propose
 - Lowered weak-layer preset densities to 100/150/200 kg/m³ (within the Schöttner ≤250 kg/m³ range)
 
 ### v3.1
+
 - Variational model for out-of-plane bending
 - Complex terrain through the addition of out-of-plane tilt
 - Up, down, and cross-slope cracks
