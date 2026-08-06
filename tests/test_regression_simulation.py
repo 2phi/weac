@@ -2,9 +2,8 @@
 This module contains regression tests for the WEAC model.
 """
 
-import unittest
-
 import numpy as np
+import pytest
 
 from weac.analysis import CriteriaEvaluator
 from weac.components import (
@@ -67,7 +66,7 @@ GT_skier_baseline = np.array(
             2.1861445155788474e-06,
             -3.6611891841525330e-11,
             -3.1307448147011621e-15,
-        ]
+        ],
     ]
 )
 
@@ -138,7 +137,7 @@ GT_skiers_baseline = np.array(
             1.5197214594845995e-06,
             -8.1335195861421427e-12,
             -4.2196897119194863e-16,
-        ]
+        ],
     ]
 )
 
@@ -147,13 +146,13 @@ GT_pst_without_touchdown = np.array(
         [
             -8.4871937355689708e-03,
             -7.1030228169780734e-03,
-            2.1468411930446529e+00,
-            2.1468411930446507e+00,
-            1.2199839953114783e+01,
-            1.3555514675869393e+01,
+            2.1468411930446529e00,
+            2.1468411930446507e00,
+            1.2199839953114783e01,
+            1.3555514675869393e01,
         ],
         [
-            0.0000000000000000e+00,
+            0.0000000000000000e00,
             1.9281153001886413e-09,
             8.6973240373155267e-03,
             8.6973240373155267e-03,
@@ -163,10 +162,10 @@ GT_pst_without_touchdown = np.array(
         [
             6.4429390610499186e-03,
             3.1432512066047066e-03,
-            1.9796843832394049e+00,
-            1.9796843832394051e+00,
-            3.1544987306063848e+02,
-            8.3417059155662048e+02,
+            1.9796843832394049e00,
+            1.9796843832394051e00,
+            3.1544987306063848e02,
+            8.3417059155662048e02,
         ],
         [
             -3.4064303328982494e-05,
@@ -190,8 +189,8 @@ GT_pst_without_touchdown = np.array(
             -1.7819428769682468e-04,
             -1.7819428769682468e-04,
             -4.4063073869004441e-05,
-            0.0000000000000000e+00,
-        ]
+            0.0000000000000000e00,
+        ],
     ]
 )
 
@@ -249,7 +248,7 @@ GT_pst_with_touchdown = np.array(
 )
 
 
-class TestRegressionSimulation(unittest.TestCase):
+class TestRegressionSimulation:
     """Regression tests asserting stable outputs for key scenarios."""
 
     def test_skier_baseline(self):
@@ -376,8 +375,10 @@ class TestRegressionSimulation(unittest.TestCase):
         C = sm.unknown_constants
 
         # Touchdown mode and distance baselines
-        self.assertEqual(td.touchdown_mode, "C_in_contact")
-        self.assertAlmostEqual(td.touchdown_distance, 1577.2698088929287, places=6)
+        assert td.touchdown_mode == "C_in_contact"
+        assert td.touchdown_distance == pytest.approx(
+            1577.2698088929287, abs=0.5 * 10 ** (-6)
+        )
 
         # Scenario segments updated by touchdown length
         seg_lengths = np.array([seg.length for seg in sm.scenario.segments])
@@ -418,28 +419,40 @@ class TestRegressionSimulation(unittest.TestCase):
 
         # find_minimum_force baseline
         fm = evaluator.find_minimum_force(system=sm, tolerance_stress=0.005)
-        self.assertTrue(fm.success)
-        self.assertGreater(fm.critical_skier_weight, 0)
+        assert fm.success
+        assert fm.critical_skier_weight > 0
         # Baseline values recorded
-        self.assertAlmostEqual(fm.critical_skier_weight, 75.17870187198098, places=6)
-        self.assertAlmostEqual(fm.max_dist_stress, 1.0000048176337313, places=6)
-        self.assertLess(fm.min_dist_stress, 1.0)
+        assert fm.critical_skier_weight == pytest.approx(
+            75.17870187198098, abs=0.5 * 10 ** (-6)
+        )
+        assert fm.max_dist_stress == pytest.approx(
+            1.0000048176337313, abs=0.5 * 10 ** (-6)
+        )
+        assert fm.min_dist_stress < 1.0
 
-        # evaluate_SteadyState baseline
-        ss = evaluator.evaluate_SteadyState(system=sm, vertical=False)
-        self.assertTrue(ss.converged)
-        self.assertGreater(ss.touchdown_distance, 0)
-        # Baseline values recorded
-        self.assertAlmostEqual(ss.touchdown_distance, 1262.7061033873686, places=6)
-        np.testing.assert_allclose(ss.energy_release_rate, 2.110196960094839, rtol=1e-6, atol=0)
+        # evaluate_SteadyState baseline (hybrid structured result)
+        ss = evaluator.evaluate_SteadyState(system=sm)
+        assert ss.converged
+        assert ss.tensile.critical_cut_length > 0
+        assert ss.err.energy_release_rate > 0
+        assert ss.phi == 30.0
+        # Baseline values recorded from a green hybrid SS run
+        assert ss.tensile.critical_cut_length == pytest.approx(
+            276.88720225, abs=0.5 * 10 ** (-6)
+        )
+        assert ss.err.energy_release_rate == pytest.approx(
+            1.8587470190926725, abs=0.5 * 10 ** (-6)
+        )
+        assert ss.tensile.cut_direction_winner == "upslope"
+        assert ss.err.cut_direction_winner == "upslope"
 
         # evaluate_coupled_criterion baseline
         cc = evaluator.evaluate_coupled_criterion(system=sm, max_iterations=10)
-        self.assertIsNotNone(cc)
-        self.assertIsInstance(cc.critical_skier_weight, float)
-        self.assertIsInstance(cc.crack_length, float)
+        assert cc is not None
+        assert isinstance(cc.critical_skier_weight, float)
+        assert isinstance(cc.crack_length, float)
         # Baseline values recorded
-        self.assertTrue(cc.converged)
+        assert cc.converged
         np.testing.assert_allclose(
             cc.critical_skier_weight, 180.87597195071328, rtol=1e-2
         )
@@ -449,11 +462,7 @@ class TestRegressionSimulation(unittest.TestCase):
 
         # find_minimum_crack_length baseline (returns crack length > 0)
         crack_len, new_segments = evaluator.find_minimum_crack_length(system=sm)
-        self.assertGreater(crack_len, 0)
-        self.assertTrue(all(isinstance(s, Segment) for s in new_segments))
+        assert crack_len > 0
+        assert all(isinstance(s, Segment) for s in new_segments)
         # Baseline value recorded
         np.testing.assert_allclose(crack_len, 1564.671141349807, rtol=1e-2)
-
-
-if __name__ == "__main__":
-    unittest.main(verbosity=2)

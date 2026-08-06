@@ -80,8 +80,12 @@ class WeakLayer(BaseModel):
         Mode-II fracture toughness GIIc [J/m^2].  Default 0.79 J/m^2.
     """
 
-    rho: float = Field(default=150, gt=0, description="Density of the Slab  [kg m⁻³]")
-    h: float = Field(default=20, gt=0, description="Height/Thickness of the slab  [mm]")
+    rho: float = Field(
+        default=150, gt=0, description="Density of the Weak Layer  [kg m⁻³]"
+    )
+    h: float = Field(
+        default=20, gt=0, description="Height/Thickness of the weak layer  [mm]"
+    )
     f: float | None = Field(
         default=None, description="Weight density of the weak layer [N/mm^3]"
     )

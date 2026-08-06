@@ -1445,10 +1445,12 @@ class Plotter:
         def find_sigma_for_tau(tau_val, sigma_c, method: str | None = None):
             # Target function to find the root of: envelope(sigma, tau) - 1 = 0
             def envelope_root_func(sigma_val):
-                return (
-                    criteria_evaluator.stress_envelope(
-                        sigma_val, tau_val, weak_layer, method=method
-                    )
+                return float(
+                    np.asarray(
+                        criteria_evaluator.stress_envelope(
+                            sigma_val, tau_val, weak_layer, method=method
+                        )
+                    ).item()
                     - 1
                 )
 
@@ -1628,12 +1630,14 @@ class Plotter:
         def find_GI_for_GII(GII_val):
             # Target function to find the root of: envelope(sigma, tau) - 1 = 0
             def envelope_root_func(GI_val):
-                return (
-                    criteria_evaluator.fracture_toughness_envelope(
-                        GI_val,
-                        GII_val,
-                        weak_layer,
-                    )
+                return float(
+                    np.asarray(
+                        criteria_evaluator.fracture_toughness_envelope(
+                            GI_val,
+                            GII_val,
+                            weak_layer,
+                        )
+                    ).item()
                     - 1
                 )
 

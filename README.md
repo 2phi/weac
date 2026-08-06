@@ -1,6 +1,6 @@
+<!-- markdownlint-disable MD033 MD009 MD053 -->
 <!-- LOGO AND TITLE-->
 <!-- <p align="right"><img src="https://github.com/2phi/weac/raw/main/img/logo.png" alt="Logo" width="80" height="80"></p> -->
-
 
 <h1 align="center">
   <br>
@@ -84,18 +84,19 @@ WEAC implements closed-form analytical models for the [mechanical analysis of dr
 <img src="https://github.com/2phi/weac/raw/main/img/systems.png" alt="Systems" width="500"/>
 
 Cite the repository as:
-```
+
+```text
 Rosendahl, P. L., Schneider, J., & Weissgraeber, P. (2022). Weak Layer Anticrack Nucleation Model (WEAC). Zenodo. https://doi.org/10.5281/zenodo.5773113
 ```
 
 Read the [📄 white paper](https://doi.org/10.5194/tc-17-1475-2023) for model derivations, illustrations, dimensions, material properties, and kinematics:
 
-- Weißgraeber, P. & Rosendahl, P. L. (2023). A closed-form model for layered snow slabs. The Cryosphere, 17(4), 1475–1496. https://doi.org/10.5194/tc-17-1475-2023
+- Weißgraeber, P. & Rosendahl, P. L. (2023). A closed-form model for layered snow slabs. The Cryosphere, 17(4), 1475–1496. <https://doi.org/10.5194/tc-17-1475-2023>
 
 For more background info, please refer to the companion papers:
 
-- Rosendahl, P. L. & Weißgraeber, P. (2020). Modeling snow slab avalanches caused by weak-layer failure – Part 1: Slabs on compliant and collapsible weak layers. The Cryosphere, 14(1), 115–130. https://doi.org/10.5194/tc-14-115-2020
-- Rosendahl, P. L. & Weißgraeber, P. (2020). Modeling snow slab avalanches caused by weak-layer failure – Part 2: Coupled mixed-mode criterion for skier-triggered anticracks. The Cryosphere, 14(1), 131–145. https://doi.org/10.5194/tc-14-131-2020
+- Rosendahl, P. L. & Weißgraeber, P. (2020). Modeling snow slab avalanches caused by weak-layer failure – Part 1: Slabs on compliant and collapsible weak layers. The Cryosphere, 14(1), 115–130. <https://doi.org/10.5194/tc-14-115-2020>
+- Rosendahl, P. L. & Weißgraeber, P. (2020). Modeling snow slab avalanches caused by weak-layer failure – Part 2: Coupled mixed-mode criterion for skier-triggered anticracks. The Cryosphere, 14(1), 131–145. <https://doi.org/10.5194/tc-14-131-2020>
 
 Written in [🐍 Python](https://www.python.org) and built with [💻 Visual Studio Code](https://code.visualstudio.com), [🐙 GitKraken](https://www.gitkraken.com), and [🪐 Jupyter](https://jupyter.org). Note that [release v1.0](https://github.com/2phi/weac/releases/tag/v1.0.0) was written and built in [🌋 MATLAB](https://www.mathworks.com/products/matlab.html).
 
@@ -105,19 +106,21 @@ Written in [🐍 Python](https://www.python.org) and built with [💻 Visual Stu
 [![Atom](https://img.shields.io/badge/Atom-498b60.svg?style=flat-square&logo=atom&logoColor=white&label&labelColor=gray)](https://atom.io)
 [![GitKraken](https://img.shields.io/badge/GitKraken-179287.svg?style=flat-square&logo=gitkraken&logoColor=white&label&labelColor=gray)](https://www.gitkraken.com) -->
 
-
-
 <!-- INSTALLATION -->
 ## Installation
 
 Install globally using the `pip` Package Installer for Python
+
 ```sh
 pip install -U weac
 ```
+
 or clone the repo
+
 ```sh
 git clone https://github.com/2phi/weac
 ```
+
 for local use.
 
 Needs (runtime dependencies are declared in [pyproject.toml](https://github.com/2phi/weac/blob/main/pyproject.toml)):
@@ -128,7 +131,6 @@ Needs (runtime dependencies are declared in [pyproject.toml](https://github.com/
 - [Matplotlib](https://matplotlib.org/) ≥ 3.9.1
 - [Pydantic](https://docs.pydantic.dev/latest/) ≥ 2.11.7
 - [Snowpylot](https://github.com/connellymk/snowpylot) ≥ 1.1.3
-
 
 <!-- DEVELOPMENT SETUP -->
 ## Development Setup
@@ -173,10 +175,6 @@ source .venv/bin/activate  # On Windows: .venv\Scripts\activate
 Run the test suite using uv:
 
 ```bash
-# Run all tests
-uv run python tests/run_tests.py
-
-# Or use pytest directly (if installed)
 uv run pytest
 ```
 
@@ -376,16 +374,28 @@ See the [open issues](https://github.com/2phi/weac/issues) for a list of propose
 
 - [ ] Change to scenario & scenario_config: InfEnd/Cut/Segment/Weight
 
-### v3.2
-<!-- - [ ] New mathematical foundation to improve the weak-layer representation -->
-- [ ] Complex terrain through the addition of out-of-plane tilt
-- [ ] Up, down, and cross-slope cracks
-
-### v3.1
+### v3.3
 
 - [ ] Improved CriteriaEvaluator Optimization (x2 time reduction)
 
 ## Release history
+
+### v3.2.0
+
+- **Breaking:** `CriteriaEvaluator.evaluate_SteadyState` rewrite uses different inputs and produces different outputs. Two independent configurations are evaluated for tensile failure and energy release rate
+- Steady-state evaluation uses independent configurations (for tensile and ERR legs)
+- Analysis package flatten: Steady State, CoupledCriterion, and Envelopes live in independent files
+- Split `Layer` and `WeakLayer` into separate component models
+- Jamieson–Johnson slab tensile strength method (`tensile_strength_method="jamieson_johnson"`)
+- Weak-layer Young's modulus from Schöttner FC&DH density law (`E_method="schottner_fc_dh"`)
+- Lowered weak-layer preset densities to 100/150/200 kg/m³ (within the Schöttner ≤250 kg/m³ range)
+
+### v3.1
+
+- Variational model for out-of-plane bending
+- Complex terrain through the addition of out-of-plane tilt
+- Up, down, and cross-slope cracks
+- "generalized" backend with multi-component field support, selectable constitutive models, slab width (b), rotation angle (theta), explicit left/right load vectors, per-segment loading flags, and Mode‑III workflows (GIII).
 
 ### v3.0
 
@@ -468,6 +478,7 @@ See the [open issues](https://github.com/2phi/weac/issues) for a list of propose
 
 <!-- WORKFLOWS -->
 ## Workflows
+
 [![Publish Python 🐍 releases 📦 to PyPI ](https://github.com/2phi/weac/actions/workflows/release.yml/badge.svg)](https://github.com/2phi/weac/actions/workflows/release.yml)<br>
 [![Build and publish Sphinx 🪬 documentation ](https://github.com/2phi/weac/actions/workflows/docs.yml/badge.svg)](https://github.com/2phi/weac/actions/workflows/docs.yml)
 
@@ -489,14 +500,10 @@ Under the following terms:
 
 - **ShareAlike** — If you remix, transform, or build upon the material, you must distribute your contributions under the [same license](https://creativecommons.org/licenses/by-nc-sa/4.0/?ref=chooser-v1#ref-same-license) as the original.
 
-
-
 <!-- CONTACT -->
 ## Contact
 
-E-mail: mail@2phi.de · Web: https://2phi.de · Project Link: [https://github.com/2phi/weac](https://github.com/2phi/weac) · Project DOI: [http://dx.doi.org/10.5281/zenodo.5773113](http://dx.doi.org/10.5281/zenodo.5773113)
-
-
+E-mail: <mail@2phi.de> · Web: <https://2phi.de> · Project Link: [https://github.com/2phi/weac](https://github.com/2phi/weac) · Project DOI: [http://dx.doi.org/10.5281/zenodo.5773113](http://dx.doi.org/10.5281/zenodo.5773113)
 
 <!-- MARKDOWN LINKS & IMAGES -->
 <!-- https://www.markdownguide.org/basic-syntax/#reference-style-links -->

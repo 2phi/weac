@@ -1,21 +1,21 @@
 """Unit tests for JSON helpers."""
 
 import json
-import unittest
 
 import numpy as np
+import pytest
 
 from .json_helpers import json_default
 
 
-class TestJsonHelpers(unittest.TestCase):
+class TestJsonHelpers:
     """Test the JSON serialization helpers."""
 
     def test_json_default_numpy_array(self):
         """Verify numpy arrays are serialized to lists."""
         data = {"a": np.array([1, 2, 3])}
         result = json.dumps(data, default=json_default)
-        self.assertEqual(json.loads(result), {"a": [1, 2, 3]})
+        assert json.loads(result) == {"a": [1, 2, 3]}
 
     def test_json_default_numpy_scalars(self):
         """Verify numpy scalar types are serialized to Python primitives."""
@@ -32,7 +32,7 @@ class TestJsonHelpers(unittest.TestCase):
             "bool_true": True,
             "bool_false": False,
         }
-        self.assertDictEqual(json.loads(result), expected)
+        assert json.loads(result) == expected
 
     def test_json_default_mixed_types(self):
         """Verify mixed data including numpy and standard types serializes correctly."""
@@ -46,8 +46,8 @@ class TestJsonHelpers(unittest.TestCase):
         result = json.dumps(data, default=json_default)
         # Note: np.float32 may have precision differences, test against its .item()
         expected_py_float = np.float32(1.23).item()
-        self.assertAlmostEqual(
-            json.loads(result)["np_float"], expected_py_float, places=6
+        assert json.loads(result)["np_float"] == pytest.approx(
+            expected_py_float, abs=0.5 * 10 ** (-6)
         )
         # Check the rest of the dictionary
         loaded_result = json.loads(result)
@@ -58,7 +58,7 @@ class TestJsonHelpers(unittest.TestCase):
             "py_str": "hello",
             "py_list": [1, "a", None],
         }
-        self.assertDictEqual(loaded_result, expected_dict)
+        assert loaded_result == expected_dict
 
     def test_json_default_unhandled_type(self):
         """Verify unhandled types are converted to their string representation."""
@@ -71,22 +71,18 @@ class TestJsonHelpers(unittest.TestCase):
 
         data = {"key": Unserializable()}
         result = json.dumps(data, default=json_default)
-        self.assertEqual(json.loads(result), {"key": "UnserializableObject"})
+        assert json.loads(result) == {"key": "UnserializableObject"}
 
-    def test_various_inputs(self):
-        """Test a variety of inputs for comprehensive coverage."""
-        test_cases = [
+    @pytest.mark.parametrize(
+        "value,expected",
+        [
             (np.int32(-5), "-5"),
             (np.float64(1e-9), "1e-09"),
             (np.array([1.0, 2.5]), "[1.0, 2.5]"),
             (True, "true"),
             (None, "null"),
-        ]
-
-        for value, expected in test_cases:
-            with self.subTest(value=value):
-                self.assertEqual(json.dumps(value, default=json_default), expected)
-
-
-if __name__ == "__main__":
-    unittest.main()
+        ],
+    )
+    def test_various_inputs(self, value, expected):
+        """Test a variety of inputs for comprehensive coverage."""
+        assert json.dumps(value, default=json_default) == expected

@@ -2,9 +2,8 @@
 This module contains tests that compare the results of the old and new WEAC implementations.
 """
 
-import unittest
-
 import numpy as np
+import pytest
 
 from weac.analysis.analyzer import Analyzer
 from weac.components import (
@@ -21,7 +20,7 @@ from tests.utils.weac_reference_runner import (  # noqa: E402
 )
 
 
-class TestIntegrationOldVsNew(unittest.TestCase):
+class TestIntegrationOldVsNew:
     """Integration tests comparing old weac implementation with new weac implementation."""
 
     def test_simple_two_layer_setup(self):
@@ -109,47 +108,33 @@ class TestIntegrationOldVsNew(unittest.TestCase):
         )
 
         # Compare the WeakLayer attributes
-        self.assertEqual(
-            old_state["weak"]["nu"],
-            new_system.weak_layer.nu,
-            "Weak layer Poisson's ratio should be the same",
+        assert old_state["weak"]["nu"] == new_system.weak_layer.nu, (
+            "Weak layer Poisson's ratio should be the same"
         )
-        self.assertEqual(
-            old_state["weak"]["E"],
-            new_system.weak_layer.E,
-            "Weak layer Young's modulus should be the same",
+        assert old_state["weak"]["E"] == new_system.weak_layer.E, (
+            "Weak layer Young's modulus should be the same"
         )
-        self.assertEqual(
-            old_state["t"],
-            new_system.weak_layer.h,
-            "Weak layer thickness should be the same",
+        assert old_state["t"] == new_system.weak_layer.h, (
+            "Weak layer thickness should be the same"
         )
-        self.assertEqual(
-            old_state["kn"],
-            new_system.weak_layer.kn,
-            "Weak layer normal stiffness should be the same",
+        assert old_state["kn"] == new_system.weak_layer.kn, (
+            "Weak layer normal stiffness should be the same"
         )
-        self.assertEqual(
-            old_state["kt"],
-            new_system.weak_layer.kt,
-            "Weak layer shear stiffness should be the same",
+        assert old_state["kt"] == new_system.weak_layer.kt, (
+            "Weak layer shear stiffness should be the same"
         )
 
         # Compare the Slab properties
-        self.assertEqual(
-            old_state["h"], new_system.slab.H, "Slab thickness should be the same"
-        )
-        self.assertEqual(
-            old_state["zs"],
-            new_system.slab.z_cog,
-            "Slab center of gravity should be the same",
+        assert old_state["h"] == new_system.slab.H, "Slab thickness should be the same"
+        assert old_state["zs"] == new_system.slab.z_cog, (
+            "Slab center of gravity should be the same"
         )
 
         # Compare the Layer properties
         old_slab = (
             np.asarray(old_state["slab"]) if old_state["slab"] is not None else None
         )
-        self.assertIsNotNone(old_slab, "Old slab data should be available")
+        assert old_slab is not None, "Old slab data should be available"
         if old_slab is not None:
             np.testing.assert_array_equal(
                 old_slab[:, 0] * 1e-12,
@@ -178,14 +163,12 @@ class TestIntegrationOldVsNew(unittest.TestCase):
             )
 
         # Compare all the attributes of the old and new model
-        self.assertEqual(
-            old_state["a"],
-            new_system.scenario.cut_length,
-            "Cut length should be the same",
+        assert old_state["a"] == new_system.scenario.cut_length, (
+            "Cut length should be the same"
         )
 
         # Compare the z vectors
-        self.assertEqual(old_z.shape, new_z.shape, "Z-vector shapes should match")
+        assert old_z.shape == new_z.shape, "Z-vector shapes should match"
         np.testing.assert_allclose(
             old_z,
             new_z,
@@ -361,72 +344,47 @@ class TestIntegrationOldVsNew(unittest.TestCase):
         )
 
         # Compare the WeakLayer attributes
-        self.assertEqual(
-            old_state["weak"]["nu"],
-            new_system.weak_layer.nu,
-            "Weak layer Poisson's ratio should be the same",
+        assert old_state["weak"]["nu"] == new_system.weak_layer.nu, (
+            "Weak layer Poisson's ratio should be the same"
         )
-        self.assertEqual(
-            old_state["weak"]["E"],
-            new_system.weak_layer.E,
-            "Weak layer Young's modulus should be the same",
+        assert old_state["weak"]["E"] == new_system.weak_layer.E, (
+            "Weak layer Young's modulus should be the same"
         )
-        self.assertEqual(
-            old_state["t"],
-            new_system.weak_layer.h,
-            "Weak layer thickness should be the same",
+        assert old_state["t"] == new_system.weak_layer.h, (
+            "Weak layer thickness should be the same"
         )
-        self.assertEqual(
-            old_state["kn"],
-            new_system.weak_layer.kn,
-            "Weak layer normal stiffness should be the same",
+        assert old_state["kn"] == new_system.weak_layer.kn, (
+            "Weak layer normal stiffness should be the same"
         )
-        self.assertEqual(
-            old_state["kt"],
-            new_system.weak_layer.kt,
-            "Weak layer shear stiffness should be the same",
+        assert old_state["kt"] == new_system.weak_layer.kt, (
+            "Weak layer shear stiffness should be the same"
         )
 
         # Compare the Slab Touchdown attributes
-        self.assertEqual(
-            old_state["touchdown"]["tc"],
-            new_system.scenario.crack_h,
-            "Crack height should be the same",
+        assert old_state["touchdown"]["tc"] == new_system.scenario.crack_h, (
+            "Crack height should be the same"
         )
-        self.assertAlmostEqual(
-            old_state["touchdown"]["a1"],
-            new_system.slab_touchdown.l_AB,
-            places=9,
-            msg="Transition length A should be the same",
+        assert old_state["touchdown"]["a1"] == pytest.approx(
+            new_system.slab_touchdown.l_AB, abs=0.5 * 10 ** (-9)
         )
-        self.assertAlmostEqual(
-            old_state["touchdown"]["a2"],
-            new_system.slab_touchdown.l_BC,
-            places=9,
-            msg="Transition length B should be the same",
+        assert old_state["touchdown"]["a2"] == pytest.approx(
+            new_system.slab_touchdown.l_BC, abs=0.5 * 10 ** (-9)
         )
-        self.assertAlmostEqual(
-            old_state["touchdown"]["td"],
-            new_system.slab_touchdown.touchdown_distance,
-            places=9,
-            msg="Touchdown distance should be the same",
+        assert old_state["touchdown"]["td"] == pytest.approx(
+            new_system.slab_touchdown.touchdown_distance, abs=0.5 * 10 ** (-9)
         )
 
         # Compare the Slab properties
-        self.assertEqual(
-            old_state["h"], new_system.slab.H, "Slab thickness should be the same"
-        )
-        self.assertEqual(
-            old_state["zs"],
-            new_system.slab.z_cog,
-            "Slab center of gravity should be the same",
+        assert old_state["h"] == new_system.slab.H, "Slab thickness should be the same"
+        assert old_state["zs"] == new_system.slab.z_cog, (
+            "Slab center of gravity should be the same"
         )
 
         # Compare the Layer properties
         old_slab = (
             np.asarray(old_state["slab"]) if old_state["slab"] is not None else None
         )
-        self.assertIsNotNone(old_slab, "Old slab data should be available")
+        assert old_slab is not None, "Old slab data should be available"
         if old_slab is not None:
             np.testing.assert_array_equal(
                 old_slab[:, 0] * 1e-12,
@@ -455,18 +413,12 @@ class TestIntegrationOldVsNew(unittest.TestCase):
             )
 
         # Compare all the attributes of the old and new model
-        self.assertEqual(
-            old_state["a"],
-            new_system.scenario.cut_length,
-            "Cut length should be the same",
+        assert old_state["a"] == new_system.scenario.cut_length, (
+            "Cut length should be the same"
         )
 
         # --- Compare results ---
-        self.assertEqual(
-            old_z.shape,
-            new_z.shape,
-            "Result arrays should have the same shape",
-        )
+        assert old_z.shape == new_z.shape, "Result arrays should have the same shape"
 
         # Numerical differences lie in the absolute realm of e-12
         np.testing.assert_allclose(
@@ -557,7 +509,3 @@ class TestIntegrationOldVsNew(unittest.TestCase):
             atol=1e-12,
             err_msg="Principal slab stress should be very similar",
         )
-
-
-if __name__ == "__main__":
-    unittest.main(verbosity=2)

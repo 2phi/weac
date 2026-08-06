@@ -5,9 +5,8 @@ Tests displacement calculations, stress calculations, energy release rates,
 and other field quantity computations.
 """
 
-import unittest
-
 import numpy as np
+import pytest
 
 from weac.components import Layer, WeakLayer
 from weac.core.eigensystem import Eigensystem
@@ -15,49 +14,138 @@ from weac.core.field_quantities import FieldQuantities
 from weac.core.slab import Slab
 
 
-class TestFieldQuantitiesBasic(unittest.TestCase):
+@pytest.fixture
+def basic_fq():
+    """FieldQuantities with a simple solution vector for basic tests."""
+    layers = [Layer(rho=200, h=100)]
+    weak_layer = WeakLayer(rho=50, h=20, E=0.5)
+    slab = Slab(layers)
+    eigensystem = Eigensystem(weak_layer, slab)
+    fq = FieldQuantities(eigensystem)
+    # [u, u', w, w', psi, psi'] at multiple points
+    Z = np.array(
+        [
+            [1.0, 2.0, 3.0],  # u values at 3 points
+            [0.1, 0.2, 0.3],  # u' values
+            [0.5, 1.0, 1.5],  # w values
+            [0.05, 0.1, 0.15],  # w' values
+            [0.01, 0.02, 0.03],  # psi values
+            [0.001, 0.002, 0.003],  # psi' values
+        ]
+    )
+    return fq, Z
+
+
+@pytest.fixture
+def displacement_fq():
+    """FieldQuantities for displacement-at-height tests."""
+    layers = [Layer(rho=250, h=120)]
+    weak_layer = WeakLayer(rho=60, h=25)
+    slab = Slab(layers)
+    eigensystem = Eigensystem(weak_layer, slab)
+    fq = FieldQuantities(eigensystem)
+    Z = np.array(
+        [
+            [2.0, 4.0],  # u values
+            [0.2, 0.4],  # u' values
+            [1.0, 2.0],  # w values
+            [0.1, 0.2],  # w' values
+            [0.05, 0.1],  # psi values
+            [0.005, 0.01],  # psi' values
+        ]
+    )
+    return fq, Z
+
+
+@pytest.fixture
+def stress_fq():
+    """FieldQuantities with known elastic properties for stress tests."""
+    layers = [Layer(rho=200, h=100, E=50, nu=0.25)]  # Known elastic properties
+    weak_layer = WeakLayer(rho=50, h=20, E=0.5, kn=10.0, kt=5.0)  # Known stiffnesses
+    slab = Slab(layers)
+    eigensystem = Eigensystem(weak_layer, slab)
+    fq = FieldQuantities(eigensystem)
+    Z = np.array(
+        [
+            [1.0, 2.0],  # u values
+            [0.1, 0.2],  # u' values
+            [0.5, 1.0],  # w values
+            [0.05, 0.1],  # w' values
+            [0.01, 0.02],  # psi values
+            [0.001, 0.002],  # psi' values
+        ]
+    )
+    return fq, Z
+
+
+@pytest.fixture
+def strain_fq():
+    """FieldQuantities for strain tests."""
+    layers = [Layer(rho=200, h=100)]
+    weak_layer = WeakLayer(rho=50, h=20)
+    slab = Slab(layers)
+    eigensystem = Eigensystem(weak_layer, slab)
+    fq = FieldQuantities(eigensystem)
+    Z = np.array(
+        [
+            [1.0, 2.0],
+            [0.1, 0.2],
+            [0.5, 1.0],
+            [0.05, 0.1],
+            [0.01, 0.02],
+            [0.001, 0.002],
+        ]
+    )
+    return fq, Z
+
+
+@pytest.fixture
+def err_fq():
+    """FieldQuantities for energy release rate tests."""
+    layers = [Layer(rho=200, h=100)]
+    weak_layer = WeakLayer(rho=50, h=20, kn=10.0, kt=5.0)
+    slab = Slab(layers)
+    eigensystem = Eigensystem(weak_layer, slab)
+    fq = FieldQuantities(eigensystem)
+    # Single point solution vector (crack tip)
+    Z_tip = np.array(
+        [
+            [1.0],  # u
+            [0.1],  # u'
+            [0.5],  # w
+            [0.05],  # w'
+            [0.01],  # psi
+            [0.001],  # psi'
+        ]
+    )
+    return fq, Z_tip
+
+
+class TestFieldQuantitiesBasic:
     """Test basic field quantity calculations."""
 
-    def setUp(self):
-        """Set up test eigensystem and field quantities."""
-        layers = [Layer(rho=200, h=100)]
-        weak_layer = WeakLayer(rho=50, h=20, E=0.5)
-        slab = Slab(layers)
-        eigensystem = Eigensystem(weak_layer, slab)
-        self.fq = FieldQuantities(eigensystem)
-
-        # Create a simple test solution vector
-        # [u, u', w, w', psi, psi'] at multiple points
-        self.Z = np.array(
-            [
-                [1.0, 2.0, 3.0],  # u values at 3 points
-                [0.1, 0.2, 0.3],  # u' values
-                [0.5, 1.0, 1.5],  # w values
-                [0.05, 0.1, 0.15],  # w' values
-                [0.01, 0.02, 0.03],  # psi values
-                [0.001, 0.002, 0.003],  # psi' values
-            ]
-        )
-
-    def test_center_line_displacement(self):
+    def test_center_line_displacement(self, basic_fq):
         """Test center-line displacement calculation."""
-        w_values = self.fq.w(self.Z)
+        fq, Z = basic_fq
+        w_values = fq.w(Z)
 
         # Should return w values (row 2) in default units (mm)
-        expected = self.Z[2, :]
+        expected = Z[2, :]
         np.testing.assert_array_equal(
             w_values,
             expected,
             err_msg="Center-line displacement should equal w component",
         )
 
-    def test_center_line_displacement_units(self):
+    def test_center_line_displacement_units(self, basic_fq):
         """Test center-line displacement with different units."""
+        fq, Z = basic_fq
         # Test different units
-        w_mm = self.fq.w(self.Z, unit="mm")
-        w_m = self.fq.w(self.Z, unit="m")
-        w_cm = self.fq.w(self.Z, unit="cm")
-        self.assertRaises(ValueError, self.fq.w, self.Z, unit="inch")
+        w_mm = fq.w(Z, unit="mm")
+        w_m = fq.w(Z, unit="m")
+        w_cm = fq.w(Z, unit="cm")
+        with pytest.raises(ValueError):
+            fq.w(Z, unit="inch")
 
         # Check unit conversions
         np.testing.assert_array_almost_equal(
@@ -73,23 +161,25 @@ class TestFieldQuantitiesBasic(unittest.TestCase):
             err_msg="Centimeter to mm conversion should be correct",
         )
 
-    def test_center_line_displacement_derivative(self):
+    def test_center_line_displacement_derivative(self, basic_fq):
         """Test center-line displacement derivative."""
-        dw_dx = self.fq.dw_dx(self.Z)
+        fq, Z = basic_fq
+        dw_dx = fq.dw_dx(Z)
 
         # Should return w' values (row 3)
-        expected = self.Z[3, :]
+        expected = Z[3, :]
         np.testing.assert_array_equal(
             dw_dx, expected, err_msg="Displacement derivative should equal w' component"
         )
 
-    def test_rotation_calculation(self):
+    def test_rotation_calculation(self, basic_fq):
         """Test rotation calculation."""
-        psi_rad = self.fq.psi(self.Z, unit="rad")
-        psi_deg = self.fq.psi(self.Z, unit="deg")
+        fq, Z = basic_fq
+        psi_rad = fq.psi(Z, unit="rad")
+        psi_deg = fq.psi(Z, unit="deg")
 
         # Radians should equal psi component
-        expected_rad = self.Z[4, :]
+        expected_rad = Z[4, :]
         np.testing.assert_array_equal(
             psi_rad,
             expected_rad,
@@ -105,48 +195,30 @@ class TestFieldQuantitiesBasic(unittest.TestCase):
             err_msg="Rotation conversion to degrees should be correct",
         )
 
-    def test_rotation_derivative(self):
+    def test_rotation_derivative(self, basic_fq):
         """Test rotation derivative calculation."""
-        dpsi_dx = self.fq.dpsi_dx(self.Z)
+        fq, Z = basic_fq
+        dpsi_dx = fq.dpsi_dx(Z)
 
         # Should return psi' values (row 5)
-        expected = self.Z[5, :]
+        expected = Z[5, :]
         np.testing.assert_array_equal(
             dpsi_dx, expected, err_msg="Rotation derivative should equal psi' component"
         )
 
 
-class TestFieldQuantitiesDisplacements(unittest.TestCase):
+class TestFieldQuantitiesDisplacements:
     """Test displacement calculations at different heights."""
 
-    def setUp(self):
-        """Set up test system."""
-        layers = [Layer(rho=250, h=120)]
-        weak_layer = WeakLayer(rho=60, h=25)
-        slab = Slab(layers)
-        eigensystem = Eigensystem(weak_layer, slab)
-        self.fq = FieldQuantities(eigensystem)
-
-        # Simple solution vector
-        self.Z = np.array(
-            [
-                [2.0, 4.0],  # u values
-                [0.2, 0.4],  # u' values
-                [1.0, 2.0],  # w values
-                [0.1, 0.2],  # w' values
-                [0.05, 0.1],  # psi values
-                [0.005, 0.01],  # psi' values
-            ]
-        )
-
-    def test_displacement_at_different_heights(self):
+    def test_displacement_at_different_heights(self, displacement_fq):
         """Test horizontal displacement at different heights."""
+        fq, Z = displacement_fq
         h0 = 30.0  # Height above centerline
 
-        u_values = self.fq.u(self.Z, h0)
+        u_values = fq.u(Z, h0)
 
         # u = u0 + h0 * psi
-        expected = self.Z[0, :] + h0 * self.Z[4, :]
+        expected = Z[0, :] + h0 * Z[4, :]
         np.testing.assert_array_almost_equal(
             u_values,
             expected,
@@ -154,14 +226,15 @@ class TestFieldQuantitiesDisplacements(unittest.TestCase):
             err_msg="Displacement at height should follow u = u0 + h*psi",
         )
 
-    def test_displacement_derivative_at_height(self):
+    def test_displacement_derivative_at_height(self, displacement_fq):
         """Test displacement derivative at different heights."""
+        fq, Z = displacement_fq
         h0 = 40.0
 
-        du_dx = self.fq.du_dx(self.Z, h0)
+        du_dx = fq.du_dx(Z, h0)
 
         # du/dx = u0' + h0 * psi'
-        expected = self.Z[1, :] + h0 * self.Z[5, :]
+        expected = Z[1, :] + h0 * Z[5, :]
         np.testing.assert_array_almost_equal(
             du_dx,
             expected,
@@ -169,48 +242,28 @@ class TestFieldQuantitiesDisplacements(unittest.TestCase):
             err_msg="Displacement derivative should follow du/dx = u0' + h*psi'",
         )
 
-    def test_displacement_at_centerline(self):
+    def test_displacement_at_centerline(self, displacement_fq):
         """Test that displacement at centerline equals u0."""
-        u_centerline = self.fq.u(self.Z, h0=0.0)
+        fq, Z = displacement_fq
+        u_centerline = fq.u(Z, h0=0.0)
 
         # At centerline (h0=0), u = u0
-        expected = self.Z[0, :]
+        expected = Z[0, :]
         np.testing.assert_array_equal(
             u_centerline, expected, err_msg="Displacement at centerline should equal u0"
         )
 
 
-class TestFieldQuantitiesStresses(unittest.TestCase):
+class TestFieldQuantitiesStresses:
     """Test stress and force calculations."""
 
-    def setUp(self):
-        """Set up test system with known properties."""
-        layers = [Layer(rho=200, h=100, E=50, nu=0.25)]  # Known elastic properties
-        weak_layer = WeakLayer(
-            rho=50, h=20, E=0.5, kn=10.0, kt=5.0
-        )  # Known stiffnesses
-        slab = Slab(layers)
-        eigensystem = Eigensystem(weak_layer, slab)
-        self.fq = FieldQuantities(eigensystem)
-
-        # Test solution vector
-        self.Z = np.array(
-            [
-                [1.0, 2.0],  # u values
-                [0.1, 0.2],  # u' values
-                [0.5, 1.0],  # w values
-                [0.05, 0.1],  # w' values
-                [0.01, 0.02],  # psi values
-                [0.001, 0.002],  # psi' values
-            ]
-        )
-
-    def test_axial_force_calculation(self):
+    def test_axial_force_calculation(self, stress_fq):
         """Test axial normal force calculation."""
-        N = self.fq.N(self.Z)
+        fq, Z = stress_fq
+        N = fq.N(Z)
 
         # N = A11 * u' + B11 * psi'
-        expected = self.fq.es.A11 * self.Z[1, :] + self.fq.es.B11 * self.Z[5, :]
+        expected = fq.es.A11 * Z[1, :] + fq.es.B11 * Z[5, :]
         np.testing.assert_array_almost_equal(
             N,
             expected,
@@ -218,12 +271,13 @@ class TestFieldQuantitiesStresses(unittest.TestCase):
             err_msg="Axial force should follow N = A11*u' + B11*psi'",
         )
 
-    def test_bending_moment_calculation(self):
+    def test_bending_moment_calculation(self, stress_fq):
         """Test bending moment calculation."""
-        M = self.fq.M(self.Z)
+        fq, Z = stress_fq
+        M = fq.M(Z)
 
         # M = B11 * u' + D11 * psi'
-        expected = self.fq.es.B11 * self.Z[1, :] + self.fq.es.D11 * self.Z[5, :]
+        expected = fq.es.B11 * Z[1, :] + fq.es.D11 * Z[5, :]
         np.testing.assert_array_almost_equal(
             M,
             expected,
@@ -231,12 +285,13 @@ class TestFieldQuantitiesStresses(unittest.TestCase):
             err_msg="Bending moment should follow M = B11*u' + D11*psi'",
         )
 
-    def test_shear_force_calculation(self):
+    def test_shear_force_calculation(self, stress_fq):
         """Test vertical shear force calculation."""
-        V = self.fq.V(self.Z)
+        fq, Z = stress_fq
+        V = fq.V(Z)
 
         # V = kA55 * (w' + psi)
-        expected = self.fq.es.kA55 * (self.Z[3, :] + self.Z[4, :])
+        expected = fq.es.kA55 * (Z[3, :] + Z[4, :])
         np.testing.assert_array_almost_equal(
             V,
             expected,
@@ -244,13 +299,14 @@ class TestFieldQuantitiesStresses(unittest.TestCase):
             err_msg="Shear force should follow V = kA55*(w' + psi)",
         )
 
-    def test_weak_layer_normal_stress(self):
+    def test_weak_layer_normal_stress(self, stress_fq):
         """Test weak layer normal stress calculation."""
-        sig_MPa = self.fq.sig(self.Z, unit="MPa")
-        sig_kPa = self.fq.sig(self.Z, unit="kPa")
+        fq, Z = stress_fq
+        sig_MPa = fq.sig(Z, unit="MPa")
+        sig_kPa = fq.sig(Z, unit="kPa")
 
         # sig = -kn * w
-        expected_MPa = -self.fq.es.weak_layer.kn * self.Z[2, :]
+        expected_MPa = -fq.es.weak_layer.kn * Z[2, :]
         np.testing.assert_array_almost_equal(
             sig_MPa,
             expected_MPa,
@@ -263,16 +319,17 @@ class TestFieldQuantitiesStresses(unittest.TestCase):
             sig_kPa, sig_MPa * 1000, decimal=8, err_msg="kPa should be 1000 times MPa"
         )
 
-    def test_weak_layer_shear_stress(self):
+    def test_weak_layer_shear_stress(self, stress_fq):
         """Test weak layer shear stress calculation."""
-        tau = self.fq.tau(self.Z, unit="MPa")
+        fq, Z = stress_fq
+        tau = fq.tau(Z, unit="MPa")
 
         # tau = -kt * (w' * h/2 - u(h=H/2))
-        h = self.fq.es.weak_layer.h
-        H = self.fq.es.slab.H
-        u_surface = self.fq.u(self.Z, h0=H / 2)
+        h = fq.es.weak_layer.h
+        H = fq.es.slab.H
+        u_surface = fq.u(Z, h0=H / 2)
 
-        expected = self.fq.es.weak_layer.kt * (self.Z[3, :] * h / 2 - u_surface)
+        expected = fq.es.weak_layer.kt * (Z[3, :] * h / 2 - u_surface)
         np.testing.assert_array_almost_equal(
             tau,
             expected,
@@ -281,48 +338,31 @@ class TestFieldQuantitiesStresses(unittest.TestCase):
         )
 
 
-class TestFieldQuantitiesStrains(unittest.TestCase):
+class TestFieldQuantitiesStrains:
     """Test strain calculations."""
 
-    def setUp(self):
-        """Set up test system."""
-        layers = [Layer(rho=200, h=100)]
-        weak_layer = WeakLayer(rho=50, h=20)
-        slab = Slab(layers)
-        eigensystem = Eigensystem(weak_layer, slab)
-        self.fq = FieldQuantities(eigensystem)
-
-        self.Z = np.array(
-            [
-                [1.0, 2.0],
-                [0.1, 0.2],
-                [0.5, 1.0],
-                [0.05, 0.1],
-                [0.01, 0.02],
-                [0.001, 0.002],
-            ]
-        )
-
-    def test_normal_strain_calculation(self):
+    def test_normal_strain_calculation(self, strain_fq):
         """Test weak layer normal strain calculation."""
-        eps = self.fq.eps(self.Z)
+        fq, Z = strain_fq
+        eps = fq.eps(Z)
 
         # eps = -w / h
-        expected = -self.Z[2, :] / self.fq.es.weak_layer.h
+        expected = -Z[2, :] / fq.es.weak_layer.h
         np.testing.assert_array_almost_equal(
             eps, expected, decimal=10, err_msg="Normal strain should follow eps = -w/h"
         )
 
-    def test_shear_strain_calculation(self):
+    def test_shear_strain_calculation(self, strain_fq):
         """Test weak layer shear strain calculation."""
-        gamma = self.fq.gamma(self.Z)
+        fq, Z = strain_fq
+        gamma = fq.gamma(Z)
 
         # gamma = w'/2 - u(h=H/2)/h
-        h = self.fq.es.weak_layer.h
-        H = self.fq.es.slab.H
-        u_surface = self.fq.u(self.Z, h0=H / 2)
+        h = fq.es.weak_layer.h
+        H = fq.es.slab.H
+        u_surface = fq.u(Z, h0=H / 2)
 
-        expected = self.Z[3, :] / 2 - u_surface / h
+        expected = Z[3, :] / 2 - u_surface / h
         np.testing.assert_array_almost_equal(
             gamma,
             expected,
@@ -331,36 +371,17 @@ class TestFieldQuantitiesStrains(unittest.TestCase):
         )
 
 
-class TestFieldQuantitiesEnergyReleaseRates(unittest.TestCase):
+class TestFieldQuantitiesEnergyReleaseRates:
     """Test energy release rate calculations."""
 
-    def setUp(self):
-        """Set up test system."""
-        layers = [Layer(rho=200, h=100)]
-        weak_layer = WeakLayer(rho=50, h=20, kn=10.0, kt=5.0)
-        slab = Slab(layers)
-        eigensystem = Eigensystem(weak_layer, slab)
-        self.fq = FieldQuantities(eigensystem)
-
-        # Single point solution vector (crack tip)
-        self.Z_tip = np.array(
-            [
-                [1.0],  # u
-                [0.1],  # u'
-                [0.5],  # w
-                [0.05],  # w'
-                [0.01],  # psi
-                [0.001],  # psi'
-            ]
-        )
-
-    def test_mode_I_energy_release_rate(self):
+    def test_mode_I_energy_release_rate(self, err_fq):
         """Test Mode I energy release rate calculation."""
-        G_I = self.fq.Gi(self.Z_tip, unit="kJ/m^2")
+        fq, Z_tip = err_fq
+        G_I = fq.Gi(Z_tip, unit="kJ/m^2")
 
         # G_I = sig^2 / (2 * kn)
-        sig = self.fq.sig(self.Z_tip, unit="MPa")
-        expected = sig**2 / (2 * self.fq.es.weak_layer.kn)
+        sig = fq.sig(Z_tip, unit="MPa")
+        expected = sig**2 / (2 * fq.es.weak_layer.kn)
 
         np.testing.assert_array_almost_equal(
             G_I,
@@ -369,13 +390,14 @@ class TestFieldQuantitiesEnergyReleaseRates(unittest.TestCase):
             err_msg="Mode I ERR should follow G_I = sig²/(2*kn)",
         )
 
-    def test_mode_II_energy_release_rate(self):
+    def test_mode_II_energy_release_rate(self, err_fq):
         """Test Mode II energy release rate calculation."""
-        G_II = self.fq.Gii(self.Z_tip, unit="kJ/m^2")
+        fq, Z_tip = err_fq
+        G_II = fq.Gii(Z_tip, unit="kJ/m^2")
 
         # G_II = tau^2 / (2 * kt)
-        tau = self.fq.tau(self.Z_tip, unit="MPa")
-        expected = tau**2 / (2 * self.fq.es.weak_layer.kt)
+        tau = fq.tau(Z_tip, unit="MPa")
+        expected = tau**2 / (2 * fq.es.weak_layer.kt)
 
         np.testing.assert_array_almost_equal(
             G_II,
@@ -384,11 +406,12 @@ class TestFieldQuantitiesEnergyReleaseRates(unittest.TestCase):
             err_msg="Mode II ERR should follow G_II = tau²/(2*kt)",
         )
 
-    def test_energy_release_rate_units(self):
+    def test_energy_release_rate_units(self, err_fq):
         """Test energy release rate unit conversions."""
-        G_I_kJ = self.fq.Gi(self.Z_tip, unit="kJ/m^2")
-        G_I_J = self.fq.Gi(self.Z_tip, unit="J/m^2")
-        G_I_N = self.fq.Gi(self.Z_tip, unit="N/mm")
+        fq, Z_tip = err_fq
+        G_I_kJ = fq.Gi(Z_tip, unit="kJ/m^2")
+        G_I_J = fq.Gi(Z_tip, unit="J/m^2")
+        G_I_N = fq.Gi(Z_tip, unit="N/mm")
 
         # Check unit conversions
         np.testing.assert_array_almost_equal(
@@ -399,7 +422,7 @@ class TestFieldQuantitiesEnergyReleaseRates(unittest.TestCase):
         )
 
 
-class TestFieldQuantitiesPhysicalConsistency(unittest.TestCase):
+class TestFieldQuantitiesPhysicalConsistency:
     """Test physical consistency of field quantity calculations."""
 
     def test_displacement_continuity(self):
@@ -418,8 +441,8 @@ class TestFieldQuantitiesPhysicalConsistency(unittest.TestCase):
         u2 = fq.u(Z, h2)
 
         # Should be very close for nearby heights
-        self.assertAlmostEqual(
-            u1[0], u2[0], places=6, msg="Displacement should be continuous"
+        assert u1[0] == pytest.approx(u2[0], abs=0.5 * 10 ** (-6)), (
+            "Displacement should be continuous"
         )
 
     def test_stress_sign_conventions(self):
@@ -434,9 +457,7 @@ class TestFieldQuantitiesPhysicalConsistency(unittest.TestCase):
         Z_positive_w = np.array([[0], [0], [1.0], [0], [0], [0]])  # Positive w
         sig_pos = fq.sig(Z_positive_w)
 
-        self.assertLess(
-            sig_pos[0], 0, "Positive deflection should give compressive stress"
-        )
+        assert sig_pos[0] < 0, "Positive deflection should give compressive stress"
 
     def test_energy_release_rate_positivity(self):
         """Test that energy release rates are always positive."""
@@ -452,9 +473,5 @@ class TestFieldQuantitiesPhysicalConsistency(unittest.TestCase):
         G_I = fq.Gi(Z_nonzero)
         G_II = fq.Gii(Z_nonzero)
 
-        self.assertGreaterEqual(G_I[0], 0, "Mode I ERR should be non-negative")
-        self.assertGreaterEqual(G_II[0], 0, "Mode II ERR should be non-negative")
-
-
-if __name__ == "__main__":
-    unittest.main(verbosity=2)
+        assert G_I[0] >= 0, "Mode I ERR should be non-negative"
+        assert G_II[0] >= 0, "Mode II ERR should be non-negative"

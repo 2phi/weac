@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "weac"
-version = "3.1.9"
+version = "3.2.0"
 authors = [{ name = "2phi GbR", email = "mail@2phi.de" }]
 description = "Weak layer anticrack nucleation model"
 readme = "README.md"
@@ -72,6 +72,9 @@ dev = [
     "black>=24.4.0",
     "isort>=5.13.0",
 
+    # Testing
+    "pytest>=8",
+
     # Versioning helper matching [tool.bumpversion]
     "bump-my-version", # e.g. bump-my-version bump patch
 ]
@@ -84,6 +87,9 @@ where = ["src"]
 
 # [tool.uv.sources]
 # snowpylot = { path = "../snowpylot", editable = true }
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
 
 [tool.ruff.lint]
 ignore = ["E741"]
@@ -126,7 +132,7 @@ ignore = [
 ]
 
 [tool.bumpversion]
-current_version = "3.1.9"
+current_version = "3.2.0"
 
 [[tool.bumpversion.files]]
 filename = "pyproject.toml"
