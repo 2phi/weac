@@ -4,16 +4,15 @@ Unit tests for the Slab class.
 Tests layer assembly, property calculations, center of gravity, and physical consistency.
 """
 
-import unittest
-
 import numpy as np
+import pytest
 
 from weac.components import Layer
 from weac.constants import G_MM_S2
 from weac.core.slab import Slab
 
 
-class TestSlabBasicOperations(unittest.TestCase):
+class TestSlabBasicOperations:
     """Test basic slab assembly and property calculations."""
 
     def test_single_layer_slab(self):
@@ -22,16 +21,14 @@ class TestSlabBasicOperations(unittest.TestCase):
         slab = Slab([layer])
 
         # Check basic properties
-        self.assertEqual(len(slab.layers), 1)
-        self.assertEqual(
-            slab.H, 100.0, "Total thickness should equal single layer thickness"
-        )
-        self.assertEqual(slab.hi[0], 100.0)
-        self.assertEqual(slab.rhoi[0], 250e-12, "Density should be converted to t/mm³")
+        assert len(slab.layers) == 1
+        assert slab.H == 100.0, "Total thickness should equal single layer thickness"
+        assert slab.hi[0] == 100.0
+        assert slab.rhoi[0] == 250e-12, "Density should be converted to t/mm³"
 
         # Check coordinate system (z=0 at slab midpoint)
-        self.assertEqual(slab.zi_mid[0], 0.0, "Single layer midpoint should be at z=0")
-        self.assertEqual(slab.zi_bottom[0], 50.0, "Bottom should be H/2 below midpoint")
+        assert slab.zi_mid[0] == 0.0, "Single layer midpoint should be at z=0"
+        assert slab.zi_bottom[0] == 50.0, "Bottom should be H/2 below midpoint"
 
     def test_multi_layer_slab(self):
         """Test slab with multiple layers."""
@@ -44,7 +41,7 @@ class TestSlabBasicOperations(unittest.TestCase):
 
         # Check total thickness
         expected_H = 50 + 80 + 70
-        self.assertEqual(slab.H, expected_H)
+        assert slab.H == expected_H
 
         # Check layer thicknesses
         np.testing.assert_array_almost_equal(slab.hi, [50, 80, 70])
@@ -67,7 +64,7 @@ class TestSlabBasicOperations(unittest.TestCase):
         np.testing.assert_array_almost_equal(slab.zi_bottom, expected_zi_bottom)
 
 
-class TestSlabCenterOfGravity(unittest.TestCase):
+class TestSlabCenterOfGravity:
     """Test center of gravity calculations."""
 
     def test_uniform_density_slab(self):
@@ -79,11 +76,8 @@ class TestSlabCenterOfGravity(unittest.TestCase):
         slab = Slab(layers)
 
         # For uniform density, CoG should be at geometric center (z=0)
-        self.assertAlmostEqual(
-            slab.z_cog,
-            0.0,
-            places=5,
-            msg="Uniform density slab should have CoG at geometric center",
+        assert slab.z_cog == pytest.approx(0.0, abs=0.5 * 10 ** (-5)), (
+            "Uniform density slab should have CoG at geometric center"
         )
 
     def test_density_gradient_slab(self):
@@ -95,9 +89,7 @@ class TestSlabCenterOfGravity(unittest.TestCase):
         slab = Slab(layers)
 
         # CoG should shift toward heavier bottom layer (positive z)
-        self.assertGreater(
-            slab.z_cog, 0.0, "CoG should shift toward heavier bottom layer"
-        )
+        assert slab.z_cog > 0.0, "CoG should shift toward heavier bottom layer"
 
     def test_top_heavy_slab(self):
         """Test CoG for top-heavy slab."""
@@ -108,10 +100,10 @@ class TestSlabCenterOfGravity(unittest.TestCase):
         slab = Slab(layers)
 
         # CoG should shift toward heavier top layer (negative z)
-        self.assertLess(slab.z_cog, 0.0, "CoG should shift toward heavier top layer")
+        assert slab.z_cog < 0.0, "CoG should shift toward heavier top layer"
 
 
-class TestSlabWeightCalculations(unittest.TestCase):
+class TestSlabWeightCalculations:
     """Test weight and load calculations."""
 
     def test_weight_load_calculation(self):
@@ -121,7 +113,7 @@ class TestSlabWeightCalculations(unittest.TestCase):
 
         # qw = sum(rho * g * h) for all layers
         expected_qw = 200e-12 * G_MM_S2 * 100  # t/mm³ * mm/s² * mm = t*mm/s²/mm² = N/mm
-        self.assertAlmostEqual(slab.qw, expected_qw, places=8)
+        assert slab.qw == pytest.approx(expected_qw, abs=0.5 * 10 ** (-8))
 
     def test_multi_layer_weight(self):
         """Test weight calculation for multiple layers."""
@@ -134,10 +126,10 @@ class TestSlabWeightCalculations(unittest.TestCase):
 
         # Calculate expected total weight per unit length
         expected_qw = (150 * 60 + 250 * 80 + 350 * 100) * 1e-12 * G_MM_S2
-        self.assertAlmostEqual(slab.qw, expected_qw, places=8)
+        assert slab.qw == pytest.approx(expected_qw, abs=0.5 * 10 ** (-8))
 
 
-class TestSlabVerticalCenterOfGravity(unittest.TestCase):
+class TestSlabVerticalCenterOfGravity:
     """Test vertical center of gravity calculations for inclined slabs."""
 
     def test_vertical_cog_flat_surface(self):
@@ -148,9 +140,9 @@ class TestSlabVerticalCenterOfGravity(unittest.TestCase):
         x_cog, z_cog, w = slab.calc_vertical_center_of_gravity(phi=0)
 
         # For flat surface, should have zero displacement and weight
-        self.assertEqual(x_cog, 0.0)
-        self.assertEqual(z_cog, 0.0)
-        self.assertEqual(w, 0.0)
+        assert x_cog == 0.0
+        assert z_cog == 0.0
+        assert w == 0.0
 
     def test_vertical_cog_inclined_surface(self):
         """Test vertical CoG calculation for inclined surface."""
@@ -163,13 +155,9 @@ class TestSlabVerticalCenterOfGravity(unittest.TestCase):
         x_cog, z_cog, w = slab.calc_vertical_center_of_gravity(phi=30)
 
         # For inclined surface, should have non-zero values
-        self.assertNotEqual(
-            x_cog, 0.0, "Horizontal CoG should be non-zero for inclined surface"
-        )
-        self.assertNotEqual(
-            z_cog, 0.0, "Vertical CoG should be non-zero for inclined surface"
-        )
-        self.assertGreater(w, 0.0, "Weight should be positive")
+        assert x_cog != 0.0, "Horizontal CoG should be non-zero for inclined surface"
+        assert z_cog != 0.0, "Vertical CoG should be non-zero for inclined surface"
+        assert w > 0.0, "Weight should be positive"
 
     def test_vertical_cog_steep_inclination(self):
         """Test vertical CoG for steep inclination."""
@@ -180,19 +168,15 @@ class TestSlabVerticalCenterOfGravity(unittest.TestCase):
         x_cog_60, _, w_60 = slab.calc_vertical_center_of_gravity(phi=60)
 
         # Steeper inclination should result in larger displacements and weights
-        self.assertGreater(
-            abs(x_cog_60),
-            abs(x_cog_30),
-            "Steeper inclination should increase horizontal displacement",
+        assert abs(x_cog_60) > abs(x_cog_30), (
+            "Steeper inclination should increase horizontal displacement"
         )
-        self.assertGreater(
-            w_60,
-            w_30,
-            "Steeper inclination should increase weight of triangular segment",
+        assert w_60 > w_30, (
+            "Steeper inclination should increase weight of triangular segment"
         )
 
 
-class TestSlabElasticProperties(unittest.TestCase):
+class TestSlabElasticProperties:
     """Test elastic property assembly."""
 
     def test_elastic_property_arrays(self):
@@ -218,16 +202,12 @@ class TestSlabElasticProperties(unittest.TestCase):
         slab = Slab(layers)
 
         # Properties should be auto-calculated and positive
-        self.assertGreater(
-            slab.Ei[0], 0, "Young's modulus should be auto-calculated and positive"
-        )
-        self.assertGreater(
-            slab.Gi[0], 0, "Shear modulus should be auto-calculated and positive"
-        )
-        self.assertEqual(slab.nui[0], 0.25, "Default Poisson's ratio should be 0.25")
+        assert slab.Ei[0] > 0, "Young's modulus should be auto-calculated and positive"
+        assert slab.Gi[0] > 0, "Shear modulus should be auto-calculated and positive"
+        assert slab.nui[0] == 0.25, "Default Poisson's ratio should be 0.25"
 
 
-class TestSlabPhysicalConsistency(unittest.TestCase):
+class TestSlabPhysicalConsistency:
     """Test physical consistency of slab calculations."""
 
     def test_coordinate_system_consistency(self):
@@ -240,15 +220,15 @@ class TestSlabPhysicalConsistency(unittest.TestCase):
         slab = Slab(layers)
 
         # Total thickness should equal sum of layer thicknesses
-        self.assertEqual(slab.H, sum(slab.hi))
+        assert slab.H == sum(slab.hi)
 
         # Bottom of last layer should be at H/2
-        self.assertAlmostEqual(slab.zi_bottom[-1], slab.H / 2, places=5)
+        assert slab.zi_bottom[-1] == pytest.approx(slab.H / 2, abs=0.5 * 10 ** (-5))
 
         # Top of first layer should be at -H/2
         # (first layer bottom - first layer thickness)
         top_of_first = slab.zi_bottom[0] - slab.hi[0]
-        self.assertAlmostEqual(top_of_first, -slab.H / 2, places=5)
+        assert top_of_first == pytest.approx(-slab.H / 2, abs=0.5 * 10 ** (-5))
 
     def test_center_of_gravity_bounds(self):
         """Test that center of gravity is within slab bounds."""
@@ -259,12 +239,8 @@ class TestSlabPhysicalConsistency(unittest.TestCase):
         slab = Slab(layers)
 
         # CoG should be within slab thickness bounds
-        self.assertGreaterEqual(
-            slab.z_cog, -slab.H / 2, "CoG should be within slab (above top)"
-        )
-        self.assertLessEqual(
-            slab.z_cog, slab.H / 2, "CoG should be within slab (below bottom)"
-        )
+        assert slab.z_cog >= -slab.H / 2, "CoG should be within slab (above top)"
+        assert slab.z_cog <= slab.H / 2, "CoG should be within slab (below bottom)"
 
     def test_mass_conservation(self):
         """Test that mass calculations are consistent."""
@@ -279,8 +255,4 @@ class TestSlabPhysicalConsistency(unittest.TestCase):
 
         # Weight per unit length should equal mass per length times gravity
         expected_weight = total_mass_per_length * G_MM_S2
-        self.assertAlmostEqual(slab.qw, expected_weight, places=10)
-
-
-if __name__ == "__main__":
-    unittest.main(verbosity=2)
+        assert slab.qw == pytest.approx(expected_weight, abs=0.5 * 10 ** (-10))

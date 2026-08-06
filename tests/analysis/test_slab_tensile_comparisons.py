@@ -14,7 +14,8 @@ higher ERR.
 """
 
 from dataclasses import dataclass, field
-import unittest
+
+import pytest
 
 from weac.analysis.criteria_evaluator import CriteriaEvaluator
 from weac.components import (
@@ -255,104 +256,90 @@ def _evaluate_hybrid_ss(evaluator: CriteriaEvaluator, setup: SetupDefinition):
     return evaluator.evaluate_SteadyState(_build_system(setup))
 
 
-class TestSlabTensileComparisons(unittest.TestCase):
+@pytest.fixture(scope="module")
+def evaluator():
+    """Shared CriteriaEvaluator for the comparison matrix."""
+    return CriteriaEvaluator(CriteriaConfig())
+
+
+@pytest.fixture(scope="module")
+def hybrid_results(evaluator):
+    """Cache hybrid A/B steady-state results per comparison case."""
+    return {
+        case.name: (
+            _evaluate_hybrid_ss(evaluator, case.setup_a),
+            _evaluate_hybrid_ss(evaluator, case.setup_b),
+        )
+        for case in COMPARISON_CASES
+    }
+
+
+class TestSlabTensileComparisons:
     """Regression checks for hybrid tensile ease and ERR ordering."""
 
-    @classmethod
-    def setUpClass(cls):
-        """Create a shared evaluator and cache hybrid A/B results per case."""
-        cls.evaluator = CriteriaEvaluator(CriteriaConfig())
-        cls.hybrid_results: dict[str, tuple] = {
-            case.name: (
-                _evaluate_hybrid_ss(cls.evaluator, case.setup_a),
-                _evaluate_hybrid_ss(cls.evaluator, case.setup_b),
-            )
-            for case in COMPARISON_CASES
-        }
-
-    def test_hybrid_steady_state_structured_fields(self):
+    def test_hybrid_steady_state_structured_fields(self, hybrid_results):
         """Smoke: hybrid SS exposes tensile L_crit and ERR scalars."""
         if not COMPARISON_CASES:
-            self.skipTest("Populate COMPARISON_CASES A/B setup pairs.")
-        result_a, _ = self.hybrid_results[COMPARISON_CASES[0].name]
-        self.assertGreater(result_a.tensile.critical_cut_length, 0)
-        self.assertTrue(hasattr(result_a.err, "energy_release_rate"))
-        self.assertGreater(result_a.err.energy_release_rate, 0)
+            pytest.skip("Populate COMPARISON_CASES A/B setup pairs.")
+        result_a, _ = hybrid_results[COMPARISON_CASES[0].name]
+        assert result_a.tensile.critical_cut_length > 0
+        assert hasattr(result_a.err, "energy_release_rate")
+        assert result_a.err.energy_release_rate > 0
 
-    def test_slab_tensile_ease_ordering(self):
+    @pytest.mark.parametrize(
+        "case",
+        COMPARISON_CASES,
+        ids=[case.name for case in COMPARISON_CASES],
+    )
+    def test_slab_tensile_ease_ordering(self, hybrid_results, case):
         """Steph tensile map: A/B ease via shorter critical_cut_length."""
-        if not COMPARISON_CASES:
-            self.skipTest("Populate COMPARISON_CASES A/B setup pairs.")
+        result_a, result_b = hybrid_results[case.name]
+        l_a = result_a.tensile.critical_cut_length
+        l_b = result_b.tensile.critical_cut_length
+        # Always require structured ERR fields.
+        assert result_a.err.energy_release_rate > 0
+        assert result_b.err.energy_release_rate > 0
 
-        for case in COMPARISON_CASES:
-            with self.subTest(case=case.name):
-                result_a, result_b = self.hybrid_results[case.name]
-                l_a = result_a.tensile.critical_cut_length
-                l_b = result_b.tensile.critical_cut_length
-                # Always require structured ERR fields.
-                self.assertGreater(result_a.err.energy_release_rate, 0)
-                self.assertGreater(result_b.err.energy_release_rate, 0)
+        if case.name in SMOKE_ONLY_CASES:
+            assert l_a > 0
+            assert l_b > 0
+            return
+        if case.name in A_EASIER_CASES:
+            assert l_a <= l_b, (
+                f"{case.name}: expected A easier (L_crit A <= B), got "
+                f"A={l_a:.6f}, B={l_b:.6f}"
+            )
+        elif case.name in B_EASIER_CASES:
+            assert l_b <= l_a, (
+                f"{case.name}: expected B easier (L_crit B <= A), got "
+                f"A={l_a:.6f}, B={l_b:.6f}"
+            )
+        else:
+            assert l_a > 0
+            assert l_b > 0
 
-                if case.name in SMOKE_ONLY_CASES:
-                    self.assertGreater(l_a, 0)
-                    self.assertGreater(l_b, 0)
-                    continue
-                if case.name in A_EASIER_CASES:
-                    self.assertLessEqual(
-                        l_a,
-                        l_b,
-                        msg=(
-                            f"{case.name}: expected A easier (L_crit A <= B), got "
-                            f"A={l_a:.6f}, B={l_b:.6f}"
-                        ),
-                    )
-                elif case.name in B_EASIER_CASES:
-                    self.assertLessEqual(
-                        l_b,
-                        l_a,
-                        msg=(
-                            f"{case.name}: expected B easier (L_crit B <= A), got "
-                            f"A={l_a:.6f}, B={l_b:.6f}"
-                        ),
-                    )
-                else:
-                    self.assertGreater(l_a, 0)
-                    self.assertGreater(l_b, 0)
-
-    def test_slab_err_ordering(self):
+    @pytest.mark.parametrize(
+        "case",
+        COMPARISON_CASES,
+        ids=[case.name for case in COMPARISON_CASES],
+    )
+    def test_slab_err_ordering(self, hybrid_results, case):
         """Steph ERR map: higher energy_release_rate for all cases (no smoke)."""
-        if not COMPARISON_CASES:
-            self.skipTest("Populate COMPARISON_CASES A/B setup pairs.")
+        result_a, result_b = hybrid_results[case.name]
+        err_a = result_a.err.energy_release_rate
+        err_b = result_b.err.energy_release_rate
+        assert err_a > 0
+        assert err_b > 0
 
-        for case in COMPARISON_CASES:
-            with self.subTest(case=case.name):
-                result_a, result_b = self.hybrid_results[case.name]
-                err_a = result_a.err.energy_release_rate
-                err_b = result_b.err.energy_release_rate
-                self.assertGreater(err_a, 0)
-                self.assertGreater(err_b, 0)
-
-                if case.name in A_HIGHER_ERR_CASES:
-                    self.assertGreaterEqual(
-                        err_a,
-                        err_b,
-                        msg=(
-                            f"{case.name}: expected A higher ERR (A >= B), got "
-                            f"A={err_a:.6f}, B={err_b:.6f}"
-                        ),
-                    )
-                elif case.name in B_HIGHER_ERR_CASES:
-                    self.assertGreaterEqual(
-                        err_b,
-                        err_a,
-                        msg=(
-                            f"{case.name}: expected B higher ERR (B >= A), got "
-                            f"A={err_a:.6f}, B={err_b:.6f}"
-                        ),
-                    )
-                else:
-                    self.fail(f"{case.name}: missing from ERR expectation frozensets")
-
-
-if __name__ == "__main__":
-    unittest.main()
+        if case.name in A_HIGHER_ERR_CASES:
+            assert err_a >= err_b, (
+                f"{case.name}: expected A higher ERR (A >= B), got "
+                f"A={err_a:.6f}, B={err_b:.6f}"
+            )
+        elif case.name in B_HIGHER_ERR_CASES:
+            assert err_b >= err_a, (
+                f"{case.name}: expected B higher ERR (B >= A), got "
+                f"A={err_a:.6f}, B={err_b:.6f}"
+            )
+        else:
+            pytest.fail(f"{case.name}: missing from ERR expectation frozensets")
