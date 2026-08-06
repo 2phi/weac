@@ -1003,7 +1003,8 @@ class CoupledCriterionEngine:
         theta = system.scenario.theta
         has_foundation = system.scenario.ki[segment_index]
         is_loaded = system.scenario.gi[segment_index]
-        # Calculate the displacement field
+        # Calculate the displacement field (pass qs so particular solution
+        # matches analyzer.rasterize_solution)
         Z = system.z(
             coordinate_in_segment,
             C,
@@ -1012,6 +1013,7 @@ class CoupledCriterionEngine:
             theta,
             has_foundation=has_foundation,
             is_loaded=is_loaded,
+            qs=system.scenario.surface_load,
         )
 
         # Calculate the stresses (fq returns shape (1,); expose Python floats)
