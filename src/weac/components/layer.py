@@ -103,6 +103,29 @@ def _adam_tensile_strength(rho, unit: Literal["kPa", "MPa"] = "kPa"):
     return TS_0 * (rho / RHO_ICE) ** kappa * convert[unit]
 
 
+def _jamieson_johnson_tensile_strength(rho, unit: Literal["kPa", "MPa"] = "kPa"):
+    """
+    Estimate the tensile strength of a slab layer from its density.
+
+    Uses the density parametrization of Jamieson & Johnson (1990).
+
+    Arguments
+    ---------
+    rho : ndarray, float
+        Layer density (kg/m^3).
+    unit : str, optional
+        Desired output unit of the layer strength. Default is 'kPa'.
+
+    Returns
+    -------
+    ndarray
+        Tensile strength in specified unit.
+    """
+    convert = {"kPa": 1e-3, "MPa": 1e-6}
+    # Jamieson & Johnson's equation is given in Pa
+    return 7.97e4 * (rho / RHO_ICE) ** 2.39 * convert[unit]
+
+
 # # TODO: Compressive Strength from Schöttner
 # def _schotter_compressive_strength(rho, unit: Literal["kPa", "MPa"] = "kPa"):
 #     """
@@ -135,7 +158,7 @@ class Layer(BaseModel):
         Shear modulus G [MPa].  If omitted it is derived from ``E`` and ``nu``.
     tensile_strength: float
         Tensile strength [kPa].
-    tensile_strength_method: Literal["sigrist", "adam", "hybrid"]
+    tensile_strength_method: Literal["sigrist", "adam", "hybrid", "jamieson_johnson"]
         Method to calculate the tensile strength.
     """
 
@@ -152,8 +175,10 @@ class Layer(BaseModel):
     tensile_strength: float = Field(
         default=0.0, ge=0, description="Tensile strength [kPa]"
     )
-    tensile_strength_method: Literal["sigrist", "adam", "hybrid"] = Field(
-        default="hybrid",
+    tensile_strength_method: Literal[
+        "sigrist", "adam", "hybrid", "jamieson_johnson"
+    ] = Field(
+        default="jamieson_johnson",
         description="Method to calculate the tensile strength",
     )
     E_method: Literal["bergfeld", "scapazzo", "gerling"] = Field(
@@ -182,6 +207,8 @@ class Layer(BaseModel):
                 ts_value = _sigrist_tensile_strength(self.rho, unit="kPa")
             elif self.tensile_strength_method == "adam":
                 ts_value = _adam_tensile_strength(self.rho, unit="kPa")
+            elif self.tensile_strength_method == "jamieson_johnson":
+                ts_value = _jamieson_johnson_tensile_strength(self.rho, unit="kPa")
             elif self.tensile_strength_method == "hybrid":
                 # Use Sigrist for rho < 250, Adam for rho >= 250
                 if self.rho < 250:
@@ -218,6 +245,7 @@ __all__ = [
     "_adam_tensile_strength",
     "_bergfeld_youngs_modulus",
     "_gerling_youngs_modulus",
+    "_jamieson_johnson_tensile_strength",
     "_scapozza_youngs_modulus",
     "_sigrist_tensile_strength",
 ]

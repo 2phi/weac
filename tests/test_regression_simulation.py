@@ -430,17 +430,21 @@ class TestRegressionSimulation:
         )
         assert fm.min_dist_stress < 1.0
 
-        # evaluate_SteadyState baseline
-        ss = evaluator.evaluate_SteadyState(system=sm, vertical=False)
+        # evaluate_SteadyState baseline (hybrid structured result)
+        ss = evaluator.evaluate_SteadyState(system=sm)
         assert ss.converged
-        assert ss.touchdown_distance > 0
-        # Baseline values recorded
-        assert ss.touchdown_distance == pytest.approx(
-            1262.7061033873686, abs=0.5 * 10 ** (-6)
+        assert ss.tensile.critical_cut_length > 0
+        assert ss.err.energy_release_rate > 0
+        assert ss.phi == 30.0
+        # Baseline values recorded from a green hybrid SS run
+        assert ss.tensile.critical_cut_length == pytest.approx(
+            276.88720225, abs=0.5 * 10 ** (-6)
         )
-        np.testing.assert_allclose(
-            ss.energy_release_rate, 2.110196960094839, rtol=1e-6, atol=0
+        assert ss.err.energy_release_rate == pytest.approx(
+            1.8587470190926725, abs=0.5 * 10 ** (-6)
         )
+        assert ss.tensile.cut_direction_winner == "upslope"
+        assert ss.err.cut_direction_winner == "upslope"
 
         # evaluate_coupled_criterion baseline
         cc = evaluator.evaluate_coupled_criterion(system=sm, max_iterations=10)

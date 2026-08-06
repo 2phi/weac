@@ -7,6 +7,7 @@ import numpy as np
 import pytest
 
 from weac.analysis import Analyzer
+from weac.analysis.analyzer import local_segment_grid
 from weac.components import (
     Config,
     Layer,
@@ -54,6 +55,67 @@ def an_pst(sm_pst):
     return Analyzer(system_model=sm_pst, printing_enabled=False)
 
 
+class TestLocalSegmentGrid:
+    """Unit tests for piecewise boundary-refined local grids."""
+
+    def test_uniform_matches_linspace(self):
+        """Omitting boundary knobs preserves historical linspace behavior."""
+        for endpoint in (True, False):
+            got = local_segment_grid(1000.0, 11, include_right_endpoint=endpoint)
+            expected = np.linspace(0.0, 1000.0, num=11, endpoint=endpoint)
+            np.testing.assert_allclose(got, expected)
+
+    def test_boundary_windows_have_fine_spacing(self):
+        """Fine windows respect boundary_dx near both ends."""
+        length = 1000.0
+        window = 15.0
+        dx = 0.5
+        xi = local_segment_grid(
+            length,
+            n_budget=80,
+            include_right_endpoint=True,
+            boundary_window=window,
+            boundary_dx=dx,
+        )
+        assert xi[0] == 0.0
+        assert xi[-1] == length
+        left = xi[xi <= window + 1e-9]
+        right = xi[xi >= length - window - 1e-9]
+        assert left.size > 2
+        assert right.size > 2
+        assert np.max(np.diff(left)) <= dx + 1e-9
+        assert np.max(np.diff(right)) <= dx + 1e-9
+        # Interior should be coarser than the fine window.
+        interior = xi[(xi > window) & (xi < length - window)]
+        if interior.size > 1:
+            assert np.median(np.diff(interior)) > dx
+
+    def test_non_last_segment_omits_right_endpoint(self):
+        """Joints are owned by the next segment's local x=0."""
+        xi = local_segment_grid(
+            500.0,
+            n_budget=40,
+            include_right_endpoint=False,
+            boundary_window=15.0,
+            boundary_dx=0.5,
+        )
+        assert xi[0] == 0.0
+        assert xi[-1] < 500.0
+        # Still refined approaching the right joint.
+        near_right = xi[xi >= 500.0 - 15.0]
+        assert near_right.size > 5
+        assert np.max(np.diff(near_right)) <= 0.5 + 1e-9
+
+    def test_boundary_args_must_be_paired(self):
+        """Setting only one boundary kwarg is an error."""
+        with pytest.raises(ValueError):
+            local_segment_grid(
+                100.0, 10, include_right_endpoint=True, boundary_window=15.0
+            )
+        with pytest.raises(ValueError):
+            local_segment_grid(100.0, 10, include_right_endpoint=True, boundary_dx=0.5)
+
+
 class TestAnalyzer:
     """Test suite for the Analyzer."""
 
@@ -65,6 +127,29 @@ class TestAnalyzer:
             assert xs.shape[0] == Z.shape[1]
             assert xs_supported.shape[0] == xs.shape[0]
             assert np.all(np.diff(xs[~np.isnan(xs)]) >= 0)
+
+    def test_rasterize_solution_boundary_refinement(self, an_pst, sm_pst):
+        """Boundary mode densifies domain ends and the segment joint."""
+        xs, Z, _ = an_pst.rasterize_solution(
+            mode="cracked",
+            num=200,
+            boundary_window=15.0,
+            boundary_dx=0.5,
+        )
+        assert xs.shape[0] == Z.shape[1]
+        assert np.all(np.diff(xs) >= -1e-12)
+        # Domain ends present.
+        assert float(xs[0]) == pytest.approx(0.0, abs=0.5 * 10 ** (-9))
+        assert float(xs[-1]) == pytest.approx(
+            float(np.sum(sm_pst.scenario.li)), abs=0.5 * 10 ** (-6)
+        )
+        # Joint between the two PST segments is present.
+        joint = float(abs(sm_pst.scenario.li[0]))
+        assert np.any(np.isclose(xs, joint, atol=1e-9))
+        # Local spacing near the joint is fine.
+        near = xs[np.abs(xs - joint) <= 15.0]
+        assert near.size > 10
+        assert float(np.max(np.diff(near))) <= 0.5 + 1e-6
 
     def test_get_zmesh_contains_expected_keys(self, an_ski):
         """Test get_zmesh contains expected keys."""
