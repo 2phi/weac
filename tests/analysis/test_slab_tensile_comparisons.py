@@ -6,7 +6,8 @@ Populate ``COMPARISON_CASES``defines A/B setup pairs to assert that
 """
 
 from dataclasses import dataclass, field
-import unittest
+
+import pytest
 
 from weac.analysis.criteria_evaluator import CriteriaEvaluator
 from weac.components import (
@@ -166,37 +167,25 @@ def _evaluate_slab_tensile_criterion(
     return result.maximal_stress_result.slab_tensile_criterion
 
 
-class TestSlabTensileComparisons(unittest.TestCase):
+@pytest.fixture(scope="module")
+def evaluator():
+    """Shared CriteriaEvaluator for the comparison matrix."""
+    return CriteriaEvaluator(CriteriaConfig())
+
+
+class TestSlabTensileComparisons:
     """Regression checks for slab tensile setup ordering."""
 
-    @classmethod
-    def setUpClass(cls):
-        """Create a shared evaluator for the comparison matrix."""
-        cls.evaluator = CriteriaEvaluator(CriteriaConfig())
-
-    def test_slab_tensile_criterion_ordering(self):
+    @pytest.mark.parametrize(
+        "case",
+        COMPARISON_CASES,
+        ids=[case.name for case in COMPARISON_CASES],
+    )
+    def test_slab_tensile_criterion_ordering(self, evaluator, case):
         """Each case asserts that setup A exceeds setup B."""
-        if not COMPARISON_CASES:
-            self.skipTest("Populate COMPARISON_CASES A/B setup pairs.")
-
-        for case in COMPARISON_CASES:
-            with self.subTest(case=case.name):
-                criterion_a = _evaluate_slab_tensile_criterion(
-                    self.evaluator, case.setup_a
-                )
-                criterion_b = _evaluate_slab_tensile_criterion(
-                    self.evaluator, case.setup_b
-                )
-                # print(f"{case.name}: A={criterion_a:.6f}, B={criterion_b:.6f}")
-                self.assertGreaterEqual(
-                    criterion_a,
-                    criterion_b,
-                    msg=(
-                        f"{case.name}: expected A >= B, got "
-                        f"A={criterion_a:.6f}, B={criterion_b:.6f}"
-                    ),
-                )
-
-
-if __name__ == "__main__":
-    unittest.main()
+        criterion_a = _evaluate_slab_tensile_criterion(evaluator, case.setup_a)
+        criterion_b = _evaluate_slab_tensile_criterion(evaluator, case.setup_b)
+        assert criterion_a >= criterion_b, (
+            f"{case.name}: expected A >= B, got "
+            f"A={criterion_a:.6f}, B={criterion_b:.6f}"
+        )

@@ -4,7 +4,7 @@ Component Classes for Inputs of the WEAC model.
 
 from .config import Config
 from .criteria_config import CriteriaConfig
-from .layer import Layer, WeakLayer
+from .layer import Layer
 from .model_input import ModelInput
 from .presets import (
     LESS_WEAK_LAYER,
@@ -15,6 +15,7 @@ from .presets import (
 )
 from .scenario_config import ScenarioConfig, SystemType, TouchdownMode
 from .segment import Segment
+from .weak_layer import WeakLayer
 
 __all__ = [
     "Config",

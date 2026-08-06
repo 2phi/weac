@@ -1,0 +1,7 @@
+weac.components.weak_layer module
+=================================
+
+.. automodule:: weac.components.weak_layer
+   :members:
+   :show-inheritance:
+   :undoc-members:

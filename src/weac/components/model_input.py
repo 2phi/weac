@@ -17,7 +17,8 @@ import logging
 
 from pydantic import BaseModel, ConfigDict, Field, model_validator
 
-from weac.components.layer import Layer, WeakLayer
+from weac.components.layer import Layer
+from weac.components.weak_layer import WeakLayer
 from weac.components.scenario_config import ScenarioConfig
 from weac.components.segment import Segment
 
@@ -45,7 +46,7 @@ class ModelInput(BaseModel):
     )
 
     weak_layer: WeakLayer = Field(
-        default_factory=lambda: WeakLayer(rho=125, h=20, E=1.0),
+        default_factory=lambda: WeakLayer(rho=150, h=20),
         description="Weak layer",
     )
     layers: list[Layer] = Field(

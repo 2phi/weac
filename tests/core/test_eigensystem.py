@@ -5,69 +5,76 @@ Tests system matrix assembly, eigenvalue/eigenvector calculations,
 complementary and particular solutions.
 """
 
-import unittest
-
 import numpy as np
+import pytest
 
 from weac.components import Layer, WeakLayer
 from weac.core.eigensystem import Eigensystem
 from weac.core.slab import Slab
 
 
-class TestEigensystemBasicProperties(unittest.TestCase):
+@pytest.fixture
+def multi_layer_eigensystem():
+    """Eigensystem with a two-layer slab."""
+    layers = [Layer(rho=200, h=100), Layer(rho=300, h=150)]
+    weak_layer = WeakLayer(rho=50, h=20, E=0.5, G_Ic=1.0)
+    slab = Slab(layers)
+    return Eigensystem(weak_layer, slab)
+
+
+@pytest.fixture
+def single_layer_eigensystem():
+    """Eigensystem with a single-layer slab (eigenvalue tests)."""
+    layers = [Layer(rho=250, h=120)]
+    weak_layer = WeakLayer(rho=80, h=25, E=0.3)
+    slab = Slab(layers)
+    return Eigensystem(weak_layer, slab)
+
+
+@pytest.fixture
+def solution_eigensystem():
+    """Eigensystem for complementary/particular solution tests."""
+    layers = [Layer(rho=200, h=100)]
+    weak_layer = WeakLayer(rho=60, h=15)
+    slab = Slab(layers)
+    return Eigensystem(weak_layer, slab)
+
+
+class TestEigensystemBasicProperties:
     """Test basic eigensystem setup and property calculations."""
 
-    def setUp(self):
-        """Set up common test data."""
-        self.layers = [Layer(rho=200, h=100), Layer(rho=300, h=150)]
-        self.weak_layer = WeakLayer(rho=50, h=20, E=0.5, G_Ic=1.0)
-        self.slab = Slab(self.layers)
-        self.eigensystem = Eigensystem(self.weak_layer, self.slab)
-
-    def test_eigensystem_initialization(self):
+    def test_eigensystem_initialization(self, multi_layer_eigensystem):
         """Test that eigensystem initializes correctly."""
-        self.assertIsNotNone(self.eigensystem.weak_layer)
-        self.assertIsNotNone(self.eigensystem.slab)
+        eigensystem = multi_layer_eigensystem
+        assert eigensystem.weak_layer is not None
+        assert eigensystem.slab is not None
 
         # Check that eigenvalue calculation was performed
-        self.assertIsNotNone(
-            self.eigensystem.ewC, "Complex eigenvalues should be calculated"
-        )
-        self.assertIsNotNone(
-            self.eigensystem.ewR, "Real eigenvalues should be calculated"
-        )
-        self.assertIsNotNone(
-            self.eigensystem.evC, "Complex eigenvectors should be calculated"
-        )
-        self.assertIsNotNone(
-            self.eigensystem.evR, "Real eigenvectors should be calculated"
-        )
+        assert eigensystem.ewC is not None, "Complex eigenvalues should be calculated"
+        assert eigensystem.ewR is not None, "Real eigenvalues should be calculated"
+        assert eigensystem.evC is not None, "Complex eigenvectors should be calculated"
+        assert eigensystem.evR is not None, "Real eigenvectors should be calculated"
 
-    def test_laminate_stiffness_parameters(self):
+    def test_laminate_stiffness_parameters(self, multi_layer_eigensystem):
         """Test calculation of laminate stiffness parameters."""
+        eigensystem = multi_layer_eigensystem
         # Check that stiffness parameters are positive
-        self.assertGreater(
-            self.eigensystem.A11, 0, "Extensional stiffness should be positive"
-        )
-        self.assertGreater(
-            self.eigensystem.D11, 0, "Bending stiffness should be positive"
-        )
-        self.assertGreater(
-            self.eigensystem.kA55, 0, "Shear stiffness should be positive"
-        )
+        assert eigensystem.A11 > 0, "Extensional stiffness should be positive"
+        assert eigensystem.D11 > 0, "Bending stiffness should be positive"
+        assert eigensystem.kA55 > 0, "Shear stiffness should be positive"
 
         # K0 can be negative depending on coupling
-        self.assertIsInstance(self.eigensystem.K0, float)
+        assert isinstance(eigensystem.K0, float)
 
-    def test_system_matrix_properties(self):
+    def test_system_matrix_properties(self, multi_layer_eigensystem):
         """Test properties of the system matrix."""
-        K = self.eigensystem.K
+        K = multi_layer_eigensystem.K
 
         # Check matrix dimensions
-        self.assertEqual(K.shape, (6, 6), "System matrix should be 6x6")
+        assert K.shape == (6, 6), "System matrix should be 6x6"
 
         # Check that it's a real matrix
-        self.assertTrue(np.all(np.isreal(K)), "System matrix should be real")
+        assert np.all(np.isreal(K)), "System matrix should be real"
 
         # Check specific structure (first row should be [0, 1, 0, 0, 0, 0])
         expected_first_row = [0, 1, 0, 0, 0, 0]
@@ -94,195 +101,155 @@ class TestEigensystemBasicProperties(unittest.TestCase):
         )
 
 
-class TestEigensystemEigenvalueCalculations(unittest.TestCase):
+class TestEigensystemEigenvalueCalculations:
     """Test eigenvalue and eigenvector calculations."""
 
-    def setUp(self):
-        """Set up test eigensystem."""
-        layers = [Layer(rho=250, h=120)]
-        weak_layer = WeakLayer(rho=80, h=25, E=0.3)
-        slab = Slab(layers)
-        self.eigensystem = Eigensystem(weak_layer, slab)
-
-    def test_eigenvalue_classification(self):
+    def test_eigenvalue_classification(self, single_layer_eigensystem):
         """Test that eigenvalues are correctly classified."""
+        eigensystem = single_layer_eigensystem
         # Real eigenvalues should be real
-        self.assertTrue(
-            np.all(np.isreal(self.eigensystem.ewR)),
-            "Real eigenvalues should be real numbers",
+        assert np.all(np.isreal(eigensystem.ewR)), (
+            "Real eigenvalues should be real numbers"
         )
 
         # Complex eigenvalues should have positive imaginary parts
-        if len(self.eigensystem.ewC) > 0:
-            self.assertTrue(
-                np.all(self.eigensystem.ewC.imag > 0),
-                "Complex eigenvalues should have positive imaginary parts",
+        if len(eigensystem.ewC) > 0:
+            assert np.all(eigensystem.ewC.imag > 0), (
+                "Complex eigenvalues should have positive imaginary parts"
             )
 
-    def test_eigenvector_dimensions(self):
+    def test_eigenvector_dimensions(self, single_layer_eigensystem):
         """Test that eigenvectors have correct dimensions."""
+        eigensystem = single_layer_eigensystem
         # Real eigenvectors
-        if len(self.eigensystem.ewR) > 0:
-            self.assertEqual(
-                self.eigensystem.evR.shape[0],
-                6,
-                "Real eigenvectors should be 6-dimensional",
+        if len(eigensystem.ewR) > 0:
+            assert eigensystem.evR.shape[0] == 6, (
+                "Real eigenvectors should be 6-dimensional"
             )
-            self.assertEqual(
-                self.eigensystem.evR.shape[1],
-                len(self.eigensystem.ewR),
-                "Number of real eigenvectors should match number of real eigenvalues",
+            assert eigensystem.evR.shape[1] == len(eigensystem.ewR), (
+                "Number of real eigenvectors should match number of real eigenvalues"
             )
 
         # Complex eigenvectors
-        if len(self.eigensystem.ewC) > 0:
-            self.assertEqual(
-                self.eigensystem.evC.shape[0],
-                6,
-                "Complex eigenvectors should be 6-dimensional",
+        if len(eigensystem.ewC) > 0:
+            assert eigensystem.evC.shape[0] == 6, (
+                "Complex eigenvectors should be 6-dimensional"
             )
-            self.assertEqual(
-                self.eigensystem.evC.shape[1],
-                len(self.eigensystem.ewC),
-                "Number of complex eigenvectors should match number of complex eigenvalues",
+            assert eigensystem.evC.shape[1] == len(eigensystem.ewC), (
+                "Number of complex eigenvectors should match number of complex eigenvalues"
             )
 
-    def test_eigenvalue_shifts(self):
+    def test_eigenvalue_shifts(self, single_layer_eigensystem):
         """Test eigenvalue shift arrays."""
+        eigensystem = single_layer_eigensystem
         # Shifts should have same length as eigenvalues
-        self.assertEqual(
-            len(self.eigensystem.sR),
-            len(self.eigensystem.ewR),
-            "Real shifts should match real eigenvalues",
+        assert len(eigensystem.sR) == len(eigensystem.ewR), (
+            "Real shifts should match real eigenvalues"
         )
-        self.assertEqual(
-            len(self.eigensystem.sC),
-            len(self.eigensystem.ewC),
-            "Complex shifts should match complex eigenvalues",
+        assert len(eigensystem.sC) == len(eigensystem.ewC), (
+            "Complex shifts should match complex eigenvalues"
         )
 
         # Shifts should be -1 or 0
-        self.assertTrue(
-            np.all(np.isin(self.eigensystem.sR, [-1, 0])),
-            "Real shifts should be -1 or 0",
-        )
-        self.assertTrue(
-            np.all(np.isin(self.eigensystem.sC, [-1, 0])),
-            "Complex shifts should be -1 or 0",
+        assert np.all(np.isin(eigensystem.sR, [-1, 0])), "Real shifts should be -1 or 0"
+        assert np.all(np.isin(eigensystem.sC, [-1, 0])), (
+            "Complex shifts should be -1 or 0"
         )
 
 
-class TestEigensystemSolutionMethods(unittest.TestCase):
+class TestEigensystemSolutionMethods:
     """Test complementary and particular solution methods."""
 
-    def setUp(self):
-        """Set up test eigensystem."""
-        layers = [Layer(rho=200, h=100)]
-        weak_layer = WeakLayer(rho=60, h=15)
-        slab = Slab(layers)
-        self.eigensystem = Eigensystem(weak_layer, slab)
-
-    def test_complementary_solution_bedded(self):
+    def test_complementary_solution_bedded(self, solution_eigensystem):
         """Test complementary solution for bedded segment."""
         x = 100.0  # Position
         length = 1000.0  # Segment length
         has_foundation = True  # Bedded
 
-        zh = self.eigensystem.zh(x, length, has_foundation)
+        zh = solution_eigensystem.zh(x, length, has_foundation)
 
         # Should return 6x6 matrix
-        self.assertEqual(
-            zh.shape, (6, 6), "Complementary solution should be 6x6 matrix"
-        )
+        assert zh.shape == (6, 6), "Complementary solution should be 6x6 matrix"
 
         # Should be real for bedded segments
-        self.assertTrue(
-            np.allclose(np.imag(zh), 0.0, atol=1e-12),
-            "Bedded complementary solution should be (numerically) real",
+        assert np.allclose(np.imag(zh), 0.0, atol=1e-12), (
+            "Bedded complementary solution should be (numerically) real"
         )
 
-    def test_complementary_solution_free(self):
+    def test_complementary_solution_free(self, solution_eigensystem):
         """Test complementary solution for free segment."""
         x = 50.0  # Position
         length = 500.0  # Segment length
         has_foundation = False  # Free
 
-        zh = self.eigensystem.zh(x, length, has_foundation)
+        zh = solution_eigensystem.zh(x, length, has_foundation)
 
         # Should return 6x6 matrix
-        self.assertEqual(
-            zh.shape, (6, 6), "Complementary solution should be 6x6 matrix"
+        assert zh.shape == (6, 6), "Complementary solution should be 6x6 matrix"
+
+        assert np.allclose(np.imag(zh), 0.0, atol=1e-12), (
+            "Free complementary solution should be (numerically) real"
         )
 
-        self.assertTrue(
-            np.allclose(np.imag(zh), 0.0, atol=1e-12),
-            "Free complementary solution should be (numerically) real",
-        )
-
-    def test_complementary_solution_at_origin(self):
+    def test_complementary_solution_at_origin(self, solution_eigensystem):
         """Test complementary solution at x=0."""
-        zh_bedded = self.eigensystem.zh(0.0, 1000.0, True)
-        zh_free = self.eigensystem.zh(0.0, 1000.0, False)
+        zh_bedded = solution_eigensystem.zh(0.0, 1000.0, True)
+        zh_free = solution_eigensystem.zh(0.0, 1000.0, False)
 
         # At x=0, certain columns should have specific values
         # For free segments, the polynomial form gives specific patterns
-        self.assertTrue(
-            np.isfinite(zh_bedded).all(), "Bedded solution should be finite at origin"
+        assert np.isfinite(zh_bedded).all(), (
+            "Bedded solution should be finite at origin"
         )
-        self.assertTrue(
-            np.isfinite(zh_free).all(), "Free solution should be finite at origin"
-        )
+        assert np.isfinite(zh_free).all(), "Free solution should be finite at origin"
 
-    def test_particular_solution_bedded(self):
+    def test_particular_solution_bedded(self, solution_eigensystem):
         """Test particular solution for bedded segment."""
         x = 200.0  # Position
         phi = 30.0  # Inclination
         has_foundation = True  # Bedded
         qs = 5.0  # Surface load
 
-        zp = self.eigensystem.zp(x, phi, has_foundation, qs)
+        zp = solution_eigensystem.zp(x, phi, has_foundation, qs)
 
         # Should return 6x1 vector
-        self.assertEqual(zp.shape, (6, 1), "Particular solution should be 6x1 vector")
+        assert zp.shape == (6, 1), "Particular solution should be 6x1 vector"
         # Should be real
-        self.assertTrue(
-            np.allclose(np.imag(zp), 0.0, atol=1e-12),
-            "Particular solution should be (numerically) real",
+        assert np.allclose(np.imag(zp), 0.0, atol=1e-12), (
+            "Particular solution should be (numerically) real"
         )
 
-    def test_particular_solution_free(self):
+    def test_particular_solution_free(self, solution_eigensystem):
         """Test particular solution for free segment."""
         x = 150.0  # Position
         phi = 25.0  # Inclination
         has_foundation = False  # Free
         qs = 0.0  # No additional surface load
 
-        zp = self.eigensystem.zp(x, phi, has_foundation, qs)
+        zp = solution_eigensystem.zp(x, phi, has_foundation, qs)
 
         # Should be real
-        self.assertTrue(
-            np.allclose(np.imag(zp), 0.0, atol=1e-12),
-            "Particular solution should be (numerically) real",
+        assert np.allclose(np.imag(zp), 0.0, atol=1e-12), (
+            "Particular solution should be (numerically) real"
         )
 
-    def test_load_vector_calculation(self):
+    def test_load_vector_calculation(self, solution_eigensystem):
         """Test system load vector calculation."""
         phi = 20.0  # Inclination
         qs = 10.0  # Surface load
 
-        q = self.eigensystem.get_load_vector(phi, qs)
+        q = solution_eigensystem.get_load_vector(phi, qs)
 
         # Should return 6x1 vector
-        self.assertEqual(q.shape, (6, 1), "Load vector should be 6x1")
+        assert q.shape == (6, 1), "Load vector should be 6x1"
 
         # Should be real
-        self.assertTrue(
-            np.allclose(np.imag(q), 0.0, atol=1e-12),
-            "Load vector should be (numerically) real",
+        assert np.allclose(np.imag(q), 0.0, atol=1e-12), (
+            "Load vector should be (numerically) real"
         )
 
 
-class TestEigensystemPhysicalConsistency(unittest.TestCase):
+class TestEigensystemPhysicalConsistency:
     """Test physical consistency of eigensystem calculations."""
 
     def test_stiffness_scaling_with_properties(self):
@@ -299,12 +266,8 @@ class TestEigensystemPhysicalConsistency(unittest.TestCase):
         eig2 = Eigensystem(weak_layer, slab2)
 
         # Higher Young's modulus should lead to higher stiffnesses
-        self.assertGreater(
-            eig2.A11, eig1.A11, "Higher E should increase extensional stiffness"
-        )
-        self.assertGreater(
-            eig2.D11, eig1.D11, "Higher E should increase bending stiffness"
-        )
+        assert eig2.A11 > eig1.A11, "Higher E should increase extensional stiffness"
+        assert eig2.D11 > eig1.D11, "Higher E should increase bending stiffness"
 
     def test_weak_layer_stiffness_influence(self):
         """Test that weak layer properties affect system behavior."""
@@ -320,11 +283,9 @@ class TestEigensystemPhysicalConsistency(unittest.TestCase):
         eig_stiff = Eigensystem(wl_stiff, slab)
 
         # Stiffness values should be different
-        self.assertNotAlmostEqual(
-            eig_soft.K[1, 0],
-            eig_stiff.K[1, 0],
-            msg="Different weak layer properties should affect system matrix",
-        )
+        assert eig_soft.K[1, 0] != pytest.approx(
+            eig_stiff.K[1, 0], abs=0.5 * 10 ** (-7)
+        ), "Different weak layer properties should affect system matrix"
 
     def test_inclination_effect_on_loads(self):
         """Test that inclination affects load vectors correctly."""
@@ -338,9 +299,8 @@ class TestEigensystemPhysicalConsistency(unittest.TestCase):
         q_inclined = eigensystem.get_load_vector(phi=30.0, qs=0.0)
 
         # Should be different for non-zero inclination
-        self.assertFalse(
-            np.allclose(q_flat, q_inclined),
-            "Load vectors should differ for different inclinations",
+        assert not np.allclose(q_flat, q_inclined), (
+            "Load vectors should differ for different inclinations"
         )
 
     def test_complementary_solution_continuity(self):
@@ -358,11 +318,6 @@ class TestEigensystemPhysicalConsistency(unittest.TestCase):
         zh2 = eigensystem.zh(x2, length, True)
 
         # Solutions should be very close for nearby points
-        self.assertTrue(
-            np.allclose(zh1, zh2, atol=1e-6),
-            "Complementary solutions should be continuous",
+        assert np.allclose(zh1, zh2, atol=1e-6), (
+            "Complementary solutions should be continuous"
         )
-
-
-if __name__ == "__main__":
-    unittest.main(verbosity=2)

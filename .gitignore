@@ -59,5 +59,6 @@ old*
 
 .weac-reference/
 
-# Folder for development and local testing
+# Folders for development and local testing
 dev/
+todo/

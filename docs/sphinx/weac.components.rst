@@ -13,6 +13,7 @@ Submodules
    weac.components.model_input
    weac.components.scenario_config
    weac.components.segment
+   weac.components.weak_layer
 
 Module contents
 ---------------

@@ -1,32 +1,29 @@
 """Named presets for WEAC components."""
 
-from weac.components.layer import WeakLayer
+from weac.components.weak_layer import WeakLayer
 
 _WEAK_LAYER_PARAMS: dict[str, dict] = {
     "very_weak": {
-        "rho": 125,
+        "rho": 100,
         "h": 10,
         "sigma_c": 5.16,
         "tau_c": 4.09,
-        "E": 2.0,
         "G_Ic": 0.36,
         "G_IIc": 0.5,
     },
     "weak": {
-        "rho": 125,
+        "rho": 150,
         "h": 10,
         "sigma_c": 6.16,
         "tau_c": 5.09,
-        "E": 2.0,
         "G_Ic": 1.1,
         "G_IIc": 1.5,
     },
     "less_weak": {
-        "rho": 125,
+        "rho": 200,
         "h": 10,
         "sigma_c": 7.16,
         "tau_c": 6.09,
-        "E": 2.0,
         "G_Ic": 1.8,
         "G_IIc": 2.5,
     },

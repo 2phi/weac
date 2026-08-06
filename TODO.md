@@ -10,8 +10,17 @@
 
 ## Minor
 
-- [ ] Swap to Pytest from Unittest
-- [ ] resolve fracture criterion also when lower than strength criterion
+- [ ] Free-end coupled criterion for finite lab specimens (e.g. 1 m slab): `CriteriaEvaluator` currently requires `system_type="skier"` with infinite-end BCs; support free-end (PST-style) mid-load CC without approximating ends as infinite
+- [ ] Per-segment effective out-of-plane load length `l_eff` [mm] on `Segment`
+  - Needed for: converting a point mass `m` [kg] into the unit-width line-load jump used by the solver when the load does not span the global default ski length. Today `get_skier_point_load` and `Scenario._setup_scenario` always divide by `constants.LSKI_MM` (1000 mm), so short skis, long skis, or a narrow out-of-plane contact (e.g. a cube’s depth) cannot be represented correctly—especially when sample width `b` differs from 1000 mm.
+  - Formula: `F [N/mm] = 1e-3 * m * G_MM_S2 / l_eff` (same as today with `l_eff = LSKI_MM`). Smaller `l_eff` → larger intensity for the same mass.
+  - Requires:
+    - Add optional `Segment.l_eff: float` (default `LSKI_MM`) applying to the mass at that segment’s right edge (`m`).
+    - Thread `l_eff` through `get_skier_point_load(m, l_eff=…)` (or replace it), `Scenario.fi` assembly, and both `UnknownConstantsSolver` / `GeneralizedUnknownConstantsSolver` so no path still hardcodes `LSKI_MM`.
+    - Keep backward compatibility: omit/`None` → `LSKI_MM`; existing skier/CC tests unchanged.
+    - Document interaction with slab width `b`: `l_eff` is the out-of-plane contact extent of *this* load; clipping to `min(l_eff, b)` may be needed when the object is wider than the specimen.
+    - Unit tests: same `m`, two `l_eff` values → interface load scales as `1/l_eff`; default `l_eff` matches legacy `LSKI_MM` results.
+  - Out of scope for this item: finite along-slope contact length (patch/`qs`); full `AppliedLoad` objects; tilted-cube contact modes.
 - [ ] Florian CriterionEvaluator: clarify and fix damping behavior (find_minimum_force / evaluate_coupled_criterion)
   - Expected behavior
     - find_minimum_force: compute the critical skier weight w* [kg] such that max(stress_envelope) == 1 within tolerance_stress. This solver should not apply damping; it must return the numerically precise root of residual(weight) = max(stress_envelope) - 1 using a bracketed method and finite tolerances.
@@ -133,7 +142,6 @@
 - [ ] Make rasterize_solution smarter (iterative convergence)
 - [ ] SNOWPACK Parser
 - [ ] SMP Parser
-- [ ] Build Tests: Integration -> Pure
 
 ## Patch
 

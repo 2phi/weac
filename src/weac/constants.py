@@ -35,3 +35,13 @@ CG1: Final[float] = (
     # Exponent of Young modulus parameterization
     # according to Gerling et al. (2017)
 )
+CS0: Final[float] = (
+    2.72e4
+    # Prefactor of Young modulus parametrization for faceted crystals
+    # and depth hoar (FC&DH) according to Schöttner et al.
+)
+CS1: Final[float] = (
+    5.4
+    # Exponent of Young modulus parameterization for faceted crystals
+    # and depth hoar (FC&DH) according to Schöttner et al.
+)
