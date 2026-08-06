@@ -20,7 +20,12 @@ from weac.core.system_model import SystemModel
 
 logger = logging.getLogger(__name__)
 
-# Default boundary-refined rasterization (stress / tip sampling).
+# Default boundary-refined rasterization for stress / tip sampling.
+# Intentionally used everywhere (coupled criterion and steady-state PST):
+# historically coupled ``_calculate_maximal_stresses`` used a uniform
+# ``num=4000`` grid; the refined grid (soft budget 800 + fine windows near
+# segment ends/joints) is faster and better resolves near-tip Sxx peaks.
+# A regression test locks metric deltas vs the old uniform grid.
 RASTER_NUM = 800
 BOUNDARY_WINDOW_MM = 15.0
 BOUNDARY_DX_MM = 0.5

@@ -9,6 +9,11 @@ from __future__ import annotations
 
 import numpy as np
 
+from weac.analysis.analyzer import (
+    BOUNDARY_DX_MM,
+    BOUNDARY_WINDOW_MM,
+    RASTER_NUM,
+)
 from weac.analysis.coupled_criterion import (
     CoupledCriterionEngine,
     CoupledCriterionHistory,
@@ -179,8 +184,16 @@ class CriteriaEvaluator:
         self,
         system: SystemModel,
         print_call_stats: bool = False,
+        *,
+        num: int = RASTER_NUM,
+        boundary_window: float | None = BOUNDARY_WINDOW_MM,
+        boundary_dx: float | None = BOUNDARY_DX_MM,
     ) -> MaximalStressResult:
         """Calculate maximal stresses in the system (facade delegate)."""
         return self._coupled._calculate_maximal_stresses(
-            system, print_call_stats=print_call_stats
+            system,
+            print_call_stats=print_call_stats,
+            num=num,
+            boundary_window=boundary_window,
+            boundary_dx=boundary_dx,
         )

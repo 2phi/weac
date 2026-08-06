@@ -13,6 +13,7 @@ tests but are not part of ``__all__``.
 
 from __future__ import annotations
 
+import math
 import time
 from collections.abc import Callable, Mapping, Sequence
 from dataclasses import dataclass, field
@@ -38,6 +39,7 @@ from weac.components import (
     WeakLayer,
 )
 from weac.components.scenario_config import SystemType
+from weac.constants import EPS
 from weac.core.system_model import SystemModel
 
 __all__ = [
@@ -56,6 +58,8 @@ CUT_MIN_MM = 1.0
 CUT_MAX_MM = 5000.0
 CUT_XTOL_MM = 0.5
 BEDDED_LENGTH_DEFAULT = 5e3
+# Shared slack for free-segment raster masking and tip-contact comparisons [mm].
+TIP_CONTACT_EPS_MM = EPS
 
 PST_SYSTEM_TYPES: tuple[SystemType, ...] = ("pst-", "-pst")
 
@@ -109,9 +113,12 @@ def _numeric(block: Mapping[str, Any], key: str) -> float | None:
     if value is None:
         return None
     try:
-        return float(value)
+        number = float(value)
     except (TypeError, ValueError):
         return None
+    if not math.isfinite(number):
+        return None
+    return number
 
 
 def _higher_err_winner(
@@ -409,7 +416,9 @@ def free_tip_deflection(
     lengths = [float(seg.length) for seg in system.scenario.segments]
     starts = np.cumsum([0.0, *lengths[:-1]])
     ends = np.cumsum(lengths)
-    mask = (x >= starts[free_i] - 1e-9) & (x <= ends[free_i] + 1e-9)
+    mask = (x >= starts[free_i] - TIP_CONTACT_EPS_MM) & (
+        x <= ends[free_i] + TIP_CONTACT_EPS_MM
+    )
     if not np.any(mask):
         raise RuntimeError("No raster points found on the free segment")
 
@@ -565,8 +574,8 @@ def search_critical_cut_length(
     ``max_Sxx_norm >= 1``.
 
     One Brent search only. After a tensile root is found, check tip contact
-    at that cut once (``w_tip`` vs ``crack_h``); if already touching, treat
-    as no tensile crack.
+    at that cut once (``w_tip >= crack_h - TIP_CONTACT_EPS_MM``); if already
+    touching, treat as no tensile crack.
 
     Flags:
     - ``already_cracked``: cracked at ``cut_min`` and tip not yet touching
@@ -618,7 +627,7 @@ def search_critical_cut_length(
         )
 
     w_tip, crack_h = free_tip_deflection(system)
-    if w_tip >= crack_h:
+    if w_tip >= crack_h - TIP_CONTACT_EPS_MM:
         # Tip already touching at the tensile root → not a valid free crack.
         if sample_counter is not None:
             sample_counter.append(1)

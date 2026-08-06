@@ -5,7 +5,11 @@ from __future__ import annotations
 import unittest
 from unittest.mock import MagicMock, patch
 
-from weac.analysis.steady_state import CutSearchResult, search_critical_cut_length
+from weac.analysis.steady_state import (
+    TIP_CONTACT_EPS_MM,
+    CutSearchResult,
+    search_critical_cut_length,
+)
 from weac.components import Layer, WeakLayer
 
 
@@ -90,6 +94,46 @@ class TestTipTouchAtTensileRoot(unittest.TestCase):
         self.assertTrue(result.converged)
         self.assertEqual(result.critical_cut_length, 400.0)
         self.assertIn("critical cut=400", result.message)
+
+    def test_touching_within_eps_reports_no_crack(self) -> None:
+        """Near-equality (within TIP_CONTACT_EPS_MM) counts as tip contact."""
+        crack_h = 10.0
+        w_tip = crack_h - 0.5 * TIP_CONTACT_EPS_MM
+        tensile = CutSearchResult(
+            cut_length=400.0,
+            already_at_min=False,
+            never_reached=False,
+            converged=True,
+            sample=self._stress_sample(1.0),
+        )
+        cut_max_sample = self._stress_sample(0.6)
+
+        with (
+            patch(
+                "weac.analysis.steady_state.search_cut_by_residual",
+                return_value=tensile,
+            ),
+            patch(
+                "weac.analysis.steady_state.free_tip_deflection",
+                return_value=(w_tip, crack_h),
+            ),
+            patch(
+                "weac.analysis.steady_state.evaluate_pst_at_cut",
+                return_value=cut_max_sample,
+            ),
+        ):
+            result = search_critical_cut_length(
+                layers=self.layers,
+                weak_layer=self.weak_layer,
+                system_type="pst-",
+                phi=30.0,
+                cut_max=5000.0,
+            )
+
+        self.assertTrue(result.no_crack)
+        self.assertFalse(result.converged)
+        self.assertEqual(result.critical_cut_length, 5000.0)
+        self.assertIn("tip already touching", result.message)
 
     def test_never_reached_skips_tip_check(self) -> None:
         tensile = CutSearchResult(

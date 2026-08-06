@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import math
 import unittest
 from typing import Any
 
@@ -104,6 +105,27 @@ class TestEaseSelection(unittest.TestCase):
         )
         self.assertEqual(result.winner, "upslope")
         self.assertEqual(result.err_winner, "upslope")
+
+    def test_nan_ease_excluded_from_usable_set(self) -> None:
+        # Finite upslope must win; pre-fix NaN compare always biased to downslope.
+        result = select_ease_orientation(
+            _side(ease=2.0, err=1.0),
+            _side(ease=math.nan, err=9.0),
+            ease_key="max_Sxx_norm",
+            higher_is_easier=True,
+        )
+        self.assertEqual(result.winner, "upslope")
+        self.assertEqual(result.err_winner, "downslope")
+
+    def test_both_nan_ease_falls_back_to_err(self) -> None:
+        result = select_ease_orientation(
+            _side(ease=math.nan, err=1.0),
+            _side(ease=math.nan, err=3.0),
+            ease_key="max_Sxx_norm",
+            higher_is_easier=True,
+        )
+        self.assertEqual(result.winner, "downslope")
+        self.assertEqual(result.err_winner, "downslope")
 
     def test_already_cracked_is_usable(self) -> None:
         self.assertTrue(

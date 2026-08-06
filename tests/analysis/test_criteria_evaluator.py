@@ -172,6 +172,55 @@ class TestCriteriaEvaluator:
             1 / 4, abs=0.5 * 10 ** (-7)
         )
 
+    def test_calculate_maximal_stresses_boundary_refined_grid_vs_historical(
+        self, evaluator, layers, weak_layer
+    ):  # pylint: disable=protected-access
+        """Lock metric shift from uniform num=4000 to boundary-refined defaults.
+
+        Coupled and steady-state paths intentionally share the refined grid
+        (RASTER_NUM + BOUNDARY_*). This fixture documents the accepted delta
+        vs the historical uniform sampling for density-gated slab tension.
+        """
+        cut_length = 2000.0
+        side_length = 5000.0
+        segments = [
+            Segment(length=side_length, has_foundation=True, m=0),
+            Segment(length=cut_length / 2, has_foundation=False, m=0),
+            Segment(length=cut_length / 2, has_foundation=False, m=0),
+            Segment(length=side_length, has_foundation=True, m=0),
+        ]
+        system = SystemModel(
+            model_input=ModelInput(
+                layers=layers,
+                weak_layer=weak_layer,
+                segments=segments,
+                scenario_config=ScenarioConfig(phi=30.0, system_type="pst-"),
+            ),
+            config=Config(touchdown=True),
+        )
+
+        refined = evaluator._calculate_maximal_stresses(system)
+        historical = evaluator._calculate_maximal_stresses(
+            system,
+            num=4000,
+            boundary_window=None,
+            boundary_dx=None,
+        )
+
+        # Production (refined) absolute values.
+        assert refined.max_Sxx_norm == pytest.approx(5.040349417307018, rel=0, abs=1e-9)
+        assert refined.slab_tensile_criterion == pytest.approx(
+            0.7433264887063655, rel=0, abs=1e-9
+        )
+
+        # Locked new-minus-old deltas for this fixture.
+        assert refined.max_Sxx_norm - historical.max_Sxx_norm == pytest.approx(
+            0.0, abs=1e-12
+        )
+        assert (
+            refined.slab_tensile_criterion - historical.slab_tensile_criterion
+        ) == pytest.approx(-0.002053388090349051, rel=0, abs=1e-12)
+
     def test_find_minimum_force_convergence(
         self, evaluator, layers, weak_layer, phi, segments_length, config
     ):
@@ -387,14 +436,44 @@ class TestCriteriaEvaluator:
         assert results.iterations > 1
         assert not results.pure_stress_criteria
         uncracked_count = sum(1 for m in rasterize_modes if m == "uncracked")
-        # 1x find_minimum_force + 1x main-loop iteration 1
-        assert uncracked_count == 2
+        # 1x find_minimum_force + 1x main-loop iteration 1 + 1x post-convergence
+        assert uncracked_count == 3
         history = results.history
         assert history is not None
         assert len(history.g_deltas) == results.iterations
         assert len(history.sigma_maxs) == results.iterations
         # Post-iter-1 stress history reuses the iteration-1 sample
         assert all(s == history.sigma_maxs[0] for s in history.sigma_maxs[1:])
+
+    def test_evaluate_coupled_criterion_final_stress_matches_final_system(self):
+        """Returned stress distances match a fresh rasterization of final_system."""
+        layers = [Layer(rho=170, h=100), Layer(rho=230, h=130)]
+        wl = WeakLayer(rho=180, h=20)
+        segs = [Segment(length=10000, has_foundation=True, m=0)]
+        sc = ScenarioConfig(phi=30.0, system_type="skier", cut_length=0.0)
+        mi = ModelInput(layers=layers, weak_layer=wl, segments=segs, scenario_config=sc)
+        sm = SystemModel(model_input=mi, config=Config(touchdown=True))
+        evaluator = CriteriaEvaluator(CriteriaConfig())
+
+        results = evaluator.evaluate_coupled_criterion(system=sm, max_iterations=10)
+
+        assert results.converged
+        assert results.iterations > 1
+        assert not results.pure_stress_criteria
+
+        analyzer = Analyzer(results.final_system, printing_enabled=False)
+        _, z, _ = analyzer.rasterize_solution(mode="uncracked", num=2000)
+        sigma_kPa = results.final_system.fq.sig(z, unit="kPa")
+        tau_kPa = results.final_system.fq.tau(z, unit="kPa")
+        stress_env = evaluator._coupled.stress_envelope(  # pylint: disable=protected-access
+            sigma_kPa, tau_kPa, results.final_system.weak_layer
+        )
+        assert results.max_dist_stress == pytest.approx(float(np.max(stress_env)))
+        assert results.min_dist_stress == pytest.approx(float(np.min(stress_env)))
+        history = results.history
+        assert history is not None
+        # History still holds the reused iter-1 sample; return value is refreshed.
+        assert history.dist_maxs[-1] == history.dist_maxs[0]
 
     def test_evaluate_SteadyState(
         self, evaluator, layers, weak_layer, phi, segments_length

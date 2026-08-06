@@ -112,9 +112,11 @@ class CoupledCriterionResult:
     final_system : SystemModel
         The final system model.
     max_dist_stress : float
-        The maximum distance to failure.
+        Maximum distance to the stress envelope for the returned
+        ``final_system`` geometry.
     min_dist_stress : float
-        The minimum distance to failure.
+        Minimum distance to the stress envelope for the returned
+        ``final_system`` geometry.
     """
 
     converged: bool
@@ -502,6 +504,20 @@ class CoupledCriterionEngine:
             if iteration_count < iteration_budget and has_foundation:
                 logger.info("No Exception encountered - Converged successfully.")
                 if crack_length > 0:
+                    # History keeps iter-1 stress samples after the loop
+                    # optimization; refresh return values on the converged
+                    # geometry so callers see final-system margins.
+                    if iteration_count > 1:
+                        _, z, _ = analyzer.rasterize_solution(
+                            mode="uncracked", num=2000
+                        )
+                        sigma_kPa = system.fq.sig(z, unit="kPa")
+                        tau_kPa = system.fq.tau(z, unit="kPa")
+                        stress_env = self.stress_envelope(
+                            sigma_kPa, tau_kPa, system.weak_layer
+                        )
+                        max_dist_stress = float(np.max(stress_env))
+                        min_dist_stress = float(np.min(stress_env))
                     analyzer.print_call_stats(
                         message="evaluate_coupled_criterion Call Statistics"
                     )
@@ -1123,9 +1139,17 @@ class CoupledCriterionEngine:
         self,
         system: SystemModel,
         print_call_stats: bool = False,
+        *,
+        num: int = RASTER_NUM,
+        boundary_window: float | None = BOUNDARY_WINDOW_MM,
+        boundary_dx: float | None = BOUNDARY_DX_MM,
     ) -> MaximalStressResult:
         """
         Calculate the maximal stresses in the system.
+
+        Defaults use the shared boundary-refined raster grid
+        (``RASTER_NUM`` / ``BOUNDARY_*``), same as steady-state stress
+        evaluation — not the historical uniform ``num=4000`` grid.
 
         Parameters
         ----------
@@ -1133,6 +1157,11 @@ class CoupledCriterionEngine:
             The system model to analyze.
         print_call_stats : bool, optional
             Whether to print analyzer call statistics. Default is False.
+        num : int, optional
+            Soft raster point budget passed to ``rasterize_solution``.
+        boundary_window, boundary_dx : float, optional
+            Boundary-refined sampling window/spacing [mm]. Pass ``None`` for
+            both to recover uniform linspace sampling (historical grid).
 
         Returns
         -------
@@ -1142,10 +1171,10 @@ class CoupledCriterionEngine:
         """
         analyzer = Analyzer(system, printing_enabled=print_call_stats)
         _, Z, _ = analyzer.rasterize_solution(
-            num=RASTER_NUM,
+            num=num,
             mode="cracked",
-            boundary_window=BOUNDARY_WINDOW_MM,
-            boundary_dx=BOUNDARY_DX_MM,
+            boundary_window=boundary_window,
+            boundary_dx=boundary_dx,
         )
         Sxx_kPa = analyzer.Sxx(Z=Z, phi=system.scenario.phi, dz=1, unit="kPa")
         principal_stress_kPa = analyzer.principal_stress_slab(
