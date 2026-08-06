@@ -475,6 +475,62 @@ class TestCriteriaEvaluator:
         # History still holds the reused iter-1 sample; return value is refreshed.
         assert history.dist_maxs[-1] == history.dist_maxs[0]
 
+    def test_calculate_sigma_tau_at_x_matches_rasterize_with_surface_load(self):
+        """Pointwise stresses must use scenario.surface_load like rasterize_solution."""
+        layers = [Layer(rho=170, h=100), Layer(rho=230, h=130)]
+        wl = WeakLayer(rho=180, h=20)
+        segs = [
+            Segment(length=5000, has_foundation=True, m=0),
+            Segment(length=5000, has_foundation=True, m=0),
+        ]
+        surface_load = 0.2
+        sc = ScenarioConfig(
+            phi=30.0,
+            system_type="skiers",
+            surface_load=surface_load,
+        )
+        sm = SystemModel(
+            model_input=ModelInput(
+                layers=layers,
+                weak_layer=wl,
+                segments=segs,
+                scenario_config=sc,
+            ),
+            config=Config(touchdown=False),
+        )
+        engine = CriteriaEvaluator(CriteriaConfig())._coupled  # pylint: disable=protected-access
+        analyzer = Analyzer(sm, printing_enabled=False)
+        xs, z, _ = analyzer.rasterize_solution(mode="cracked", num=200)
+
+        # Sample interior points so we avoid segment-boundary double-counting.
+        sample_idxs = np.linspace(5, len(xs) - 6, 8, dtype=int)
+        for idx in sample_idxs:
+            x = float(xs[idx])
+            sigma_pt, tau_pt = engine._calculate_sigma_tau_at_x(x, sm)
+            z_col = z[:, [idx]]
+            sigma_rast = float(np.asarray(sm.fq.sig(z_col, unit="kPa")).item())
+            # Same sign convention as _calculate_sigma_tau_at_x
+            tau_rast = float(np.asarray(-sm.fq.tau(z_col, unit="kPa")).item())
+            assert sigma_pt == pytest.approx(sigma_rast, rel=1e-9, abs=1e-9)
+            assert tau_pt == pytest.approx(tau_rast, rel=1e-9, abs=1e-9)
+
+        # Surface load must actually change the particular solution.
+        sm_no_qs = SystemModel(
+            model_input=ModelInput(
+                layers=layers,
+                weak_layer=wl,
+                segments=segs,
+                scenario_config=ScenarioConfig(
+                    phi=30.0, system_type="skiers", surface_load=0.0
+                ),
+            ),
+            config=Config(touchdown=False),
+        )
+        x_mid = float(xs[len(xs) // 2])
+        sigma_qs, tau_qs = engine._calculate_sigma_tau_at_x(x_mid, sm)
+        sigma_0, tau_0 = engine._calculate_sigma_tau_at_x(x_mid, sm_no_qs)
+        assert abs(sigma_qs - sigma_0) > 1e-6 or abs(tau_qs - tau_0) > 1e-6
+
     def test_evaluate_SteadyState(
         self, evaluator, layers, weak_layer, phi, segments_length
     ):
