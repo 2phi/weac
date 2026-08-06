@@ -23,9 +23,9 @@
   <meta name="theme-color" media="(prefers-color-scheme: light)" content="#ffffff" />
   <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#030711" />
   
-  <title>Index | WEAC 3.1.9</title>
-  <meta property="og:title" content="Index | WEAC 3.1.9" />
-  <meta name="twitter:title" content="Index | WEAC 3.1.9" />
+  <title>Index | WEAC 3.2.0</title>
+  <meta property="og:title" content="Index | WEAC 3.2.0" />
+  <meta name="twitter:title" content="Index | WEAC 3.2.0" />
   <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=e72c8e07" />
   <link rel="stylesheet" type="text/css" href="_static/theme.css?v=73505e79" />
   <link rel="canonical" href="https://2phi.github.io/weac/genindex.html" />
@@ -42,7 +42,7 @@
       Skip to content
     </a><header class="sticky top-0 z-40 w-full border-b shadow-xs border-border bg-background/90 backdrop-blur"><div class="container flex items-center h-14">
     <div class="hidden mr-4 md:flex">
-      <a href="index.html" class="flex items-center mr-6"><span class="hidden font-bold sm:inline-block text-clip whitespace-nowrap">WEAC 3.1.9</span>
+      <a href="index.html" class="flex items-center mr-6"><span class="hidden font-bold sm:inline-block text-clip whitespace-nowrap">WEAC 3.2.0</span>
       </a></div><button
       class="inline-flex items-center justify-center h-10 px-0 py-2 mr-2 text-base font-medium transition-colors rounded-md hover:text-accent-foreground hover:bg-transparent md:hidden"
       type="button" @click="showSidebar = true">
@@ -98,7 +98,7 @@
   class="fixed inset-y-0 left-0 md:top-14 z-50 md:z-30 bg-background md:bg-transparent transition-all duration-100 -translate-x-full md:translate-x-0 ml-0 p-6 md:p-0 md:-ml-2 md:h-[calc(100vh-3.5rem)] w-5/6 md:w-full overflow-y-auto border-r border-border md:sticky"
   :aria-hidden="!showSidebar" :class="{ 'translate-x-0': showSidebar }">
 
-    <a href="index.html" class="justify-start text-sm md:!hidden bg-background"><span class="font-bold text-clip whitespace-nowrap">WEAC 3.1.9</span>
+    <a href="index.html" class="justify-start text-sm md:!hidden bg-background"><span class="font-bold text-clip whitespace-nowrap">WEAC 3.2.0</span>
     </a>
 
     <div class="relative overflow-hidden md:overflow-auto my-4 md:my-0">
@@ -140,8 +140,11 @@
 </li>
 <li class="toctree-l1"><a class="reference internal" href="weac.analysis.html">weac.analysis package</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="weac.analysis.analyzer.html">weac.analysis.analyzer module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="weac.analysis.coupled_criterion.html">weac.analysis.coupled_criterion module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="weac.analysis.criteria_evaluator.html">weac.analysis.criteria_evaluator module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="weac.analysis.envelopes.html">weac.analysis.envelopes module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="weac.analysis.plotter.html">weac.analysis.plotter module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="weac.analysis.steady_state.html">weac.analysis.steady_state module</a></li>
 </ul>
 </li>
 </ul>
@@ -182,7 +185,7 @@
      class="flex items-center mb-4 space-x-1 text-sm text-muted-foreground">
   <a class="overflow-hidden text-ellipsis whitespace-nowrap hover:text-foreground"
      href="index.html">
-    <span class="hidden md:inline">WEAC 3.1.9</span>
+    <span class="hidden md:inline">WEAC 3.2.0</span>
     <svg xmlns="http://www.w3.org/2000/svg"
          height="18"
          width="18"
@@ -212,6 +215,16 @@
       <ul style="list-style-type:none">
         <li><a href="weac.analysis.analyzer.html#weac.analysis.analyzer.Analyzer.__init__">(weac.analysis.analyzer.Analyzer method)</a>
 </li>
+        <li><a href="weac.analysis.coupled_criterion.html#weac.analysis.coupled_criterion.CoupledCriterionEngine.__init__">(weac.analysis.coupled_criterion.CoupledCriterionEngine method)</a>
+</li>
+        <li><a href="weac.analysis.coupled_criterion.html#weac.analysis.coupled_criterion.CoupledCriterionHistory.__init__">(weac.analysis.coupled_criterion.CoupledCriterionHistory method)</a>
+</li>
+        <li><a href="weac.analysis.coupled_criterion.html#weac.analysis.coupled_criterion.CoupledCriterionResult.__init__">(weac.analysis.coupled_criterion.CoupledCriterionResult method)</a>
+</li>
+        <li><a href="weac.analysis.coupled_criterion.html#weac.analysis.coupled_criterion.FindMinimumForceResult.__init__">(weac.analysis.coupled_criterion.FindMinimumForceResult method)</a>
+</li>
+        <li><a href="weac.analysis.coupled_criterion.html#weac.analysis.coupled_criterion.MaximalStressResult.__init__">(weac.analysis.coupled_criterion.MaximalStressResult method)</a>
+</li>
         <li><a href="weac.analysis.html#weac.analysis.CoupledCriterionHistory.__init__">(weac.analysis.CoupledCriterionHistory method)</a>
 </li>
         <li><a href="weac.analysis.html#weac.analysis.CoupledCriterionResult.__init__">(weac.analysis.CoupledCriterionResult method)</a>
@@ -232,13 +245,25 @@
 </li>
         <li><a href="weac.analysis.html#weac.analysis.FindMinimumForceResult.__init__">(weac.analysis.FindMinimumForceResult method)</a>
 </li>
+        <li><a href="weac.analysis.html#weac.analysis.MaximalStressResult.__init__">(weac.analysis.MaximalStressResult method)</a>
+</li>
         <li><a href="weac.analysis.html#weac.analysis.Plotter.__init__">(weac.analysis.Plotter method)</a>
 </li>
         <li><a href="weac.analysis.plotter.html#weac.analysis.plotter.MidpointNormalize.__init__">(weac.analysis.plotter.MidpointNormalize method)</a>
 </li>
         <li><a href="weac.analysis.plotter.html#weac.analysis.plotter.Plotter.__init__">(weac.analysis.plotter.Plotter method)</a>
 </li>
+        <li><a href="weac.analysis.steady_state.html#weac.analysis.steady_state.SteadyStateErrBlock.__init__">(weac.analysis.steady_state.SteadyStateErrBlock method)</a>
+</li>
+        <li><a href="weac.analysis.steady_state.html#weac.analysis.steady_state.SteadyStateResult.__init__">(weac.analysis.steady_state.SteadyStateResult method)</a>
+</li>
+        <li><a href="weac.analysis.steady_state.html#weac.analysis.steady_state.SteadyStateTensileBlock.__init__">(weac.analysis.steady_state.SteadyStateTensileBlock method)</a>
+</li>
+        <li><a href="weac.analysis.html#weac.analysis.SteadyStateErrBlock.__init__">(weac.analysis.SteadyStateErrBlock method)</a>
+</li>
         <li><a href="weac.analysis.html#weac.analysis.SteadyStateResult.__init__">(weac.analysis.SteadyStateResult method)</a>
+</li>
+        <li><a href="weac.analysis.html#weac.analysis.SteadyStateTensileBlock.__init__">(weac.analysis.SteadyStateTensileBlock method)</a>
 </li>
         <li><a href="weac.core.html#weac.core.Eigensystem.__init__">(weac.core.Eigensystem method)</a>
 </li>
@@ -360,9 +385,11 @@
         <li><a href="weac.core.slab.html#weac.core.slab.Slab.calc_vertical_center_of_gravity">(weac.core.slab.Slab method)</a>
 </li>
       </ul></li>
-      <li><a href="weac.analysis.criteria_evaluator.html#weac.analysis.criteria_evaluator.CriteriaEvaluator.check_crack_self_propagation">check_crack_self_propagation() (weac.analysis.criteria_evaluator.CriteriaEvaluator method)</a>
+      <li><a href="weac.analysis.coupled_criterion.html#weac.analysis.coupled_criterion.CoupledCriterionEngine.check_crack_self_propagation">check_crack_self_propagation() (weac.analysis.coupled_criterion.CoupledCriterionEngine method)</a>
 
       <ul style="list-style-type:none">
+        <li><a href="weac.analysis.criteria_evaluator.html#weac.analysis.criteria_evaluator.CriteriaEvaluator.check_crack_self_propagation">(weac.analysis.criteria_evaluator.CriteriaEvaluator method)</a>
+</li>
         <li><a href="weac.analysis.html#weac.analysis.CriteriaEvaluator.check_crack_self_propagation">(weac.analysis.CriteriaEvaluator method)</a>
 </li>
       </ul></li>
@@ -404,27 +431,53 @@
         <li><a href="weac.components.html#weac.components.WeakLayer.constitutive_model">(weac.components.WeakLayer attribute)</a>
 </li>
       </ul></li>
-      <li><a href="weac.analysis.html#weac.analysis.CoupledCriterionResult.converged">converged (weac.analysis.CoupledCriterionResult attribute)</a>
+      <li><a href="weac.analysis.coupled_criterion.html#weac.analysis.coupled_criterion.CoupledCriterionResult.converged">converged (weac.analysis.coupled_criterion.CoupledCriterionResult attribute)</a>
 
       <ul style="list-style-type:none">
+        <li><a href="weac.analysis.html#weac.analysis.CoupledCriterionResult.converged">(weac.analysis.CoupledCriterionResult attribute)</a>
+</li>
         <li><a href="weac.analysis.criteria_evaluator.html#weac.analysis.criteria_evaluator.CoupledCriterionResult.converged">(weac.analysis.criteria_evaluator.CoupledCriterionResult attribute)</a>
 </li>
-        <li><a href="weac.analysis.criteria_evaluator.html#weac.analysis.criteria_evaluator.SteadyStateResult.converged">(weac.analysis.criteria_evaluator.SteadyStateResult attribute)</a>
+        <li><a href="weac.analysis.criteria_evaluator.html#weac.analysis.criteria_evaluator.SteadyStateResult.converged">(weac.analysis.criteria_evaluator.SteadyStateResult property)</a>
 </li>
-        <li><a href="weac.analysis.html#weac.analysis.SteadyStateResult.converged">(weac.analysis.SteadyStateResult attribute)</a>
+        <li><a href="weac.analysis.steady_state.html#weac.analysis.steady_state.SteadyStateErrBlock.converged">(weac.analysis.steady_state.SteadyStateErrBlock attribute)</a>
+</li>
+        <li><a href="weac.analysis.steady_state.html#weac.analysis.steady_state.SteadyStateResult.converged">(weac.analysis.steady_state.SteadyStateResult property)</a>
+</li>
+        <li><a href="weac.analysis.steady_state.html#weac.analysis.steady_state.SteadyStateTensileBlock.converged">(weac.analysis.steady_state.SteadyStateTensileBlock attribute)</a>
+</li>
+        <li><a href="weac.analysis.html#weac.analysis.SteadyStateErrBlock.converged">(weac.analysis.SteadyStateErrBlock attribute)</a>
+</li>
+        <li><a href="weac.analysis.html#weac.analysis.SteadyStateResult.converged">(weac.analysis.SteadyStateResult property)</a>
+</li>
+        <li><a href="weac.analysis.html#weac.analysis.SteadyStateTensileBlock.converged">(weac.analysis.SteadyStateTensileBlock attribute)</a>
+</li>
+      </ul></li>
+      <li><a href="weac.analysis.criteria_evaluator.html#weac.analysis.criteria_evaluator.SteadyStateResult.core_scalars">core_scalars() (weac.analysis.criteria_evaluator.SteadyStateResult method)</a>
+
+      <ul style="list-style-type:none">
+        <li><a href="weac.analysis.steady_state.html#weac.analysis.steady_state.SteadyStateResult.core_scalars">(weac.analysis.steady_state.SteadyStateResult method)</a>
+</li>
+        <li><a href="weac.analysis.html#weac.analysis.SteadyStateResult.core_scalars">(weac.analysis.SteadyStateResult method)</a>
+</li>
+      </ul></li>
+      <li><a href="weac.analysis.coupled_criterion.html#weac.analysis.coupled_criterion.CoupledCriterionEngine">CoupledCriterionEngine (class in weac.analysis.coupled_criterion)</a>
+</li>
+      <li><a href="weac.analysis.html#weac.analysis.CoupledCriterionHistory">CoupledCriterionHistory (class in weac.analysis)</a>
+
+      <ul style="list-style-type:none">
+        <li><a href="weac.analysis.coupled_criterion.html#weac.analysis.coupled_criterion.CoupledCriterionHistory">(class in weac.analysis.coupled_criterion)</a>
+</li>
+        <li><a href="weac.analysis.criteria_evaluator.html#weac.analysis.criteria_evaluator.CoupledCriterionHistory">(class in weac.analysis.criteria_evaluator)</a>
 </li>
       </ul></li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul style="margin-left:0;list-style-type:none">
-      <li><a href="weac.analysis.html#weac.analysis.CoupledCriterionHistory">CoupledCriterionHistory (class in weac.analysis)</a>
-
-      <ul style="list-style-type:none">
-        <li><a href="weac.analysis.criteria_evaluator.html#weac.analysis.criteria_evaluator.CoupledCriterionHistory">(class in weac.analysis.criteria_evaluator)</a>
-</li>
-      </ul></li>
       <li><a href="weac.analysis.html#weac.analysis.CoupledCriterionResult">CoupledCriterionResult (class in weac.analysis)</a>
 
       <ul style="list-style-type:none">
+        <li><a href="weac.analysis.coupled_criterion.html#weac.analysis.coupled_criterion.CoupledCriterionResult">(class in weac.analysis.coupled_criterion)</a>
+</li>
         <li><a href="weac.analysis.criteria_evaluator.html#weac.analysis.criteria_evaluator.CoupledCriterionResult">(class in weac.analysis.criteria_evaluator)</a>
 </li>
       </ul></li>
@@ -434,21 +487,27 @@
         <li><a href="weac.core.scenario.html#weac.core.scenario.Scenario.crack_h">(weac.core.scenario.Scenario attribute)</a>
 </li>
       </ul></li>
-      <li><a href="weac.analysis.html#weac.analysis.CoupledCriterionResult.crack_length">crack_length (weac.analysis.CoupledCriterionResult attribute)</a>
+      <li><a href="weac.analysis.coupled_criterion.html#weac.analysis.coupled_criterion.CoupledCriterionResult.crack_length">crack_length (weac.analysis.coupled_criterion.CoupledCriterionResult attribute)</a>
 
       <ul style="list-style-type:none">
+        <li><a href="weac.analysis.html#weac.analysis.CoupledCriterionResult.crack_length">(weac.analysis.CoupledCriterionResult attribute)</a>
+</li>
         <li><a href="weac.analysis.criteria_evaluator.html#weac.analysis.criteria_evaluator.CoupledCriterionResult.crack_length">(weac.analysis.criteria_evaluator.CoupledCriterionResult attribute)</a>
 </li>
       </ul></li>
-      <li><a href="weac.analysis.html#weac.analysis.CoupledCriterionHistory.crack_lengths">crack_lengths (weac.analysis.CoupledCriterionHistory attribute)</a>
+      <li><a href="weac.analysis.coupled_criterion.html#weac.analysis.coupled_criterion.CoupledCriterionHistory.crack_lengths">crack_lengths (weac.analysis.coupled_criterion.CoupledCriterionHistory attribute)</a>
 
       <ul style="list-style-type:none">
+        <li><a href="weac.analysis.html#weac.analysis.CoupledCriterionHistory.crack_lengths">(weac.analysis.CoupledCriterionHistory attribute)</a>
+</li>
         <li><a href="weac.analysis.criteria_evaluator.html#weac.analysis.criteria_evaluator.CoupledCriterionHistory.crack_lengths">(weac.analysis.criteria_evaluator.CoupledCriterionHistory attribute)</a>
 </li>
       </ul></li>
-      <li><a href="weac.analysis.criteria_evaluator.html#weac.analysis.criteria_evaluator.CriteriaEvaluator.criteria_config">criteria_config (weac.analysis.criteria_evaluator.CriteriaEvaluator attribute)</a>
+      <li><a href="weac.analysis.coupled_criterion.html#weac.analysis.coupled_criterion.CoupledCriterionEngine.criteria_config">criteria_config (weac.analysis.coupled_criterion.CoupledCriterionEngine attribute)</a>
 
       <ul style="list-style-type:none">
+        <li><a href="weac.analysis.criteria_evaluator.html#weac.analysis.criteria_evaluator.CriteriaEvaluator.criteria_config">(weac.analysis.criteria_evaluator.CriteriaEvaluator attribute)</a>
+</li>
         <li><a href="weac.analysis.html#weac.analysis.CriteriaEvaluator.criteria_config">(weac.analysis.CriteriaEvaluator attribute)</a>
 </li>
       </ul></li>
@@ -464,9 +523,19 @@
         <li><a href="weac.analysis.criteria_evaluator.html#weac.analysis.criteria_evaluator.CriteriaEvaluator">(class in weac.analysis.criteria_evaluator)</a>
 </li>
       </ul></li>
-      <li><a href="weac.analysis.html#weac.analysis.CoupledCriterionResult.critical_skier_weight">critical_skier_weight (weac.analysis.CoupledCriterionResult attribute)</a>
+      <li><a href="weac.analysis.steady_state.html#weac.analysis.steady_state.SteadyStateTensileBlock.critical_cut_length">critical_cut_length (weac.analysis.steady_state.SteadyStateTensileBlock attribute)</a>
 
       <ul style="list-style-type:none">
+        <li><a href="weac.analysis.html#weac.analysis.SteadyStateTensileBlock.critical_cut_length">(weac.analysis.SteadyStateTensileBlock attribute)</a>
+</li>
+      </ul></li>
+      <li><a href="weac.analysis.coupled_criterion.html#weac.analysis.coupled_criterion.CoupledCriterionResult.critical_skier_weight">critical_skier_weight (weac.analysis.coupled_criterion.CoupledCriterionResult attribute)</a>
+
+      <ul style="list-style-type:none">
+        <li><a href="weac.analysis.coupled_criterion.html#weac.analysis.coupled_criterion.FindMinimumForceResult.critical_skier_weight">(weac.analysis.coupled_criterion.FindMinimumForceResult attribute)</a>
+</li>
+        <li><a href="weac.analysis.html#weac.analysis.CoupledCriterionResult.critical_skier_weight">(weac.analysis.CoupledCriterionResult attribute)</a>
+</li>
         <li><a href="weac.analysis.criteria_evaluator.html#weac.analysis.criteria_evaluator.CoupledCriterionResult.critical_skier_weight">(weac.analysis.criteria_evaluator.CoupledCriterionResult attribute)</a>
 </li>
         <li><a href="weac.analysis.criteria_evaluator.html#weac.analysis.criteria_evaluator.FindMinimumForceResult.critical_skier_weight">(weac.analysis.criteria_evaluator.FindMinimumForceResult attribute)</a>
@@ -480,9 +549,23 @@
         <li><a href="weac.core.scenario.html#weac.core.scenario.Scenario.cum_sum_li">(weac.core.scenario.Scenario attribute)</a>
 </li>
       </ul></li>
-      <li><a href="weac.components.scenario_config.html#id4">cut_length (weac.components.scenario_config.ScenarioConfig attribute)</a>, <a href="weac.components.scenario_config.html#weac.components.scenario_config.ScenarioConfig.cut_length">[1]</a>
+      <li><a href="weac.analysis.steady_state.html#weac.analysis.steady_state.SteadyStateErrBlock.cut_direction_winner">cut_direction_winner (weac.analysis.steady_state.SteadyStateErrBlock attribute)</a>
 
       <ul style="list-style-type:none">
+        <li><a href="weac.analysis.steady_state.html#weac.analysis.steady_state.SteadyStateTensileBlock.cut_direction_winner">(weac.analysis.steady_state.SteadyStateTensileBlock attribute)</a>
+</li>
+        <li><a href="weac.analysis.html#weac.analysis.SteadyStateErrBlock.cut_direction_winner">(weac.analysis.SteadyStateErrBlock attribute)</a>
+</li>
+        <li><a href="weac.analysis.html#weac.analysis.SteadyStateTensileBlock.cut_direction_winner">(weac.analysis.SteadyStateTensileBlock attribute)</a>
+</li>
+      </ul></li>
+      <li><a href="weac.analysis.steady_state.html#weac.analysis.steady_state.SteadyStateErrBlock.cut_length">cut_length (weac.analysis.steady_state.SteadyStateErrBlock attribute)</a>
+
+      <ul style="list-style-type:none">
+        <li><a href="weac.analysis.html#weac.analysis.SteadyStateErrBlock.cut_length">(weac.analysis.SteadyStateErrBlock attribute)</a>
+</li>
+        <li><a href="weac.components.scenario_config.html#id4">(weac.components.scenario_config.ScenarioConfig attribute)</a>, <a href="weac.components.scenario_config.html#weac.components.scenario_config.ScenarioConfig.cut_length">[1]</a>
+</li>
         <li><a href="weac.components.html#id26">(weac.components.ScenarioConfig attribute)</a>, <a href="weac.components.html#weac.components.ScenarioConfig.cut_length">[1]</a>
 </li>
         <li><a href="weac.core.html#weac.core.Scenario.cut_length">(weac.core.Scenario attribute)</a>
@@ -525,30 +608,54 @@
 </li>
       <li><a href="weac.utils.snow_types.html#weac.utils.snow_types.GrainType.DHxr">DHxr (weac.utils.snow_types.GrainType attribute)</a>
 </li>
+      <li><a href="weac.analysis.criteria_evaluator.html#weac.analysis.criteria_evaluator.SteadyStateResult.diagnostics">diagnostics (weac.analysis.criteria_evaluator.SteadyStateResult property)</a>
+
+      <ul style="list-style-type:none">
+        <li><a href="weac.analysis.steady_state.html#weac.analysis.steady_state.SteadyStateErrBlock.diagnostics">(weac.analysis.steady_state.SteadyStateErrBlock attribute)</a>
+</li>
+        <li><a href="weac.analysis.steady_state.html#weac.analysis.steady_state.SteadyStateResult.diagnostics">(weac.analysis.steady_state.SteadyStateResult property)</a>
+</li>
+        <li><a href="weac.analysis.steady_state.html#weac.analysis.steady_state.SteadyStateTensileBlock.diagnostics">(weac.analysis.steady_state.SteadyStateTensileBlock attribute)</a>
+</li>
+        <li><a href="weac.analysis.html#weac.analysis.SteadyStateErrBlock.diagnostics">(weac.analysis.SteadyStateErrBlock attribute)</a>
+</li>
+        <li><a href="weac.analysis.html#weac.analysis.SteadyStateResult.diagnostics">(weac.analysis.SteadyStateResult property)</a>
+</li>
+        <li><a href="weac.analysis.html#weac.analysis.SteadyStateTensileBlock.diagnostics">(weac.analysis.SteadyStateTensileBlock attribute)</a>
+</li>
+      </ul></li>
       <li><a href="weac.analysis.html#weac.analysis.Analyzer.differential_ERR">differential_ERR() (weac.analysis.Analyzer method)</a>
 
       <ul style="list-style-type:none">
         <li><a href="weac.analysis.analyzer.html#weac.analysis.analyzer.Analyzer.differential_ERR">(weac.analysis.analyzer.Analyzer method)</a>
 </li>
       </ul></li>
-      <li><a href="weac.analysis.html#weac.analysis.CoupledCriterionResult.dist_ERR_envelope">dist_ERR_envelope (weac.analysis.CoupledCriterionResult attribute)</a>
+      <li><a href="weac.analysis.coupled_criterion.html#weac.analysis.coupled_criterion.CoupledCriterionResult.dist_ERR_envelope">dist_ERR_envelope (weac.analysis.coupled_criterion.CoupledCriterionResult attribute)</a>
 
       <ul style="list-style-type:none">
+        <li><a href="weac.analysis.html#weac.analysis.CoupledCriterionResult.dist_ERR_envelope">(weac.analysis.CoupledCriterionResult attribute)</a>
+</li>
         <li><a href="weac.analysis.criteria_evaluator.html#weac.analysis.criteria_evaluator.CoupledCriterionResult.dist_ERR_envelope">(weac.analysis.criteria_evaluator.CoupledCriterionResult attribute)</a>
 </li>
       </ul></li>
-      <li><a href="weac.analysis.html#weac.analysis.CoupledCriterionHistory.dist_maxs">dist_maxs (weac.analysis.CoupledCriterionHistory attribute)</a>
+      <li><a href="weac.analysis.coupled_criterion.html#weac.analysis.coupled_criterion.CoupledCriterionHistory.dist_maxs">dist_maxs (weac.analysis.coupled_criterion.CoupledCriterionHistory attribute)</a>
 
       <ul style="list-style-type:none">
+        <li><a href="weac.analysis.html#weac.analysis.CoupledCriterionHistory.dist_maxs">(weac.analysis.CoupledCriterionHistory attribute)</a>
+</li>
         <li><a href="weac.analysis.criteria_evaluator.html#weac.analysis.criteria_evaluator.CoupledCriterionHistory.dist_maxs">(weac.analysis.criteria_evaluator.CoupledCriterionHistory attribute)</a>
 </li>
       </ul></li>
-      <li><a href="weac.analysis.html#weac.analysis.CoupledCriterionHistory.dist_mins">dist_mins (weac.analysis.CoupledCriterionHistory attribute)</a>
+      <li><a href="weac.analysis.coupled_criterion.html#weac.analysis.coupled_criterion.CoupledCriterionHistory.dist_mins">dist_mins (weac.analysis.coupled_criterion.CoupledCriterionHistory attribute)</a>
 
       <ul style="list-style-type:none">
+        <li><a href="weac.analysis.html#weac.analysis.CoupledCriterionHistory.dist_mins">(weac.analysis.CoupledCriterionHistory attribute)</a>
+</li>
         <li><a href="weac.analysis.criteria_evaluator.html#weac.analysis.criteria_evaluator.CoupledCriterionHistory.dist_mins">(weac.analysis.criteria_evaluator.CoupledCriterionHistory attribute)</a>
 </li>
       </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul style="margin-left:0;list-style-type:none">
       <li><a href="weac.core.field_quantities.html#weac.core.field_quantities.FieldQuantities.dpsi_dx">dpsi_dx() (weac.core.field_quantities.FieldQuantities method)</a>
 </li>
       <li><a href="weac.core.field_quantities.html#weac.core.field_quantities.FieldQuantities.dpsi_dxdx">dpsi_dxdx() (weac.core.field_quantities.FieldQuantities method)</a>
@@ -557,8 +664,6 @@
         <li><a href="weac.core.generalized_field_quantities.html#weac.core.generalized_field_quantities.GeneralizedFieldQuantities.dpsi_dxdx">(weac.core.generalized_field_quantities.GeneralizedFieldQuantities method)</a>
 </li>
       </ul></li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul style="margin-left:0;list-style-type:none">
       <li><a href="weac.core.field_quantities.html#weac.core.field_quantities.FieldQuantities.dpsi_dxdxdx">dpsi_dxdxdx() (weac.core.field_quantities.FieldQuantities method)</a>
 
       <ul style="list-style-type:none">
@@ -672,10 +777,10 @@
         <li><a href="weac.core.html#id50">(weac.core.SystemModel property)</a>
 </li>
       </ul></li>
-      <li><a href="weac.analysis.criteria_evaluator.html#weac.analysis.criteria_evaluator.SteadyStateResult.energy_release_rate">energy_release_rate (weac.analysis.criteria_evaluator.SteadyStateResult attribute)</a>
+      <li><a href="weac.analysis.steady_state.html#weac.analysis.steady_state.SteadyStateErrBlock.energy_release_rate">energy_release_rate (weac.analysis.steady_state.SteadyStateErrBlock attribute)</a>
 
       <ul style="list-style-type:none">
-        <li><a href="weac.analysis.html#weac.analysis.SteadyStateResult.energy_release_rate">(weac.analysis.SteadyStateResult attribute)</a>
+        <li><a href="weac.analysis.html#weac.analysis.SteadyStateErrBlock.energy_release_rate">(weac.analysis.SteadyStateErrBlock attribute)</a>
 </li>
       </ul></li>
       <li><a href="weac.components.html#weac.components.Segment.ensure_ndarray">ensure_ndarray() (weac.components.Segment class method)</a>
@@ -684,18 +789,32 @@
         <li><a href="weac.components.segment.html#weac.components.segment.Segment.ensure_ndarray">(weac.components.segment.Segment class method)</a>
 </li>
       </ul></li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul style="margin-left:0;list-style-type:none">
       <li><a href="weac.core.field_quantities.html#weac.core.field_quantities.FieldQuantities.eps">eps() (weac.core.field_quantities.FieldQuantities method)</a>
 </li>
       <li><a href="weac.core.generalized_field_quantities.html#weac.core.generalized_field_quantities.GeneralizedFieldQuantities.eps_zz">eps_zz() (weac.core.generalized_field_quantities.GeneralizedFieldQuantities method)</a>
 </li>
-      <li><a href="weac.analysis.criteria_evaluator.html#weac.analysis.criteria_evaluator.CriteriaEvaluator.evaluate_coupled_criterion">evaluate_coupled_criterion() (weac.analysis.criteria_evaluator.CriteriaEvaluator method)</a>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul style="margin-left:0;list-style-type:none">
+      <li><a href="weac.analysis.criteria_evaluator.html#weac.analysis.criteria_evaluator.SteadyStateResult.err">err (weac.analysis.criteria_evaluator.SteadyStateResult attribute)</a>
 
       <ul style="list-style-type:none">
+        <li><a href="weac.analysis.steady_state.html#weac.analysis.steady_state.SteadyStateResult.err">(weac.analysis.steady_state.SteadyStateResult attribute)</a>
+</li>
+        <li><a href="weac.analysis.html#weac.analysis.SteadyStateResult.err">(weac.analysis.SteadyStateResult attribute)</a>
+</li>
+      </ul></li>
+      <li><a href="weac.analysis.coupled_criterion.html#weac.analysis.coupled_criterion.CoupledCriterionEngine.evaluate_coupled_criterion">evaluate_coupled_criterion() (weac.analysis.coupled_criterion.CoupledCriterionEngine method)</a>
+
+      <ul style="list-style-type:none">
+        <li><a href="weac.analysis.criteria_evaluator.html#weac.analysis.criteria_evaluator.CriteriaEvaluator.evaluate_coupled_criterion">(weac.analysis.criteria_evaluator.CriteriaEvaluator method)</a>
+</li>
         <li><a href="weac.analysis.html#weac.analysis.CriteriaEvaluator.evaluate_coupled_criterion">(weac.analysis.CriteriaEvaluator method)</a>
 </li>
       </ul></li>
+      <li><a href="weac.analysis.steady_state.html#weac.analysis.steady_state.evaluate_steady_state">evaluate_steady_state() (in module weac.analysis.steady_state)</a>
+</li>
+      <li><a href="weac.analysis.steady_state.html#weac.analysis.steady_state.evaluate_steady_state_from_layers">evaluate_steady_state_from_layers() (in module weac.analysis.steady_state)</a>
+</li>
       <li><a href="weac.analysis.criteria_evaluator.html#weac.analysis.criteria_evaluator.CriteriaEvaluator.evaluate_SteadyState">evaluate_SteadyState() (weac.analysis.criteria_evaluator.CriteriaEvaluator method)</a>
 
       <ul style="list-style-type:none">
@@ -773,35 +892,45 @@
       </ul></li>
       <li><a href="weac.core.field_quantities.html#weac.core.field_quantities.FieldQuantities">FieldQuantities (class in weac.core.field_quantities)</a>
 </li>
-      <li><a href="weac.analysis.html#weac.analysis.CoupledCriterionResult.final_system">final_system (weac.analysis.CoupledCriterionResult attribute)</a>
+      <li><a href="weac.analysis.coupled_criterion.html#weac.analysis.coupled_criterion.CoupledCriterionResult.final_system">final_system (weac.analysis.coupled_criterion.CoupledCriterionResult attribute)</a>
 
       <ul style="list-style-type:none">
+        <li><a href="weac.analysis.html#weac.analysis.CoupledCriterionResult.final_system">(weac.analysis.CoupledCriterionResult attribute)</a>
+</li>
         <li><a href="weac.analysis.criteria_evaluator.html#weac.analysis.criteria_evaluator.CoupledCriterionResult.final_system">(weac.analysis.criteria_evaluator.CoupledCriterionResult attribute)</a>
 </li>
       </ul></li>
-      <li><a href="weac.analysis.criteria_evaluator.html#weac.analysis.criteria_evaluator.CriteriaEvaluator.find_crack_length_for_weight">find_crack_length_for_weight() (weac.analysis.criteria_evaluator.CriteriaEvaluator method)</a>
+      <li><a href="weac.analysis.coupled_criterion.html#weac.analysis.coupled_criterion.CoupledCriterionEngine.find_crack_length_for_weight">find_crack_length_for_weight() (weac.analysis.coupled_criterion.CoupledCriterionEngine method)</a>
 
       <ul style="list-style-type:none">
+        <li><a href="weac.analysis.criteria_evaluator.html#weac.analysis.criteria_evaluator.CriteriaEvaluator.find_crack_length_for_weight">(weac.analysis.criteria_evaluator.CriteriaEvaluator method)</a>
+</li>
         <li><a href="weac.analysis.html#weac.analysis.CriteriaEvaluator.find_crack_length_for_weight">(weac.analysis.CriteriaEvaluator method)</a>
+</li>
+      </ul></li>
+      <li><a href="weac.analysis.coupled_criterion.html#weac.analysis.coupled_criterion.CoupledCriterionEngine.find_minimum_crack_length">find_minimum_crack_length() (weac.analysis.coupled_criterion.CoupledCriterionEngine method)</a>
+
+      <ul style="list-style-type:none">
+        <li><a href="weac.analysis.criteria_evaluator.html#weac.analysis.criteria_evaluator.CriteriaEvaluator.find_minimum_crack_length">(weac.analysis.criteria_evaluator.CriteriaEvaluator method)</a>
+</li>
+        <li><a href="weac.analysis.html#weac.analysis.CriteriaEvaluator.find_minimum_crack_length">(weac.analysis.CriteriaEvaluator method)</a>
 </li>
       </ul></li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul style="margin-left:0;list-style-type:none">
-      <li><a href="weac.analysis.criteria_evaluator.html#weac.analysis.criteria_evaluator.CriteriaEvaluator.find_minimum_crack_length">find_minimum_crack_length() (weac.analysis.criteria_evaluator.CriteriaEvaluator method)</a>
+      <li><a href="weac.analysis.coupled_criterion.html#weac.analysis.coupled_criterion.CoupledCriterionEngine.find_minimum_force">find_minimum_force() (weac.analysis.coupled_criterion.CoupledCriterionEngine method)</a>
 
       <ul style="list-style-type:none">
-        <li><a href="weac.analysis.html#weac.analysis.CriteriaEvaluator.find_minimum_crack_length">(weac.analysis.CriteriaEvaluator method)</a>
+        <li><a href="weac.analysis.criteria_evaluator.html#weac.analysis.criteria_evaluator.CriteriaEvaluator.find_minimum_force">(weac.analysis.criteria_evaluator.CriteriaEvaluator method)</a>
 </li>
-      </ul></li>
-      <li><a href="weac.analysis.criteria_evaluator.html#weac.analysis.criteria_evaluator.CriteriaEvaluator.find_minimum_force">find_minimum_force() (weac.analysis.criteria_evaluator.CriteriaEvaluator method)</a>
-
-      <ul style="list-style-type:none">
         <li><a href="weac.analysis.html#weac.analysis.CriteriaEvaluator.find_minimum_force">(weac.analysis.CriteriaEvaluator method)</a>
 </li>
       </ul></li>
       <li><a href="weac.analysis.html#weac.analysis.FindMinimumForceResult">FindMinimumForceResult (class in weac.analysis)</a>
 
       <ul style="list-style-type:none">
+        <li><a href="weac.analysis.coupled_criterion.html#weac.analysis.coupled_criterion.FindMinimumForceResult">(class in weac.analysis.coupled_criterion)</a>
+</li>
         <li><a href="weac.analysis.criteria_evaluator.html#weac.analysis.criteria_evaluator.FindMinimumForceResult">(class in weac.analysis.criteria_evaluator)</a>
 </li>
       </ul></li>
@@ -833,9 +962,13 @@
         <li><a href="weac.core.html#weac.core.SystemModel.fq">(weac.core.SystemModel property)</a>
 </li>
       </ul></li>
-      <li><a href="weac.analysis.criteria_evaluator.html#weac.analysis.criteria_evaluator.CriteriaEvaluator.fracture_toughness_envelope">fracture_toughness_envelope() (weac.analysis.criteria_evaluator.CriteriaEvaluator method)</a>
+      <li><a href="weac.analysis.envelopes.html#weac.analysis.envelopes.fracture_toughness_envelope">fracture_toughness_envelope() (in module weac.analysis.envelopes)</a>
 
       <ul style="list-style-type:none">
+        <li><a href="weac.analysis.coupled_criterion.html#weac.analysis.coupled_criterion.CoupledCriterionEngine.fracture_toughness_envelope">(weac.analysis.coupled_criterion.CoupledCriterionEngine method)</a>
+</li>
+        <li><a href="weac.analysis.criteria_evaluator.html#weac.analysis.criteria_evaluator.CriteriaEvaluator.fracture_toughness_envelope">(weac.analysis.criteria_evaluator.CriteriaEvaluator method)</a>
+</li>
         <li><a href="weac.analysis.html#weac.analysis.CriteriaEvaluator.fracture_toughness_envelope">(weac.analysis.CriteriaEvaluator method)</a>
 </li>
       </ul></li>
@@ -856,15 +989,19 @@
         <li><a href="weac.components.html#id38">(weac.components.WeakLayer attribute)</a>, <a href="weac.components.html#weac.components.WeakLayer.G">[1]</a>
 </li>
       </ul></li>
-      <li><a href="weac.analysis.html#weac.analysis.CoupledCriterionResult.g_delta">g_delta (weac.analysis.CoupledCriterionResult attribute)</a>
+      <li><a href="weac.analysis.coupled_criterion.html#weac.analysis.coupled_criterion.CoupledCriterionResult.g_delta">g_delta (weac.analysis.coupled_criterion.CoupledCriterionResult attribute)</a>
 
       <ul style="list-style-type:none">
+        <li><a href="weac.analysis.html#weac.analysis.CoupledCriterionResult.g_delta">(weac.analysis.CoupledCriterionResult attribute)</a>
+</li>
         <li><a href="weac.analysis.criteria_evaluator.html#weac.analysis.criteria_evaluator.CoupledCriterionResult.g_delta">(weac.analysis.criteria_evaluator.CoupledCriterionResult attribute)</a>
 </li>
       </ul></li>
-      <li><a href="weac.analysis.html#weac.analysis.CoupledCriterionHistory.g_deltas">g_deltas (weac.analysis.CoupledCriterionHistory attribute)</a>
+      <li><a href="weac.analysis.coupled_criterion.html#weac.analysis.coupled_criterion.CoupledCriterionHistory.g_deltas">g_deltas (weac.analysis.coupled_criterion.CoupledCriterionHistory attribute)</a>
 
       <ul style="list-style-type:none">
+        <li><a href="weac.analysis.html#weac.analysis.CoupledCriterionHistory.g_deltas">(weac.analysis.CoupledCriterionHistory attribute)</a>
+</li>
         <li><a href="weac.analysis.criteria_evaluator.html#weac.analysis.criteria_evaluator.CoupledCriterionHistory.g_deltas">(weac.analysis.criteria_evaluator.CoupledCriterionHistory attribute)</a>
 </li>
       </ul></li>
@@ -908,14 +1045,14 @@
         <li><a href="weac.core.generalized_eigensystem.html#weac.core.generalized_eigensystem.GeneralizedEigensystem.get_load_vector">(weac.core.generalized_eigensystem.GeneralizedEigensystem method)</a>
 </li>
       </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul style="margin-left:0;list-style-type:none">
       <li><a href="weac.core.html#weac.core.Scenario.get_segment_idx">get_segment_idx() (weac.core.Scenario method)</a>
 
       <ul style="list-style-type:none">
         <li><a href="weac.core.scenario.html#weac.core.scenario.Scenario.get_segment_idx">(weac.core.scenario.Scenario method)</a>
 </li>
       </ul></li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul style="margin-left:0;list-style-type:none">
       <li><a href="weac.utils.misc.html#weac.utils.misc.get_skier_point_load">get_skier_point_load() (in module weac.utils.misc)</a>
 </li>
       <li><a href="weac.analysis.html#weac.analysis.Analyzer.get_zmesh">get_zmesh() (weac.analysis.Analyzer method)</a>
@@ -1033,9 +1170,11 @@
         <li><a href="weac.core.slab.html#id1">(weac.core.slab.Slab attribute)</a>, <a href="weac.core.slab.html#weac.core.slab.Slab.hi">[1]</a>
 </li>
       </ul></li>
-      <li><a href="weac.analysis.html#weac.analysis.CoupledCriterionResult.history">history (weac.analysis.CoupledCriterionResult attribute)</a>
+      <li><a href="weac.analysis.coupled_criterion.html#weac.analysis.coupled_criterion.CoupledCriterionResult.history">history (weac.analysis.coupled_criterion.CoupledCriterionResult attribute)</a>
 
       <ul style="list-style-type:none">
+        <li><a href="weac.analysis.html#weac.analysis.CoupledCriterionResult.history">(weac.analysis.CoupledCriterionResult attribute)</a>
+</li>
         <li><a href="weac.analysis.criteria_evaluator.html#weac.analysis.criteria_evaluator.CoupledCriterionResult.history">(weac.analysis.criteria_evaluator.CoupledCriterionResult attribute)</a>
 </li>
       </ul></li>
@@ -1062,9 +1201,11 @@
 </li>
       <li><a href="weac.utils.snow_types.html#weac.utils.snow_types.HandHardness.Im">Im (weac.utils.snow_types.HandHardness attribute)</a>
 </li>
-      <li><a href="weac.analysis.html#weac.analysis.CoupledCriterionHistory.incr_energies">incr_energies (weac.analysis.CoupledCriterionHistory attribute)</a>
+      <li><a href="weac.analysis.coupled_criterion.html#weac.analysis.coupled_criterion.CoupledCriterionHistory.incr_energies">incr_energies (weac.analysis.coupled_criterion.CoupledCriterionHistory attribute)</a>
 
       <ul style="list-style-type:none">
+        <li><a href="weac.analysis.html#weac.analysis.CoupledCriterionHistory.incr_energies">(weac.analysis.CoupledCriterionHistory attribute)</a>
+</li>
         <li><a href="weac.analysis.criteria_evaluator.html#weac.analysis.criteria_evaluator.CoupledCriterionHistory.incr_energies">(weac.analysis.criteria_evaluator.CoupledCriterionHistory attribute)</a>
 </li>
       </ul></li>
@@ -1074,14 +1215,16 @@
         <li><a href="weac.analysis.analyzer.html#weac.analysis.analyzer.Analyzer.incremental_ERR">(weac.analysis.analyzer.Analyzer method)</a>
 </li>
       </ul></li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul style="margin-left:0;list-style-type:none">
-      <li><a href="weac.analysis.html#weac.analysis.CoupledCriterionResult.initial_critical_skier_weight">initial_critical_skier_weight (weac.analysis.CoupledCriterionResult attribute)</a>
+      <li><a href="weac.analysis.coupled_criterion.html#weac.analysis.coupled_criterion.CoupledCriterionResult.initial_critical_skier_weight">initial_critical_skier_weight (weac.analysis.coupled_criterion.CoupledCriterionResult attribute)</a>
 
       <ul style="list-style-type:none">
+        <li><a href="weac.analysis.html#weac.analysis.CoupledCriterionResult.initial_critical_skier_weight">(weac.analysis.CoupledCriterionResult attribute)</a>
+</li>
         <li><a href="weac.analysis.criteria_evaluator.html#weac.analysis.criteria_evaluator.CoupledCriterionResult.initial_critical_skier_weight">(weac.analysis.criteria_evaluator.CoupledCriterionResult attribute)</a>
 </li>
       </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul style="margin-left:0;list-style-type:none">
       <li><a href="weac.utils.snow_types.html#weac.utils.snow_types.HandHardness.Ip">Ip (weac.utils.snow_types.HandHardness attribute)</a>
 </li>
       <li><a href="weac.core.system_model.html#weac.core.system_model.SystemModel.is_generalized">is_generalized (weac.core.system_model.SystemModel property)</a>
@@ -1098,9 +1241,13 @@
       </ul></li>
       <li><a href="weac.utils.misc.html#weac.utils.misc.isnotebook">isnotebook() (in module weac.utils.misc)</a>
 </li>
-      <li><a href="weac.analysis.html#weac.analysis.CoupledCriterionResult.iterations">iterations (weac.analysis.CoupledCriterionResult attribute)</a>
+      <li><a href="weac.analysis.coupled_criterion.html#weac.analysis.coupled_criterion.CoupledCriterionResult.iterations">iterations (weac.analysis.coupled_criterion.CoupledCriterionResult attribute)</a>
 
       <ul style="list-style-type:none">
+        <li><a href="weac.analysis.coupled_criterion.html#weac.analysis.coupled_criterion.FindMinimumForceResult.iterations">(weac.analysis.coupled_criterion.FindMinimumForceResult attribute)</a>
+</li>
+        <li><a href="weac.analysis.html#weac.analysis.CoupledCriterionResult.iterations">(weac.analysis.CoupledCriterionResult attribute)</a>
+</li>
         <li><a href="weac.analysis.criteria_evaluator.html#weac.analysis.criteria_evaluator.CoupledCriterionResult.iterations">(weac.analysis.criteria_evaluator.CoupledCriterionResult attribute)</a>
 </li>
         <li><a href="weac.analysis.criteria_evaluator.html#weac.analysis.criteria_evaluator.FindMinimumForceResult.iterations">(weac.analysis.criteria_evaluator.FindMinimumForceResult attribute)</a>
@@ -1210,14 +1357,14 @@
         <li><a href="weac.components.segment.html#id0">(weac.components.segment.Segment attribute)</a>, <a href="weac.components.segment.html#weac.components.segment.Segment.length">[1]</a>
 </li>
       </ul></li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul style="margin-left:0;list-style-type:none">
       <li><a href="weac.core.html#id13">li (weac.core.Scenario attribute)</a>, <a href="weac.core.html#weac.core.Scenario.li">[1]</a>
 
       <ul style="list-style-type:none">
         <li><a href="weac.core.scenario.html#id0">(weac.core.scenario.Scenario attribute)</a>, <a href="weac.core.scenario.html#weac.core.scenario.Scenario.li">[1]</a>
 </li>
       </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul style="margin-left:0;list-style-type:none">
       <li><a href="weac.utils.misc.html#weac.utils.misc.load_dummy_profile">load_dummy_profile() (in module weac.utils.misc)</a>
 </li>
       <li><a href="weac.components.scenario_config.html#weac.components.scenario_config.ScenarioConfig.load_vector_left">load_vector_left (weac.components.scenario_config.ScenarioConfig attribute)</a>
@@ -1240,6 +1387,8 @@
         <li><a href="weac.core.scenario.html#id5">(weac.core.scenario.Scenario attribute)</a>, <a href="weac.core.scenario.html#weac.core.scenario.Scenario.load_vector_right">[1]</a>
 </li>
       </ul></li>
+      <li><a href="weac.analysis.analyzer.html#weac.analysis.analyzer.local_segment_grid">local_segment_grid() (in module weac.analysis.analyzer)</a>
+</li>
       <li><a href="weac.components.criteria_config.html#id7">low_density_threshold_kg_m3 (weac.components.criteria_config.CriteriaConfig attribute)</a>, <a href="weac.components.criteria_config.html#weac.components.criteria_config.CriteriaConfig.low_density_threshold_kg_m3">[1]</a>
 
       <ul style="list-style-type:none">
@@ -1261,9 +1410,13 @@
       </ul></li>
       <li><a href="weac.core.field_quantities.html#weac.core.field_quantities.FieldQuantities.M">M() (weac.core.field_quantities.FieldQuantities method)</a>
 </li>
-      <li><a href="weac.analysis.html#weac.analysis.CoupledCriterionResult.max_dist_stress">max_dist_stress (weac.analysis.CoupledCriterionResult attribute)</a>
+      <li><a href="weac.analysis.coupled_criterion.html#weac.analysis.coupled_criterion.CoupledCriterionResult.max_dist_stress">max_dist_stress (weac.analysis.coupled_criterion.CoupledCriterionResult attribute)</a>
 
       <ul style="list-style-type:none">
+        <li><a href="weac.analysis.coupled_criterion.html#weac.analysis.coupled_criterion.FindMinimumForceResult.max_dist_stress">(weac.analysis.coupled_criterion.FindMinimumForceResult attribute)</a>
+</li>
+        <li><a href="weac.analysis.html#weac.analysis.CoupledCriterionResult.max_dist_stress">(weac.analysis.CoupledCriterionResult attribute)</a>
+</li>
         <li><a href="weac.analysis.criteria_evaluator.html#weac.analysis.criteria_evaluator.CoupledCriterionResult.max_dist_stress">(weac.analysis.criteria_evaluator.CoupledCriterionResult attribute)</a>
 </li>
         <li><a href="weac.analysis.criteria_evaluator.html#weac.analysis.criteria_evaluator.FindMinimumForceResult.max_dist_stress">(weac.analysis.criteria_evaluator.FindMinimumForceResult attribute)</a>
@@ -1271,26 +1424,60 @@
         <li><a href="weac.analysis.html#weac.analysis.FindMinimumForceResult.max_dist_stress">(weac.analysis.FindMinimumForceResult attribute)</a>
 </li>
       </ul></li>
-      <li><a href="weac.analysis.criteria_evaluator.html#weac.analysis.criteria_evaluator.MaximalStressResult.max_principal_stress_norm">max_principal_stress_norm (weac.analysis.criteria_evaluator.MaximalStressResult attribute)</a>
-</li>
-      <li><a href="weac.analysis.criteria_evaluator.html#weac.analysis.criteria_evaluator.MaximalStressResult.max_Sxx_norm">max_Sxx_norm (weac.analysis.criteria_evaluator.MaximalStressResult attribute)</a>
-</li>
-      <li><a href="weac.analysis.criteria_evaluator.html#weac.analysis.criteria_evaluator.SteadyStateResult.maximal_stress_result">maximal_stress_result (weac.analysis.criteria_evaluator.SteadyStateResult attribute)</a>
+      <li><a href="weac.analysis.coupled_criterion.html#weac.analysis.coupled_criterion.MaximalStressResult.max_principal_stress_norm">max_principal_stress_norm (weac.analysis.coupled_criterion.MaximalStressResult attribute)</a>
 
       <ul style="list-style-type:none">
-        <li><a href="weac.analysis.html#weac.analysis.SteadyStateResult.maximal_stress_result">(weac.analysis.SteadyStateResult attribute)</a>
+        <li><a href="weac.analysis.criteria_evaluator.html#weac.analysis.criteria_evaluator.MaximalStressResult.max_principal_stress_norm">(weac.analysis.criteria_evaluator.MaximalStressResult attribute)</a>
+</li>
+        <li><a href="weac.analysis.html#weac.analysis.MaximalStressResult.max_principal_stress_norm">(weac.analysis.MaximalStressResult attribute)</a>
 </li>
       </ul></li>
-      <li><a href="weac.analysis.criteria_evaluator.html#weac.analysis.criteria_evaluator.MaximalStressResult">MaximalStressResult (class in weac.analysis.criteria_evaluator)</a>
-</li>
-      <li><a href="weac.analysis.html#weac.analysis.CoupledCriterionResult.message">message (weac.analysis.CoupledCriterionResult attribute)</a>
+      <li><a href="weac.analysis.coupled_criterion.html#weac.analysis.coupled_criterion.MaximalStressResult.max_Sxx_norm">max_Sxx_norm (weac.analysis.coupled_criterion.MaximalStressResult attribute)</a>
 
       <ul style="list-style-type:none">
+        <li><a href="weac.analysis.criteria_evaluator.html#weac.analysis.criteria_evaluator.MaximalStressResult.max_Sxx_norm">(weac.analysis.criteria_evaluator.MaximalStressResult attribute)</a>
+</li>
+        <li><a href="weac.analysis.html#weac.analysis.MaximalStressResult.max_Sxx_norm">(weac.analysis.MaximalStressResult attribute)</a>
+</li>
+      </ul></li>
+      <li><a href="weac.analysis.steady_state.html#weac.analysis.steady_state.SteadyStateErrBlock.maximal_stress_result">maximal_stress_result (weac.analysis.steady_state.SteadyStateErrBlock attribute)</a>
+
+      <ul style="list-style-type:none">
+        <li><a href="weac.analysis.steady_state.html#weac.analysis.steady_state.SteadyStateTensileBlock.maximal_stress_result">(weac.analysis.steady_state.SteadyStateTensileBlock attribute)</a>
+</li>
+        <li><a href="weac.analysis.html#weac.analysis.SteadyStateErrBlock.maximal_stress_result">(weac.analysis.SteadyStateErrBlock attribute)</a>
+</li>
+        <li><a href="weac.analysis.html#weac.analysis.SteadyStateTensileBlock.maximal_stress_result">(weac.analysis.SteadyStateTensileBlock attribute)</a>
+</li>
+      </ul></li>
+      <li><a href="weac.analysis.html#weac.analysis.MaximalStressResult">MaximalStressResult (class in weac.analysis)</a>
+
+      <ul style="list-style-type:none">
+        <li><a href="weac.analysis.coupled_criterion.html#weac.analysis.coupled_criterion.MaximalStressResult">(class in weac.analysis.coupled_criterion)</a>
+</li>
+        <li><a href="weac.analysis.criteria_evaluator.html#weac.analysis.criteria_evaluator.MaximalStressResult">(class in weac.analysis.criteria_evaluator)</a>
+</li>
+      </ul></li>
+      <li><a href="weac.analysis.coupled_criterion.html#weac.analysis.coupled_criterion.CoupledCriterionResult.message">message (weac.analysis.coupled_criterion.CoupledCriterionResult attribute)</a>
+
+      <ul style="list-style-type:none">
+        <li><a href="weac.analysis.html#weac.analysis.CoupledCriterionResult.message">(weac.analysis.CoupledCriterionResult attribute)</a>
+</li>
         <li><a href="weac.analysis.criteria_evaluator.html#weac.analysis.criteria_evaluator.CoupledCriterionResult.message">(weac.analysis.criteria_evaluator.CoupledCriterionResult attribute)</a>
 </li>
-        <li><a href="weac.analysis.criteria_evaluator.html#weac.analysis.criteria_evaluator.SteadyStateResult.message">(weac.analysis.criteria_evaluator.SteadyStateResult attribute)</a>
+        <li><a href="weac.analysis.criteria_evaluator.html#weac.analysis.criteria_evaluator.SteadyStateResult.message">(weac.analysis.criteria_evaluator.SteadyStateResult property)</a>
 </li>
-        <li><a href="weac.analysis.html#weac.analysis.SteadyStateResult.message">(weac.analysis.SteadyStateResult attribute)</a>
+        <li><a href="weac.analysis.steady_state.html#weac.analysis.steady_state.SteadyStateErrBlock.message">(weac.analysis.steady_state.SteadyStateErrBlock attribute)</a>
+</li>
+        <li><a href="weac.analysis.steady_state.html#weac.analysis.steady_state.SteadyStateResult.message">(weac.analysis.steady_state.SteadyStateResult property)</a>
+</li>
+        <li><a href="weac.analysis.steady_state.html#weac.analysis.steady_state.SteadyStateTensileBlock.message">(weac.analysis.steady_state.SteadyStateTensileBlock attribute)</a>
+</li>
+        <li><a href="weac.analysis.html#weac.analysis.SteadyStateErrBlock.message">(weac.analysis.SteadyStateErrBlock attribute)</a>
+</li>
+        <li><a href="weac.analysis.html#weac.analysis.SteadyStateResult.message">(weac.analysis.SteadyStateResult property)</a>
+</li>
+        <li><a href="weac.analysis.html#weac.analysis.SteadyStateTensileBlock.message">(weac.analysis.SteadyStateTensileBlock attribute)</a>
 </li>
       </ul></li>
       <li><a href="weac.utils.snow_types.html#weac.utils.snow_types.GrainType.MF">MF (weac.utils.snow_types.GrainType attribute)</a>
@@ -1305,9 +1492,13 @@
 </li>
       <li><a href="weac.analysis.plotter.html#weac.analysis.plotter.MidpointNormalize">MidpointNormalize (class in weac.analysis.plotter)</a>
 </li>
-      <li><a href="weac.analysis.html#weac.analysis.CoupledCriterionResult.min_dist_stress">min_dist_stress (weac.analysis.CoupledCriterionResult attribute)</a>
+      <li><a href="weac.analysis.coupled_criterion.html#weac.analysis.coupled_criterion.CoupledCriterionResult.min_dist_stress">min_dist_stress (weac.analysis.coupled_criterion.CoupledCriterionResult attribute)</a>
 
       <ul style="list-style-type:none">
+        <li><a href="weac.analysis.coupled_criterion.html#weac.analysis.coupled_criterion.FindMinimumForceResult.min_dist_stress">(weac.analysis.coupled_criterion.FindMinimumForceResult attribute)</a>
+</li>
+        <li><a href="weac.analysis.html#weac.analysis.CoupledCriterionResult.min_dist_stress">(weac.analysis.CoupledCriterionResult attribute)</a>
+</li>
         <li><a href="weac.analysis.criteria_evaluator.html#weac.analysis.criteria_evaluator.CoupledCriterionResult.min_dist_stress">(weac.analysis.criteria_evaluator.CoupledCriterionResult attribute)</a>
 </li>
         <li><a href="weac.analysis.criteria_evaluator.html#weac.analysis.criteria_evaluator.FindMinimumForceResult.min_dist_stress">(weac.analysis.criteria_evaluator.FindMinimumForceResult attribute)</a>
@@ -1345,6 +1536,8 @@
         <li><a href="weac.components.html#weac.components.WeakLayer.model_config">(weac.components.WeakLayer attribute)</a>
 </li>
       </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul style="margin-left:0;list-style-type:none">
       <li><a href="weac.components.html#weac.components.Layer.model_post_init">model_post_init() (weac.components.Layer method)</a>
 
       <ul style="list-style-type:none">
@@ -1355,8 +1548,6 @@
         <li><a href="weac.components.html#weac.components.WeakLayer.model_post_init">(weac.components.WeakLayer method)</a>
 </li>
       </ul></li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul style="margin-left:0;list-style-type:none">
       <li><a href="weac.components.html#weac.components.ModelInput">ModelInput (class in weac.components)</a>
 
       <ul style="list-style-type:none">
@@ -1373,9 +1564,15 @@
 </li>
         <li><a href="weac.analysis.analyzer.html#module-weac.analysis.analyzer">weac.analysis.analyzer</a>
 </li>
+        <li><a href="weac.analysis.coupled_criterion.html#module-weac.analysis.coupled_criterion">weac.analysis.coupled_criterion</a>
+</li>
         <li><a href="weac.analysis.criteria_evaluator.html#module-weac.analysis.criteria_evaluator">weac.analysis.criteria_evaluator</a>
 </li>
+        <li><a href="weac.analysis.envelopes.html#module-weac.analysis.envelopes">weac.analysis.envelopes</a>
+</li>
         <li><a href="weac.analysis.plotter.html#module-weac.analysis.plotter">weac.analysis.plotter</a>
+</li>
+        <li><a href="weac.analysis.steady_state.html#module-weac.analysis.steady_state">weac.analysis.steady_state</a>
 </li>
         <li><a href="weac.components.html#module-weac.components">weac.components</a>
 </li>
@@ -1447,9 +1644,11 @@
   <td style="width: 33%; vertical-align: top;"><ul style="margin-left:0;list-style-type:none">
       <li><a href="weac.core.field_quantities.html#weac.core.field_quantities.FieldQuantities.N">N() (weac.core.field_quantities.FieldQuantities method)</a>
 </li>
-      <li><a href="weac.analysis.criteria_evaluator.html#weac.analysis.criteria_evaluator.FindMinimumForceResult.new_segments">new_segments (weac.analysis.criteria_evaluator.FindMinimumForceResult attribute)</a>
+      <li><a href="weac.analysis.coupled_criterion.html#weac.analysis.coupled_criterion.FindMinimumForceResult.new_segments">new_segments (weac.analysis.coupled_criterion.FindMinimumForceResult attribute)</a>
 
       <ul style="list-style-type:none">
+        <li><a href="weac.analysis.criteria_evaluator.html#weac.analysis.criteria_evaluator.FindMinimumForceResult.new_segments">(weac.analysis.criteria_evaluator.FindMinimumForceResult attribute)</a>
+</li>
         <li><a href="weac.analysis.html#weac.analysis.FindMinimumForceResult.new_segments">(weac.analysis.FindMinimumForceResult attribute)</a>
 </li>
       </ul></li>
@@ -1484,9 +1683,11 @@
   <h2 id="O">O</h2>
   <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul style="margin-left:0;list-style-type:none">
-      <li><a href="weac.analysis.criteria_evaluator.html#weac.analysis.criteria_evaluator.FindMinimumForceResult.old_segments">old_segments (weac.analysis.criteria_evaluator.FindMinimumForceResult attribute)</a>
+      <li><a href="weac.analysis.coupled_criterion.html#weac.analysis.coupled_criterion.FindMinimumForceResult.old_segments">old_segments (weac.analysis.coupled_criterion.FindMinimumForceResult attribute)</a>
 
       <ul style="list-style-type:none">
+        <li><a href="weac.analysis.criteria_evaluator.html#weac.analysis.criteria_evaluator.FindMinimumForceResult.old_segments">(weac.analysis.criteria_evaluator.FindMinimumForceResult attribute)</a>
+</li>
         <li><a href="weac.analysis.html#weac.analysis.FindMinimumForceResult.old_segments">(weac.analysis.FindMinimumForceResult attribute)</a>
 </li>
       </ul></li>
@@ -1509,9 +1710,15 @@
 </li>
       <li><a href="weac.utils.snow_types.html#weac.utils.snow_types.HandHardness.P_K">P_K (weac.utils.snow_types.HandHardness attribute)</a>
 </li>
-      <li><a href="weac.components.scenario_config.html#id1">phi (weac.components.scenario_config.ScenarioConfig attribute)</a>, <a href="weac.components.scenario_config.html#weac.components.scenario_config.ScenarioConfig.phi">[1]</a>
+      <li><a href="weac.analysis.criteria_evaluator.html#weac.analysis.criteria_evaluator.SteadyStateResult.phi">phi (weac.analysis.criteria_evaluator.SteadyStateResult attribute)</a>
 
       <ul style="list-style-type:none">
+        <li><a href="weac.analysis.steady_state.html#weac.analysis.steady_state.SteadyStateResult.phi">(weac.analysis.steady_state.SteadyStateResult attribute)</a>
+</li>
+        <li><a href="weac.analysis.html#weac.analysis.SteadyStateResult.phi">(weac.analysis.SteadyStateResult attribute)</a>
+</li>
+        <li><a href="weac.components.scenario_config.html#id1">(weac.components.scenario_config.ScenarioConfig attribute)</a>, <a href="weac.components.scenario_config.html#weac.components.scenario_config.ScenarioConfig.phi">[1]</a>
+</li>
         <li><a href="weac.components.html#id23">(weac.components.ScenarioConfig attribute)</a>, <a href="weac.components.html#weac.components.ScenarioConfig.phi">[1]</a>
 </li>
         <li><a href="weac.core.html#weac.core.Scenario.phi">(weac.core.Scenario attribute)</a>
@@ -1649,10 +1856,22 @@
 </li>
       <li><a href="weac.utils.snow_types.html#weac.utils.snow_types.GrainType.PPsd">PPsd (weac.utils.snow_types.GrainType attribute)</a>
 </li>
-      <li><a href="weac.analysis.criteria_evaluator.html#weac.analysis.criteria_evaluator.MaximalStressResult.principal_stress_kPa">principal_stress_kPa (weac.analysis.criteria_evaluator.MaximalStressResult attribute)</a>
+      <li><a href="weac.analysis.coupled_criterion.html#weac.analysis.coupled_criterion.MaximalStressResult.principal_stress_kPa">principal_stress_kPa (weac.analysis.coupled_criterion.MaximalStressResult attribute)</a>
+
+      <ul style="list-style-type:none">
+        <li><a href="weac.analysis.criteria_evaluator.html#weac.analysis.criteria_evaluator.MaximalStressResult.principal_stress_kPa">(weac.analysis.criteria_evaluator.MaximalStressResult attribute)</a>
 </li>
-      <li><a href="weac.analysis.criteria_evaluator.html#weac.analysis.criteria_evaluator.MaximalStressResult.principal_stress_norm">principal_stress_norm (weac.analysis.criteria_evaluator.MaximalStressResult attribute)</a>
+        <li><a href="weac.analysis.html#weac.analysis.MaximalStressResult.principal_stress_kPa">(weac.analysis.MaximalStressResult attribute)</a>
 </li>
+      </ul></li>
+      <li><a href="weac.analysis.coupled_criterion.html#weac.analysis.coupled_criterion.MaximalStressResult.principal_stress_norm">principal_stress_norm (weac.analysis.coupled_criterion.MaximalStressResult attribute)</a>
+
+      <ul style="list-style-type:none">
+        <li><a href="weac.analysis.criteria_evaluator.html#weac.analysis.criteria_evaluator.MaximalStressResult.principal_stress_norm">(weac.analysis.criteria_evaluator.MaximalStressResult attribute)</a>
+</li>
+        <li><a href="weac.analysis.html#weac.analysis.MaximalStressResult.principal_stress_norm">(weac.analysis.MaximalStressResult attribute)</a>
+</li>
+      </ul></li>
       <li><a href="weac.analysis.html#weac.analysis.Analyzer.principal_stress_slab">principal_stress_slab() (weac.analysis.Analyzer method)</a>
 
       <ul style="list-style-type:none">
@@ -1685,9 +1904,11 @@
 </li>
       <li><a href="weac.core.generalized_field_quantities.html#weac.core.generalized_field_quantities.GeneralizedFieldQuantities.psiz">psiz() (weac.core.generalized_field_quantities.GeneralizedFieldQuantities method)</a>
 </li>
-      <li><a href="weac.analysis.html#weac.analysis.CoupledCriterionResult.pure_stress_criteria">pure_stress_criteria (weac.analysis.CoupledCriterionResult attribute)</a>
+      <li><a href="weac.analysis.coupled_criterion.html#weac.analysis.coupled_criterion.CoupledCriterionResult.pure_stress_criteria">pure_stress_criteria (weac.analysis.coupled_criterion.CoupledCriterionResult attribute)</a>
 
       <ul style="list-style-type:none">
+        <li><a href="weac.analysis.html#weac.analysis.CoupledCriterionResult.pure_stress_criteria">(weac.analysis.CoupledCriterionResult attribute)</a>
+</li>
         <li><a href="weac.analysis.criteria_evaluator.html#weac.analysis.criteria_evaluator.CoupledCriterionResult.pure_stress_criteria">(weac.analysis.criteria_evaluator.CoupledCriterionResult attribute)</a>
 </li>
       </ul></li>
@@ -1842,9 +2063,11 @@
         <li><a href="weac.core.scenario.html#weac.core.scenario.Scenario.segments">(weac.core.scenario.Scenario attribute)</a>
 </li>
       </ul></li>
-      <li><a href="weac.analysis.html#weac.analysis.CoupledCriterionResult.self_collapse">self_collapse (weac.analysis.CoupledCriterionResult attribute)</a>
+      <li><a href="weac.analysis.coupled_criterion.html#weac.analysis.coupled_criterion.CoupledCriterionResult.self_collapse">self_collapse (weac.analysis.coupled_criterion.CoupledCriterionResult attribute)</a>
 
       <ul style="list-style-type:none">
+        <li><a href="weac.analysis.html#weac.analysis.CoupledCriterionResult.self_collapse">(weac.analysis.CoupledCriterionResult attribute)</a>
+</li>
         <li><a href="weac.analysis.criteria_evaluator.html#weac.analysis.criteria_evaluator.CoupledCriterionResult.self_collapse">(weac.analysis.criteria_evaluator.CoupledCriterionResult attribute)</a>
 </li>
       </ul></li>
@@ -1880,15 +2103,19 @@
         <li><a href="weac.components.html#weac.components.WeakLayer.sigma_comp">(weac.components.WeakLayer attribute)</a>
 </li>
       </ul></li>
-      <li><a href="weac.analysis.html#weac.analysis.CoupledCriterionHistory.sigma_maxs">sigma_maxs (weac.analysis.CoupledCriterionHistory attribute)</a>
+      <li><a href="weac.analysis.coupled_criterion.html#weac.analysis.coupled_criterion.CoupledCriterionHistory.sigma_maxs">sigma_maxs (weac.analysis.coupled_criterion.CoupledCriterionHistory attribute)</a>
 
       <ul style="list-style-type:none">
+        <li><a href="weac.analysis.html#weac.analysis.CoupledCriterionHistory.sigma_maxs">(weac.analysis.CoupledCriterionHistory attribute)</a>
+</li>
         <li><a href="weac.analysis.criteria_evaluator.html#weac.analysis.criteria_evaluator.CoupledCriterionHistory.sigma_maxs">(weac.analysis.criteria_evaluator.CoupledCriterionHistory attribute)</a>
 </li>
       </ul></li>
-      <li><a href="weac.analysis.html#weac.analysis.CoupledCriterionHistory.skier_weights">skier_weights (weac.analysis.CoupledCriterionHistory attribute)</a>
+      <li><a href="weac.analysis.coupled_criterion.html#weac.analysis.coupled_criterion.CoupledCriterionHistory.skier_weights">skier_weights (weac.analysis.coupled_criterion.CoupledCriterionHistory attribute)</a>
 
       <ul style="list-style-type:none">
+        <li><a href="weac.analysis.html#weac.analysis.CoupledCriterionHistory.skier_weights">(weac.analysis.CoupledCriterionHistory attribute)</a>
+</li>
         <li><a href="weac.analysis.criteria_evaluator.html#weac.analysis.criteria_evaluator.CoupledCriterionHistory.skier_weights">(weac.analysis.criteria_evaluator.CoupledCriterionHistory attribute)</a>
 </li>
       </ul></li>
@@ -1914,10 +2141,16 @@
         <li><a href="weac.core.html#id48">(weac.core.SystemModel attribute)</a>, <a href="weac.core.html#weac.core.SystemModel.slab">[1]</a>
 </li>
       </ul></li>
+      <li><a href="weac.analysis.coupled_criterion.html#weac.analysis.coupled_criterion.MaximalStressResult.slab_tensile_criterion">slab_tensile_criterion (weac.analysis.coupled_criterion.MaximalStressResult attribute)</a>
+
+      <ul style="list-style-type:none">
+        <li><a href="weac.analysis.criteria_evaluator.html#weac.analysis.criteria_evaluator.MaximalStressResult.slab_tensile_criterion">(weac.analysis.criteria_evaluator.MaximalStressResult attribute)</a>
+</li>
+        <li><a href="weac.analysis.html#weac.analysis.MaximalStressResult.slab_tensile_criterion">(weac.analysis.MaximalStressResult attribute)</a>
+</li>
+      </ul></li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul style="margin-left:0;list-style-type:none">
-      <li><a href="weac.analysis.criteria_evaluator.html#weac.analysis.criteria_evaluator.MaximalStressResult.slab_tensile_criterion">slab_tensile_criterion (weac.analysis.criteria_evaluator.MaximalStressResult attribute)</a>
-</li>
       <li><a href="weac.core.system_model.html#weac.core.system_model.SystemModel.slab_touchdown">slab_touchdown (weac.core.system_model.SystemModel attribute)</a>
 
       <ul style="list-style-type:none">
@@ -1952,10 +2185,24 @@
         <li><a href="weac.core.generalized_eigensystem.html#weac.core.generalized_eigensystem.GeneralizedEigensystem.sR">(weac.core.generalized_eigensystem.GeneralizedEigensystem attribute)</a>
 </li>
       </ul></li>
+      <li><a href="weac.analysis.html#weac.analysis.SteadyStateErrBlock">SteadyStateErrBlock (class in weac.analysis)</a>
+
+      <ul style="list-style-type:none">
+        <li><a href="weac.analysis.steady_state.html#weac.analysis.steady_state.SteadyStateErrBlock">(class in weac.analysis.steady_state)</a>
+</li>
+      </ul></li>
       <li><a href="weac.analysis.html#weac.analysis.SteadyStateResult">SteadyStateResult (class in weac.analysis)</a>
 
       <ul style="list-style-type:none">
         <li><a href="weac.analysis.criteria_evaluator.html#weac.analysis.criteria_evaluator.SteadyStateResult">(class in weac.analysis.criteria_evaluator)</a>
+</li>
+        <li><a href="weac.analysis.steady_state.html#weac.analysis.steady_state.SteadyStateResult">(class in weac.analysis.steady_state)</a>
+</li>
+      </ul></li>
+      <li><a href="weac.analysis.html#weac.analysis.SteadyStateTensileBlock">SteadyStateTensileBlock (class in weac.analysis)</a>
+
+      <ul style="list-style-type:none">
+        <li><a href="weac.analysis.steady_state.html#weac.analysis.steady_state.SteadyStateTensileBlock">(class in weac.analysis.steady_state)</a>
 </li>
       </ul></li>
       <li><a href="weac.components.scenario_config.html#id5">stiffness_ratio (weac.components.scenario_config.ScenarioConfig attribute)</a>, <a href="weac.components.scenario_config.html#weac.components.scenario_config.ScenarioConfig.stiffness_ratio">[1]</a>
@@ -1966,9 +2213,13 @@
       </ul></li>
       <li><a href="weac.core.slab_touchdown.html#weac.core.slab_touchdown.SlabTouchdown.straight_scenario">straight_scenario (weac.core.slab_touchdown.SlabTouchdown attribute)</a>
 </li>
-      <li><a href="weac.analysis.criteria_evaluator.html#weac.analysis.criteria_evaluator.CriteriaEvaluator.stress_envelope">stress_envelope() (weac.analysis.criteria_evaluator.CriteriaEvaluator method)</a>
+      <li><a href="weac.analysis.envelopes.html#weac.analysis.envelopes.stress_envelope">stress_envelope() (in module weac.analysis.envelopes)</a>
 
       <ul style="list-style-type:none">
+        <li><a href="weac.analysis.coupled_criterion.html#weac.analysis.coupled_criterion.CoupledCriterionEngine.stress_envelope">(weac.analysis.coupled_criterion.CoupledCriterionEngine method)</a>
+</li>
+        <li><a href="weac.analysis.criteria_evaluator.html#weac.analysis.criteria_evaluator.CriteriaEvaluator.stress_envelope">(weac.analysis.criteria_evaluator.CriteriaEvaluator method)</a>
+</li>
         <li><a href="weac.analysis.html#weac.analysis.CriteriaEvaluator.stress_envelope">(weac.analysis.CriteriaEvaluator method)</a>
 </li>
       </ul></li>
@@ -1978,9 +2229,11 @@
         <li><a href="weac.components.html#id7">(weac.components.CriteriaConfig attribute)</a>, <a href="weac.components.html#weac.components.CriteriaConfig.stress_envelope_method">[1]</a>
 </li>
       </ul></li>
-      <li><a href="weac.analysis.criteria_evaluator.html#weac.analysis.criteria_evaluator.FindMinimumForceResult.success">success (weac.analysis.criteria_evaluator.FindMinimumForceResult attribute)</a>
+      <li><a href="weac.analysis.coupled_criterion.html#weac.analysis.coupled_criterion.FindMinimumForceResult.success">success (weac.analysis.coupled_criterion.FindMinimumForceResult attribute)</a>
 
       <ul style="list-style-type:none">
+        <li><a href="weac.analysis.criteria_evaluator.html#weac.analysis.criteria_evaluator.FindMinimumForceResult.success">(weac.analysis.criteria_evaluator.FindMinimumForceResult attribute)</a>
+</li>
         <li><a href="weac.analysis.html#weac.analysis.FindMinimumForceResult.success">(weac.analysis.FindMinimumForceResult attribute)</a>
 </li>
       </ul></li>
@@ -2000,14 +2253,30 @@
         <li><a href="weac.analysis.analyzer.html#weac.analysis.analyzer.Analyzer.Sxx">(weac.analysis.analyzer.Analyzer method)</a>
 </li>
       </ul></li>
-      <li><a href="weac.analysis.criteria_evaluator.html#weac.analysis.criteria_evaluator.MaximalStressResult.Sxx_kPa">Sxx_kPa (weac.analysis.criteria_evaluator.MaximalStressResult attribute)</a>
-</li>
-      <li><a href="weac.analysis.criteria_evaluator.html#weac.analysis.criteria_evaluator.MaximalStressResult.Sxx_norm">Sxx_norm (weac.analysis.criteria_evaluator.MaximalStressResult attribute)</a>
-</li>
-      <li><a href="weac.analysis.criteria_evaluator.html#weac.analysis.criteria_evaluator.SteadyStateResult.system">system (weac.analysis.criteria_evaluator.SteadyStateResult attribute)</a>
+      <li><a href="weac.analysis.coupled_criterion.html#weac.analysis.coupled_criterion.MaximalStressResult.Sxx_kPa">Sxx_kPa (weac.analysis.coupled_criterion.MaximalStressResult attribute)</a>
 
       <ul style="list-style-type:none">
-        <li><a href="weac.analysis.html#weac.analysis.SteadyStateResult.system">(weac.analysis.SteadyStateResult attribute)</a>
+        <li><a href="weac.analysis.criteria_evaluator.html#weac.analysis.criteria_evaluator.MaximalStressResult.Sxx_kPa">(weac.analysis.criteria_evaluator.MaximalStressResult attribute)</a>
+</li>
+        <li><a href="weac.analysis.html#weac.analysis.MaximalStressResult.Sxx_kPa">(weac.analysis.MaximalStressResult attribute)</a>
+</li>
+      </ul></li>
+      <li><a href="weac.analysis.coupled_criterion.html#weac.analysis.coupled_criterion.MaximalStressResult.Sxx_norm">Sxx_norm (weac.analysis.coupled_criterion.MaximalStressResult attribute)</a>
+
+      <ul style="list-style-type:none">
+        <li><a href="weac.analysis.criteria_evaluator.html#weac.analysis.criteria_evaluator.MaximalStressResult.Sxx_norm">(weac.analysis.criteria_evaluator.MaximalStressResult attribute)</a>
+</li>
+        <li><a href="weac.analysis.html#weac.analysis.MaximalStressResult.Sxx_norm">(weac.analysis.MaximalStressResult attribute)</a>
+</li>
+      </ul></li>
+      <li><a href="weac.analysis.steady_state.html#weac.analysis.steady_state.SteadyStateErrBlock.system">system (weac.analysis.steady_state.SteadyStateErrBlock attribute)</a>
+
+      <ul style="list-style-type:none">
+        <li><a href="weac.analysis.steady_state.html#weac.analysis.steady_state.SteadyStateTensileBlock.system">(weac.analysis.steady_state.SteadyStateTensileBlock attribute)</a>
+</li>
+        <li><a href="weac.analysis.html#weac.analysis.SteadyStateErrBlock.system">(weac.analysis.SteadyStateErrBlock attribute)</a>
+</li>
+        <li><a href="weac.analysis.html#weac.analysis.SteadyStateTensileBlock.system">(weac.analysis.SteadyStateTensileBlock attribute)</a>
 </li>
       </ul></li>
       <li><a href="weac.components.scenario_config.html#id0">system_type (weac.components.scenario_config.ScenarioConfig attribute)</a>, <a href="weac.components.scenario_config.html#weac.components.scenario_config.ScenarioConfig.system_type">[1]</a>
@@ -2047,9 +2316,11 @@
         <li><a href="weac.components.html#weac.components.WeakLayer.tau_c">(weac.components.WeakLayer attribute)</a>
 </li>
       </ul></li>
-      <li><a href="weac.analysis.html#weac.analysis.CoupledCriterionHistory.tau_maxs">tau_maxs (weac.analysis.CoupledCriterionHistory attribute)</a>
+      <li><a href="weac.analysis.coupled_criterion.html#weac.analysis.coupled_criterion.CoupledCriterionHistory.tau_maxs">tau_maxs (weac.analysis.coupled_criterion.CoupledCriterionHistory attribute)</a>
 
       <ul style="list-style-type:none">
+        <li><a href="weac.analysis.html#weac.analysis.CoupledCriterionHistory.tau_maxs">(weac.analysis.CoupledCriterionHistory attribute)</a>
+</li>
         <li><a href="weac.analysis.criteria_evaluator.html#weac.analysis.criteria_evaluator.CoupledCriterionHistory.tau_maxs">(weac.analysis.criteria_evaluator.CoupledCriterionHistory attribute)</a>
 </li>
       </ul></li>
@@ -2057,6 +2328,14 @@
 </li>
       <li><a href="weac.core.generalized_field_quantities.html#weac.core.generalized_field_quantities.GeneralizedFieldQuantities.tau_yz">tau_yz() (weac.core.generalized_field_quantities.GeneralizedFieldQuantities method)</a>
 </li>
+      <li><a href="weac.analysis.criteria_evaluator.html#weac.analysis.criteria_evaluator.SteadyStateResult.tensile">tensile (weac.analysis.criteria_evaluator.SteadyStateResult attribute)</a>
+
+      <ul style="list-style-type:none">
+        <li><a href="weac.analysis.steady_state.html#weac.analysis.steady_state.SteadyStateResult.tensile">(weac.analysis.steady_state.SteadyStateResult attribute)</a>
+</li>
+        <li><a href="weac.analysis.html#weac.analysis.SteadyStateResult.tensile">(weac.analysis.SteadyStateResult attribute)</a>
+</li>
+      </ul></li>
       <li><a href="weac.components.html#id16">tensile_strength (weac.components.Layer attribute)</a>, <a href="weac.components.html#weac.components.Layer.tensile_strength">[1]</a>
 
       <ul style="list-style-type:none">
@@ -2079,12 +2358,12 @@
         <li><a href="weac.core.scenario.html#weac.core.scenario.Scenario.theta">(weac.core.scenario.Scenario attribute)</a>
 </li>
       </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul style="margin-left:0;list-style-type:none">
       <li><a href="weac.core.generalized_field_quantities.html#weac.core.generalized_field_quantities.GeneralizedFieldQuantities.theta_uc">theta_uc() (weac.core.generalized_field_quantities.GeneralizedFieldQuantities method)</a>
 </li>
       <li><a href="weac.core.generalized_field_quantities.html#weac.core.generalized_field_quantities.GeneralizedFieldQuantities.theta_ul">theta_ul() (weac.core.generalized_field_quantities.GeneralizedFieldQuantities method)</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul style="margin-left:0;list-style-type:none">
       <li><a href="weac.core.generalized_field_quantities.html#weac.core.generalized_field_quantities.GeneralizedFieldQuantities.theta_vc">theta_vc() (weac.core.generalized_field_quantities.GeneralizedFieldQuantities method)</a>
 </li>
       <li><a href="weac.core.generalized_field_quantities.html#weac.core.generalized_field_quantities.GeneralizedFieldQuantities.theta_vl">theta_vl() (weac.core.generalized_field_quantities.GeneralizedFieldQuantities method)</a>
@@ -2111,14 +2390,8 @@
         <li><a href="weac.components.config.html#id0">(weac.components.config.Config attribute)</a>, <a href="weac.components.config.html#weac.components.config.Config.touchdown">[1]</a>
 </li>
       </ul></li>
-      <li><a href="weac.analysis.criteria_evaluator.html#weac.analysis.criteria_evaluator.SteadyStateResult.touchdown_distance">touchdown_distance (weac.analysis.criteria_evaluator.SteadyStateResult attribute)</a>
-
-      <ul style="list-style-type:none">
-        <li><a href="weac.analysis.html#weac.analysis.SteadyStateResult.touchdown_distance">(weac.analysis.SteadyStateResult attribute)</a>
+      <li><a href="weac.core.slab_touchdown.html#weac.core.slab_touchdown.SlabTouchdown.touchdown_distance">touchdown_distance (weac.core.slab_touchdown.SlabTouchdown attribute)</a>
 </li>
-        <li><a href="weac.core.slab_touchdown.html#weac.core.slab_touchdown.SlabTouchdown.touchdown_distance">(weac.core.slab_touchdown.SlabTouchdown attribute)</a>
-</li>
-      </ul></li>
       <li><a href="weac.core.slab_touchdown.html#weac.core.slab_touchdown.SlabTouchdown.touchdown_mode">touchdown_mode (weac.core.slab_touchdown.SlabTouchdown attribute)</a>
 </li>
       <li><a href="weac.analysis.analyzer.html#weac.analysis.analyzer.track_analyzer_call">track_analyzer_call() (in module weac.analysis.analyzer)</a>
@@ -2270,6 +2543,13 @@
 </li>
       </ul></li>
       <li>
+    weac.analysis.coupled_criterion
+
+      <ul style="list-style-type:none">
+        <li><a href="weac.analysis.coupled_criterion.html#module-weac.analysis.coupled_criterion">module</a>
+</li>
+      </ul></li>
+      <li>
     weac.analysis.criteria_evaluator
 
       <ul style="list-style-type:none">
@@ -2277,10 +2557,24 @@
 </li>
       </ul></li>
       <li>
+    weac.analysis.envelopes
+
+      <ul style="list-style-type:none">
+        <li><a href="weac.analysis.envelopes.html#module-weac.analysis.envelopes">module</a>
+</li>
+      </ul></li>
+      <li>
     weac.analysis.plotter
 
       <ul style="list-style-type:none">
         <li><a href="weac.analysis.plotter.html#module-weac.analysis.plotter">module</a>
+</li>
+      </ul></li>
+      <li>
+    weac.analysis.steady_state
+
+      <ul style="list-style-type:none">
+        <li><a href="weac.analysis.steady_state.html#module-weac.analysis.steady_state">module</a>
 </li>
       </ul></li>
       <li>
@@ -2367,6 +2661,8 @@
         <li><a href="weac.core.eigensystem.html#module-weac.core.eigensystem">module</a>
 </li>
       </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul style="margin-left:0;list-style-type:none">
       <li>
     weac.core.field_quantities
 
@@ -2381,8 +2677,6 @@
         <li><a href="weac.core.generalized_eigensystem.html#module-weac.core.generalized_eigensystem">module</a>
 </li>
       </ul></li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul style="margin-left:0;list-style-type:none">
       <li>
     weac.core.generalized_field_quantities
 
@@ -2585,7 +2879,7 @@
 </footer>
     </div>
     
-    <script src="_static/documentation_options.js?v=5af9b2ba"></script>
+    <script src="_static/documentation_options.js?v=4f6ddb47"></script>
     <script src="_static/doctools.js?v=fd6eb6e6"></script>
     <script src="_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script defer="defer" src="_static/theme.js?v=582b20c5"></script>

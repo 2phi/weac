@@ -1,0 +1,7 @@
+weac.analysis.envelopes module
+==============================
+
+.. automodule:: weac.analysis.envelopes
+   :members:
+   :show-inheritance:
+   :undoc-members:

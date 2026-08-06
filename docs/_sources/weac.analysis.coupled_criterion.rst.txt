@@ -1,0 +1,7 @@
+weac.analysis.coupled\_criterion module
+=======================================
+
+.. automodule:: weac.analysis.coupled_criterion
+   :members:
+   :show-inheritance:
+   :undoc-members:

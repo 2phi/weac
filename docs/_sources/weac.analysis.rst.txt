@@ -8,8 +8,11 @@ Submodules
    :maxdepth: 4
 
    weac.analysis.analyzer
+   weac.analysis.coupled_criterion
    weac.analysis.criteria_evaluator
+   weac.analysis.envelopes
    weac.analysis.plotter
+   weac.analysis.steady_state
 
 Module contents
 ---------------

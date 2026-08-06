@@ -21,9 +21,9 @@
 <meta content="#ffffff" media="(prefers-color-scheme: light)" name="theme-color"/>
 <meta content="#030711" media="(prefers-color-scheme: dark)" name="theme-color"/>
 <meta content="width=device-width, initial-scale=1" name="viewport"/>
-<title>weac package | WEAC 3.1.9</title>
-<meta content="weac package | WEAC 3.1.9" property="og:title"/>
-<meta content="weac package | WEAC 3.1.9" name="twitter:title"/>
+<title>weac package | WEAC 3.2.0</title>
+<meta content="weac package | WEAC 3.2.0" property="og:title"/>
+<meta content="weac package | WEAC 3.2.0" name="twitter:title"/>
 <link href="_static/pygments.css?v=e72c8e07" rel="stylesheet" type="text/css"/>
 <link href="_static/theme.css?v=73505e79" rel="stylesheet" type="text/css"/>
 <link href="https://2phi.github.io/weac/weac.html" rel="canonical"/>
@@ -37,7 +37,7 @@
       Skip to content
     </a><header class="sticky top-0 z-40 w-full border-b shadow-xs border-border bg-background/90 backdrop-blur"><div class="container flex items-center h-14">
 <div class="hidden mr-4 md:flex">
-<a class="flex items-center mr-6" href="index.html"><span class="hidden font-bold sm:inline-block text-clip whitespace-nowrap">WEAC 3.1.9</span>
+<a class="flex items-center mr-6" href="index.html"><span class="hidden font-bold sm:inline-block text-clip whitespace-nowrap">WEAC 3.2.0</span>
 </a></div><button @click="showSidebar = true" class="inline-flex items-center justify-center h-10 px-0 py-2 mr-2 text-base font-medium transition-colors rounded-md hover:text-accent-foreground hover:bg-transparent md:hidden" type="button">
 <svg aria-hidden="true" fill="currentColor" height="24" viewbox="0 96 960 960" width="24" xmlns="http://www.w3.org/2000/svg">
 <path d="M152.587 825.087q-19.152 0-32.326-13.174t-13.174-32.326q0-19.152 13.174-32.326t32.326-13.174h440q19.152 0 32.326 13.174t13.174 32.326q0 19.152-13.174 32.326t-32.326 13.174h-440Zm0-203.587q-19.152 0-32.326-13.174T107.087 576q0-19.152 13.174-32.326t32.326-13.174h320q19.152 0 32.326 13.174T518.087 576q0 19.152-13.174 32.326T472.587 621.5h-320Zm0-203.587q-19.152 0-32.326-13.174t-13.174-32.326q0-19.152 13.174-32.326t32.326-13.174h440q19.152 0 32.326 13.174t13.174 32.326q0 19.152-13.174 32.326t-32.326 13.174h-440ZM708.913 576l112.174 112.174q12.674 12.674 12.674 31.826t-12.674 31.826Q808.413 764.5 789.261 764.5t-31.826-12.674l-144-144Q600 594.391 600 576t13.435-31.826l144-144q12.674-12.674 31.826-12.674t31.826 12.674q12.674 12.674 12.674 31.826t-12.674 31.826L708.913 576Z"></path>
@@ -67,7 +67,7 @@
 </div>
 </header>
 <div class="flex-1"><div class="container md:grid md:grid-cols-[220px_minmax(0,1fr)] md:gap-6 lg:grid-cols-[240px_minmax(0,1fr)] lg:gap-10"><aside :aria-hidden="!showSidebar" :class="{ 'translate-x-0': showSidebar }" class="fixed inset-y-0 left-0 md:top-14 z-50 md:z-30 bg-background md:bg-transparent transition-all duration-100 -translate-x-full md:translate-x-0 ml-0 p-6 md:p-0 md:-ml-2 md:h-[calc(100vh-3.5rem)] w-5/6 md:w-full overflow-y-auto border-r border-border md:sticky" id="left-sidebar">
-<a class="justify-start text-sm md:!hidden bg-background" href="index.html"><span class="font-bold text-clip whitespace-nowrap">WEAC 3.1.9</span>
+<a class="justify-start text-sm md:!hidden bg-background" href="index.html"><span class="font-bold text-clip whitespace-nowrap">WEAC 3.2.0</span>
 </a>
 <div class="relative overflow-hidden md:overflow-auto my-4 md:my-0">
 <div class="overflow-y-auto h-full w-full relative pr-6"><nav class="table w-full min-w-full my-6 lg:my-8">
@@ -108,8 +108,11 @@
 </li>
 <li class="toctree-l1" x-data="{ expanded: $el.classList.contains('current') ? true : false }"><a :class="{ 'expanded' : expanded }" @click="expanded = !expanded" class="reference internal expandable" href="weac.analysis.html">weac.analysis package<button @click.prevent.stop="expanded = !expanded" type="button" x-cloak=""><span class="sr-only"></span><svg fill="currentColor" height="18px" stroke="none" viewbox="0 0 24 24" width="18px" xmlns="http://www.w3.org/2000/svg"><path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"></path></svg></button></a><ul x-cloak="" x-show="expanded">
 <li class="toctree-l2"><a class="reference internal" href="weac.analysis.analyzer.html">weac.analysis.analyzer module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="weac.analysis.coupled_criterion.html">weac.analysis.coupled_criterion module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="weac.analysis.criteria_evaluator.html">weac.analysis.criteria_evaluator module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="weac.analysis.envelopes.html">weac.analysis.envelopes module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="weac.analysis.plotter.html">weac.analysis.plotter module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="weac.analysis.steady_state.html">weac.analysis.steady_state module</a></li>
 </ul>
 </li>
 </ul>
@@ -144,7 +147,7 @@
 <div class="w-full min-w-0 mx-auto">
 <nav aria-label="breadcrumbs" class="flex items-center mb-4 space-x-1 text-sm text-muted-foreground">
 <a class="overflow-hidden text-ellipsis whitespace-nowrap hover:text-foreground" href="index.html">
-<span class="hidden md:inline">WEAC 3.1.9</span>
+<span class="hidden md:inline">WEAC 3.2.0</span>
 <svg aria-label="Home" class="md:hidden" fill="currentColor" height="18" stroke="none" viewbox="0 96 960 960" width="18" xmlns="http://www.w3.org/2000/svg">
 <path d="M240 856h120V616h240v240h120V496L480 316 240 496v360Zm-80 80V456l320-240 320 240v480H520V696h-80v240H160Zm320-350Z"></path>
 </svg>
@@ -162,21 +165,43 @@
 <li class="toctree-l2"><a class="reference internal" href="weac.analysis.html#submodules">Submodules</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="weac.analysis.analyzer.html">weac.analysis.analyzer module</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="weac.analysis.analyzer.html#weac.analysis.analyzer.track_analyzer_call"><code class="docutils literal notranslate"><span class="pre">track_analyzer_call()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="weac.analysis.analyzer.html#weac.analysis.analyzer.local_segment_grid"><code class="docutils literal notranslate"><span class="pre">local_segment_grid()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="weac.analysis.analyzer.html#weac.analysis.analyzer.Analyzer"><code class="docutils literal notranslate"><span class="pre">Analyzer</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="weac.analysis.coupled_criterion.html">weac.analysis.coupled_criterion module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="weac.analysis.coupled_criterion.html#weac.analysis.coupled_criterion.CoupledCriterionHistory"><code class="docutils literal notranslate"><span class="pre">CoupledCriterionHistory</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="weac.analysis.coupled_criterion.html#weac.analysis.coupled_criterion.CoupledCriterionResult"><code class="docutils literal notranslate"><span class="pre">CoupledCriterionResult</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="weac.analysis.coupled_criterion.html#weac.analysis.coupled_criterion.FindMinimumForceResult"><code class="docutils literal notranslate"><span class="pre">FindMinimumForceResult</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="weac.analysis.coupled_criterion.html#weac.analysis.coupled_criterion.MaximalStressResult"><code class="docutils literal notranslate"><span class="pre">MaximalStressResult</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="weac.analysis.coupled_criterion.html#weac.analysis.coupled_criterion.CoupledCriterionEngine"><code class="docutils literal notranslate"><span class="pre">CoupledCriterionEngine</span></code></a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="weac.analysis.criteria_evaluator.html">weac.analysis.criteria_evaluator module</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="weac.analysis.criteria_evaluator.html#weac.analysis.criteria_evaluator.CoupledCriterionHistory"><code class="docutils literal notranslate"><span class="pre">CoupledCriterionHistory</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="weac.analysis.criteria_evaluator.html#weac.analysis.criteria_evaluator.CoupledCriterionResult"><code class="docutils literal notranslate"><span class="pre">CoupledCriterionResult</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="weac.analysis.criteria_evaluator.html#weac.analysis.criteria_evaluator.CriteriaEvaluator"><code class="docutils literal notranslate"><span class="pre">CriteriaEvaluator</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="weac.analysis.criteria_evaluator.html#weac.analysis.criteria_evaluator.FindMinimumForceResult"><code class="docutils literal notranslate"><span class="pre">FindMinimumForceResult</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="weac.analysis.criteria_evaluator.html#weac.analysis.criteria_evaluator.MaximalStressResult"><code class="docutils literal notranslate"><span class="pre">MaximalStressResult</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="weac.analysis.criteria_evaluator.html#weac.analysis.criteria_evaluator.SteadyStateResult"><code class="docutils literal notranslate"><span class="pre">SteadyStateResult</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="weac.analysis.criteria_evaluator.html#weac.analysis.criteria_evaluator.FindMinimumForceResult"><code class="docutils literal notranslate"><span class="pre">FindMinimumForceResult</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="weac.analysis.criteria_evaluator.html#weac.analysis.criteria_evaluator.CriteriaEvaluator"><code class="docutils literal notranslate"><span class="pre">CriteriaEvaluator</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="weac.analysis.envelopes.html">weac.analysis.envelopes module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="weac.analysis.envelopes.html#weac.analysis.envelopes.fracture_toughness_envelope"><code class="docutils literal notranslate"><span class="pre">fracture_toughness_envelope()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="weac.analysis.envelopes.html#weac.analysis.envelopes.stress_envelope"><code class="docutils literal notranslate"><span class="pre">stress_envelope()</span></code></a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="weac.analysis.plotter.html">weac.analysis.plotter module</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="weac.analysis.plotter.html#weac.analysis.plotter.MidpointNormalize"><code class="docutils literal notranslate"><span class="pre">MidpointNormalize</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="weac.analysis.plotter.html#weac.analysis.plotter.Plotter"><code class="docutils literal notranslate"><span class="pre">Plotter</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="weac.analysis.steady_state.html">weac.analysis.steady_state module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="weac.analysis.steady_state.html#weac.analysis.steady_state.SteadyStateErrBlock"><code class="docutils literal notranslate"><span class="pre">SteadyStateErrBlock</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="weac.analysis.steady_state.html#weac.analysis.steady_state.SteadyStateResult"><code class="docutils literal notranslate"><span class="pre">SteadyStateResult</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="weac.analysis.steady_state.html#weac.analysis.steady_state.SteadyStateTensileBlock"><code class="docutils literal notranslate"><span class="pre">SteadyStateTensileBlock</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="weac.analysis.steady_state.html#weac.analysis.steady_state.evaluate_steady_state"><code class="docutils literal notranslate"><span class="pre">evaluate_steady_state()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="weac.analysis.steady_state.html#weac.analysis.steady_state.evaluate_steady_state_from_layers"><code class="docutils literal notranslate"><span class="pre">evaluate_steady_state_from_layers()</span></code></a></li>
 </ul>
 </li>
 </ul>
@@ -254,14 +279,49 @@
 <li class="toctree-l4"><a class="reference internal" href="weac.analysis.html#weac.analysis.FindMinimumForceResult.__init__"><code class="docutils literal notranslate"><span class="pre">FindMinimumForceResult.__init__()</span></code></a></li>
 </ul>
 </li>
+<li class="toctree-l3"><a class="reference internal" href="weac.analysis.html#weac.analysis.MaximalStressResult"><code class="docutils literal notranslate"><span class="pre">MaximalStressResult</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="weac.analysis.html#weac.analysis.MaximalStressResult.principal_stress_kPa"><code class="docutils literal notranslate"><span class="pre">MaximalStressResult.principal_stress_kPa</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="weac.analysis.html#weac.analysis.MaximalStressResult.Sxx_kPa"><code class="docutils literal notranslate"><span class="pre">MaximalStressResult.Sxx_kPa</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="weac.analysis.html#weac.analysis.MaximalStressResult.principal_stress_norm"><code class="docutils literal notranslate"><span class="pre">MaximalStressResult.principal_stress_norm</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="weac.analysis.html#weac.analysis.MaximalStressResult.Sxx_norm"><code class="docutils literal notranslate"><span class="pre">MaximalStressResult.Sxx_norm</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="weac.analysis.html#weac.analysis.MaximalStressResult.max_principal_stress_norm"><code class="docutils literal notranslate"><span class="pre">MaximalStressResult.max_principal_stress_norm</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="weac.analysis.html#weac.analysis.MaximalStressResult.max_Sxx_norm"><code class="docutils literal notranslate"><span class="pre">MaximalStressResult.max_Sxx_norm</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="weac.analysis.html#weac.analysis.MaximalStressResult.slab_tensile_criterion"><code class="docutils literal notranslate"><span class="pre">MaximalStressResult.slab_tensile_criterion</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="weac.analysis.html#weac.analysis.MaximalStressResult.__init__"><code class="docutils literal notranslate"><span class="pre">MaximalStressResult.__init__()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="weac.analysis.html#weac.analysis.SteadyStateErrBlock"><code class="docutils literal notranslate"><span class="pre">SteadyStateErrBlock</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="weac.analysis.html#weac.analysis.SteadyStateErrBlock.energy_release_rate"><code class="docutils literal notranslate"><span class="pre">SteadyStateErrBlock.energy_release_rate</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="weac.analysis.html#weac.analysis.SteadyStateErrBlock.cut_length"><code class="docutils literal notranslate"><span class="pre">SteadyStateErrBlock.cut_length</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="weac.analysis.html#weac.analysis.SteadyStateErrBlock.cut_direction_winner"><code class="docutils literal notranslate"><span class="pre">SteadyStateErrBlock.cut_direction_winner</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="weac.analysis.html#weac.analysis.SteadyStateErrBlock.converged"><code class="docutils literal notranslate"><span class="pre">SteadyStateErrBlock.converged</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="weac.analysis.html#weac.analysis.SteadyStateErrBlock.message"><code class="docutils literal notranslate"><span class="pre">SteadyStateErrBlock.message</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="weac.analysis.html#weac.analysis.SteadyStateErrBlock.diagnostics"><code class="docutils literal notranslate"><span class="pre">SteadyStateErrBlock.diagnostics</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="weac.analysis.html#weac.analysis.SteadyStateErrBlock.maximal_stress_result"><code class="docutils literal notranslate"><span class="pre">SteadyStateErrBlock.maximal_stress_result</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="weac.analysis.html#weac.analysis.SteadyStateErrBlock.system"><code class="docutils literal notranslate"><span class="pre">SteadyStateErrBlock.system</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="weac.analysis.html#weac.analysis.SteadyStateErrBlock.__init__"><code class="docutils literal notranslate"><span class="pre">SteadyStateErrBlock.__init__()</span></code></a></li>
+</ul>
+</li>
 <li class="toctree-l3"><a class="reference internal" href="weac.analysis.html#weac.analysis.SteadyStateResult"><code class="docutils literal notranslate"><span class="pre">SteadyStateResult</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="weac.analysis.html#weac.analysis.SteadyStateResult.tensile"><code class="docutils literal notranslate"><span class="pre">SteadyStateResult.tensile</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="weac.analysis.html#weac.analysis.SteadyStateResult.err"><code class="docutils literal notranslate"><span class="pre">SteadyStateResult.err</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="weac.analysis.html#weac.analysis.SteadyStateResult.phi"><code class="docutils literal notranslate"><span class="pre">SteadyStateResult.phi</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="weac.analysis.html#weac.analysis.SteadyStateResult.converged"><code class="docutils literal notranslate"><span class="pre">SteadyStateResult.converged</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="weac.analysis.html#weac.analysis.SteadyStateResult.message"><code class="docutils literal notranslate"><span class="pre">SteadyStateResult.message</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="weac.analysis.html#weac.analysis.SteadyStateResult.touchdown_distance"><code class="docutils literal notranslate"><span class="pre">SteadyStateResult.touchdown_distance</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="weac.analysis.html#weac.analysis.SteadyStateResult.energy_release_rate"><code class="docutils literal notranslate"><span class="pre">SteadyStateResult.energy_release_rate</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="weac.analysis.html#weac.analysis.SteadyStateResult.maximal_stress_result"><code class="docutils literal notranslate"><span class="pre">SteadyStateResult.maximal_stress_result</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="weac.analysis.html#weac.analysis.SteadyStateResult.system"><code class="docutils literal notranslate"><span class="pre">SteadyStateResult.system</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="weac.analysis.html#weac.analysis.SteadyStateResult.diagnostics"><code class="docutils literal notranslate"><span class="pre">SteadyStateResult.diagnostics</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="weac.analysis.html#weac.analysis.SteadyStateResult.core_scalars"><code class="docutils literal notranslate"><span class="pre">SteadyStateResult.core_scalars()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="weac.analysis.html#weac.analysis.SteadyStateResult.__init__"><code class="docutils literal notranslate"><span class="pre">SteadyStateResult.__init__()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="weac.analysis.html#weac.analysis.SteadyStateTensileBlock"><code class="docutils literal notranslate"><span class="pre">SteadyStateTensileBlock</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="weac.analysis.html#weac.analysis.SteadyStateTensileBlock.critical_cut_length"><code class="docutils literal notranslate"><span class="pre">SteadyStateTensileBlock.critical_cut_length</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="weac.analysis.html#weac.analysis.SteadyStateTensileBlock.cut_direction_winner"><code class="docutils literal notranslate"><span class="pre">SteadyStateTensileBlock.cut_direction_winner</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="weac.analysis.html#weac.analysis.SteadyStateTensileBlock.converged"><code class="docutils literal notranslate"><span class="pre">SteadyStateTensileBlock.converged</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="weac.analysis.html#weac.analysis.SteadyStateTensileBlock.message"><code class="docutils literal notranslate"><span class="pre">SteadyStateTensileBlock.message</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="weac.analysis.html#weac.analysis.SteadyStateTensileBlock.diagnostics"><code class="docutils literal notranslate"><span class="pre">SteadyStateTensileBlock.diagnostics</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="weac.analysis.html#weac.analysis.SteadyStateTensileBlock.maximal_stress_result"><code class="docutils literal notranslate"><span class="pre">SteadyStateTensileBlock.maximal_stress_result</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="weac.analysis.html#weac.analysis.SteadyStateTensileBlock.system"><code class="docutils literal notranslate"><span class="pre">SteadyStateTensileBlock.system</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="weac.analysis.html#weac.analysis.SteadyStateTensileBlock.__init__"><code class="docutils literal notranslate"><span class="pre">SteadyStateTensileBlock.__init__()</span></code></a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="weac.analysis.html#weac.analysis.Plotter"><code class="docutils literal notranslate"><span class="pre">Plotter</span></code></a><ul>
@@ -712,7 +772,7 @@
 </div>
 </footer>
 </div>
-<script src="_static/documentation_options.js?v=5af9b2ba"></script>
+<script src="_static/documentation_options.js?v=4f6ddb47"></script>
 <script src="_static/doctools.js?v=fd6eb6e6"></script>
 <script src="_static/sphinx_highlight.js?v=6ffebe34"></script>
 <script defer="defer" src="_static/theme.js?v=582b20c5"></script>
