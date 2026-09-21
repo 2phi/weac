@@ -81,10 +81,11 @@ def bin_profile_to_layers(
 
     # Run target: explicit bin size when given, else the 1 mm floor (native mode
     # where a native step >= 1 mm already closes each sample individually).
-    target = (
+    target = max(
         float(layer_thickness_mm)
         if layer_thickness_mm is not None
-        else float(min_thickness_mm)
+        else float(min_thickness_mm),
+        float(min_thickness_mm),
     )
 
     # Greedily accumulate cells until a run reaches `target`.

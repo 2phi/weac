@@ -63,7 +63,7 @@ def gradient_profile_to_layers(
     depth_mm: np.ndarray,
     density_kg_m3: np.ndarray,
     *,
-    threshold_kg_m3_per_mm: float = 8.0,
+    threshold_kg_m3_per_mm: float = 12.0,
     span_mm: float = 2.5,
     min_thickness_mm: float = 1.0,
     depth_scale: float = 1.0,
@@ -76,7 +76,7 @@ def gradient_profile_to_layers(
             ``depth_mm``.
         threshold_kg_m3_per_mm: Cut threshold ``T``. Samples whose fixed-span
             ``|drho/dz|`` exceeds ``T`` start their own layer; ``<= T`` samples
-            merge. Default ``8`` (== 20 kg/m^3 across the 2.5 mm span).
+            merge. Default ``12`` (== 30 kg/m^3 across the 2.5 mm span).
         span_mm: Fixed baseline for the gradient [mm]; default ``2.5``.
         min_thickness_mm: Minimum layer thickness [mm]. Sub-floor segments are
             merged forward; a trailing remainder below the floor is folded into

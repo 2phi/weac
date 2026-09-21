@@ -5,8 +5,10 @@ Tests the parsing of CAAML files, density measurement extraction,
 fallback to hardness+grain type calculations, and stability test parsing.
 """
 
+import importlib
 import math
 import os
+import sys
 
 import pytest
 
@@ -181,3 +183,12 @@ class TestSnowPilotParser:
             assert density > 0, "Weighted density should be positive"
             # Should be close to 20 since most measurements are 20 kg/m³
             assert density == pytest.approx(20, abs=5)
+
+
+def test_deprecated_utils_snowpilot_import():
+    """Legacy ``weac.utils.snowpilot_parser`` path re-exports with a warning."""
+    name = "weac.utils.snowpilot_parser"
+    sys.modules.pop(name, None)
+    with pytest.warns(DeprecationWarning, match="weac.parser"):
+        legacy = importlib.import_module(name)
+    assert legacy.SnowPilotParser is SnowPilotParser

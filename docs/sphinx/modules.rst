@@ -57,9 +57,11 @@ The WEAC package is organized into the following main modules:
    - Plotting and visualization
    - Result processing
 
+**Field-profile parsers (`weac.parser`)**
+   - SMP, SnowScope, and SnowPilot (CAAML) profile parsers
+
 **Utilities (`weac.utils`)**
    - Helper functions
-   - Data parsers
    - Snow type utilities
    - Miscellaneous tools
 

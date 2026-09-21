@@ -167,16 +167,21 @@ class SMPParser:
             layer_thickness_mm: Bin mode only; ``None`` groups at native Loewe
                 spacing with a 1 mm floor, a value groups samples into ~that
                 thickness. Ignored in gradient mode.
-            signal: Gradient mode only; the profile the gradient acts on. Only
-                ``"density"`` is implemented (penetration_resistance/both are backlog).
             gradient_threshold: Gradient mode only; cut threshold ``T`` in
-                kg/m^3/mm over the 2.5 mm span. Default ``8``.
+                kg/m^3/mm over the 2.5 mm span. Default ``12``.
 
         Returns:
             ``(layers, density_methods)`` with layers ordered surface -> ground
             and ``density_methods = [parameterization] * len(layers)``.
         """
         profile = self.extract_profile(density_method=density_method)
+        dens = profile.density_kg_m3
+        if not (np.all(np.isfinite(dens)) and np.all(dens > 0)):
+            raise ValueError(
+                f"SMP profile {Path(self.file_path).name}: "
+                f"{profile.density_method} density not strictly positive "
+                f"({float(np.nanmin(dens)):.4g}–{float(np.nanmax(dens)):.4g} kg/m³)"
+            )
         phi_deg = float(slope_angle_deg)
         depth_scale = plumb_to_slope_normal(phi_deg) if phi_deg != 0.0 else 1.0
         if method == "bin":
@@ -186,12 +191,14 @@ class SMPParser:
                 layer_thickness_mm=layer_thickness_mm,
                 depth_scale=depth_scale,
             )
-        else:  # gradient
+        elif method == "gradient":
             layers = gradient_profile_to_layers(
                 profile.depth_mm,
                 profile.density_kg_m3,
                 threshold_kg_m3_per_mm=gradient_threshold,
                 depth_scale=depth_scale,
             )
+        else:
+            raise ValueError(f'method must be "bin" or "gradient", got {method!r}')
         density_methods = [profile.density_method] * len(layers)
         return layers, density_methods

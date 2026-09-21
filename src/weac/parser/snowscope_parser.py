@@ -169,9 +169,17 @@ class SnowScopeParser:
         self.density_method = density_method
         self._semilog_slope = semilog_slope
         self._semilog_intercept = semilog_intercept
-        self.depth_mm, self.penetration_resistance_kPa = _read_snowscope_csv(
-            file_path
+        self.depth_mm, self.penetration_resistance_kPa = _read_snowscope_csv(file_path)
+        # Semilog density needs F > 0; bad source rows must not become NaN in layers.
+        invalid = np.isfinite(self.penetration_resistance_kPa) & (
+            self.penetration_resistance_kPa <= 0
         )
+        if np.any(invalid):
+            n = int(np.count_nonzero(invalid))
+            raise ValueError(
+                f"SnowScope file {Path(file_path).name} has {n} sample(s) with "
+                "non-positive hardness (kPa); hardness must be > 0"
+            )
         if semilog_slope is not None:
             logger.info(
                 "Loaded SnowScope profile %s; custom semilog a=%.4g b=%.4g",
@@ -265,10 +273,8 @@ class SnowScopeParser:
             layer_thickness_mm: Bin mode only; ``None`` groups at native sample
                 spacing with a 1 mm floor, a value groups samples into ~that
                 thickness. Ignored in gradient mode.
-            signal: Gradient mode only; the profile the gradient acts on. Only
-                ``"density"`` is implemented (force/both are backlog).
             gradient_threshold: Gradient mode only; cut threshold ``T`` in
-                kg/m^3/mm over the 2.5 mm span. Default ``8``.
+                kg/m^3/mm over the 2.5 mm span. Default ``12``.
 
         Returns:
             ``(layers, density_methods)`` with layers ordered surface -> ground
@@ -288,12 +294,14 @@ class SnowScopeParser:
                 layer_thickness_mm=layer_thickness_mm,
                 depth_scale=depth_scale,
             )
-        else:  # gradient
+        elif method == "gradient":
             layers = gradient_profile_to_layers(
                 profile.depth_mm,
                 profile.density_kg_m3,
                 threshold_kg_m3_per_mm=gradient_threshold,
                 depth_scale=depth_scale,
             )
+        else:
+            raise ValueError(f'method must be "bin" or "gradient", got {method!r}')
         density_methods = [profile.density_method] * len(layers)
         return layers, density_methods

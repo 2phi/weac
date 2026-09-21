@@ -131,13 +131,14 @@ def plot_force_penetration_layers(
 
     # Depth increases downward: surface at the top. Plumb depth is the deepest.
     if depth.size:
-        ax_resistance.set_ylim(float(np.nanmax(depth)), surface_mm)
+        max_depth = float(np.nanmax(depth))
+        if depth_step.size:
+            max_depth = max(max_depth, float(np.nanmax(depth_step)))
+        ax_resistance.set_ylim(max_depth, surface_mm)
     for ax in (ax_resistance, ax_density, ax_density_sn, ax_layers):
         ax.grid(True, alpha=0.25, lw=0.4)
 
-    fig.suptitle(
-        title or f"Penetration resistance profile ({profile.density_method})"
-    )
+    fig.suptitle(title or f"Penetration resistance profile ({profile.density_method})")
     fig.tight_layout()
 
     if save_path is not None:

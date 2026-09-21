@@ -17,7 +17,7 @@ def plot_smp_penetration_parser(
     slope_angle_deg: float = 0.0,
     density_method: DensityMethod | None = None,
     layer_thickness_mm: float | None = None,
-    gradient_threshold: float = 8.0,
+    gradient_threshold: float = 12.0,
     **plot_kwargs,
 ) -> Figure:
     """Extract from an SMP parser and plot the penetration-resistance debug view."""

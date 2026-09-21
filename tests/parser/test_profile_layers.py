@@ -50,6 +50,16 @@ class TestExplicitBinning:
         assert len(layers) == 2
         np.testing.assert_allclose(_thicknesses(layers), [10.0, 10.0])
 
+    def test_explicit_target_below_floor_clamped(self):
+        # 0.5 mm target with default 1 mm floor must not emit sub-floor layers.
+        distance = np.arange(0.0, 3.0, 0.5)
+        density = np.full(distance.shape, 200.0)
+        layers = bin_profile_to_layers(distance, density, layer_thickness_mm=0.5)
+
+        assert len(layers) == 3
+        assert all(layer.h >= 1.0 - 1e-9 for layer in layers)
+        np.testing.assert_allclose(_thicknesses(layers), [1.0, 1.0, 1.0])
+
     def test_remainder_at_least_1mm_kept(self):
         # 45 * 0.5 = 22.5 mm -> 10, 10, remainder 2.5 mm (>= 1 mm) kept.
         distance = np.arange(0.0, 22.5, 0.5)
@@ -120,7 +130,7 @@ class TestThicknessConservation:
 
 class TestGradientSegmentation:
     def test_sharp_jump_cuts_at_default_threshold(self):
-        # 40 kg/m^3 step over a <=2.5 mm span -> |drho/dz| ~ 16 > T=8: a cut
+        # 40 kg/m^3 step over a <=2.5 mm span -> |drho/dz| ~ 16 > T=12: a cut
         # must separate the 200 slab from the 240 slab.
         distance = np.arange(0.0, 20.0, 1.0)
         density = np.where(distance < 10.0, 200.0, 240.0)
@@ -142,10 +152,10 @@ class TestGradientSegmentation:
         assert layers[0].rho == pytest.approx(float(np.mean(density)), abs=1.0)
 
     def test_steep_ramp_becomes_many_thin_layers(self):
-        # Sustained 10 kg/m^3/mm slope > T -> every sample is a cut, floored to
-        # a staircase of >= 1 mm layers.
+        # Sustained 15 kg/m^3/mm slope > default T=12 -> every sample is a cut,
+        # floored to a staircase of >= 1 mm layers.
         distance = np.arange(0.0, 30.0, 1.0)
-        density = 200.0 + 10.0 * distance
+        density = 200.0 + 15.0 * distance
         layers = gradient_profile_to_layers(distance, density)
 
         assert len(layers) == distance.size  # each 1 mm cell its own layer

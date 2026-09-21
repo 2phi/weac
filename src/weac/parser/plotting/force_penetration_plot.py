@@ -64,7 +64,7 @@ def plot_force_penetration_parser(
     semilog_slope: float | None = None,
     semilog_intercept: float | None = None,
     layer_thickness_mm: float | None = None,
-    gradient_threshold: float = 8.0,
+    gradient_threshold: float = 12.0,
     **plot_kwargs,
 ) -> Figure:
     """Extract from an SMP or SnowScope parser and plot the debug view.
