@@ -28,34 +28,14 @@ from snowpylot.snow_pit import SnowPit
 from snowpylot.snow_profile import DensityObs
 
 # Import WEAC components
-from weac.components import (
-    Layer,
-)
+from weac.components import Layer
+from weac.parser.utils import plumb_to_slope_normal
 from weac.utils.geldsetzer import compute_density
 
 logger = logging.getLogger(__name__)
 
 convert_to_mm = {"cm": 10, "mm": 1, "m": 1000, "dm": 100}
 convert_to_deg = {"deg": 1, "rad": 180 / np.pi}
-
-
-def vertical_to_slope_normal_depth_scale(phi_deg: float) -> float:
-    """Scale vertical (plumb) depth/thickness to distance along slope normal.
-
-    CAAML / SnowPilot report depths from the surface along the vertical. WEAC slab
-    layer thicknesses are measured normal to the slope. Following the convention
-    used for SnowPilot import here, the plumb-line depth ``d_v`` is converted to
-    slope-normal depth ``d_n`` by ``d_n = d_v * cos(phi)``, where ``phi`` is the
-    slope angle from horizontal.
-    """
-    phi = np.deg2rad(float(phi_deg))
-    c = float(np.cos(phi))
-    if c <= 1e-6:
-        raise ValueError(
-            f"Slope angle too close to ±90° ({phi_deg}°); cannot convert vertical "
-            "depths to slope-normal."
-        )
-    return c
 
 
 class SnowPilotParser:
@@ -86,9 +66,7 @@ class SnowPilotParser:
         """
         snowpit = self.snowpit
         phi_deg = float(slope_angle_deg)
-        depth_scale = (
-            vertical_to_slope_normal_depth_scale(phi_deg) if phi_deg != 0.0 else 1.0
-        )
+        depth_scale = plumb_to_slope_normal(phi_deg) if phi_deg != 0.0 else 1.0
         # Extract layers from snowpit: list[SnowpylotLayer]
         sp_layers: list[SnowpylotLayer] = [
             layer

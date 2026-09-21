@@ -130,7 +130,8 @@ Needs (runtime dependencies are declared in [pyproject.toml](https://github.com/
 - [Scipy](https://www.scipy.org/) ≥ 1.14.0
 - [Matplotlib](https://matplotlib.org/) ≥ 3.9.1
 - [Pydantic](https://docs.pydantic.dev/latest/) ≥ 2.11.7
-- [Snowpylot](https://github.com/connellymk/snowpylot) ≥ 1.1.3
+- [Snowpylot](https://github.com/connellymk/snowpylot) ≥ 1.1.5
+- [snowmicropyn](https://github.com/slf-dot-ch/snowmicropyn) ≥ 1.4.0
 
 <!-- DEVELOPMENT SETUP -->
 ## Development Setup
@@ -363,6 +364,44 @@ u_top = skier_system.fq.u(Z=z_skier, h0=top, unit='um')
 u_mid = skier_system.fq.u(Z=z_skier, h0=mid, unit='um')
 u_bot = skier_system.fq.u(Z=z_skier, h0=bot, unit='um')
 psi = skier_system.fq.psi(Z=z_skier, unit='deg')
+```
+
+### Parsing field profiles into layers
+
+Instead of hand-building `Layer` lists, WEAC ships parsers in `weac.parser` that convert common field-profile formats into slope-normal WEAC layers (ordered surface → ground). All parsers expose `extract_layers(...)` returning `(layers, density_methods)`, so the output plugs directly into `ModelInput`. See [`demo/parser_demo.ipynb`](https://github.com/2phi/weac/blob/main/demo/parser_demo.ipynb) for side-by-side plots of the three parsers on a co-located Weissfluhjoch pit.
+
+```python
+from weac.parser import SMPParser, SnowScopeParser, SnowPilotParser
+```
+
+**SnowMicroPen** (`.PNT`) — `SMPParser` derives density and SSA from the force signal via [snowmicropyn](https://github.com/slf-dot-ch/snowmicropyn)'s Löwe 2012 shot-noise model plus a parameterization (`P2015`, `CR2020`, `K2020a`, `K2020b`). Surface and ground are auto-detected at construction.
+
+```python
+smp = SMPParser("profile.PNT", density_method="CR2020")
+# "bin" groups at a fixed thickness; "gradient" cuts on density-gradient jumps
+layers, density_methods = smp.extract_layers(method="bin", layer_thickness_mm=20.0)
+```
+
+**SnowScope** (`.csv`) — `SnowScopeParser` reads penetration hardness (kPa) and derives density from a semilog model `D = a·ln(F) + b` (default `HAGENMULLER2018`). It exposes the same `extract_layers` interface as the SMP parser.
+
+```python
+scope = SnowScopeParser("profile.csv", density_method="HAGENMULLER2018")
+layers, density_methods = scope.extract_layers(method="gradient", gradient_threshold=12.0)
+
+scope_custom = SnowScopeParser(
+    "profile.csv",
+    semilog_slope=50.0,
+    semilog_intercept=100.0,
+)
+```
+
+**SnowPilot / CAAML** (`.xml`) — `SnowPilotParser` uses [snowpylot](https://github.com/connellymk/snowpylot) to read CAAML snowpits, emitting hand-hardness / density-observation layers. Densities come from measured observations where available, falling back to the Geldsetzer estimate from grain type and hand hardness.
+
+```python
+pilot = SnowPilotParser("profile.xml")
+# pass a known slope angle to scale plumb depths to slope-normal, e.g.:
+# pilot.extract_layers(slope_angle_deg=pilot.pit_slope_angle_deg() or 0.0)
+layers, density_methods = pilot.extract_layers()
 ```
 
 <!-- ROADMAP -->

@@ -11,10 +11,8 @@ import os
 import pytest
 
 from weac.components import Layer
-from weac.utils.snowpilot_parser import (
-    SnowPilotParser,
-    vertical_to_slope_normal_depth_scale,
-)
+from weac.parser.snowpilot_parser import SnowPilotParser
+from weac.parser.utils import plumb_to_slope_normal
 
 
 @pytest.fixture
@@ -126,10 +124,10 @@ class TestSnowPilotParser:
     def test_slope_normal_le_plumb_depth(self):
         """Slope-normal depth is less than or equal to plumb-line depth."""
         d_v = 100.0  # arbitrary plumb thickness [mm]
-        assert vertical_to_slope_normal_depth_scale(0.0) == 1.0
-        assert d_v * vertical_to_slope_normal_depth_scale(0.0) == d_v
+        assert plumb_to_slope_normal(0.0) == 1.0
+        assert d_v * plumb_to_slope_normal(0.0) == d_v
         for phi in (5.0, 15.0, 33.0, 45.0, 60.0, 75.0):
-            scale = vertical_to_slope_normal_depth_scale(phi)
+            scale = plumb_to_slope_normal(phi)
             d_n = d_v * scale
             assert scale <= 1.0, "scale should be <= 1 for tilted slopes"
             assert d_n <= d_v, "slope-normal thickness should be <= plumb thickness"
