@@ -15,8 +15,11 @@ WEAC (Weak Layer Anticrack Nucleation Model) is a comprehensive Python package f
 **Analysis & Visualization**
    - :doc:`weac.analysis` - Analysis tools, criteria evaluation, and plotting
 
+**Field-profile parsers**
+   - :doc:`weac.parser` - SMP, SnowScope, and SnowPilot (CAAML) parsers
+
 **Utilities & Configuration**
-   - :doc:`weac.utils` - Helper functions, parsers, and utilities
+   - :doc:`weac.utils` - Helper functions and utilities
    - :doc:`weac.logging_config` - Logging configuration
 
 Subpackages
@@ -28,6 +31,7 @@ Subpackages
    weac.analysis
    weac.components
    weac.core
+   weac.parser
    weac.utils
 
 Submodules
@@ -55,6 +59,7 @@ To get started with WEAC, begin with the main package overview and then explore 
 1. **New Users**: Start with :doc:`weac.components` to understand data structures
 2. **System Modeling**: Use :doc:`weac.core` for computational tasks
 3. **Analysis**: Apply :doc:`weac.analysis` for results processing and visualization
-4. **Utilities**: Access :doc:`weac.utils` for helper functions and data parsing
+4. **Field profiles**: Use :doc:`weac.parser` for SMP, SnowScope, and CAAML inputs
+5. **Utilities**: Access :doc:`weac.utils` for helper functions
 
 For complete examples and tutorials, see the main documentation index.
