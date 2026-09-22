@@ -1,0 +1,7 @@
+weac.parser.utils.layer\_binning module
+=======================================
+
+.. automodule:: weac.parser.utils.layer_binning
+   :members:
+   :show-inheritance:
+   :undoc-members:

@@ -1,0 +1,7 @@
+weac.parser.plotting.snowscope\_penetration\_plot module
+========================================================
+
+.. automodule:: weac.parser.plotting.snowscope_penetration_plot
+   :members:
+   :show-inheritance:
+   :undoc-members:

@@ -1,0 +1,29 @@
+weac.parser package
+===================
+
+Subpackages
+-----------
+
+.. toctree::
+   :maxdepth: 4
+
+   weac.parser.plotting
+   weac.parser.utils
+
+Submodules
+----------
+
+.. toctree::
+   :maxdepth: 4
+
+   weac.parser.smp_parser
+   weac.parser.snowpilot_parser
+   weac.parser.snowscope_parser
+
+Module contents
+---------------
+
+.. automodule:: weac.parser
+   :members:
+   :show-inheritance:
+   :undoc-members:

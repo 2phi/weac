@@ -1,0 +1,20 @@
+weac.parser.utils package
+=========================
+
+Submodules
+----------
+
+.. toctree::
+   :maxdepth: 4
+
+   weac.parser.utils.layer_binning
+   weac.parser.utils.layer_gradient
+   weac.parser.utils.plump_to_slope_normal
+
+Module contents
+---------------
+
+.. automodule:: weac.parser.utils
+   :members:
+   :show-inheritance:
+   :undoc-members:

@@ -1,0 +1,7 @@
+weac.parser.utils.layer\_gradient module
+========================================
+
+.. automodule:: weac.parser.utils.layer_gradient
+   :members:
+   :show-inheritance:
+   :undoc-members:

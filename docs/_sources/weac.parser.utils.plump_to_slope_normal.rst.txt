@@ -1,0 +1,7 @@
+weac.parser.utils.plump\_to\_slope\_normal module
+=================================================
+
+.. automodule:: weac.parser.utils.plump_to_slope_normal
+   :members:
+   :show-inheritance:
+   :undoc-members:
