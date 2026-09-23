@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "weac"
-version = "3.3.0"
+version = "3.3.1"
 authors = [{ name = "2phi GbR", email = "mail@2phi.de" }]
 description = "Weak layer anticrack nucleation model"
 readme = "README.md"
@@ -68,7 +68,7 @@ dev = [
 
     # Linters/formatters aligned with configured tools
     "ruff>=0.4.0",
-    "pylint>=3.3.0",
+    "pylint>=3.3.1",
     "pycodestyle>=2.11.1",
     "black>=24.4.0",
     "isort>=5.13.0",
@@ -133,7 +133,7 @@ ignore = [
 ]
 
 [tool.bumpversion]
-current_version = "3.3.0"
+current_version = "3.3.1"
 
 [[tool.bumpversion.files]]
 filename = "pyproject.toml"
