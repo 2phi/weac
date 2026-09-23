@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from pathlib import Path
-from typing import Protocol
+from typing import Literal, Protocol
 
 import matplotlib.pyplot as plt
 import numpy as np
@@ -50,6 +50,7 @@ def plot_force_penetration_layers(
     layers: list[Layer],
     *,
     slope_angle_deg: float = 0.0,
+    depth_axis: Literal["plumb", "slope-normal"] = "plumb",
     title: str | None = None,
     layer_label: str = "layers",
     save_path: str | Path | None = None,
@@ -65,14 +66,18 @@ def plot_force_penetration_layers(
             ``density_method``).
         layers: WEAC layers ordered surface -> ground (from ``extract_layers``).
             ``Layer.h`` is slope-normal, so the reconstructed staircase is drawn
-            on the slope-normal axis (panels 3-4). Pass the same
-            ``slope_angle_deg`` used to extract the layers so the slope-normal
-            density panel and the staircase share one axis. The staircase bottom
-            overshoots the last sample by one cell because the binning helpers
-            repeat the final sample spacing (an intentional part of their cell
-            model, see ``layer_binning``).
-        slope_angle_deg: Slope angle [deg] used when the layers were extracted;
-            sets the ``cos(phi)`` compression of the slope-normal depth axis.
+            on the slope-normal axis (panels 3-4). For a plumb profile, pass the
+            same ``slope_angle_deg`` used to extract the layers so the
+            slope-normal density panel and the staircase share one axis. The
+            staircase bottom overshoots the last sample by one cell because the
+            binning helpers repeat the final sample spacing (an intentional part
+            of their cell model, see ``layer_binning``).
+        slope_angle_deg: Slope angle [deg] for a plumb profile; sets the
+            ``cos(phi)`` compression of the slope-normal depth axis. Ignored
+            when ``depth_axis`` is ``"slope-normal"`` (must stay ``0``).
+        depth_axis: ``"plumb"`` (SnowScope) compresses panels 3-4 by
+            ``cos(phi)``. ``"slope-normal"`` (SMP) uses the recorded depth as
+            the slope-normal axis with no further scaling.
         title: Figure suptitle; defaults to the density method name.
         layer_label: Legend/title label for the segmented panel.
         save_path: If given, save the figure (PNG) to this path.
@@ -88,7 +93,23 @@ def plot_force_penetration_layers(
     surface_mm = float(depth[0]) if depth.size else 0.0
 
     phi = float(slope_angle_deg)
-    scale = plumb_to_slope_normal(phi) if phi != 0.0 else 1.0
+    if depth_axis == "slope-normal":
+        if phi != 0.0:
+            raise ValueError(
+                "slope_angle_deg applies only to plumb profiles; "
+                "this depth axis is already slope-normal."
+            )
+        scale = 1.0
+        recorded_label = "slope-normal"
+        sn_title = "Sample density\n(slope-normal)"
+    elif depth_axis == "plumb":
+        scale = plumb_to_slope_normal(phi) if phi != 0.0 else 1.0
+        recorded_label = "plumb"
+        sn_title = f"Sample density\n(slope-normal, φ={phi:g}°)"
+    else:
+        raise ValueError(
+            f'depth_axis must be "plumb" or "slope-normal", got {depth_axis!r}'
+        )
     # Anchor at the surface; compress only the below-surface span (matches how
     # the layer staircase accumulates slope-normal thicknesses from surface_mm).
     depth_sn = surface_mm + (depth - surface_mm) * scale
@@ -101,15 +122,15 @@ def plot_force_penetration_layers(
     ax_resistance.plot(resistance, depth, color="#004E8A", lw=0.9)
     ax_resistance.set_xlabel("Penetration resistance [kPa]")
     ax_resistance.set_ylabel("Depth [mm]")
-    ax_resistance.set_title("Penetration resistance\n(plumb)")
+    ax_resistance.set_title(f"Penetration resistance\n({recorded_label})")
 
     ax_density.plot(density, depth, color="#00689D", lw=0.9)
     ax_density.set_xlabel("Density [kg m$^{-3}$]")
-    ax_density.set_title("Sample density\n(plumb)")
+    ax_density.set_title(f"Sample density\n({recorded_label})")
 
     ax_density_sn.plot(density, depth_sn, color="#009D81", lw=0.9)
     ax_density_sn.set_xlabel("Density [kg m$^{-3}$]")
-    ax_density_sn.set_title(f"Sample density\n(slope-normal, φ={phi:g}°)")
+    ax_density_sn.set_title(sn_title)
 
     # Segmented layers (slope-normal) with the slope-normal density overlaid.
     ax_layers.plot(
@@ -129,7 +150,8 @@ def plot_force_penetration_layers(
     ax_layers.set_title(f"Segmented {layer_label}\n(slope-normal, n={len(layers)})")
     ax_layers.legend(loc="lower right", fontsize=8, frameon=False)
 
-    # Depth increases downward: surface at the top. Plumb depth is the deepest.
+    # Depth increases downward: surface at the top. Recorded depth is the deepest
+    # unless a plumb profile was compressed onto the slope normal.
     if depth.size:
         max_depth = float(np.nanmax(depth))
         if depth_step.size:

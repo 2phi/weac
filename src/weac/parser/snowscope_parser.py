@@ -253,9 +253,9 @@ class SnowScopeParser:
         """Segment the SnowScope density profile into WEAC slab layers (top-down).
 
         The SnowScope probe descends along the global vertical, so ``depth_mm``
-        is a plumb depth while WEAC ``Layer.h`` is slope-normal. As in the SMP
-        parser, thicknesses are converted plumb -> slope-normal by ``cos(phi)``
-        via :func:`plumb_to_slope_normal`. The SnowScope file
+        is a plumb depth while WEAC ``Layer.h`` is slope-normal. As in the
+        SnowPilot parser, thicknesses are converted plumb -> slope-normal by
+        ``cos(phi)`` via :func:`plumb_to_slope_normal`. The SnowScope file
         records no slope, so ``slope_angle_deg`` defaults to ``0`` (no scaling);
         scale only when the angle is known (pass it explicitly).
 

@@ -3052,7 +3052,7 @@ wheels = [
 
 [[package]]
 name = "weac"
-version = "3.3.0"
+version = "3.3.1"
 source = { editable = "." }
 dependencies = [
     { name = "matplotlib" },
@@ -3135,7 +3135,7 @@ requires-dist = [
     { name = "numpy", specifier = ">=2.3.5,<2.4.0" },
     { name = "pycodestyle", marker = "extra == 'dev'", specifier = ">=2.11.1" },
     { name = "pydantic", specifier = ">=2.11.7" },
-    { name = "pylint", marker = "extra == 'dev'", specifier = ">=3.3.0" },
+    { name = "pylint", marker = "extra == 'dev'", specifier = ">=3.3.1" },
     { name = "pytest", marker = "extra == 'dev'", specifier = ">=8" },
     { name = "pyzmq", marker = "extra == 'dev'", specifier = ">=27.0.1" },
     { name = "pyzmq", marker = "extra == 'interactive'", specifier = ">=27.0.1" },

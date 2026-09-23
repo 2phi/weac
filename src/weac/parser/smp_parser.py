@@ -24,14 +24,17 @@ from snowmicropyn import loewe2012
 from weac.components import Layer
 from weac.parser.utils import (
     bin_profile_to_layers,
+    detect_knappe_surface,
     gradient_profile_to_layers,
-    plumb_to_slope_normal,
 )
 
 logger = logging.getLogger(__name__)
 
 # Shipped shortnames; runtime lookup uses snowmicropyn's Parameterizations registry.
 DensityMethod = Literal["P2015", "CR2020", "K2020a", "K2020b"]
+# ``snowmicropyn`` is Profile.detect_surface(). ``knappe`` is Knappe surface detection.
+# ``manual`` uses the ``surface_mm`` argument.
+SurfaceMethod = Literal["snowmicropyn", "knappe", "manual"]
 SMP_PARAMETERIZATIONS = smp.derivatives.parameterizations
 
 # Standard SnowMicroPen tip diameter used to convert force (N) to kPa.
@@ -65,6 +68,7 @@ class SMPParser:
 
     file_path: str
     density_method: DensityMethod
+    surface_method: SurfaceMethod
     loaded_profile: smp.Profile
 
     def __init__(
@@ -73,14 +77,37 @@ class SMPParser:
         *,
         density_method: DensityMethod = "P2015",
         surface_mm: float | None = None,
+        surface_method: SurfaceMethod = "snowmicropyn",
         apply_drift_correction: bool = False,
     ):
+        """Load a ``.PNT`` file and mark surface and ground.
+
+        Args:
+            file_path: Path to the SMP ``.PNT`` file.
+            density_method: Default parameterization for :meth:`extract_profile`.
+            surface_mm: Manual surface marker, mm along the probe. When set,
+                the surface is placed here and ``surface_method`` is recorded
+                as ``"manual"``. Required when ``surface_method`` is ``"manual"``.
+            surface_method: ``"snowmicropyn"`` calls
+                :meth:`snowmicropyn.Profile.detect_surface`. ``"knappe"`` uses
+                :func:`~weac.parser.utils.detect_knappe_surface`. ``"manual"``
+                places the surface at ``surface_mm``.
+            apply_drift_correction: Subtract snowmicropyn's force offset after
+                the surface marker is set.
+        """
         self.file_path = file_path
         self.density_method = density_method
+        self.surface_method: SurfaceMethod = (
+            "manual" if surface_mm is not None else surface_method
+        )
 
         loaded_profile = smp.Profile.load(file_path)
 
-        if surface_mm is not None:
+        if self.surface_method == "manual":
+            if surface_mm is None:
+                raise ValueError(
+                    'surface_mm is required when surface_method is "manual".'
+                )
             profile_length = loaded_profile.recording_length
             if not 0.0 <= surface_mm <= profile_length:
                 raise ValueError(
@@ -88,8 +115,17 @@ class SMPParser:
                     f"[0, {profile_length}]."
                 )
             loaded_profile.set_marker("surface", float(surface_mm))
-        else:
+        elif self.surface_method == "knappe":
+            loaded_profile.set_marker(
+                "surface", detect_knappe_surface(loaded_profile.samples)
+            )
+        elif self.surface_method == "snowmicropyn":
             loaded_profile.detect_surface()
+        else:
+            raise ValueError(
+                'surface_method must be "snowmicropyn", "knappe", or "manual", '
+                f"got {surface_method!r}"
+            )
 
         if apply_drift_correction:
             # ``subtract_force_offset`` mutates the force signal in place and
@@ -101,9 +137,11 @@ class SMPParser:
 
         self.loaded_profile = loaded_profile
         logger.info(
-            "Loaded SMP profile %s; density method %s",
+            "Loaded SMP profile %s; density method %s; surface %.3f mm (%s)",
             Path(file_path).name,
             self.density_method,
+            loaded_profile.surface,
+            self.surface_method,
         )
 
     def extract_profile(
@@ -140,7 +178,6 @@ class SMPParser:
 
     def extract_layers(
         self,
-        slope_angle_deg: float = 0.0,
         *,
         method: Literal["bin", "gradient"] = "bin",
         density_method: DensityMethod | None = None,
@@ -149,16 +186,12 @@ class SMPParser:
     ) -> tuple[list[Layer], list[str]]:
         """Segment the SMP density profile into WEAC slab layers (top-down).
 
-        The SMP probe descends along the global vertical, so ``depth_mm`` is a
-        plumb depth while WEAC ``Layer.h`` is slope-normal. As in the SnowPilot
-        parser, thicknesses are converted plumb -> slope-normal by ``cos(phi)``
-        via :func:`plumb_to_slope_normal`. Unlike SnowPilot, the
-        SMP file records no slope, so ``slope_angle_deg`` defaults to ``0`` (no
-        scaling); scale only when the angle is known (pass it explicitly).
+        The SnowMicroPen is driven normal to the slope, so ``depth_mm`` is
+        already a slope-normal depth and is used directly as WEAC ``Layer.h``.
+        Plumb profiles (SnowScope, SnowPilot) still scale by ``cos(phi)``; SMP
+        does not.
 
         Args:
-            slope_angle_deg: Slope angle [deg from horizontal]. ``0`` leaves
-                ``h`` as recorded; non-zero scales ``h`` by ``cos(phi)``.
             method: Layering mode. ``"bin"`` groups at a fixed thickness (or the
                 native spacing); ``"gradient"`` cuts where the density gradient
                 over a fixed 2.5 mm span exceeds ``gradient_threshold``.
@@ -182,21 +215,17 @@ class SMPParser:
                 f"{profile.density_method} density not strictly positive "
                 f"({float(np.nanmin(dens)):.4g}–{float(np.nanmax(dens)):.4g} kg/m³)"
             )
-        phi_deg = float(slope_angle_deg)
-        depth_scale = plumb_to_slope_normal(phi_deg) if phi_deg != 0.0 else 1.0
         if method == "bin":
             layers = bin_profile_to_layers(
                 profile.depth_mm,
                 profile.density_kg_m3,
                 layer_thickness_mm=layer_thickness_mm,
-                depth_scale=depth_scale,
             )
         elif method == "gradient":
             layers = gradient_profile_to_layers(
                 profile.depth_mm,
                 profile.density_kg_m3,
                 threshold_kg_m3_per_mm=gradient_threshold,
-                depth_scale=depth_scale,
             )
         else:
             raise ValueError(f'method must be "bin" or "gradient", got {method!r}')
