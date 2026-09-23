@@ -21,16 +21,16 @@
 <meta content="#ffffff" media="(prefers-color-scheme: light)" name="theme-color"/>
 <meta content="#030711" media="(prefers-color-scheme: dark)" name="theme-color"/>
 <meta content="width=device-width, initial-scale=1" name="viewport"/>
-<title>weac.logging_config module | WEAC 3.3.1</title>
-<meta content="weac.logging_config module | WEAC 3.3.1" property="og:title"/>
-<meta content="weac.logging_config module | WEAC 3.3.1" name="twitter:title"/>
+<title>weac.parser.utils.knappe_surface module | WEAC 3.3.1</title>
+<meta content="weac.parser.utils.knappe_surface module | WEAC 3.3.1" property="og:title"/>
+<meta content="weac.parser.utils.knappe_surface module | WEAC 3.3.1" name="twitter:title"/>
 <link href="_static/pygments.css?v=e72c8e07" rel="stylesheet" type="text/css"/>
 <link href="_static/theme.css?v=73505e79" rel="stylesheet" type="text/css"/>
-<link href="https://2phi.github.io/weac/weac.logging_config.html" rel="canonical"/>
+<link href="https://2phi.github.io/weac/weac.parser.utils.knappe_surface.html" rel="canonical"/>
 <link href="search.html" rel="search" title="Search"/>
 <link href="genindex.html" rel="index" title="Index"/>
-<link href="modules.html" rel="next" title="weac"/>
-<link href="weac.constants.html" rel="prev" title="weac.constants module"/>
+<link href="weac.parser.utils.layer_binning.html" rel="next" title="weac.parser.utils.layer_binning module"/>
+<link href="weac.parser.utils.html" rel="prev" title="weac.parser.utils package"/>
 </head>
 <body :class="{ 'overflow-hidden': showSidebar }" class="min-h-screen font-sans antialiased bg-background text-foreground" x-data="{ showSidebar: false, showScrollTop: false }">
 <div @click.self="showSidebar = false" class="fixed inset-0 z-50 overflow-hidden bg-background/80 backdrop-blur-sm md:hidden" x-cloak="" x-show="showSidebar"></div><div class="relative flex flex-col min-h-screen" id="page"><a class="absolute top-0 left-0 z-[100] block bg-background p-4 text-xl transition -translate-x-full opacity-0 focus:translate-x-0 focus:opacity-100" href="#content">
@@ -77,10 +77,10 @@
 <li class="toctree-l2"><a class="reference internal" href="weac.analysis.html">weac.analysis package</a></li>
 <li class="toctree-l2"><a class="reference internal" href="weac.components.html">weac.components package</a></li>
 <li class="toctree-l2"><a class="reference internal" href="weac.core.html">weac.core package</a></li>
-<li class="toctree-l2"><a class="reference internal" href="weac.parser.html">weac.parser package</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="weac.parser.html">weac.parser package</a></li>
 <li class="toctree-l2"><a class="reference internal" href="weac.utils.html">weac.utils package</a></li>
 <li class="toctree-l2"><a class="reference internal" href="weac.constants.html">weac.constants module</a></li>
-<li class="toctree-l2 current"><a class="current reference internal" href="#">weac.logging_config module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="weac.logging_config.html">weac.logging_config module</a></li>
 </ul>
 </li>
 <li class="toctree-l1" x-data="{ expanded: $el.classList.contains('current') ? true : false }"><a :class="{ 'expanded' : expanded }" @click="expanded = !expanded" class="reference internal expandable" href="weac.components.html">weac.components package<button @click.prevent.stop="expanded = !expanded" type="button" x-cloak=""><span class="sr-only"></span><svg fill="currentColor" height="18px" stroke="none" viewbox="0 0 24 24" width="18px" xmlns="http://www.w3.org/2000/svg"><path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"></path></svg></button></a><ul x-cloak="" x-show="expanded">
@@ -118,7 +118,7 @@
 </li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Utilities &amp; Tools</span></p>
-<ul class="current">
+<ul>
 <li class="toctree-l1" x-data="{ expanded: $el.classList.contains('current') ? true : false }"><a :class="{ 'expanded' : expanded }" @click="expanded = !expanded" class="reference internal expandable" href="weac.utils.html">weac.utils package<button @click.prevent.stop="expanded = !expanded" type="button" x-cloak=""><span class="sr-only"></span><svg fill="currentColor" height="18px" stroke="none" viewbox="0 0 24 24" width="18px" xmlns="http://www.w3.org/2000/svg"><path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"></path></svg></button></a><ul x-cloak="" x-show="expanded">
 <li class="toctree-l2"><a class="reference internal" href="weac.utils.geldsetzer.html">weac.utils.geldsetzer module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="weac.utils.misc.html">weac.utils.misc module</a></li>
@@ -126,7 +126,7 @@
 <li class="toctree-l2"><a class="reference internal" href="weac.utils.snowpilot_parser.html">weac.utils.snowpilot_parser module</a></li>
 </ul>
 </li>
-<li class="toctree-l1 current"><a class="current reference internal" href="#">weac.logging_config module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="weac.logging_config.html">weac.logging_config module</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Examples &amp; Reference</span></p>
 <ul class="current">
@@ -154,23 +154,30 @@
 </svg>
 </a>
 <div class="mr-1"> &gt; </div><a class="hover:text-foreground overflow-hidden text-ellipsis whitespace-nowrap" href="weac.html">weac package</a>
-<div class="mr-1"> &gt; </div><span aria-current="page" class="font-medium text-foreground overflow-hidden text-ellipsis whitespace-nowrap">weac.logging_config module</span>
+<div class="mr-1"> &gt; </div><a class="hover:text-foreground overflow-hidden text-ellipsis whitespace-nowrap" href="weac.parser.html">weac.parser package</a>
+<div class="mr-1"> &gt; </div><a class="hover:text-foreground overflow-hidden text-ellipsis whitespace-nowrap" href="weac.parser.utils.html">weac.parser.utils package</a>
+<div class="mr-1"> &gt; </div><span aria-current="page" class="font-medium text-foreground overflow-hidden text-ellipsis whitespace-nowrap">weac.parser.utils.knappe_surface module</span>
 </nav>
 <div id="content" role="main">
-<section id="module-weac.logging_config">
-<span id="weac-logging-config-module"></span><h1>weac.logging_config module<a class="headerlink" href="#module-weac.logging_config" title="Link to this heading">¶</a></h1>
-<p>Logging configuration for weak layer anticrack nucleation model.</p>
+<section id="module-weac.parser.utils.knappe_surface">
+<span id="weac-parser-utils-knappe-surface-module"></span><h1>weac.parser.utils.knappe_surface module<a class="headerlink" href="#module-weac.parser.utils.knappe_surface" title="Link to this heading">¶</a></h1>
+<p>Knappe surface detection for SnowMicroPen force profiles.</p>
+<p>Gradient detector: a 1 mm moving linear regression, Hanning-smoothed, then a
+threshold of 5× the population standard deviation of the quietest 20 mm inside
+the first 100 mm (air above the snow). The surface is the first sample after
+the top 1000 where the gradient exceeds that threshold and the next 1 mm stays
+above it. The fraction of that window still below the threshold must itself be
+smaller than the threshold, which rejects isolated noise spikes.</p>
 <dl class="py function">
-<dt class="sig sig-object py" id="weac.logging_config.setup_logging">
-<span class="sig-prename descclassname"><span class="pre">weac.logging_config.</span></span><span class="sig-name descname"><span class="pre">setup_logging</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">level</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/weac/logging_config.html#setup_logging"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#weac.logging_config.setup_logging" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#weac.logging_config.setup_logging'">¶</a></dt>
-<dd><p>Initialise the global logging configuration exactly once.
-The level is taken from the env var WEAC_LOG_LEVEL (default WARNING).</p>
+<dt class="sig sig-object py" id="weac.parser.utils.knappe_surface.detect_knappe_surface">
+<span class="sig-prename descclassname"><span class="pre">weac.parser.utils.knappe_surface.</span></span><span class="sig-name descname"><span class="pre">detect_knappe_surface</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">samples</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/weac/parser/utils/knappe_surface.html#detect_knappe_surface"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#weac.parser.utils.knappe_surface.detect_knappe_surface" title="Link to this definition" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#weac.parser.utils.knappe_surface.detect_knappe_surface'">¶</a></dt>
+<dd><p>Return the Knappe surface distance in mm along the SMP profile.</p>
+<p><code class="docutils literal notranslate"><span class="pre">samples</span></code> needs <code class="docutils literal notranslate"><span class="pre">distance</span></code> and <code class="docutils literal notranslate"><span class="pre">force</span></code> columns (snowmicropyn’s
+<code class="docutils literal notranslate"><span class="pre">Profile.samples</span></code>). Falls back to the first sample when the profile is
+shorter than the 1 mm window or no surface rises out of the air noise.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>level</strong> (<em>str</em><em> | </em><em>None</em>)</p>
-</dd>
-<dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p>None</p>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>float</p>
 </dd>
 </dl>
 </dd></dl>
@@ -178,7 +185,7 @@ The level is taken from the env var WEAC_LOG_LEVEL (default WARNING).</p>
 </div></div><aside class="hidden text-sm xl:block" id="right-sidebar">
 <div class="sticky top-16 -mt-10 max-h-[calc(100vh-5rem)] h-full overflow-y-auto pt-6 space-y-2"><p class="font-medium">On this page</p>
 <ul>
-<li><a :data-current="activeSection === '#weac.logging_config.setup_logging'" class="reference internal" href="#weac.logging_config.setup_logging"><code class="docutils literal notranslate"><span class="pre">setup_logging()</span></code></a></li>
+<li><a :data-current="activeSection === '#weac.parser.utils.knappe_surface.detect_knappe_surface'" class="reference internal" href="#weac.parser.utils.knappe_surface.detect_knappe_surface"><code class="docutils literal notranslate"><span class="pre">detect_knappe_surface()</span></code></a></li>
 </ul>
 </div>
 </aside>

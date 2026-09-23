@@ -7,6 +7,7 @@ Submodules
 .. toctree::
    :maxdepth: 4
 
+   weac.parser.utils.knappe_surface
    weac.parser.utils.layer_binning
    weac.parser.utils.layer_gradient
    weac.parser.utils.plump_to_slope_normal

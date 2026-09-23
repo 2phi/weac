@@ -23,9 +23,9 @@
   <meta name="theme-color" media="(prefers-color-scheme: light)" content="#ffffff" />
   <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#030711" />
   
-  <title>weac.parser.plotting.force_penetration_layers | WEAC 3.3.0</title>
-  <meta property="og:title" content="weac.parser.plotting.force_penetration_layers | WEAC 3.3.0" />
-  <meta name="twitter:title" content="weac.parser.plotting.force_penetration_layers | WEAC 3.3.0" />
+  <title>weac.parser.plotting.force_penetration_layers | WEAC 3.3.1</title>
+  <meta property="og:title" content="weac.parser.plotting.force_penetration_layers | WEAC 3.3.1" />
+  <meta name="twitter:title" content="weac.parser.plotting.force_penetration_layers | WEAC 3.3.1" />
   <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=e72c8e07" />
   <link rel="stylesheet" type="text/css" href="../../../../_static/theme.css?v=73505e79" />
   <link rel="canonical" href="https://2phi.github.io/weac/_modules/weac/parser/plotting/force_penetration_layers.html" />
@@ -42,7 +42,7 @@
       Skip to content
     </a><header class="sticky top-0 z-40 w-full border-b shadow-xs border-border bg-background/90 backdrop-blur"><div class="container flex items-center h-14">
     <div class="hidden mr-4 md:flex">
-      <a href="../../../../index.html" class="flex items-center mr-6"><span class="hidden font-bold sm:inline-block text-clip whitespace-nowrap">WEAC 3.3.0</span>
+      <a href="../../../../index.html" class="flex items-center mr-6"><span class="hidden font-bold sm:inline-block text-clip whitespace-nowrap">WEAC 3.3.1</span>
       </a></div><button
       class="inline-flex items-center justify-center h-10 px-0 py-2 mr-2 text-base font-medium transition-colors rounded-md hover:text-accent-foreground hover:bg-transparent md:hidden"
       type="button" @click="showSidebar = true">
@@ -98,7 +98,7 @@
   class="fixed inset-y-0 left-0 md:top-14 z-50 md:z-30 bg-background md:bg-transparent transition-all duration-100 -translate-x-full md:translate-x-0 ml-0 p-6 md:p-0 md:-ml-2 md:h-[calc(100vh-3.5rem)] w-5/6 md:w-full overflow-y-auto border-r border-border md:sticky"
   :aria-hidden="!showSidebar" :class="{ 'translate-x-0': showSidebar }">
 
-    <a href="../../../../index.html" class="justify-start text-sm md:!hidden bg-background"><span class="font-bold text-clip whitespace-nowrap">WEAC 3.3.0</span>
+    <a href="../../../../index.html" class="justify-start text-sm md:!hidden bg-background"><span class="font-bold text-clip whitespace-nowrap">WEAC 3.3.1</span>
     </a>
 
     <div class="relative overflow-hidden md:overflow-auto my-4 md:my-0">
@@ -186,7 +186,7 @@
      class="flex items-center mb-4 space-x-1 text-sm text-muted-foreground">
   <a class="overflow-hidden text-ellipsis whitespace-nowrap hover:text-foreground"
      href="../../../../index.html">
-    <span class="hidden md:inline">WEAC 3.3.0</span>
+    <span class="hidden md:inline">WEAC 3.3.1</span>
     <svg xmlns="http://www.w3.org/2000/svg"
          height="18"
          width="18"
@@ -213,7 +213,7 @@
 </span><span id="line-3"><span class="kn">from</span><span class="w"> </span><span class="nn">__future__</span><span class="w"> </span><span class="kn">import</span> <span class="n">annotations</span>
 </span><span id="line-4">
 </span><span id="line-5"><span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
-</span><span id="line-6"><span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Protocol</span>
+</span><span id="line-6"><span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Literal</span><span class="p">,</span> <span class="n">Protocol</span>
 </span><span id="line-7">
 </span><span id="line-8"><span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
 </span><span id="line-9"><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
@@ -265,102 +265,124 @@
 </span><span id="line-50">    <span class="n">layers</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">Layer</span><span class="p">],</span>
 </span><span id="line-51">    <span class="o">*</span><span class="p">,</span>
 </span><span id="line-52">    <span class="n">slope_angle_deg</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span>
-</span><span id="line-53">    <span class="n">title</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-</span><span id="line-54">    <span class="n">layer_label</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;layers&quot;</span><span class="p">,</span>
-</span><span id="line-55">    <span class="n">save_path</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="n">Path</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-</span><span id="line-56">    <span class="n">show</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
-</span><span id="line-57">    <span class="n">figsize</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="mf">13.0</span><span class="p">,</span> <span class="mf">6.5</span><span class="p">),</span>
-</span><span id="line-58"><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Figure</span><span class="p">:</span>
-</span><span id="line-59"><span class="w">    </span><span class="sd">&quot;&quot;&quot;Plot penetration resistance, density, slope-normal density, and layers on a depth axis.</span>
-</span><span id="line-60">
-</span><span id="line-61"><span class="sd">    Args:</span>
-</span><span id="line-62"><span class="sd">        profile: :class:`~weac.parser.smp_parser.SMPProfile` or</span>
-</span><span id="line-63"><span class="sd">            :class:`~weac.parser.snowscope_parser.SnowScopeProfile` (must expose</span>
-</span><span id="line-64"><span class="sd">            ``depth_mm``, ``penetration_resistance_kPa``, ``density_kg_m3``,</span>
-</span><span id="line-65"><span class="sd">            ``density_method``).</span>
-</span><span id="line-66"><span class="sd">        layers: WEAC layers ordered surface -&gt; ground (from ``extract_layers``).</span>
-</span><span id="line-67"><span class="sd">            ``Layer.h`` is slope-normal, so the reconstructed staircase is drawn</span>
-</span><span id="line-68"><span class="sd">            on the slope-normal axis (panels 3-4). Pass the same</span>
-</span><span id="line-69"><span class="sd">            ``slope_angle_deg`` used to extract the layers so the slope-normal</span>
-</span><span id="line-70"><span class="sd">            density panel and the staircase share one axis. The staircase bottom</span>
-</span><span id="line-71"><span class="sd">            overshoots the last sample by one cell because the binning helpers</span>
-</span><span id="line-72"><span class="sd">            repeat the final sample spacing (an intentional part of their cell</span>
-</span><span id="line-73"><span class="sd">            model, see ``layer_binning``).</span>
-</span><span id="line-74"><span class="sd">        slope_angle_deg: Slope angle [deg] used when the layers were extracted;</span>
-</span><span id="line-75"><span class="sd">            sets the ``cos(phi)`` compression of the slope-normal depth axis.</span>
-</span><span id="line-76"><span class="sd">        title: Figure suptitle; defaults to the density method name.</span>
-</span><span id="line-77"><span class="sd">        layer_label: Legend/title label for the segmented panel.</span>
-</span><span id="line-78"><span class="sd">        save_path: If given, save the figure (PNG) to this path.</span>
-</span><span id="line-79"><span class="sd">        show: Call ``plt.show()`` before returning (default ``True``).</span>
-</span><span id="line-80"><span class="sd">        figsize: Figure size in inches.</span>
-</span><span id="line-81">
-</span><span id="line-82"><span class="sd">    Returns:</span>
-</span><span id="line-83"><span class="sd">        The created :class:`~matplotlib.figure.Figure`.</span>
-</span><span id="line-84"><span class="sd">    &quot;&quot;&quot;</span>
-</span><span id="line-85">    <span class="n">depth</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">profile</span><span class="o">.</span><span class="n">depth_mm</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
-</span><span id="line-86">    <span class="n">resistance</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">profile</span><span class="o">.</span><span class="n">penetration_resistance_kPa</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
-</span><span id="line-87">    <span class="n">density</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">profile</span><span class="o">.</span><span class="n">density_kg_m3</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
-</span><span id="line-88">    <span class="n">surface_mm</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">depth</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="k">if</span> <span class="n">depth</span><span class="o">.</span><span class="n">size</span> <span class="k">else</span> <span class="mf">0.0</span>
-</span><span id="line-89">
-</span><span id="line-90">    <span class="n">phi</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">slope_angle_deg</span><span class="p">)</span>
-</span><span id="line-91">    <span class="n">scale</span> <span class="o">=</span> <span class="n">plumb_to_slope_normal</span><span class="p">(</span><span class="n">phi</span><span class="p">)</span> <span class="k">if</span> <span class="n">phi</span> <span class="o">!=</span> <span class="mf">0.0</span> <span class="k">else</span> <span class="mf">1.0</span>
-</span><span id="line-92">    <span class="c1"># Anchor at the surface; compress only the below-surface span (matches how</span>
-</span><span id="line-93">    <span class="c1"># the layer staircase accumulates slope-normal thicknesses from surface_mm).</span>
-</span><span id="line-94">    <span class="n">depth_sn</span> <span class="o">=</span> <span class="n">surface_mm</span> <span class="o">+</span> <span class="p">(</span><span class="n">depth</span> <span class="o">-</span> <span class="n">surface_mm</span><span class="p">)</span> <span class="o">*</span> <span class="n">scale</span>
-</span><span id="line-95">    <span class="n">rho_step</span><span class="p">,</span> <span class="n">depth_step</span> <span class="o">=</span> <span class="n">_layer_staircase</span><span class="p">(</span><span class="n">layers</span><span class="p">,</span> <span class="n">surface_mm</span><span class="p">)</span>
-</span><span id="line-96">
-</span><span id="line-97">    <span class="n">fig</span><span class="p">,</span> <span class="p">(</span><span class="n">ax_resistance</span><span class="p">,</span> <span class="n">ax_density</span><span class="p">,</span> <span class="n">ax_density_sn</span><span class="p">,</span> <span class="n">ax_layers</span><span class="p">)</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span>
-</span><span id="line-98">        <span class="mi">1</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="n">figsize</span><span class="p">,</span> <span class="n">sharey</span><span class="o">=</span><span class="kc">True</span>
-</span><span id="line-99">    <span class="p">)</span>
-</span><span id="line-100">
-</span><span id="line-101">    <span class="n">ax_resistance</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">resistance</span><span class="p">,</span> <span class="n">depth</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;#004E8A&quot;</span><span class="p">,</span> <span class="n">lw</span><span class="o">=</span><span class="mf">0.9</span><span class="p">)</span>
-</span><span id="line-102">    <span class="n">ax_resistance</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s2">&quot;Penetration resistance [kPa]&quot;</span><span class="p">)</span>
-</span><span id="line-103">    <span class="n">ax_resistance</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">&quot;Depth [mm]&quot;</span><span class="p">)</span>
-</span><span id="line-104">    <span class="n">ax_resistance</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">&quot;Penetration resistance</span><span class="se">\n</span><span class="s2">(plumb)&quot;</span><span class="p">)</span>
-</span><span id="line-105">
-</span><span id="line-106">    <span class="n">ax_density</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">density</span><span class="p">,</span> <span class="n">depth</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;#00689D&quot;</span><span class="p">,</span> <span class="n">lw</span><span class="o">=</span><span class="mf">0.9</span><span class="p">)</span>
-</span><span id="line-107">    <span class="n">ax_density</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s2">&quot;Density [kg m$^{-3}$]&quot;</span><span class="p">)</span>
-</span><span id="line-108">    <span class="n">ax_density</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">&quot;Sample density</span><span class="se">\n</span><span class="s2">(plumb)&quot;</span><span class="p">)</span>
-</span><span id="line-109">
-</span><span id="line-110">    <span class="n">ax_density_sn</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">density</span><span class="p">,</span> <span class="n">depth_sn</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;#009D81&quot;</span><span class="p">,</span> <span class="n">lw</span><span class="o">=</span><span class="mf">0.9</span><span class="p">)</span>
-</span><span id="line-111">    <span class="n">ax_density_sn</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s2">&quot;Density [kg m$^{-3}$]&quot;</span><span class="p">)</span>
-</span><span id="line-112">    <span class="n">ax_density_sn</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Sample density</span><span class="se">\n</span><span class="s2">(slope-normal, φ=</span><span class="si">{</span><span class="n">phi</span><span class="si">:</span><span class="s2">g</span><span class="si">}</span><span class="s2">°)&quot;</span><span class="p">)</span>
-</span><span id="line-113">
-</span><span id="line-114">    <span class="c1"># Segmented layers (slope-normal) with the slope-normal density overlaid.</span>
-</span><span id="line-115">    <span class="n">ax_layers</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span>
-</span><span id="line-116">        <span class="n">density</span><span class="p">,</span>
-</span><span id="line-117">        <span class="n">depth_sn</span><span class="p">,</span>
-</span><span id="line-118">        <span class="n">color</span><span class="o">=</span><span class="s2">&quot;#B5B5B5&quot;</span><span class="p">,</span>
-</span><span id="line-119">        <span class="n">lw</span><span class="o">=</span><span class="mf">0.8</span><span class="p">,</span>
-</span><span id="line-120">        <span class="n">alpha</span><span class="o">=</span><span class="mf">0.7</span><span class="p">,</span>
-</span><span id="line-121">        <span class="n">label</span><span class="o">=</span><span class="s2">&quot;sample density&quot;</span><span class="p">,</span>
-</span><span id="line-122">    <span class="p">)</span>
-</span><span id="line-123">    <span class="k">if</span> <span class="n">rho_step</span><span class="o">.</span><span class="n">size</span><span class="p">:</span>
-</span><span id="line-124">        <span class="n">ax_layers</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">rho_step</span><span class="p">,</span> <span class="n">depth_step</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;#EC6500&quot;</span><span class="p">,</span> <span class="n">lw</span><span class="o">=</span><span class="mf">1.6</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="n">layer_label</span><span class="p">)</span>
-</span><span id="line-125">        <span class="c1"># Boundary ticks (every other point is a shared top/bottom depth).</span>
-</span><span id="line-126">        <span class="k">for</span> <span class="n">boundary</span> <span class="ow">in</span> <span class="n">depth_step</span><span class="p">[</span><span class="mi">1</span><span class="p">::</span><span class="mi">2</span><span class="p">]:</span>
-</span><span id="line-127">            <span class="n">ax_layers</span><span class="o">.</span><span class="n">axhline</span><span class="p">(</span><span class="n">boundary</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;#EC6500&quot;</span><span class="p">,</span> <span class="n">lw</span><span class="o">=</span><span class="mf">0.3</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.3</span><span class="p">)</span>
-</span><span id="line-128">    <span class="n">ax_layers</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s2">&quot;Density [kg m$^{-3}$]&quot;</span><span class="p">)</span>
-</span><span id="line-129">    <span class="n">ax_layers</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Segmented </span><span class="si">{</span><span class="n">layer_label</span><span class="si">}</span><span class="se">\n</span><span class="s2">(slope-normal, n=</span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">layers</span><span class="p">)</span><span class="si">}</span><span class="s2">)&quot;</span><span class="p">)</span>
-</span><span id="line-130">    <span class="n">ax_layers</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">loc</span><span class="o">=</span><span class="s2">&quot;lower right&quot;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">8</span><span class="p">,</span> <span class="n">frameon</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
-</span><span id="line-131">
-</span><span id="line-132">    <span class="c1"># Depth increases downward: surface at the top. Plumb depth is the deepest.</span>
-</span><span id="line-133">    <span class="k">if</span> <span class="n">depth</span><span class="o">.</span><span class="n">size</span><span class="p">:</span>
-</span><span id="line-134">        <span class="n">max_depth</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">nanmax</span><span class="p">(</span><span class="n">depth</span><span class="p">))</span>
-</span><span id="line-135">        <span class="k">if</span> <span class="n">depth_step</span><span class="o">.</span><span class="n">size</span><span class="p">:</span>
-</span><span id="line-136">            <span class="n">max_depth</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">max_depth</span><span class="p">,</span> <span class="nb">float</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">nanmax</span><span class="p">(</span><span class="n">depth_step</span><span class="p">)))</span>
-</span><span id="line-137">        <span class="n">ax_resistance</span><span class="o">.</span><span class="n">set_ylim</span><span class="p">(</span><span class="n">max_depth</span><span class="p">,</span> <span class="n">surface_mm</span><span class="p">)</span>
-</span><span id="line-138">    <span class="k">for</span> <span class="n">ax</span> <span class="ow">in</span> <span class="p">(</span><span class="n">ax_resistance</span><span class="p">,</span> <span class="n">ax_density</span><span class="p">,</span> <span class="n">ax_density_sn</span><span class="p">,</span> <span class="n">ax_layers</span><span class="p">):</span>
-</span><span id="line-139">        <span class="n">ax</span><span class="o">.</span><span class="n">grid</span><span class="p">(</span><span class="kc">True</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.25</span><span class="p">,</span> <span class="n">lw</span><span class="o">=</span><span class="mf">0.4</span><span class="p">)</span>
-</span><span id="line-140">
-</span><span id="line-141">    <span class="n">fig</span><span class="o">.</span><span class="n">suptitle</span><span class="p">(</span><span class="n">title</span> <span class="ow">or</span> <span class="sa">f</span><span class="s2">&quot;Penetration resistance profile (</span><span class="si">{</span><span class="n">profile</span><span class="o">.</span><span class="n">density_method</span><span class="si">}</span><span class="s2">)&quot;</span><span class="p">)</span>
-</span><span id="line-142">    <span class="n">fig</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
-</span><span id="line-143">
-</span><span id="line-144">    <span class="k">if</span> <span class="n">save_path</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-</span><span id="line-145">        <span class="n">fig</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="n">save_path</span><span class="p">,</span> <span class="n">dpi</span><span class="o">=</span><span class="mi">200</span><span class="p">,</span> <span class="n">bbox_inches</span><span class="o">=</span><span class="s2">&quot;tight&quot;</span><span class="p">,</span> <span class="n">facecolor</span><span class="o">=</span><span class="s2">&quot;white&quot;</span><span class="p">)</span>
-</span><span id="line-146">    <span class="k">if</span> <span class="n">show</span><span class="p">:</span>
-</span><span id="line-147">        <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
-</span><span id="line-148">    <span class="k">return</span> <span class="n">fig</span></div>
+</span><span id="line-53">    <span class="n">depth_axis</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;plumb&quot;</span><span class="p">,</span> <span class="s2">&quot;slope-normal&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;plumb&quot;</span><span class="p">,</span>
+</span><span id="line-54">    <span class="n">title</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+</span><span id="line-55">    <span class="n">layer_label</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;layers&quot;</span><span class="p">,</span>
+</span><span id="line-56">    <span class="n">save_path</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="n">Path</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+</span><span id="line-57">    <span class="n">show</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+</span><span id="line-58">    <span class="n">figsize</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="mf">13.0</span><span class="p">,</span> <span class="mf">6.5</span><span class="p">),</span>
+</span><span id="line-59"><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Figure</span><span class="p">:</span>
+</span><span id="line-60"><span class="w">    </span><span class="sd">&quot;&quot;&quot;Plot penetration resistance, density, slope-normal density, and layers on a depth axis.</span>
+</span><span id="line-61">
+</span><span id="line-62"><span class="sd">    Args:</span>
+</span><span id="line-63"><span class="sd">        profile: :class:`~weac.parser.smp_parser.SMPProfile` or</span>
+</span><span id="line-64"><span class="sd">            :class:`~weac.parser.snowscope_parser.SnowScopeProfile` (must expose</span>
+</span><span id="line-65"><span class="sd">            ``depth_mm``, ``penetration_resistance_kPa``, ``density_kg_m3``,</span>
+</span><span id="line-66"><span class="sd">            ``density_method``).</span>
+</span><span id="line-67"><span class="sd">        layers: WEAC layers ordered surface -&gt; ground (from ``extract_layers``).</span>
+</span><span id="line-68"><span class="sd">            ``Layer.h`` is slope-normal, so the reconstructed staircase is drawn</span>
+</span><span id="line-69"><span class="sd">            on the slope-normal axis (panels 3-4). For a plumb profile, pass the</span>
+</span><span id="line-70"><span class="sd">            same ``slope_angle_deg`` used to extract the layers so the</span>
+</span><span id="line-71"><span class="sd">            slope-normal density panel and the staircase share one axis. The</span>
+</span><span id="line-72"><span class="sd">            staircase bottom overshoots the last sample by one cell because the</span>
+</span><span id="line-73"><span class="sd">            binning helpers repeat the final sample spacing (an intentional part</span>
+</span><span id="line-74"><span class="sd">            of their cell model, see ``layer_binning``).</span>
+</span><span id="line-75"><span class="sd">        slope_angle_deg: Slope angle [deg] for a plumb profile; sets the</span>
+</span><span id="line-76"><span class="sd">            ``cos(phi)`` compression of the slope-normal depth axis. Ignored</span>
+</span><span id="line-77"><span class="sd">            when ``depth_axis`` is ``&quot;slope-normal&quot;`` (must stay ``0``).</span>
+</span><span id="line-78"><span class="sd">        depth_axis: ``&quot;plumb&quot;`` (SnowScope) compresses panels 3-4 by</span>
+</span><span id="line-79"><span class="sd">            ``cos(phi)``. ``&quot;slope-normal&quot;`` (SMP) uses the recorded depth as</span>
+</span><span id="line-80"><span class="sd">            the slope-normal axis with no further scaling.</span>
+</span><span id="line-81"><span class="sd">        title: Figure suptitle; defaults to the density method name.</span>
+</span><span id="line-82"><span class="sd">        layer_label: Legend/title label for the segmented panel.</span>
+</span><span id="line-83"><span class="sd">        save_path: If given, save the figure (PNG) to this path.</span>
+</span><span id="line-84"><span class="sd">        show: Call ``plt.show()`` before returning (default ``True``).</span>
+</span><span id="line-85"><span class="sd">        figsize: Figure size in inches.</span>
+</span><span id="line-86">
+</span><span id="line-87"><span class="sd">    Returns:</span>
+</span><span id="line-88"><span class="sd">        The created :class:`~matplotlib.figure.Figure`.</span>
+</span><span id="line-89"><span class="sd">    &quot;&quot;&quot;</span>
+</span><span id="line-90">    <span class="n">depth</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">profile</span><span class="o">.</span><span class="n">depth_mm</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
+</span><span id="line-91">    <span class="n">resistance</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">profile</span><span class="o">.</span><span class="n">penetration_resistance_kPa</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
+</span><span id="line-92">    <span class="n">density</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">profile</span><span class="o">.</span><span class="n">density_kg_m3</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
+</span><span id="line-93">    <span class="n">surface_mm</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">depth</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="k">if</span> <span class="n">depth</span><span class="o">.</span><span class="n">size</span> <span class="k">else</span> <span class="mf">0.0</span>
+</span><span id="line-94">
+</span><span id="line-95">    <span class="n">phi</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">slope_angle_deg</span><span class="p">)</span>
+</span><span id="line-96">    <span class="k">if</span> <span class="n">depth_axis</span> <span class="o">==</span> <span class="s2">&quot;slope-normal&quot;</span><span class="p">:</span>
+</span><span id="line-97">        <span class="k">if</span> <span class="n">phi</span> <span class="o">!=</span> <span class="mf">0.0</span><span class="p">:</span>
+</span><span id="line-98">            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+</span><span id="line-99">                <span class="s2">&quot;slope_angle_deg applies only to plumb profiles; &quot;</span>
+</span><span id="line-100">                <span class="s2">&quot;this depth axis is already slope-normal.&quot;</span>
+</span><span id="line-101">            <span class="p">)</span>
+</span><span id="line-102">        <span class="n">scale</span> <span class="o">=</span> <span class="mf">1.0</span>
+</span><span id="line-103">        <span class="n">recorded_label</span> <span class="o">=</span> <span class="s2">&quot;slope-normal&quot;</span>
+</span><span id="line-104">        <span class="n">sn_title</span> <span class="o">=</span> <span class="s2">&quot;Sample density</span><span class="se">\n</span><span class="s2">(slope-normal)&quot;</span>
+</span><span id="line-105">    <span class="k">elif</span> <span class="n">depth_axis</span> <span class="o">==</span> <span class="s2">&quot;plumb&quot;</span><span class="p">:</span>
+</span><span id="line-106">        <span class="n">scale</span> <span class="o">=</span> <span class="n">plumb_to_slope_normal</span><span class="p">(</span><span class="n">phi</span><span class="p">)</span> <span class="k">if</span> <span class="n">phi</span> <span class="o">!=</span> <span class="mf">0.0</span> <span class="k">else</span> <span class="mf">1.0</span>
+</span><span id="line-107">        <span class="n">recorded_label</span> <span class="o">=</span> <span class="s2">&quot;plumb&quot;</span>
+</span><span id="line-108">        <span class="n">sn_title</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;Sample density</span><span class="se">\n</span><span class="s2">(slope-normal, φ=</span><span class="si">{</span><span class="n">phi</span><span class="si">:</span><span class="s2">g</span><span class="si">}</span><span class="s2">°)&quot;</span>
+</span><span id="line-109">    <span class="k">else</span><span class="p">:</span>
+</span><span id="line-110">        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+</span><span id="line-111">            <span class="sa">f</span><span class="s1">&#39;depth_axis must be &quot;plumb&quot; or &quot;slope-normal&quot;, got </span><span class="si">{</span><span class="n">depth_axis</span><span class="si">!r}</span><span class="s1">&#39;</span>
+</span><span id="line-112">        <span class="p">)</span>
+</span><span id="line-113">    <span class="c1"># Anchor at the surface; compress only the below-surface span (matches how</span>
+</span><span id="line-114">    <span class="c1"># the layer staircase accumulates slope-normal thicknesses from surface_mm).</span>
+</span><span id="line-115">    <span class="n">depth_sn</span> <span class="o">=</span> <span class="n">surface_mm</span> <span class="o">+</span> <span class="p">(</span><span class="n">depth</span> <span class="o">-</span> <span class="n">surface_mm</span><span class="p">)</span> <span class="o">*</span> <span class="n">scale</span>
+</span><span id="line-116">    <span class="n">rho_step</span><span class="p">,</span> <span class="n">depth_step</span> <span class="o">=</span> <span class="n">_layer_staircase</span><span class="p">(</span><span class="n">layers</span><span class="p">,</span> <span class="n">surface_mm</span><span class="p">)</span>
+</span><span id="line-117">
+</span><span id="line-118">    <span class="n">fig</span><span class="p">,</span> <span class="p">(</span><span class="n">ax_resistance</span><span class="p">,</span> <span class="n">ax_density</span><span class="p">,</span> <span class="n">ax_density_sn</span><span class="p">,</span> <span class="n">ax_layers</span><span class="p">)</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span>
+</span><span id="line-119">        <span class="mi">1</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="n">figsize</span><span class="p">,</span> <span class="n">sharey</span><span class="o">=</span><span class="kc">True</span>
+</span><span id="line-120">    <span class="p">)</span>
+</span><span id="line-121">
+</span><span id="line-122">    <span class="n">ax_resistance</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">resistance</span><span class="p">,</span> <span class="n">depth</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;#004E8A&quot;</span><span class="p">,</span> <span class="n">lw</span><span class="o">=</span><span class="mf">0.9</span><span class="p">)</span>
+</span><span id="line-123">    <span class="n">ax_resistance</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s2">&quot;Penetration resistance [kPa]&quot;</span><span class="p">)</span>
+</span><span id="line-124">    <span class="n">ax_resistance</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">&quot;Depth [mm]&quot;</span><span class="p">)</span>
+</span><span id="line-125">    <span class="n">ax_resistance</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Penetration resistance</span><span class="se">\n</span><span class="s2">(</span><span class="si">{</span><span class="n">recorded_label</span><span class="si">}</span><span class="s2">)&quot;</span><span class="p">)</span>
+</span><span id="line-126">
+</span><span id="line-127">    <span class="n">ax_density</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">density</span><span class="p">,</span> <span class="n">depth</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;#00689D&quot;</span><span class="p">,</span> <span class="n">lw</span><span class="o">=</span><span class="mf">0.9</span><span class="p">)</span>
+</span><span id="line-128">    <span class="n">ax_density</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s2">&quot;Density [kg m$^{-3}$]&quot;</span><span class="p">)</span>
+</span><span id="line-129">    <span class="n">ax_density</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Sample density</span><span class="se">\n</span><span class="s2">(</span><span class="si">{</span><span class="n">recorded_label</span><span class="si">}</span><span class="s2">)&quot;</span><span class="p">)</span>
+</span><span id="line-130">
+</span><span id="line-131">    <span class="n">ax_density_sn</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">density</span><span class="p">,</span> <span class="n">depth_sn</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;#009D81&quot;</span><span class="p">,</span> <span class="n">lw</span><span class="o">=</span><span class="mf">0.9</span><span class="p">)</span>
+</span><span id="line-132">    <span class="n">ax_density_sn</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s2">&quot;Density [kg m$^{-3}$]&quot;</span><span class="p">)</span>
+</span><span id="line-133">    <span class="n">ax_density_sn</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="n">sn_title</span><span class="p">)</span>
+</span><span id="line-134">
+</span><span id="line-135">    <span class="c1"># Segmented layers (slope-normal) with the slope-normal density overlaid.</span>
+</span><span id="line-136">    <span class="n">ax_layers</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span>
+</span><span id="line-137">        <span class="n">density</span><span class="p">,</span>
+</span><span id="line-138">        <span class="n">depth_sn</span><span class="p">,</span>
+</span><span id="line-139">        <span class="n">color</span><span class="o">=</span><span class="s2">&quot;#B5B5B5&quot;</span><span class="p">,</span>
+</span><span id="line-140">        <span class="n">lw</span><span class="o">=</span><span class="mf">0.8</span><span class="p">,</span>
+</span><span id="line-141">        <span class="n">alpha</span><span class="o">=</span><span class="mf">0.7</span><span class="p">,</span>
+</span><span id="line-142">        <span class="n">label</span><span class="o">=</span><span class="s2">&quot;sample density&quot;</span><span class="p">,</span>
+</span><span id="line-143">    <span class="p">)</span>
+</span><span id="line-144">    <span class="k">if</span> <span class="n">rho_step</span><span class="o">.</span><span class="n">size</span><span class="p">:</span>
+</span><span id="line-145">        <span class="n">ax_layers</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">rho_step</span><span class="p">,</span> <span class="n">depth_step</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;#EC6500&quot;</span><span class="p">,</span> <span class="n">lw</span><span class="o">=</span><span class="mf">1.6</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="n">layer_label</span><span class="p">)</span>
+</span><span id="line-146">        <span class="c1"># Boundary ticks (every other point is a shared top/bottom depth).</span>
+</span><span id="line-147">        <span class="k">for</span> <span class="n">boundary</span> <span class="ow">in</span> <span class="n">depth_step</span><span class="p">[</span><span class="mi">1</span><span class="p">::</span><span class="mi">2</span><span class="p">]:</span>
+</span><span id="line-148">            <span class="n">ax_layers</span><span class="o">.</span><span class="n">axhline</span><span class="p">(</span><span class="n">boundary</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;#EC6500&quot;</span><span class="p">,</span> <span class="n">lw</span><span class="o">=</span><span class="mf">0.3</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.3</span><span class="p">)</span>
+</span><span id="line-149">    <span class="n">ax_layers</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s2">&quot;Density [kg m$^{-3}$]&quot;</span><span class="p">)</span>
+</span><span id="line-150">    <span class="n">ax_layers</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Segmented </span><span class="si">{</span><span class="n">layer_label</span><span class="si">}</span><span class="se">\n</span><span class="s2">(slope-normal, n=</span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">layers</span><span class="p">)</span><span class="si">}</span><span class="s2">)&quot;</span><span class="p">)</span>
+</span><span id="line-151">    <span class="n">ax_layers</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">loc</span><span class="o">=</span><span class="s2">&quot;lower right&quot;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">8</span><span class="p">,</span> <span class="n">frameon</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+</span><span id="line-152">
+</span><span id="line-153">    <span class="c1"># Depth increases downward: surface at the top. Recorded depth is the deepest</span>
+</span><span id="line-154">    <span class="c1"># unless a plumb profile was compressed onto the slope normal.</span>
+</span><span id="line-155">    <span class="k">if</span> <span class="n">depth</span><span class="o">.</span><span class="n">size</span><span class="p">:</span>
+</span><span id="line-156">        <span class="n">max_depth</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">nanmax</span><span class="p">(</span><span class="n">depth</span><span class="p">))</span>
+</span><span id="line-157">        <span class="k">if</span> <span class="n">depth_step</span><span class="o">.</span><span class="n">size</span><span class="p">:</span>
+</span><span id="line-158">            <span class="n">max_depth</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">max_depth</span><span class="p">,</span> <span class="nb">float</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">nanmax</span><span class="p">(</span><span class="n">depth_step</span><span class="p">)))</span>
+</span><span id="line-159">        <span class="n">ax_resistance</span><span class="o">.</span><span class="n">set_ylim</span><span class="p">(</span><span class="n">max_depth</span><span class="p">,</span> <span class="n">surface_mm</span><span class="p">)</span>
+</span><span id="line-160">    <span class="k">for</span> <span class="n">ax</span> <span class="ow">in</span> <span class="p">(</span><span class="n">ax_resistance</span><span class="p">,</span> <span class="n">ax_density</span><span class="p">,</span> <span class="n">ax_density_sn</span><span class="p">,</span> <span class="n">ax_layers</span><span class="p">):</span>
+</span><span id="line-161">        <span class="n">ax</span><span class="o">.</span><span class="n">grid</span><span class="p">(</span><span class="kc">True</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.25</span><span class="p">,</span> <span class="n">lw</span><span class="o">=</span><span class="mf">0.4</span><span class="p">)</span>
+</span><span id="line-162">
+</span><span id="line-163">    <span class="n">fig</span><span class="o">.</span><span class="n">suptitle</span><span class="p">(</span><span class="n">title</span> <span class="ow">or</span> <span class="sa">f</span><span class="s2">&quot;Penetration resistance profile (</span><span class="si">{</span><span class="n">profile</span><span class="o">.</span><span class="n">density_method</span><span class="si">}</span><span class="s2">)&quot;</span><span class="p">)</span>
+</span><span id="line-164">    <span class="n">fig</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+</span><span id="line-165">
+</span><span id="line-166">    <span class="k">if</span> <span class="n">save_path</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+</span><span id="line-167">        <span class="n">fig</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="n">save_path</span><span class="p">,</span> <span class="n">dpi</span><span class="o">=</span><span class="mi">200</span><span class="p">,</span> <span class="n">bbox_inches</span><span class="o">=</span><span class="s2">&quot;tight&quot;</span><span class="p">,</span> <span class="n">facecolor</span><span class="o">=</span><span class="s2">&quot;white&quot;</span><span class="p">)</span>
+</span><span id="line-168">    <span class="k">if</span> <span class="n">show</span><span class="p">:</span>
+</span><span id="line-169">        <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</span><span id="line-170">    <span class="k">return</span> <span class="n">fig</span></div>
 
 </span></code></pre></div>
     </div></div>
@@ -377,7 +399,7 @@
 </footer>
     </div>
     
-    <script src="../../../../_static/documentation_options.js?v=3eb8911e"></script>
+    <script src="../../../../_static/documentation_options.js?v=9ac01507"></script>
     <script src="../../../../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script defer="defer" src="../../../../_static/theme.js?v=582b20c5"></script>
