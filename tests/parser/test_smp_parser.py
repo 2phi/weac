@@ -9,6 +9,7 @@ import pytest
 
 from weac.components import Layer
 from weac.parser.smp_parser import SMPParser
+from weac.parser.utils import detect_knappe_surface
 
 
 @pytest.fixture
@@ -105,9 +106,54 @@ class TestSMPParser:
         with pytest.raises(ValueError, match="surface_mm"):
             SMPParser(str(smp_pnt_path), surface_mm=length + 1.0)
 
+    def test_knappe_surface_crops_deeper_than_snowmicropyn(self, smp_pnt_path: Path):
+        default = SMPParser(str(smp_pnt_path), density_method="CR2020")
+        knappe = SMPParser(
+            str(smp_pnt_path), density_method="CR2020", surface_method="knappe"
+        )
+
+        assert default.surface_method == "snowmicropyn"
+        assert knappe.surface_method == "knappe"
+        # Knappe surface on this pit sits below snowmicropyn's surface.
+        assert knappe.loaded_profile.surface == pytest.approx(132.492, abs=0.01)
+        assert knappe.loaded_profile.surface > default.loaded_profile.surface
+
+        prof_default = default.extract_profile()
+        prof_knappe = knappe.extract_profile()
+        assert prof_knappe.density_method == "CR2020"
+        assert prof_knappe.depth_mm.size > 0
+        assert np.all(np.isfinite(prof_knappe.penetration_resistance_kPa))
+        assert np.all(prof_knappe.density_kg_m3 > 0)
+        assert prof_knappe.depth_mm[-1] < prof_default.depth_mm[-1]
+
+    def test_surface_mm_overrides_surface_method(self, smp_pnt_path: Path):
+        parser = SMPParser(str(smp_pnt_path), surface_mm=50.0, surface_method="knappe")
+        assert parser.surface_method == "manual"
+        assert parser.loaded_profile.surface == pytest.approx(50.0)
+
+    def test_manual_surface_method_sets_surface_mm(self, smp_pnt_path: Path):
+        parser = SMPParser(str(smp_pnt_path), surface_method="manual", surface_mm=50.0)
+        assert parser.surface_method == "manual"
+        assert parser.loaded_profile.surface == pytest.approx(50.0)
+
+    def test_manual_surface_method_requires_surface_mm(self, smp_pnt_path: Path):
+        with pytest.raises(ValueError, match="surface_mm is required"):
+            SMPParser(str(smp_pnt_path), surface_method="manual")
+
+    def test_unknown_surface_method_raises(self, smp_pnt_path: Path):
+        with pytest.raises(ValueError, match="surface_method"):
+            SMPParser(str(smp_pnt_path), surface_method="typo")  # type: ignore[arg-type]
+
+    def test_knappe_surface_falls_back_when_profile_is_shorter_than_window(self):
+        samples = {
+            "distance": np.array([1.5, 2.0]),
+            "force": np.array([0.0, 0.2]),
+        }
+        assert detect_knappe_surface(samples) == pytest.approx(1.5)
+
 
 def profile_depth_sum(parser: SMPParser) -> float:
-    """Total plumb thickness implied by the windowed SMP depth axis."""
+    """Total slope-normal thickness implied by the windowed SMP depth axis."""
     profile = parser.extract_profile()
     depth = profile.depth_mm
     cell = np.diff(depth)

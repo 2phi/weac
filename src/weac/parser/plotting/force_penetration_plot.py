@@ -8,9 +8,11 @@ signal, so this package does not apply to
 
 Four depth-aligned panels (see :func:`plot_force_penetration_layers`):
 
-1. Penetration resistance vs plumb depth.
-2. Sample density vs plumb depth.
-3. Sample density vs slope-normal depth (plumb depth compressed by ``cos(phi)``).
+1. Penetration resistance vs recorded depth.
+2. Sample density vs recorded depth.
+3. Sample density vs slope-normal depth. SnowScope records plumb depth, so this
+   panel compresses by ``cos(phi)``. SMP records slope-normal depth already, so
+   this panel matches the recorded axis.
 4. Segmented WEAC layers (``bin`` or ``gradient``) vs slope-normal depth, with
    the slope-normal density faintly overlaid.
 
@@ -71,8 +73,9 @@ def plot_force_penetration_parser(
 
     Dispatches to :func:`plot_smp_penetration_parser` or
     :func:`plot_snowscope_penetration_parser`. ``semilog_slope`` /
-    ``semilog_intercept`` apply only to SnowScope. ``**plot_kwargs`` (e.g.
-    ``title``, ``save_path``, ``show``) pass through to
+    ``semilog_intercept`` and ``slope_angle_deg`` apply only to SnowScope
+    (SMP depths are already slope-normal). ``**plot_kwargs`` (e.g. ``title``,
+    ``save_path``, ``show``) pass through to
     :func:`plot_force_penetration_layers`.
     """
     if isinstance(parser, SnowScopeParser):
@@ -92,10 +95,14 @@ def plot_force_penetration_parser(
             raise TypeError(
                 "semilog_slope and semilog_intercept apply only to SnowScopeParser"
             )
+        if slope_angle_deg != 0.0:
+            raise ValueError(
+                "SMP depths are already slope-normal; slope_angle_deg applies "
+                "to SnowScope and SnowPilot only."
+            )
         return plot_smp_penetration_parser(
             parser,
             method=method,
-            slope_angle_deg=slope_angle_deg,
             density_method=density_method,  # type: ignore[arg-type]
             layer_thickness_mm=layer_thickness_mm,
             gradient_threshold=gradient_threshold,

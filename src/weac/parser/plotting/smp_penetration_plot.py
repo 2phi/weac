@@ -14,21 +14,23 @@ def plot_smp_penetration_parser(
     parser: SMPParser,
     *,
     method: Literal["bin", "gradient"] = "bin",
-    slope_angle_deg: float = 0.0,
     density_method: DensityMethod | None = None,
     layer_thickness_mm: float | None = None,
     gradient_threshold: float = 12.0,
     **plot_kwargs,
 ) -> Figure:
-    """Extract from an SMP parser and plot the penetration-resistance debug view."""
+    """Extract from an SMP parser and plot the penetration-resistance debug view.
+
+    SMP depths are already slope-normal, so this does not accept
+    ``slope_angle_deg`` and does not compress the depth axis.
+    """
     profile = parser.extract_profile(density_method=density_method)
     layers, _ = parser.extract_layers(
-        slope_angle_deg,
         method=method,
         density_method=density_method,
         layer_thickness_mm=layer_thickness_mm,
         gradient_threshold=gradient_threshold,
     )
     plot_kwargs.setdefault("layer_label", method)
-    plot_kwargs.setdefault("slope_angle_deg", slope_angle_deg)
+    plot_kwargs.setdefault("depth_axis", "slope-normal")
     return plot_force_penetration_layers(profile, layers, **plot_kwargs)

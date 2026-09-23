@@ -374,7 +374,7 @@ Instead of hand-building `Layer` lists, WEAC ships parsers in `weac.parser` that
 from weac.parser import SMPParser, SnowScopeParser, SnowPilotParser
 ```
 
-**SnowMicroPen** (`.PNT`) — `SMPParser` derives density and SSA from the force signal via [snowmicropyn](https://github.com/slf-dot-ch/snowmicropyn)'s Löwe 2012 shot-noise model plus a parameterization (`P2015`, `CR2020`, `K2020a`, `K2020b`). Surface and ground are auto-detected at construction.
+**SnowMicroPen** (`.PNT`) — `SMPParser` derives density and SSA from the force signal via [snowmicropyn](https://github.com/slf-dot-ch/snowmicropyn)'s Löwe 2012 shot-noise model plus a parameterization (`P2015`, `CR2020`, `K2020a`, `K2020b`). Surface and ground are auto-detected at construction. The probe is driven normal to the slope, so recorded depths are already slope-normal and are not scaled by slope angle.
 
 ```python
 smp = SMPParser("profile.PNT", density_method="CR2020")
@@ -382,7 +382,7 @@ smp = SMPParser("profile.PNT", density_method="CR2020")
 layers, density_methods = smp.extract_layers(method="bin", layer_thickness_mm=20.0)
 ```
 
-**SnowScope** (`.csv`) — `SnowScopeParser` reads penetration hardness (kPa) and derives density from a semilog model `D = a·ln(F) + b` (default `HAGENMULLER2018`). It exposes the same `extract_layers` interface as the SMP parser.
+**SnowScope** (`.csv`) — `SnowScopeParser` reads penetration hardness (kPa) and derives density from a semilog model `D = a·ln(F) + b` (default `HAGENMULLER2018`). Layering matches the SMP parser (`bin` / `gradient`). SnowScope depths are plumb, so pass `slope_angle_deg` to scale `Layer.h` by `cos(phi)`.
 
 ```python
 scope = SnowScopeParser("profile.csv", density_method="HAGENMULLER2018")
